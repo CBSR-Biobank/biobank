@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 
+@SuppressWarnings("nls")
 public class InBoundsValidator
     extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<InBounds, Object> {
@@ -39,7 +40,7 @@ public class InBoundsValidator
     private boolean checkBounds(AbstractPosition position,
         ConstraintValidatorContext context) {
         ContainerType ct = position.getHoldingContainer().getContainerType();
-        
+
         Integer maxRow = ct.getRowCapacity();
         Integer maxCol = ct.getColCapacity();
         Integer row = position.getRow();

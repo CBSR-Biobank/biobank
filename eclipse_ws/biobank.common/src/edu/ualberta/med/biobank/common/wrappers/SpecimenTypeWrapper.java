@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
@@ -21,7 +20,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import"; 
+    @SuppressWarnings("nls")
+    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -67,7 +67,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
-    public static final String ALL_SAMPLE_TYPES_QRY = "from " 
+    @SuppressWarnings("nls")
+    public static final String ALL_SAMPLE_TYPES_QRY = "from "
         + SpecimenType.class.getName();
 
     public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
@@ -85,10 +86,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return list;
     }
 
-    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from " 
-        + SpecimenType.class.getName() + " where " 
+    @SuppressWarnings("nls")
+    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from "
+        + SpecimenType.class.getName() + " where "
         + SpecimenTypePeer.PARENT_SPECIMEN_TYPES.getName()
-        + ".size = 0"; 
+        + ".size = 0";
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
         WritableApplicationService appService, boolean sort)
@@ -122,9 +124,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY_START = "select count(x) from "; 
+    @SuppressWarnings("nls")
+    private static final String IS_USED_QRY_START = "select count(x) from ";
+    @SuppressWarnings("nls")
     private static final String IS_USED_QRY_END =
-        " as x where x.specimenType.id=?"; 
+        " as x where x.specimenType.id=?";
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
@@ -156,16 +160,6 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
             parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
             parent.addPersistTasks(tasks);
         }
-    }
-
-    public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankException {
-        checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
-            getName(),
-            "A specimen type with name"); 
-        checkNoDuplicates(SpecimenType.class,
-            SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            "A specimen type with name short"); 
     }
 
     public boolean isUnknownImport() {

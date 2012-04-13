@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.validator.constraint.impl;
 
 import java.text.MessageFormat;
 import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -12,6 +13,7 @@ import org.hibernate.metadata.ClassMetadata;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 
+@SuppressWarnings("nls")
 public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<Empty, Object> {
     private static final String SIZE_QUERY_TEMPLATE =

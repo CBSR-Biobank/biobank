@@ -113,7 +113,9 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             }
         } catch (ApplicationException e) {
             throw new ActionException(
-                LocalizedString.tr("Problem modify associated CSM user properties"), e);
+                LocalizedString
+                    .tr("Problem modify associated CSM user properties"),
+                e);
         }
     }
 
@@ -127,7 +129,8 @@ public class UserSaveAction implements Action<UserSaveOutput> {
 
         if (!managerMembs.containsAll(executorMembs)) {
             throw new ActionException(
-                LocalizedString.tr("Your manageable memberships have changed since you began modifying this user. Please start over and try again."));
+                LocalizedString
+                    .tr("Your manageable memberships have changed since you began modifying this user. Please start over and try again."));
         }
 
         return managerMembs;
@@ -169,6 +172,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void handleMembershipUpdates(ActionContext context,
         Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
@@ -195,8 +199,10 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
-                throw new ActionException(
-                    LocalizedString.tr("Your roles or permissions have changed since you began modifying this user. Please start over and try again."));
+                throw new ActionException(LocalizedString.tr("Your roles" +
+                    " or permissions have changed since you began" +
+                    " modifying this user. Please start over and try" +
+                    " again."));
             }
 
             Domain newD = newM.getDomain();
@@ -231,15 +237,17 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
+    @SuppressWarnings("unused")
     private void mergeMembershipsOnDomain(ActionContext context, User user) {
 
     }
 
+    @SuppressWarnings("nls")
     private void checkFullyManageable(ActionContext context, Membership m) {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
-            throw new ActionException(
-                LocalizedString.tr("You do not have adequate permissions to modify this user."));
+            throw new ActionException(LocalizedString.tr("You do not have" +
+                " adequate permissions to modify this user."));
         }
     }
 
@@ -253,7 +261,8 @@ public class UserSaveAction implements Action<UserSaveOutput> {
 
         if (!contextGroupIds.containsAll(input.getGroupIds())) {
             throw new ActionException(
-                LocalizedString.tr("It appears you are trying to add groups you were not aware of. Please start over and try again."));
+                LocalizedString
+                    .tr("It appears you are trying to add groups you were not aware of. Please start over and try again."));
         }
 
         // add or remove every Group in the context
@@ -261,7 +270,8 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
                 throw new ActionException(
-                    LocalizedString.tr("You cannot add this user to groups you cannot manage."));
+                    LocalizedString
+                        .tr("You cannot add this user to groups you cannot manage."));
             }
 
             if (input.getGroupIds().contains(group.getId())) {

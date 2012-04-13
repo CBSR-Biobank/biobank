@@ -1,11 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -29,7 +31,9 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-    private static final String DISPATCHS_CACHE_KEY = "dispatchs"; 
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenWrapper.class);
+    @SuppressWarnings("nls")
+    private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private static final SpecimenLogProvider LOG_PROVIDER =
         new SpecimenLogProvider();
 
@@ -51,13 +55,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         // its top is itself.
         newObject.setTopSpecimen(newObject);
         return newObject;
-    }
-
-    public void checkInventoryIdUnique() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
-            getInventoryId(),
-            "A specimen with inventoryId"); 
     }
 
     public String getFormattedCreatedAt() {
@@ -108,16 +105,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return getPositionString(true, true);
     }
 
-    public String getCenterString() {
-        CenterWrapper<?> center = getCurrentCenter();
-        if (center != null) {
-            return center.getNameShort();
-        }
-        // TODO should never see that ? should never retrieve a Specimen which
-        // site cannot be displayed ?
-        return "CANNOT DISPLAY INFORMATION"; 
-    }
-
     @Override
     public SpecimenLogProvider getLogProvider() {
         return LOG_PROVIDER;
@@ -126,20 +113,22 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * Set the position in the given container using the positionString
      */
+    @SuppressWarnings("nls")
     public void setParentFromPositionString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
-                positionString.replaceFirst(parentContainer.getLabel(), "")); 
+                positionString.replaceFirst(parentContainer.getLabel(), ""));
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setParent(parentContainer, rcp);
         } else {
-            throw new Exception(
-                MessageFormat.format(
-                    "Position {0} not valid.", positionString)); 
+            // {0} position string, e.g. "AA" or "12"
+            throw new Exception(i18n.tr("Position \"{0}\" not valid.",
+                positionString));
         }
     }
 
+    @SuppressWarnings("nls")
     public String getPositionString(boolean fullString,
         boolean addTopParentShortName) {
         RowColPos position = getPosition();
@@ -156,8 +145,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
-                + getPositionStringInParent(position, directParent) + " (" 
-                + nameShort + ")"; 
+                + getPositionStringInParent(position, directParent) + " ("
+                + nameShort + ")";
         return directParent.getLabel()
             + getPositionStringInParent(position, directParent);
     }
@@ -186,13 +175,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    private static final String Specimen_QRY = "from " 
-        + Specimen.class.getName() + " where " 
-        + SpecimenPeer.INVENTORY_ID.getName() + " = ?"; 
+    @SuppressWarnings("nls")
+    private static final String Specimen_QRY = "from "
+        + Specimen.class.getName() + " where "
+        + SpecimenPeer.INVENTORY_ID.getName() + " = ?";
 
     /**
      * search in all Specimens list. No matter which site added it.
      */
+    @SuppressWarnings("nls")
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException, BiobankCheckException {
@@ -203,15 +194,19 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return null;
         if (specimens.size() == 1)
             return new SpecimenWrapper(appService, specimens.get(0));
-        throw new BiobankCheckException("Error retrieving specimens: found " 
-            + specimens.size() + " results."); 
+
+        // {0} number of specimens found
+        throw new BiobankCheckException(i18n.tr(
+            "Error retrieving specimens: found {0} results.",
+            specimens.size()));
     }
 
-    private static final String SPECIMENS_NON_ACTIVE_QRY = "from " 
+    @SuppressWarnings("nls")
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
         + Specimen.class.getName()
-        + " spec where spec." 
+        + " spec where spec."
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + " = ? and activityStatus != ?"; 
+        + " = ? and activityStatus != ?";
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
         WritableApplicationService appService, CenterWrapper<?> center)
@@ -228,6 +223,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return list;
     }
 
+    @SuppressWarnings("nls")
     public static List<SpecimenWrapper> getSpecimensInSiteWithPositionLabel(
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException, BiobankException {
@@ -238,7 +234,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             RowColPos rcp = null;
             try {
                 rcp = container.getContainerType().getRowColFromPositionString(
-                    positionString.replaceFirst(container.getLabel(), "")); 
+                    positionString.replaceFirst(container.getLabel(), ""));
             } catch (Exception e) {
                 // Should never happen: it has been already tested in
                 // getPossibleParentsMethod
@@ -349,11 +345,12 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * method to change the top {@code Specimen}. The top {@code Specimen} will
      * be automatically updated.
      */
+    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Specimen. Set the parent Specimen instead."); 
+            "Not allowed to directly set the top Specimen. Set the parent Specimen instead.");
     }
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen,
@@ -469,11 +466,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * return a string with collection date (different from created at if it is
      * an aliquoted specimen) + the collection center
      */
+    @SuppressWarnings("nls")
     public String getCollectionInfo() {
-        return getTopSpecimen().getFormattedCreatedAt()
-            + " in " 
-            + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
-            + " (visit #" + getCollectionEvent().getVisitNumber() + ")";  
+        // {0} when the top specimen was created
+        // {1} where the specimen originated from
+        // {2} the visit number of the collection event
+        return i18n.tr("{0} in {1} (visit #{2})",
+            getTopSpecimen().getFormattedCreatedAt(),
+            getTopSpecimen().getOriginInfo().getCenter().getNameShort(),
+            getCollectionEvent().getVisitNumber());
     }
 
     public boolean hasUnknownImportType() {

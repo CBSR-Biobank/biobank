@@ -26,5 +26,4 @@ public class CommentWrapper extends CommentBaseWrapper {
         if (sb.length() > 0) sb.delete(sb.length() - 2, sb.length() - 1);
         return sb.toString();
     }
-
 }

@@ -45,7 +45,6 @@ public class RequestDispatchAction implements Action<EmptyResult> {
             .isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
         // Dispatch is saved here because it is all one transaction

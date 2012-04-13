@@ -52,7 +52,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
         new OgnlMessageInterpolator();
 
     // TODO: I really hope this doesn't hold onto TONS of objects. Investigate!
-    private ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
+    private final ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
         new ConcurrentHashMap<EntityPersister, Set<String>>();
 
     public BeanValidationHandler() {
@@ -153,6 +153,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
         }
     }
 
+    @SuppressWarnings("nls")
     private <T> void handleViolations(
         Set<ConstraintViolation<T>> constraintViolations, Class<?>[] groups) {
         if (constraintViolations.isEmpty()) return;

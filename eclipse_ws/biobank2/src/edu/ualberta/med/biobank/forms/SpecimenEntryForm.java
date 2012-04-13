@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -56,11 +57,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; 
+        "edu.ualberta.med.biobank.forms.SpecimenEntryForm";
 
     public static final String OK_MESSAGE = "Edit specimen";
 
-    private SpecimenWrapper specimen = new SpecimenWrapper(
+    private final SpecimenWrapper specimen = new SpecimenWrapper(
         SessionManager.getAppService());
 
     private ComboViewer activityStatusComboViewer;
@@ -204,7 +205,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     BigDecimal volume = specimen.getQuantity();
                     if (volumeField != null) {
                         if (volume == null) {
-                            volumeField.setText(""); 
+                            volumeField.setText("");
                         } else {
                             volumeField.setText(volume.toString());
                         }
@@ -316,12 +317,12 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         parentPEventField.setText(new StringBuilder(
                             parentPEvent
                                 .getFormattedCreatedAt())
-                            .append(" (") 
+                            .append(" (")
                             .append(
                                 NLS.bind(
                                     "worksheet: {0}",
                                     parentPEvent.getWorksheet()))
-                            .append(")") 
+                            .append(")")
                             .toString());
                     commentText.setText(wizard.getComment());
                     setDirty(true); // so changes can be saved
@@ -336,7 +337,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             .getNameShort());
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Current center");
-        setTextValue(centerLabel, specimen.getCenterString());
+        setTextValue(centerLabel, getCenterString(specimen));
 
         createReadOnlyLabelledField(client, SWT.NONE,
             "Position",
@@ -396,6 +397,16 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         setFirstControl(specimenTypeComboViewer.getControl());
     }
 
+    private static String getCenterString(SpecimenWrapper specimen) {
+        CenterWrapper<?> center = specimen.getCurrentCenter();
+        if (center != null) {
+            return center.getNameShort();
+        }
+        // TODO should never see that ? should never retrieve a Specimen which
+        // site cannot be displayed ?
+        return "CANNOT DISPLAY INFORMATION";
+    }
+
     private void createProcessingEventSection(Composite client) {
 
         // create top section
@@ -407,15 +418,15 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 "Source Processing Event");
         String parentPEventString;
         if (parentPevent == null)
-            parentPEventString = ""; 
+            parentPEventString = "";
         else
             parentPEventString =
                 new StringBuilder(parentPevent.getFormattedCreatedAt())
-                    .append(" (") 
+                    .append(" (")
                     .append(
                         NLS.bind("worksheet: {0}",
                             parentPevent.getWorksheet()))
-                    .append(")").toString(); 
+                    .append(")").toString();
         parentPEventField = createReadOnlyWidget(
             client,
             SWT.NONE,
@@ -428,13 +439,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 "Processing Event");
         String peventString;
         if (pevent == null)
-            peventString = ""; 
+            peventString = "";
         else
             peventString =
-                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") 
+                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")
                     .append(
                         NLS.bind("worksheet: {0}",
-                            pevent.getWorksheet())).append(")").toString(); 
+                            pevent.getWorksheet())).append(")").toString();
         pEventField = createReadOnlyWidget(
             client,
             SWT.NONE,

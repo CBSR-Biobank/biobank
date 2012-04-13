@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -11,7 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
@@ -24,12 +25,13 @@ import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends PatientBaseWrapper {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PatientWrapper.class);
     private static final PatientLogProvider LOG_PROVIDER =
         new PatientLogProvider();
 
@@ -53,8 +55,9 @@ public class PatientWrapper extends PatientBaseWrapper {
         return newObject;
     }
 
-    private static final String PATIENT_QRY = "from " + Patient.class.getName() 
-        + " where " + PatientPeer.PNUMBER.getName() + "=?";  
+    @SuppressWarnings("nls")
+    private static final String PATIENT_QRY = "from " + Patient.class.getName()
+        + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
     /**
      * Search a patient in the site with the given number
@@ -88,22 +91,27 @@ public class PatientWrapper extends PatientBaseWrapper {
                 study.getSiteCollection(false));
             centers.addAll(study.getClinicCollection());
             if (Collections.disjoint(centers, user.getWorkingCenters())) {
-                throw new ApplicationException(MessageFormat.format(
-                    "Patient {0} exists but you don't have access to it. Check studies linked to the sites and clinics you can access.", 
-                    patientNumber));
+                @SuppressWarnings("nls")
+                // {0} patient number
+                String msg = i18n.tr("Patient {0} exists" +
+                    " but you don't have access to it. Check studies" +
+                    " linked to the sites and clinics you can access.",
+                    patientNumber);
+                throw new ApplicationException(msg);
             }
         }
         return patient;
     }
 
+    @SuppressWarnings("nls")
     private static final String SOURCE_SPECIMEN_COUNT_QRY =
-        "select count(spcs) from " 
+        "select count(spcs) from "
             + CollectionEvent.class.getName()
-            + " as cevent join cevent." 
+            + " as cevent join cevent."
             + CollectionEventPeer.ORIGINAL_SPECIMENS.getName()
-            + " as spcs where cevent." 
+            + " as spcs where cevent."
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-            + "=?"; 
+            + "=?";
 
     public long getSourceSpecimenCount(boolean fast)
         throws ApplicationException, BiobankException {
@@ -118,15 +126,16 @@ public class PatientWrapper extends PatientBaseWrapper {
         return total;
     }
 
+    @SuppressWarnings("nls")
     private static final String ALIQUOTED_SPECIMEN_COUNT_QRY =
-        "select count(spcs) from " 
+        "select count(spcs) from "
             + CollectionEvent.class.getName()
-            + " as cevent join cevent." 
+            + " as cevent join cevent."
             + CollectionEventPeer.ALL_SPECIMENS.getName()
-            + " as spcs where cevent." 
+            + " as spcs where cevent."
             + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-            + "=? and spcs." 
-            + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null"; 
+            + "=? and spcs."
+            + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null";
 
     public long getAliquotedSpecimenCount(boolean fast)
         throws ApplicationException, BiobankException {
@@ -157,22 +166,24 @@ public class PatientWrapper extends PatientBaseWrapper {
         return getPnumber();
     }
 
+    @SuppressWarnings("nls")
     private static final String LAST_7_DAYS_PROCESSING_EVENTS_FOR_CENTER_QRY =
-        "select distinct(pEvent) from " 
+        "select distinct(pEvent) from "
             + Patient.class.getName()
-            + " as patient join patient." 
+            + " as patient join patient."
             + PatientPeer.COLLECTION_EVENTS.getName()
-            + " as ces join ces." 
+            + " as ces join ces."
             + CollectionEventPeer.ALL_SPECIMENS.getName()
-            + " as specimens join specimens." 
+            + " as specimens join specimens."
             + SpecimenPeer.PROCESSING_EVENT.getName()
-            + " as pEvent where patient." 
+            + " as pEvent where patient."
             + PatientPeer.ID.getName()
-            + "=? and pEvent." 
+            + "=? and pEvent."
             + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
-            + "=? and pEvent." 
+            + "=? and pEvent."
             + ProcessingEventPeer.CREATED_AT.getName()
-            + ">? and pEvent." + ProcessingEventPeer.CREATED_AT.getName() + "<?";  
+            + ">? and pEvent." + ProcessingEventPeer.CREATED_AT.getName()
+            + "<?";
 
     // used in scan link and cabinet link
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
@@ -200,56 +211,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     public PatientLogProvider getLogProvider() {
         return LOG_PROVIDER;
-    }
-
-    /**
-     * merge patient2 into this patient
-     */
-    @Deprecated
-    public void merge(PatientWrapper patient2) throws Exception {
-        reload();
-        patient2.reload();
-        if (getStudy().equals(patient2.getStudy())) {
-            List<CollectionEventWrapper> cevents = patient2
-                .getCollectionEventCollection(false);
-
-            if (!cevents.isEmpty()) {
-
-                Set<CollectionEventWrapper> toAdd =
-                    new HashSet<CollectionEventWrapper>();
-                boolean merged = false;
-                for (CollectionEventWrapper p2event : cevents) {
-                    for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
-                        if (p1event.getVisitNumber().equals(
-                            p2event.getVisitNumber())) {
-                            // merge collection event
-                            p1event.merge(p2event);
-                            merged = true;
-                        }
-                    if (!merged)
-                        toAdd.add(p2event);
-                    merged = false;
-                }
-
-                for (CollectionEventWrapper addMe : toAdd) {
-                    addMe.setPatient(this);
-                    addMe.persist();
-                }
-
-                persist();
-                patient2.delete();
-
-                ((BiobankApplicationService) appService).logActivity("merge", 
-                    null, patient2.getPnumber(), null, null,
-                    patient2.getPnumber() + " --> " + getPnumber(), "Patient");  
-                ((BiobankApplicationService) appService).logActivity("merge", 
-                    null, getPnumber(), null, null, getPnumber() + " <-- " 
-                        + patient2.getPnumber(), "Patient"); 
-            }
-        } else {
-            throw new BiobankCheckException(
-                "Cannot merge patients from different studies."); 
-        }
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection(
@@ -303,8 +264,9 @@ public class PatientWrapper extends PatientBaseWrapper {
     public static Integer getNextVisitNumber(
         WritableApplicationService appService, PatientWrapper patient)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from " 
-            + CollectionEvent.class.getName() + " ce where ce.patient.id=?", 
+        @SuppressWarnings("nls")
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
             Arrays.asList(patient.getId()));
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)

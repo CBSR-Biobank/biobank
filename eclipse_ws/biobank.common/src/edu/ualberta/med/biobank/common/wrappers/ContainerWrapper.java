@@ -10,6 +10,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
@@ -42,7 +45,11 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ContainerBaseWrapper {
+    @SuppressWarnings("nls")
     public static final String PATH_DELIMITER = "/";
+
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContainerWrapper.class);
 
     private static final String CHILD_POSITION_CONFLICT_MSG =
         "Position {0} of container {1} already contains container {2} when trying to add container {3}.";
@@ -118,6 +125,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankRuntimeException if this or any parent is new (does not
      *             have an id) as the path is then undefined.
      */
+    @SuppressWarnings("nls")
     @Override
     public String getPath() {
         if (isNew()) {
@@ -199,6 +207,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return pos == null ? null : pos.getParent();
     }
 
+    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setPath(String dummy) {
@@ -233,6 +242,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         setTopContainerInternal(topContainer, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setTopContainer(ContainerBaseWrapper container) {
@@ -366,6 +376,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *         type
      * 
      */
+    @SuppressWarnings("nls")
     public String getFullInfoLabel() {
         if (getContainerType() == null
             || getContainerType().getNameShort() == null) {
@@ -441,6 +452,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @return
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     public ContainerWrapper getChildByLabel(String label) throws Exception {
         ContainerTypeWrapper containerType = getContainerType();
         if (containerType == null) {
@@ -491,6 +503,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception if the sample type is null.
      */
+    @SuppressWarnings("nls")
     public boolean canHoldSpecimenType(SpecimenWrapper specimen)
         throws Exception {
         SpecimenTypeWrapper type = specimen.getSpecimenType();
@@ -523,6 +536,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             getContainerType());
     }
 
+    @SuppressWarnings("nls")
     private static final String POSSIBLE_PARENTS_BASE_QRY =
         "select distinct(c) from "
             + Container.class.getName()
@@ -542,6 +556,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param type if the child is a container, this is its type (if available)
      * @throws BiobankException
      */
+    @SuppressWarnings("nls")
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
         SiteWrapper site, ContainerTypeWrapper type)
@@ -630,6 +645,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param minRowCapacity min row capacity
      * @param minColCapacity min col capacity
      */
+    @SuppressWarnings("nls")
     public static List<ContainerWrapper> getEmptyContainersHoldingSpecimenType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         List<SpecimenTypeWrapper> sampleTypes, Integer minRowCapacity,
@@ -649,6 +665,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     private static final String CONTAINERS_IN_SITE_QRY = "from "
         + Container.class.getName() + " where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
@@ -684,6 +701,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY =
         "from "
             + Container.class.getName() + " where "
@@ -879,26 +897,27 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                         - crop));
             }
             String errorMsg;
-            if (contType == null)
-                if (isContainerPosition)
+            if (contType == null) {
+                if (isContainerPosition) {
                     errorMsg =
                         MessageFormat
                             .format(
                                 "Can''t find container that will match these possible labels: {0}",
                                 res.toString());
-                else
+                } else {
                     errorMsg =
                         MessageFormat
                             .format(
                                 "Can''t find container that can hold specimens and that will match these possible labels: {0}",
                                 res.toString());
-            else
-                errorMsg =
-                    MessageFormat
-                        .format(
-                            "Can''t find container with type {0} that will match these possible labels: {1}",
-                            contType.getNameShort(), res.toString());
-
+                }
+            } else {
+                // {0} container type short name
+                // {1} possible labels
+                errorMsg = i18n.tr("Can't find container with type {0}" +
+                    " that will match these possible labels: {1}",
+                    contType.getNameShort(), res.toString());
+            }
             throw new BiobankException(errorMsg);
         }
         return foundContainers;
@@ -908,6 +927,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getContainerType().isPallet96();
     }
 
+    @SuppressWarnings("nls")
     private static final String POSITION_FREE_QRY = "from "
         + Specimen.class.getName()
         + " where "

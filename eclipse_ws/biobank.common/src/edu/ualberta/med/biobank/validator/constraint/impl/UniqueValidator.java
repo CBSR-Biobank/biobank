@@ -15,6 +15,7 @@ import org.hibernate.metadata.ClassMetadata;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
+@SuppressWarnings("nls")
 public class UniqueValidator extends
     EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<Unique, Object> {

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,6 +9,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -34,6 +36,8 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchWrapper.class);
     private static final DispatchLogProvider LOG_PROVIDER =
         new DispatchLogProvider();
     private static final Property<String, Dispatch> WAYBILL_PROPERTY =
@@ -56,7 +60,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     // TODO: Not sure if it's a good idea to maintain a list like this
     // internally. It can result in unwanted changes being persisted.
-    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist =
+    private final List<DispatchSpecimenWrapper> dispatchSpecimensToPersist =
         new ArrayList<DispatchSpecimenWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
@@ -75,11 +79,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return newObject;
     }
 
+    @SuppressWarnings("nls")
     public String getStateDescription() {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
         if (state == null)
-            return ""; 
+            return "";
         return state.getLabel();
     }
 
@@ -152,6 +157,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return list;
     }
 
+    @SuppressWarnings("nls")
     public void addSpecimens(List<SpecimenWrapper> newSpecimens,
         DispatchSpecimenState state) throws BiobankCheckException {
         if (newSpecimens == null)
@@ -192,10 +198,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     hasNewSpecimens = true;
                 }
             } else
-                throw new BiobankCheckException(
-                    MessageFormat.format(
-                        "Specimen {0} does not belong to this sender.", 
-                        specimen.getInventoryId()));
+                // {0} specimen inventory ID
+                throw new BiobankCheckException(i18n.tr(
+                    "Specimen {0} does not belong to this sender.",
+                    specimen.getInventoryId()));
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         resetMap();
@@ -297,14 +303,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         setState(ds.getId());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSenderCenter() == null ? "" : getSenderCenter() 
-            .getNameShort() + "/"); 
-        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter() 
-            .getNameShort() + "/"); 
-        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo() 
+        sb.append(getSenderCenter() == null ? "" : getSenderCenter()
+            .getNameShort() + "/");
+        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter()
+            .getNameShort() + "/");
+        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo()
             .getFormattedDateReceived());
         return sb.toString();
     }
@@ -350,22 +357,22 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
-    @SuppressWarnings("unused")
-    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " 
+    @SuppressWarnings({ "unused", "nls" })
+    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from "
         + DispatchSpecimen.class.getName()
-        + " ra inner join fetch ra." 
+        + " ra inner join fetch ra."
         + DispatchSpecimenPeer.SPECIMEN.getName()
-        + " as spec inner join fetch spec." 
+        + " as spec inner join fetch spec."
         + SpecimenPeer.SPECIMEN_TYPE.getName()
-        + " inner join fetch spec." 
+        + " inner join fetch spec."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent inner join fetch cevent." 
+        + " as cevent inner join fetch cevent."
         + CollectionEventPeer.PATIENT.getName()
-        + " inner join fetch spec." 
+        + " inner join fetch spec."
         + SpecimenPeer.ACTIVITY_STATUS.getName()
-        + " where ra." 
+        + " where ra."
         + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
-        + " = ?"; 
+        + " = ?";
 
     public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState()
@@ -389,9 +396,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return LOG_PROVIDER;
     }
 
-    private static final String DISPATCH_HQL_STRING = "from " 
-        + Dispatch.class.getName() + " as d inner join fetch d." 
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s "; 
+    @SuppressWarnings("nls")
+    private static final String DISPATCH_HQL_STRING = "from "
+        + Dispatch.class.getName() + " as d inner join fetch d."
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -399,8 +407,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s." 
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?"); 
+        @SuppressWarnings("nls")
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
 
@@ -411,17 +420,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
         DISPATCH_HQL_STRING
-            + " where s." 
+            + " where s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >=? and s." 
+            + " >=? and s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " <? and (d." 
+            + " <? and (d."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." 
+            + "= ? or d."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; 
+            + " = ?)";
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -444,17 +454,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHED_BY_DATE_SENT_QRY =
         DISPATCH_HQL_STRING
-            + " where s." 
+            + " where s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." 
+            + " >= ? and s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (d." 
+            + " < ? and (d."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." 
+            + "= ? or d."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; 
+            + " = ?)";
 
     public static List<DispatchWrapper> getDispatchesByDateSent(
         WritableApplicationService appService, Date dateSent,

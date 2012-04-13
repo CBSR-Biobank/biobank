@@ -28,6 +28,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
         return new ProcessingEventDeletePermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
@@ -37,9 +38,9 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
         for (Specimen sp : pevent.getSpecimens()) {
             if (sp.getChildSpecimens().size() != 0)
-                throw new ActionException(
-                    LocalizedString
-                        .tr("Delete failed. There are child specimens linked through this processing event"));
+                throw new ActionException(LocalizedString.tr("Delete failed." +
+                    " There are child specimens linked through this" +
+                    " processing event"));
             sp.setActivityStatus(ActivityStatus.ACTIVE);
             sp.setProcessingEvent(null);
             context.getSession().saveOrUpdate(sp);

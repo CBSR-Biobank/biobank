@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.util.NullHelper;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
 
+@SuppressWarnings("nls")
 public class ValidContainerTypeValidator
     extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<ValidContainerType, Object> {

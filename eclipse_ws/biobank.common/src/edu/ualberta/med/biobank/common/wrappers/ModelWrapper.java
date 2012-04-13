@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -40,9 +39,13 @@ import org.hibernate.Hibernate;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 @SuppressWarnings("unused")
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ModelWrapper.class);
     final Map<Property<?, ?>, Object> propertyCache =
         new HashMap<Property<?, ?>, Object>();
 
@@ -68,6 +71,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         this.session = new WrapperSession(this);
     }
 
+    @SuppressWarnings("nls")
     public ModelWrapper(WritableApplicationService appService) {
         this.appService = appService;
         try {
@@ -76,10 +80,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Class<E> classType = getWrappedClass();
             if (classType != null) {
                 throw new RuntimeException(
-                    "was not able to create new object of type " 
+                    "was not able to create new object of type "
                         + classType.getName(), e);
             }
-            throw new RuntimeException("was not able to create new object", 
+            throw new RuntimeException("was not able to create new object",
                 e);
         }
 
@@ -102,11 +106,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         firePropertyChanges(oldWrappedObject, newWrappedObject);
     }
 
+    @SuppressWarnings("nls")
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
         List<Property<?, ? super E>> propertiesList = getProperties();
         if ((propertiesList == null) || (propertiesList.size() == 0)) {
-            throw new RuntimeException("wrapper has not defined any properties"); 
+            throw new RuntimeException("wrapper has not defined any properties");
         }
 
         for (Property<?, ? super E> property : propertiesList) {
@@ -117,7 +122,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             }
         }
 
-        throw new RuntimeException("invalid property: " + propertyName); 
+        throw new RuntimeException("invalid property: " + propertyName);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -295,6 +300,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * using this wrapper id, retrieve the object from the database
      */
+    @SuppressWarnings("nls")
     protected E getObjectFromDatabase() throws BiobankException {
         Integer id = null;
         List<E> list = null;
@@ -315,9 +321,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         if (list.size() == 1) {
             return list.get(0);
         }
-        throw new BiobankException(MessageFormat.format(
-            "Found {0} objects of type {1} with id={2}", list.size(), 
-            getWrappedClass().getName(), id));
+        // {0} number of objects found
+        // {1} object name
+        // {2} object id
+        throw new BiobankException(i18n.tr(
+            "Found {0} objects of type {1} with id={2}",
+            list.size(),
+            getWrappedClass().getName(),
+            id));
     }
 
     public abstract Class<E> getWrappedClass();
@@ -346,8 +357,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         firePropertyChanges(oldWrappedObject, wrappedObject);
     }
 
+    @SuppressWarnings("nls")
     private static final String PROPERTY_COUNT_HQL =
-        "SELECT m.{0}.size FROM {1} m WHERE m.id = ?"; 
+        "SELECT m.{0}.size FROM {1} m WHERE m.id = ?";
 
     protected final <T> Long getPropertyCount(
         Property<Collection<T>, ? super E> property, boolean fast)
@@ -382,35 +394,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         // no exception would be thrown.
         Constructor<E> constructor = getWrappedClass().getConstructor();
         return constructor.newInstance();
-    }
-
-    private static final String CHECK_NO_DUPLICATES =
-        "select count(o) from {0} " 
-            + "as o where {1}=? {2}"; 
-
-    protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
-        String value, String errorName) throws ApplicationException,
-        BiobankException {
-        HQLCriteria c;
-        final List<Object> params = new ArrayList<Object>();
-        params.add(value);
-        String equalsTest = ""; 
-        if (!isNew()) {
-            equalsTest = " and id <> ?"; 
-            params.add(getId());
-        }
-
-        final String hqlString = MessageFormat.format(CHECK_NO_DUPLICATES,
-            objectClass.getName(), propertyName, equalsTest);
-
-        c = new HQLCriteria(hqlString, params);
-
-        if (getCountResult(appService, c) > 0) {
-            throw new DuplicateEntryException(
-                errorName + " " 
-                    + MessageFormat.format(
-                        "''{0}'' already exists.", value)); 
-        }
     }
 
     /**
@@ -470,6 +453,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     // TODO: switch to using the properties?
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         Class<E> classType = getWrappedClass();
@@ -479,19 +463,19 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             for (Method method : methods) {
                 String name = method.getName();
                 Class<?> returnType = method.getReturnType();
-                if (name.startsWith("get") 
-                    && !name.equals("getClass") 
+                if (name.startsWith("get")
+                    && !name.equals("getClass")
                     && (String.class.isAssignableFrom(returnType) || Number.class
                         .isAssignableFrom(returnType))) {
                     try {
                         Object res = method.invoke(wrappedObject,
                             (Object[]) null);
                         if (res != null) {
-                            sb.append(name).append(":").append(res.toString()) 
-                                .append("/"); 
+                            sb.append(name).append(":").append(res.toString())
+                                .append("/");
                         }
                     } catch (Exception e) {
-                        throw new RuntimeException("Error in toString method", 
+                        throw new RuntimeException("Error in toString method",
                             e);
                     }
                 }
@@ -557,24 +541,27 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
+    @SuppressWarnings("nls")
     public void initObjectWith(ModelWrapper<E> otherWrapper)
         throws BiobankException {
         if (otherWrapper == null) {
             throw new BiobankCheckException(
-                "Cannot init internal object with a null wrapper"); 
+                "Cannot init internal object with a null wrapper");
         }
         setWrappedObject(otherWrapper.wrappedObject);
     }
 
+    @SuppressWarnings("nls")
     public void logLookup(String center) throws Exception {
         ((BiobankApplicationService) appService).logActivity(getLogMessage(
-            "select", center, getWrappedClass().getSimpleName() + " LOOKUP")); 
+            "select", center, getWrappedClass().getSimpleName() + " LOOKUP"));
     }
 
+    @SuppressWarnings("nls")
     public void logEdit(String site) throws Exception {
         if (!isNew()) {
             ((BiobankApplicationService) appService).logActivity(getLogMessage(
-                "edit", site, getWrappedClass().getSimpleName() + " EDIT"));  
+                "edit", site, getWrappedClass().getSimpleName() + " EDIT"));
         }
     }
 
@@ -781,6 +768,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(property, allWrappers);
     }
 
+    @SuppressWarnings("nls")
     public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollectionWithCheck(
         Property<Collection<R>, ? super E> property, List<W> wrappersToRemove)
         throws BiobankCheckException {
@@ -794,7 +782,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             false);
 
         if (!currentWrappers.containsAll(wrappersToRemove)) {
-            throw new BiobankCheckException("object not in list"); 
+            throw new BiobankCheckException("object not in list");
         }
 
         removeFromWrapperCollection(property, wrappersToRemove);

@@ -94,7 +94,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
 
     @SuppressWarnings("nls")
     private void updateCollectionEvent(ActionContext context,
-        Specimen specimen, Comment comment) {
+        Specimen specimen, @SuppressWarnings("unused") Comment comment) {
         // when i came across this old and new were reversed... definitely
         // wrong. Test prolly breaks now if it ever worked
         CollectionEvent oldCEvent = specimen.getCollectionEvent();
@@ -109,7 +109,8 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             if (specimen.getParentSpecimen()
                 .getProcessingEvent() == null)
                 throw new ActionException(
-                    LocalizedString.tr("You must select a parent with a processing event"));
+                    LocalizedString
+                        .tr("You must select a parent with a processing event"));
         }
         context.getSession().saveOrUpdate(specimen);
         if (!oldCEvent.equals(newCEvent)) {
