@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -30,8 +31,9 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentViewForm extends BiobankViewForm {
@@ -56,7 +58,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BgcBaseText boxNumberLabel;
 
-    private SpecimenEntryWidget specimenWidget;
+    private NewSpecimenInfoTable specimenTable;
 
     private CommentsInfoTable commentEntryTable;
 
@@ -109,11 +111,13 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        specimenWidget =
-            new SpecimenEntryWidget(client, SWT.NONE, toolkit, false);
-        specimenWidget.setSpecimens(specimens);
-        specimenWidget
-            .addDoubleClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+        specimenTable =
+            new NewSpecimenInfoTable(client, specimens,
+                ColumnsShown.PEVENT_SOURCE_SPECIMENS, 10);
+        specimenTable.adaptToToolkit(toolkit, true);
+        specimenTable
+            .addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {
+
                 @Override
                 public void doubleClick(InfoTableEvent<SpecimenInfo> event) {
                     Specimen s =
@@ -125,6 +129,21 @@ public class ShipmentViewForm extends BiobankViewForm {
                                 new SpecimenWrapper(SessionManager
                                     .getAppService(), s))),
                         SpecimenViewForm.ID);
+                }
+            });
+        specimenTable
+            .addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
+                @Override
+                public void editItem(InfoTableEvent<SpecimenInfo> event) {
+                    Specimen s =
+                        ((SpecimenInfo) ((InfoTableSelection) event
+                            .getSelection()).getObject()).specimen;
+                    AdapterBase.openForm(
+                        new FormInput(
+                            new SpecimenAdapter(null,
+                                new SpecimenWrapper(SessionManager
+                                    .getAppService(), s))),
+                        SpecimenEntryForm.ID);
                 }
             });
     }
@@ -209,7 +228,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         setShipmentValues();
 
         commentEntryTable.setList(originInfo.getCommentCollection(false));
-        specimenWidget.setSpecimens(specimens);
+        specimenTable.setList(specimens);
     }
 
     private void setPartName() {

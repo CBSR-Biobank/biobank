@@ -11,6 +11,8 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
@@ -18,6 +20,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerInfoTable extends InfoTableWidget<Container> {
 
@@ -140,6 +143,18 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                 }
             }
         });
+    }
+
+    @Override
+    protected Boolean canEdit(Container target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ContainerUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(Container target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ContainerDeletePermission(target.getId()));
     }
 
 }

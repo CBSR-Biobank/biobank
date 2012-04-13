@@ -158,7 +158,7 @@ public class PatientViewForm extends BiobankViewForm {
                                 new CollectionEventAdapter(
                                     PatientViewForm.this.adapter, map.get(ce
                                         .getId()));
-                            adapter.openEntryForm();
+                            adapter.openViewForm();
                         } catch (ApplicationException e) {
                             BgcPlugin.openAsyncError(
                                 "Unable to open form",

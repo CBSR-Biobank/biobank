@@ -38,16 +38,18 @@ public class ProcessingEventAdapter extends AdapterBase {
     @Override
     public void init() {
         try {
+            ProcessingEventWrapper pevent =
+                (ProcessingEventWrapper) getModelObject();
             this.isDeletable =
                 SessionManager.getAppService().isAllowed(
-                    new ProcessingEventDeletePermission());
+                    new ProcessingEventDeletePermission(pevent.getId()));
             this.isReadable =
                 SessionManager.getAppService()
                     .isAllowed(
-                        new ProcessingEventReadPermission(null));
+                        new ProcessingEventReadPermission(pevent.getId()));
             this.isEditable =
                 SessionManager.getAppService().isAllowed(
-                    new ProcessingEventUpdatePermission());
+                    new ProcessingEventUpdatePermission(pevent.getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Permission Error",
                 "Unable to retrieve user permissions");

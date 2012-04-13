@@ -140,13 +140,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                         if ((RequestContainerAdapter) ((TreeItemAdapter) element)
                             .getParent() == null)
                             return ""; //$NON-NLS-1$
-                        else
-                            return ((RequestContainerAdapter) ((TreeItemAdapter) element)
-                                .getParent()).container.getLabel()
-                                + ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
-                                    .getSpecimen()).getSpecimen()
-                                    .getWrappedObject()
-                                    .getSpecimenPosition().getPositionString();
+                        return ((RequestContainerAdapter) ((TreeItemAdapter) element)
+                            .getParent()).container.getLabel()
+                            + ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                                .getSpecimen()).getSpecimen()
+                                .getWrappedObject()
+                                .getSpecimenPosition().getPositionString();
                     } else if (columnIndex < 4)
                         return ((TreeItemAdapter) element)
                             .getColumnText(columnIndex - 1);

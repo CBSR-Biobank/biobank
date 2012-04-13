@@ -31,7 +31,7 @@ public class ProcessingEventGetBriefInfoAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(null).isAllowed(context);
+        return new ProcessingEventReadPermission(id).isAllowed(context);
     }
 
     @Override

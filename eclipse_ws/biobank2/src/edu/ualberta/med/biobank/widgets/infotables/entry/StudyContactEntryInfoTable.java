@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.Messages;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
@@ -141,5 +142,15 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                 }
             }
         };
+    }
+
+    @Override
+    protected Boolean canEdit(Contact target) throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(Contact target) throws ApplicationException {
+        return true;
     }
 }

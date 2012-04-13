@@ -63,9 +63,9 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             parentSpecimenId));
         specimen.setActivityStatus(activityStatus);
 
-        Comment comment = addComment(context, specimen);
+        addComment(context, specimen);
 
-        updateCollectionEvent(context, specimen, comment);
+        updateCollectionEvent(context, specimen);
         updateTopSpecimen(context, specimen);
 
         return new EmptyResult();
@@ -92,7 +92,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
     }
 
     private void updateCollectionEvent(ActionContext context,
-        Specimen specimen, Comment comment) {
+        Specimen specimen) {
         // when i came across this old and new were reversed... definitely
         // wrong. Test prolly breaks now if it ever worked
         CollectionEvent oldCEvent = specimen.getCollectionEvent();

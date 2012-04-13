@@ -4,9 +4,13 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
@@ -108,5 +112,19 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     protected String getCollectionModelObjectToString(Object o) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyUpdatePermission(target.getStudy().getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyDeletePermission(target.getStudy().getId()));
     }
 }

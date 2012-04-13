@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -21,6 +20,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
@@ -31,7 +32,9 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.common.util.DelegatingList;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
 import edu.ualberta.med.biobank.common.util.ListChangeSource;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * This abstract class is used to create most the tables used in the client. The
@@ -131,6 +134,51 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
+
+        // This code serves to provide menus on a selection basis, with
+        // permission checking
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                try {
+                    if (addItemListeners.getListeners().length > 0) {
+                        MenuItem item = new MenuItem(menu, SWT.PUSH);
+                        item.setText(Messages.AbstractInfoTableWidget_add);
+                        item.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                addItem();
+                            }
+                        });
+                    }
+                    if (editItemListeners.getListeners().length > 0
+                        && canEdit(getSelection())) {
+                        MenuItem item = new MenuItem(menu, SWT.PUSH);
+                        item.setText(Messages.AbstractInfoTableWidget_edit);
+                        item.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                editItem();
+                            }
+                        });
+                    }
+                    if (deleteItemListeners.getListeners().length > 0
+                        && canDelete(getSelection())) {
+                        MenuItem item = new MenuItem(menu, SWT.PUSH);
+                        item.setText(Messages.AbstractInfoTableWidget_delete);
+                        item.addSelectionListener(new SelectionAdapter() {
+                            @Override
+                            public void widgetSelected(SelectionEvent event) {
+                                deleteItem();
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    BgcPlugin.openAsyncError("Error",
+                        "Unable to load menu for selection", e);
+                }
+            }
+        });
 
         // need to autosize at creation to be sure the size is well initialized
         // the first time. (if don't do that, display problems in UserManagement
@@ -312,44 +360,14 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     public void addAddItemListener(IInfoTableAddItemListener<T> listener) {
         addItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.AbstractInfoTableWidget_add);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addItem();
-            }
-        });
     }
 
     public void addEditItemListener(IInfoTableEditItemListener<T> listener) {
         editItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.AbstractInfoTableWidget_edit);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                editItem();
-            }
-        });
     }
 
     public void addDeleteItemListener(IInfoTableDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.AbstractInfoTableWidget_delete);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                deleteItem();
-            }
-        });
     }
 
     /**
@@ -425,7 +443,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     }
 
     protected void deleteItem() {
-        Object objSelected = getSelection();
+        T objSelected = getSelection();
 
         if (objSelected == null)
             return;
@@ -445,6 +463,10 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
             });
         }
     }
+
+    protected abstract Boolean canEdit(T target) throws ApplicationException;
+
+    protected abstract Boolean canDelete(T target) throws ApplicationException;
 
     public void setList(final List<T> list) {
         this.list.setDelegate(list);

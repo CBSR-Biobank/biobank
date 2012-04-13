@@ -6,8 +6,12 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * this need to be rename ? to study source specimen ??
@@ -46,7 +50,8 @@ public class SourceSpecimenInfoTable extends
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -73,11 +78,12 @@ public class SourceSpecimenInfoTable extends
         Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
             "study specimen type is null"); //$NON-NLS-1$
         info.name = info.studySourceVessel.getSpecimenType().getName();
-        info.needOriginalVolume = (info.studySourceVessel
-            .getNeedOriginalVolume() != null) ? (info.studySourceVessel
-            .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
-            : Messages.SourceSpecimenInfoTable_no_label)
-            : Messages.SourceSpecimenInfoTable_no_label;
+        info.needOriginalVolume =
+            (info.studySourceVessel
+                .getNeedOriginalVolume() != null) ? (info.studySourceVessel
+                .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
+                : Messages.SourceSpecimenInfoTable_no_label)
+                : Messages.SourceSpecimenInfoTable_no_label;
         return info;
     }
 
@@ -101,6 +107,20 @@ public class SourceSpecimenInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new SpecimenUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new SpecimenDeletePermission(target.getId()));
     }
 
 }

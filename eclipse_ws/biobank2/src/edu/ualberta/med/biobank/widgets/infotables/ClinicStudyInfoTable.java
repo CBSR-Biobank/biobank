@@ -5,10 +5,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
 
@@ -95,5 +99,19 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyUpdatePermission(target.getStudy().getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyDeletePermission(target.getStudy().getId()));
     }
 }
