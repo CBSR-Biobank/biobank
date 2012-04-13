@@ -83,16 +83,16 @@ public class StudyEntryForm extends BiobankEntryForm {
         public boolean inStudy;
     }
 
-    private StudyWrapper study = new StudyWrapper(
+    private final StudyWrapper study = new StudyWrapper(
         SessionManager.getAppService());
 
     private ClinicAddInfoTable contactEntryTable;
 
-    private List<StudyEventAttrCustom> pvCustomInfoList;
+    private final List<StudyEventAttrCustom> pvCustomInfoList;
 
     private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -106,7 +106,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     private StudyInfo studyInfo;

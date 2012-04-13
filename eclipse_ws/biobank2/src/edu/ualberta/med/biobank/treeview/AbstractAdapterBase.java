@@ -52,7 +52,7 @@ public abstract class AbstractAdapterBase implements
 
     private String label;
 
-    private String tooltip;
+    private final String tooltip;
 
     protected AbstractAdapterBase parent;
 
@@ -67,7 +67,7 @@ public abstract class AbstractAdapterBase implements
     private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
     // FIXME can we merge this list of listeners with the DeltaListener ?
-    private List<AdapterChangedListener> listeners;
+    private final List<AdapterChangedListener> listeners;
 
     protected boolean isDeletable = false;
 
@@ -325,8 +325,9 @@ public abstract class AbstractAdapterBase implements
                 + getClass().getName());
         }
         boolean doDelete = true;
-        doDelete = BgcPlugin.openConfirm(
-            Messages.AdapterBase_confirm_delete_title, msg);
+        doDelete =
+            BgcPlugin.openConfirm(Messages.AdapterBase_confirm_delete_title,
+                msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -344,14 +345,17 @@ public abstract class AbstractAdapterBase implements
                         runDelete();
                         page.closeEditor(part, true);
                     } catch (ApplicationException e) {
-                        if (e.getCause() instanceof ConstraintViolationException) {
+                        if (e.getCause() instanceof javax.validation.ConstraintViolationException) {
                             List<String> msgs = BiobankFormBase
                                 .getConstraintViolationsMsgs(
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
                                 Messages.AdapterBase_delete_error_title,
                                 StringUtils.join(msgs, "\n")); //$NON-NLS-1$
-
+                        } else if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
+                            BgcPlugin.openAsyncError(
+                                Messages.AdapterBase_delete_error_title,
+                                "delete not allowed");
                         } else {
                             BgcPlugin.openAsyncError(
                                 Messages.AdapterBase_delete_error_title,
