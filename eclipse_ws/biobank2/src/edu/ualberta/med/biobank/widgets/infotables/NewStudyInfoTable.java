@@ -54,26 +54,6 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     }
 
     @Override
-    public void firstPage() {
-        // all data on one page, do nothing
-    }
-
-    @Override
-    public void prevPage() {
-        // all data on one page, do nothing
-    }
-
-    @Override
-    public void nextPage() {
-        // all data on one page, do nothing
-    }
-
-    @Override
-    public void lastPage() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     protected boolean isEditMode() {
         return false;
     }
