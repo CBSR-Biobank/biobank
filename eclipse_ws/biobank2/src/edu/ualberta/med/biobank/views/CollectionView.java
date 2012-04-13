@@ -10,11 +10,13 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionView extends AbstractAdministrationView {
 
@@ -53,9 +55,19 @@ public class CollectionView extends AbstractAdministrationView {
         radioPnumber.setSelection(true);
     }
 
-    protected void notFound(String text) {
+    protected void notFound(String text) throws ApplicationException {
+        if (!SessionManager.getAppService().isAllowed(
+            new PatientCreatePermission(null))) {
+            BgcPlugin.openInformation("Patient not found",
+                "No patient with id '"
+                    + text
+                    + "' found.");
+            return;
+        }
+
         boolean create =
-            BgcPlugin.openConfirm(Messages.CollectionView_patient_error_title,
+            BgcPlugin.openConfirm(
+                Messages.CollectionView_patient_error_title,
                 Messages.CollectionView_patient_error_msg);
         if (create) {
             SearchedPatientInfo spi = new SearchedPatientInfo();

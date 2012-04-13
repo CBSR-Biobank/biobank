@@ -22,7 +22,11 @@ public class UpdateRequestPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Integer id = specs.get(0);
+        if (specs.size() == 0) return true;
+        Integer id =
+            context.load(RequestSpecimen.class, specs.get(0)).getSpecimen()
+                .getCurrentCenter()
+                .getId();
         for (Integer spec : specs)
             if (!context.load(RequestSpecimen.class, spec)
                 .getSpecimen().getCurrentCenter().getId()
