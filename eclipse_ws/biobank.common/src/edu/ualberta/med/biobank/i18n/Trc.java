@@ -17,7 +17,7 @@ class Trc extends AbstractLocalizable {
     }
 
     @Override
-    String localize() {
+    public String getString() {
         return i18n.trc(context, text);
     }
 

@@ -26,7 +26,7 @@ class Trnc extends AbstractLocalizable {
     }
 
     @Override
-    String localize() {
+    public String getString() {
         return i18n.trnc(context, singular, plural, n, objects);
     }
 

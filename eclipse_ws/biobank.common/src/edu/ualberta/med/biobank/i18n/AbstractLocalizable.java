@@ -11,7 +11,7 @@ public abstract class AbstractLocalizable implements Serializable {
 
     private final List<String> key;
 
-    abstract String localize();
+    public abstract String getString();
 
     protected AbstractLocalizable(String key1, String... keyn) {
         List<String> tmp = new ArrayList<String>(keyn.length + 1);

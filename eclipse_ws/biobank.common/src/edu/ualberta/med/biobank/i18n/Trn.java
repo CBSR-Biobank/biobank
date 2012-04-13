@@ -23,7 +23,7 @@ class Trn extends AbstractLocalizable {
     }
 
     @Override
-    String localize() {
+    public String getString() {
         return i18n.trn(singular, plural, n, objects);
     }
 
