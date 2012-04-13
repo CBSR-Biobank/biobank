@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.i18n;
+package edu.ualberta.med.biobank.validator.messageinterpolator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

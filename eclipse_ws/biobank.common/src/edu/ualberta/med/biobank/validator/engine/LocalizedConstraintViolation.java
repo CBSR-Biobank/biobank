@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpo
  * 
  * @author Jonathan Ferland
  */
-public class LocalizedConstraintViolation<T> implements ConstraintViolation<T>,
-    Serializable {
+public class LocalizedConstraintViolation<T>
+    implements ConstraintViolation<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final OgnlMessageInterpolator MESSAGE_INTERPOLATOR =
