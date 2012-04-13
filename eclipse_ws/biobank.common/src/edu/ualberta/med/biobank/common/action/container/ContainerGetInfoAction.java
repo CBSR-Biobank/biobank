@@ -25,6 +25,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType ctype"
             + " LEFT JOIN FETCH ctype.childContainerTypes"
+            + " LEFT JOIN FETCH ctype.childLabelingScheme"
             + " LEFT JOIN FETCH ctype.specimenTypes"
             + " LEFT JOIN FETCH container.position"
             + " INNER JOIN FETCH container.topContainer topContainer"
@@ -48,7 +49,6 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
             + " LEFT JOIN FETCH container.position position"
             + " LEFT JOIN FETCH position.parentContainer parentContainer"
             + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
-            + " LEFT JOIN FETCH parentCtype.capacity"
             + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
             + " LEFT JOIN FETCH parentCtype.childContainerTypes"
             + " WHERE container.id = ?";

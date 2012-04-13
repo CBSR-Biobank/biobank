@@ -238,11 +238,9 @@ public abstract class AbstractLinkAssignEntryForm extends
                 SWT.RADIO);
         // used only for linking (but faster and easier to add it in this class)
         radioSinglePosition = toolkit.createButton(buttonsComposite,
-            "Single with position",
-            SWT.RADIO);
+            "Single with position", SWT.RADIO);
         radioMultiple = toolkit.createButton(buttonsComposite,
-            "Multiple",
-            SWT.RADIO);
+            "Multiple", SWT.RADIO);
 
         singleFieldsComposite = toolkit.createComposite(leftComposite);
         layout = new GridLayout(1, false);
@@ -425,8 +423,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); 
-        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); 
+        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
+        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
@@ -457,11 +455,11 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd = new GridData();
         gd.horizontalSpan = 3;
         comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values", 
+        fakeScanRandom = toolkit.createButton(comp, "Get random scan values",
             SWT.RADIO);
         fakeScanRandom.setSelection(true);
         toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO); 
+            "Get random and already linked specimens", SWT.RADIO);
     }
 
     /**
@@ -620,7 +618,8 @@ public abstract class AbstractLinkAssignEntryForm extends
             List<ContainerWrapper> foundContainers =
                 ContainerWrapper.getPossibleContainersFromPosition(
                     SessionManager.getAppService(), positionText.getText(),
-                    isContainerPosition, type);
+                    isContainerPosition, SessionManager.getUser()
+                        .getCurrentWorkingSite(), type);
             if (foundContainers.size() == 1) {
                 initParentContainers(foundContainers.get(0));
             } else if (foundContainers.size() > 1) {
@@ -634,31 +633,19 @@ public abstract class AbstractLinkAssignEntryForm extends
                     for (ContainerWrapper cont : foundContainers) {
                         sb.append(cont.getFullInfoLabel());
                     }
-                    BgcPlugin
-                        .openError(
-                            "Container problem",
-                            NLS.bind(
-                                "More than one container found matching {0}",
-                                sb.toString()));
+                    BgcPlugin.openError("Container problem",
+                        NLS.bind("More than one container found matching {0}",
+                            sb.toString()));
                     focusControl(positionText);
                 } else
                     initParentContainers(dlg.getSelectedContainer());
             }
         } catch (BiobankException be) {
-            BgcPlugin
-                .openError(
-                    "Init container from position",
-                    be);
-            appendLog(NLS
-                .bind(
-                    "ERROR: {0}",
-                    be.getMessage()));
+            BgcPlugin.openError("Init container from position", be);
+            appendLog(NLS.bind("ERROR: {0}", be.getMessage()));
             focusControl(positionText);
         } catch (Exception ex) {
-            BgcPlugin
-                .openError(
-                    "Init container from position",
-                    ex);
+            BgcPlugin.openError("Init container from position", ex);
             focusControl(positionText);
         }
     }
@@ -681,10 +668,9 @@ public abstract class AbstractLinkAssignEntryForm extends
                 label = parent.getLabel();
             parentMsg.append(label);
             if (i != 0)
-                parentMsg.append("|"); 
+                parentMsg.append("|");
         }
-        appendLog(NLS.bind(
-            "Parent containers found: {0}",
+        appendLog(NLS.bind("Parent containers found: {0}",
             parentMsg.toString()));
     }
 
@@ -697,7 +683,7 @@ public abstract class AbstractLinkAssignEntryForm extends
             @Override
             public void run() {
                 try {
-                    appendLog("----"); 
+                    appendLog("----");
                     String positionString = positionField.getText();
                     if (parentContainers == null
                         || parentContainers.size() == 0) {
@@ -705,14 +691,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                         return;
                     }
 
-                    appendLog(NLS
-                        .bind(
-                            "Checking position {0}",
-                            positionString));
+                    appendLog(NLS.bind("Checking position {0}", positionString));
                     ContainerWrapper container = parentContainers.get(0);
                     RowColPos position = container.getContainerType()
                         .getRowColFromPositionString(
-                            positionString.replace(container.getLabel(), "")); 
+                            positionString.replace(container.getLabel(), ""));
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);
@@ -720,13 +703,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        BgcPlugin
-                            .openError(
-                                "Position not free",
-                                NLS.bind(
-                                    "Position {0} already in use in container {1}",
-                                    positionString, parentContainers.get(0)
-                                        .getLabel()));
+                        BgcPlugin.openError("Position not free",
+                            NLS.bind(
+                                "Position {0} already in use in container {1}",
+                                positionString, parentContainers.get(0)
+                                    .getLabel()));
                         appendLog(NLS
                             .bind(
                                 "ERROR: Position {0} already in use in container {1}",

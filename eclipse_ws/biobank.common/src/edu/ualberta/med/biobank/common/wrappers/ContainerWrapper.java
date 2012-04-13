@@ -181,7 +181,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         ContainerWrapper parent = getParentContainer();
         if (parent != null) {
             RowColPos pos = getPositionAsRowCol();
-            if (pos != null) {
+            if ((pos != null) && (parent.getContainerType() != null)) {
                 return parent.getContainerType().getPositionString(pos);
             }
         }
@@ -848,14 +848,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *            used
      * @throws BiobankException
      */
-    @SuppressWarnings({ "unused", "null" })
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, String positionText,
-        boolean isContainerPosition, ContainerTypeWrapper contType)
+        boolean isContainerPosition, SiteWrapper site,
+        ContainerTypeWrapper contType)
         throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
-            positionText, contType.getSite(), contType);
+            positionText, site, contType);
         if (isContainerPosition)
             foundContainers = possibles;
         else {
