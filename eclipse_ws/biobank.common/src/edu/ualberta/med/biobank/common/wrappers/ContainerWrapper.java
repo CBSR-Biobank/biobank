@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -51,31 +52,21 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     private static final I18n i18n = I18nFactory
         .getI18n(ContainerWrapper.class);
 
+    @SuppressWarnings("nls")
     private static final String CHILD_POSITION_CONFLICT_MSG =
-        "Position {0} of container {1} already contains container {2} when trying to add container {3}.";
+        i18n.tr("Position {0} of container {1} already contains container {2} when trying to add container {3}.");
+    @SuppressWarnings("nls")
     private static final String OUT_OF_BOUNDS_POSITION_MSG =
-        "Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).";
+        i18n.tr("Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).");
+    @SuppressWarnings("nls")
     private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG =
-        "Container {0} does not allow inserts of type {1}.";
+        i18n.tr("Container {0} does not allow inserts of type {1}.");
+    @SuppressWarnings("nls")
     private static final String SAMPLE_EXISTS_AT_POSITION_MSG =
-        "Container {0} is already holding an specimen at position {1} {2}";
+        i18n.tr("Container {0} is already holding an specimen at position {1} {2}");
+    @SuppressWarnings("nls")
     private static final String CONTAINER_AT_POSITION_MSG =
-        "Container {0} is already holding a container {1} at position {2}.";
-
-    private static final Collection<Property<?, ? super Container>> UNIQUE_LABEL_PROPS,
-        UNIQUE_BARCODE_PROPS;
-
-    static {
-        UNIQUE_LABEL_PROPS = new ArrayList<Property<?, ? super Container>>();
-        UNIQUE_LABEL_PROPS.add(ContainerPeer.SITE.to(SitePeer.ID));
-        UNIQUE_LABEL_PROPS.add(ContainerPeer.LABEL);
-        UNIQUE_LABEL_PROPS.add(ContainerPeer.CONTAINER_TYPE
-            .to(ContainerTypePeer.ID));
-
-        UNIQUE_BARCODE_PROPS = new ArrayList<Property<?, ? super Container>>();
-        UNIQUE_BARCODE_PROPS.add(ContainerPeer.SITE.to(SitePeer.ID));
-        UNIQUE_BARCODE_PROPS.add(ContainerPeer.PRODUCT_BARCODE);
-    }
+        i18n.tr("Container {0} is already holding a container {1} at position {2}.");
 
     private Map<RowColPos, SpecimenWrapper> specimens;
     private Map<RowColPos, ContainerWrapper> children;
@@ -290,6 +281,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
         ContainerTypeWrapper type = getContainerType();
@@ -297,17 +289,24 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (rcp != null) {
             if (rcp.getRow() >= type.getRowCapacity()
                 || rcp.getCol() >= type.getColCapacity()) {
-                throw new Exception(
-                    MessageFormat
-                        .format(
-                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",
-                            position, getFullInfoLabel(),
-                            type.getRowCapacity(), type.getColCapacity()));
+                // {0} container position
+                // {1} container label (container type)
+                // {2} row capacity
+                // {3} column capacity
+                throw new LocalizedException(
+                    LocalizedString.tr("Can''t use position {0} in container" +
+                        " {1} because capacity is {2} * {3}.",
+                        position,
+                        getFullInfoLabel(),
+                        type.getRowCapacity(),
+                        type.getColCapacity()));
             }
             if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new Exception(
-                    MessageFormat.format(
-                        "Position ''{0}'' is invalid for this container {1}",
+                throw new LocalizedException(
+                    // {0} container position
+                    // {1} container label (container type)
+                    LocalizedString.tr(
+                        "Position \"{0}\" is invalid for container \"{1}\".",
                         position, getFullInfoLabel()));
             }
         }
@@ -684,6 +683,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     private static final String CONTAINERS_BY_LABEL = "from "
         + Container.class.getName() + " where " + ContainerPeer.LABEL.getName()
         + "=?";
@@ -711,6 +711,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     /**
      * Get the container with the given productBarcode in a site
      */
+    @SuppressWarnings("nls")
     public static ContainerWrapper getContainerWithProductBarcodeInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String productBarcode) throws Exception {
@@ -723,11 +724,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (containers.size() == 0) {
             return null;
         } else if (containers.size() > 1) {
-            throw new Exception(
-                MessageFormat
-                    .format(
-                        "Multiples containers registered with product barcode {0}.",
-                        productBarcode));
+            // {0} container barcode
+            throw new LocalizedException(
+                LocalizedString.tr("Multiples containers registered with" +
+                    " product barcode \"{0}\".",
+                    productBarcode));
         }
         return new ContainerWrapper(appService, containers.get(0));
     }
@@ -760,12 +761,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         reload();
     }
 
+    @SuppressWarnings("nls")
     @Deprecated
     private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
         if (type == null) {
-            throw new Exception(
-                "Error initializing container. That is not a valid container type.");
+            throw new IllegalArgumentException("null container type");
         }
         Boolean filled = (getChild(i, j) != null);
         if (!filled) {
@@ -860,7 +861,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *            used
      * @throws BiobankException
      */
-    @SuppressWarnings({ "unused", "null" })
+    @SuppressWarnings({ "unused", "null", "nls" })
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, String positionText,
         boolean isContainerPosition, ContainerTypeWrapper contType)
@@ -885,6 +886,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (foundContainers.size() == 0) {
             List<Integer> validLengths = ContainerLabelingSchemeWrapper
                 .getPossibleLabelLength(appService);
+
             StringBuffer res = new StringBuffer();
 
             for (int i = 0; i < validLengths.size(); i++) {
@@ -896,28 +898,27 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     res.append(positionText.substring(0, positionText.length()
                         - crop));
             }
+
             String errorMsg;
             if (contType == null) {
                 if (isContainerPosition) {
-                    errorMsg =
-                        MessageFormat
-                            .format(
-                                "Can''t find container that will match these possible labels: {0}",
-                                res.toString());
+                    // {0} possible labels
+                    errorMsg = i18n.tr("Can''t find container that will" +
+                        " match these possible labels: {0}", res.toString());
                 } else {
-                    errorMsg =
-                        MessageFormat
-                            .format(
-                                "Can''t find container that can hold specimens and that will match these possible labels: {0}",
-                                res.toString());
+                    // {0} possible labels
+                    errorMsg = i18n.tr("Can''t find container that can hold" +
+                        " specimens and that will match these possible" +
+                        " labels: {0}", res.toString());
                 }
             } else {
                 // {0} container type short name
                 // {1} possible labels
-                errorMsg = i18n.tr("Can't find container with type {0}" +
+                errorMsg = i18n.tr("Can''t find container with type {0}" +
                     " that will match these possible labels: {1}",
                     contType.getNameShort(), res.toString());
             }
+
             throw new BiobankException(errorMsg);
         }
         return foundContainers;

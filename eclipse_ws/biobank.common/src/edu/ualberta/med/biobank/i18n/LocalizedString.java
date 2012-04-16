@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.i18n;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
 
@@ -14,15 +11,13 @@ import org.xnap.commons.i18n.I18n;
  * 
  * @author Jonathan Ferland
  */
-public class LocalizedString implements Serializable {
+public class LocalizedString extends LazyString {
     private static final long serialVersionUID = 1L;
 
     private final AbstractLocalizable localizable;
-    private transient String string;
 
     public LocalizedString(AbstractLocalizable localizable) {
         this.localizable = localizable;
-        this.string = localizable.getString();
     }
 
     /**
@@ -87,11 +82,6 @@ public class LocalizedString implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return string;
-    }
-
-    @Override
     public int hashCode() {
         int hash = 31 + ((localizable == null) ? 0 : localizable.hashCode());
         return hash;
@@ -109,9 +99,8 @@ public class LocalizedString implements Serializable {
         return true;
     }
 
-    private void readObject(ObjectInputStream ois)
-        throws IOException, ClassNotFoundException {
-        ois.defaultReadObject();
-        string = localizable.getString();
+    @Override
+    protected String loadString() {
+        return localizable.getString();
     }
 }

@@ -14,14 +14,15 @@ import edu.ualberta.med.biobank.i18n.LocalizedString;
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
     private static final long serialVersionUID = 1L;
-    private Class<?> objectClass;
-    private String propertyName;
-    private String value;
-    private Integer objectId;
+    private final Class<?> objectClass;
+    private final String propertyName;
+    private final String value;
+    private final Integer objectId;
 
+    @SuppressWarnings("nls")
     private static final String CHECK_NO_DUPLICATES =
-        "select count(o) from {0} " //$NON-NLS-1$
-            + "as o where {1}=? {2}"; //$NON-NLS-1$
+        "select count(o) from {0} "
+            + "as o where {1}=? {2}";
 
     public CheckNoDuplicateAction(Class<?> objectClass, Integer objectId,
         String propertyName, String value) {
@@ -40,9 +41,9 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
     @SuppressWarnings("nls")
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        String equalsTest = ""; //$NON-NLS-1$
+        String equalsTest = "";
         if (objectId != null) {
-            equalsTest = " and id <> ?"; //$NON-NLS-1$
+            equalsTest = " and id <> ?";
         }
 
         final String qryString = MessageFormat.format(CHECK_NO_DUPLICATES,
@@ -57,7 +58,8 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         List<Long> res = query.list();
         if (res.size() != 1) {
             throw new ActionException(
-                LocalizedString.tr("Expected a single query result, but got \"{0}\".",
+                LocalizedString.tr(
+                    "Expected a single query result, but got \"{0}\".",
                     res.size()));
         }
         return new BooleanResult(res.get(0) == 0);
