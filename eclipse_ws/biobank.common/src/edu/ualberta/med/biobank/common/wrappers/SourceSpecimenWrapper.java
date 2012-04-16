@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.wrappers.base.SourceSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
@@ -21,7 +21,7 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
         if (other instanceof SourceSpecimenWrapper) {
             ModelWrapper<SpecimenType> otherSpecimenType = ((SourceSpecimenWrapper) other)
                 .getSpecimenType();
-            return NullHelper.cmp(getSpecimenType(), otherSpecimenType);
+            return NullUtil.cmp(getSpecimenType(), otherSpecimenType);
         }
         return 0;
     }

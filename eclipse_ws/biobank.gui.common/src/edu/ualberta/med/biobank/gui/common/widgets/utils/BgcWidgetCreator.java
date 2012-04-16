@@ -61,7 +61,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 
 public class BgcWidgetCreator {
 
@@ -606,7 +606,7 @@ public class BgcWidgetCreator {
         b.getValidationStatus().addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                boolean equal = NullHelper.eq(
+                boolean equal = NullUtil.eq(
                     writableValue.getValue(), observableValue.getValue());
 
                 if (equal) {

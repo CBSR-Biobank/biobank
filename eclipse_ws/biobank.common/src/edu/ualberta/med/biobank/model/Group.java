@@ -15,7 +15,7 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -72,7 +72,7 @@ public class Group extends Principal {
         public int compare(Group a, Group b) {
             if (a == null && b == null) return 0;
             if (a == null ^ b == null) return (a == null) ? -1 : 1;
-            return NullHelper.cmp(a.getName(), b.getName());
+            return NullUtil.cmp(a.getName(), b.getName());
         }
     }
 }

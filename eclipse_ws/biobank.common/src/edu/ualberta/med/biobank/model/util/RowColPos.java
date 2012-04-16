@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.model.util;
 
 import java.io.Serializable;
 
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 
 public class RowColPos implements Comparable<RowColPos>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -48,8 +48,8 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     @Override
     public int compareTo(RowColPos that) {
-        int cmp = NullHelper.cmp(row, that.row);
-        return cmp != 0 ? cmp : NullHelper.cmp(col, that.col);
+        int cmp = NullUtil.cmp(row, that.row);
+        return cmp != 0 ? cmp : NullUtil.cmp(col, that.col);
     }
 
     @Override

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.util;
 
 import java.util.Comparator;
 
-public class NullHelper {
+public class NullUtil {
     public static boolean eq(Object a, Object b) {
         return (a == null) ? (b == null) : a.equals(b);
     }

@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 
 public abstract class GroupInfoTable extends
     DefaultAbstractInfoTableWidget<Group> {
@@ -156,7 +156,7 @@ public abstract class GroupInfoTable extends
     public static class GroupComparator implements Comparator<Group> {
         @Override
         public int compare(Group a, Group b) {
-            return NullHelper.cmp(a.getName(), b.getName(),
+            return NullUtil.cmp(a.getName(), b.getName(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }

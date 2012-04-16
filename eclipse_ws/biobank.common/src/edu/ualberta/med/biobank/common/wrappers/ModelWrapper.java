@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.util.ProxyUtil;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -594,7 +594,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     @Override
     public int compareTo(ModelWrapper<E> other) {
-        return NullHelper.cmp(getId(), other.getId());
+        return NullUtil.cmp(getId(), other.getId());
     }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(

@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UserInfoTable extends
@@ -212,7 +212,7 @@ public abstract class UserInfoTable extends
     public static class UserComparator implements Comparator<User> {
         @Override
         public int compare(User a, User b) {
-            return NullHelper.cmp(a.getLogin(), b.getLogin(),
+            return NullUtil.cmp(a.getLogin(), b.getLogin(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }
