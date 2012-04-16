@@ -48,4 +48,8 @@ public class AbstractReportTreeNode {
     public String getToolTipText() {
         return null;
     }
+
+    public void removeAll() {
+        children.clear();
+    }
 }

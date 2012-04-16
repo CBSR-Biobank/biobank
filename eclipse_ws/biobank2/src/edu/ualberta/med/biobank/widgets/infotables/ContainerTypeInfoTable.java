@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -177,5 +178,13 @@ public class ContainerTypeInfoTable extends
             .isAllowed(
                 new ContainerTypeDeletePermission(target.getContainerType()
                     .getId()));
+    }
+
+    @Override
+    protected Boolean canView(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeReadPermission(target.getContainerType()));
     }
 }

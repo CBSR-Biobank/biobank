@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -155,6 +156,12 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
     protected Boolean canDelete(Container target) throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new ContainerDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(Container target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ContainerReadPermission(target.getId()));
     }
 
 }

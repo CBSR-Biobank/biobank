@@ -153,4 +153,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
     protected Boolean canDelete(Contact target) throws ApplicationException {
         return true;
     }
+
+    @Override
+    protected Boolean canView(Contact target) throws ApplicationException {
+        return true;
+    }
 }

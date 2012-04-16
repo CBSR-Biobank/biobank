@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -113,5 +114,12 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new StudyDeletePermission(target.getStudy().getId()));
+    }
+
+    @Override
+    protected Boolean canView(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyReadPermission(target.getStudy().getId()));
     }
 }

@@ -118,4 +118,9 @@ public class ClinicVisitInfoTable extends
         return false;
     }
 
+    @Override
+    protected Boolean canView(PatientCEventInfo target)
+        throws ApplicationException {
+        return true;
+    }
 }

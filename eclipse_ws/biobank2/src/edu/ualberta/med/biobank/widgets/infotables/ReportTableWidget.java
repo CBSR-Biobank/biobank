@@ -190,7 +190,11 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
     @Override
     protected Boolean canDelete(T target) throws ApplicationException {
-        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(T target) throws ApplicationException {
         return false;
     }
 

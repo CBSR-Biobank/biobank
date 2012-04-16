@@ -148,4 +148,10 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         return true;
     }
 
+    @Override
+    protected Boolean canView(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
 }

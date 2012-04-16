@@ -382,7 +382,11 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     public void doubleClick() {
         // get selection as derived class object
         Object selection = getSelection();
-
+        try {
+            if (!canView(getSelection())) return;
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError("Error", "Unable to open form.", e);
+        }
         final InfoTableEvent<T> event = new InfoTableEvent<T>(this,
             new InfoTableSelection(selection));
         Object[] listeners = doubleClickListeners.getListeners();
@@ -463,6 +467,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
             });
         }
     }
+
+    protected abstract Boolean canView(T target) throws ApplicationException;
 
     protected abstract Boolean canEdit(T target) throws ApplicationException;
 

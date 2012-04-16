@@ -77,4 +77,10 @@ public class ShippingMethodInfoTable extends
         throws ApplicationException {
         return true;
     }
+
+    @Override
+    protected Boolean canView(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
+    }
 }

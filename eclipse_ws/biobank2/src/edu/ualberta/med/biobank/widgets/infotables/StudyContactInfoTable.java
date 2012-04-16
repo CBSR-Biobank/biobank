@@ -189,4 +189,10 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         throws ApplicationException {
         return false;
     }
+
+    @Override
+    protected Boolean canView(ClinicContacts target)
+        throws ApplicationException {
+        return false;
+    }
 }

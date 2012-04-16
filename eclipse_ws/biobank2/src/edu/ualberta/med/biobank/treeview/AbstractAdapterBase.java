@@ -451,7 +451,7 @@ public abstract class AbstractAdapterBase implements
     }
 
     public void openViewForm() {
-        if (getViewFormId() != null) {
+        if (getViewFormId() != null && isReadable) {
             openForm(new FormInput(this), getViewFormId());
         }
     }

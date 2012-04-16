@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -123,6 +124,13 @@ public class CollectionEventInfoTable extends
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new CollectionEventDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(CollectionEventWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventReadPermission(target.getId()));
     }
 
 }
