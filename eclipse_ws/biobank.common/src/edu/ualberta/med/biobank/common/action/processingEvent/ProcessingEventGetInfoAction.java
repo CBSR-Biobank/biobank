@@ -41,7 +41,7 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(null).isAllowed(context);
+        return new ProcessingEventReadPermission(peventId).isAllowed(context);
     }
 
     @Override

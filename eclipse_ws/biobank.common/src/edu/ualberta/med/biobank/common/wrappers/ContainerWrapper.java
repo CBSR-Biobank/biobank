@@ -849,8 +849,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
-        BiobankApplicationService appService, String positionText,
-        boolean isContainerPosition, SiteWrapper site,
+        BiobankApplicationService appService, SiteWrapper site,
+        String positionText, boolean isContainerPosition,
         ContainerTypeWrapper contType)
         throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;

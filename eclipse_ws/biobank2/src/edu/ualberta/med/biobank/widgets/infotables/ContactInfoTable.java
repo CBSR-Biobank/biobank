@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
@@ -52,7 +53,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -132,6 +134,18 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(ContactWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

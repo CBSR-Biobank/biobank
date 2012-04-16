@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -107,7 +108,7 @@ public enum SearchType {
             CenterWrapper<?> center) throws Exception {
             PEventByWSSearchAction action =
                 new PEventByWSSearchAction(searchString,
-                    center.getId());
+                    (Site) center.getWrappedObject());
             return wrapIds(SessionManager.getAppService()
                 .doAction(action).getList(), ProcessingEventWrapper.class);
         }

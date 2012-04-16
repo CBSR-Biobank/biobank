@@ -6,10 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
@@ -48,7 +52,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return Messages.infotable_loading_msg;
@@ -115,12 +120,17 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return null;
     }
 
-    /*
-     * @Override public void setSelection(ClinicWrapper item) {
-     * BiobankCollectionModel modelItem = null; for (BiobankCollectionModel m :
-     * model) { if (item.equals(m.o)) { modelItem = m; break; } } if (modelItem
-     * == null) return;
-     * 
-     * tableViewer.setSelection(new StructuredSelection(modelItem)); }
-     */
+    @Override
+    protected Boolean canEdit(ClinicWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(ClinicWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicDeletePermission(target.getId()));
+    }
+
 }

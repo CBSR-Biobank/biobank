@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.widgets.infotables.RoleInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class RolesPage extends BgcDialogPage {
 
@@ -65,6 +66,17 @@ public abstract class RolesPage extends BgcDialogPage {
                 newRole.setName("Copy of " + src.getName());
                 newRole.getPermissions().addAll(src.getPermissions());
                 addRole(newRole);
+            }
+
+            @Override
+            protected Boolean canEdit(Role target) throws ApplicationException {
+                return true;
+            }
+
+            @Override
+            protected Boolean canDelete(Role target)
+                throws ApplicationException {
+                return true;
             }
         };
         roleInfoTable.setList(getCurrentAllRolesList());

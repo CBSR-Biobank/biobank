@@ -363,7 +363,6 @@ public class ContainerAdapter extends AdapterBase {
     protected void runDelete() throws Exception {
         SessionManager.getAppService().doAction(new ContainerDeleteAction(
             (Container) getModelObject().getWrappedObject()));
-        SessionManager.updateAllSimilarNodes(getParent(),
-            true);
+        SessionManager.updateAllSimilarNodes(getParent(), true);
     }
 }

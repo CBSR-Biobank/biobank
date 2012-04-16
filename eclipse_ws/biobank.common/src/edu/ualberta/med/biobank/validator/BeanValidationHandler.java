@@ -52,7 +52,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
         new OgnlMessageInterpolator();
 
     // TODO: I really hope this doesn't hold onto TONS of objects. Investigate!
-    private ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
+    private final ConcurrentHashMap<EntityPersister, Set<String>> associationsPerEntityPersister =
         new ConcurrentHashMap<EntityPersister, Set<String>>();
 
     public BeanValidationHandler() {
@@ -94,8 +94,15 @@ public class BeanValidationHandler implements PreInsertEventListener,
     public void onPreRemoveCollection(PreCollectionRemoveEvent event) {
         // TODO: this is important when the owning entity is deleted, to check
         // this first.
-        // System.out.println("Remove. Role: " +
-        // event.getCollection().getRole());
+        Object entity = event.getAffectedOwnerOrNull();
+        if (entity == null) return;
+
+        EventSource session = event.getSession();
+        EntityPersister persister = session.getEntityPersister(null, entity);
+
+        Validator validator = getValidator(persister, session);
+
+        validate(validator, entity, session, new Class<?>[] { PreDelete.class });
     }
 
     @Override

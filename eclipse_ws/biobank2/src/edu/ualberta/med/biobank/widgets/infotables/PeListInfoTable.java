@@ -5,10 +5,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBriefInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
 
@@ -102,5 +106,19 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ProcessingEventBriefInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ProcessingEventUpdatePermission(target.e.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(ProcessingEventBriefInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ProcessingEventDeletePermission(target.e.getId()));
     }
 }

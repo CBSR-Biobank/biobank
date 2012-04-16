@@ -29,4 +29,8 @@ public class ClinicWithShipmentAdapter extends ClinicAdapter {
         return false;
     }
 
+    @Override
+    public void rebuild() {
+        performExpand();
+    }
 }

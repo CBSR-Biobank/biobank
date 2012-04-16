@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class GroupsPage extends BgcDialogPage {
 
@@ -84,6 +85,18 @@ public abstract class GroupsPage extends BgcDialogPage {
                     }
 
                     addGroup(newGroup);
+                }
+
+                @Override
+                protected Boolean canEdit(Group target)
+                    throws ApplicationException {
+                    return true;
+                }
+
+                @Override
+                protected Boolean canDelete(Group target)
+                    throws ApplicationException {
+                    return true;
                 }
             };
 

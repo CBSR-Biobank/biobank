@@ -679,9 +679,6 @@ End:
     <copy todir="${buildDirectory}/plugins/biobank.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.common" />
     </copy>
-    <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
-      <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
-    </copy>
     <copy todir="${buildDirectory}/plugins/labelPrinter">
       <fileset dir="${eclipse.workspace.dir}/labelPrinter" />
     </copy>

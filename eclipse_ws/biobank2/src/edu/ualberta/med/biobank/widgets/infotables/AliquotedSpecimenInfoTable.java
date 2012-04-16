@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotedSpecimenInfoTable extends
     InfoTableWidget<AliquotedSpecimenWrapper> {
@@ -109,5 +110,17 @@ public class AliquotedSpecimenInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 }
