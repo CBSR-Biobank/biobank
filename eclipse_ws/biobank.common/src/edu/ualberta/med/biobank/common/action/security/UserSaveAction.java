@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserSaveAction implements Action<UserSaveOutput> {
     private static final long serialVersionUID = 1L;
@@ -111,10 +110,9 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                 tx.registerSynchronization(new PersistCsmUserOnRollback(
                     oldUserData, oldPw));
             }
-        } catch (ApplicationException e) {
-            throw new ActionException(
-                LocalizedString
-                    .tr("Problem modify associated CSM user properties"),
+        } catch (Exception e) {
+            throw new ActionException(LocalizedString.tr(
+                "Problem modify associated CSM user properties"),
                 e);
         }
     }
@@ -296,7 +294,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             if (status == javax.transaction.Status.STATUS_ROLLEDBACK) {
                 try {
                     BiobankCSMSecurityUtil.deleteUser(user);
-                } catch (ApplicationException e) {
+                } catch (Exception e) {
                     // TODO: what to do?
                 }
             }
@@ -317,7 +315,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             if (status == javax.transaction.Status.STATUS_ROLLEDBACK) {
                 try {
                     BiobankCSMSecurityUtil.persistUser(user, oldPassword);
-                } catch (ApplicationException e) {
+                } catch (Exception e) {
                     // TODO: what to do?
                 }
             }

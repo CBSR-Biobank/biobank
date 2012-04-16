@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 public class BiobankClassCache extends ClassCache {
+    @SuppressWarnings("nls")
     @Override
     public boolean isCollection(String className, String attribName)
         throws QueryException
