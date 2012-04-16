@@ -238,6 +238,7 @@ public abstract class AbstractAdapterBase implements
             getChildren())) {
             removeChild(child);
         }
+        this.hasChildren = false;
     }
 
     public AbstractAdapterBase contains(AbstractAdapterBase item) {
