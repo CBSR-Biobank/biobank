@@ -276,7 +276,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     @Override
     protected Boolean canEdit(SpecimenInfo target) throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
+        return target != null && SessionManager.getAppService().isAllowed(
             new SpecimenUpdatePermission(target.specimen.getId()));
     }
 

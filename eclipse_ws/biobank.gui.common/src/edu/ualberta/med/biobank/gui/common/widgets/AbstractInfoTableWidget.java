@@ -90,7 +90,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected ListenerList deleteItemListeners = new ListenerList();
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    public AbstractInfoTableWidget(Composite parent, String[] headings,
+    public AbstractInfoTableWidget(final Composite parent,
+        final String[] headings,
         int[] columnWidths, int rowsPerPage) {
         super(parent, SWT.NONE);
 
@@ -141,6 +142,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
             @Override
             public void handleEvent(Event event) {
                 try {
+                    int max = menu.getItemCount();
+                    for (int i = max - 1; i >= 0; i--)
+                        menu.getItem(i).dispose();
                     if (addItemListeners.getListeners().length > 0) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
                         item.setText(Messages.AbstractInfoTableWidget_add);
@@ -177,6 +181,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     BgcPlugin.openAsyncError("Error",
                         "Unable to load menu for selection", e);
                 }
+                BgcClipboard.addClipboardCopySupport(tableViewer, menu,
+                    labelProvider,
+                    headings.length);
             }
         });
 
@@ -186,9 +193,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         if (autoSizeColumns) {
             autoSizeColumns();
         }
-
-        BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider,
-            headings.length);
 
     }
 
