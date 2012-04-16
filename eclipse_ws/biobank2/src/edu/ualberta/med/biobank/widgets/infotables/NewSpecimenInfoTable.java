@@ -283,13 +283,13 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
     @Override
     protected Boolean canDelete(SpecimenInfo target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
+        return target != null && SessionManager.getAppService().isAllowed(
             new SpecimenDeletePermission(target.specimen.getId()));
     }
 
     @Override
     protected Boolean canView(SpecimenInfo target) throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
+        return target != null && SessionManager.getAppService().isAllowed(
             new SpecimenReadPermission(target.specimen.getId()));
     }
 
