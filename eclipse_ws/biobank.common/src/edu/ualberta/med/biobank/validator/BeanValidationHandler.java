@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +18,7 @@ import javax.validation.groups.Default;
 
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
+import org.hibernate.action.EntityDeleteAction;
 import org.hibernate.cfg.beanvalidation.HibernateTraversableResolver;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.event.AbstractPreDatabaseOperationEvent;
@@ -98,11 +100,26 @@ public class BeanValidationHandler implements PreInsertEventListener,
         if (entity == null) return;
 
         EventSource session = event.getSession();
-        EntityPersister persister = session.getEntityPersister(null, entity);
 
-        Validator validator = getValidator(persister, session);
+        boolean queuedForDeletion = false;
+        @SuppressWarnings("rawtypes")
+        ArrayList deletions = session.getActionQueue().cloneDeletions();
+        for (Object deletion : deletions) {
+            EntityDeleteAction action = (EntityDeleteAction) deletion;
+            if (action.getInstance() == entity) {
+                queuedForDeletion = true;
+                break;
+            }
+        }
 
-        validate(validator, entity, session, new Class<?>[] { PreDelete.class });
+        if (queuedForDeletion) {
+            // only validate the owning object for deletion if it is set
+            // to be deleted in the Hibernate ActionQueue
+            Class<?>[] groups = new Class<?>[] { PreDelete.class };
+            EntityPersister prstr = session.getEntityPersister(null, entity);
+            Validator validator = getValidator(prstr, session);
+            validate(validator, entity, session, groups);
+        }
     }
 
     @Override
