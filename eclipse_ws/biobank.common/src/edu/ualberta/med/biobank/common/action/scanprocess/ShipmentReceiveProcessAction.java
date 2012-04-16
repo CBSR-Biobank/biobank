@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.scanprocess;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.ItemState;
@@ -23,7 +23,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
 
     private static final long serialVersionUID = 1L;
 
-    private ShipmentProcessInfo data;
+    private final ShipmentProcessInfo data;
 
     public ShipmentReceiveProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
@@ -92,7 +92,8 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      */
     private void updateCellWithSpecimen(CellInfo cell, Specimen specimen) {
         cell.setSpecimenId(specimen.getId());
-        cell.setTitle(specimen.getCollectionEvent().getPatient().getPnumber());
+        cell.setTitle(LocalizedString.lit(specimen.getCollectionEvent()
+            .getPatient().getPnumber()));
     }
 
     /**
@@ -103,15 +104,16 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      */
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void processCellDipatchReceiveStatus(Session session, CellInfo cell) {
         Specimen foundSpecimen = searchSpecimen(session, cell.getValue());
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(
+            cell.setInformation(LocalizedString.tr(
                 "Specimen {0} not found in database", cell
                     .getValue()));
-            cell.setTitle("!");
+            cell.setTitle(LocalizedString.tr("!"));
         } else {
             ItemState state = data
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
@@ -119,7 +121,8 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellInfoStatus.EXTRA);
-                cell.setInformation("Specimen should not be in shipment");
+                cell.setInformation(LocalizedString.tr(
+                    "Specimen should not be in shipment"));
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);

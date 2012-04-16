@@ -16,7 +16,7 @@ public class LocalizedString extends LazyString {
 
     private final AbstractLocalizable localizable;
 
-    public LocalizedString(AbstractLocalizable localizable) {
+    private LocalizedString(AbstractLocalizable localizable) {
         this.localizable = localizable;
     }
 
@@ -68,6 +68,10 @@ public class LocalizedString extends LazyString {
         String plural, long n, Object... objects) {
         return new LocalizedString(new Trnc(context, singular, plural, n,
             objects));
+    }
+
+    public static LocalizedString lit(String literal) {
+        return new LocalizedString(new Literal(literal));
     }
 
     /**

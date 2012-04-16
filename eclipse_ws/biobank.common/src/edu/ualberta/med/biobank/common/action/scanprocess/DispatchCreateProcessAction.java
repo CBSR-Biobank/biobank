@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.scanprocess;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 
@@ -10,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessIn
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 public class DispatchCreateProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
 
-    private ShipmentProcessInfo data;
+    private final ShipmentProcessInfo data;
 
     public DispatchCreateProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
@@ -123,8 +123,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
-    // TODO: the server local may be different than the client, baking strings
-    // here is a bad idea.
+    @SuppressWarnings("nls")
     private CellInfoStatus processCellDipatchCreateStatus(CellInfo scanCell,
         Center sender, boolean checkAlreadyAdded) {
         Specimen expectedSpecimen = null;
@@ -135,24 +134,25 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format(
-                "Specimen {0} missing",
+            scanCell.setInformation(LocalizedString.tr("Specimen {0} missing",
                 expectedSpecimen.getInventoryId()));
-            scanCell.setTitle("?");
+            scanCell.setTitle(LocalizedString.tr("?"));
         } else {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellInfoStatus.ERROR);
-                scanCell.setInformation("Specimen does not exist.");
+                scanCell.setInformation(LocalizedString.tr(
+                    "Specimen does not exist."));
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
                     // Position taken
                     scanCell.setStatus(CellInfoStatus.ERROR);
-                    scanCell
-                        .setInformation("Specimen different from the one registered at this position");
-                    scanCell.setTitle("!");
+                    scanCell.setInformation(LocalizedString.tr(
+                        "Specimen different from the one registered" +
+                            " at this position"));
+                    scanCell.setTitle(LocalizedString.tr("!"));
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
@@ -162,10 +162,10 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     } else {
                         // should not be there
                         scanCell.setStatus(CellInfoStatus.ERROR);
-                        scanCell.setTitle(foundSpecimen.getCollectionEvent()
-                            .getPatient().getPnumber());
-                        scanCell
-                            .setInformation("This specimen should be on another pallet");
+                        scanCell.setTitle(LocalizedString.lit(foundSpecimen
+                            .getCollectionEvent().getPatient().getPnumber()));
+                        scanCell.setInformation(LocalizedString.tr(
+                            "This specimen should be on another pallet"));
                     }
                 }
             }
@@ -182,26 +182,25 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * @param checkAlreadyAdded
      * @throws Exception
      */
-    // TODO: the server local may be different than the client, baking strings
-    // here is a bad idea.
+    @SuppressWarnings("nls")
     private void checkCanAddSpecimen(CellInfo cell, Specimen specimen,
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation("");
+            cell.setInformation(LocalizedString.lit(""));
         } else if (specimen.getActivityStatus() != ActivityStatus.ACTIVE) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat
-                .format(
-                    "Activity status of {0} is not ''Active''. Check comments on this specimen for more information.",
-                    specimen.getInventoryId()));
+            cell.setInformation(LocalizedString.tr(
+                "Activity status of {0} is not ''Active''. Check" +
+                    " comments on this specimen for more information.",
+                specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat
-                .format(
-                    "Specimen {0} is currently assigned to center {1}. It should first be sent to center {2}.",
-                    specimen.getInventoryId(), specimen.getCurrentCenter()
-                        .getNameShort(), sender.getNameShort()));
+            cell.setInformation(LocalizedString.tr(
+                "Specimen {0} is currently assigned to center" +
+                    " {1}. It should first be sent to center {2}.",
+                specimen.getInventoryId(), specimen.getCurrentCenter()
+                    .getNameShort(), sender.getNameShort()));
         } else {
             Map<Integer, ItemState> currentSpecimenIds = data
                 .getCurrentDispatchSpecimenIds();
@@ -209,13 +208,13 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format(
+                cell.setInformation(LocalizedString.tr(
                     "{0} is already in this dispatch.",
                     specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
                 .run(actionContext).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format(
+                cell.setInformation(LocalizedString.tr(
                     "{0} is already in a not closed dispatch.",
                     specimen.getInventoryId()));
             } else {
@@ -223,8 +222,8 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     cell.setStatus(CellInfoStatus.IN_SHIPMENT_ADDED);
                 else
                     cell.setStatus(CellInfoStatus.FILLED);
-                cell.setTitle(specimen.getCollectionEvent().getPatient()
-                    .getPnumber());
+                cell.setTitle(LocalizedString.lit(specimen.getCollectionEvent()
+                    .getPatient().getPnumber()));
                 cell.setSpecimenId(specimen.getId());
             }
         }

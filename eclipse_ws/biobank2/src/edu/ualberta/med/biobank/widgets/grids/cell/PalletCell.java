@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -21,13 +22,13 @@ public class PalletCell extends AbstractUICell {
 
     private String information;
 
-    private String title = ""; 
+    private String title = "";
 
     private SpecimenWrapper sourceSpecimen;
 
     private SpecimenWrapper specimen;
 
-    private ScanCell scanCell;
+    private final ScanCell scanCell;
 
     private SpecimenWrapper expectedSpecimen;
 
@@ -162,7 +163,7 @@ public class PalletCell extends AbstractUICell {
             }
             return type.getName();
         }
-        return ""; 
+        return "";
     }
 
     public SpecimenTypeWrapper getType() {
@@ -249,9 +250,9 @@ public class PalletCell extends AbstractUICell {
         edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());
-        setInformation(cell.getInformation());
+        setInformation(cell.getInformation().toString());
         setValue(cell.getValue());
-        setTitle(cell.getTitle());
+        setTitle(cell.getTitle().toString());
         SpecimenWrapper expectedSpecimen = null;
         if (cell.getExpectedSpecimenId() != null) {
             expectedSpecimen = new SpecimenWrapper(appService);
@@ -284,10 +285,11 @@ public class PalletCell extends AbstractUICell {
             : getExpectedSpecimen().getId());
         if (getStatus() != null)
             serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
-        serverCell.setInformation(getInformation());
+        serverCell.setInformation(LocalizedString.lit(getInformation()
+            .toString()));
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
-        serverCell.setTitle(getTitle());
+        serverCell.setTitle(LocalizedString.lit(getTitle()));
         return serverCell;
     }
 }

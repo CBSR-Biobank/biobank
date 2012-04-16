@@ -14,13 +14,14 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResu
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenLinkProcessAction extends ServerProcessAction {
 
     private static final long serialVersionUID = 1L;
-    private Integer studyId;
+    private final Integer studyId;
 
     // multiple cells link process
     public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
@@ -50,6 +51,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     protected CellInfoStatus internalProcessScanResult(Session session,
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
         throws ActionException {
@@ -67,11 +69,10 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         String otherPosition = ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(otherValue.getRow(),
                                 otherValue.getCol()));
-                        cell.setInformation(MessageFormat
-                            .format(
+                        cell.setInformation(LocalizedString
+                            .tr(
                                 "Value ''{0}'' has already been scanned in position {1}",
-                                cell
-                                    .getValue(), otherPosition));
+                                cell.getValue(), otherPosition));
                         appendNewLog(MessageFormat
                             .format(
                                 "ERROR in {0}: Value ''{1}'' has already been scanned in position {2}",
@@ -113,6 +114,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
      */
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private CellInfoStatus processCellLinkStatus(Session session, CellInfo cell)
         throws ActionException {
         if (cell == null)
@@ -124,7 +126,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen != null) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation("Specimen already in database");
+                cell.setInformation(LocalizedString
+                    .tr("Specimen already in database"));
                 String palletPosition = ContainerLabelingSchemeWrapper
                     .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                 if (foundSpecimen.getParentSpecimen() == null)

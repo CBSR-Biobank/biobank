@@ -37,7 +37,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchSpecimensTreeTable specimensTree;
-    private List<SpecimenWrapper> receivedOrExtraSpecimens =
+    private final List<SpecimenWrapper> receivedOrExtraSpecimens =
         new ArrayList<SpecimenWrapper>();
     private CommentsInfoTable commentEntryTable;
 
@@ -204,7 +204,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 if (showMessages)
                     BgcPlugin.openInformation(
                         "Problem with specimen", res
-                            .getCell().getInformation());
+                            .getCell().getInformation().toString());
                 else
                     throw new Exception(
                         "Problem with specimen");

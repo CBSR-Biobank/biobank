@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -23,7 +24,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 public class SpecimenAssignProcessAction extends ServerProcessAction {
 
     private static final long serialVersionUID = 1L;
-    private AssignProcessInfo data;
+    private final AssignProcessInfo data;
 
     // multiple cells assign process
     public SpecimenAssignProcessAction(AssignProcessInfo data,
@@ -141,8 +142,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)
                     scanCell.setStatus(CellInfoStatus.FILLED);
-                    scanCell.setTitle(foundSpecimen.getCollectionEvent()
-                        .getPatient().getPnumber());
+                    scanCell.setTitle(LocalizedString.lit(foundSpecimen
+                        .getCollectionEvent().getPatient().getPnumber()));
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
                     ContainerType cType =
@@ -164,9 +165,10 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                                     scanCell, foundSpecimen);
                             } else {
                                 scanCell.setStatus(CellInfoStatus.NEW);
-                                scanCell.setTitle(foundSpecimen
-                                    .getCollectionEvent().getPatient()
-                                    .getPnumber());
+                                scanCell.setTitle(LocalizedString
+                                    .lit(foundSpecimen
+                                        .getCollectionEvent().getPatient()
+                                        .getPnumber()));
                             }
                         }
                     } else {
@@ -185,6 +187,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
      */
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsMissing(String position, CellInfo scanCell,
         Specimen missingSpecimen,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) {
@@ -193,9 +196,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             .get(rcp);
         if (!Boolean.TRUE.equals(posHasMovedSpecimen)) {
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format("",
+            scanCell.setInformation(LocalizedString.lit(
                 missingSpecimen.getInventoryId()));
-            scanCell.setTitle("?");
+            scanCell.setTitle(LocalizedString.tr("?"));
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
             appendNewLog(MessageFormat
@@ -216,9 +219,10 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
      */
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsNotFound(String position, CellInfo scanCell) {
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation("Specimen not found");
+        scanCell.setInformation(LocalizedString.tr("Specimen not found"));
         appendNewLog(MessageFormat.format(
             "ERROR in {0}: specimen ''{1}'' not found in the database",
             position, scanCell.getValue()));
@@ -229,12 +233,13 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
      */
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsPositionAlreadyTaken(String position,
         CellInfo scanCell, Specimen expectedSpecimen,
         Specimen foundSpecimen) {
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation("");
-        scanCell.setTitle("!");
+        scanCell.setInformation(LocalizedString.lit(""));
+        scanCell.setTitle(LocalizedString.lit("!"));
         appendNewLog(MessageFormat
             .format(
                 "ERROR in {0}: Expected inventoryId {1} from patient {2} -- Found inventoryId {3} from patient {4}",
@@ -290,6 +295,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsMoved(String position, CellInfo scanCell,
         Specimen foundSpecimen) {
         String expectedPosition = SpecimenActionHelper.getPositionString(
@@ -299,9 +305,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         }
 
         scanCell.setStatus(CellInfoStatus.MOVED);
-        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setInformation(MessageFormat.format(
+        scanCell.setTitle(LocalizedString.lit(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber()));
+        scanCell.setInformation(LocalizedString.tr(
             "Specimen previously registered on another position: {0}",
             expectedPosition));
 
@@ -313,6 +319,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsInOtherSite(String position, CellInfo scanCell,
         Specimen foundSpecimen) {
         String currentPosition = SpecimenActionHelper.getPositionString(
@@ -322,9 +329,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         }
         String siteName = foundSpecimen.getCurrentCenter().getNameShort();
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
-            .getPnumber());
-        scanCell.setInformation(MessageFormat.format(
+        scanCell.setTitle(LocalizedString.lit(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber()));
+        scanCell.setInformation(LocalizedString.tr(
             "Specimen has a position in another site (site {0})",
             siteName));
 
@@ -336,15 +343,16 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsTypeError(String position, CellInfo scanCell,
         Specimen foundSpecimen, ContainerType containerType) {
         String palletType = containerType.getName();
         String sampleType = foundSpecimen.getSpecimenType().getName();
 
-        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
-            .getPnumber());
+        scanCell.setTitle(LocalizedString.lit(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber()));
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation(MessageFormat.format(
+        scanCell.setInformation(LocalizedString.tr(
             "This pallet type {0} can''t hold a specimen of type {1}",
             palletType, sampleType));
         appendNewLog(MessageFormat
@@ -355,13 +363,15 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
+    @SuppressWarnings("nls")
     private void updateCellAsDispatchedError(String positionString,
         CellInfo scanCell, Specimen foundSpecimen) {
-        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
-            .getPnumber());
+        scanCell.setTitle(LocalizedString.lit(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber()));
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell
-            .setInformation("Cannot assign position to a specimen that in dispatch transit");
+            .setInformation(LocalizedString
+                .tr("Cannot assign position to a specimen that in dispatch transit"));
         appendNewLog(MessageFormat
             .format(
                 "ERROR in {0}: Cannot assign position to a specimen that still is in dispatch transit",

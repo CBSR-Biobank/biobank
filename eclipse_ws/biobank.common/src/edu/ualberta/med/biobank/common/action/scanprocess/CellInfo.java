@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.i18n.LocalizedString;
+
 public class CellInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -14,9 +16,11 @@ public class CellInfo implements Serializable {
 
     private CellInfoStatus status;
 
-    private String information;
+    private LocalizedString information;
 
-    private String title = ""; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    // default cell info title
+    private LocalizedString title = LocalizedString.tr("");
 
     private Integer expectedSpecimenId;
 
@@ -44,11 +48,11 @@ public class CellInfo implements Serializable {
     /**
      * usually displayed in the middle of the cell
      */
-    public String getTitle() {
+    public LocalizedString getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(LocalizedString title) {
         this.title = title;
     }
 
@@ -57,11 +61,11 @@ public class CellInfo implements Serializable {
      * 
      * @return
      */
-    public String getInformation() {
+    public LocalizedString getInformation() {
         return information;
     }
 
-    public void setInformation(String information) {
+    public void setInformation(LocalizedString information) {
         this.information = information;
     }
 
