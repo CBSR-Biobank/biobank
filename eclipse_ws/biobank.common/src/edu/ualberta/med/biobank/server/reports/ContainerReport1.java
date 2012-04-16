@@ -7,9 +7,10 @@ import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerReport1 extends AbstractReport {
 
-    private CapacityPostProcess rowPostProcess;
+    private final CapacityPostProcess rowPostProcess;
 
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String QUERY = 
         "select (select c.label || '(' || c.containerType.nameShort || ')' from " 
         + Container.class.getName()

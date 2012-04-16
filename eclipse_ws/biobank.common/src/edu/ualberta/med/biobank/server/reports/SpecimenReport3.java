@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -14,22 +15,22 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenReport3 extends AbstractReport {
-
     // TODO: switch to CollectionEvent.visitNumber?
 
-    private static final String QUERY = "SELECT s" 
-        + (" FROM " + Specimen.class.getName() + " s ")  
-        + ("    inner join fetch s.collectionEvent ce") 
-        + ("    inner join fetch ce.patient p") 
-        + ("    inner join fetch s.topSpecimen ts") 
-        + ("    inner join fetch s.specimenType st") 
-        + ("    WHERE s.specimenPosition.container.label not like '" 
-            + SENT_SAMPLES_FREEZER_NAME + "'") 
-        + "     and s.collectionEvent.patient.pnumber = ?" 
-        + "     and datediff(s.topSpecimen.createdAt, ?) = 0" 
-        + "     and s.specimenType.nameShort like ?" 
-        + "     and s.activityStatus != " + ActivityStatus.CLOSED.getId() 
-        + " ORDER BY s.activityStatus, RAND()"; 
+    @SuppressWarnings("nls")
+    private static final String QUERY = "SELECT s"
+        + (" FROM " + Specimen.class.getName() + " s ")
+        + ("    inner join fetch s.collectionEvent ce")
+        + ("    inner join fetch ce.patient p")
+        + ("    inner join fetch s.topSpecimen ts")
+        + ("    inner join fetch s.specimenType st")
+        + ("    WHERE s.specimenPosition.container.label not like '"
+            + SENT_SAMPLES_FREEZER_NAME + "'")
+        + "     and s.collectionEvent.patient.pnumber = ?"
+        + "     and datediff(s.topSpecimen.createdAt, ?) = 0"
+        + "     and s.specimenType.nameShort like ?"
+        + "     and s.activityStatus != " + ActivityStatus.CLOSED.getId()
+        + " ORDER BY s.activityStatus, RAND()";
 
     public SpecimenReport3(BiobankReport report) {
         super(QUERY, report);
@@ -64,12 +65,17 @@ public class SpecimenReport3 extends AbstractReport {
         return results;
     }
 
+    @SuppressWarnings("nls")
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
         String typeName, long maxResults, Integer numResultsFound) {
+
+        LocalizedString notFound = LocalizedString.tr("NOT_FOUND({0})",
+            (maxResults - numResultsFound));
+
         return new Object[] { pnumber,
-            "", 
+            "",
             DateFormatter.formatAsDate(dateDrawn), typeName,
-            "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" };   
+            notFound, "" };
     }
 
     // Database calls are made so can't use RowPostProcess

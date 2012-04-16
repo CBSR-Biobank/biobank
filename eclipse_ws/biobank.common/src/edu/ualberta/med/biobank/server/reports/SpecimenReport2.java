@@ -5,14 +5,19 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenReport2 extends AbstractReport {
+    @SuppressWarnings("nls")
+    private static final LocalizedString NO_DATE_PROCESSED = LocalizedString
+        .tr("No Date Processed");
 
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String QUERY = 
         "FROM " + Specimen.class.getName() + " as s"  
         + "    inner join fetch s.collectionEvent ce" 
@@ -31,7 +36,7 @@ public class SpecimenReport2 extends AbstractReport {
         + " ORDER BY RAND()"; 
     // @formatter:on
 
-    private int numResults;
+    private final int numResults;
 
     public SpecimenReport2(BiobankReport report) {
         super(QUERY, report);
@@ -59,7 +64,7 @@ public class SpecimenReport2 extends AbstractReport {
             String inventoryId = specimen.getInventoryId();
             String specimenType = specimen.getSpecimenType().getNameShort();
 
-            String dateProcessed = "No Date Processed"; 
+            Object dateProcessed = NO_DATE_PROCESSED;
             Specimen parentSpecimen = specimen.getParentSpecimen();
             if (parentSpecimen != null) {
                 ProcessingEvent pe = parentSpecimen.getProcessingEvent();

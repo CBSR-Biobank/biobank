@@ -14,6 +14,10 @@ public abstract class LazyString implements Serializable {
 
     protected abstract String loadString();
 
+    protected void reloadString() {
+        string = loadString();
+    }
+
     @Override
     public String toString() {
         return getString();

@@ -13,10 +13,11 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("nls")
 public class BiobankVersionUtil {
-    public static final String SERVER_VERSION_PROP_FILE = "version.properties"; 
+    public static final String SERVER_VERSION_PROP_FILE = "version.properties";
 
-    public static final String SERVER_VERSION_PROP_KEY = "server.version"; 
+    public static final String SERVER_VERSION_PROP_KEY = "server.version";
 
     public static SwVersion serverVersion = null;
 
@@ -31,23 +32,23 @@ public class BiobankVersionUtil {
             props.load(BiobankApplicationServiceImpl.class
                 .getResourceAsStream(SERVER_VERSION_PROP_FILE));
         } catch (FileNotFoundException e) {
-            log.error("file " + SERVER_VERSION_PROP_FILE + " not found.", e);  
+            log.error("file " + SERVER_VERSION_PROP_FILE + " not found.", e);
         } catch (IOException e) {
-            log.error("Problem with file " + SERVER_VERSION_PROP_FILE, e); 
+            log.error("Problem with file " + SERVER_VERSION_PROP_FILE, e);
         }
     }
 
     public static void checkVersion(String clientVersionStr)
         throws ApplicationException {
         if (props == null) {
-            log.error("server does not have a version"); 
+            log.error("server does not have a version");
             throw new ServerVersionInvalidException();
         }
 
         String serverVersionStr = props.getProperty(SERVER_VERSION_PROP_KEY);
 
         if (serverVersionStr == null) {
-            log.error("server does not have a version"); 
+            log.error("server does not have a version");
             throw new ServerVersionInvalidException();
         }
 
@@ -55,15 +56,15 @@ public class BiobankVersionUtil {
             serverVersion = new SwVersion(serverVersionStr);
 
             if (clientVersionStr == null) {
-                log.error("client does not have a version"); 
+                log.error("client does not have a version");
                 throw new ClientVersionInvalidException();
             }
 
             try {
                 SwVersion clientVersion = new SwVersion(clientVersionStr);
 
-                log.info("check version: server_version/" + serverVersionStr 
-                    + " client_version/" + clientVersionStr); 
+                log.info("check version: server_version/" + serverVersionStr
+                    + " client_version/" + clientVersionStr);
 
                 if (clientVersion.getMajor() < serverVersion.getMajor()) {
                     throw new ServerVersionNewerException(

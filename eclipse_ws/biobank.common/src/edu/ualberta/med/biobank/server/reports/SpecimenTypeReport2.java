@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -11,20 +12,27 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeReport2 extends AbstractReport {
+    @SuppressWarnings("nls")
+    private static final LocalizedString UNUSED = LocalizedString
+        .tr("Unused");
 
-    private final static String USED_SPECIMEN_TYPES_QUERY = "SELECT alqs.specimenType.nameShort," 
-        + "     alqs.study.nameShort" 
-        + (" FROM " + AliquotedSpecimen.class.getName() + " alqs ")  
-        + " ORDER BY alqs.specimenType.nameShort, alqs.study.nameShort"; 
+    @SuppressWarnings("nls")
+    private final static String USED_SPECIMEN_TYPES_QUERY =
+        "SELECT alqs.specimenType.nameShort,"
+            + "     alqs.study.nameShort"
+            + (" FROM " + AliquotedSpecimen.class.getName() + " alqs ")
+            + " ORDER BY alqs.specimenType.nameShort, alqs.study.nameShort";
 
-    private final static String NOT_USED_QUERY = "SELECT st.nameShort " 
-        + (" FROM " + SpecimenType.class.getName() + " st ")  
-        + " WHERE st not in (SELECT ss.specimenType " 
-        + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")"   
-        + "ORDER BY st.nameShort"; 
+    @SuppressWarnings("nls")
+    private final static String NOT_USED_QUERY = "SELECT st.nameShort "
+        + (" FROM " + SpecimenType.class.getName() + " st ")
+        + " WHERE st not in (SELECT ss.specimenType "
+        + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")"
+        + "ORDER BY st.nameShort";
 
+    @SuppressWarnings("nls")
     public SpecimenTypeReport2(BiobankReport report) {
-        super("", report); 
+        super("", report);
     }
 
     @Override
@@ -48,7 +56,7 @@ public class SpecimenTypeReport2 extends AbstractReport {
             expandedResults
                 .add(new Object[] {
                     ob,
-                    "Unused" }); 
+                    UNUSED });
         }
         return expandedResults;
     }

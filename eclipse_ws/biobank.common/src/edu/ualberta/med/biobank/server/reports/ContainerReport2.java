@@ -15,6 +15,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class ContainerReport2 extends AbstractReport {
 
     // @formatter:off 
+    @SuppressWarnings("nls")
     private static final String QUERY = "SELECT c" 
         + " FROM " + Container.class.getName() + " c "  
         + "    inner join fetch c.containerType" 
