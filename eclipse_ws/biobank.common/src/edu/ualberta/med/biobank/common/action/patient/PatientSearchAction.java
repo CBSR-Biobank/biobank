@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -54,7 +55,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return true;
+        return new PatientReadPermission(patientId).isAllowed(context);
     }
 
     @Override
@@ -81,19 +82,6 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
         }
         throw new ActionException(
             "More than one patient found with pnumber " + pnumber); //$NON-NLS-1$
-        // FIXME need this kind of test ?
-        // if (patient != null) {
-        // StudyWrapper study = patient.getStudy();
-        // List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
-        // study.getSiteCollection(false));
-        // centers.addAll(study.getClinicCollection());
-        // if (Collections.disjoint(centers, user.getWorkingCenters())) {
-        // throw new ApplicationException(MessageFormat.format(
-        //                    Messages.getString("PatientWrapper.patient.access.msg"), //$NON-NLS-1$
-        // patientNumber));
-        // }
-        // }
-
     }
 
 }

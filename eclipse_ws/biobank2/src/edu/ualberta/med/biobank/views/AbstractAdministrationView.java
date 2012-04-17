@@ -91,7 +91,6 @@ public abstract class AbstractAdministrationView extends
         if (!getTreeViewer().getControl().isDisposed()) {
             getTreeViewer().refresh(true);
             getTreeViewer().expandToLevel(3);
-            setSearchFieldsEnablement(true);
         }
     }
 
