@@ -56,8 +56,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         Permission permission;
         if (peventId == null) {
             permission =
-                new ProcessingEventCreatePermission(context.load(Center.class,
-                    centerId));
+                new ProcessingEventCreatePermission(centerId);
         } else {
             permission = new ProcessingEventUpdatePermission(peventId);
         }

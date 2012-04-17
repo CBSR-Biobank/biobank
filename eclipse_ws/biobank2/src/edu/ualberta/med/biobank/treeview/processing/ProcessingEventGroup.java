@@ -33,7 +33,7 @@ public class ProcessingEventGroup extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new ProcessingEventCreatePermission(SessionManager
                         .getUser()
-                        .getCurrentWorkingCenter().getWrappedObject()));
+                        .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
         }

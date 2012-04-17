@@ -9,19 +9,12 @@ public class ProcessingEventCreatePermission implements Permission {
     private static final long serialVersionUID = 1L;
     private Integer centerId;
 
-    public ProcessingEventCreatePermission() {
-
-    }
-
-    public ProcessingEventCreatePermission(Center center) {
-        this.centerId = center.getId();
+    public ProcessingEventCreatePermission(Integer centerId) {
+        this.centerId = centerId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        if (centerId == null)
-            return PermissionEnum.PROCESSING_EVENT_CREATE
-                .isAllowed(context.getUser());
         return PermissionEnum.PROCESSING_EVENT_CREATE.isAllowed(
             context.getUser(), context.load(Center.class, centerId));
     }

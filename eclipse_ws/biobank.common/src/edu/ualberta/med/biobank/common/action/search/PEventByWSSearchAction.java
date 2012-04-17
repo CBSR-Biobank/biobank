@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 
 public class PEventByWSSearchAction implements
     Action<ListResult<Integer>> {
@@ -25,17 +24,17 @@ public class PEventByWSSearchAction implements
     private static final long serialVersionUID = 1L;
     private String worksheet;
 
-    private Site site;
+    private Integer site;
 
     public PEventByWSSearchAction(String worksheet,
-        Site currentCenter) {
+        Integer currentCenter) {
         this.worksheet = worksheet;
         this.site = currentCenter;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(site).isAllowed(context);
+        return new ProcessingEventReadPermission(null, site).isAllowed(context);
     }
 
     @Override

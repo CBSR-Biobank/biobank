@@ -145,8 +145,9 @@ public class ProcessingView extends AbstractAdministrationView {
                 ((AdapterBase) adaper).resetObject();
             }
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new ProcessingEventReadPermission(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getWrappedObject())));
+                new ProcessingEventReadPermission(null, SessionManager
+                    .getUser()
+                    .getCurrentWorkingCenter().getId())));
         } catch (Exception e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
