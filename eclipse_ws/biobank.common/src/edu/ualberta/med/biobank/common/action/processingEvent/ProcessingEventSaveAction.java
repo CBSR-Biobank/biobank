@@ -84,12 +84,14 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         for (Integer specimen : addedSpecimenIds) {
             Specimen spec = context.load(Specimen.class, specimen);
             spec.setProcessingEvent(peventToSave);
+            spec.setActivityStatus(ActivityStatus.CLOSED);
             context.getSession().saveOrUpdate(spec);
         }
 
         for (Integer specimen : removedSpecimenIds) {
             Specimen spec = context.load(Specimen.class, specimen);
             spec.setProcessingEvent(null);
+            spec.setActivityStatus(ActivityStatus.ACTIVE);
             context.getSession().saveOrUpdate(spec);
         }
 

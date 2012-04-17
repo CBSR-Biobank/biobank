@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -171,6 +172,13 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new DispatchDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchReadPermission(target.getId()));
     }
 
 }

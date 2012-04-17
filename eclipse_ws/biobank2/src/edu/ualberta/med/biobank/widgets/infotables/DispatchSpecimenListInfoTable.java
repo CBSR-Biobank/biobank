@@ -225,4 +225,10 @@ public abstract class DispatchSpecimenListInfoTable extends
         return true;
     }
 
+    @Override
+    protected Boolean canView(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
 }

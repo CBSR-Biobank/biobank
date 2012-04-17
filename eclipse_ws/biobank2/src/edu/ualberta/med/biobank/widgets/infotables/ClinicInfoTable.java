@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -131,6 +132,12 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new ClinicDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(ClinicWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicReadPermission(target.getId()));
     }
 
 }

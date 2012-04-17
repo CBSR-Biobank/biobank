@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -275,15 +276,21 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     @Override
     protected Boolean canEdit(SpecimenInfo target) throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
+        return target != null && SessionManager.getAppService().isAllowed(
             new SpecimenUpdatePermission(target.specimen.getId()));
     }
 
     @Override
     protected Boolean canDelete(SpecimenInfo target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
+        return target != null && SessionManager.getAppService().isAllowed(
             new SpecimenDeletePermission(target.specimen.getId()));
+    }
+
+    @Override
+    protected Boolean canView(SpecimenInfo target) throws ApplicationException {
+        return target != null && SessionManager.getAppService().isAllowed(
+            new SpecimenReadPermission(target.specimen.getId()));
     }
 
 }

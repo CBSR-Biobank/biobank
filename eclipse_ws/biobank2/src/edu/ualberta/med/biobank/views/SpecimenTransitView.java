@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -36,6 +38,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
@@ -172,6 +175,16 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             for (AbstractAdapterBase adaper : rootNode.getChildren()) {
                 adaper.rebuild();
             }
+        }
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new DispatchReadPermission(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getWrappedObject()))
+                || SessionManager.getAppService().isAllowed(
+                    new OriginInfoReadPermission(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getWrappedObject())));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
         }
         super.reload();
     }

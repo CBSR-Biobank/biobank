@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBri
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -120,5 +121,12 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new ProcessingEventDeletePermission(target.e.getId()));
+    }
+
+    @Override
+    protected Boolean canView(ProcessingEventBriefInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ProcessingEventReadPermission(target.e.getId()));
     }
 }

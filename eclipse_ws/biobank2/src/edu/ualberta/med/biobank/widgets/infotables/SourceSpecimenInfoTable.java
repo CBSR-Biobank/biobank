@@ -6,9 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -112,15 +109,19 @@ public class SourceSpecimenInfoTable extends
     @Override
     protected Boolean canEdit(SourceSpecimenWrapper target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new SpecimenUpdatePermission(target.getId()));
+        return true;
     }
 
     @Override
     protected Boolean canDelete(SourceSpecimenWrapper target)
         throws ApplicationException {
-        return SessionManager.getAppService().isAllowed(
-            new SpecimenDeletePermission(target.getId()));
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

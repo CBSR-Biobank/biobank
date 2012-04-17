@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
 
@@ -56,4 +57,15 @@ public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
             currentSpecimens.addAll(specInfos);
         }
     }
+
+    @Override
+    public Boolean canEdit(SpecimenInfo target) throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    public Boolean canDelete(SpecimenInfo target) throws ApplicationException {
+        return true;
+    }
+
 }

@@ -78,6 +78,11 @@ public abstract class RolesPage extends BgcDialogPage {
                 throws ApplicationException {
                 return true;
             }
+
+            @Override
+            protected Boolean canView(Role target) throws ApplicationException {
+                return true;
+            }
         };
         roleInfoTable.setList(getCurrentAllRolesList());
         setControl(content);

@@ -123,4 +123,10 @@ public class AliquotedSpecimenInfoTable extends
         throws ApplicationException {
         return true;
     }
+
+    @Override
+    protected Boolean canView(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
 }

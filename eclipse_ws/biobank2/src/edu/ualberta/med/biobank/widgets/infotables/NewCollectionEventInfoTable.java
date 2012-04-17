@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -102,6 +103,13 @@ public class NewCollectionEventInfoTable extends
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new CollectionEventDeletePermission(target.cevent.getId()));
+    }
+
+    @Override
+    protected Boolean canView(PatientCEventInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventReadPermission(target.cevent.getId()));
     }
 
 }

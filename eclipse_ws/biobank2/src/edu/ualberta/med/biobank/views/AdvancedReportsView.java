@@ -1,10 +1,14 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISourceProviderListener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.LoginSessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
@@ -17,19 +21,48 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
     private static AdvancedReportsView currentView;
 
-    private boolean allowed = false;
+    private Boolean allowed = false;
 
     public AdvancedReportsView() {
         currentView = this;
         SessionManager.addView(this);
         try {
-            if (SessionManager.getInstance().isConnected())
-                this.allowed =
-                    SessionManager.getAppService().isAllowed(
-                        new ReportsPermission());
+            if (SessionManager.getInstance().isConnected()) allowed =
+                SessionManager.getAppService().isAllowed(
+                    new ReportsPermission());
         } catch (Exception e) {
             BgcPlugin.openAccessDeniedErrorMessage(e);
         }
+        BgcPlugin.getLoginStateSourceProvider()
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    try {
+                        if (sourceName
+                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginSessionState.LOGGED_OUT))
+                            allowed = false;
+                        else if (sourceName
+                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                            allowed =
+                                SessionManager.getAppService().isAllowed(
+                                    new ReportsPermission());
+                            reload();
+                        }
+                    } catch (Exception e) {
+                        BgcPlugin.openAccessDeniedErrorMessage(e);
+                    }
+                }
+            });
     }
 
     @Override

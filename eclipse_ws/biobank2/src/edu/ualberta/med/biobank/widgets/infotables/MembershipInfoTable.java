@@ -224,5 +224,10 @@ public class MembershipInfoTable
     @Override
     protected Boolean canDelete(Membership target) throws ApplicationException {
         return true;
+    }
+
+    @Override
+    protected Boolean canView(Membership target) throws ApplicationException {
+        return true;
     };
 }

@@ -98,6 +98,12 @@ public abstract class UsersPage extends BgcDialogPage {
                     throws ApplicationException {
                     return true;
                 }
+
+                @Override
+                protected Boolean canView(User target)
+                    throws ApplicationException {
+                    return true;
+                }
             };
         setControl(content);
     }

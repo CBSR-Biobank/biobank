@@ -98,6 +98,12 @@ public abstract class GroupsPage extends BgcDialogPage {
                     throws ApplicationException {
                     return true;
                 }
+
+                @Override
+                protected Boolean canView(Group target)
+                    throws ApplicationException {
+                    return true;
+                }
             };
 
         setControl(content);

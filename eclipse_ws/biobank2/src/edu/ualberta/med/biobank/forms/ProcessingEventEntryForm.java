@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
@@ -78,13 +77,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
+    private final ProcessingEventWrapper pevent = new ProcessingEventWrapper(
         SessionManager.getAppService());
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
+
+    protected Study study;
 
     @Override
     protected void init() throws Exception {
@@ -304,33 +305,38 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     "This specimen is from study ''{0}''. This study is not linked to your current working center. Processing is not allowed.",
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        else if (specimens.size() > 0) {
-                            try {
-                                Study study =
-                                    SessionManager
+                        else if (study == null) {
+                            if (specimens.size() == 0)
+                                study =
+                                    specimen.getCollectionEvent().getPatient()
+                                        .getStudy().getWrappedObject();
+                            else {
+                                try {
+                                    study = SessionManager
                                         .getAppService()
                                         .doAction(
                                             new SpecimenGetInfoAction(specimens
                                                 .get(0).specimen.getId()))
                                         .getSpecimen().getCollectionEvent()
                                         .getPatient().getStudy();
-                                if (!study.equals(
-                                    specimen.getCollectionEvent().getPatient()
-                                        .getStudy()))
+                                } catch (Exception e) {
                                     throw new VetoException(
-                                        "All specimens must be part of the same study.");
-                            } catch (Exception e) {
-                                BgcPlugin
-                                    .openAsyncError(
-                                        "Error loading specimen",
-                                        e);
+                                        "All Specimens must be part of the same study.");
+                                }
                             }
-                            break;
                         }
+                        if (!specimen.getCollectionEvent().getPatient()
+                            .getStudy().getWrappedObject().equals(study))
+                            throw new VetoException(
+                                "In a processing event, all specimens must be part of the same study.");
                     case POST_ADD:
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
                         break;
+                    case PRE_DELETE:
+                        if (specimen.getChildSpecimenCollection(false).size() != 0)
+                            throw new VetoException(
+                                "Cannot remove processed specimens with children.");
                     }
                 }
             };

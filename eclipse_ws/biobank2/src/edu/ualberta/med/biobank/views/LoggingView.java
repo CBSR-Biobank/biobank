@@ -43,8 +43,6 @@ public class LoggingView extends ViewPart {
     public static final String ID =
         "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
 
-    private ISourceProviderListener siteStateListener;
-
     private static enum ComboListType {
         CENTER,
         USER,
@@ -83,16 +81,47 @@ public class LoggingView extends ViewPart {
         }
     };
 
-    private boolean allowed;
+    private boolean allowed = false;
 
     public LoggingView() {
         try {
-            this.allowed = SessionManager.getAppService().isAllowed(
-                new LoggingPermission());
-        } catch (ApplicationException e) {
+            if (SessionManager.getInstance().isConnected()) allowed =
+                SessionManager.getAppService().isAllowed(
+                    new LoggingPermission());
+        } catch (Exception e) {
             BgcPlugin.openAccessDeniedErrorMessage(e);
-            this.allowed = false;
         }
+        BgcPlugin.getLoginStateSourceProvider()
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    try {
+                        if (sourceName
+                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginSessionState.LOGGED_OUT))
+                            allowed = false;
+                        else if (sourceName
+                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                            allowed =
+                                SessionManager.getAppService().isAllowed(
+                                    new LoggingPermission());
+                        }
+                        setEnableAllFields(allowed);
+                        loadComboFields();
+                    } catch (Exception e) {
+                        BgcPlugin.openAccessDeniedErrorMessage(e);
+                    }
+                }
+            });
     }
 
     @Override
@@ -270,7 +299,6 @@ public class LoggingView extends ViewPart {
             }
         });
 
-        sessionMonitor();
         clearFields();
 
         // if logged in and select the site selected in "working site" combo
@@ -280,40 +308,6 @@ public class LoggingView extends ViewPart {
             loadComboFields();
         } else
             setEnableAllFields(false);
-    }
-
-    // monitors the logged in / out state
-    private void sessionMonitor() {
-        siteStateListener = new ISourceProviderListener() {
-            @Override
-            public void sourceChanged(int sourcePriority, String sourceName,
-                Object sourceValue) {
-                if (sourceValue.equals(LoginSessionState.LOGGED_OUT)) {
-                    setEnableAllFields(false);
-                } else if (sourceValue.equals(LoginSessionState.LOGGED_IN)) {
-                    loadComboFields();
-                    setEnableAllFields(true);
-                }
-            }
-
-            @SuppressWarnings("rawtypes")
-            @Override
-            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-                //
-            }
-        };
-
-        BgcPlugin.getLoginStateSourceProvider().addSourceProviderListener(
-            siteStateListener);
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (siteStateListener != null) {
-            BgcPlugin.getLoginStateSourceProvider()
-                .removeSourceProviderListener(siteStateListener);
-        }
     }
 
     @Override

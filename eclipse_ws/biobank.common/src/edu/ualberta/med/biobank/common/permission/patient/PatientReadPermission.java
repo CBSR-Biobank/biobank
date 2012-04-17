@@ -17,10 +17,12 @@ public class PatientReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Patient patient = context.load(Patient.class,
+        Patient patient = context.get(Patient.class,
             patientId);
+        if (patient == null)
+            return PermissionEnum.PATIENT_READ.isAllowed(context.getUser(),
+                null, null);
         return PermissionEnum.PATIENT_READ.isAllowed(context.getUser(),
             patient.getStudy());
     }
-
 }

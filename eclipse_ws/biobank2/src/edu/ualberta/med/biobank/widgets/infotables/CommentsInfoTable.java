@@ -169,4 +169,10 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
         throws ApplicationException {
         return false;
     }
+
+    @Override
+    protected Boolean canView(CommentWrapper target)
+        throws ApplicationException {
+        return false;
+    }
 }

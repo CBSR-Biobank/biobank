@@ -213,6 +213,7 @@ public class CDateTime extends BaseCombo {
                 break;
             case SWT.KeyDown:
                 handleKey(event);
+                event.doit = false;
                 break;
             case SWT.MouseDown:
                 if (event.button == 1) {
