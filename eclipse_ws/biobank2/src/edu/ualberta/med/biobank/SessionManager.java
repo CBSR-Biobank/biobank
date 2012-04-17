@@ -15,6 +15,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -40,12 +42,15 @@ import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
+    private static final I18n i18n = I18nFactory.getI18n(SessionManager.class);
 
+    @SuppressWarnings("nls")
     public static final String BIOBANK2_CONTEXT_LOGGED_OUT =
-        "biobank.context.loggedOut"; 
+        "biobank.context.loggedOut";
 
+    @SuppressWarnings("nls")
     public static final String BIOBANK2_CONTEXT_LOGGED_IN =
-        "biobank.context.loggedIn"; 
+        "biobank.context.loggedIn";
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
         .getName());
@@ -54,7 +59,7 @@ public class SessionManager {
 
     private SessionAdapter sessionAdapter;
 
-    private RootNode rootNode;
+    private final RootNode rootNode;
 
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
@@ -85,9 +90,10 @@ public class SessionManager {
         updateSessionState();
     }
 
+    @SuppressWarnings("nls")
     public void addSession(final BiobankApplicationService appService,
         String serverName, UserWrapper user) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());  
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
@@ -113,8 +119,9 @@ public class SessionManager {
         perspectivesUpdateDone.clear();
     }
 
+    @SuppressWarnings("nls")
     public void updateSession() {
-        Assert.isNotNull(sessionAdapter, "session adapter is null"); 
+        Assert.isNotNull(sessionAdapter, "session adapter is null");
         sessionAdapter.performExpand();
     }
 
@@ -152,6 +159,7 @@ public class SessionManager {
             .isDebugging());
     }
 
+    @SuppressWarnings("nls")
     public SessionAdapter getSession() {
         Assert.isNotNull(sessionAdapter,
             "No connection available. Please log in to continue.");
@@ -253,21 +261,22 @@ public class SessionManager {
             type);
     }
 
+    @SuppressWarnings("nls")
     public static void logLookup(IBiobankModel object) {
         try {
             Class<?> clazz = object.getClass();
             StringBuilder loggerName =
                 new StringBuilder(clazz.getSimpleName());
-            loggerName.append("LogProvider"); 
+            loggerName.append("LogProvider");
             loggerName.insert(0,
-                "edu.ualberta.med.biobank.common.wrappers.loggers."); 
+                "edu.ualberta.med.biobank.common.wrappers.loggers.");
             WrapperLogProvider<?> provider =
                 (WrapperLogProvider<?>) Class
                     .forName(
                         loggerName.toString())
                     .getConstructor().newInstance();
             Log log = provider.getObjectLog(object);
-            log.setAction("select"); 
+            log.setAction("select");
             log.setType(clazz.getSimpleName());
             getAppService().logActivity(log);
         } catch (Exception e) {
@@ -287,6 +296,7 @@ public class SessionManager {
     public static void updateAllSimilarNodes(final AbstractAdapterBase adapter,
         final boolean canReset) {
         Display.getDefault().asyncExec(new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -308,13 +318,13 @@ public class SessionManager {
                                             ((AdapterBase) ab).resetObject();
                                     }
                                 } catch (Exception ex) {
-                                    logger.error("Problem reseting object", ex); 
+                                    logger.error("Problem reseting object", ex);
                                 }
                             view.getTreeViewer().update(ab, null);
                         }
                     }
                 } catch (Exception ex) {
-                    logger.error("Error updating tree nodes", ex); 
+                    logger.error("Error updating tree nodes", ex);
                 }
             }
         });
@@ -331,6 +341,7 @@ public class SessionManager {
     public static void updateViewsVisibility(final IWorkbenchPage page,
         final boolean login) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -347,7 +358,7 @@ public class SessionManager {
                     }
                 } catch (PartInitException e) {
                     BgcPlugin.openAsyncError(
-                        "Error displaying available actions", e);
+                        i18n.tr("Error displaying available actions"), e);
                 }
                 // don't want to switch if was activated by an handler after
                 // login
@@ -359,8 +370,8 @@ public class SessionManager {
                             .showPerspective(MainPerspective.ID,
                                 page.getWorkbenchWindow());
                     } catch (WorkbenchException e) {
-                        logger.error("Error opening main perspective", e); 
-                }
+                        logger.error("Error opening main perspective", e);
+                    }
             }
         });
     }
