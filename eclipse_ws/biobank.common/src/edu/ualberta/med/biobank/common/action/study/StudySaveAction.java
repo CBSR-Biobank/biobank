@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
@@ -29,6 +29,14 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class StudySaveAction implements Action<IdResult> {
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr REMOVED_CONTACT_MISSING_STUDY =
+        LTemplate.tr("Study \"{0}\" not found in removed contact's studies.");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr STUDY_EVEN_ATTRS_SHARE_ID =
+        LTemplate.tr("Cannot add multiple study event attributes with the" +
+            " same id (\"{0}\").");
+
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = Logger.getLogger(StudySaveAction.class
@@ -246,7 +254,6 @@ public class StudySaveAction implements Action<IdResult> {
         return new IdResult(study.getId());
     }
 
-    @SuppressWarnings("nls")
     private void saveContacts(ActionContext context) {
         Set<Contact> contacts =
             context.load(Contact.class, contactIds);
@@ -268,9 +275,7 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
-                    LocalizedString.tr(
-                        "Study \"{0}\" not found in removed contact's studies.",
-                        study.getNameShort()));
+                    REMOVED_CONTACT_MISSING_STUDY.format(study.getNameShort()));
             }
         }
     }
@@ -338,16 +343,13 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
-    @SuppressWarnings("nls")
     private void saveEventAttributes(ActionContext context) {
         Set<Integer> geAttrIdsUsed = new HashSet<Integer>();
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
-                throw new ActionException(
-                    LocalizedString.tr(
-                        "Cannot add multiple study event attributes with the same id (\"{0}\").",
-                        eAttrSaveInfo.globalEventAttrId));
+                throw new ActionException(STUDY_EVEN_ATTRS_SHARE_ID.format(
+                    eAttrSaveInfo.globalEventAttrId));
             }
             StudyEventAttr seAttr;
             if (eAttrSaveInfo.id == null) {

@@ -7,7 +7,8 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -69,8 +70,8 @@ public class SpecimenReport3 extends AbstractReport {
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
         String typeName, long maxResults, Integer numResultsFound) {
 
-        LocalizedString notFound = LocalizedString.tr("NOT_FOUND({0})",
-            (maxResults - numResultsFound));
+        LString notFound = LTemplate.tr("NOT_FOUND({0})")
+            .format((maxResults - numResultsFound));
 
         return new Object[] { pnumber,
             "",

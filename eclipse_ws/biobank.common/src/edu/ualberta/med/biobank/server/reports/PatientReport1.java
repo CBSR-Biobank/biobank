@@ -8,7 +8,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -17,7 +17,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientReport1 extends AbstractReport {
     @SuppressWarnings("nls")
-    private static final LocalizedString ALL_CLINICS = LocalizedString
+    private static final LString ALL_CLINICS = LString
         .tr("All Clinics");
 
     @SuppressWarnings("nls")

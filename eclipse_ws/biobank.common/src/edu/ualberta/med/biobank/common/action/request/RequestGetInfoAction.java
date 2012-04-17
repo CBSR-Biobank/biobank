@@ -11,16 +11,17 @@ import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.Request;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
-    private Integer id;
+
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr REQUEST_NOT_FOUND =
+        LTemplate.tr("No request found with id \"{0}\".");
+
+    private final Integer id;
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String REQUEST_HQL = "select distinct request from "
@@ -44,7 +45,6 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
         return new RequestReadPermission().isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public RequestReadInfo run(ActionContext context)
         throws ActionException {
@@ -61,11 +61,9 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
             sInfo.request = (Request) row;
 
         } else {
-            throw new ActionException(
-                LocalizedString.tr("No request found with id \"{0}\".", id));
+            throw new ActionException(REQUEST_NOT_FOUND.format(id));
         }
 
         return sInfo;
     }
-
 }

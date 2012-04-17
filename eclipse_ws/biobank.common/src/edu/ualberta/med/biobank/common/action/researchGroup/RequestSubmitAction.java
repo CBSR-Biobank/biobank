@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.researchGroup.SubmitRequestPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -51,7 +51,7 @@ public class RequestSubmitAction implements Action<IdResult> {
         for (String id : specs) {
             if (id == null || id.equals(""))
                 throw new ActionException(
-                    LocalizedString.tr("Blank specimen id, please check your your file for correct input."));
+                    LString.tr("Blank specimen id, please check your your file for correct input."));
 
             Query q = context.getSession().createQuery("from "
                 + Specimen.class.getName() + " where inventoryId=?");

@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -38,7 +38,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
         for (Specimen sp : pevent.getSpecimens()) {
             if (sp.getChildSpecimens().size() != 0)
-                throw new ActionException(LocalizedString.tr("Delete failed." +
+                throw new ActionException(LString.tr("Delete failed." +
                     " There are child specimens linked through this" +
                     " processing event"));
             sp.setActivityStatus(ActivityStatus.ACTIVE);

@@ -2,14 +2,17 @@ package edu.ualberta.med.biobank.common.action.container;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class ContainerActionHelper {
-
     @SuppressWarnings("nls")
+    public static final LString PARENT_REQUIRES_POSITION =
+        LString.tr("Parent container and position should either both be" +
+            " set or both be null");
+
     public static void setPosition(ActionContext context,
         Container container, RowColPos rcp, Integer parentId) {
         ContainerPosition pos = container.getPosition();
@@ -31,8 +34,7 @@ public class ContainerActionHelper {
                 context.getSession().delete(pos);
             }
         } else {
-            throw new ActionException(
-                LocalizedString.tr("Parent container and position should either both be set or both be null"));
+            throw new ActionException(PARENT_REQUIRES_POSITION);
         }
         container.setTopContainer(parent == null ? container : parent
             .getTopContainer());

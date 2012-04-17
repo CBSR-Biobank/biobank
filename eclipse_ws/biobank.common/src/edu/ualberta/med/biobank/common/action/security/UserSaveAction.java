@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -25,6 +26,33 @@ import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
 
 public class UserSaveAction implements Action<UserSaveOutput> {
+    @SuppressWarnings("nls")
+    public static final LString STALE_GROUPS =
+        LString.tr("It appears you are trying to add groups you were not" +
+            " aware of. Please refresh your user management, start over" +
+            ", and try again.");
+    @SuppressWarnings("nls")
+    public static final LString CANNOT_ADD_UNMANAGEABLE_GROUPS =
+        LString.tr("You cannot add this user to groups you cannot manage.");
+    @SuppressWarnings("nls")
+    public static final LString INADEQUATE_PERMISSIONS =
+        LString.tr("You do not have adequate permissions to modify this user.");
+    @SuppressWarnings("nls")
+    public static final LString STALE_ROLES_OR_PERMISSIONS =
+        LString.tr("Your roles or permissions have changed since you began" +
+            " modifying this user. Please start over and try again.");
+    @SuppressWarnings("nls")
+    public static final LString CSM_MODIFICATION_FAILURE =
+        LString.tr("Problem modify associated CSM user properties");
+    @SuppressWarnings("nls")
+    public static final LString STALE_MANAGEABLE_MEMBERSHIPS =
+        LString.tr("Your manageable memberships have changed since you began" +
+            " modifying this user. Please refresh your user management," +
+            " start over, and try again.");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr PASSWORD_TOO_SHORT =
+        LTemplate.tr("Passwords must be at least {0} characters long");
+
     private static final long serialVersionUID = 1L;
     private static final Permission PERMISSION = new UserManagerPermission();
 
@@ -78,7 +106,6 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
-    @SuppressWarnings("nls")
     private void setCsmUserProperties(ActionContext context, User user,
         User oldUserData) {
         try {
@@ -93,9 +120,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
 
                 if (pw == null || pw.length() < MIN_PW_LENGTH) {
                     throw new ActionException(
-                        LocalizedString.tr(
-                            "Passwords must be at least {0} characters long",
-                            MIN_PW_LENGTH));
+                        PASSWORD_TOO_SHORT.format(MIN_PW_LENGTH));
                 }
 
                 Transaction tx = context.getSession().getTransaction();
@@ -111,13 +136,10 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                     oldUserData, oldPw));
             }
         } catch (Exception e) {
-            throw new ActionException(LocalizedString.tr(
-                "Problem modify associated CSM user properties"),
-                e);
+            throw new ActionException(CSM_MODIFICATION_FAILURE, e);
         }
     }
 
-    @SuppressWarnings("nls")
     private Set<Membership> getManageableMemberships(ActionContext context,
         User user) {
         User manager = input.getContext().getManager();
@@ -126,9 +148,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Membership> executorMembs = user.getManageableMemberships(executor);
 
         if (!managerMembs.containsAll(executorMembs)) {
-            throw new ActionException(
-                LocalizedString
-                    .tr("Your manageable memberships have changed since you began modifying this user. Please start over and try again."));
+            throw new ActionException(STALE_MANAGEABLE_MEMBERSHIPS);
         }
 
         return managerMembs;
@@ -170,7 +190,6 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
-    @SuppressWarnings("nls")
     private void handleMembershipUpdates(ActionContext context,
         Set<Pair<Membership>> conflicts) {
         User executingUser = context.getUser();
@@ -197,10 +216,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
-                throw new ActionException(LocalizedString.tr("Your roles" +
-                    " or permissions have changed since you began" +
-                    " modifying this user. Please start over and try" +
-                    " again."));
+                throw new ActionException(STALE_ROLES_OR_PERMISSIONS);
             }
 
             Domain newD = newM.getDomain();
@@ -237,19 +253,15 @@ public class UserSaveAction implements Action<UserSaveOutput> {
 
     @SuppressWarnings("unused")
     private void mergeMembershipsOnDomain(ActionContext context, User user) {
-
     }
 
-    @SuppressWarnings("nls")
     private void checkFullyManageable(ActionContext context, Membership m) {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
-            throw new ActionException(LocalizedString.tr("You do not have" +
-                " adequate permissions to modify this user."));
+            throw new ActionException(INADEQUATE_PERMISSIONS);
         }
     }
 
-    @SuppressWarnings("nls")
     private void setGroups(ActionContext context, User user) {
         User executingUser = context.getUser();
 
@@ -258,18 +270,14 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
         if (!contextGroupIds.containsAll(input.getGroupIds())) {
-            throw new ActionException(
-                LocalizedString
-                    .tr("It appears you are trying to add groups you were not aware of. Please start over and try again."));
+            throw new ActionException(STALE_GROUPS);
         }
 
         // add or remove every Group in the context
         Set<Group> groups = context.load(Group.class, contextGroupIds);
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
-                throw new ActionException(
-                    LocalizedString
-                        .tr("You cannot add this user to groups you cannot manage."));
+                throw new ActionException(CANNOT_ADD_UNMANAGEABLE_GROUPS);
             }
 
             if (input.getGroupIds().contains(group.getId())) {

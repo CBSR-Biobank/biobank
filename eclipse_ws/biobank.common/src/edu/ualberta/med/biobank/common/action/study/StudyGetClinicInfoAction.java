@@ -14,13 +14,17 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr CLINIC_REQUIRES_CONTACTS =
+        LTemplate.tr("Clinic \"{0}\" must have contacts.");
 
     @SuppressWarnings("nls")
     private static final String STUDY_CONTACTS_HQL =
@@ -59,7 +63,7 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
         return true;
     }
 
-    @SuppressWarnings({ "unchecked", "nls" })
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<ClinicInfo> run(ActionContext context)
         throws ActionException {
@@ -93,9 +97,8 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
             Clinic clinic = (Clinic) row[0];
             List<Contact> contactList = contactsByClinic.get(clinic);
             if (contactList == null) {
-                throw new ActionException(
-                    LocalizedString.tr("Clinic \"{0}\" must have contacts.",
-                        clinic.getNameShort()));
+                throw new ActionException(CLINIC_REQUIRES_CONTACTS
+                    .format(clinic.getNameShort()));
             }
             ClinicInfo info = new ClinicInfo(clinic, (Long) row[1],
                 (Long) row[2], contactList);

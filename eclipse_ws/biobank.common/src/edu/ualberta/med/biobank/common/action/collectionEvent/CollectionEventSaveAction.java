@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -37,10 +37,32 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
-@SuppressWarnings("nls")
 public class CollectionEventSaveAction implements Action<IdResult> {
-
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr ABSENT_SPECIMEN =
+        LTemplate.tr("Specimen \"{0}\" not found in collection.");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr LOCKED_LABEL =
+        LTemplate.tr("Attribute for label \"{0}\" is locked, changes not" +
+            " permitted.");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr STUDY_EVENT_ATTR_MISSING =
+        LTemplate.tr("Cannot find Study Event Attribute with id \"{0}\".");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE =
+        LTemplate.tr("Value \"{0}\" is invalid for label \"{2}\".");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE =
+        LTemplate.tr("Value \"{0}\" (\"{1}\") is invalid for label" +
+            " \"{2}\".");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr CANNOT_PARSE_DATE =
+        LTemplate.tr("Cannot parse date \"{0}\".");
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr UNKNOWN_EVENT_ATTR_TYPE =
+        LTemplate.tr("Unknown Event Attribute Type \"{0}\".");
 
     private Integer ceventId;
     private Integer patientId;
@@ -183,10 +205,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen = context.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
-                        throw new ActionException(
-                            LocalizedString
-                                .tr("Specimen \"{0}\" not found in collection",
-                                    specimen.getInventoryId()));
+                        throw new ActionException(ABSENT_SPECIMEN
+                            .format(specimen.getInventoryId()));
                     }
                 }
                 specimen.setActivityStatus(specInfo.activityStatus);
@@ -237,96 +257,85 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     sAttr = studyEventAttrInfo == null ? null
                         : studyEventAttrInfo.attr;
                     if (sAttr == null) {
-                        throw new ActionException(
-                            LocalizedString
-                                .tr("Cannot find Study Event Attribute with id \"{0}\".",
-                                    attrInfo.studyEventAttrId));
+                        throw new ActionException(STUDY_EVENT_ATTR_MISSING
+                            .format(attrInfo.studyEventAttrId));
                     }
                 }
 
                 if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                     String label = sAttr.getGlobalEventAttr().getLabel();
-                    throw new ActionException(
-                        LocalizedString
-                            .tr("Attribute for label \"{0}\" is locked, changes not permitted.",
-                                label));
+                    throw new ActionException(LOCKED_LABEL.format(label));
                 }
 
                 if (attrInfo.value != null) {
                     // validate the value
-                    attrInfo.value = attrInfo.value.trim();
-                    if (attrInfo.value.length() > 0) {
-                        EventAttrTypeEnum type = attrInfo.type;
-                        List<String> permissibleSplit = null;
+            attrInfo.value = attrInfo.value.trim();
+            if (attrInfo.value.length() > 0) {
+                EventAttrTypeEnum type = attrInfo.type;
+                List<String> permissibleSplit = null;
 
-                        if (type == EventAttrTypeEnum.SELECT_SINGLE
-                            || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                            String permissible = sAttr.getPermissible();
-                            if (permissible != null) {
-                                permissibleSplit = Arrays.asList(permissible
-                                    .split(";")); //$NON-NLS-1$
-                            }
-                        }
-
-                        if (type == EventAttrTypeEnum.SELECT_SINGLE) {
-                            if (!permissibleSplit.contains(attrInfo.value)) {
-                                String label =
-                                    sAttr.getGlobalEventAttr().getLabel();
-                                throw new ActionException(
-                                    LocalizedString
-                                        .tr("Value \"{0}\" is invalid for label \"{2}\".",
-                                            attrInfo.value, label));
-                            }
-                        } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                            for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
-                                if (!permissibleSplit.contains(singleVal)) {
-                                    String label =
-                                        sAttr.getGlobalEventAttr().getLabel();
-                                    throw new ActionException(
-                                        LocalizedString
-                                            .tr(
-                                                "Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".",
-                                                singleVal, attrInfo.value,
-                                                label));
-                                }
-                            }
-                        } else if (type == EventAttrTypeEnum.NUMBER) {
-                            Double.parseDouble(attrInfo.value);
-                        } else if (type == EventAttrTypeEnum.DATE_TIME) {
-                            try {
-                                DateFormatter.dateFormatter
-                                    .parse(attrInfo.value);
-                            } catch (ParseException e) {
-                                throw new ActionException(
-                                    LocalizedString.tr("Cannot parse date \"{0}\".",
-                                        attrInfo.value));
-                            }
-                        } else if (type == EventAttrTypeEnum.TEXT) {
-                            // do nothing
-                        } else {
-                            throw new ActionException(
-                                LocalizedString.tr(
-                                    "Unknown Event Attribute Type \"{0}\".",
-                                    type.getName()));
-                        }
+                if (type == EventAttrTypeEnum.SELECT_SINGLE
+                    || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                    String permissible = sAttr.getPermissible();
+                    if (permissible != null) {
+                        permissibleSplit = Arrays.asList(permissible
+                            .split(";")); //$NON-NLS-1$
                     }
                 }
 
-                EventAttr eventAttr;
-                if (ceventAttrInfo == null) {
-                    eventAttr = new EventAttr();
-                    cevent.getEventAttrs().add(eventAttr);
-                    eventAttr.setCollectionEvent(cevent);
-                    eventAttr.setStudyEventAttr(sAttr);
+                if (type == EventAttrTypeEnum.SELECT_SINGLE) {
+                    if (!permissibleSplit.contains(attrInfo.value)) {
+                        String label =
+                            sAttr.getGlobalEventAttr().getLabel();
+                        throw new ActionException(
+                            INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE
+                                .format(attrInfo.value, label));
+                    }
+                } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                    for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
+                        if (!permissibleSplit.contains(singleVal)) {
+                            String label =
+                                sAttr.getGlobalEventAttr().getLabel();
+                            throw new ActionException(
+                                INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE
+                                    .format(singleVal, attrInfo.value,
+                                        label));
+                        }
+                    }
+                } else if (type == EventAttrTypeEnum.NUMBER) {
+                    Double.parseDouble(attrInfo.value);
+                } else if (type == EventAttrTypeEnum.DATE_TIME) {
+                    try {
+                        DateFormatter.dateFormatter
+                            .parse(attrInfo.value);
+                    } catch (ParseException e) {
+                        throw new ActionException(CANNOT_PARSE_DATE
+                            .format(attrInfo.value));
+                    }
+                } else if (type == EventAttrTypeEnum.TEXT) {
+                    // do nothing
                 } else {
-                    eventAttr = ceventAttrInfo.attr;
+                    throw new ActionException(UNKNOWN_EVENT_ATTR_TYPE
+                        .format(type.getName()));
                 }
-                eventAttr.setValue(attrInfo.value);
-
-                // FIXME need to remove attributes ? when they don't exist
-                // anymore
-                // in study maybe ? See previous code in wrapper ?
             }
+        }
+
+        EventAttr eventAttr;
+        if (ceventAttrInfo == null) {
+            eventAttr = new EventAttr();
+            cevent.getEventAttrs().add(eventAttr);
+            eventAttr.setCollectionEvent(cevent);
+            eventAttr.setStudyEventAttr(sAttr);
+        } else {
+            eventAttr = ceventAttrInfo.attr;
+        }
+        eventAttr.setValue(attrInfo.value);
+
+        // FIXME need to remove attributes ? when they don't exist
+        // anymore
+        // in study maybe ? See previous code in wrapper ?
+    }
     }
 
     private void saveComment(ActionContext context, CollectionEvent ceventToSave) {

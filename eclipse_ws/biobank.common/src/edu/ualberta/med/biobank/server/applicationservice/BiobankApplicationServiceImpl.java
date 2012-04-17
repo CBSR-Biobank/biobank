@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
@@ -163,7 +163,7 @@ public class BiobankApplicationServiceImpl extends
             Arrays.asList(csmUserId)));
         if (users.size() != 1) {
             throw new LocalizedException(
-                LocalizedString.tr("Problem with HQL result size"));
+                LString.tr("Problem with HQL result size"));
         }
         User user = users.get(0);
         user.setNeedPwdChange(false);

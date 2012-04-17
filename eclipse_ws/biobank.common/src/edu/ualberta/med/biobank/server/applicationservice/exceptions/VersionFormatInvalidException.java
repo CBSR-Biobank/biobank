@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 
 public class VersionFormatInvalidException extends BiobankServerException {
 
@@ -17,7 +17,7 @@ public class VersionFormatInvalidException extends BiobankServerException {
     @SuppressWarnings("nls")
     @Override
     public String getMessage() {
-        return LocalizedString.tr("The version string is formatted incorrectly.").toString();
+        return LString.tr("The version string is formatted incorrectly.").toString();
     }
 
 }

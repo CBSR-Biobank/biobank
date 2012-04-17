@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
@@ -17,7 +18,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class ActionContext {
     private final User user;
     private final Session session;
-    private BiobankApplicationService appService;
+    private final BiobankApplicationService appService;
 
     public ActionContext(User user, Session session,
         BiobankApplicationService appService) {
@@ -118,6 +119,22 @@ public class ActionContext {
             results.add(result);
         }
         return results;
+    }
+
+    public static <T> T singleResult(Query q, Class<T> klazz, Serializable id)
+        throws ModelNotFoundException {
+        T result = null;
+        try {
+            @SuppressWarnings("unchecked")
+            T tmp = (T) q.uniqueResult();
+            result = tmp;
+        } catch (Exception e) {
+            throw new ModelNotFoundException(klazz, id, e);
+        }
+
+        if (result == null) throw new ModelNotFoundException(klazz, id);
+
+        return result;
     }
 
     public WritableApplicationService getAppService() {

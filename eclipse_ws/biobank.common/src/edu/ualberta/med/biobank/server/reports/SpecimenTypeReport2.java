@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -13,7 +13,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeReport2 extends AbstractReport {
     @SuppressWarnings("nls")
-    private static final LocalizedString UNUSED = LocalizedString
+    private static final LString UNUSED = LString
         .tr("Unused");
 
     @SuppressWarnings("nls")

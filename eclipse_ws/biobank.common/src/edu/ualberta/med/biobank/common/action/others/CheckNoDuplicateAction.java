@@ -9,11 +9,15 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
-
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr UNEXPECTED_RESULTS =
+        LTemplate.tr("Expected a single query result, but got \"{0}\".");
+
     private final Class<?> objectClass;
     private final String propertyName;
     private final String value;
@@ -57,10 +61,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();
         if (res.size() != 1) {
-            throw new ActionException(
-                LocalizedString.tr(
-                    "Expected a single query result, but got \"{0}\".",
-                    res.size()));
+            throw new ActionException(UNEXPECTED_RESULTS.format(res.size()));
         }
         return new BooleanResult(res.get(0) == 0);
     }

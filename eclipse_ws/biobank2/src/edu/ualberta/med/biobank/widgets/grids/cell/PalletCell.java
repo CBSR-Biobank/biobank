@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -285,11 +285,11 @@ public class PalletCell extends AbstractUICell {
             : getExpectedSpecimen().getId());
         if (getStatus() != null)
             serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
-        serverCell.setInformation(LocalizedString.lit(getInformation()
+        serverCell.setInformation(LString.lit(getInformation()
             .toString()));
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
-        serverCell.setTitle(LocalizedString.lit(getTitle()));
+        serverCell.setTitle(getTitle());
         return serverCell;
     }
 }

@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.ProxiedListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ProxiedListResult<Object>> {
@@ -45,7 +45,7 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
                     .getAppService()));
         } catch (Exception e) {
             throw new ActionException(
-                LocalizedString.tr("Unable to run report for unknown reason"), e);
+                LString.tr("Unable to run report for unknown reason"), e);
         }
     }
 }

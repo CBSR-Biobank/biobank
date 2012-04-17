@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -142,8 +143,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)
                     scanCell.setStatus(CellInfoStatus.FILLED);
-                    scanCell.setTitle(LocalizedString.lit(foundSpecimen
-                        .getCollectionEvent().getPatient().getPnumber()));
+                    scanCell.setTitle(foundSpecimen.getCollectionEvent()
+                        .getPatient().getPnumber());
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
                     ContainerType cType =
@@ -165,10 +166,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                                     scanCell, foundSpecimen);
                             } else {
                                 scanCell.setStatus(CellInfoStatus.NEW);
-                                scanCell.setTitle(LocalizedString
-                                    .lit(foundSpecimen
-                                        .getCollectionEvent().getPatient()
-                                        .getPnumber()));
+                                scanCell.setTitle(foundSpecimen
+                                    .getCollectionEvent().getPatient()
+                                    .getPnumber());
                             }
                         }
                     } else {
@@ -196,9 +196,9 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             .get(rcp);
         if (!Boolean.TRUE.equals(posHasMovedSpecimen)) {
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(LocalizedString.lit(
+            scanCell.setInformation(LString.tr("Missing specimen \"{0}\".",
                 missingSpecimen.getInventoryId()));
-            scanCell.setTitle(LocalizedString.tr("?"));
+            scanCell.setTitle("?");
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
             appendNewLog(MessageFormat
@@ -222,7 +222,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     @SuppressWarnings("nls")
     private void updateCellAsNotFound(String position, CellInfo scanCell) {
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation(LocalizedString.tr("Specimen not found"));
+        scanCell.setInformation(LString.tr("Specimen not found"));
         appendNewLog(MessageFormat.format(
             "ERROR in {0}: specimen ''{1}'' not found in the database",
             position, scanCell.getValue()));
@@ -238,8 +238,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         CellInfo scanCell, Specimen expectedSpecimen,
         Specimen foundSpecimen) {
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation(LocalizedString.lit(""));
-        scanCell.setTitle(LocalizedString.lit("!"));
+        scanCell.setInformation(LString.tr("Error"));
+        scanCell.setTitle("!");
         appendNewLog(MessageFormat
             .format(
                 "ERROR in {0}: Expected inventoryId {1} from patient {2} -- Found inventoryId {3} from patient {4}",
@@ -305,11 +305,11 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         }
 
         scanCell.setStatus(CellInfoStatus.MOVED);
-        scanCell.setTitle(LocalizedString.lit(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber()));
-        scanCell.setInformation(LocalizedString.tr(
-            "Specimen previously registered on another position: {0}",
-            expectedPosition));
+        scanCell.setTitle(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber());
+        scanCell.setInformation(LTemplate.tr(
+            "Specimen previously registered on another position: {0}")
+            .format(expectedPosition));
 
         appendNewLog(MessageFormat
             .format(
@@ -329,11 +329,11 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         }
         String siteName = foundSpecimen.getCurrentCenter().getNameShort();
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setTitle(LocalizedString.lit(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber()));
-        scanCell.setInformation(LocalizedString.tr(
-            "Specimen has a position in another site (site {0})",
-            siteName));
+        scanCell.setTitle(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber());
+        scanCell.setInformation(LTemplate.tr(
+            "Specimen has a position in another site (site {0})")
+            .format(siteName));
 
         appendNewLog(MessageFormat
             .format(
@@ -349,10 +349,10 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         String palletType = containerType.getName();
         String sampleType = foundSpecimen.getSpecimenType().getName();
 
-        scanCell.setTitle(LocalizedString.lit(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber()));
+        scanCell.setTitle(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber());
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation(LocalizedString.tr(
+        scanCell.setInformation(LString.tr(
             "This pallet type {0} can''t hold a specimen of type {1}",
             palletType, sampleType));
         appendNewLog(MessageFormat
@@ -366,11 +366,11 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     @SuppressWarnings("nls")
     private void updateCellAsDispatchedError(String positionString,
         CellInfo scanCell, Specimen foundSpecimen) {
-        scanCell.setTitle(LocalizedString.lit(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber()));
+        scanCell.setTitle(foundSpecimen
+            .getCollectionEvent().getPatient().getPnumber());
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell
-            .setInformation(LocalizedString
+            .setInformation(LString
                 .tr("Cannot assign position to a specimen that in dispatch transit"));
         appendNewLog(MessageFormat
             .format(

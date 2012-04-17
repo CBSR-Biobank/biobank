@@ -9,11 +9,15 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
+    public static final LTemplate.Tr CANNOT_FIND_DISPATCH =
+        LTemplate.tr("Cannot find a dispatch with id \"{0}\".");
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL = "SELECT distinct dispatch "
@@ -26,7 +30,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         + " LEFT JOIN fetch comments.user"
         + " WHERE dispatch.id=?";
 
-    private Integer id;
+    private final Integer id;
 
     public DispatchGetInfoAction(Integer id) {
         this.id = id;
@@ -37,7 +41,6 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         return new DispatchReadPermission(id).isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public DispatchReadInfo run(ActionContext context) throws ActionException {
         DispatchReadInfo sInfo = new DispatchReadInfo();
@@ -55,11 +58,9 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException(
-                LocalizedString.tr("No dispatch found with id \"{0}\".", id));
+            throw new ActionException(CANNOT_FIND_DISPATCH.format(id));
         }
 
         return sInfo;
     }
-
 }

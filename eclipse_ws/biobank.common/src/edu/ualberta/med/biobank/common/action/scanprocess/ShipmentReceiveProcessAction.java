@@ -10,7 +10,8 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.ItemState;
@@ -92,8 +93,8 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      */
     private void updateCellWithSpecimen(CellInfo cell, Specimen specimen) {
         cell.setSpecimenId(specimen.getId());
-        cell.setTitle(LocalizedString.lit(specimen.getCollectionEvent()
-            .getPatient().getPnumber()));
+        cell.setTitle(specimen.getCollectionEvent()
+            .getPatient().getPnumber());
     }
 
     /**
@@ -110,10 +111,10 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(LocalizedString.tr(
-                "Specimen {0} not found in database", cell
-                    .getValue()));
-            cell.setTitle(LocalizedString.tr("!"));
+            cell.setInformation(LTemplate.tr(
+                "Specimen {0} not found in database")
+                .format(cell.getValue()));
+            cell.setTitle("!");
         } else {
             ItemState state = data
                 .getCurrentDispatchSpecimenIds().get(foundSpecimen.getId());
@@ -121,7 +122,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellInfoStatus.EXTRA);
-                cell.setInformation(LocalizedString.tr(
+                cell.setInformation(LString.tr(
                     "Specimen should not be in shipment"));
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {

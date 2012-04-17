@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -19,7 +19,12 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 public class ContainerSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final LString CANNOT_SET_LABEL =
+        LString.tr("Cannot set label on child containers.");
+
+    @SuppressWarnings("nls")
+    public static final String PATH_DELIMITER = "/";
 
     public Integer containerId;
     public ActivityStatus activityStatus;
@@ -78,7 +83,6 @@ public class ContainerSaveAction implements Action<IdResult> {
         return permission.isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Container container;
@@ -97,8 +101,7 @@ public class ContainerSaveAction implements Action<IdResult> {
 
         if (parentId != null) {
             if (label != null) {
-                throw new ActionException(
-                    LocalizedString.tr("Cannot set label on child containers."));
+                throw new ActionException(CANNOT_SET_LABEL);
             }
             Container parent = context.load(Container.class, parentId);
             String parentPath = parent.getPath();

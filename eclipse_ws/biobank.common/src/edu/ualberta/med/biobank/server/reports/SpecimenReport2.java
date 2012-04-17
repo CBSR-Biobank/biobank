@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -13,7 +13,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenReport2 extends AbstractReport {
     @SuppressWarnings("nls")
-    private static final LocalizedString NO_DATE_PROCESSED = LocalizedString
+    private static final LString NO_DATE_PROCESSED = LString
         .tr("No Date Processed");
 
     // @formatter:off

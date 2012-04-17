@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
+import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -67,6 +67,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @SuppressWarnings("nls")
     private static final String CONTAINER_AT_POSITION_MSG =
         i18n.tr("Container {0} is already holding a container {1} at position {2}.");
+    @SuppressWarnings("nls")
+    private static final LTemplate.Tr INVALID_POSITION =
+        LTemplate.tr("Can't use position {0} in container {1} because its" +
+            " maximum capacity is {2} rows and {3} columns.");
 
     private Map<RowColPos, SpecimenWrapper> specimens;
     private Map<RowColPos, ContainerWrapper> children;
@@ -281,7 +285,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception
      */
-    @SuppressWarnings("nls")
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
         ContainerTypeWrapper type = getContainerType();
@@ -293,21 +296,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 // {1} container label (container type)
                 // {2} row capacity
                 // {3} column capacity
-                throw new LocalizedException(
-                    LocalizedString.tr("Can''t use position {0} in container" +
-                        " {1} because capacity is {2} * {3}.",
-                        position,
-                        getFullInfoLabel(),
-                        type.getRowCapacity(),
-                        type.getColCapacity()));
-            }
-            if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new LocalizedException(
-                    // {0} container position
-                    // {1} container label (container type)
-                    LocalizedString.tr(
-                        "Position \"{0}\" is invalid for container \"{1}\".",
-                        position, getFullInfoLabel()));
+                throw new LocalizedException(INVALID_POSITION.format(
+                    position,
+                    getFullInfoLabel(),
+                    type.getRowCapacity(),
+                    type.getColCapacity()));
             }
         }
         return rcp;
@@ -711,7 +704,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     /**
      * Get the container with the given productBarcode in a site
      */
-    @SuppressWarnings("nls")
     public static ContainerWrapper getContainerWithProductBarcodeInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String productBarcode) throws Exception {
@@ -721,15 +713,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 Arrays.asList(new Object[] { siteWrapper.getId(),
                     productBarcode }));
         List<Container> containers = appService.query(criteria);
-        if (containers.size() == 0) {
-            return null;
-        } else if (containers.size() > 1) {
-            // {0} container barcode
-            throw new LocalizedException(
-                LocalizedString.tr("Multiples containers registered with" +
-                    " product barcode \"{0}\".",
-                    productBarcode));
-        }
         return new ContainerWrapper(appService, containers.get(0));
     }
 

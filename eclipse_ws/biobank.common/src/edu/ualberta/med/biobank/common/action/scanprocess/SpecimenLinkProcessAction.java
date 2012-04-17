@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResu
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
@@ -69,7 +69,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         String otherPosition = ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(otherValue.getRow(),
                                 otherValue.getCol()));
-                        cell.setInformation(LocalizedString
+                        cell.setInformation(LString
                             .tr(
                                 "Value ''{0}'' has already been scanned in position {1}",
                                 cell.getValue(), otherPosition));
@@ -126,7 +126,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen != null) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(LocalizedString
+                cell.setInformation(LString
                     .tr("Specimen already in database"));
                 String palletPosition = ContainerLabelingSchemeWrapper
                     .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));

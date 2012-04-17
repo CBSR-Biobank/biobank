@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.researchGroup;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -9,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 
 /**
@@ -41,7 +38,6 @@ public class ResearchGroupGetInfoAction implements
         return new ResearchGroupReadPermission(rgId).isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public ResearchGroupReadInfo run(ActionContext context)
         throws ActionException {
@@ -50,17 +46,8 @@ public class ResearchGroupGetInfoAction implements
         Query query = context.getSession().createQuery(RESEARCH_INFO_HQL);
         query.setParameter(0, rgId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object row = rows.get(0);
-
-            sInfo.researchGroup = (ResearchGroup) row;
-
-        } else {
-            throw new ActionException(
-                LocalizedString.tr("No research group found with id \"{0}\".", rgId));
-        }
+        sInfo.researchGroup =
+            ActionContext.singleResult(query, ResearchGroup.class, rgId);
 
         return sInfo;
     }

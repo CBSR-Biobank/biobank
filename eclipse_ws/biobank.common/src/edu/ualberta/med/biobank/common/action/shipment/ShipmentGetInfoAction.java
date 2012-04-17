@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.Query;
 
@@ -11,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
-import edu.ualberta.med.biobank.i18n.LocalizedString;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
 /**
@@ -43,7 +41,6 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         return new OriginInfoReadPermission(oiId).isAllowed(context);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public ShipmentReadInfo run(ActionContext context)
         throws ActionException {
@@ -52,21 +49,13 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         Query query = context.getSession().createQuery(ORIGIN_INFO_HQL);
         query.setParameter(0, oiId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object row = rows.get(0);
+        OriginInfo oi =
+            ActionContext.singleResult(query, OriginInfo.class, oiId);
 
-            sInfo.originInfo = (OriginInfo) row;
-            sInfo.specimens = new ArrayList<SpecimenInfo>(
-                new ShipmentGetSpecimenListInfoAction(oiId).run(context)
-                    .getList());
-
-        } else {
-            throw new ActionException(
-                LocalizedString.tr("No origin information with id \"{0}\" could be found.",
-                    oiId));
-        }
+        sInfo.originInfo = oi;
+        sInfo.specimens = new ArrayList<SpecimenInfo>(
+            new ShipmentGetSpecimenListInfoAction(oiId).run(context)
+                .getList());
 
         return sInfo;
     }
