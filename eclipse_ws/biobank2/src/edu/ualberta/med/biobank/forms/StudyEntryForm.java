@@ -75,7 +75,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         Messages.study_visit_info_dateProcessed;
 
-    protected static BgcLogger LOGGER = BgcLogger
+    protected static BgcLogger log = BgcLogger
         .getLogger(StudyEntryForm.class.getName());
 
     private static class StudyEventAttrCustom extends EventAttrCustom {
@@ -494,7 +494,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                             ActivityStatus.ACTIVE;
                     }
 
-                    LOGGER.debug(studyEventAttrSaveInfo.toString());
+                    log.debug(studyEventAttrSaveInfo.toString());
                     studyEventAttrSaveInfos.add(studyEventAttrSaveInfo);
                 }
             }
