@@ -331,6 +331,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
                         break;
+                    case PRE_DELETE:
+                        if (specimen.getChildSpecimenCollection(false).size() != 0)
+                            throw new VetoException(
+                                "Cannot remove processed specimens with children.");
                     }
                 }
             };
