@@ -14,11 +14,11 @@ public class ProcessingEventGetSourceSpecimenListInfoAction extends
     private static final String SOURCE_SPEC_QRY =
         SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " INNER JOIN FETCH spec.processingEvent"
-            + " LEFT INNER JOIN FETCH spec.childSpecimens"
+            + " LEFT JOIN FETCH spec.childSpecimens"
             + " WHERE spec.processingEvent.id=?"
             + SpecimenListGetInfoAction.SPEC_BASE_END;
 
-    private Integer peventId;
+    private final Integer peventId;
 
     public ProcessingEventGetSourceSpecimenListInfoAction(Integer pevenId) {
         this.peventId = pevenId;

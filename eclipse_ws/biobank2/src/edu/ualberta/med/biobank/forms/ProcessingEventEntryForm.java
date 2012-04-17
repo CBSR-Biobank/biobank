@@ -77,10 +77,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private ProcessingEventWrapper pevent = new ProcessingEventWrapper(
+    private final ProcessingEventWrapper pevent = new ProcessingEventWrapper(
         SessionManager.getAppService());
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
@@ -328,7 +328,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                         if (!specimen.getCollectionEvent().getPatient()
                             .getStudy().getWrappedObject().equals(study))
                             throw new VetoException(
-                                "All specimens must be part of the same study.");
+                                "In a processing event, all specimens must be part of the same study.");
                     case POST_ADD:
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
