@@ -15,6 +15,18 @@ public abstract class LString implements Serializable {
         return template;
     }
 
+    @Deprecated
+    public static LString lit(final String literal) {
+        return new LString(null) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getString() {
+                return literal;
+            }
+        };
+    }
+
     public static LString tr(String text, Object... objects) {
         return LTemplate.tr(text).format(objects);
     }
