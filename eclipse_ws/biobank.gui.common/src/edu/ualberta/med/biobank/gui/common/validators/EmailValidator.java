@@ -13,12 +13,14 @@ import org.eclipse.core.runtime.Status;
  */
 public class EmailValidator extends AbstractValidator {
 
-    public static final String EMAIL_PATTERN = ".+@.+\\..+"; 
+    @SuppressWarnings("nls")
+    public static final String EMAIL_PATTERN = ".+@.+\\..+";
 
     public EmailValidator(String message) {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String))

@@ -17,16 +17,25 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class BgcClipboard {
+    private static final I18n i18n = I18nFactory.getI18n(BgcClipboard.class);
+
+    @SuppressWarnings("nls")
+    private static final String COPY_MENU_ITEM_TEXT = i18n.tr("Copy");
+    @SuppressWarnings("nls")
+    private static final String LINE_SEPARATOR_PROPERTY = "line.separator";
 
     public static void addClipboardCopySupport(final ColumnViewer tv,
         Menu menu, final BgcLabelProvider labelProvider, final int numCols) {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Copy");
+        item.setText(COPY_MENU_ITEM_TEXT);
         item.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override
@@ -43,7 +52,7 @@ public class BgcClipboard {
                         if (text != null) {
                             row.add(text);
                         } else {
-                            row.add(""); 
+                            row.add(StringUtil.EMPTY_STRING);
                         }
                     }
                     selectedRows.add(StringUtils.join(row, '\t'));
@@ -52,7 +61,8 @@ public class BgcClipboard {
                     StringBuilder sb = new StringBuilder();
                     for (Object row : selectedRows) {
                         if (sb.length() != 0) {
-                            sb.append(System.getProperty("line.separator")); 
+                            sb.append(System
+                                .getProperty(LINE_SEPARATOR_PROPERTY));
                         }
                         sb.append(row.toString());
                     }

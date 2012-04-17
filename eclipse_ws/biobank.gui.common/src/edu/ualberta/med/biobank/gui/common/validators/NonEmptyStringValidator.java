@@ -4,7 +4,6 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-
 public class NonEmptyStringValidator extends AbstractValidator {
 
     public NonEmptyStringValidator(String message) {
@@ -14,8 +13,7 @@ public class NonEmptyStringValidator extends AbstractValidator {
     @Override
     public IStatus validate(Object value) {
         if (value != null && !(value instanceof String)) {
-            throw new RuntimeException(
-                "");
+            throw new RuntimeException();
         }
 
         if (value != null && ((String) value).length() != 0) {

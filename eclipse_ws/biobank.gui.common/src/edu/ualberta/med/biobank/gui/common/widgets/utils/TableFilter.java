@@ -10,14 +10,21 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 public abstract class TableFilter<T> {
+    private static final I18n i18n = I18nFactory.getI18n(TableFilter.class);
 
-    private Text filterText;
+    @SuppressWarnings("nls")
+    private static final String TABLE_FILTER_DESCRIPTION = i18n
+        .tr("Enter text to filter the list:");
+
+    private final Text filterText;
 
     public TableFilter(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText("Enter text to filter the list:");
+        label.setText(TABLE_FILTER_DESCRIPTION);
         filterText = new Text(parent, SWT.BORDER);
         GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
         filterText.setLayoutData(gd);

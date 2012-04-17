@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.DelegatingList;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
@@ -54,6 +56,15 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     implements IInfoTablePagination, ListChangeSource<T> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractInfoTableWidget.class);
+
+    @SuppressWarnings("nls")
+    private static final String ADD_MENU_ITEM_TEXT = i18n.tr("Add");
+    @SuppressWarnings("nls")
+    private static final String EDIT_MENU_ITEM_TEXT = i18n.tr("Edit");
+    @SuppressWarnings("nls")
+    private static final String DELETE_MENU_ITEM_TEXT = i18n.tr("Delete");
 
     public static class RowItem {
         int itemNumber;
@@ -75,9 +86,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected boolean autoSizeColumns;
 
-    private BgcTableSorter tableSorter;
+    private final BgcTableSorter tableSorter;
 
-    private BgcLabelProvider labelProvider;
+    private final BgcLabelProvider labelProvider;
 
     protected PaginationWidget paginationWidget;
 
@@ -315,7 +326,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Add");
+        item.setText(ADD_MENU_ITEM_TEXT);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -329,7 +340,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
+        item.setText(EDIT_MENU_ITEM_TEXT);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -343,7 +354,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(DELETE_MENU_ITEM_TEXT);
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {

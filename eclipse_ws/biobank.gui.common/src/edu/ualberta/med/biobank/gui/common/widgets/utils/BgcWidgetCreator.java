@@ -55,6 +55,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -165,6 +166,7 @@ public class BgcWidgetCreator {
             widgetValues, modelObservableValue, validator, null);
     }
 
+    @SuppressWarnings("nls")
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String[] widgetValues, IObservableValue modelObservableValue,
@@ -186,7 +188,7 @@ public class BgcWidgetCreator {
                 bindingKey);
         } else {
             Assert.isTrue(false,
-                "invalid widget class " + widgetClass.getName()); 
+                "invalid widget class " + widgetClass.getName());
         }
         return null;
     }
@@ -214,13 +216,14 @@ public class BgcWidgetCreator {
         bindings.put(bindingKey, binding);
     }
 
+    @SuppressWarnings("nls")
     private Combo createCombo(Composite composite, int options,
         String[] widgetValues, final IObservableValue modelObservableValue,
         UpdateValueStrategy uvs, String bindingKey) {
         final Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER
             | options);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        Assert.isNotNull(widgetValues, "combo values not assigned"); 
+        Assert.isNotNull(widgetValues, "combo values not assigned");
         combo.setItems(widgetValues);
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
@@ -459,7 +462,7 @@ public class BgcWidgetCreator {
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
             IObservableValue selectedValue =
-                new WritableValue("", String.class); 
+                new WritableValue(StringUtil.EMPTY_STRING, String.class);
             Binding binding = dbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
@@ -504,12 +507,13 @@ public class BgcWidgetCreator {
         return createLabel(parent, fieldLabel, SWT.LEFT, true);
     }
 
+    @SuppressWarnings("nls")
     public Label createLabel(Composite parent, String fieldLabel, int options,
         boolean addColon) {
         Label label = null;
         String text = fieldLabel;
         if (addColon) {
-            text += ":"; 
+            text += ":";
         }
         if (toolkit == null) {
             label = new Label(parent, options);
@@ -740,6 +744,7 @@ public class BgcWidgetCreator {
         }
     }
 
+    @SuppressWarnings("nls")
     public Control createWidget(Composite parent, Class<?> widgetClass,
         int widgetOptions, String value) {
         if (widgetClass == BgcBaseText.class) {
@@ -753,7 +758,7 @@ public class BgcWidgetCreator {
             }
             return field;
         } else if (widgetClass == Label.class) {
-            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT 
+            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
                 | SWT.BORDER, false);
             if (value != null) {
                 field.setText(value);
@@ -766,7 +771,7 @@ public class BgcWidgetCreator {
             return button;
         } else {
             Assert.isTrue(false,
-                "invalid widget class " + widgetClass.getName()); 
+                "invalid widget class " + widgetClass.getName());
         }
         return null;
     }

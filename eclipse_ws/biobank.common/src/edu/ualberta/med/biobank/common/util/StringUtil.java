@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class StringUtil {
+    @SuppressWarnings("nls")
+    public static final String EMPTY_STRING = "";
+
     /**
      * Returns a concatenation of the {@link String} form of each element in the
      * given {@code Collection}, delimited by the given delimiter. Rolled our

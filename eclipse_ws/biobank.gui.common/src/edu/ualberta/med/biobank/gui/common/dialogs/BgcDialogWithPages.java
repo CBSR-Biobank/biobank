@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 /**
@@ -202,7 +203,7 @@ public abstract class BgcDialogWithPages extends BgcBaseDialog {
             public String getText(Object element) {
                 if ((element != null) && (element instanceof BgcDialogPage))
                     return ((BgcDialogPage) element).getTitle();
-                return ""; 
+                return StringUtil.EMPTY_STRING;
             }
         });
         listViewer.setInput(getPages());
@@ -239,23 +240,25 @@ public abstract class BgcDialogWithPages extends BgcBaseDialog {
             }
         });
 
-        final IPropertyChangeListener fontListener = new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                if (JFaceResources.BANNER_FONT.equals(event.getProperty())) {
-                    updateMessage();
-                }
-                if (JFaceResources.DIALOG_FONT.equals(event.getProperty())) {
-                    updateMessage();
-                    Font dialogFont = JFaceResources.getDialogFont();
-                    // updateTreeFont(dialogFont);
-                    Control[] children = ((Composite) buttonBar).getChildren();
-                    for (int i = 0; i < children.length; i++) {
-                        children[i].setFont(dialogFont);
+        final IPropertyChangeListener fontListener =
+            new IPropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (JFaceResources.BANNER_FONT.equals(event.getProperty())) {
+                        updateMessage();
+                    }
+                    if (JFaceResources.DIALOG_FONT.equals(event.getProperty())) {
+                        updateMessage();
+                        Font dialogFont = JFaceResources.getDialogFont();
+                        // updateTreeFont(dialogFont);
+                        Control[] children =
+                            ((Composite) buttonBar).getChildren();
+                        for (int i = 0; i < children.length; i++) {
+                            children[i].setFont(dialogFont);
+                        }
                     }
                 }
-            }
-        };
+            };
 
         titleArea.addDisposeListener(new DisposeListener() {
             @Override

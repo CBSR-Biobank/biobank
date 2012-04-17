@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.gui.common.widgets;
 
-import org.eclipse.osgi.util.NLS;
+import java.text.MessageFormat;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,10 +10,29 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class PaginationWidget extends Composite {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PaginationWidget.class);
+
+    @SuppressWarnings("nls")
+    private static final String PREVIOUS_PAGE_BUTTON_TOOLTIP = i18n
+        .tr("Previous Page");
+    @SuppressWarnings("nls")
+    private static final String FIRST_PAGE_BUTTON_TOOLTIP = i18n
+        .tr("First Page");
+    @SuppressWarnings("nls")
+    private static final String NEXT_PAGE_BUTTON_TOOLTIP = i18n.tr("Next Page");
+    @SuppressWarnings("nls")
+    private static final String LAST_PAGE_BUTTON_TOOLTIP = i18n.tr("Last Page");
+    @SuppressWarnings("nls")
+    private static final String PAGE_X_OF_UNKNOWN = i18n.tr("Page: {0} of ?");
+    @SuppressWarnings("nls")
+    private static final String PAGE_X_OF_Y = i18n.tr("Page: {0} of {1}");
 
     class PageInformation {
         public int page;
@@ -30,22 +50,23 @@ public class PaginationWidget extends Composite {
 
     public static final int TOTAL_PAGES_UNKNOWN = -1;
 
-    private IInfoTablePagination paginator;
+    private final IInfoTablePagination paginator;
 
-    private Button firstButton;
+    private final Button firstButton;
 
-    private Button prevButton;
+    private final Button prevButton;
 
-    private Button nextButton;
+    private final Button nextButton;
 
-    private Button lastButton;
+    private final Button lastButton;
 
-    private Label pageLabel;
+    private final Label pageLabel;
 
     protected PageInformation pageInfo;
 
     public PaginationWidget(Composite parent, int style,
-        IInfoTablePagination paginator, int buttonsEnabledOnInit, int rowsPerPage) {
+        IInfoTablePagination paginator, int buttonsEnabledOnInit,
+        int rowsPerPage) {
         super(parent, style);
         this.paginator = paginator;
 
@@ -55,7 +76,7 @@ public class PaginationWidget extends Composite {
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
         firstButton
-            .setToolTipText("First Page");
+            .setToolTipText(FIRST_PAGE_BUTTON_TOOLTIP);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -67,7 +88,7 @@ public class PaginationWidget extends Composite {
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton
-            .setToolTipText("Previous Page");
+            .setToolTipText(PREVIOUS_PAGE_BUTTON_TOOLTIP);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -80,7 +101,7 @@ public class PaginationWidget extends Composite {
         nextButton = new Button(this, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText("Next page");
+        nextButton.setToolTipText(NEXT_PAGE_BUTTON_TOOLTIP);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -91,7 +112,7 @@ public class PaginationWidget extends Composite {
         lastButton = new Button(this, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText("Last Page");
+        lastButton.setToolTipText(LAST_PAGE_BUTTON_TOOLTIP);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -214,12 +235,11 @@ public class PaginationWidget extends Composite {
 
     public void setPageLabelText() {
         if (pageInfo.pageTotal == TOTAL_PAGES_UNKNOWN) {
-            pageLabel.setText(NLS.bind(
-                "Page: {0} of ?",
+            pageLabel.setText(MessageFormat.format(PAGE_X_OF_UNKNOWN,
                 pageInfo.page + 1));
         } else {
-            pageLabel.setText(NLS.bind("Page: {0} of {1}",
-                pageInfo.page + 1, +pageInfo.pageTotal));
+            pageLabel.setText(MessageFormat.format(PAGE_X_OF_Y,
+                pageInfo.page + 1, pageInfo.pageTotal));
         }
     }
 

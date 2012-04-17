@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.CDT.Key;
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.CDT.PickerPart;
@@ -42,6 +44,69 @@ import edu.ualberta.med.biobank.gui.common.widgets.nebula.v.VTracker;
 
 @SuppressWarnings("unused")
 class DatePicker extends VPanel {
+    private static final I18n i18n = I18nFactory.getI18n(CDateTime.class);
+
+    @SuppressWarnings("nls")
+    private static final String[] DATE_ORDINALS = new String[] {
+        i18n.tr("1st"),
+        i18n.tr("2nd"),
+        i18n.tr("3rd"),
+        i18n.tr("4th"),
+        i18n.tr("5th"),
+        i18n.tr("6th"),
+        i18n.tr("7th"),
+        i18n.tr("8th"),
+        i18n.tr("9th"),
+        i18n.tr("10th"),
+        i18n.tr("11th"),
+        i18n.tr("12th"),
+        i18n.tr("13th"),
+        i18n.tr("14th"),
+        i18n.tr("15th"),
+        i18n.tr("16th"),
+        i18n.tr("17th"),
+        i18n.tr("18th"),
+        i18n.tr("19th"),
+        i18n.tr("20th"),
+        i18n.tr("21st"),
+        i18n.tr("22nd"),
+        i18n.tr("23rd"),
+        i18n.tr("24th"),
+        i18n.tr("25th"),
+        i18n.tr("26th"),
+        i18n.tr("27th"),
+        i18n.tr("28th"),
+        i18n.tr("29th"),
+        i18n.tr("30th"),
+        i18n.tr("31st")
+    };
+
+    @SuppressWarnings("nls")
+    private static final String TODAY_BUTTON_TEXT = i18n.tr("Today");
+    @SuppressWarnings("nls")
+    private static final String TODAY_BUTTON_VERBOSE_TEXT = i18n
+        .tr("Today is {0,date,EEEE}, the {1}");
+    @SuppressWarnings("nls")
+    private static final String CLEAR_BUTTON_TEXT = i18n.tr("Clear");
+    @SuppressWarnings("nls")
+    private static final String PREVIOUS_MONTH_BUTTON_TOOLTIP = i18n
+        .tr("Previous Month");
+    @SuppressWarnings("nls")
+    private static final String NEXT_MONTH_BUTTON_TOOLTIP = i18n
+        .tr("Next Month");
+    @SuppressWarnings("nls")
+    private static final String TODAYS_DATE_BUTTON_TOOLTIP = i18n
+        .tr("Go To Today");
+    @SuppressWarnings("nls")
+    private static final String PREVIOUS_YEAR_BUTTON_TOOLTIP = i18n
+        .tr("Previous Year");
+    @SuppressWarnings("nls")
+    private static final String NEXT_YEAR_BUTTON_TOOLTIP = i18n.tr("Next Year");
+    @SuppressWarnings("nls")
+    private static final String TODAY_BUTTON_TOOLTIP = i18n.tr("Go To Today");
+    @SuppressWarnings("nls")
+    private static final String SHOW_SELECTION_MENU_ITEM_TEXT = i18n
+        .tr("Show Selection");
 
     private static final int DAYS_IN_WEEK = 7;
     private static final int NUM_ROWS = 6;
@@ -90,7 +155,7 @@ class DatePicker extends VPanel {
 
     VButton[] yearButtons;
 
-    private CDateTime cdt;
+    private final CDateTime cdt;
     private int fields = 0;
     private SimpleDateFormat sdf;
     private String lastPattern;
@@ -1271,26 +1336,19 @@ class DatePicker extends VPanel {
                         DATE_ORDINALS[cal.get(Calendar.DATE) - 1]
                     };
                     MessageFormat formatter =
-                        new MessageFormat("Today is {0,date,EEEE}, the {1}",
+                        new MessageFormat(TODAY_BUTTON_VERBOSE_TEXT,
                             locale);
                     today.setText(formatter.format(margs));
                 } else {
-                    today.setText("Today");
+                    today.setText(TODAY_BUTTON_TEXT);
                 }
             }
             if (clear != null) {
-                clear.setText("Clear");
+                clear.setText(CLEAR_BUTTON_TEXT);
             }
             footer.layout();
         }
     }
-
-    private static final String[] DATE_ORDINALS = new String[] {
-        "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th",
-        "11th", "12th", "13th", "14th", "15th", "16th", "17th", "18th", "19th",
-        "20th", "21st", "22nd", "23rd", "24th", "25th", "26th", "27th", "28th",
-        "29th", "30th", "31st"
-    };
 
     /**
      * set / update the text of the header - <code>monthLabel</code>,
@@ -1373,21 +1431,21 @@ class DatePicker extends VPanel {
     private void updateLocale() {
         Locale locale = cdt.getLocale();
         if (monthPrev != null)
-            monthPrev.setToolTipText("Previous Month");
+            monthPrev.setToolTipText(PREVIOUS_MONTH_BUTTON_TOOLTIP);
         if (monthNext != null)
-            monthNext.setToolTipText("Next Month");
+            monthNext.setToolTipText(NEXT_MONTH_BUTTON_TOOLTIP);
         if (dateNow != null)
-            dateNow.setToolTipText("Go To Today");
+            dateNow.setToolTipText(TODAYS_DATE_BUTTON_TOOLTIP);
         if (yearPrev != null)
-            yearPrev.setToolTipText("Previous Year");
+            yearPrev.setToolTipText(PREVIOUS_YEAR_BUTTON_TOOLTIP);
         if (yearNext != null)
-            yearNext.setToolTipText("Next Year");
+            yearNext.setToolTipText(NEXT_YEAR_BUTTON_TOOLTIP);
         if (today != null)
-            today.setToolTipText("Go To Today");
+            today.setToolTipText(TODAY_BUTTON_TOOLTIP);
         if (todayMenuItem != null)
-            todayMenuItem.setText("Go To Today");
+            todayMenuItem.setText(TODAY_BUTTON_TOOLTIP);
         if (showSelMenuItem != null)
-            showSelMenuItem.setText("Show Selection");
+            showSelMenuItem.setText(SHOW_SELECTION_MENU_ITEM_TEXT);
     }
 
     private void updateMonths() {
