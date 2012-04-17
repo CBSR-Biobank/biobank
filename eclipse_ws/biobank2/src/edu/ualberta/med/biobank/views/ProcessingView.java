@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingView extends AbstractAdministrationView {
 
@@ -141,14 +140,14 @@ public class ProcessingView extends AbstractAdministrationView {
     @Override
     public void reload() {
         if (processingNode == null) createNodes();
-        for (AbstractAdapterBase adaper : processingNode.getChildren()) {
-            adaper.rebuild();
-        }
         try {
+            for (AbstractAdapterBase adaper : processingNode.getChildren()) {
+                ((AdapterBase) adaper).resetObject();
+            }
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
                 new ProcessingEventReadPermission(SessionManager.getUser()
                     .getCurrentWorkingCenter().getWrappedObject())));
-        } catch (ApplicationException e) {
+        } catch (Exception e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
         super.reload();
