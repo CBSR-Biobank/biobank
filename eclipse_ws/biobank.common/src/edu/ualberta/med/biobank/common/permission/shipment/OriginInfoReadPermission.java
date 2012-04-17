@@ -18,11 +18,15 @@ public class OriginInfoReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        OriginInfo oi = context.load(OriginInfo.class, oiId);
         User user = context.getUser();
-        return PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
-            oi.getReceiverSite())
-            || PermissionEnum.ORIGIN_INFO_READ.isAllowed(user, oi.getCenter());
+        if (oiId != null) {
+            OriginInfo oi = context.load(OriginInfo.class, oiId);
+            return PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
+                oi.getReceiverSite())
+                || PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
+                    oi.getCenter());
+        }
+        return PermissionEnum.ORIGIN_INFO_READ.isAllowed(user);
     }
 
 }

@@ -17,11 +17,14 @@ public class DispatchReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Dispatch dispatch = context.get(Dispatch.class, dispatchId,
-            new Dispatch());
-        return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
-            dispatch.getReceiverCenter())
-            || PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
-                dispatch.getSenderCenter());
+        if (dispatchId != null) {
+            Dispatch dispatch = context.get(Dispatch.class, dispatchId,
+                new Dispatch());
+            return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
+                dispatch.getReceiverCenter())
+                || PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
+                    dispatch.getSenderCenter());
+        }
+        return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser());
     }
 }

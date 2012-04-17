@@ -73,10 +73,15 @@ public class ContainerGroup extends AdapterBase {
                                 new SiteGetTopContainersAction(siteAdapter
                                     .getId())).getList();
                     ContainerGroup.super.performExpand();
-                } catch (ApplicationException e) {
-                    // TODO: open an error dialog here?
-                    LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$            
+                } catch (Exception e) {
+                    String text = getClass().getName();
+                    if (getModelObject() != null) {
+                        text = getModelObject().toString();
+                    }
+                    LOGGER.error(
+                        "Error while loading children of node " + text, e); //$NON-NLS-1$
                 }
+
             }
         });
     }
