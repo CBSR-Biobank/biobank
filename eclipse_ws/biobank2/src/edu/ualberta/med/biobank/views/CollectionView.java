@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -53,6 +54,7 @@ public class CollectionView extends AbstractAdministrationView {
         radioPnumber = new Button(composite, SWT.RADIO);
         radioPnumber.setText(Messages.CollectionView_patient_label);
         radioPnumber.setSelection(true);
+
     }
 
     protected void notFound(String text) throws ApplicationException {
@@ -172,6 +174,12 @@ public class CollectionView extends AbstractAdministrationView {
     public void reload() {
         for (AbstractAdapterBase adapter : rootNode.getChildren())
             adapter.rebuild();
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new PatientReadPermission(null)));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+        }
         super.reload();
     }
 
