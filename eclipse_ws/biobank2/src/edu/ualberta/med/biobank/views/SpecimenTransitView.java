@@ -178,9 +178,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         }
         try {
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new DispatchReadPermission(null))
+                new DispatchReadPermission(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getWrappedObject()))
                 || SessionManager.getAppService().isAllowed(
-                    new OriginInfoReadPermission(null)));
+                    new OriginInfoReadPermission(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getWrappedObject())));
         } catch (ApplicationException e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }

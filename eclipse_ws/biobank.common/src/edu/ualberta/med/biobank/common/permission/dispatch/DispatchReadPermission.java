@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.permission.dispatch;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
@@ -11,8 +12,14 @@ public class DispatchReadPermission implements Permission {
 
     private Integer dispatchId;
 
+    private Integer centerId;
+
     public DispatchReadPermission(Integer oiId) {
         this.dispatchId = oiId;
+    }
+
+    public DispatchReadPermission(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override
@@ -25,6 +32,9 @@ public class DispatchReadPermission implements Permission {
                 || PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
                     dispatch.getSenderCenter());
         }
+        else if (centerId != null)
+            return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser(),
+                context.load(Center.class, centerId));
         return PermissionEnum.DISPATCH_READ.isAllowed(context.getUser());
     }
 }

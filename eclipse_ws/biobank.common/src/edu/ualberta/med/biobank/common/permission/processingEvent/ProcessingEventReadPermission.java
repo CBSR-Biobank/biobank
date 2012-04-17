@@ -9,21 +9,21 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 public class ProcessingEventReadPermission implements Permission {
     private static final long serialVersionUID = 1L;
     private Integer peId;
-    private Center center;
+    private Integer centerId;
 
     public ProcessingEventReadPermission(Integer peId) {
         this.peId = peId;
     }
 
-    public ProcessingEventReadPermission(Center site) {
-        this.center = site;
+    public ProcessingEventReadPermission(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
         if (peId == null)
             return PermissionEnum.PROCESSING_EVENT_READ.isAllowed(
-                context.getUser(), center
+                context.getUser(), context.load(Center.class, centerId)
                 );
         return PermissionEnum.PROCESSING_EVENT_READ.isAllowed(
             context.getUser(), context.load(ProcessingEvent.class, peId)
