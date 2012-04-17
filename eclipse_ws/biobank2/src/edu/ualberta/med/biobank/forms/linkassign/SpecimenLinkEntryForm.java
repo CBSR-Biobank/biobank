@@ -62,6 +62,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
 
+    protected static BgcLogger log = BgcLogger
+        .getLogger(SpecimenLinkEntryForm.class.getName());
+
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
     private static final String NEW_SINGLE_POSITION_BINDING =
         "newSinglePosition-binding";
@@ -106,6 +109,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void init() throws Exception {
+        log.debug("init");
         super.init();
         setPartName("Linking specimens");
         setCanLaunchScan(true);
@@ -118,11 +122,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean isSingleMode() {
+        log.debug("isSingleMode");
         return mode.isSingleMode();
     }
 
     @Override
     protected void setMode(Mode m) {
+        log.debug("setMode: " + mode);
         mode = m;
     }
 
@@ -267,12 +273,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void defaultInitialisation() {
+        log.debug("defaultInitialisation");
         super.defaultInitialisation();
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
     }
 
     @Override
     protected void setNeedSinglePosition(boolean position) {
+        log.debug("setNeedSinglePosition: " + position);
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, position);
         widgetCreator.showWidget(newSinglePositionLabel, position);
         widgetCreator.showWidget(newSinglePositionText, position);
@@ -379,6 +387,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private void checkInventoryId(BgcBaseText inventoryIdText) {
+        log.debug("checkInventoryId: " + inventoryIdText.getText());
         boolean ok = true;
         try {
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
@@ -428,6 +437,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * @throws ApplicationException
      */
     private void setTypeCombos() {
+        log.debug("setTypeCombos");
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
         if (isSingleMode()) {
@@ -498,6 +508,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void doBeforeSave() throws Exception {
+        log.debug("doBeforeSave");
         // can't access the combos in another thread, so do it now
         if (mode.isSingleMode()) {
             SpecimenHierarchyInfo selection = singleTypesWidget.getSelection();
@@ -511,6 +522,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
+        log.debug("saveForm");
         if (mode.isSingleMode())
             saveSingleSpecimen();
         else
@@ -521,6 +533,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private void saveMultipleSpecimens() throws Exception {
+        log.debug("saveForm");
+
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletCell> cells =
             (Map<RowColPos, PalletCell>) palletWidget
@@ -551,6 +565,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     protected void printSaveMultipleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
+        log.debug("printSaveMultipleLogMessage");
+
         StringBuffer sb = new StringBuffer(
             "ALIQUOTED SPECIMENS:\n");
         for (AliquotedSpecimenResInfo resInfo : resList) {
@@ -576,6 +592,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private void saveSingleSpecimen() throws Exception {
+        log.debug("saveSingleSpecimen");
+
         AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
         asi.activityStatus = ActivityStatus.ACTIVE;
         asi.typeId = singleSpecimen.getSpecimenType().getId();
@@ -597,6 +615,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     protected void printSaveSingleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
+        log.debug("printSaveSingleLogMessage");
+
         if (resList.size() == 1) {
             AliquotedSpecimenResInfo resInfo = resList.get(0);
             String posStr = resInfo.position;
@@ -617,6 +637,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     public void setValues() throws Exception {
+        log.debug("setValues");
+
         super.setValues();
         if (isSingleMode())
             singleTypesWidget.deselectAll();
@@ -626,6 +648,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     public void reset(boolean resetAll) {
+        log.debug("reset: " + resetAll);
+
         linkFormPatientManagement.reset(resetAll);
         if (resetAll) {
             palletWidget.setCells(null);
@@ -638,6 +662,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     public boolean onClose() {
+        log.debug("onClose");
         linkFormPatientManagement.onClose();
         return super.onClose();
     }
@@ -647,6 +672,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: do this before multiple scan is made
      */
     protected void beforeScanThreadStart() {
+        log.debug("beforeScanThreadStart");
         super.beforeScanThreadStart();
         setTypeCombos();
         beforeScans(true);
@@ -657,6 +683,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: do this before scan of one tube is really made
      */
     protected void beforeScanTubeAlone() {
+        log.debug("beforeScanTubeAlone");
         super.beforeScanTubeAlone();
         beforeScans(false);
     }
@@ -665,6 +692,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: do this before any scan is really launched
      */
     private void beforeScans(boolean resetTypeRows) {
+        log.debug("beforeScans: " + resetTypeRows);
         preSelections = new ArrayList<SpecimenHierarchyInfo>();
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
             preSelections.add(stw.getSelection());
@@ -694,6 +722,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
+        log.debug("getCellProcessAction");
         return new SpecimenLinkProcessAction(centerId,
             linkFormPatientManagement
                 .getCurrentPatient().getStudy().getId(), cell, locale);
@@ -703,6 +732,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
+        log.debug("getPalletProcessAction");
         return new SpecimenLinkProcessAction(centerId,
             linkFormPatientManagement
                 .getCurrentPatient().getStudy().getId(), cells, isRescanMode,
@@ -718,6 +748,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                log.debug("afterScanAndProcess: asyncExec");
+
                 // enabled the hierarchy combos
                 typesSelectionPerRowComposite
                     .setEnabled(currentScanState != UICellStatus.ERROR);
@@ -756,6 +788,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected void processCellResult(final RowColPos rcp, PalletCell cell) {
+        log.debug("processCellResult");
         Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
             typesRowsCount = 0;
@@ -779,6 +812,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void setCountOnSpecimenWidget(Map<Integer, Integer> typesRows,
         int row) {
+        log.debug("setCountOnSpecimenWidget");
         AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
         Integer number = typesRows.get(row);
         if (number == null) {
@@ -793,6 +827,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void setHierarchyToCell(PalletCell cell,
         SpecimenHierarchyInfo selection) {
+        log.debug("setHierarchyToCell");
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
         if (cell.getStatus() != UICellStatus.ERROR)
@@ -801,11 +836,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected Mode initialisationMode() {
+        log.debug("initialisationMode: " + mode);
         return mode;
     }
 
     @Override
     protected void enableFields(boolean enable) {
+        log.debug("enableFields: " + enable);
         super.enableFields(enable);
         multipleOptionsFields.setEnabled(enable);
     }
