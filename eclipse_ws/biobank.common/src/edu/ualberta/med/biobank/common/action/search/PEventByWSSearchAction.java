@@ -34,7 +34,7 @@ public class PEventByWSSearchAction implements
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(null, site).isAllowed(context);
+        return new ProcessingEventReadPermission(site).isAllowed(context);
     }
 
     @Override

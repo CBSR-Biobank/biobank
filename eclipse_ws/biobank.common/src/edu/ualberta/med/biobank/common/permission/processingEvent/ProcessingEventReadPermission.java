@@ -15,10 +15,8 @@ public class ProcessingEventReadPermission implements Permission {
         this.peId = peId;
     }
 
-    public ProcessingEventReadPermission(
-        @SuppressWarnings("unused") Integer peId, Integer centerId) {
-        // this could be a different permission...
-        this.centerId = centerId;
+    public ProcessingEventReadPermission(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override
