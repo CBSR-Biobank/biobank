@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * TODO: it would be nice to set the cells that contain the comment message to
@@ -155,5 +156,23 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
     public CommentWrapper getSelection() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(CommentWrapper target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(CommentWrapper target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(CommentWrapper target)
+        throws ApplicationException {
+        return false;
     }
 }

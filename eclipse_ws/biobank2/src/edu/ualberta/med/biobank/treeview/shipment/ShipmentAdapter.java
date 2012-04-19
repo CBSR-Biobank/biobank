@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -43,7 +45,6 @@ public class ShipmentAdapter extends AdapterBase {
                 SessionManager.getAppService().isAllowed(
                     new ShipmentDeletePermission(
                         ((OriginInfoWrapper) getModelObject())
-                            .getReceiverSite()
                             .getId(),
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId()));
@@ -136,7 +137,10 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected void additionalRefreshAfterDelete() {
-        getParent().getParent().rebuild();
+        WrapperEventType eventType = WrapperEventType.DELETE;
+        WrapperEvent event = new WrapperEvent(eventType, getModelObject());
+        getModelObject().notifyListeners(event);
+        getParent().getParent().getParent().performExpand();
     }
 
     @Override
@@ -148,6 +152,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public void runDelete() throws ApplicationException {
+
         OriginInfoDeleteAction action =
             new OriginInfoDeleteAction((OriginInfo)
                 getModelObject().getWrappedObject(),

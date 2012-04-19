@@ -6,8 +6,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
@@ -87,6 +92,27 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     @Override
     public boolean isEditMode() {
         return true;
+    }
+
+    @Override
+    protected Boolean canEdit(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchReadPermission(target.getId()));
     }
 
 }

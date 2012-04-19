@@ -1,4 +1,5 @@
 po/output
+.options
 *.jasper
 backup/
 docs/doxygen
@@ -62,3 +63,4 @@ docs/javaClientUserGuide/*.fls
 docs/javaClientUserGuide/*.lof
 docs/javaClientUserGuide/*.tdo
 output/
+webapp/WEB-INF/classes/log4j.xml

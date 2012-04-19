@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
@@ -133,6 +134,24 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(ContactWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

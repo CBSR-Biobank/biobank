@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
@@ -63,5 +64,23 @@ public class ShippingMethodInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
     }
 }

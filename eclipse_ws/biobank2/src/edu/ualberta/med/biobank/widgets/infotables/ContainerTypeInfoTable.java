@@ -12,11 +12,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeInfoTable extends
     InfoTableWidget<SiteContainerTypeInfo> {
@@ -156,5 +160,31 @@ public class ContainerTypeInfoTable extends
                 }
             }
         });
+    }
+
+    @Override
+    protected Boolean canEdit(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeUpdatePermission(target.getContainerType()
+                    .getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeDeletePermission(target.getContainerType()
+                    .getId()));
+    }
+
+    @Override
+    protected Boolean canView(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeReadPermission(target.getContainerType()));
     }
 }

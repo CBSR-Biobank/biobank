@@ -17,6 +17,8 @@ public class ContainerActionHelper {
         bundle.tr("Parent container and position should either both be" +
             " set or both be null").format();
 
+    public static final String PATH_DELIMITER = "/"; //$NON-NLS-1$
+
     public static void setPosition(ActionContext context,
         Container container, RowColPos rcp, Integer parentId) {
         ContainerPosition pos = container.getPosition();
@@ -42,5 +44,21 @@ public class ContainerActionHelper {
         }
         container.setTopContainer(parent == null ? container : parent
             .getTopContainer());
+    }
+
+    public static void updateContainerPathAndLabel(Container container,
+        Container parentContainer) {
+        StringBuilder path = new StringBuilder();
+        String parentPath = parentContainer.getPath();
+        if ((parentPath != null) && !parentPath.isEmpty()) {
+            path.append(parentPath).append(PATH_DELIMITER);
+        }
+        path.append(parentContainer.getId());
+        container.setPath(path.toString());
+        container.setTopContainer(parentContainer.getTopContainer());
+        container.setLabel(parentContainer.getLabel()
+            + parentContainer.getContainerType().getPositionString(
+                container.getPositionAsRowCol()));
+
     }
 }

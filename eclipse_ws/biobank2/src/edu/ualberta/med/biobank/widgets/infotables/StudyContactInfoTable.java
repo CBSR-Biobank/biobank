@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Used to display clinic and contact information. Meant to be used by
@@ -175,5 +176,23 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ClinicContacts target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(ClinicContacts target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(ClinicContacts target)
+        throws ApplicationException {
+        return false;
     }
 }

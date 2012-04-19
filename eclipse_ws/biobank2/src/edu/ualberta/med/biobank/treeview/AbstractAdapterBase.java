@@ -52,7 +52,7 @@ public abstract class AbstractAdapterBase implements
 
     private String label;
 
-    private String tooltip;
+    private final String tooltip;
 
     protected AbstractAdapterBase parent;
 
@@ -67,7 +67,7 @@ public abstract class AbstractAdapterBase implements
     private IDeltaListener deltaListener = NullDeltaListener.getSoleInstance();
 
     // FIXME can we merge this list of listeners with the DeltaListener ?
-    private List<AdapterChangedListener> listeners;
+    private final List<AdapterChangedListener> listeners;
 
     protected boolean isDeletable = false;
 
@@ -238,6 +238,7 @@ public abstract class AbstractAdapterBase implements
             getChildren())) {
             removeChild(child);
         }
+        this.hasChildren = false;
     }
 
     public AbstractAdapterBase contains(AbstractAdapterBase item) {
@@ -344,14 +345,17 @@ public abstract class AbstractAdapterBase implements
                         runDelete();
                         page.closeEditor(part, true);
                     } catch (ApplicationException e) {
-                        if (e.getCause() instanceof ConstraintViolationException) {
+                        if (e.getCause() instanceof javax.validation.ConstraintViolationException) {
                             List<String> msgs = BiobankFormBase
                                 .getConstraintViolationsMsgs(
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
                                 "Delete failed",
-                                StringUtils.join(msgs, "\n")); 
-
+                                StringUtils.join(msgs, "\n"));
+                        } else if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
+                            BgcPlugin.openAsyncError(
+                                "Delete failed",
+                                "delete not allowed");
                         } else {
                             BgcPlugin.openAsyncError(
                                 "Delete failed",
@@ -447,7 +451,7 @@ public abstract class AbstractAdapterBase implements
     }
 
     public void openViewForm() {
-        if (getViewFormId() != null) {
+        if (getViewFormId() != null && isReadable) {
             openForm(new FormInput(this), getViewFormId());
         }
     }

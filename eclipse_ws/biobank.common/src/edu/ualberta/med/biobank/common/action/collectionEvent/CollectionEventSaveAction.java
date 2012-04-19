@@ -227,9 +227,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
             originalSpecimens, newSsCollection);
-        ceventToSave.setOriginalSpecimens(newSsCollection);
+        ceventToSave.getOriginalSpecimens().addAll(newSsCollection);
         newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
-        ceventToSave.setAllSpecimens(newAllSpecCollection);
+        ceventToSave.getAllSpecimens().addAll(newAllSpecCollection);
         for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
             context.getSession().delete(srcSpc);
         }

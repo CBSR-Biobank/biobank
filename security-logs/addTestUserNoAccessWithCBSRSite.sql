@@ -1,11 +1,11 @@
 set collation_connection ='latin1_general_cs';
 
-set @USER_NAME = 'testprocessor';
+set @USER_NAME = 'testnoaccess';
 set @PASSWORD = 'orDBlaojDQE=';
-set @GROUP_NAME = 'CBSR Technician Level 2';
+set @GROUP_NAME = 'No Access Group';
 set @GROUP_DISCRIMINATOR ='BbGroup';
 set @USER_DISCRIMINATOR ='User';
-set @PROCESS = 'Process';
+set @NOTHING = 'Nothing';
 
 -- create csm_user
 insert into csm_user (USER_ID, LOGIN_NAME, MIGRATED_FLAG, FIRST_NAME, LAST_NAME, PASSWORD, UPDATE_DATE)
@@ -55,25 +55,8 @@ insert into membership (id, version, every_permission, user_manager, domain_id, 
 
 -- add a role
 insert into role (id, version, name)
-       select coalesce(MAX(r.id), 0)+1, 0, @PROCESS
+       select coalesce(MAX(r.id), 0)+1, 0, @Nothing
        from role r;
-
--- Add processing permissions to the role
-create temporary table TECHNICIAN_PROCESS (perm int);
-insert into TECHNICIAN_PROCESS values
-        (2), (3), (4), (5), (6), (7),
-        (12), (13), (14), (15),
-        (17), (18), (19), (20),
-        (21), (22), (23), (24),
-        (25), (26), (27), (28),
-        (29), (30), (31), (32), (33),
-        (43), (44), (46),
-        (52), (53), (54), (55),
-        (56), (57), (58), (59),
-        (66), (67);
-insert into role_permission (id, permission_id)
-       select coalesce((select MAX(r.id) from role r), 0), t.perm
-       from TECHNICIAN_PROCESS t;
 
 -- add the role to the membership
 insert into membership_role (membership_id, role_id)

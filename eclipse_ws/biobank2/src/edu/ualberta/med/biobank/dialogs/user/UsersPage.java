@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UsersPage extends BgcDialogPage {
     private UserInfoTable userInfoTable;
@@ -84,6 +85,24 @@ public abstract class UsersPage extends BgcDialogPage {
                     if (deleted)
                         getCurrentAllUsersList().remove(user);
                     return deleted;
+                }
+
+                @Override
+                protected Boolean canEdit(User target)
+                    throws ApplicationException {
+                    return true;
+                }
+
+                @Override
+                protected Boolean canDelete(User target)
+                    throws ApplicationException {
+                    return true;
+                }
+
+                @Override
+                protected Boolean canView(User target)
+                    throws ApplicationException {
+                    return true;
                 }
             };
         setControl(content);

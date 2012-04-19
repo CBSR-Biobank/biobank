@@ -2,13 +2,16 @@ package edu.ualberta.med.biobank.test.action;
 
 import junit.framework.Assert;
 
+import org.hibernate.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
@@ -72,4 +75,97 @@ public class TestContainer extends TestAction {
 
     // TODO: need tests for container labels
 
+    @Test
+    public void testMoveContainer() {
+        Transaction tx = session.beginTransaction();
+
+        factory.createTopContainer();
+        Container childL1Container = factory.createParentContainer();
+        Container[] childL2Containers = new Container[] {
+            factory.createContainer(),
+            factory.createContainer(),
+            factory.createContainer(),
+        };
+
+        Container topContainer2 = factory.createTopContainer();
+        tx.commit();
+
+        exec(new ContainerMoveAction(childL1Container, topContainer2,
+            topContainer2.getLabel() + "A1"));
+
+        ContainerInfo containerInfo =
+            exec(new ContainerGetInfoAction(childL1Container.getId()));
+        childL1Container = containerInfo.container;
+
+        Assert.assertEquals(topContainer2.getId(),
+            childL1Container.getTopContainer().getId());
+        Assert.assertEquals(topContainer2.getId(),
+            childL1Container.getParentContainer().getId());
+
+        String expectedL2Path =
+            topContainer2.getId() + "/" + childL1Container.getId();
+
+        // check that children have correct settings too
+        for (Container child : childL2Containers) {
+            containerInfo = exec(new ContainerGetInfoAction(child.getId()));
+            Assert.assertEquals(topContainer2.getId(),
+                containerInfo.container.getTopContainer().getId());
+
+            // ensure parent is still childL1Container
+            Assert.assertEquals(childL1Container.getId(),
+                containerInfo.container.getParentContainer().getId());
+
+            // check the path
+            Assert
+                .assertEquals(expectedL2Path, containerInfo.container.getPath());
+        }
+    }
+
+    @Test
+    public void testMoveContainerOccupiedLocation() {
+        Transaction tx = session.beginTransaction();
+
+        factory.createTopContainer();
+        Container child1Container = factory.createContainer();
+
+        Container topContainer2 = factory.createTopContainer();
+        // create child at position A1
+        factory.createContainer();
+        tx.commit();
+
+        try {
+            exec(new ContainerMoveAction(child1Container, topContainer2,
+                topContainer2.getLabel() + "A1"));
+            Assert
+                .fail("should not be allowed to move a containers to occupied spot");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testMoveContainerDiffSites() {
+        // containers are not allowed to be moved between sites
+        Transaction tx = session.beginTransaction();
+
+        factory.createTopContainer();
+        Container childContainer = factory.createContainer();
+
+        factory.createSite();
+        factory.createTopContainerType();
+        Container topContainerS2 = factory.createTopContainer();
+
+        tx.commit();
+
+        try {
+            // use default labeling scheme
+            exec(new ContainerMoveAction(childContainer, topContainerS2,
+                topContainerS2.getLabel() + "A1"));
+            Assert
+                .fail("should not be allowed to move containers between sites");
+        } catch (Exception e) {
+            Assert.assertTrue(true);
+        }
+
+    }
 }

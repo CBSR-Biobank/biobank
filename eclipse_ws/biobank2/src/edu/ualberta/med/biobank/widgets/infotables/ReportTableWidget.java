@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
 
@@ -180,6 +181,21 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
     public T getSelection() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(T target) throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(T target) throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(T target) throws ApplicationException {
+        return false;
     }
 
 }

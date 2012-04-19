@@ -10,11 +10,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionView extends AbstractAdministrationView {
 
@@ -51,11 +54,22 @@ public class CollectionView extends AbstractAdministrationView {
         radioPnumber = new Button(composite, SWT.RADIO);
         radioPnumber.setText("Patient Number");
         radioPnumber.setSelection(true);
+
     }
 
-    protected void notFound(String text) {
+    protected void notFound(String text) throws ApplicationException {
+        if (!SessionManager.getAppService().isAllowed(
+            new PatientCreatePermission(null))) {
+            BgcPlugin.openInformation("Patient not found",
+                "No patient with id '"
+                    + text
+                    + "' found.");
+            return;
+        }
+
         boolean create =
-            BgcPlugin.openConfirm("Patient not found",
+            BgcPlugin.openConfirm(
+                "Patient not found",
                 "Do you want to create this patient?");
         if (create) {
             SearchedPatientInfo spi = new SearchedPatientInfo();
@@ -160,6 +174,12 @@ public class CollectionView extends AbstractAdministrationView {
     public void reload() {
         for (AbstractAdapterBase adapter : rootNode.getChildren())
             adapter.rebuild();
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new PatientReadPermission(null)));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+        }
         super.reload();
     }
 

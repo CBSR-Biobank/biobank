@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -12,14 +13,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction;
-import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypesAction.SiteGetContainerTypesResult;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -31,7 +33,7 @@ public class ContainerTypeGroup extends AdapterBase {
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
-    private SiteGetContainerTypesResult containerTypesResult = null;
+    private List<SiteContainerTypeInfo> containerTypeInfos = null;
 
     private Boolean createAllowed;
 
@@ -99,12 +101,16 @@ public class ContainerTypeGroup extends AdapterBase {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteAdapter siteAdapter = (SiteAdapter) getParent();
-        containerTypesResult = SessionManager.getAppService().doAction(
-            new SiteGetContainerTypesAction(siteAdapter.getId()));
+        containerTypeInfos = SessionManager.getAppService().doAction(
+            new SiteGetContainerTypeInfoAction(siteAdapter.getId())).getList();
+
+        List<ContainerType> containerTypes = new ArrayList<ContainerType>();
+        for (SiteContainerTypeInfo info : containerTypeInfos) {
+            containerTypes.add(info.getContainerType());
+        }
 
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-            containerTypesResult.getContainerTypes(),
-            ContainerTypeWrapper.class);
+            containerTypes, ContainerTypeWrapper.class);
     }
 
     @Override

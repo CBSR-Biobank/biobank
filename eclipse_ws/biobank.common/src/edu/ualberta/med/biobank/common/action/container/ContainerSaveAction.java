@@ -100,30 +100,19 @@ public class ContainerSaveAction implements Action<IdResult> {
         container.setContainerType(context.load(ContainerType.class,
             typeId));
 
-        StringBuilder path = new StringBuilder();
-
         if (parentId != null) {
             if (label != null) {
                 throw new ActionException(CANNOT_SET_LABEL_ERRMSG);
             }
+            ContainerActionHelper.setPosition(context, container, position,
+                parentId);
             Container parent = context.load(Container.class, parentId);
-            String parentPath = parent.getPath();
-            if ((parentPath != null) && !parentPath.isEmpty()) {
-                path.append(parentPath).append(PATH_DELIMITER);
-            }
-            path.append(parentId);
-            container.setPath(path.toString());
-
-            container.setTopContainer(parent.getTopContainer());
-            container.setLabel(parent.getLabel()
-                + parent.getContainerType().getPositionString(
-                    position));
+            ContainerActionHelper.updateContainerPathAndLabel(container,
+                parent);
         } else {
             container.setLabel(label);
+            container.setTopContainer(container);
         }
-
-        ContainerActionHelper.setPosition(context, container, position,
-            parentId);
 
         Comment comment = CommentUtil.create(context.getUser(), commentText);
         if (comment != null) {

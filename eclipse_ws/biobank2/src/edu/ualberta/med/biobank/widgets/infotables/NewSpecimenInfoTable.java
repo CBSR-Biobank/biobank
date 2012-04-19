@@ -6,14 +6,19 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
@@ -267,6 +272,25 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 return super.compare(01, o2);
             }
         };
+    }
+
+    @Override
+    protected Boolean canEdit(SpecimenInfo target) throws ApplicationException {
+        return target != null && SessionManager.getAppService().isAllowed(
+            new SpecimenUpdatePermission(target.specimen.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(SpecimenInfo target)
+        throws ApplicationException {
+        return target != null && SessionManager.getAppService().isAllowed(
+            new SpecimenDeletePermission(target.specimen.getId()));
+    }
+
+    @Override
+    protected Boolean canView(SpecimenInfo target) throws ApplicationException {
+        return target != null && SessionManager.getAppService().isAllowed(
+            new SpecimenReadPermission(target.specimen.getId()));
     }
 
 }

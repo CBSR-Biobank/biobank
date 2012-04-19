@@ -25,11 +25,6 @@
     </layout>
   </appender>
 
-  <category name="edu.ualberta.med.biobank.common.action.study">
-    <level value="debug" />
-    <appender-ref ref="CONSOLE" />
-  </category>
-
   <category name="Biobank.Activity">
     <level value="INFO" />
     <appender-ref ref="BIOBANK_APPENDER" />

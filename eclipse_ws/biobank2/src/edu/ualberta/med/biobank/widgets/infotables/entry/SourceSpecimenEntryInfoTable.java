@@ -144,8 +144,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 @Override
                 public void newAdded(Object spec) {
                     SourceSpecimenWrapper ss = (SourceSpecimenWrapper) spec;
-                    availableSpecimenTypes.remove(ss
-                        .getSpecimenType());
+                    availableSpecimenTypes.remove(ss.getSpecimenType());
                     dlg.setSpecimenTypes(availableSpecimenTypes);
                     selectedSourceSpecimens.add(ss);
                     addedOrModifiedSourceSpecimens.add(ss);

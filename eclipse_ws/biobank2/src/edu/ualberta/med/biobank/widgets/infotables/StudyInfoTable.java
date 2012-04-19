@@ -6,9 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
@@ -106,6 +111,25 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canView(StudyWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyReadPermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canEdit(StudyWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(StudyWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyDeletePermission(target.getId()));
     }
 
 }

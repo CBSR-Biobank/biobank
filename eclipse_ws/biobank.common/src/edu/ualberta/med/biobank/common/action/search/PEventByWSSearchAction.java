@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Site;
 
 public class PEventByWSSearchAction implements
     Action<ListResult<Integer>> {
@@ -24,10 +25,10 @@ public class PEventByWSSearchAction implements
     private static final long serialVersionUID = 1L;
     private String worksheet;
 
-    private Integer site;
+    private Site site;
 
     public PEventByWSSearchAction(String worksheet,
-        Integer currentCenter) {
+        Site currentCenter) {
         this.worksheet = worksheet;
         this.site = currentCenter;
     }

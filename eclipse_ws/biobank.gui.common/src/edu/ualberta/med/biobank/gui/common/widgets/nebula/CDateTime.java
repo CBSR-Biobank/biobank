@@ -226,6 +226,10 @@ public class CDateTime extends BaseCombo {
                 break;
             case SWT.KeyDown:
                 handleKey(event);
+                if (event.keyCode == SWT.ARROW_DOWN
+                    || event.keyCode == SWT.ARROW_UP) {
+                    event.doit = false;
+                }
                 break;
             case SWT.MouseDown:
                 if (event.button == 1) {

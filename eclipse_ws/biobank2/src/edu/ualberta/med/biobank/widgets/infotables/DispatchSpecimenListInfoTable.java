@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class DispatchSpecimenListInfoTable extends
     InfoTableWidget<DispatchSpecimenWrapper> {
@@ -210,6 +211,24 @@ public abstract class DispatchSpecimenListInfoTable extends
             dsaList = new ArrayList<DispatchSpecimenWrapper>();
         }
         reloadCollection(dsaList);
+    }
+
+    @Override
+    protected Boolean canEdit(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

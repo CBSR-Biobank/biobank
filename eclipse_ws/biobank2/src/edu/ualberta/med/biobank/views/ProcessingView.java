@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -24,10 +25,12 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ProcessingView"; 
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
 
     private static ProcessingView currentInstance;
 
@@ -49,10 +52,7 @@ public class ProcessingView extends AbstractAdministrationView {
         SessionManager.addView(this);
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-
+    private void createNodes() {
         processingNode = new ProcessingEventGroup((RootNode) rootNode, 2,
             "Processing Events");
         processingNode.setParent(rootNode);
@@ -136,6 +136,23 @@ public class ProcessingView extends AbstractAdministrationView {
     public static void reloadCurrent() {
         if (currentInstance != null)
             currentInstance.reload();
+    }
+
+    @Override
+    public void reload() {
+        if (processingNode == null) createNodes();
+        for (AbstractAdapterBase adaper : processingNode.getChildren()) {
+            adaper.rebuild();
+        }
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new ProcessingEventReadPermission(SessionManager
+                    .getUser()
+                    .getCurrentWorkingCenter().getId())));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+        }
+        super.reload();
     }
 
     @Override
@@ -236,7 +253,8 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     public void clear() {
-        processingNode.removeAll();
+        rootNode.removeAll();
+        processingNode = null;
         setSearchFieldsEnablement(false);
     }
 

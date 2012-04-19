@@ -523,7 +523,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         listeners.add(listener);
     }
 
-    void notifyListeners(WrapperEvent event) {
+    public void notifyListeners(WrapperEvent event) {
         // create a new list to avoid concurrent modification
         for (WrapperListener listener : new ArrayList<WrapperListener>(
             listeners)) {

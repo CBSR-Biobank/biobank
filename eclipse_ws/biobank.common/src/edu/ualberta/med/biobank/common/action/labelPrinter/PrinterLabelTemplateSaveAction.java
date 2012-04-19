@@ -45,8 +45,6 @@ public class PrinterLabelTemplateSaveAction implements Action<IdResult> {
         printerLabelTemplate.setJasperTemplate(jasperTemplate);
 
         context.getSession().saveOrUpdate(printerLabelTemplate);
-        context.getSession().flush();
-
         return new IdResult(printerLabelTemplate.getId());
     }
 

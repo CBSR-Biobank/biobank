@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public abstract class AbstractDispatchGroup extends AdapterBase {
 
     public AbstractDispatchGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true);
+        super(parent, id, name, false);
     }
 
     @Override

@@ -4,10 +4,15 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewCollectionEventInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
@@ -84,6 +89,27 @@ public class NewCollectionEventInfoTable extends
                 return super.compare(01, o2);
             }
         };
+    }
+
+    @Override
+    protected Boolean canEdit(PatientCEventInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventUpdatePermission(target.cevent.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(PatientCEventInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventDeletePermission(target.cevent.getId()));
+    }
+
+    @Override
+    protected Boolean canView(PatientCEventInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventReadPermission(target.cevent.getId()));
     }
 
 }

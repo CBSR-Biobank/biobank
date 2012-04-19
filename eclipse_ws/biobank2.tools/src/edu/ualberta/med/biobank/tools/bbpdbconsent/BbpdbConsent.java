@@ -31,25 +31,24 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * This class fixes this problem in the current BioBank database.
  * 
  */
-@Deprecated
 public class BbpdbConsent {
 
     // @formatter:off
-    private static String USAGE = 
-          "Usage: bbpdbconsent [options]\n\n"
-        + "Used to fix the consent given by a patient on the BBPSP study.\n"
-        + "When the database was imported from MS Access to MySQL, the\n"
-        + "consent was incorrectly assigned. The consent that was labeled\n"
-        + "as \"consent_genetics\" in the MS Access database should have been\n"
-        + "converted to \"genetic mutation\". Instead it was converted as\n"
-        + "\"genetic predisposition\".\n\n"
-        + "Options\n"
-        + "  -H, --host       hostname for BioBank server and MySQL server\n"
-        + "  -p, --port       port number for BioBank server\n"
-        + "  -u, --user       user name to log into BioBank server\n"
-        + "  -w, --password   password to log into BioBank server\n"
-        + "  -v, --verbose    shows verbose output\n"
-        + "  -h, --help       shows this text\n"; //$NON-NLS-1$
+    private static String USAGE =
+        "Usage: bbpdbconsent [options]\n\n"
+            + "Used to fix the consent given by a patient on the BBPSP study.\n"
+            + "When the database was imported from MS Access to MySQL, the\n"
+            + "consent was incorrectly assigned. The consent that was labeled\n"
+            + "as \"consent_genetics\" in the MS Access database should have been\n"
+            + "converted to \"genetic mutation\". Instead it was converted as\n"
+            + "\"genetic predisposition\".\n\n"
+            + "Options\n"
+            + "  -H, --host       hostname for BioBank server and MySQL server\n"
+            + "  -p, --port       port number for BioBank server\n"
+            + "  -u, --user       user name to log into BioBank server\n"
+            + "  -w, --password   password to log into BioBank server\n"
+            + "  -v, --verbose    shows verbose output\n"
+            + "  -h, --help       shows this text\n"; //$NON-NLS-1$
     // @formatter:on
 
     private static final Logger LOGGER = Logger.getLogger(BbpdbConsent.class
@@ -63,9 +62,9 @@ public class BbpdbConsent {
         + " and patient_visit.patient_nr=patient.patient_nr"
         + " order by patient.dec_chr_nr";
 
-    private Connection bbpdbCon;
+    private final Connection bbpdbCon;
 
-    private BiobankApplicationService appService;
+    private final BiobankApplicationService appService;
 
     private Map<String, Map<Date, Boolean>> consentData;
 
@@ -95,14 +94,14 @@ public class BbpdbConsent {
 
         LOGGER.info("host url is " + hostUrl);
 
-        appService = ServiceConnection.getAppService(hostUrl, args.username,
-            args.password);
-
         getValidConsentInfo();
         if (consentData.isEmpty()) {
             throw new Exception(
                 "no matching consent information found in bbpdb databse");
         }
+
+        appService = ServiceConnection.getAppService(hostUrl, args.username,
+            args.password);
 
         fixConsentInfo();
     }
@@ -208,19 +207,19 @@ public class BbpdbConsent {
             }
         }
 
-        for (CollectionEventWrapper ce : ceventsToCorrect) {
-            String consentValue = ce.getEventAttrValue("Consent");
-            consentValue = consentValue.replace("Genetic Predisposition",
-                "Genetic Mutation");
-            ce.setEventAttrValue("Consent", consentValue);
-            ce.persist();
-            LOGGER
-                .info("corrected consent for patient "
-                    + ce.getPatient().getPnumber()
-                    + " and cevent with date drawn "
-                    + DateFormatter.formatAsDateTime(ce
-                        .getMinSourceSpecimenDate()));
-
-        }
+        // for (CollectionEventWrapper ce : ceventsToCorrect) {
+        // String consentValue = ce.getEventAttrValue("Consent");
+        // consentValue = consentValue.replace("Genetic Predisposition",
+        // "Genetic Mutation");
+        // ce.setEventAttrValue("Consent", consentValue);
+        // ce.persist();
+        // LOGGER
+        // .info("corrected consent for patient "
+        // + ce.getPatient().getPnumber()
+        // + " and cevent with date drawn "
+        // + DateFormatter.formatAsDateTime(ce
+        // .getMinSourceSpecimenDate()));
+        //
+        // }
     }
 }

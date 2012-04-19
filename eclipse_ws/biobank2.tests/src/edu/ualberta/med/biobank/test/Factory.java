@@ -342,12 +342,22 @@ public class Factory {
 
         Container container = new Container();
         container.setSite(getDefaultSite());
+        if (!getDefaultTopContainerType().getSite().equals(
+            container.getSite())) {
+            // make sure sites match
+            createTopContainerType();
+        }
         container.setContainerType(getDefaultTopContainerType());
         container.setLabel(label);
+        container.setTopContainer(container);
 
         Container parentContainer = getDefaultParentContainer();
         if (parentContainer != null) {
             ContainerType containerType = getDefaultContainerType();
+            if (!containerType.getSite().equals(container.getSite())) {
+                // make sure sites match
+                containerType = createContainerType();
+            }
             container.setContainerType(containerType);
 
             ContainerType parentCt = parentContainer.getContainerType();
@@ -370,6 +380,7 @@ public class Factory {
 
             cp.setParentContainer(parentContainer);
             parentContainer.getChildPositions().add(cp);
+            container.setTopContainer(parentContainer.getTopContainer());
         }
 
         setDefaultContainer(container);
@@ -381,7 +392,6 @@ public class Factory {
     public Container createTopContainer() {
         setDefaultParentContainer(null);
         Container topContainer = createContainer();
-        topContainer.setContainerType(getDefaultTopContainerType());
 
         setDefaultTopContainer(topContainer);
         setDefaultParentContainer(topContainer);

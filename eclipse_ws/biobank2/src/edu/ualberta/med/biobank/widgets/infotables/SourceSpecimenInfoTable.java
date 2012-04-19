@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * this need to be rename ? to study source specimen ??
@@ -103,6 +104,24 @@ public class SourceSpecimenInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(SourceSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

@@ -62,7 +62,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return true;
+        return new PatientReadPermission(patientId).isAllowed(context);
     }
 
     @Override
@@ -88,19 +88,5 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             return pinfo;
         }
         throw new ActionException(MULTIPLE_PATIENTS_FOUND.format(pnumber));
-        // FIXME need this kind of test ?
-        // if (patient != null) {
-        // StudyWrapper study = patient.getStudy();
-        // List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>(
-        // study.getSiteCollection(false));
-        // centers.addAll(study.getClinicCollection());
-        // if (Collections.disjoint(centers, user.getWorkingCenters())) {
-        // throw new ApplicationException(MessageFormat.format(
-        //                    Messages.getString("PatientWrapper.patient.access.msg"), //$NON-NLS-1$
-        // patientNumber));
-        // }
-        // }
-
-    }
-
+     }
 }

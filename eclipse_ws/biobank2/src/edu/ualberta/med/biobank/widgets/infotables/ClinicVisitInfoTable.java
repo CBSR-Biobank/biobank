@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventI
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicVisitInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
@@ -105,4 +106,21 @@ public class ClinicVisitInfoTable extends
         return ((TableRowData) item.o).cevent;
     }
 
+    @Override
+    protected Boolean canEdit(PatientCEventInfo target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(PatientCEventInfo target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(PatientCEventInfo target)
+        throws ApplicationException {
+        return true;
+    }
 }

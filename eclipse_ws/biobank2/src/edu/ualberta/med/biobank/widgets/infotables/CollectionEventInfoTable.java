@@ -6,9 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
@@ -105,6 +110,27 @@ public class CollectionEventInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(CollectionEventWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(CollectionEventWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(CollectionEventWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new CollectionEventReadPermission(target.getId()));
     }
 
 }

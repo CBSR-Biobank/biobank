@@ -47,7 +47,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "name" }, groups = PrePersist.class),
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
 })
-@NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class)
+@NotUsed.List({
+    @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class),
+    @NotUsed(by = SpecimenPosition.class, property = "container.containerType", groups = PreDelete.class)
+})
 @Empty.List({
     @Empty(property = "childContainerTypes", groups = PreDelete.class),
     @Empty(property = "parentContainerTypes", groups = PreDelete.class),

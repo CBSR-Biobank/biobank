@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
@@ -213,5 +214,20 @@ public class MembershipInfoTable
             String text = item.getText(column);
             return text;
         }
+    }
+
+    @Override
+    protected Boolean canEdit(Membership target) throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(Membership target) throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(Membership target) throws ApplicationException {
+        return true;
     };
 }

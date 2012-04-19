@@ -1394,6 +1394,12 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  style="push"
+                  tooltip="Delete Selected Item">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
                   style="push"

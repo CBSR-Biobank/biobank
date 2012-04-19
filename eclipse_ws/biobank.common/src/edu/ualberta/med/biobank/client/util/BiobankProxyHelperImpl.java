@@ -21,13 +21,14 @@ import java.util.Set;
 import javax.persistence.Transient;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 
 public class BiobankProxyHelperImpl extends ProxyHelperImpl {
-    private static Logger log = Logger.getLogger(ProxyHelperImpl.class
+    private static Logger log = LoggerFactory.getLogger(ProxyHelperImpl.class
         .getName());
 
     @Override
@@ -136,8 +137,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                                     + objectProxy.getListChunk().size() + ".");
                         }
                     }
-                    log.debug("invoking " + method.getName() + " on class "
-                        + plainObject.getClass());
+                    log.debug("invoking {} on class {}", method.getName(),
+                        plainObject.getClass());
                     String setterMethodName = "set"
                         + method.getName().substring(3);
                     if (childObject instanceof List
