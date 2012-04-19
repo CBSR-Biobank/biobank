@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -10,8 +11,8 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
@@ -49,6 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
+    private static final Bundle bundle = new CommonBundle();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -163,7 +165,7 @@ public class BiobankApplicationServiceImpl extends
             Arrays.asList(csmUserId)));
         if (users.size() != 1) {
             throw new LocalizedException(
-                LString.tr("Problem with HQL result size"));
+                bundle.tr("Problem with HQL result size").format());
         }
         User user = users.get(0);
         user.setNeedPwdChange(false);

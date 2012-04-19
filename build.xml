@@ -175,6 +175,7 @@ End:
         <include name="jaxrpc.jar" />
         <include name="jta-1.1.jar" />
         <include name="log4j-1.2.14.jar" />
+        <include name="messages.jar" />
         <include name="mysql-connector-java-5.1.15-bin.jar" />
 	<include name="ognl-2.6.7.jar" />
         <include name="saaj.jar" />
@@ -211,6 +212,7 @@ End:
         <include name="iText-2.1.7.jar" />
         <include name="jasperreports-4.0.1.jar" />
         <include name="jdt-compiler-3.1.1.jar" />
+        <include name="messages.jar" />
         <include name="DynamicJasper-3.0.14.jar" />
       </fileset>
     </copy>
@@ -229,6 +231,7 @@ End:
         <include name="gluegen.jar" />
         <include name="jdom.jar" />
         <include name="mailapi.jar" />
+        <include name="messages.jar" />
         <include name="smtp.jar" />
         <include name="spiffy-all-0.05.jar" />
         <include name="SuperCSV-1.52.jar" />

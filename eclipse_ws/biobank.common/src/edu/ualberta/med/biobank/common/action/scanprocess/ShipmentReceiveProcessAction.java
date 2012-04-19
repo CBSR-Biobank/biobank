@@ -5,13 +5,13 @@ import java.util.Map;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.ItemState;
@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
  * Used by dispatch and request
  */
 public class ShipmentReceiveProcessAction extends ServerProcessAction {
-
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     private final ShipmentProcessInfo data;
 
@@ -111,7 +111,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
         if (foundSpecimen == null) {
             // not in db
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(LTemplate.tr(
+            cell.setInformation(bundle.tr(
                 "Specimen {0} not found in database")
                 .format(cell.getValue()));
             cell.setTitle("!");
@@ -122,8 +122,8 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 // not in the shipment
                 updateCellWithSpecimen(cell, foundSpecimen);
                 cell.setStatus(CellInfoStatus.EXTRA);
-                cell.setInformation(LString.tr(
-                    "Specimen should not be in shipment"));
+                cell.setInformation(bundle.tr(
+                    "Specimen should not be in shipment").format());
             } else {
                 if (DispatchSpecimenState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);

@@ -5,22 +5,25 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
 public class PatientSearchAction implements Action<SearchedPatientInfo> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr MULTIPLE_PATIENTS_FOUND =
-        LTemplate.tr("More than one patient found with pnumber \"{0}\".");
+    public static final Tr MULTIPLE_PATIENTS_FOUND =
+        bundle.tr("More than one patient found with pnumber \"{0}\".");
 
     // @formatter:off
     @SuppressWarnings("nls")

@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -17,6 +18,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenReport3 extends AbstractReport {
     // TODO: switch to CollectionEvent.visitNumber?
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
     private static final String QUERY = "SELECT s"
@@ -70,7 +72,7 @@ public class SpecimenReport3 extends AbstractReport {
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
         String typeName, long maxResults, Integer numResultsFound) {
 
-        LString notFound = LTemplate.tr("NOT_FOUND({0})")
+        LString notFound = bundle.tr("NOT_FOUND({0})")
             .format((maxResults - numResultsFound));
 
         return new Object[] { pnumber,

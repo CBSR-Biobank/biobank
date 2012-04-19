@@ -2,21 +2,25 @@ package edu.ualberta.med.biobank.common.action.reports;
 
 import java.lang.reflect.Constructor;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ProxiedListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ProxiedListResult<Object>> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final LString UNKNOWN_PROBLEM_ERRMSG =
+        bundle.tr("Unable to run report for unknown reason").format();
+
     BiobankReport report;
 
     public ReportAction(BiobankReport report) {
@@ -44,8 +48,7 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
                 runReport.generate(context
                     .getAppService()));
         } catch (Exception e) {
-            throw new ActionException(
-                LString.tr("Unable to run report for unknown reason"), e);
+            throw new ActionException(UNKNOWN_PROBLEM_ERRMSG, e);
         }
     }
 }

@@ -8,19 +8,21 @@ import java.util.Map.Entry;
 
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenLinkProcessAction extends ServerProcessAction {
-
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
     private final Integer studyId;
 
     // multiple cells link process
@@ -69,10 +71,10 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         String otherPosition = ContainerLabelingSchemeWrapper
                             .rowColToSbs(new RowColPos(otherValue.getRow(),
                                 otherValue.getCol()));
-                        cell.setInformation(LString
+                        cell.setInformation(bundle
                             .tr(
-                                "Value ''{0}'' has already been scanned in position {1}",
-                                cell.getValue(), otherPosition));
+                                "Value ''{0}'' has already been scanned in position {1}")
+                            .format(cell.getValue(), otherPosition));
                         appendNewLog(MessageFormat
                             .format(
                                 "ERROR in {0}: Value ''{1}'' has already been scanned in position {2}",
@@ -126,8 +128,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen != null) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(LString
-                    .tr("Specimen already in database"));
+                cell.setInformation(bundle
+                    .tr("Specimen already in database").format());
                 String palletPosition = ContainerLabelingSchemeWrapper
                     .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                 if (foundSpecimen.getParentSpecimen() == null)

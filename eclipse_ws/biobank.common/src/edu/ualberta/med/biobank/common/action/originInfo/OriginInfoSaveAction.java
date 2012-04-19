@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -11,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -21,13 +23,15 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class OriginInfoSaveAction implements Action<IdResult> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
-    private OriginInfoSaveInfo oiInfo;
-    private ShipmentInfoSaveInfo siInfo;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final LString NULL_SPECIMEN_ID_ERRMSG =
+        bundle.tr("Specimen id can not be null").format();
+
+    private final OriginInfoSaveInfo oiInfo;
+    private final ShipmentInfoSaveInfo siInfo;
 
     public OriginInfoSaveAction(OriginInfoSaveInfo oiInfo,
         ShipmentInfoSaveInfo siInfo) {
@@ -86,8 +90,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         if (oiInfo.removedSpecIds != null)
             for (Integer specId : oiInfo.removedSpecIds) {
                 if (specId == null)
-                    throw new ActionException(
-                        LString.tr("Specimen id can not be null"));
+                    throw new ActionException(NULL_SPECIMEN_ID_ERRMSG);
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 Center center = context.load(Center.class, oiInfo.siteId);
@@ -101,8 +104,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         if (oiInfo.addedSpecIds != null)
             for (Integer specId : oiInfo.addedSpecIds) {
                 if (specId == null)
-                    throw new ActionException(
-                        LString.tr("Specimen id can not be null"));
+                    throw new ActionException(NULL_SPECIMEN_ID_ERRMSG);
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 spec.setOriginInfo(oi);

@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.server.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -12,9 +14,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeReport2 extends AbstractReport {
+    private static final Bundle bundle = new CommonBundle();
+
     @SuppressWarnings("nls")
-    private static final LString UNUSED = LString
-        .tr("Unused");
+    private static final LString UNUSED =
+        bundle.tr("Unused").format();
 
     @SuppressWarnings("nls")
     private final static String USED_SPECIMEN_TYPES_QUERY =

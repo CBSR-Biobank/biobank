@@ -2,16 +2,22 @@ package edu.ualberta.med.biobank.i18n;
 
 import java.io.Serializable;
 
+/**
+ * Holds a localized {@link String}, accessible through {@link #getString} (or
+ * {@link #toString()}), returned in the current locale.
+ * 
+ * @author Jonathan Ferland
+ */
 public abstract class LString implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final LTemplate template;
+    private final Template template;
 
-    LString(LTemplate template) {
+    LString(Template template) {
         this.template = template;
     }
 
-    public LTemplate getTemplate() {
+    public Template getTemplate() {
         return template;
     }
 
@@ -25,24 +31,6 @@ public abstract class LString implements Serializable {
                 return literal;
             }
         };
-    }
-
-    public static LString tr(String text, Object... objects) {
-        return LTemplate.tr(text).format(objects);
-    }
-
-    public static LString trn(String text, String pluralText, int n,
-        Object... objects) {
-        return LTemplate.trn(text, pluralText).format(n, objects);
-    }
-
-    public static LString trc(String context, String text) {
-        return LTemplate.trc(context, text).format();
-    }
-
-    public static LString trnc(String context, String text, String pluralText,
-        int n, Object... objects) {
-        return LTemplate.trnc(context, text, pluralText).format(n, objects);
     }
 
     @Override

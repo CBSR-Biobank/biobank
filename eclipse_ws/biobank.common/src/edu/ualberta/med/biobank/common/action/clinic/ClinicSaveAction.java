@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -13,18 +14,20 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 
 public class ClinicSaveAction extends CenterSaveAction {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr CONTACT_HAS_STUDIES =
-        LTemplate.tr("Cannot delete contact {0} because it is still" +
-            " associated with other studies.");
+    public static final Tr CONTACT_HAS_STUDIES_ERRMSG =
+        bundle.tr("Cannot delete contact {0} because it is still associated" +
+            " with other studies.");
 
     // This info class does not support the Contact <-> Study association
     public static class ContactSaveInfo implements ActionResult {
@@ -129,7 +132,7 @@ public class ClinicSaveAction extends CenterSaveAction {
         for (Contact contact : contactsDiff.getRemoveSet()) {
             Collection<Study> studyCollection = contact.getStudies();
             if ((studyCollection != null) && !studyCollection.isEmpty()) {
-                throw new ActionException(CONTACT_HAS_STUDIES
+                throw new ActionException(CONTACT_HAS_STUDIES_ERRMSG
                     .format(contact.getName()));
             }
             context.getSession().delete(contact);

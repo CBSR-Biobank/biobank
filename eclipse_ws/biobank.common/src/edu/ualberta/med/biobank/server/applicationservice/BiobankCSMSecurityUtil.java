@@ -3,9 +3,11 @@ package edu.ualberta.med.biobank.server.applicationservice;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.LTemplate;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.i18n.Tr;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
@@ -14,6 +16,8 @@ import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 
 public class BiobankCSMSecurityUtil {
+    private static final Bundle bundle = new CommonBundle();
+
     @SuppressWarnings("nls")
     public static final String APPLICATION_CONTEXT_NAME = "biobank";
     @SuppressWarnings("nls")
@@ -22,37 +26,38 @@ public class BiobankCSMSecurityUtil {
     public static final String CENTER_FEATURE_START_NAME = "Center Feature: ";
 
     @SuppressWarnings("nls")
-    private static final LTemplate.Tr LOGIN_EXISTS =
-        LTemplate.tr("Login {0} already exists.");
+    private static final Tr LOGIN_EXISTS =
+        bundle.tr("Login {0} already exists.");
     @SuppressWarnings("nls")
     private static final LString LOGIN_REQUIRED =
-        LString.tr("Login should be set");
+        bundle.tr("Login should be set").format();
     @SuppressWarnings("nls")
-    private static final LTemplate.Tr CSM_USER_IS_NULL =
-        LTemplate.tr("User with id {0} is missing a csmUserId.");
+    private static final Tr CSM_USER_IS_NULL =
+        bundle.tr("User with id {0} is missing a csmUserId.");
     @SuppressWarnings("nls")
-    private static final LTemplate.Tr CSM_USER_ID_NOT_FOUND =
-        LTemplate.tr("CSM Security user with id {0} not found.");
+    private static final Tr CSM_USER_ID_NOT_FOUND =
+        bundle.tr("CSM Security user with id {0} not found.");
     @SuppressWarnings("nls")
     private static final LString UNEXPECTED_PROBLEM =
-        LString.tr("Unexpected problem while modifying user.");
+        bundle.tr("Unexpected problem while modifying user.").format();
     @SuppressWarnings("nls")
-    private static final LTemplate.Tr USER_NOT_FOUND =
-        LTemplate.tr("User {0} not found.");
+    private static final Tr USER_NOT_FOUND =
+        bundle.tr("User {0} not found.");
     @SuppressWarnings("nls")
     private static final LString CANNOT_DELETE_SELF =
-        LString.tr("User cannot delete himself.");
+        bundle.tr("User cannot delete himself.").format();
     @SuppressWarnings("nls")
     private static final LString SELF_PW_UPDATE_ONLY =
-        LString.tr("Only the user itself can modify its password through" +
-            " this method");
+        bundle.tr("Only the user itself can modify its password through" +
+            " this method").format();
     @SuppressWarnings("nls")
     private static final LString OLD_PW_INCORRECT =
-        LString.tr("Cannot modify password: verification password is" +
-            " incorrect.");
+        bundle.tr("Cannot modify password: verification password is" +
+            " incorrect.").format();
     @SuppressWarnings("nls")
     private static final LString OLD_PW_CANNOT_EQUAL_NEW =
-        LString.tr("New password needs to be different from the old one.");
+        bundle.tr("New password needs to be different from the old one.")
+            .format();
 
     public static void modifyPassword(Long csmUserId, String oldPassword,
         String newPassword) {

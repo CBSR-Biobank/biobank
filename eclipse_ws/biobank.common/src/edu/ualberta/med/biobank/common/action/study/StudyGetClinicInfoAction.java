@@ -8,23 +8,26 @@ import java.util.Map;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr CLINIC_REQUIRES_CONTACTS =
-        LTemplate.tr("Clinic \"{0}\" must have contacts.");
+    public static final Tr CLINIC_REQUIRES_CONTACTS =
+        bundle.tr("Clinic \"{0}\" must have contacts.");
 
     @SuppressWarnings("nls")
     private static final String STUDY_CONTACTS_HQL =

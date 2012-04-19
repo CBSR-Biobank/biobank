@@ -3,20 +3,21 @@ package edu.ualberta.med.biobank.common.action.specimen;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
-import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
-
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     public static class SpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -47,8 +48,8 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         public String centerName;
     }
 
-    private List<SpecimenInfo> specInfos;
-    private Integer containerId;
+    private final List<SpecimenInfo> specInfos;
+    private final Integer containerId;
 
     public SpecimenAssignSaveAction(Integer containerId,
         List<SpecimenInfo> specInfos) {
@@ -70,7 +71,8 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         SpecimenAssignResInfo res = new SpecimenAssignResInfo();
         if (containerId == null && containerId == null)
             throw new ActionException(
-                LString.tr("Problem with sent data. Container id is null"));
+                bundle.tr("Problem with sent data. Container id is null")
+                    .format());
         res.parentContainerId = containerId;
 
         Container container = context.load(Container.class, containerId);

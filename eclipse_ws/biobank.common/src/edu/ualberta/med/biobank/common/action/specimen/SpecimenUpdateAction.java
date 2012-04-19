@@ -1,12 +1,13 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
-import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -15,6 +16,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class SpecimenUpdateAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     private Integer specimenId;
     private Integer specimenTypeId;
@@ -109,8 +111,9 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             if (specimen.getParentSpecimen()
                 .getProcessingEvent() == null)
                 throw new ActionException(
-                    LString
-                        .tr("You must select a parent with a processing event"));
+                    bundle
+                        .tr("You must select a parent with a processing event")
+                        .format());
         }
         context.getSession().saveOrUpdate(specimen);
         if (!oldCEvent.equals(newCEvent)) {

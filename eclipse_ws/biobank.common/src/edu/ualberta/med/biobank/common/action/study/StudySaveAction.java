@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -17,7 +18,8 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
@@ -29,12 +31,14 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class StudySaveAction implements Action<IdResult> {
+    private static final Bundle bundle = new CommonBundle();
+
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr REMOVED_CONTACT_MISSING_STUDY =
-        LTemplate.tr("Study \"{0}\" not found in removed contact's studies.");
+    public static final Tr REMOVED_CONTACT_MISSING_STUDY =
+        bundle.tr("Study \"{0}\" not found in removed contact's studies.");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr STUDY_EVEN_ATTRS_SHARE_ID =
-        LTemplate.tr("Cannot add multiple study event attributes with the" +
+    public static final Tr STUDY_EVEN_ATTRS_SHARE_ID =
+        bundle.tr("Cannot add multiple study event attributes with the" +
             " same id (\"{0}\").");
 
     private static final long serialVersionUID = 1L;

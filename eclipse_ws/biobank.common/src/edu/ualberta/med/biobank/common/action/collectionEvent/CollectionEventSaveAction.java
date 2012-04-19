@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -24,7 +25,8 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -39,30 +41,30 @@ import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class CollectionEventSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr ABSENT_SPECIMEN =
-        LTemplate.tr("Specimen \"{0}\" not found in collection.");
+    public static final Tr ABSENT_SPECIMEN_ERRMSG =
+        bundle.tr("Specimen \"{0}\" not found in collection.");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr LOCKED_LABEL =
-        LTemplate.tr("Attribute for label \"{0}\" is locked, changes not" +
+    public static final Tr LOCKED_LABEL_ERRMSG =
+        bundle.tr("Attribute for label \"{0}\" is locked, changes not" +
             " permitted.");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr STUDY_EVENT_ATTR_MISSING =
-        LTemplate.tr("Cannot find Study Event Attribute with id \"{0}\".");
+    public static final Tr STUDY_EVENT_ATTR_MISSING_ERRMSG =
+        bundle.tr("Cannot find Study Event Attribute with id \"{0}\".");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE =
-        LTemplate.tr("Value \"{0}\" is invalid for label \"{2}\".");
+    public static final Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG =
+        bundle.tr("Value \"{0}\" is invalid for label \"{2}\".");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE =
-        LTemplate.tr("Value \"{0}\" (\"{1}\") is invalid for label" +
-            " \"{2}\".");
+    public static final Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG =
+        bundle.tr("Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr CANNOT_PARSE_DATE =
-        LTemplate.tr("Cannot parse date \"{0}\".");
+    public static final Tr CANNOT_PARSE_DATE_ERRMSG =
+        bundle.tr("Cannot parse date \"{0}\".");
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr UNKNOWN_EVENT_ATTR_TYPE =
-        LTemplate.tr("Unknown Event Attribute Type \"{0}\".");
+    public static final Tr UNKNOWN_EVENT_ATTR_TYPE_ERRMSG =
+        bundle.tr("Unknown Event Attribute Type \"{0}\".");
 
     private Integer ceventId;
     private Integer patientId;
@@ -205,7 +207,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     specimen = context.load(Specimen.class, specInfo.id);
 
                     if (!newAllSpecCollection.contains(specimen)) {
-                        throw new ActionException(ABSENT_SPECIMEN
+                        throw new ActionException(ABSENT_SPECIMEN_ERRMSG
                             .format(specimen.getInventoryId()));
                     }
                 }
@@ -257,14 +259,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     sAttr = studyEventAttrInfo == null ? null
                         : studyEventAttrInfo.attr;
                     if (sAttr == null) {
-                        throw new ActionException(STUDY_EVENT_ATTR_MISSING
+                        throw new ActionException(STUDY_EVENT_ATTR_MISSING_ERRMSG
                             .format(attrInfo.studyEventAttrId));
                     }
                 }
 
                 if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                     String label = sAttr.getGlobalEventAttr().getLabel();
-                    throw new ActionException(LOCKED_LABEL.format(label));
+                    throw new ActionException(LOCKED_LABEL_ERRMSG.format(label));
                 }
 
                 if (attrInfo.value != null) {
@@ -288,7 +290,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         String label =
                             sAttr.getGlobalEventAttr().getLabel();
                         throw new ActionException(
-                            INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE
+                            INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
                                 .format(attrInfo.value, label));
                     }
                 } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
@@ -297,7 +299,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             String label =
                                 sAttr.getGlobalEventAttr().getLabel();
                             throw new ActionException(
-                                INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE
+                                INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
                                     .format(singleVal, attrInfo.value,
                                         label));
                         }
@@ -309,13 +311,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         DateFormatter.dateFormatter
                             .parse(attrInfo.value);
                     } catch (ParseException e) {
-                        throw new ActionException(CANNOT_PARSE_DATE
+                        throw new ActionException(CANNOT_PARSE_DATE_ERRMSG
                             .format(attrInfo.value));
                     }
                 } else if (type == EventAttrTypeEnum.TEXT) {
                     // do nothing
                 } else {
-                    throw new ActionException(UNKNOWN_EVENT_ATTR_TYPE
+                    throw new ActionException(UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
                         .format(type.getName()));
                 }
             }

@@ -5,18 +5,21 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.i18n.LTemplate;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LTemplate.Tr UNEXPECTED_RESULTS =
-        LTemplate.tr("Expected a single query result, but got \"{0}\".");
+    public static final Tr UNEXPECTED_RESULTS =
+        bundle.tr("Expected a single query result, but got \"{0}\".");
 
     private final Class<?> objectClass;
     private final String propertyName;

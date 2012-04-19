@@ -32,8 +32,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
-import edu.ualberta.med.biobank.i18n.LTemplate;
-import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -68,8 +66,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     private static final String CONTAINER_AT_POSITION_MSG =
         i18n.tr("Container {0} is already holding a container {1} at position {2}.");
     @SuppressWarnings("nls")
-    private static final LTemplate.Tr INVALID_POSITION =
-        LTemplate.tr("Can't use position {0} in container {1} because its" +
+    private static final String INVALID_POSITION =
+        i18n.tr("Can't use position {0} in container {1} because its" +
             " maximum capacity is {2} rows and {3} columns.");
 
     private Map<RowColPos, SpecimenWrapper> specimens;
@@ -296,7 +294,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 // {1} container label (container type)
                 // {2} row capacity
                 // {3} column capacity
-                throw new LocalizedException(INVALID_POSITION.format(
+                throw new Exception(MessageFormat.format(INVALID_POSITION,
                     position,
                     getFullInfoLabel(),
                     type.getRowCapacity(),

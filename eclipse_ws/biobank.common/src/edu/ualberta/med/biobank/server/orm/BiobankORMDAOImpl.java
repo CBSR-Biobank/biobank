@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.orm;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -12,7 +13,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl.AppServiceAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
@@ -50,7 +51,8 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 @SuppressWarnings("unused")
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
-    private static AtomicInteger nextHandleId = new AtomicInteger(0);
+    private static final Bundle bundle = new CommonBundle();
+    private static final AtomicInteger nextHandleId = new AtomicInteger(0);
     private static final HashMap<QueryHandle, QueryProcess> queryMap =
         new HashMap<QueryHandle, QueryProcess>();
 
@@ -104,7 +106,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         @SuppressWarnings("unchecked")
         List<User> res = criteria.list();
         if (res.size() != 1)
-            throw new ActionException(LString.tr("Unable to get the current user."));
+            throw new ActionException(
+                bundle.tr("Unable to get the current user.").format());
         return res.get(0);
     }
 

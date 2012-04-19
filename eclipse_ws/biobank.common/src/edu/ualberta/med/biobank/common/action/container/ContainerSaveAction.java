@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.container;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -8,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
@@ -18,10 +20,11 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class ContainerSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LString CANNOT_SET_LABEL =
-        LString.tr("Cannot set label on child containers.");
+    public static final LString CANNOT_SET_LABEL_ERRMSG =
+        bundle.tr("Cannot set label on child containers.").format();
 
     @SuppressWarnings("nls")
     public static final String PATH_DELIMITER = "/";
@@ -101,7 +104,7 @@ public class ContainerSaveAction implements Action<IdResult> {
 
         if (parentId != null) {
             if (label != null) {
-                throw new ActionException(CANNOT_SET_LABEL);
+                throw new ActionException(CANNOT_SET_LABEL_ERRMSG);
             }
             Container parent = context.load(Container.class, parentId);
             String parentPath = parent.getPath();

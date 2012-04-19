@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -16,9 +18,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PatientReport1 extends AbstractReport {
+    private static final Bundle bundle = new CommonBundle();
+
     @SuppressWarnings("nls")
-    private static final LString ALL_CLINICS = LString
-        .tr("All Clinics");
+    private static final LString ALL_CLINICS =
+        bundle.tr("All Clinics").format();
 
     @SuppressWarnings("nls")
     public static String QUERY_STRING =
