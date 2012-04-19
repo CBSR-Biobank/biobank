@@ -20,8 +20,8 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
 
     private String scannedValue;
     private BgcBaseText valueText;
-    private RowColPos position;
-    private Map<RowColPos, PalletCell> cells;
+    private final RowColPos position;
+    private final Map<RowColPos, PalletCell> cells;
 
     public ScanOneTubeDialog(Shell parentShell,
         Map<RowColPos, PalletCell> cells, RowColPos rcp) {

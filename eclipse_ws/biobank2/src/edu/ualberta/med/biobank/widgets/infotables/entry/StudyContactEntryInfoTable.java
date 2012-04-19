@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
-import edu.ualberta.med.biobank.widgets.infotables.Messages;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {

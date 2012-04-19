@@ -158,7 +158,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                         menu.getItem(i).dispose();
                     if (addItemListeners.getListeners().length > 0) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_add);
+                        item.setText(ADD_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -169,7 +169,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     if (editItemListeners.getListeners().length > 0
                         && canEdit(getSelection())) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_edit);
+                        item.setText(EDIT_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -180,7 +180,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     if (deleteItemListeners.getListeners().length > 0
                         && canDelete(getSelection())) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_delete);
+                        item.setText(DELETE_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {

@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Patient;
@@ -88,5 +89,5 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             return pinfo;
         }
         throw new ActionException(MULTIPLE_PATIENTS_FOUND.format(pnumber));
-     }
+    }
 }

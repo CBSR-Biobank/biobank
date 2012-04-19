@@ -133,7 +133,7 @@ public class ContainerAdapter extends AdapterBase {
 
         if (isEditable() && (topLevel == null || !topLevel)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ContainerAdapter_move_label);
+            mi.setText("Move container to");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -172,11 +172,12 @@ public class ContainerAdapter extends AdapterBase {
                     new IRunnableWithProgress() {
                         @Override
                         public void run(final IProgressMonitor monitor) {
-                            monitor.beginTask(NLS
-                                .bind(
-                                    "Moving specimens from container {0} to {1}",
-                                    getContainer().getFullInfoLabel(),
-                                    newContainer.getFullInfoLabel()),
+                            monitor.beginTask(
+                                NLS
+                                    .bind(
+                                        "Moving specimens from container {0} to {1}",
+                                        getContainer().getFullInfoLabel(),
+                                        newContainer.getFullInfoLabel()),
                                 IProgressMonitor.UNKNOWN);
                             try {
                                 SessionManager.getAppService()
