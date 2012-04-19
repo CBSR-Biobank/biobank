@@ -7,6 +7,6 @@ public class CommonBundle extends Bundle {
 
     @SuppressWarnings("nls")
     public CommonBundle() {
-        super("edu.ualberta.med.biobank.common.Messages");
+        super("i18n.Messages");
     }
 }

@@ -1,3 +1,4 @@
+po/output
 *.jasper
 backup/
 docs/doxygen

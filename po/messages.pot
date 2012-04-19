@@ -1,0 +1,1329 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:33
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-19 15:28-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/clinic/ClinicSaveAction.java:29
+#, java-format
+msgid ""
+"Cannot delete contact {0} because it is still associated with other studies."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:48
+#, java-format
+msgid "Specimen \"{0}\" not found in collection."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:51
+#, java-format
+msgid "Attribute for label \"{0}\" is locked, changes not permitted."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:55
+#, java-format
+msgid "Cannot find Study Event Attribute with id \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:58
+#, java-format
+msgid "Value \"{0}\" is invalid for label \"{2}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:61
+#, java-format
+msgid "Value \"{0}\" (\"{1}\") is invalid for label \"{2}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:64
+#, java-format
+msgid "Cannot parse date \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:67
+#, java-format
+msgid "Unknown Event Attribute Type \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/container/ContainerActionHelper.java:17
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenActionHelper.java:85
+msgid "Parent container and position should either both be set or both be null"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/container/ContainerSaveAction.java:27
+msgid "Cannot set label on child containers."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/dispatch/DispatchDeleteAction.java:20
+msgid "Only freshly created dispatches may be deleted."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/dispatch/DispatchGetInfoAction.java:23
+#, java-format
+msgid "Cannot find a dispatch with id \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/exception/AccessDeniedException.java:12
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:123
+msgid "Access Denied"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/exception/ModelNotFoundException.java:16
+#, java-format
+msgid "Cannot find a {0} with id {1} in persistence."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/originInfo/OriginInfoDeleteAction.java:21
+msgid "Specimens do not come from the same place."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/originInfo/OriginInfoSaveAction.java:31
+msgid "Specimen id can not be null"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/others/CheckNoDuplicateAction.java:22
+#, java-format
+msgid "Expected a single query result, but got \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/patient/PatientMergeException.java:14
+msgid "Problem merging patients"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/patient/PatientSearchAction.java:26
+#, java-format
+msgid "More than one patient found with pnumber \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/processingEvent/ProcessingEventDeleteAction.java:21
+msgid ""
+"Delete failed. There are child specimens linked through this processing event"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/reports/ReportAction.java:22
+msgid "Unable to run report for unknown reason"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/request/RequestGetInfoAction.java:25
+#, java-format
+msgid "No request found with id \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/researchGroup/RequestSubmitAction.java:28
+msgid "Blank specimen id, please check your your file for correct input."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:28
+#, java-format
+msgid "Specimen {0} missing"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:31
+msgid "Specimen does not exist."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:36
+#, java-format
+msgid "{0} is already in a not closed dispatch."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:168
+msgid "Specimen different from the one registered at this position"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:183
+msgid "This specimen should be on another pallet"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:210
+#, java-format
+msgid ""
+"Activity status of {0} is not ''Active''. Check comments on this specimen "
+"for more information."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:216
+#, java-format
+msgid ""
+"Specimen {0} is currently assigned to center {1}. It should first be sent to "
+"center {2}."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:228
+#, java-format
+msgid "{0} is already in this dispatch."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/ShipmentReceiveProcessAction.java:115
+#, java-format
+msgid "Specimen {0} not found in database"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/ShipmentReceiveProcessAction.java:126
+msgid "Specimen should not be in shipment"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:200
+#, java-format
+msgid "Missing specimen \"{0}\"."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:226
+msgid "Specimen not found"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:242
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcFormBase.java:65
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:222
+msgid "Error"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:312
+#, java-format
+msgid "Specimen previously registered on another position: {0}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:336
+#, java-format
+msgid "Specimen has a position in another site (site {0})"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:357
+#, java-format
+msgid "This pallet type {0} can''t hold a specimen of type {1}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:375
+msgid "Cannot assign position to a specimen that in dispatch transit"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:76
+#, java-format
+msgid "Value ''{0}'' has already been scanned in position {1}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:132
+msgid "Specimen already in database"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/GroupDeleteAction.java:19
+msgid "You do not have adequate permissions to delete this group"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/GroupSaveAction.java:28
+msgid "You do not have adequate permissions to save this group."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserDeleteAction.java:22
+msgid "You do not have adequate permissions to delete this user."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserDeleteAction.java:26
+msgid "Unable to delete associated CSM user."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:37
+msgid ""
+"It appears you are trying to add groups you were not aware of. Please "
+"refresh your user management, start over, and try again."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:42
+msgid "You cannot add this user to groups you cannot manage."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:46
+msgid "You do not have adequate permissions to modify this user."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:50
+msgid ""
+"Your roles or permissions have changed since you began modifying this user. "
+"Please start over and try again."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:54
+msgid "Problem modify associated CSM user properties"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:57
+msgid ""
+"Your manageable memberships have changed since you began modifying this "
+"user. Please refresh your user management, start over, and try again."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:62
+#, java-format
+msgid "Passwords must be at least {0} characters long"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenAssignSaveAction.java:74
+msgid "Problem with sent data. Container id is null"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenUpdateAction.java:115
+msgid "You must select a parent with a processing event"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/study/StudyGetClinicInfoAction.java:30
+#, java-format
+msgid "Clinic \"{0}\" must have contacts."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/study/StudySaveAction.java:38
+#, java-format
+msgid "Study \"{0}\" not found in removed contact's studies."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/study/StudySaveAction.java:41
+#, java-format
+msgid "Cannot add multiple study event attributes with the same id (\"{0}\")."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:141
+#, java-format
+msgid "labeling scheme with id \"{0}\" does not exist"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:336
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:389
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:549
+#, java-format
+msgid "Label should be {0} characters."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:344
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:396
+msgid "Invalid characters in label. Are they in upper case?"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:353
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:405
+#, java-format
+msgid "Label {0} does not exist in this scheme."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:357
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:407
+#, java-format
+msgid "Label {0} does not exist in {1}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:360
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:410
+#, java-format
+msgid "Max value is {0}. (Max row: {1}. Max col: {2}.)"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:435
+msgid "2 char numeric labeling scheme not found"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:438
+#, java-format
+msgid "Label {0} is incorrect: it should be 2 characters"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:544
+msgid "CBSR 2 char alphabetic labeling scheme not found."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:553
+msgid "Label should be double letter (BB)."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:55
+#, java-format
+msgid ""
+"Position {0} of container {1} already contains container {2} when trying to "
+"add container {3}."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:58
+#, java-format
+msgid ""
+"Position {0} is invalid. Row should be between 0 and {1} (exclusive) and "
+"column should be between 0 and {2} (exclusive)."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:61
+#, java-format
+msgid "Container {0} does not allow inserts of type {1}."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:64
+#, java-format
+msgid "Container {0} is already holding an specimen at position {1} {2}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:67
+#, java-format
+msgid "Container {0} is already holding a container {1} at position {2}."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:70
+msgid ""
+"Can't use position {0} in container {1} because its maximum capacity is {2} "
+"rows and {3} columns."
+msgstr ""
+
+#. {0} possible labels
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:887
+#, java-format
+msgid "Can''t find container that will match these possible labels: {0}"
+msgstr ""
+
+#. {0} possible labels
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:891
+#, java-format
+msgid ""
+"Can''t find container that can hold specimens and that will match these "
+"possible labels: {0}"
+msgstr ""
+
+#. {0} container type short name
+#. {1} possible labels
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:898
+#, java-format
+msgid ""
+"Can''t find container with type {0} that will match these possible labels: "
+"{1}"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/DispatchWrapper.java:203
+#, java-format
+msgid "Specimen {0} does not belong to this sender."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ModelWrapper.java:328
+#, java-format
+msgid "Found {0} objects of type {1} with id={2}"
+msgstr ""
+
+#. {0} patient number
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/PatientWrapper.java:96
+#, java-format
+msgid ""
+"Patient {0} exists but you don't have access to it. Check studies linked to "
+"the sites and clinics you can access."
+msgstr ""
+
+#. {0} position string, e.g. "AA" or "12"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/SpecimenWrapper.java:126
+#, java-format
+msgid "Position \"{0}\" not valid."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/SpecimenWrapper.java:200
+#, java-format
+msgid "Error retrieving specimens: found {0} results."
+msgstr ""
+
+#. {0} when the top specimen was created
+#. {1} where the specimen originated from
+#. {2} the visit number of the collection event
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/SpecimenWrapper.java:474
+#, java-format
+msgid "{0} in {1} (visit #{2})"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/ActivityStatus.java:26
+msgid "Active"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/ActivityStatus.java:27
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:11
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestState.java:11
+msgid "Closed"
+msgstr ""
+
+#. TODO: why can't there be a closed and flagged item or an active but
+#. flagged item? Especially for users that are mean to be enabled or
+#. disabled. When is ActivityStatus.FLAGGED even used in the source code?
+#. Can a flagged user log in? What is the point of flagged? Shouldn't it be
+#. separate?
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/ActivityStatus.java:33
+msgid "Flagged"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:15
+msgid "Unknown Object"
+msgstr ""
+
+#. @formatter:off
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:21
+msgid "Activity Status"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:22
+msgid "Address"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:23
+msgid "Aliquoted Specimen"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:24
+msgid "Capacity"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:25
+msgid "Center"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:26
+msgid "Clinic"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:27
+msgid "Collection Event"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:28
+msgid "Comment"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:29
+msgid "Contact"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:30
+msgid "Container"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:31
+msgid "Container Labeling Scheme"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:32
+msgid "Container Position"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:33
+msgid "Container Type"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:34
+msgid "Dispatch"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:35
+msgid "Dispatch Specimen"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:36
+msgid "Domain"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:37
+msgid "Event Attribute"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:38
+msgid "Event Attribute Type"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:39
+msgid "Global Event Attribute"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:40
+msgid "Group"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:41
+msgid "Membership"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:42
+msgid "Origin Information"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:43
+msgid "Patient"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:44
+msgid "Permission"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:45
+msgid "Principal"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:46
+msgid "Processing Event"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:47
+msgid "Request"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:48
+msgid "Request Specimen"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:49
+msgid "Research Group"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:50
+msgid "Role"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:51
+msgid "Shipment Information"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:52
+msgid "Shipping Method"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:53
+msgid "Site"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:54
+msgid "Source Specimen"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:55
+msgid "Specimen"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:56
+msgid "Specimen Position"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:57
+msgid "Specimen Type"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:58
+msgid "Study"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:59
+msgid "Study Event Attribute"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:60
+msgid "User"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:31
+msgid "Specimen Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:33
+msgid "Specimen Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:35
+msgid "Specimen Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:37
+msgid "Specimen Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:39
+msgid "Specimen Link"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:41
+msgid "Specimen Assign"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:44
+msgid "Site Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:47
+msgid "Site Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:49
+msgid "Site Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:51
+msgid "Site Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:54
+msgid "Patient Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:56
+msgid "Patient Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:58
+msgid "Patient Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:60
+msgid "Patient Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:62
+msgid "Patient Merge"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:65
+msgid "Collection Event Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:67
+msgid "Collection Event Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:69
+msgid "Collection Event Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:71
+msgid "Collection Event Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:74
+msgid "Processing Event Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:76
+msgid "Processing Event Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:78
+msgid "Processing Event Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:80
+msgid "Processing Event Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:83
+msgid "Origin Information Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:85
+msgid "Origin Information Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:87
+msgid "Origin Information Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:89
+msgid "Origin Information Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:92
+msgid "Dispatch Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:94
+msgid "Dispatch Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:96
+msgid "Dispatch Change State"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:98
+msgid "Dispatch Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:100
+msgid "Dispatch Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:103
+msgid "Research Group Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:106
+msgid "Research Group Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:108
+msgid "Research Group Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:110
+msgid "Research Group Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:113
+msgid "Study Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:116
+msgid "Study Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:118
+msgid "Study Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:120
+msgid "Study Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:123
+msgid "Request Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:125
+msgid "Request Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:127
+msgid "Request Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:129
+msgid "Request Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:131
+msgid "Request Process"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:134
+msgid "Clinic Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:137
+msgid "Clinic Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:139
+msgid "Clinic Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:141
+msgid "Clinic Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:144
+msgid "Container Type Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:146
+msgid "Container Type Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:148
+msgid "Container Type Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:150
+msgid "Container Type Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:153
+msgid "Container Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:155
+msgid "Container Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:157
+msgid "Container Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:159
+msgid "Container Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:162
+msgid "Specimen Type Create"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:165
+msgid "Specimen Type Read"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:167
+msgid "Specimen Type Update"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:170
+msgid "Specimen Type Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:174
+msgid "Logging"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:176
+msgid "Reports"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:179
+msgid "Specimen List"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:181
+msgid "Label Printing"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:12
+msgid "None"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:13
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:10
+msgid "Received"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:14
+msgid "Missing"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:15
+msgid "Extra"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:8
+msgid "Creation"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:9
+msgid "In Transit"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:12
+msgid "Lost"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestSpecimenState.java:12
+msgid "Available"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestSpecimenState.java:13
+msgid "Pulled"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestSpecimenState.java:14
+msgid "Unavailable"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestSpecimenState.java:15
+msgid "Dispatched"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestState.java:8
+msgid "New"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestState.java:9
+msgid "Submitted"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestState.java:10
+msgid "Approved"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankApplicationServiceImpl.java:168
+msgid "Problem with HQL result size"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:30
+#, java-format
+msgid "Login {0} already exists."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:33
+msgid "Login should be set"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:36
+#, java-format
+msgid "User with id {0} is missing a csmUserId."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:39
+#, java-format
+msgid "CSM Security user with id {0} not found."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:42
+msgid "Unexpected problem while modifying user."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:45
+#, java-format
+msgid "User {0} not found."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:48
+msgid "User cannot delete himself."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:51
+msgid "Only the user itself can modify its password through this method"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:55
+msgid "Cannot modify password: verification password is incorrect."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:59
+msgid "New password needs to be different from the old one."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/ClientVersionInvalidException.java:13
+msgid ""
+"Client authentication failed. The Java Client version is not compatible with "
+"the server and must be upgraded."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/ServerVersionInvalidException.java:13
+msgid "Server version could not be determined."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/ServerVersionNewerException.java:13
+#, java-format
+msgid ""
+"Client authentication failed. The \"{0}\" Java Client is too old to connect "
+"to a \"{1}\" server."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/ServerVersionOlderException.java:13
+#, java-format
+msgid ""
+"Client authentication failed. The \"{0}\" Java Client is too new to connect "
+"to a \"{1}\" server."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/VersionFormatInvalidException.java:13
+msgid "The version string is formatted incorrectly."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/orm/BiobankORMDAOImpl.java:110
+msgid "Unable to get the current user."
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/reports/PatientReport1.java:25
+msgid "All Clinics"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/reports/SpecimenReport2.java:21
+msgid "No Date Processed"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/reports/SpecimenReport3.java:75
+#, java-format
+msgid "NOT_FOUND({0})"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/reports/SpecimenTypeReport2.java:21
+msgid "Unused"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:117
+msgid "Connection Attempt Failed"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:119
+msgid ""
+"Could not perform database operation. Make sure server is running correct "
+"version."
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:121
+msgid "Could not connect to server. Make sure server is running."
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:125
+msgid "You don't have rights to do this action."
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:22
+msgid "Confirm"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:24
+msgid "Reset"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:26
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/CDateTime.java:75
+msgid "Cancel"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:28
+msgid "Error printing."
+msgstr ""
+
+#. text that appears as an option in a GUI menu to print
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:31
+msgid "Print"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcFormBase.java:58
+msgid "Action Failed"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcFormBase.java:61
+msgid "Exception in form initialization"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcFormBase.java:68
+msgid "Unable to reload form."
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/AbstractInfoTableWidget.java:63
+msgid "Add"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/AbstractInfoTableWidget.java:65
+msgid "Edit"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/AbstractInfoTableWidget.java:67
+msgid "Delete"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/BgcFileBrowser.java:22
+msgid "Browse"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/BgcFileBrowser.java:24
+msgid "Open"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:24
+msgid "Previous Page"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:27
+msgid "First Page"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:29
+msgid "Next Page"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:31
+msgid "Last Page"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:33
+#, java-format
+msgid "Page: {0} of ?"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/PaginationWidget.java:35
+#, java-format
+msgid "Page: {0} of {1}"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/CDateTime.java:73
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:90
+msgid "Clear"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/CDateTime.java:77
+msgid "Accept"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/CDateTime.java:80
+msgid "<choose time>"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:51
+msgid "1st"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:52
+msgid "2nd"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:53
+msgid "3rd"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:54
+msgid "4th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:55
+msgid "5th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:56
+msgid "6th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:57
+msgid "7th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:58
+msgid "8th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:59
+msgid "9th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:60
+msgid "10th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:61
+msgid "11th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:62
+msgid "12th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:63
+msgid "13th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:64
+msgid "14th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:65
+msgid "15th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:66
+msgid "16th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:67
+msgid "17th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:68
+msgid "18th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:69
+msgid "19th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:70
+msgid "20th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:71
+msgid "21st"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:72
+msgid "22nd"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:73
+msgid "23rd"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:74
+msgid "24th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:75
+msgid "25th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:76
+msgid "26th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:77
+msgid "27th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:78
+msgid "28th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:79
+msgid "29th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:80
+msgid "30th"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:81
+msgid "31st"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:85
+msgid "Today"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:88
+#, java-format
+msgid "Today is {0,date,EEEE}, the {1}"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:93
+msgid "Previous Month"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:96
+msgid "Next Month"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:99
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:106
+msgid "Go To Today"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:102
+msgid "Previous Year"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:104
+msgid "Next Year"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/nebula/DatePicker.java:109
+msgid "Show Selection"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/utils/BgcClipboard.java:30
+msgid "Copy"
+msgstr ""
+
+#: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/utils/TableFilter.java:21
+msgid "Enter text to filter the list:"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:221
+msgid "Exception found."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/SessionManager.java:361
+msgid "Error displaying available actions"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyViewForm.java:88
+#, java-format
+msgid "Study {0}"
+msgstr ""

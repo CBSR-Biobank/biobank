@@ -2,12 +2,14 @@
 <project name="i18n" basedir=".">
   <property file="build.properties" />
 
-  <property name="bundle" value="edu.ualberta.med.biobank.i18n.Messages" />
+  <property name="bundle" value="i18n.Messages" />
   <property name="po.dir" value="po" />
+  <property name="po.output.dir" value="${po.dir}/output" />
   <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
 
   <target name="init.dir">
     <mkdir dir="${po.dir}" />
+    <mkdir dir="${po.output.dir}" />
   </target>
 
   <target name="init.gettext" description="Loads the Ant gettext tasks">
@@ -31,7 +33,7 @@
     <echo message="${po.dir}" />
     <gettext-extract keysFile="messages.pot" poDirectory="${po.dir}">
       <!-- TODO: all projects? what about sub-projects (e.g. scannerConfig) -->
-      <fileset dir="eclipse_ws/biobank.common/src" includes="**/*.java"/>
+      <fileset dir="eclipse_ws" includes="**/src/**/*.java"/>
     </gettext-extract>
   </target>
 
@@ -46,7 +48,7 @@
           description="Generates a default bundle"
           depends="init.dir,init.gettext">
     <gettext-generate-default targetBundle="${bundle}"
-                              outputDirectory="${po.dir}"
+                              outputDirectory="${po.output.dir}"
                               potfile="${po.dir}/messages.pot"/>
   </target>
 
@@ -55,10 +57,10 @@
           depends="init.dir,init.gettext">
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"
-                  outputDirectory="${po.dir}"
+                  outputDirectory="${po.output.dir}"
                   percentage="65"/>
       <jar destfile="jars/messages.jar"
            basedir="${po.dir}"
-           includes="edu/**"/>
+           includes="i18n/**"/>
   </target>
 </project>
