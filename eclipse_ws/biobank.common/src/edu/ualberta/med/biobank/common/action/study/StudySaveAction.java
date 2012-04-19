@@ -285,6 +285,7 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveSourceSpecimens(ActionContext context) {
         Set<SourceSpecimen> newSsCollection = new HashSet<SourceSpecimen>();
         for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfos) {
@@ -316,6 +317,7 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveAliquotedSpecimens(ActionContext context) {
         Set<AliquotedSpecimen> newAsCollection =
             new HashSet<AliquotedSpecimen>();

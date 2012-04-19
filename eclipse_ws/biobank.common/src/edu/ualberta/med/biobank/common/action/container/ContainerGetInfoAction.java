@@ -61,6 +61,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
 
     private final Integer containerId;
 
+    @SuppressWarnings("nls")
     public ContainerGetInfoAction(Integer containerId) {
         log.debug("containerId={}", containerId);
         if (containerId == null) {
@@ -69,6 +70,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
         this.containerId = containerId;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
 
@@ -79,6 +81,7 @@ public class ContainerGetInfoAction implements Action<ContainerInfo> {
         return result;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ContainerInfo run(ActionContext context) throws ActionException {
         log.debug("run: containerId={}", containerId);
