@@ -10,16 +10,16 @@ public class AbstractPositionI18n {
     private static final Bundle bundle = new CommonBundle();
 
     public static final Trnc NAME = bundle.trnc(
-        "model name",
+        "model",
         "Abstract Position",
         "Abstract Positions");
 
     public static class Property {
         public static final LString ROW = bundle.trc(
-            "model property",
+            "model",
             "Row").format();
         public static final LString COLUMN = bundle.trc(
-            "model property",
+            "model",
             "Column").format();
     }
 }
