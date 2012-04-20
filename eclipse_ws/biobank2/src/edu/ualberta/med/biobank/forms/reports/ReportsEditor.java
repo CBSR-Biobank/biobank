@@ -56,6 +56,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     protected ReportTreeNode node;
     protected BiobankReport report;
 
+    @SuppressWarnings("nls")
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
     // Sections

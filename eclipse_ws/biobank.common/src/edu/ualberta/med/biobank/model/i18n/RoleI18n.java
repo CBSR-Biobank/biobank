@@ -6,13 +6,13 @@ import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trn;
 
 @SuppressWarnings("nls")
-//@formatter:off
-public class GroupI18n {
+// @formatter:off
+public class RoleI18n {
     private static final Bundle bundle = new CommonBundle();
 
-    public static final Trn NAME = bundle.trn("Group", "Groups");
+    public static final Trn NAME = bundle.trn("Role", "Roles");
 
     public static class Property {
-        public static final LString NAME = bundle.trc("Group Property", "Name").format();
+        public static final LString NAME = bundle.trc("Role Property", "Name").format();
     }
 }

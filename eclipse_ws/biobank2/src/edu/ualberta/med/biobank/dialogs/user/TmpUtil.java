@@ -8,10 +8,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class TmpUtil {
+    private static final I18n i18n = I18nFactory.getI18n(TmpUtil.class);
+
     // TODO: time pressure, heh
     public static List<String> getMessages(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
@@ -25,6 +29,7 @@ public class TmpUtil {
         return messages;
     }
 
+    @SuppressWarnings("nls")
     public static void displayException(Throwable t) {
         String message = t.getMessage();
 
@@ -40,6 +45,8 @@ public class TmpUtil {
         }
 
         BgcPlugin.openAsyncError(
-            "Unable to Save User", message);
+            // TR: error dialog title
+            i18n.tr("Unable to Save User"),
+            message);
     }
 }

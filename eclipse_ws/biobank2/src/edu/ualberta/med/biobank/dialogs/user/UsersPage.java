@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +10,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -28,6 +29,8 @@ import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UsersPage extends BgcDialogPage {
+    private static final I18n i18n = I18nFactory.getI18n(UsersPage.class);
+
     private UserInfoTable userInfoTable;
 
     private final ManagerContext managerContext;
@@ -38,9 +41,10 @@ public abstract class UsersPage extends BgcDialogPage {
         this.managerContext = managerContext;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTitle() {
-        return "Users";
+        return i18n.trc("users display page title", "Users");
     }
 
     @Override
@@ -112,6 +116,7 @@ public abstract class UsersPage extends BgcDialogPage {
 
     protected void addUser() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 final User user = new User();
@@ -137,9 +142,10 @@ public abstract class UsersPage extends BgcDialogPage {
                 int res = dlg.open();
                 if (res == Status.OK) {
                     BgcPlugin.openAsyncInformation(
-                        "User Added",
-                        MessageFormat.format(
-                            "Successfully added new user {0}.",
+                        // TR: information dialog title
+                        i18n.tr("User Added"),
+                        // TR: information dialog title
+                        i18n.tr("Successfully added new user {0}.",
                             user.getLogin()));
 
                     List<User> allCurrent = getCurrentAllUsersList();

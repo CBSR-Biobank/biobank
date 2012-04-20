@@ -1,11 +1,16 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.model.Membership;
 
 public class MembershipEditWizard extends Wizard {
+    private static final I18n i18n = I18nFactory
+        .getI18n(MembershipEditWizard.class);
+
     private final Membership originalMembership;
     private final Membership membership;
     private final ManagerContext context;
@@ -74,12 +79,15 @@ public class MembershipEditWizard extends Wizard {
         dst.getRoles().addAll(src.getRoles());
     }
 
+    @SuppressWarnings("nls")
     private void updateWindowTitle() {
         String title = null;
         if (membership.isNew()) {
-            title = "Add Membership";
+            // TR: add membership wizard title
+            title = i18n.tr("Add Membership");
         } else {
-            title = "Edit Membership";
+            // TR: edit membership wizard title
+            title = i18n.tr("Edit Membership");
         }
         setWindowTitle(title);
     }

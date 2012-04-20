@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trn;
 
 @SuppressWarnings("nls")
-// @formatter: off
+// @formatter:off
 public class PatientI18n {
     private static final Bundle bundle = new CommonBundle();
 
