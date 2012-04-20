@@ -42,6 +42,7 @@ public class SiteViewFormView extends AbstractViewFormView
     private final TranslatedTextBox<ActivityStatus> activityStatus =
         new TranslatedTextBox<ActivityStatus>(ACTIVITY_STATUS_ADAPTER);
 
+    @SuppressWarnings("nls")
     @Override
     protected void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);

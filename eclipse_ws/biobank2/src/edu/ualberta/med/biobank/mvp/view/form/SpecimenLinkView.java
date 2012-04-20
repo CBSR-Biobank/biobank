@@ -56,6 +56,7 @@ public class SpecimenLinkView extends AbstractEntryFormView implements
         return confim;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
@@ -78,6 +79,7 @@ public class SpecimenLinkView extends AbstractEntryFormView implements
         confim.setButton(button);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getOkMessage() {
         return "Everything is A-Okay";

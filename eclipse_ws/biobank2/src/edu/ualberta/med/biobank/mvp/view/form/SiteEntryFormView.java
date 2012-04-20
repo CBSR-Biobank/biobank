@@ -80,6 +80,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         return studies;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
@@ -124,6 +125,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         // comment.setText(widget.comment);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getOkMessage() {
         return "Everything is A-Okay";
