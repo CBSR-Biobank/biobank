@@ -18,26 +18,32 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ContactsGetAllAction;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.i18n.ContactI18n;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SelectClinicContactDialog.class);
 
     public static final int ADD_BTN_ID = 100;
 
-    private static final String TITLE =
-        "Clinic Contacts";
+    @SuppressWarnings("nls")
+    // select clinic contact dialog title
+    private static final String TITLE = i18n.tr("Clinic Contacts");
 
     private StudyContactEntryInfoTable contactInfoTable;
 
     private Contact selectedContact;
 
-    private List<Contact> excludedContacts;
+    private final List<Contact> excludedContacts;
 
     private ComboViewer clinicCombo;
 
@@ -51,14 +57,18 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         return TITLE;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a contact to add to this study";
+        // select clinic contact dialog title area message
+        return i18n.tr("Select a contact to add to this study");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Add a clinic contact to study";
+        // select clinic contact dialog title area title
+        return i18n.tr("Add a clinic contact to study");
     }
 
     @Override
@@ -86,7 +96,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         }
 
         clinicCombo = widgetCreator.createComboViewer(contents,
-            "Clinic",
+            ContactI18n.Property.CLINIC.toString(),
             new ArrayList<Clinic>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -25,6 +27,8 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DispatchReceiveScanDialog extends
     ReceiveScanDialog<DispatchWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchReceiveScanDialog.class);
 
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
@@ -34,7 +38,8 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cell,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+            cell,
             locale);
     }
 
@@ -42,7 +47,8 @@ public class DispatchReceiveScanDialog extends
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+            cells,
             isRescanMode, locale);
     }
 
@@ -50,18 +56,23 @@ public class DispatchReceiveScanDialog extends
         return new ShipmentProcessInfo(null, currentShipment, false);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
-            BgcPlugin.openAsyncInformation(
-                "Specimens not in dispatch",
-                "Some of the specimens in this pallet were not supposed  to be in this shipment. They will be added to the extra-pending list.");
+            BgcPlugin
+                .openAsyncInformation(
+                    // alert error title
+                    i18n.tr("Specimens not in dispatch"),
+                    // alert error message
+                    i18n.tr("Some of the specimens in this pallet were not supposed  to be in this shipment. They will be added to the extra-pending list."));
             try {
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    "Error flagging specimens", e);
+                    // alert error title
+                    i18n.tr("Error flagging specimens"), e);
             }
         }
     }
@@ -76,9 +87,11 @@ public class DispatchReceiveScanDialog extends
         return UICellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
             int i = 0;
             do {
@@ -96,7 +109,7 @@ public class DispatchReceiveScanDialog extends
                     .size());
 
             palletScanned.put(new RowColPos(6, 6), new PalletCell(new ScanCell(
-                6, 6, "aaah"))); 
+                6, 6, "aaah")));
         }
         return palletScanned;
     }

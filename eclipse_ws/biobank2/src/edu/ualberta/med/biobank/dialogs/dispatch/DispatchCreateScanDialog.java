@@ -9,7 +9,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +16,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -41,6 +42,14 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchCreateScanDialog.class);
+
+    @SuppressWarnings("nls")
+    private static final String TITLE_AREA_MESSAGE =
+        i18n.tr("Scan specimens to dispatch. If a pallet with previous" +
+            " position is scan, the specimens scanned\nwill be compared" +
+            " to those that are supposed to be in the pallet.");
 
     private BgcBaseText palletproductBarcodeText;
     private NonEmptyStringValidator productBarcodeValidator;
@@ -48,7 +57,7 @@ public class DispatchCreateScanDialog extends
     private boolean isPalletWithPosition;
     private boolean specimensAdded = false;
     private ContainerWrapper currentPallet;
-    private List<ContainerWrapper> removedPallets =
+    private final List<ContainerWrapper> removedPallets =
         new ArrayList<ContainerWrapper>();
 
     public DispatchCreateScanDialog(Shell parentShell,
@@ -58,12 +67,13 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Scan specimens to dispatch. If a pallet with previous position is scan, the specimens scanned\nwill be compared to those that are supposed to be in the pallet.";
+        return TITLE_AREA_MESSAGE;
     }
 
     /**
      * add the product barcode field and radios
      */
+    @SuppressWarnings("nls")
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
@@ -72,11 +82,11 @@ public class DispatchCreateScanDialog extends
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
             palletWithoutPositionRadio
-                .setText("Pallet without previous position");
+                .setText(i18n.tr("Pallet without previous position"));
             final Button palletWithPositionRadio =
                 new Button(parent, SWT.RADIO);
             palletWithPositionRadio
-                .setText("Pallet with previous position");
+                .setText(i18n.tr("Pallet with previous position"));
 
             palletWithPositionRadio
                 .addSelectionListener(new SelectionAdapter() {
@@ -90,14 +100,14 @@ public class DispatchCreateScanDialog extends
                 });
 
             productBarcodeValidator = new NonEmptyStringValidator(
-                "Enter product barcode");
+                i18n.tr("Enter product barcode"));
             Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-                "Pallet product barcode");
+                i18n.tr("Pallet product barcode"));
             palletproductBarcodeText =
                 (BgcBaseText) createBoundWidget(parent,
                     BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
                     new String[0], this,
-                    "currentProductBarcode", productBarcodeValidator); 
+                    "currentProductBarcode", productBarcodeValidator);
             palletproductBarcodeText
                 .addKeyListener(new EnterKeyToNextFieldListener());
             showProductBarcodeField(false);
@@ -105,14 +115,15 @@ public class DispatchCreateScanDialog extends
         }
     }
 
+    @SuppressWarnings("nls")
     private void showProductBarcodeField(boolean show) {
         resetScan();
         palletproductBarcodeText.setEnabled(show);
         if (show) {
-            palletproductBarcodeText.setText(""); 
+            palletproductBarcodeText.setText("");
         } else {
             palletproductBarcodeText
-                .setText("No previous position");
+                .setText(i18n.tr("No previous position"));
         }
     }
 
@@ -130,6 +141,7 @@ public class DispatchCreateScanDialog extends
     /**
      * check the pallet is actually found (if need one)
      */
+    @SuppressWarnings("nls")
     @Override
     protected boolean checkBeforeProcessing(CenterWrapper<?> center)
         throws Exception {
@@ -144,9 +156,8 @@ public class DispatchCreateScanDialog extends
             if (currentPallet == null) {
                 BgcPlugin
                     .openAsyncError(
-                        "Pallet error",
-                        NLS.bind(
-                            "Can''t find pallet with barcode ''{0}''",
+                        i18n.tr("Pallet error"),
+                        i18n.tr("Can''t find pallet with barcode \"{0}\".",
                             currentProductBarcode));
                 return false;
             }
@@ -177,9 +188,10 @@ public class DispatchCreateScanDialog extends
             currentShipment, false);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getProceedButtonlabel() {
-        return "Add specimens";
+        return i18n.tr("Add specimens");
     }
 
     @Override

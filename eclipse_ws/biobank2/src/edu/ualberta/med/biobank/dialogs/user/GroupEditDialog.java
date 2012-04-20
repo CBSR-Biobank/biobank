@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -32,11 +34,15 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.i18n.GroupI18n;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupEditDialog extends AbstractSecurityEditDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(GroupEditDialog.class);
+
     private final String currentTitle;
     private final String titleAreaMessage;
 
@@ -47,6 +53,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
     private MembershipInfoTable membershipInfoTable;
     private MultiSelectWidget<User> usersWidget;
 
+    @SuppressWarnings("nls")
     public GroupEditDialog(Shell parent, GroupGetOutput output,
         ManagerContext context) {
         super(parent);
@@ -56,11 +63,16 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         this.context = context;
 
         if (group.isNew()) {
-            currentTitle = "Add Group";
-            titleAreaMessage = "Add a new group";
+            // TR: add group dialog title
+            currentTitle = i18n.tr("Add Group");
+            // TR: add group dialog message
+            titleAreaMessage = i18n.tr("Add a new group");
         } else {
-            currentTitle = "Edit Group";
-            titleAreaMessage = "Modify an existing group's information";
+            // TR: edit group dialog title
+            currentTitle = i18n.tr("Edit Group");
+            // TR: edit group dialog message
+            titleAreaMessage =
+                i18n.tr("Modify an existing group's information");
         }
     }
 
@@ -79,6 +91,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
@@ -90,22 +103,26 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createGeneralFields(createTabItem(tb,
-            "General", 2));
+            i18n.trc("Group Edit Dialog Tab Name", "General"), 2));
 
         createMembershipsSection(createTabItem(tb,
-            "Roles and Permissions", 1));
+            i18n.trc("Group Edit Dialog Tab Name", "Roles and Permissions"), 1));
 
         createUsersSection(createTabItem(tb,
-            "Users", 1));
+            i18n.trc("Group Edit Dialog Tab Name", "Users"), 1));
 
     }
 
+    @SuppressWarnings("nls")
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
-            SWT.BORDER, "Name", null,
+            SWT.BORDER,
+            GroupI18n.Property.NAME.toString(),
+            null,
             group, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(
-                "A valid name is required."));
+                // TR: validation message if group name not entered
+                i18n.tr("A valid name is required.")));
     }
 
     private void createMembershipsSection(Composite contents) {
@@ -126,10 +143,13 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
             new MembershipInfoTable(contents, group, membershipContext, context);
     }
 
+    @SuppressWarnings("nls")
     private void createUsersSection(Composite contents) {
         usersWidget = new MultiSelectWidget<User>(contents, SWT.NONE,
-            "Available users",
-            "Selected users", 200) {
+            // TR: list of available users to choose from
+            i18n.tr("Available users"),
+            // TR: list of available users chosen
+            i18n.tr("Selected users"), 200) {
             @Override
             protected String getTextForObject(User node) {
                 return node.getFullName() + " (" + node.getLogin() + ")";
