@@ -11,6 +11,7 @@ import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
@@ -101,7 +102,8 @@ public class WrapperUtil {
                         model = (M) implementation;
                     }
                 }
-            }
+            } else
+                modelKlazz = Hibernate.getClass(model);
 
             if (wrapperKlazz == null
                 || Modifier.isAbstract(wrapperKlazz.getModifiers())) {

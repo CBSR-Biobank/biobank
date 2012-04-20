@@ -83,6 +83,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         palletScanManagement = new PalletScanManagement() {
 
             @Override
+            public boolean isScanTubeAloneMode() {
+                // FIXME: see issue #1230. always activate this mode
+                return true;
+            }
+
+            @Override
             protected void beforeThreadStart() {
                 AbstractScanDialog.this.beforeScanThreadStart();
             }
@@ -237,7 +243,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.NONE,
                 "Plate to scan", new String[0],
-                this, "plateToScan", new ScannerBarcodeValidator( 
+                this, "plateToScan", new ScannerBarcodeValidator(
                     "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -279,7 +285,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanOkValue,
-            "Error in scan result. Please keep only specimens with no errors.", IStatus.ERROR);
+            "Error in scan result. Please keep only specimens with no errors.",
+            IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
             "Scan should be launched", IStatus.ERROR);
@@ -443,7 +450,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText(""); 
+        scanTubeAloneSwitch.setText("");
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {

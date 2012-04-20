@@ -1268,6 +1268,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletWidget.setContainerType(
                 currentMultipleContainer.getContainerType(),
                 ScanPalletDisplay.SAMPLE_WIDTH);
+            setContainerType(currentMultipleContainer
+                .getContainerType().getWrappedObject());
             palletWidget.setCells(getCells());
 
             showOnlyPallet(false);

@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
@@ -36,6 +37,7 @@ public class PalletScanManagement {
     private boolean useScanner = true;
 
     private boolean scanTubeAloneMode = true;
+    private ContainerType type;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -104,9 +106,10 @@ public class PalletScanManagement {
                     profile);
                 cells = PalletCell.convertArray(scanCells);
             } catch (Exception ex) {
-                BgcPlugin.openAsyncError(
-                    "Scan error", ex,
-                    "Barcodes can still be scanned with the handheld 2D scanner.");
+                BgcPlugin
+                    .openAsyncError(
+                        "Scan error", ex,
+                        "Barcodes can still be scanned with the handheld 2D scanner.");
                 return;
             } finally {
                 scansCount++;
@@ -136,8 +139,8 @@ public class PalletScanManagement {
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation()
-                                : "") 
-                                + " " + "Rescanned value is different"); 
+                                : "")
+                                + " " + "Rescanned value is different");
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
@@ -199,7 +202,7 @@ public class PalletScanManagement {
 
     private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), cells, rcp);
+            .getActiveWorkbenchWindow().getShell(), cells, rcp, type);
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -303,5 +306,9 @@ public class PalletScanManagement {
                 cells.put(rcp, cell);
             }
         }
+    }
+
+    public void setContainerType(ContainerType containerType) {
+        this.type = containerType;
     }
 }

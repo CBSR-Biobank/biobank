@@ -23,7 +23,7 @@ public class ShipmentProcessInfo extends AbstractProcessPalletInfo {
 
     public ShipmentProcessInfo(Container pallet, RequestWrapper request,
         boolean errorIfAlreadyAdded) {
-        super(pallet.getId());
+        super(pallet == null ? null : pallet.getId());
         init(request.getRequestSpecimenCollection(false),
             errorIfAlreadyAdded, null);
     }
