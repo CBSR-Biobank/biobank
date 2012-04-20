@@ -35,6 +35,10 @@ public enum ActivityStatus implements NotAProxy, Serializable {
     private static final List<ActivityStatus> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
 
+    public static final String NAME = Loader.i18n.trc(
+        "model",
+        "Activity Status");
+
     private final int id;
     private final String name;
 

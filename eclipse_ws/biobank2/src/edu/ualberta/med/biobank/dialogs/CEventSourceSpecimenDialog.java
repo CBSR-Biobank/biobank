@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.i18n.SourceSpecimenI18n;
 import edu.ualberta.med.biobank.model.i18n.SpecimenI18n;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
@@ -143,6 +144,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -168,11 +170,12 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
         addSpecimenTypeWidgets(contents);
 
-        timeDrawnLabel =
-            widgetCreator.createLabel(contents,
-                "Time drawn");
+        timeDrawnLabel = widgetCreator.createLabel(contents,
+            i18n.trc("label", "Time drawn"));
         timeDrawnLabel
-            .setToolTipText("If the study doesn't require a specific time drawn, then the default time drawn is used");
+            .setToolTipText(
+            // TR: source specimen time drawn tooltip
+            i18n.tr("If the study doesn't require a specific time drawn, then the default time drawn is used"));
         timeDrawnWidget =
             createDateTimeWidget(
                 contents,
@@ -181,17 +184,19 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 internalSpecimen.specimen,
                 SpecimenPeer.CREATED_AT.getName(),
                 new NotNullValidator(
-                    "Time drawn should be set"),
+                    // TR: validation error message
+                    i18n.tr("Time drawn should be set")),
                 SWT.DATE | SWT.TIME, null);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
         activityStatusComboViewer =
             widgetCreator.createComboViewer(contents,
-                "Activity status",
+                ActivityStatus.NAME,
                 ActivityStatus.valuesList(),
                 internalSpecimen.specimen.getActivityStatus(),
-                "An activity status should be selected",
+                // TR: validation message if activity status not selected
+                i18n.tr("An activity status should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -209,14 +214,14 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
         createCommentSection(contents);
 
-        quantityLabel =
-            widgetCreator.createLabel(contents,
-                "Quantity (ml)");
+        quantityLabel = widgetCreator.createLabel(contents,
+            i18n.tr("Quantity (ml)"));
         quantityLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         quantityTextValidator =
             new DoubleNumberValidator(
-                "Quantity is required.");
+                // TR: validation error message
+                i18n.tr("Quantity is required."));
         quantityText =
             (BgcBaseText) createBoundWidget(contents, BgcBaseText.class,
                 SWT.BORDER, quantityLabel, new String[0],
@@ -229,11 +234,13 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection(Composite contents) {
         commentWidget =
             (BgcBaseText) createBoundWidgetWithLabel(contents,
                 BgcBaseText.class, SWT.MULTI,
-                "Add a comment", null,
+                i18n.trc("label", "Add a comment"),
+                null,
                 commentWrapper, "message",
                 null);
         GridData gd = new GridData();
@@ -243,6 +250,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         commentWidget.setLayoutData(gd);
     }
 
+    @SuppressWarnings("nls")
     private void addSpecimenTypeWidgets(Composite contents) {
         boolean useStudyOnlySourceSpecimens = true;
         SourceSpecimen ss = null;
@@ -256,9 +264,10 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         specimenTypeComboViewer =
             getWidgetCreator().createComboViewer(contents,
-                "Type",
+                SourceSpecimenI18n.Property.SPECIMEN_TYPE.toString(),
                 mapStudySourceSpecimen.values(), ss,
-                "A specimen type should be selected",
+                // TR: validation error message
+                i18n.tr("A specimen type should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -291,8 +300,9 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
 
         final Button allSpecimenTypesCheckBox = new Button(contents, SWT.CHECK);
-        allSpecimenTypesCheckBox
-            .setText("Show only study source specimens");
+        allSpecimenTypesCheckBox.setText(
+            // TR: checkbox text
+            i18n.tr("Show only study source specimens"));
         allSpecimenTypesCheckBox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -307,6 +317,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         allSpecimenTypesCheckBox.setSelection(useStudyOnlySourceSpecimens);
     }
 
+    @SuppressWarnings("nls")
     public void updateWidgetVisibilityAndValues() {
         if (!dialogCreated) return;
 
@@ -337,6 +348,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     public void updateWidgetVisibilityAndValuesNoTimeReset() {
         if (!dialogCreated) return;
 
@@ -377,6 +389,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         return new CommentedSpecimenInfo(new SpecimenInfo());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void resetFields() {
         inventoryIdWidget.setText("");
@@ -390,6 +403,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         updateWidgetVisibilityAndValues();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void copy(Object newModelObject) {
         CommentedSpecimenInfo spec =

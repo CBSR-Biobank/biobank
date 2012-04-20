@@ -26,7 +26,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,6 +39,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -52,26 +53,39 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
 
 public class SendErrorMessageDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SendErrorMessageDialog.class);
 
-    private static final String CONTENT_TYPE = "text/plain"; 
+    @SuppressWarnings("nls")
+    private static final String CONTENT_TYPE = "text/plain";
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY = "mail.smtp.socketFactory.fallback"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_SOCKET_FACTORY_FALLBACK_KEY =
+        "mail.smtp.socketFactory.fallback";
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY = "mail.smtp.socketFactory.class"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_SOCKET_FACTORY_CLASS_KEY =
+        "mail.smtp.socketFactory.class";
 
-    private static final String MAIL_SMTP_SOCKET_FACTORY_PORT_KEY = "mail.smtp.socketFactory.port"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_SOCKET_FACTORY_PORT_KEY =
+        "mail.smtp.socketFactory.port";
 
-    private static final String MAIL_SMTP_PORT_KEY = "mail.smtp.port"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_PORT_KEY = "mail.smtp.port";
 
-    private static final String MAIL_SMTP_AUTH_KEY = "mail.smtp.auth"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_AUTH_KEY = "mail.smtp.auth";
 
-    private static final String MAIL_SMTP_HOST_KEY = "mail.smtp.host"; 
+    @SuppressWarnings("nls")
+    private static final String MAIL_SMTP_HOST_KEY = "mail.smtp.host";
 
-    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory"; 
+    @SuppressWarnings("nls")
+    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
     private EMailDescriptor email;
 
-    private List<AttachmentComposite> attachments;
+    private final List<AttachmentComposite> attachments;
 
     public SendErrorMessageDialog(Shell parentShell) {
         super(parentShell);
@@ -79,14 +93,19 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         attachments = new ArrayList<AttachmentComposite>();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Please describe steps to reproduce the problem. The application error log will be automatically attached.";
+        // TR: dialog title area message
+        return i18n
+            .tr("Please describe steps to reproduce the problem. The application error log will be automatically attached.");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Send Error EMail";
+        // TR: dialog title area title
+        return i18n.tr("Send Error Email");
     }
 
     @Override
@@ -100,6 +119,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         return IMessageProvider.INFORMATION;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         final Composite contents = new Composite(parent, SWT.NONE);
@@ -107,25 +127,32 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
-            "Title", new String[0], email,
-            "title", 
+            // TR: label
+            i18n.tr("email", "Title"),
+            new String[0], email,
+            "title",
             new NonEmptyStringValidator(
-                "Please enter a title"));
+                // TR: validation error message
+                i18n.tr("Please enter a title")));
 
         BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
             contents, BgcBaseText.class, SWT.MULTI,
-            "Description", new String[0],
-            email, "description", new NonEmptyStringValidator( 
-                "Please enter at least a very small comment"));
+            // TR: label
+            i18n.tr("email", "Description"),
+            new String[0],
+            email, "description", new NonEmptyStringValidator(
+                // TR: validation error message
+                i18n.tr("Please enter at least a very small comment")));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         descText.setLayoutData(gd);
 
         Label attLabel = widgetCreator.createLabel(contents,
-            "Attachments");
+            i18n.tr("email", "Attachments"));
         attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-        final Composite attachmentsComposite = new Composite(contents, SWT.NONE);
+        final Composite attachmentsComposite =
+            new Composite(contents, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
@@ -138,13 +165,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         Button addButton = new Button(contents, SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
-        addButton
-            .setToolTipText("Add attachment");
+        // TR: button tooltip
+        addButton.setToolTipText(i18n.tr("email", "Add attachment"));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AttachmentComposite attachmentComposite = new AttachmentComposite(
-                    attachmentsComposite, contents);
+                AttachmentComposite attachmentComposite =
+                    new AttachmentComposite(
+                        attachmentsComposite, contents);
                 contents.layout(true, true);
                 Point shellSize = getShell().getSize();
                 getShell().setSize(shellSize.x,
@@ -154,9 +182,11 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         });
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return "Send Error EMail";
+        // TR: dialog shell title
+        return i18n.tr("Send Error Email");
     }
 
     // private int createAttachmentChooser(Composite parent,
@@ -209,13 +239,16 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
     // return attachmentLine.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
     // }
 
+    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         try {
             sendMail();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Error sending mail", e);
+                // TR: dialog title
+                i18n.tr("Error sending mail"),
+                e);
         }
         super.okPressed();
     }
@@ -239,9 +272,11 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         context.run(true, false, new IRunnableWithProgress() {
+            @SuppressWarnings("nls")
             @Override
             public void run(final IProgressMonitor monitor) {
-                monitor.beginTask("Sending mail...",
+                // TR: progress dialog message
+                monitor.beginTask(i18n.tr("Sending mail..."),
                     IProgressMonitor.UNKNOWN);
                 try {
                     Properties props = new Properties();
@@ -270,15 +305,17 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                 } catch (AuthenticationFailedException afe) {
                     BgcPlugin
                         .openAsyncError(
-                            "Authentification Error",
-                            NLS.bind(
-                                "Wrong authentification for {0}",
+                            // TR: dialog title
+                            i18n.tr("Authentification Error"),
+                            // TR: dialog message
+                            i18n.tr("Wrong authentification for {0}",
                                 email.getServerUsername()));
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        "Error sending mail", e);
+                        // TR: dialog title
+                        i18n.tr("Error sending mail"), e);
                     monitor.setCanceled(true);
                     return;
                 }
@@ -286,6 +323,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         });
     }
 
+    @SuppressWarnings("nls")
     private Message getEmailMessage(Session session) throws Exception {
         MimeMessage message = new MimeMessage(session);
         message.setSubject(email.getTitle());
@@ -298,14 +336,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
         // create and fill the first message part
         MimeBodyPart mbp1 = new MimeBodyPart();
-        String text = email.getDescription() + "\n\n------"; 
+        String text = email.getDescription() + "\n\n------";
         if (SessionManager.getInstance().isConnected()) {
-            text += "\nCreated by user " 
+            text += "\nCreated by user "
                 + SessionManager.getInstance().getSession().getUser()
                     .getLogin();
         }
 
-        text += "\nSent from BioBank Java Client, version " 
+        text += "\nSent from BioBank Java Client, version "
             + BiobankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);
@@ -339,13 +377,14 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     private class AttachmentComposite extends BgcBaseWidget {
 
-        private BgcBaseText attachmentText;
+        private final BgcBaseText attachmentText;
 
-        private Button browseButton;
+        private final Button browseButton;
 
-        private Button removeButton;
+        private final Button removeButton;
 
         private String file;
 
@@ -365,13 +404,15 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
             attachmentText = (BgcBaseText) widgetCreator.createWidget(this,
                 BgcBaseText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
-            browseButton.setText("Browse");
+            // TR: button
+            browseButton.setText(i18n.tr("file", "Browse"));
             browseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     FileDialog fd = new FileDialog(browseButton.getShell(),
                         SWT.OPEN);
-                    fd.setText("Select attachment");
+                    // TR: dialog title
+                    fd.setText(i18n.tr("Select attachment"));
                     file = fd.open();
                     if (file != null) {
                         attachmentText.setText(file);
@@ -381,14 +422,15 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
             removeButton = new Button(this, SWT.PUSH);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DELETE));
+            // TR: tooltip
             removeButton
-                .setToolTipText("Remove this attachment");
+                .setToolTipText(i18n.tr("Remove this attachment"));
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     int height = AttachmentComposite.this.computeSize(
                         SWT.DEFAULT, SWT.DEFAULT).y;
-                    attachmentText.setText(""); 
+                    attachmentText.setText("");
                     AttachmentComposite.this.setVisible(false);
                     GridData gd = (GridData) AttachmentComposite.this
                         .getLayoutData();

@@ -6,17 +6,17 @@ import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
 @SuppressWarnings("nls")
-public class GroupI18n {
+public class ContainerI18n {
     private static final Bundle bundle = new CommonBundle();
 
     public static final Trnc NAME = bundle.trnc(
         "model",
-        "Group",
-        "Groups");
+        "Container",
+        "Containers");
 
     public static class Property {
-        public static final LString NAME = bundle.trc(
+        public static final LString PRODUCT_BARCODE = bundle.trc(
             "model",
-            "Name").format();
+            "Product Barcode").format();
     }
 }

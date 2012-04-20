@@ -5,14 +5,20 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class NewServerDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(MoveSpecimensToDialog.class);
 
-    private static final String TITLE = "New Server";
+    @SuppressWarnings("nls")
+    // TR: dialog title
+    private static final String TITLE = i18n.tr("New Server");
 
     protected String serverAddress;
 
@@ -20,9 +26,11 @@ public class NewServerDialog extends BgcBaseDialog {
         super(parentShell);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Enter the domain-name or IP address of the server:";
+        // TR: dialog title area message
+        return i18n.tr("Enter the domain-name or IP address of the server:");
     }
 
     @Override
@@ -30,6 +38,7 @@ public class NewServerDialog extends BgcBaseDialog {
         return TITLE;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite area = new Composite(parent, SWT.NONE);
@@ -38,11 +47,14 @@ public class NewServerDialog extends BgcBaseDialog {
         area.setLayout(layout);
         area.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            "Server field cannot be empty");
+            // TR: validation error message
+            i18n.tr("Server field cannot be empty"));
         BgcBaseText textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
             BgcBaseText.class, SWT.NONE,
-            "Address", new String[0], this,
-            "serverAddress", validator); 
+            // TR: label
+            i18n.trc("url", "Address"),
+            new String[0], this,
+            "serverAddress", validator);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;

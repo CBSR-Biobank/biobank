@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-20 11:59-0600\n"
+"POT-Creation-Date: 2012-04-20 14:46-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,8 +18,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/clinic/ClinicSaveAction.java:29
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/clinic/ClinicSaveAction.java:31
 #, java-format
+msgctxt "exception"
 msgid ""
 "Cannot delete contact {0} because it is still associated with other studies."
 msgstr ""
@@ -491,11 +492,8 @@ msgid "Center"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:26
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ClinicI18n.java:12
 msgid "Clinic"
-msgid_plural "Clinics"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:27
 msgid "Collection Event"
@@ -507,11 +505,8 @@ msgid "Comment"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:29
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:13
 msgid "Contact"
-msgid_plural "Contacts"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:30
 msgid "Container"
@@ -566,11 +561,8 @@ msgid "Origin Information"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:43
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/PatientI18n.java:12
 msgid "Patient"
-msgid_plural "Patients"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:44
 msgid "Permission"
@@ -601,18 +593,12 @@ msgid "Role"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:51
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:13
 msgid "Shipment Information"
-msgid_plural "Shipment Information"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:52
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShippingMethodI18n.java:12
 msgid "Shipping Method"
-msgid_plural "Shipping Methods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:53
 msgid "Site"
@@ -623,11 +609,8 @@ msgid "Source Specimen"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:55
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/SpecimenI18n.java:13
 msgid "Specimen"
-msgid_plural "Specimens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Name.java:56
 msgid "Specimen Position"
@@ -909,69 +892,158 @@ msgstr ""
 msgid "Label Printing"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:13
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:14
+msgctxt "model"
 msgid "Abstract Position"
 msgid_plural "Abstract Positions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:16
-msgctxt "AbstractPosition Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:20
+msgctxt "model"
 msgid "Row"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:17
-msgctxt "AbstractPosition Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/AbstractPositionI18n.java:23
+msgctxt "model"
 msgid "Column"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:17
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ClinicI18n.java:13
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:20
+msgctxt "model"
+msgid "Clinic"
+msgid_plural "Clinics"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:14
+msgctxt "model"
+msgid "Contact"
+msgid_plural "Contacts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:23
+msgctxt "model"
 msgid "Email Address"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:18
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:26
+msgctxt "model"
 msgid "Fax Number"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:19
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:29
+msgctxt "model"
 msgid "Title"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:20
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:32
+msgctxt "model"
 msgid "Mobile Number"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:21
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:35
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/GroupI18n.java:18
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/RoleI18n.java:20
+msgctxt "model"
 msgid "Name"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:22
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:38
+msgctxt "model"
 msgid "Office Number"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:23
-msgctxt "Contact Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ContactI18n.java:41
+msgctxt "model"
 msgid "Pager Number"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:16
-msgctxt "ShipmentInfo Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/GroupI18n.java:13
+msgctxt "model"
+msgid "Group"
+msgid_plural "Groups"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/PatientI18n.java:13
+msgctxt "model"
+msgid "Patient"
+msgid_plural "Patients"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/RoleI18n.java:14
+msgctxt "model"
+msgid "Role"
+msgid_plural "Roles"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:14
+msgctxt "model"
+msgid "Shipment Information"
+msgid_plural "Shipment Information"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:20
+msgctxt "model"
 msgid "Time Packed"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:18
-msgctxt "ShipmentInfo Property"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:23
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShippingMethodI18n.java:13
+msgctxt "model"
+msgid "Shipping Method"
+msgid_plural "Shipping Methods"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/ShipmentInfoI18n.java:26
+msgctxt "model"
 msgid "Waybill"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/SpecimenI18n.java:16
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/SpecimenI18n.java:14
+msgctxt "model"
+msgid "Specimen"
+msgid_plural "Specimens"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/SpecimenI18n.java:20
+msgctxt "model"
 msgid "Inventory Id"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/UserI18n.java:14
+msgctxt "model"
+msgid "User"
+msgid_plural "Users"
+msgstr[0] ""
+msgstr[1] ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/UserI18n.java:20
+msgctxt "model"
+msgid "Email"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/UserI18n.java:23
+msgctxt "model"
+msgid "Full Name"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/UserI18n.java:26
+msgctxt "model"
+msgid "Login"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/i18n/UserI18n.java:29
+msgctxt "model"
+msgid "Receive bulk emails"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:12
@@ -1415,6 +1487,35 @@ msgstr ""
 msgid "Error displaying available actions"
 msgstr ""
 
+#. TR: add source specimen to collection event dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:116
+msgctxt "dialog title"
+msgid "Add specimen"
+msgstr ""
+
+#. TR: edit source specimen from collection event dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:119
+msgctxt "dialog title"
+msgid "Edit specimen"
+msgstr ""
+
+#. TR: add source specimen to collection event dialog title area
+#. message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:134
+msgid "Add a specimen to a collection event"
+msgstr ""
+
+#. TR: edit source specimen from collection event dialog title area
+#. message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:138
+msgid "Edit a specimen in a collection event"
+msgstr ""
+
+#. TR: validation error message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:164
+msgid "Inventory ID is empty or already present"
+msgstr ""
+
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:61
 msgid "Scanning specimens"
 msgstr ""
@@ -1763,63 +1864,90 @@ msgstr ""
 msgid "Enter server name and login details."
 msgstr ""
 
+#. validation error when server text box is empty
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:191
+msgid "Server field cannot be empty"
+msgstr ""
+
+#. server combo box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:194
+msgid "&Server"
+msgstr ""
+
+#. validation error when username text box is empty
+#. TR: error dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:218
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:367
+msgid "Username field cannot be empty"
+msgstr ""
+
+#. validation error when password text box is empty
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:221
+msgid "Password field cannot be empty"
+msgstr ""
+
+#. TR: login dialog user name text box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:227
+msgid "&User Name"
+msgstr ""
+
+#. TR: login dialog checkbox label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:241
+msgid "Connect in super administrator mode"
+msgstr ""
+
 #. TR: error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:335
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:347
 msgid "Invalid Server URL"
 msgstr ""
 
 #. TR: error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:337
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:349
 msgid "Please enter a valid server URL."
 msgstr ""
 
 #. TR: error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:353
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:365
 msgid "Invalid User Name"
 msgstr ""
 
-#. TR: error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:355
-msgid "Username field cannot be empty"
-msgstr ""
-
 #. error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:389
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:401
 msgid "Super administrator"
 msgstr ""
 
 #. error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:391
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:403
 msgid "You don't have rights to connect as super administrator"
 msgstr ""
 
 #. error dialog title
 #. TR: error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:407
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:512
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:419
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:524
 msgid "Error while opening main perspective"
 msgstr ""
 
 #. TR: error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:468
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:477
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:480
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:489
 msgid "Problem getting user working centers"
 msgstr ""
 
 #. TR: error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:479
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:491
 msgid ""
 "No working center has been found for this user. Check with your manager or "
 "application administrator for user rights."
 msgstr ""
 
 #. TR: information dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:495
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:507
 msgid "Super administrator mode"
 msgstr ""
 
 #. TR: information dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:497
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:509
 msgid ""
 "No working center has been found or selected for this user. You are super "
 "administrator, so you will be logged on with no working center. Only non "
@@ -1827,16 +1955,496 @@ msgid ""
 msgstr ""
 
 #. error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:521
+#. TR: select working center title area title
+#. TR: select working center shell title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:533
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:46
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:53
 msgid "Working center selection"
 msgstr ""
 
 #. error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:523
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:535
 msgid "You need to select the center you want to work with."
+msgstr ""
+
+#. TR: select working center title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:39
+msgid "Choose the center you will work with."
+msgstr ""
+
+#. TR: no center selection combo box option
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:65
+msgid "-- no center selection --"
+msgstr ""
+
+#. TR: select working center combo box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:70
+msgid "Available centers"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/AbstractSecurityEditDialog.java:26
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:103
+msgctxt "Button"
+msgid "Save"
+msgstr ""
+
+#. TR: add group dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:67
+msgid "Add Group"
+msgstr ""
+
+#. TR: add group dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:69
+msgid "Add a new group"
+msgstr ""
+
+#. TR: edit group dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:72
+msgid "Edit Group"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:75
+msgid "Modify an existing group's information"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:106
+msgctxt "Group Edit Dialog Tab Name"
+msgid "General"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:109
+msgctxt "Group Edit Dialog Tab Name"
+msgid "Roles and Permissions"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:112
+msgctxt "Group Edit Dialog Tab Name"
+msgid "Users"
+msgstr ""
+
+#. TR: validation message if group name not entered
+#. TR: validation message when a role name is not entered
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:125
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RoleEditDialog.java:97
+msgid "A valid name is required."
+msgstr ""
+
+#. TR: list of available users to choose from
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:150
+msgid "Available users"
+msgstr ""
+
+#. TR: list of available users chosen
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupEditDialog.java:152
+msgid "Selected users"
+msgstr ""
+
+#. TR: groups page title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupsPage.java:46
+msgid "Groups"
+msgstr ""
+
+#. TR: Group name copy prefix, e.g. "Copy of Admin Group"
+#. TR: prefix of a role name when copying another role.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupsPage.java:86
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RolesPage.java:72
+msgid "Copy of "
+msgstr ""
+
+#. TR: information dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupsPage.java:144
+msgid "Group Added"
+msgstr ""
+
+#. TR: information dialog meessage
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/GroupsPage.java:146
+#, java-format
+msgid "Successfully added new group {0}."
+msgstr ""
+
+#. TR: membership domain page title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:34
+msgid "Centers and Studies"
+msgstr ""
+
+#. TR: membership domain page title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:59
+msgid "Where the user (or group) is allowed access"
+msgstr ""
+
+#. TR: GUI group text
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:83
+msgid "Centers"
+msgstr ""
+
+#. TR: validation message if no center is selected
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:88
+msgid "Select at least one center"
+msgstr ""
+
+#. TR: GUI group text
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:92
+msgid "Studies"
+msgstr ""
+
+#. TR: validation message if no study is selected
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:97
+msgid "Select at least one study"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:130
+msgctxt "Membership Dialog Checkbox"
+msgid "All Centers"
+msgstr ""
+
+#. TR: all centers checkbox tooltip
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:133
+msgid "Allow access to all current and future centers"
+msgstr ""
+
+#. label for centers that can be selected from a multi-combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:156
+msgid "Available Centers"
+msgstr ""
+
+#. label for centers that have be selected from a multi-combo box
+#. label for roles that have be selected from a multi-combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:158
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:276
+msgid "Selected Centers"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:174
+msgctxt "Membership Dialog Checkbox"
+msgid "All Studies"
+msgstr ""
+
+#. TR: all studies checkbox tooltip
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:177
+msgid "Allow access to all current and future studies"
+msgstr ""
+
+#. label for Studies that can be selected from a multi-combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:200
+msgid "Available Studies"
+msgstr ""
+
+#. label for Studies that have be selected from a multi-combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipDomainPage.java:202
+msgid "Selected Studies"
+msgstr ""
+
+#. TR: add membership wizard title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipEditWizard.java:87
+msgid "Add Membership"
+msgstr ""
+
+#. TR: edit membership wizard title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipEditWizard.java:90
+msgid "Edit Membership"
+msgstr ""
+
+#. TR: membership permissions page dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:40
+msgid "Roles and Permissions"
+msgstr ""
+
+#. TR: membership permissions page dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:67
+msgid "What the user (or group) is allowed to do"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:97
+msgctxt "Membership Permissions Dialog Group"
+msgid "Roles"
+msgstr ""
+
+#. TR: validation message if no permissions are selected
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:106
+msgid "Select at least one permission or role (with permissions) to grant"
+msgstr ""
+
+#. TR: user manager checkbox label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:212
+msgid "Can create users"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:217
+msgid ""
+"Can manage, create, edit, and delete users and groups (for the previously "
+"selected centers and studies)."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:239
+msgid "Grant all permissions and roles"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:244
+msgid "Grant all current and future roles and permissions"
+msgstr ""
+
+#. label for roles that can be selected from a multi-combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:274
+msgid "Available roles"
+msgstr ""
+
+#. TR: add a role dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RoleEditDialog.java:53
+msgid "Add Role"
+msgstr ""
+
+#. TR: add a role dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RoleEditDialog.java:55
+msgid "Add a new role"
+msgstr ""
+
+#. TR: edit a role dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RoleEditDialog.java:58
+msgid "Edit Role"
+msgstr ""
+
+#. TR: edit a role dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RoleEditDialog.java:60
+msgid "Modify an existing role's information"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RolesPage.java:33
+msgctxt "Roles Page Title"
+msgid "Roles"
+msgstr ""
+
+#. TR: information dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RolesPage.java:114
+msgid "Role added"
+msgstr ""
+
+#. TR: information dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/RolesPage.java:116
+#, java-format
+msgid "Successfully added new role {0}"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/SecurityWizardDialog.java:27
+msgctxt "User, Role, and Group Wizard save/ finish button name"
+msgid "Save"
+msgstr ""
+
+#. TR: error dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/TmpUtil.java:49
+msgid "Unable to Save User"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:68
+#, java-format
+msgid "Passwords must be at least {0} characters long."
+msgstr ""
+
+#. TR: add user dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:111
+msgid "Add User"
+msgstr ""
+
+#. TR: edit user dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:114
+msgid "Edit User"
+msgstr ""
+
+#. TR: add user dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:122
+msgid "Add a new user"
+msgstr ""
+
+#. TR: edit user dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:125
+msgid "Modify an existing user's information"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:145
+msgctxt "User Edit Dialog Tab Name"
+msgid "General"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:148
+msgctxt "User Edit Dialog Tab Name"
+msgid "Roles and Permissions"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:151
+msgctxt "User Edit Dialog Tab Name"
+msgid "Groups"
+msgstr ""
+
+#. TR: validation error message if login name not entered
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:179
+msgid "A valid login name is required."
+msgstr ""
+
+#. TR: validation error message if full name not entered
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:187
+msgid "Full name of this user is required"
+msgstr ""
+
+#. TR: validation error message if email not entered
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:195
+msgid "A valid email is required"
+msgstr ""
+
+#. TR: label for list of available groups to choose from combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:239
+msgid "Available groups"
+msgstr ""
+
+#. TR: label for list of groups chosen to choose from combo box
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:241
+msgid "Selected groups"
+msgstr ""
+
+#. TR: information dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:310
+msgid "User Information Saved"
+msgstr ""
+
+#. TR: information dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:312
+msgid ""
+"Your information has been successfully updated. You will be logged out and "
+"have to reconnect."
+msgstr ""
+
+#. TR: user password text box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:346
+msgid "New Password"
+msgstr ""
+
+#. TR: user password text box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:348
+msgid "Password"
+msgstr ""
+
+#. TR: confirm user password text box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:366
+msgid "Re-Type New Password"
+msgstr ""
+
+#. TR: confirm user password text box label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:368
+msgid "Re-Type Password"
+msgstr ""
+
+#. TR: validaton error message if two entered passwords do
+#. not match
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserEditDialog.java:374
+msgid "The passwords entered do not match."
+msgstr ""
+
+#. TR: user management dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserManagementDialog.java:34
+msgid "Select the security information to display"
+msgstr ""
+
+#. TR: user management dialog title area title
+#. TR: user management dialog shell title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserManagementDialog.java:41
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UserManagementDialog.java:48
+msgid "User/Group Management"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UsersPage.java:47
+msgctxt "users display page title"
+msgid "Users"
+msgstr ""
+
+#. TR: information dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UsersPage.java:146
+msgid "User Added"
+msgstr ""
+
+#. TR: information dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/UsersPage.java:148
+#, java-format
+msgid "Successfully added new user {0}."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/CsvDataExporter.java:24
+msgctxt "Exporter Type Name"
+msgid "Export CSV"
+msgstr ""
+
+#. exception message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/GuiDataExporter.java:46
+msgid "no results to export"
+msgstr ""
+
+#. TR: progress monitor title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/GuiDataExporter.java:62
+msgid "Exporting data..."
+msgstr ""
+
+#. TR: error dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/GuiDataExporter.java:69
+msgid "Error Exporting Data"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/GuiDataExporter.java:99
+msgctxt "default filename for output, without suffix"
+msgid "output"
+msgstr ""
+
+#. TR: export file dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/GuiDataExporter.java:119
+msgid "Export as"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PdfDataExporter.java:29
+msgctxt "Exporter Type Name"
+msgid "Export PDF"
+msgstr ""
+
+#. data export exception message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PdfDataExporter.java:45
+msgid ""
+"Results exceed 1000 rows and cannot be exported. Please export to CSV or "
+"refine your search."
+msgstr ""
+
+#. TR: error dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PdfDataExporter.java:73
+msgid "Error saving to PDF"
+msgstr ""
+
+#. TR: error dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PdfDataExporter.java:83
+msgid "Error Logging Export"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PrintPdfDataExporter.java:23
+msgctxt "Exporter Type Name"
+msgid "Print"
+msgstr ""
+
+#. TR: error title dialog
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PrintPdfDataExporter.java:50
+msgid "Error printing PDF"
+msgstr ""
+
+#. TR: error title dialog
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/export/PrintPdfDataExporter.java:59
+msgid "Error Logging Print"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyViewForm.java:88
 #, java-format
 msgid "Study {0}"
+msgstr ""
+
+#. TR: error dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/logs/LogQuery.java:125
+msgid "Unable to retrieve logs"
+msgstr ""
+
+#. exception error message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/logs/LogQuery.java:160
+#, java-format
+msgid "Search Query key: {0} does not exist."
 msgstr ""
