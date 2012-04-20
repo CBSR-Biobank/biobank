@@ -9,6 +9,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
@@ -16,16 +18,22 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.pdf" }; 
+    private static final I18n i18n = I18nFactory
+        .getI18n(PdfDataExporter.class);
 
+    @SuppressWarnings("nls")
+    private static final String[] VALID_EXTS = { "*.pdf" };
+
+    @SuppressWarnings("nls")
     public PdfDataExporter() {
-        super("Export PDF");
+        super(i18n.trc("Exporter Type Name", "Export PDF"));
     }
 
     protected PdfDataExporter(String name) {
         super(name);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void canExport(Data data) throws DataExportException {
         super.canExport(data);
@@ -33,11 +41,13 @@ public class PdfDataExporter extends GuiDataExporter {
         if (data.getRows() instanceof AbstractBiobankListProxy) {
             if (data.getRows().size() < 0 || data.getRows().size() >= 1000) {
                 throw new DataExportException(
-                    "Results exceed 1000 rows and cannot be exported. Please export to CSV or refine your search.");
+                    // data export exception message
+                    i18n.tr("Results exceed 1000 rows and cannot be exported. Please export to CSV or refine your search."));
             }
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void export(Data data, ITableLabelProvider labelProvider,
         IProgressMonitor monitor) throws DataExportException {
@@ -58,7 +68,9 @@ public class PdfDataExporter extends GuiDataExporter {
                 maps, true);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error saving to PDF",
+            BgcPlugin.openAsyncError(
+                // TR: error dialog title
+                i18n.tr("Error saving to PDF"),
                 e);
             return;
         }
@@ -67,7 +79,8 @@ public class PdfDataExporter extends GuiDataExporter {
                 data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Error Logging Export", e);
+                // TR: error dialog title
+                i18n.tr("Error Logging Export"), e);
         }
     }
 
