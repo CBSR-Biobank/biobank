@@ -505,6 +505,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             palletScanManagement.scanTubeAlone(e);
     }
 
+    @SuppressWarnings("nls")
     protected void postprocessScanTubeAlone(PalletCell palletCell)
         throws Exception {
         appendLog(NLS.bind(
@@ -550,6 +551,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         palletScanManagement.toggleScanTubeAloneMode();
     }
 
+    @SuppressWarnings("nls")
     protected void createScanTubeAloneButton(Composite parent) {
         scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE);
         GridData gd = new GridData();
@@ -609,6 +611,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
      * go through cells retrieved from scan, set status and update the types
      * combos components
      */
+    @SuppressWarnings("nls")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         // conversion for server side call
@@ -637,10 +640,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
-                    .subTask(NLS
-                        .bind(
-                            "Processing position {0}",
-                            ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                    .subTask(
+                    // TR: progress monitor message
+                    i18n.tr("Processing position {0}",
+                        ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing

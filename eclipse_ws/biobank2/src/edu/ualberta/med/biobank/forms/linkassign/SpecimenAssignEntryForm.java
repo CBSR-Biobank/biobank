@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -60,6 +62,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -70,7 +74,10 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenAssignEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm";
 
@@ -79,19 +86,25 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private static Mode mode = Mode.MULTIPLE;
 
+    @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
 
+    @SuppressWarnings("nls")
     private static final String NEW_SINGLE_POSITION_BINDING =
         "newSinglePosition-binding";
 
+    @SuppressWarnings("nls")
     private static final String OLD_SINGLE_POSITION_BINDING =
         "oldSinglePosition-binding";
 
+    @SuppressWarnings("nls")
     private static final String PRODUCT_BARCODE_BINDING =
         "productBarcode-binding";
 
+    @SuppressWarnings("nls")
     private static final String LABEL_BINDING = "label-binding";
 
+    @SuppressWarnings("nls")
     private static final String PALLET_TYPES_BINDING = "palletType-binding";
 
     protected static boolean useScanner = true;
@@ -111,11 +124,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean positionTextModified;
     private BgcBaseText singleTypeText;
     private BgcBaseText singleCollectionDateText;
-    private WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
+    private final WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
     // for multiple specimens assign
-    private ContainerWrapper currentMultipleContainer;
+    private final ContainerWrapper currentMultipleContainer;
     protected boolean palletproductBarcodeTextModified;
     private NonEmptyStringValidator productBarcodeValidator;
     protected boolean isModifyingMultipleFields;
@@ -153,6 +166,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple. initialize pallet
      */
+    @SuppressWarnings("nls")
     private void initPalletValues() {
         try {
             currentMultipleContainer.initObjectWith(new ContainerWrapper(
@@ -167,9 +181,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getActivityTitle() {
-        return "Specimen Assign";
+        // TR: dialog title
+        return i18n.tr("Specimen Assign");
     }
 
     @Override
@@ -177,9 +193,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return logger;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getFormTitle() {
-        return "Assign position or move specimens";
+        // TR: form title
+        return i18n.tr("Assign position or move specimens");
     }
 
     @Override
@@ -200,9 +218,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             setFirstControl(useScannerButton);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getOkMessage() {
-        return "Assign position to specimens or move specimens";
+        // TR: title area message
+        return i18n.tr("Assign position to specimens or move specimens");
     }
 
     @Override
@@ -210,11 +230,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return ID;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createCommonFields(Composite commonFieldsComposite) {
         BgcBaseText siteLabel = createReadOnlyLabelledField(
             commonFieldsComposite, SWT.NONE,
-            "Site");
+            // TR: label
+            i18n.tr("Site"));
         siteLabel.setText(SessionManager.getUser().getCurrentWorkingCenter()
             .getNameShort());
     }
@@ -224,6 +246,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return 450;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createSingleFields(Composite parent) {
         Composite fieldsComposite = toolkit.createComposite(parent);
@@ -240,11 +263,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // check box to say it is a cabinet specimen or not
         Label cabinetCheckButtonLabel = widgetCreator.createLabel(
             fieldsComposite,
-            "Cabinet specimen");
+            // TR: label
+            i18n.tr("Cabinet specimen"));
         cabinetCheckButton =
             toolkit.createButton(fieldsComposite, "", SWT.CHECK);
         cabinetCheckButton
-            .setToolTipText("Old cabinet specimen with 4 letters were transformed to 5 letters (C+4letters). ");
+            // TR: tooltip
+            .setToolTipText(i18n
+                .tr("Old cabinet specimen with 4 letters were transformed to 5 letters (C+4letters)."));
         cabinetCheckButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -272,7 +298,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // inventoryID
         Label inventoryIdLabel = widgetCreator.createLabel(fieldsComposite,
-            "Inventory ID");
+            Specimen.Property.INVENTORY_ID.toString());
         inventoryIdText = (BgcBaseText) createWidget(fieldsComposite,
             BgcBaseText.class, SWT.NONE, "");
         inventoryIdText.addKeyListener(textFieldKeyListener);
@@ -285,7 +311,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     } catch (Exception ex) {
                         BgcPlugin
                             .openError(
-                                "Move - specimen error",
+                                // TR: dialog title
+                                i18n.tr("Move - specimen error"),
                                 ex);
                         focusControl(inventoryIdText);
 
@@ -302,13 +329,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
         AbstractValidator inventoryValidator = new AbstractValidator(
-            "Enter a valid inventory ID") {
+            // TR: validation error message
+            i18n.tr("Enter a valid inventory ID")) {
             @Override
             public IStatus validate(Object value) {
                 if ((Boolean) foundSpecNull.getValue()) {
                     showDecoration();
                     return ValidationStatus
-                        .error("Enter a valid inventory ID");
+                        // TR: validation error message
+                        .error(i18n.tr("Enter a valid inventory ID"));
                 }
                 hideDecoration();
                 return ValidationStatus.ok();
@@ -324,12 +353,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         singleTypeText = (BgcBaseText) createLabelledWidget(fieldsComposite,
             BgcBaseText.class, SWT.NONE,
-            "Type");
+            // TR: label
+            i18n.tr("Type"));
         singleTypeText.setEnabled(false);
 
         singleCollectionDateText = (BgcBaseText) createLabelledWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
-            "Collection date");
+            // TR: label
+            i18n.tr("Collection date"));
         singleCollectionDateText.setEnabled(false);
 
         createSinglePositionFields(fieldsComposite);
@@ -340,6 +371,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Single assign. Search the specimen, if find it, display related
      * information
      */
+    @SuppressWarnings("nls")
     protected void retrieveSingleSpecimenData() throws Exception {
         String inventoryId = inventoryIdText.getText();
         singleTypeText.setText("");
@@ -365,21 +397,24 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         foundSpecNull.setValue(false);
         if (foundSpecimen == null) {
             foundSpecNull.setValue(true);
-            throw new Exception(NLS.bind(
-                "No specimen found with inventoryId {0}",
-                singleSpecimen.getInventoryId()));
+            throw new Exception(
+                // TR: exception message
+                i18n.tr("No specimen found with inventoryId {0}",
+                    singleSpecimen.getInventoryId()));
         }
 
         singleSpecimen.initObjectWith(foundSpecimen);
         if (singleSpecimen.isUsedInDispatch()) {
             foundSpecNull.setValue(true);
             throw new Exception(
-                "This specimen is currently in transit in a dispatch.");
+                // TR: exception message
+                i18n.tr("This specimen is currently in transit in a dispatch."));
         }
         if (!SessionManager.getUser().getCurrentWorkingCenter()
             .equals(singleSpecimen.getCurrentCenter())) {
             foundSpecNull.setValue(true);
-            throw new Exception(NLS.bind(
+            throw new Exception(i18n.tr(
+                // TR: exception message
                 "This specimen is currently in center ''{0}''.",
                 singleSpecimen.getCurrentCenter().getNameShort()));
         }
@@ -389,7 +424,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         String positionString = singleSpecimen.getPositionString(true, false);
         if (positionString == null) {
             displayOldSingleFields(false);
-            positionString = "none";
+            // TR: text box text
+            positionString = i18n.trc("position string", "none");
             focusControl(newSinglePositionText);
         } else {
             displayOldSingleFields(true);
@@ -408,10 +444,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Single assign: Some fields will be displayed only if the specimen has
      * already a position
      */
+    @SuppressWarnings("nls")
     private void createSinglePositionFields(Composite fieldsComposite) {
         // for move mode: display old position retrieved from database
         oldSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            "Old position");
+            // TR: label
+            i18n.tr("Old position"));
         oldSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
             oldSinglePositionLabel, new String[0], null, null);
@@ -423,10 +461,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // nothing is wrong with the specimen
         oldSinglePositionCheckLabel = widgetCreator.createLabel(
             fieldsComposite,
-            "Old position check");
+            // TR: label
+            i18n.tr("Old position check"));
         oldSinglePositionCheckValidator =
             new AbstractValidator(
-                "Enter correct old position") {
+                // TR: validation error message
+                i18n.tr("Enter correct old position")) {
                 @Override
                 public IStatus validate(Object value) {
                     if (value != null && !(value instanceof String)) {
@@ -461,9 +501,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // for all modes: position to be assigned to the specimen
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            "Position");
+            // TR: label
+            i18n.tr("Position"));
         newSinglePositionValidator = new StringLengthValidator(4,
-            "Enter a position");
+            // TR: label
+            i18n.tr("Enter a position"));
         displayOldSingleFields(false);
         newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
@@ -507,6 +549,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Single assign: show or hide old positions fields
      */
+    @SuppressWarnings("nls")
     private void displayOldSingleFields(boolean displayOld) {
         widgetCreator.setBinding(OLD_SINGLE_POSITION_BINDING, displayOld);
         widgetCreator.showWidget(oldSinglePositionLabel, displayOld);
@@ -514,18 +557,17 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.showWidget(oldSinglePositionCheckLabel, displayOld);
         widgetCreator.showWidget(oldSinglePositionCheckText, displayOld);
         if (displayOld) {
-            newSinglePositionLabel
-                .setText("New position"
-                    + ":");
+            // TR: label
+            newSinglePositionLabel.setText(i18n.tr("New position:"));
         } else {
-            newSinglePositionLabel
-                .setText("Position"
-                    + ":");
+            // TR: label
+            newSinglePositionLabel.setText(i18n.tr("Position:"));
             oldSinglePositionCheckText.setText(oldSinglePositionText.getText());
         }
         page.layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createMultipleFields(Composite parent)
         throws ApplicationException {
@@ -542,13 +584,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         productBarcodeValidator =
             new NonEmptyStringValidator(
-                "Enter product barcode");
+                // TR: validation error message
+                i18n.tr("Enter product barcode"));
         palletLabelValidator =
             new NonEmptyStringValidator(
-                "Enter label");
+                // TR: validation error message
+                i18n.tr("Enter label"));
 
         widgetCreator.createLabel(multipleOptionsFields,
-            "Use flatbed scanner");
+            // TR: label
+            i18n.tr("Use flatbed scanner"));
         useScannerButton =
             toolkit.createButton(multipleOptionsFields, "", SWT.CHECK);
         useScannerButton.addSelectionListener(new SelectionAdapter() {
@@ -560,7 +605,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         palletproductBarcodeLabel = widgetCreator.createLabel(
             multipleOptionsFields,
-            "Container product barcode");
+            // TR: label
+            i18n.tr("Container product barcode"));
         palletproductBarcodeText = (BgcBaseText) createBoundWidget(
             multipleOptionsFields, BgcBaseText.class, SWT.NONE,
             palletproductBarcodeLabel, null, currentMultipleContainer,
@@ -601,7 +647,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         palletPositionText = (BgcBaseText) createBoundWidgetWithLabel(
             multipleOptionsFields, BgcBaseText.class, SWT.NONE,
-            "Container label", null,
+            // TR: label
+            i18n.tr("Container label"), null,
             currentMultipleContainer, ContainerPeer.LABEL.getName(),
             palletLabelValidator, LABEL_BINDING);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -653,6 +700,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         createScanButton(parent);
     }
 
+    @SuppressWarnings("nls")
     private boolean checkMultipleContainerPosition() {
         checkingMultipleContainerPosition = true;
         initContainersFromPosition(palletPositionText, true, null);
@@ -683,8 +731,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         .getProductBarcode())) {
                         BgcPlugin
                             .openError(
-                                "Position error",
-                                NLS.bind(
+                                // TR: dialog title
+                                i18n.tr("Position error"),
+                                // TR: dialog message
+                                i18n.tr(
                                     "There is already a different pallet (product barcode = {0}) in this position of site {1}",
                                     barcodeAtPosition, currentMultipleContainer
                                         .getSite().getNameShort()));
@@ -721,8 +771,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     } else {
                         BgcPlugin
                             .openError(
-                                "Error",
-                                "Container found but can't hold specimens");
+                                // TR: dialog title
+                                i18n.tr("Error"),
+                                // TR: dialog message
+                                i18n.tr("Container found but can't hold specimens"));
                         return false;
                     }
                 }
@@ -742,8 +794,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             if (possibleTypes.size() == 0) {
                 BgcPlugin
                     .openAsyncError(
-                        "Containers Error",
-                        "No container type that can hold specimens has been found (if scanner is used, the container should be of size 8*12)");
+                        // TR: dialog title
+                        i18n.tr("Containers Error"),
+                        // TR: dialog message
+                        i18n.tr("No container type that can hold specimens has been found (if scanner is used, the container should be of size 8*12)"));
                 typeSelection = null;
                 return false;
             }
@@ -755,7 +809,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         } catch (Exception ex) {
             BgcPlugin
                 .openError(
-                    "Values validation",
+                    // TR: dialog title
+                    i18n.tr("Values validation"),
                     ex);
             appendLog(NLS.bind(
                 "ERROR: {0}",
@@ -783,6 +838,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return palletTypes;
     }
 
+    @SuppressWarnings("nls")
     protected boolean checkMultipleScanBarcode() {
         try {
             initWithProduct = false;
@@ -797,8 +853,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!palletFoundWithProductBarcode.isPallet96()) {
                     BgcPlugin
                         .openAsyncError(
-                            "Values validation",
-                            "A container with this barcode exists but is not a 8*12 container.");
+                            // TR: dialog title
+                            i18n.tr("Values validation"),
+                            // TR: dialog message
+                            i18n.tr("A container with this barcode exists but is not a 8*12 container."));
                     return false;
                 }
                 if (!palletPositionText.getText().isEmpty()
@@ -808,8 +866,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     // the pallet retrieved
                     BgcPlugin
                         .openAsyncError(
-                            "Values validation",
-                            NLS.bind(
+                            // TR: dialog title
+                            i18n.tr("Values validation"),
+                            // TR: dialog message
+                            i18n.tr(
                                 "A pallet with barcode {0} is already used in position {1}.",
                                 palletFoundWithProductBarcode
                                     .getProductBarcode(),
@@ -843,7 +903,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         } catch (Exception ex) {
             BgcPlugin
                 .openError(
-                    "Values validation",
+                    // TR: dialog title
+                    i18n.tr("Values validation"),
                     ex);
             appendLog(NLS.bind(
                 "ERROR: {0}",
@@ -861,6 +922,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         setUseScanner(use);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setUseScanner(boolean use) {
         useScanner = use;
@@ -903,13 +965,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * assign multiple: list of container types
      */
+    @SuppressWarnings("nls")
     private void createPalletTypesViewer(Composite parent)
         throws ApplicationException {
         initPalletContainerTypes();
         palletTypesViewer = widgetCreator.createComboViewer(parent,
-            "Container Type", null,
+            ContainerType.NAME.format(1).toString(),
             null,
-            "A pallet type should be selected",
+            null,
+            // TR: validation error message
+            i18n.tr("A pallet type should be selected"),
             true, PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -931,12 +996,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 .getCurrentWorkingSite());
     }
 
+    @SuppressWarnings("nls")
     private void checkPalletContainerTypes() {
         if (!isSingleMode() && useScanner && palletContainerTypes.size() == 0) {
             BgcPlugin
                 .openAsyncError(
-                    "No Pallet defined?",
-                    "No child container types found with 8 rows and 12 columns");
+                    // TR: dialog title
+                    i18n.tr("No Pallet defined?"),
+                    // TR: dialog message
+                    i18n.tr("No child container types found with 8 rows and 12 columns"));
         }
     }
 
@@ -960,6 +1028,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 .equals(Status.OK_STATUS) && selection.size() > 0;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
         if (mode.isSingleMode())
@@ -971,6 +1040,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             "SpecimenAssign");
     }
 
+    @SuppressWarnings("nls")
     private void saveMultipleSpecimens() throws Exception {
         if (saveEvenIfMissing) {
             SpecimenAssignResInfo res;
@@ -1030,7 +1100,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                                 res.parentLabel, res.siteName));
                     } else {
                         throw new RuntimeException(
-                            "problem with parent container creation");
+                            // TR: exception message
+                            i18n.tr("problem with parent container creation"));
                     }
                 }
             } catch (Exception ex) {
@@ -1063,6 +1134,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveSingleSpecimen() throws Exception {
         SpecimenInfo specInfo = new SpecimenInfo();
         specInfo.specimenId = singleSpecimen.getId();
@@ -1072,7 +1144,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 .getId(), Arrays.asList(specInfo)));
 
         if (res.specimens.size() != 1) {
-            throw new Exception("result problem");
+            // TR: exception message
+            throw new Exception(i18n.tr("result problem"));
         }
         SpecimenResInfo spRes = res.specimens.get(0);
         appendLog(MessageFormat
@@ -1082,6 +1155,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 spRes.typeName, spRes.patientPNumber, spRes.visitNumber));
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
         super.setValues();
@@ -1118,7 +1192,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public void reset(boolean resetAll) {
         super.reset(resetAll);
+        @SuppressWarnings("nls")
         String productBarcode = "";
+        @SuppressWarnings("nls")
         String label = "";
         ContainerTypeWrapper type = null;
 
@@ -1151,6 +1227,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         canSaveSingleSpecimen.setValue(!isSingleMode());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setBindings(boolean isSingleMode) {
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
@@ -1311,11 +1388,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (!mode.isSingleMode()) {
             saveEvenIfMissing = true;
             if (currentScanState == UICellStatus.MISSING) {
+                @SuppressWarnings("nls")
                 boolean save =
                     BgcPlugin
                         .openConfirm(
-                            "Really save?",
-                            "Specimens are missing from this pallet, are you sure you want to save? These specimens will still be registered at their current position.");
+                            // TR: dialog title
+                            i18n.tr("Really save?"),
+                            // TR: dialog message
+                            i18n.tr("Specimens are missing from this pallet, are you sure you want to save? These specimens will still be registered at their current position."));
                 if (!save) {
                     setDirty(true);
                     saveEvenIfMissing = false;
@@ -1327,6 +1407,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple assign
      */
+    @SuppressWarnings("nls")
     @Override
     protected void createFakeOptions(Composite fieldsComposite) {
         fakeScanComposite = toolkit.createComposite(fieldsComposite);
@@ -1336,10 +1417,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         fakeScanComposite.setLayoutData(gd);
         fakeScanLinkedOnlyButton =
             toolkit.createButton(fakeScanComposite,
-                "Select linked only specimens", SWT.RADIO);
+                // TR: radio button text
+                i18n.tr("Select linked only specimens"), SWT.RADIO);
         fakeScanLinkedOnlyButton.setSelection(true);
         toolkit.createButton(fakeScanComposite,
-            "Select linked and assigned specimens", SWT.RADIO);
+            // TR: radio button text
+            i18n.tr("Select linked and assigned specimens"), SWT.RADIO);
     }
 
     @Override

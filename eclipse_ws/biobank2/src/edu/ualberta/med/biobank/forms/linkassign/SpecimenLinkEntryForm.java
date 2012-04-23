@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -57,11 +59,16 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 
 // FIXME the custom selection is not done in this version. 
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenLinkEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
+    @SuppressWarnings("nls")
     private static final String NEW_SINGLE_POSITION_BINDING =
         "newSinglePosition-binding";
 
@@ -71,7 +78,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private static Mode mode = Mode.MULTIPLE;
 
     // TODO do not need a composite class anymore if only one link form is left
-    private LinkFormPatientManagement linkFormPatientManagement;
+    private final LinkFormPatientManagement linkFormPatientManagement;
 
     // single linking
     // source specimen / type relation when only one specimen
@@ -90,7 +97,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private Composite typesSelectionPerRowComposite;
     // row:total (for one row number, associate the number of specimen found on
     // this row)
-    private Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> typesRows =
+        new HashMap<Integer, Integer>();
     // List of specimen types that a pallet can have.
     private List<SpecimenTypeWrapper> palletSpecimenTypes;
     // source/type hierarchy selected (use rows order)
@@ -101,10 +109,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             widgetCreator, this);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         super.init();
-        setPartName("Linking specimens");
+        // TR: title
+        setPartName(i18n.tr("Linking specimens"));
         setCanLaunchScan(true);
 
         // If the current center is a site, and if this site defines containers
@@ -119,9 +129,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getFormTitle() {
-        return "Linking specimens";
+        // TR: form title
+        return i18n.tr("Linking specimens");
     }
 
     @Override
