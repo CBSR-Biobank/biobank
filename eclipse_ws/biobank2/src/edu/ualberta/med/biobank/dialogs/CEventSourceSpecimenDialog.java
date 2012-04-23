@@ -32,8 +32,6 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.i18n.SourceSpecimenI18n;
-import edu.ualberta.med.biobank.model.i18n.SpecimenI18n;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.InventoryIdValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -156,7 +154,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 contents,
                 BgcBaseText.class,
                 SWT.NONE,
-                SpecimenI18n.Property.INVENTORY_ID.toString(),
+                Specimen.Property.INVENTORY_ID.toString(),
                 null,
                 internalSpecimen.specimen,
                 SpecimenPeer.INVENTORY_ID.getName(),
@@ -192,7 +190,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
         activityStatusComboViewer =
             widgetCreator.createComboViewer(contents,
-                ActivityStatus.NAME,
+                ActivityStatus.NAME.format(1).toString(),
                 ActivityStatus.valuesList(),
                 internalSpecimen.specimen.getActivityStatus(),
                 // TR: validation message if activity status not selected
@@ -264,7 +262,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         specimenTypeComboViewer =
             getWidgetCreator().createComboViewer(contents,
-                SourceSpecimenI18n.Property.SPECIMEN_TYPE.toString(),
+                SourceSpecimen.Property.SPECIMEN_TYPE.toString(),
                 mapStudySourceSpecimen.values(), ss,
                 // TR: validation error message
                 i18n.tr("A specimen type should be selected"),

@@ -15,6 +15,10 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
@@ -24,7 +28,20 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "name", groups = PrePersist.class)
 public class Group extends Principal {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
+
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Group",
+        "Groups");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString NAME = HasName.Property.NAME;
+    }
 
     private String name;
     private String description;

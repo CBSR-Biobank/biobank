@@ -25,6 +25,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -48,6 +52,35 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Specimen",
+        "Specimens");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString INVENTORY_ID = bundle.trc(
+            "model",
+            "Inventory Id").format();
+        public static final LString COLLECTION_EVENT = bundle.trc(
+            "model",
+            "Collection Event").format();
+        public static final LString CURRENT_CENTER = bundle.trc(
+            "model",
+            "Current Center").format();
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString QUANTITY = bundle.trc(
+            "model",
+            "Quantity").format();
+        public static final LString TOP_SPECIMEN = bundle.trc(
+            "model",
+            "Top Specimen").format();
+    }
 
     private String inventoryId;
     private BigDecimal quantity;

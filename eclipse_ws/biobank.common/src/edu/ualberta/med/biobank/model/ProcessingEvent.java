@@ -20,6 +20,10 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -34,6 +38,31 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "worksheet", groups = PrePersist.class)
 public class ProcessingEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Processing Event",
+        "Processing Events");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString ACTIVITY_STATUS =
+            ActivityStatus.NAME.format(1);
+        public static final LString CENTER =
+            Center.NAME.format(1);
+        public static final LString COMMENTS =
+            Comment.NAME.format(2);
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString SPECIMENS =
+            Specimen.NAME.format(2);
+        public static final LString WORKSHEET = bundle.trc(
+            "model",
+            "Worksheet").format();
+    }
 
     private String worksheet;
     private Date createdAt;

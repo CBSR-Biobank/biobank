@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.i18n.RoleI18n;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -90,7 +89,7 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            RoleI18n.Property.NAME.toString(),
+            Role.Property.NAME.toString(),
             null, roleWrapper,
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
                 // TR: validation message when a role name is not entered

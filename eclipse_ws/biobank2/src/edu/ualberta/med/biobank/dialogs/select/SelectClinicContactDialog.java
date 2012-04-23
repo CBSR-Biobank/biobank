@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ContactsGetAllAction;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.i18n.ContactI18n;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyContactEntryInfoTable;
 
 public class SelectClinicContactDialog extends BgcBaseDialog {
@@ -96,7 +95,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         }
 
         clinicCombo = widgetCreator.createComboViewer(contents,
-            ContactI18n.Property.CLINIC.toString(),
+            Contact.Property.CLINIC.toString(),
             new ArrayList<Clinic>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {

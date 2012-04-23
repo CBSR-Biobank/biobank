@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,17 +12,42 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "COMMENT")
 public class Comment extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Comment",
+        "Comments");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString MESSAGE = bundle.trc(
+            "model",
+            "Message").format();
+        public static final LString USER = bundle.trc(
+            "model",
+            "User").format();
+    }
 
     private String message;
     private Date createdAt;
     private User user;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Comment.message.NotNull}")
-    @Column(name = "MESSAGE", columnDefinition="TEXT")
+    @Column(name = "MESSAGE", columnDefinition = "TEXT")
     public String getMessage() {
         return this.message;
     }

@@ -5,10 +5,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
-
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
@@ -23,26 +24,27 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  */
 @SuppressWarnings("nls")
 public enum ActivityStatus implements NotAProxy, Serializable {
-    ACTIVE(1, Loader.i18n.tr("Active")),
-    CLOSED(2, Loader.i18n.tr("Closed")),
+    ACTIVE(1, Loader.bundle.tr("Active").format()),
+    CLOSED(2, Loader.bundle.tr("Closed").format()),
     // TODO: why can't there be a closed and flagged item or an active but
     // flagged item? Especially for users that are mean to be enabled or
     // disabled. When is ActivityStatus.FLAGGED even used in the source code?
     // Can a flagged user log in? What is the point of flagged? Shouldn't it be
     // separate?
-    FLAGGED(4, Loader.i18n.tr("Flagged"));
+    FLAGGED(4, Loader.bundle.tr("Flagged").format());
 
     private static final List<ActivityStatus> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
 
-    public static final String NAME = Loader.i18n.trc(
+    public static final Trnc NAME = Loader.bundle.trnc(
         "model",
-        "Activity Status");
+        "Activity Status",
+        "Activity Statuses");
 
     private final int id;
-    private final String name;
+    private final LString name;
 
-    private ActivityStatus(int id, String name) {
+    private ActivityStatus(int id, LString name) {
         this.id = id;
         this.name = name;
     }
@@ -56,7 +58,7 @@ public enum ActivityStatus implements NotAProxy, Serializable {
     }
 
     public String getName() {
-        return name;
+        return name.toString();
     }
 
     public static ActivityStatus fromId(int id) {
@@ -69,6 +71,6 @@ public enum ActivityStatus implements NotAProxy, Serializable {
     }
 
     public static class Loader {
-        private static final I18n i18n = I18nFactory.getI18n(Loader.class);
+        private static final Bundle bundle = new CommonBundle();
     }
 }

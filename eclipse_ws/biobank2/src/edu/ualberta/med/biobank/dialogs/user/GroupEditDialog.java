@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.i18n.GroupI18n;
 import edu.ualberta.med.biobank.widgets.infotables.MembershipInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -117,7 +116,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
             SWT.BORDER,
-            GroupI18n.Property.NAME.toString(),
+            Group.Property.NAME.toString(),
             null,
             group, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(

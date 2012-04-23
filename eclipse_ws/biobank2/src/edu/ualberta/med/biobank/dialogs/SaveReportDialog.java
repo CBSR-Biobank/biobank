@@ -10,7 +10,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.i18n.ReportI18n;
+import edu.ualberta.med.biobank.model.Report;
 
 /**
  * Allows the user to move a container and its contents to a new location
@@ -53,7 +53,7 @@ public class SaveReportDialog extends BgcBaseDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.FILL,
-            ReportI18n.Property.NAME.toString(),
+            Report.Property.NAME.toString(),
             null, this, "fileName", null);
     }
 

@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.export.Data;
 import edu.ualberta.med.biobank.export.PrintPdfDataExporter;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.i18n.PatientI18n;
-import edu.ualberta.med.biobank.model.i18n.SpecimenI18n;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
@@ -153,8 +153,8 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                     // exported report column name, for positions of specimens
                     // according to a labeling scheme
                     i18n.tr("Location"),
-                    SpecimenI18n.Property.INVENTORY_ID.toString(),
-                    PatientI18n.NAME.format(1).toString(),
+                    Specimen.Property.INVENTORY_ID.toString(),
+                    Patient.NAME.format(1).toString(),
                     // exported report column name, for specimen's specimen type
                     i18n.tr("Sample Type"),
                     // exported report column name, for specimen's date drawn

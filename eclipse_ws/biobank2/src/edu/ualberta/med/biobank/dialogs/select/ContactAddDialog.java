@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.i18n.ContactI18n;
+import edu.ualberta.med.biobank.model.Contact;
 
 public class ContactAddDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -69,7 +69,7 @@ public class ContactAddDialog extends BgcBaseDialog {
 
         Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER,
-            ContactI18n.Property.NAME.toString(),
+            Contact.Property.NAME.toString(),
             new String[0],
             contactWrapper, ContactPeer.NAME.getName(), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -77,32 +77,32 @@ public class ContactAddDialog extends BgcBaseDialog {
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.TITLE.toString(),
+            Contact.Property.TITLE.toString(),
             new String[0],
             contactWrapper, ContactPeer.TITLE.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.EMAIL_ADDRESS.toString(),
+            Contact.Property.EMAIL_ADDRESS.toString(),
             new String[0],
             contactWrapper, ContactPeer.EMAIL_ADDRESS.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.MOBILE_NUMBER.toString(),
+            Contact.Property.MOBILE_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.MOBILE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.PAGER_NUMBER.toString(),
+            Contact.Property.PAGER_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.PAGER_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.OFFICE_NUMBER.toString(),
+            Contact.Property.OFFICE_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.OFFICE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            ContactI18n.Property.FAX_NUMBER.toString(),
+            Contact.Property.FAX_NUMBER.toString(),
             new String[0], contactWrapper,
             ContactPeer.FAX_NUMBER.getName(), null);
     }

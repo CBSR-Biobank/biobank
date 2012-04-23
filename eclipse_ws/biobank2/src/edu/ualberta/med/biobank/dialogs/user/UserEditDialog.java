@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.i18n.UserI18n;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
@@ -172,7 +171,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            UserI18n.Property.LOGIN.toString(),
+            User.Property.LOGIN.toString(),
             null, userWrapper,
             UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
                 // TR: validation error message if login name not entered
@@ -180,7 +179,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            UserI18n.Property.FULL_NAME.toString(),
+            User.Property.FULL_NAME.toString(),
             null, userWrapper,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
                 // TR: validation error message if full name not entered
@@ -188,7 +187,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            UserI18n.Property.EMAIL_ADDRESS.toString(),
+            User.Property.EMAIL_ADDRESS.toString(),
             null, userWrapper,
             UserPeer.EMAIL.getName(), new EmailValidator(
                 // TR: validation error message if email not entered
@@ -196,7 +195,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         Control checkbox = createBoundWidgetWithLabel(contents, Button.class,
             SWT.CHECK | readOnly,
-            UserI18n.Property.RECEIVE_BULK_EMAILS.toString(),
+            User.Property.RECEIVE_BULK_EMAILS.toString(),
             null, userWrapper,
             UserPeer.RECV_BULK_EMAILS.getName(), null);
         controls.add(checkbox);

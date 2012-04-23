@@ -15,6 +15,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -27,6 +31,29 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "User",
+        "Users");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString EMAIL_ADDRESS = bundle.trc(
+            "model",
+            "Email").format();
+        public static final LString FULL_NAME = bundle.trc(
+            "model",
+            "Full Name").format();
+        public static final LString LOGIN = bundle.trc(
+            "model",
+            "Login").format();
+        public static final LString RECEIVE_BULK_EMAILS = bundle.trc(
+            "model",
+            "Receive bulk emails").format();
+    }
 
     private String login;
     private Long csmUserId;

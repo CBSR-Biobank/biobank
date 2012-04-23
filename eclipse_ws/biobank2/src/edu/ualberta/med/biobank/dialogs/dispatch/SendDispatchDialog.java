@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.i18n.ShipmentInfoI18n;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -68,7 +68,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
         widgetCreator.createComboViewer(contents,
-            ShipmentInfoI18n.Property.SHIPPING_METHOD.toString(),
+            ShipmentInfo.Property.SHIPPING_METHOD.toString(),
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -81,13 +81,13 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             // shipping waybill text box label
-            ShipmentInfoI18n.Property.WAYBILL.toString(),
+            ShipmentInfo.Property.WAYBILL.toString(),
             null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
         createDateTimeWidget(contents,
-            ShipmentInfoI18n.Property.PACKED_AT.toString(),
+            ShipmentInfo.Property.PACKED_AT.toString(),
             date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
                 // time packed required validation message
