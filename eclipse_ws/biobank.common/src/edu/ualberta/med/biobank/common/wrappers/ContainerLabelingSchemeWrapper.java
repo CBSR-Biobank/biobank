@@ -264,6 +264,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
+        if (row == -1 || col == -1) return null;
         return new RowColPos(row, col);
     }
 
@@ -286,6 +287,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
+        if (row == -1 || col == -1) return null;
         return new RowColPos(row, col);
     }
 
@@ -573,6 +575,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
+        if (letterPosition == -1) return null;
         Integer row = letterPosition / totalCol;
         Integer col = letterPosition % totalCol;
         RowColPos rowColPos = new RowColPos(row, col);
