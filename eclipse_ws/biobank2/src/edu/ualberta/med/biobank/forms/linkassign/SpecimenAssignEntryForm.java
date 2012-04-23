@@ -144,7 +144,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void init() throws Exception {
         super.init();
-        setCanLaunchScan(true);
+        setCanLaunchScan(false);
         initPalletValues();
     }
 
@@ -951,7 +951,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         IStructuredSelection selection =
             (IStructuredSelection) palletTypesViewer
                 .getSelection();
-        return isPlateValid()
+        return (!useScanner || isPlateValid())
             && (!useScanner || productBarcodeValidator.validate(
                 palletproductBarcodeText.getText()).equals(Status.OK_STATUS))
             && palletLabelValidator.validate(palletPositionText.getText())
@@ -1186,8 +1186,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected boolean canScanTubeAlone(PalletCell cell) {
-        return super.canScanTubeAlone(cell)
-            || cell.getStatus() == UICellStatus.MISSING;
+        return fieldsValid() && (super.canScanTubeAlone(cell)
+            || cell.getStatus() == UICellStatus.MISSING);
     }
 
     /**

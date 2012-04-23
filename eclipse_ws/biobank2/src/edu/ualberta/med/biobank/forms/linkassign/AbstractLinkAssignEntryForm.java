@@ -397,11 +397,11 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        if (isScanTubeAloneMode()) {
+        PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
+            .getObjectAtCoordinates(e.x, e.y);
+        if (canScanTubeAlone(cell) && isScanTubeAloneMode()) {
             scanTubeAlone(e);
         } else {
-            PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
-                .getObjectAtCoordinates(e.x, e.y);
             if (cell != null) {
                 switch (cell.getStatus()) {
                 case ERROR:
