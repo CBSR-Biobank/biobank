@@ -891,13 +891,13 @@ ALTER TABLE specimen_position DROP INDEX FK3E45B080EF199765,
 ALTER TABLE specimen ADD INDEX ID (ID, SPECIMEN_TYPE_ID);
 
 ALTER TABLE specimen_position
-      ADD INDEX FK_SpecimenPosition_specimenTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID),
+      ADD INDEX FK_SpecimenPosition_containerTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID),
       ADD INDEX FK_SpecimenPosition_container (CONTAINER_ID, CONTAINER_TYPE_ID),
       ADD INDEX FK_SpecimenPosition_specimen (SPECIMEN_ID, SPECIMEN_TYPE_ID);
 
 ALTER TABLE specimen_position
-      ADD CONSTRAINT FK_SpecimenPosition_specimenTypeSpecimenType
-          FOREIGN KEY FK_SpecimenPosition_specimenTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID)
+      ADD CONSTRAINT FK_SpecimenPosition_containerTypeSpecimenType
+          FOREIGN KEY FK_SpecimenPosition_containerTypeSpecimenType (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID)
           REFERENCES container_type_specimen_type (CONTAINER_TYPE_ID, SPECIMEN_TYPE_ID)
           ON UPDATE NO ACTION ON DELETE NO ACTION,
       ADD CONSTRAINT FK_SpecimenPosition_container

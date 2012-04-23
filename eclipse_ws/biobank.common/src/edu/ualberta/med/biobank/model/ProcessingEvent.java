@@ -42,8 +42,12 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
+    /*
+     * Removing "unique = true" setting until CBSR fixes its duplicate worksheet
+     * problem.
+     */
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
-    @Column(name = "WORKSHEET", length = 150, unique = true)
+    @Column(name = "WORKSHEET", length = 150)
     public String getWorksheet() {
         return this.worksheet;
     }
