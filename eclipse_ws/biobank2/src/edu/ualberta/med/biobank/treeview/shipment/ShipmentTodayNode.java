@@ -40,7 +40,8 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
             if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
                 this.readAllowed =
                     SessionManager.getAppService().isAllowed(
-                        new OriginInfoReadPermission(null));
+                        new OriginInfoReadPermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getWrappedObject()));
                 this.addAllowed =
                     SessionManager.getAppService().isAllowed(
                         new OriginInfoUpdatePermission(SessionManager.getUser()
