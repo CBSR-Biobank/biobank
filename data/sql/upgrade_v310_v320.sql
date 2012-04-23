@@ -703,6 +703,7 @@ CREATE TABLE `new_processing_event` (
   `ID` int(11) NOT NULL auto_increment,
   `WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
   `CREATED_AT` datetime NOT NULL,
+  `DATE_CREATED_AT` date NOT NULL,
   `CENTER_ID` int(11) NOT NULL,
   `ACTIVITY_STATUS_ID` int(11) NOT NULL,
   `VERSION` int(11) NOT NULL,
@@ -712,21 +713,29 @@ CREATE TABLE `new_processing_event` (
   CONSTRAINT `FK327B1E4E92FAA70E` FOREIGN KEY (`CENTER_ID`) REFERENCES `center` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-insert into new_processing_event (worksheet, created_at, center_id, activity_status_id, version)
-select worksheet, created_at, center_id, activity_status_id, 0 from processing_event
-group by worksheet,created_at;
+insert into new_processing_event (worksheet, created_at, date_created_at, center_id, activity_status_id, version)
+select worksheet, min(created_at), date(convert_tz(min(created_at),'GMT','US/Mountain')), center_id, activity_status_id, 0
+from processing_event
+group by worksheet,date(convert_tz(created_at,'GMT','US/Mountain'));
 
-update processing_event_comment pec, processing_event pe, new_processing_event npe
-set pec.processing_event_id=npe.id
-where pec.processing_event_id=pe.id
-and npe.worksheet=pe.worksheet
-and npe.created_at=pe.created_at;
+ALTER TABLE processing_event ADD COLUMN NPE_ID int(11) NOT NULL;
 
-update specimen spc, processing_event pe, new_processing_event npe
-set spc.processing_event_id=npe.id
-where spc.processing_event_id=pe.id
-and npe.worksheet=pe.worksheet
-and npe.created_at=pe.created_at;
+update processing_event pe, new_processing_event npe
+set pe.npe_id=npe.id
+where pe.worksheet=npe.worksheet
+and date(convert_tz(pe.created_at,'GMT','US/Mountain'))=npe.date_created_at;
+
+update processing_event_comment pec, processing_event pe
+set pec.processing_event_id=pe.npe_id
+where pec.processing_event_id=pe.id;
+
+update specimen spc, processing_event pe
+set spc.processing_event_id=pe.npe_id
+where spc.processing_event_id=pe.id;
+
+ALTER TABLE new_processing_event
+      MODIFY COLUMN ID INT(11) NOT NULL,
+      DROP COLUMN date_created_at;
 
 SET FOREIGN_KEY_CHECKS = 0;
 drop table processing_event;
@@ -738,8 +747,6 @@ ALTER TABLE processing_event ADD INDEX FK327B1E4E92FAA705 (CENTER_ID);
 ALTER TABLE processing_event
       ADD CONSTRAINT FK327B1E4E92FAA705 FOREIGN KEY FK3A16800EC449A4 (CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 SET FOREIGN_KEY_CHECKS = 1;
-
-ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 -- TODO: this has to be added back in once we get feedback from Elizabeth
 -- ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
