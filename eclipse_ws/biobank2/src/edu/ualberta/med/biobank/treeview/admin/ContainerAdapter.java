@@ -332,8 +332,7 @@ public class ContainerAdapter extends AdapterBase {
             SessionManager.getAppService()
                 .doAction(new ContainerGetChildrenAction(getId())).getList();
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-            childContainers,
-            ContainerWrapper.class);
+            childContainers, ContainerWrapper.class);
     }
 
     @Override

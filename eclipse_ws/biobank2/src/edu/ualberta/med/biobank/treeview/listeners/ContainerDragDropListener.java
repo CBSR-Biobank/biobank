@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -18,7 +19,10 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 public class ContainerDragDropListener implements DropTargetListener,
     DragSourceListener {
 
-    private TreeViewer treeViewer;
+    protected static BgcLogger log = BgcLogger
+        .getLogger(ContainerDragDropListener.class.getName());
+
+    private final TreeViewer treeViewer;
 
     private ContainerAdapter srcContainerAdapter;
     private ContainerWrapper srcContainer;
@@ -63,8 +67,10 @@ public class ContainerDragDropListener implements DropTargetListener,
             if ((wrapper instanceof ContainerWrapper)) {
                 try {
                     ContainerWrapper container = (ContainerWrapper) wrapper;
+
                     if (container.getContainerType()
                         .getChildContainerTypeCollection().size() != 0) {
+
                         if (container.getContainerType()
                             .getChildContainerTypeCollection()
                             .contains(srcContainer.getContainerType())) {

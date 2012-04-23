@@ -19,11 +19,15 @@ public class ContainerGetChildrenAction implements
     // This query has to initialise specimenPositionCollection due to the
     // tree adapter needing to know this to display additional menu selections
     // when a right click is done on a container node.
+    //
+    // Also has to initialize containerType.childContainerTypes to support
+    // container drag and drop.
     @SuppressWarnings("nls")
     private static final String SELECT_CHILD_CONTAINERS_HQL =
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
+            + " INNER JOIN FETCH containerType.childContainerTypes"
             + " INNER JOIN FETCH container.position position"
             + " INNER JOIN FETCH position.parentContainer parentContainer"
             + " INNER JOIN FETCH parentContainer.containerType parentCType"
