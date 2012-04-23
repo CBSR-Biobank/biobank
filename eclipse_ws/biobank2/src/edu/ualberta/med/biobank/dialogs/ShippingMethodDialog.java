@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 
 public class ShippingMethodDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -57,6 +58,7 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite content = new Composite(parent, SWT.NONE);
@@ -64,9 +66,11 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Name", null, tmpShippingMethod,
+            ShippingMethod.Property.NAME.toString(),
+            null, tmpShippingMethod,
             ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
-                "Shipping method must have a name."));
+                // TR: validation error message
+                i18n.tr("Shipping method must have a name.")));
     }
 
     @Override

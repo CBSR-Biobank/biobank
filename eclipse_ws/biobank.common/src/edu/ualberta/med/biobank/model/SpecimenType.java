@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -49,6 +50,10 @@ public class SpecimenType extends AbstractBiobankModel {
 
     @SuppressWarnings("nls")
     public static class Property {
+        public static final LString NAME =
+            HasName.Property.NAME;
+        public static final LString NAME_SHORT =
+            HasName.Property.NAME_SHORT;
     }
 
     private String name;

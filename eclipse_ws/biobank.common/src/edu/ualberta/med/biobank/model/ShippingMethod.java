@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -30,6 +31,8 @@ public class ShippingMethod extends AbstractBiobankModel {
 
     @SuppressWarnings("nls")
     public static class Property {
+        public static final LString NAME =
+            HasName.Property.NAME;
     }
 
     private String name;

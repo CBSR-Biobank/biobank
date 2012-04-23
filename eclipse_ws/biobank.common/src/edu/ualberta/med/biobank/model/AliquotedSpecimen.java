@@ -50,7 +50,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
             Study.NAME.format(1);
         public static final LString VOLUME = bundle.trc(
             "model",
-            "Volume").format();
+            "Volume (ml)").format();
     }
 
     private SpecimenType specimenType;
