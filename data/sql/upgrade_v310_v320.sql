@@ -699,6 +699,11 @@ ALTER TABLE specimen MODIFY COLUMN QUANTITY DECIMAL(20, 10) NULL DEFAULT NULL;
 
 -- merge processing_events that share the same worksheet and created_at time
 
+-- Set all worsheets with 'N/A' or 'n/a' to empty string.
+-- These are given the date as the worksheet numbers below
+update processing_event set worksheet='' where worksheet='N/A' or worksheet='n/a';
+
+
 CREATE TABLE `new_processing_event` (
   `ID` int(11) NOT NULL auto_increment,
   `WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
@@ -736,6 +741,8 @@ where spc.processing_event_id=pe.id;
 ALTER TABLE new_processing_event
       MODIFY COLUMN ID INT(11) NOT NULL,
       DROP COLUMN date_created_at;
+
+update processing_event set worksheet=date(created_at) where length(worksheet)=0;
 
 SET FOREIGN_KEY_CHECKS = 0;
 drop table processing_event;
