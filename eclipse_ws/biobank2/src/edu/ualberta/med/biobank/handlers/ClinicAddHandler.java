@@ -29,8 +29,7 @@ public class ClinicAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new ClinicCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && SessionManager.getInstance().getSession() != null &&
+            return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,

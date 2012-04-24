@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -13,11 +13,12 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -90,10 +91,16 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        if (SessionManager.isSuperAdminMode()) {
-            return SiteQuery.getSites(SessionManager.getAppService());
+        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
+        @SuppressWarnings("unchecked")
+        List<Site> sites =
+            SessionManager.getAppService()
+                .doAction(
+                    new SiteGetAllAction()).getList();
+        for (Site site : sites) {
+            wrappers.add(new SiteWrapper(SessionManager.getAppService(), site));
         }
-        return Collections.emptyList();
+        return wrappers;
     }
 
     @Override

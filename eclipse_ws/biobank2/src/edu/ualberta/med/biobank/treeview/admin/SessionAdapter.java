@@ -14,7 +14,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
@@ -63,31 +61,15 @@ public class SessionAdapter extends AdapterBase {
     private void addSubNodes() {
         if (!SessionManager.getInstance().isConnected()) return;
 
-        if (SessionManager.isSuperAdminMode()) {
-            addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
-            addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-            addChild(new ResearchGroupMasterGroup(this,
-                RESEARCH_GROUPS_BASE_NODE_ID));
-            SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
-            addChild(siteGroup);
-            siteGroup.performExpand();
-            return;
-        }
-
-        // only get here if session is not in super admin mode
-        CenterWrapper<?> currentCenter = SessionManager.getUser()
-            .getCurrentWorkingCenter();
-        CenterWrapper<?> clonedCenter;
-        try {
-            clonedCenter = (CenterWrapper<?>) currentCenter.getDatabaseClone();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        if (clonedCenter != null) {
-            AbstractAdapterBase child = AdapterFactory.getAdapter(clonedCenter);
-            addChild(child);
-            child.performExpand();
-        }
+        addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+        addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+        ResearchGroupMasterGroup rgroups = new ResearchGroupMasterGroup(this,
+            RESEARCH_GROUPS_BASE_NODE_ID);
+        addChild(rgroups);
+        rgroups.performExpand();
+        SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
+        addChild(siteGroup);
+        siteGroup.performExpand();
     }
 
     @Override

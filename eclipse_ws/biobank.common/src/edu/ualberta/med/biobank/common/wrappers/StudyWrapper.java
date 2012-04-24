@@ -366,8 +366,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
         StudyWrapper study) {
-        return super.canUpdate(user, center, study)
-            && user.isInSuperAdminMode();
+        return super.canUpdate(user, center, study);
     }
 
     @Deprecated

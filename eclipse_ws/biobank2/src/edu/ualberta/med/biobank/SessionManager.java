@@ -324,10 +324,6 @@ public class SessionManager {
         getInstance().currentAdministrationViewId = id;
     }
 
-    public static boolean isSuperAdminMode() {
-        return getUser().isInSuperAdminMode();
-    }
-
     public static void updateViewsVisibility(final IWorkbenchPage page,
         final boolean login) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {

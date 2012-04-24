@@ -29,8 +29,7 @@ public class ResearchGroupAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new ResearchGroupCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && allowed
+            return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

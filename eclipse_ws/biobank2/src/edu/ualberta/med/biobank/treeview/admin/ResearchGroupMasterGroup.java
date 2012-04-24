@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -13,32 +12,21 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
+import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetAllAction;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCreatePermission;
-import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
-    private Map<Integer, ResearchGroup> rgs;
     private Boolean createAllowed;
+    private Map<Integer, ResearchGroupAdapterInfo> rgs;
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id,
             Messages.ResearchGroupMasterGroup_all_rgroups_label, null, false);
-        try {
-            rgs = ResearchGroupWrapper.getAllResearchGroups(SessionManager
-                .getAppService());
-            for (Integer rgId : rgs.keySet())
-                this.addChild(new ResearchGroupAdapter(this,
-                    new ResearchGroupAdapterInfo(rgId, rgs.get(rgId)
-                        .getNameShort())));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
-        }
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new ResearchGroupCreatePermission());
@@ -84,22 +72,22 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     @Override
     protected AbstractNewAdapterBase createChildNode() {
-        return null;
+        return new ResearchGroupAdapter(this, null);
     }
 
     @Override
     protected AbstractAdapterBase createChildNode(Object child) {
-        return null;
+        return new ResearchGroupAdapter(this, (ResearchGroupAdapterInfo) child);
     }
 
     @Override
     protected Map<Integer, ?> getChildrenObjects() throws Exception {
-        HashMap<Integer, ResearchGroupAdapterInfo> map =
-            new HashMap<Integer, ResearchGroupAdapterInfo>();
-        for (Integer rgId : rgs.keySet())
-            map.put(rgId, new ResearchGroupAdapterInfo(rgId, rgs.get(rgId)
-                .getNameShort()));
-        return map;
+        if (rgs == null)
+            rgs =
+                SessionManager.getAppService()
+                    .doAction(
+                        new ResearchGroupGetAllAction()).getMap();
+        return rgs;
     }
 
     @Override
@@ -115,7 +103,7 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
     @SuppressWarnings("unchecked")
     @Override
     public void setValue(Object value) {
-        this.rgs = (Map<Integer, ResearchGroup>) value;
+        this.rgs = (Map<Integer, ResearchGroupAdapterInfo>) value;
     }
 
     @Override
