@@ -20,7 +20,6 @@ public class UserWrapper extends UserBaseWrapper {
 
     private String password;
 
-    private boolean inSuperAdminMode;
     private transient CenterWrapper<?> currentWorkingCenter;
     private Boolean lockedOut;
 
@@ -71,14 +70,6 @@ public class UserWrapper extends UserBaseWrapper {
             return new UserWrapper(appService, users.get(0));
         throw new BiobankCheckException("Error retrieving users: found " //$NON-NLS-1$
             + users.size() + " results."); //$NON-NLS-1$
-    }
-
-    public boolean isInSuperAdminMode() {
-        return inSuperAdminMode;
-    }
-
-    public void setInSuperAdminMode(boolean inSuperAdminMode) {
-        this.inSuperAdminMode = inSuperAdminMode && isSuperAdmin();
     }
 
     public SiteWrapper getCurrentWorkingSite() {

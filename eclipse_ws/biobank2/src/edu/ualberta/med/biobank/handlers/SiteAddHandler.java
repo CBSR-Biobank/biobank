@@ -54,8 +54,7 @@ public class SiteAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new SiteCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && allowed
+            return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

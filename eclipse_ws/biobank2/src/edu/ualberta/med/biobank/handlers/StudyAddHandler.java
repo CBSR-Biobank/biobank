@@ -30,8 +30,7 @@ public class StudyAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new StudyCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && allowed
+            return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(Messages.HandlerPermission_error,

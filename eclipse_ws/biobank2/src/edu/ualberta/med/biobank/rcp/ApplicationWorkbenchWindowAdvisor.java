@@ -140,7 +140,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                                 .append(SessionManager.getServer())
                                 .toString());
                             superAdminItem.setVisible(SessionManager
-                                .getUser().isInSuperAdminMode());
+                                .getUser().isSuperAdmin());
                         } else if (sourceValue
                             .equals(LoginSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();

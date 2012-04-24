@@ -43,7 +43,7 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
             if (allowed == null)
                 allowed = SessionManager.getAppService().isAllowed(
                     new SpecimenTypeCreatePermission());
-            return SessionManager.getUser().isInSuperAdminMode()
+            return SessionManager.getUser().isSuperAdmin()
                 && allowed
                 && (SessionManager.getInstance().getSession() != null);
         } catch (ApplicationException e) {

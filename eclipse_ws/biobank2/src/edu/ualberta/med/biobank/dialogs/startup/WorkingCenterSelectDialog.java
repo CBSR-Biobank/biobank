@@ -50,10 +50,10 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(availableCenters);
-        String noCenterString = "-- "  
+        String noCenterString = "-- "
             + "no center selection"
-            + " --";  
-        if (user.isInSuperAdminMode())
+            + " --";
+        if (user.isSuperAdmin())
             objectList.add(noCenterString);
         widgetCreator.createComboViewer(contents,
             "Available centers",
