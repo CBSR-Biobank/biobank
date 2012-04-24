@@ -742,7 +742,7 @@ ALTER TABLE new_processing_event
       MODIFY COLUMN ID INT(11) NOT NULL,
       DROP COLUMN date_created_at;
 
-update processing_event set worksheet=date(created_at) where length(worksheet)=0;
+update new_processing_event set worksheet=date(created_at) where length(worksheet)=0;
 
 SET FOREIGN_KEY_CHECKS = 0;
 drop table processing_event;
@@ -755,8 +755,43 @@ ALTER TABLE processing_event
       ADD CONSTRAINT FK327B1E4E92FAA705 FOREIGN KEY FK3A16800EC449A4 (CENTER_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- TODO: this has to be added back in once we get feedback from Elizabeth
--- ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+-- fix the remaining duplicate worsheet numbers by appending a '-#' to them
+
+CREATE TABLE `tmp_dup_worksheets` (
+  `ID` int(11) NOT NULL auto_increment,
+  `CREATED_AT` datetime NOT NULL,
+  `ORIG_WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
+  `NEW_WORKSHEET` varchar(150) COLLATE latin1_general_cs NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+insert into tmp_dup_worksheets (orig_worksheet,new_worksheet,created_at)
+select pe.worksheet,'',pe.created_at
+from processing_event pe
+join (select worksheet,count(*) cnt from processing_event group by worksheet having cnt > 1) A
+    on A.worksheet=pe.worksheet
+order by pe.worksheet,pe.created_at;
+
+set @dwct = null;
+set @worksheet = null;
+
+update tmp_dup_worksheets
+    set new_worksheet =
+        if(@worksheet <> orig_worksheet or @worksheet is null,
+            if(@worksheet := orig_worksheet, orig_worksheet, orig_worksheet),
+            if(@worksheet = orig_worksheet,
+                   if(@dwct := 2, concat(@worksheet, '-', @dwct), concat(@worksheet, '-', @dwct)),
+                   if(@dwct := @dwct + 1, concat(@worksheet, '-', @dwct), concat(@worksheet, '-', @dwct))))
+       order by orig_worksheet, created_at;
+
+update processing_event pe, tmp_dup_worksheets dup
+    set pe.worksheet=dup.new_worksheet
+    where pe.worksheet=dup.orig_worksheet
+    and pe.created_at=dup.created_at;
+
+drop table tmp_dup_worksheets;
+
+ALTER TABLE processing_event ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
 
 update report r set r.IS_COUNT=b'0' where IS_COUNT is null;
 update report r set r.IS_PUBLIC=b'0' where IS_PUBLIC is null;
