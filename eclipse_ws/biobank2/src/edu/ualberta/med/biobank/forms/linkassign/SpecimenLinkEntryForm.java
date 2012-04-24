@@ -13,7 +13,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -50,6 +49,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
@@ -146,6 +146,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         mode = m;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getActivityTitle() {
         return "Specimen Link";
@@ -156,9 +157,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return logger;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getOkMessage() {
-        return "Link specimens to their source specimens";
+        // TR: title area message
+        return i18n.tr("Link specimens to their source specimens");
     }
 
     @Override
@@ -198,6 +201,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             });
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createMultipleFields(Composite parent) {
         multipleOptionsFields = toolkit.createComposite(parent);
@@ -227,9 +231,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         toolkit.createLabel(typesSelectionPerRowComposite, "");
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Source Specimen");
+            // label
+            i18n.tr("Source Specimen"));
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Aliquoted Specimen Types");
+            // label
+            i18n.tr("Aliquoted Specimen Types"));
         toolkit.createLabel(typesSelectionPerRowComposite, "");
 
         specimenTypesWidgets =
@@ -298,6 +304,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.showWidget(newSinglePositionText, position);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createSingleFields(Composite parent) {
         Composite fieldsComposite = toolkit.createComposite(parent);
@@ -313,12 +320,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         final NonEmptyStringValidator idValidator =
             new NonEmptyStringValidator(
-                "Inventory ID cannot be empty");
+                // validation error message
+                i18n.tr("Inventory ID cannot be empty"));
         // inventoryID
         final BgcBaseText inventoryIdText =
             (BgcBaseText) createBoundWidgetWithLabel(
                 fieldsComposite, BgcBaseText.class, SWT.NONE,
-                "Inventory ID",
+                Specimen.Property.INVENTORY_ID.toString(),
                 new String[0],
                 singleSpecimen, SpecimenPeer.INVENTORY_ID.getName(),
                 idValidator,
@@ -352,9 +360,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         // position field
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            "Position");
+            // label
+            i18n.tr("Position"));
         newSinglePositionValidator = new StringLengthValidator(4,
-            "Enter a position");
+            // validation error message
+            i18n.tr("Enter a position"));
         newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
             newSinglePositionLabel, new String[0], new WritableValue("",
@@ -398,6 +408,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleTypesWidget.addBindings();
     }
 
+    @SuppressWarnings("nls")
     private void checkInventoryId(BgcBaseText inventoryIdText) {
         boolean ok = true;
         try {
@@ -406,16 +417,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             if (specimen != null) {
                 BgcPlugin
                     .openAsyncError(
-                        "InventoryId error",
-                        NLS.bind(
-                            "InventoryId {0} already exists.",
+                        // dialog title
+                        i18n.tr("InventoryId error"),
+                        // dialog message
+                        i18n.tr("InventoryId {0} already exists.",
                             inventoryIdText.getText()));
                 ok = false;
             }
         } catch (Exception e) {
             BgcPlugin
                 .openAsyncError(
-                    "Error checking inventoryId",
+                    // dialog title
+                    i18n.tr("Error checking inventoryId"),
                     e);
             ok = false;
         }
@@ -502,6 +515,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
         if (mode.isSingleMode())
@@ -542,6 +556,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         printSaveMultipleLogMessage(resList);
     }
 
+    @SuppressWarnings("nls")
     protected void printSaveMultipleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
         StringBuffer sb = new StringBuffer(
@@ -588,6 +603,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         printSaveSingleLogMessage(resList);
     }
 
+    @SuppressWarnings("nls")
     protected void printSaveSingleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
         if (resList.size() == 1) {
@@ -666,6 +682,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             typesRows.clear();
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: return fake cells for testing
