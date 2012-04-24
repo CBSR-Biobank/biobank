@@ -76,6 +76,12 @@ public class ContainerType extends AbstractBiobankModel {
         public static final LString CHILD_LABELING_SCHEME = bundle.trc(
             "model",
             "Child Labeling Scheme").format();
+        public static final LString DEFAULT_TEMPERATURE = bundle.trc(
+            "model",
+            "Default Temperature").format();
+        public static final LString TOP_LEVEL = bundle.trc(
+            "model",
+            "Top Level").format();
     }
 
     private String name;
