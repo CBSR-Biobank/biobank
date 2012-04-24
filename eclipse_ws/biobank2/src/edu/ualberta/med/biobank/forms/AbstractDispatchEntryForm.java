@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
@@ -36,6 +38,8 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractDispatchEntryForm.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
@@ -62,6 +66,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     protected Set<Integer> oldSpecIds;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null");
@@ -96,12 +101,14 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
      * Create a field to enter inventory id one by one + a button to open a scan
      * dialog
      */
+    @SuppressWarnings("nls")
     protected void createSpecimensSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite,
-            "Enter inventory ID to add:");
+            // label
+            i18n.tr("Enter inventory ID to add:"));
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
@@ -130,7 +137,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             }
         });
         toolkit.createLabel(addComposite,
-            "or open scan dialog:");
+            // label
+            i18n.tr("or open scan dialog:"));
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
@@ -177,6 +185,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         reloadSpecimens();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
 

@@ -58,6 +58,9 @@ public class CollectionEvent extends AbstractBiobankModel {
             "Created At").format();
         public static final LString SPECIMENS =
             Specimen.NAME.format(2);
+        public static final LString VISIT_NUMBER = bundle.trc(
+            "model",
+            "Visit Number").format();
         public static final LString WORKSHEET = bundle.trc(
             "model",
             "Worksheet").format();

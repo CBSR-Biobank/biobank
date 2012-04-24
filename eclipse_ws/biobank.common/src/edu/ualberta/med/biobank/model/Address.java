@@ -45,7 +45,7 @@ public class Address extends AbstractBiobankModel {
             "Postal/ Zip Code").format();
         public static final LString PROVINCE = bundle.trc(
             "model",
-            "Province").format();
+            "Province/ State").format();
         public static final LString STREET1 = bundle.trc(
             "model",
             "Street 1").format();

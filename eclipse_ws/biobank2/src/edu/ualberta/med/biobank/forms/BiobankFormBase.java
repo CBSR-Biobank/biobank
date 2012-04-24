@@ -24,6 +24,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -53,10 +55,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * possible. See {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends BgcFormBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(BiobankFormBase.class);
 
     protected static BgcLogger LOGGER = BgcLogger
         .getLogger(BiobankEntryForm.class.getName());
     protected AbstractAdapterBase adapter;
+
+    @SuppressWarnings("nls")
+    // dialog title
+    private static final String SAVE_ERROR = i18n.tr("Save error");
 
     public BiobankFormBase() {
         //
@@ -92,17 +100,18 @@ public abstract class BiobankFormBase extends BgcFormBase {
         // default does nothing
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
         if (!(input instanceof FormInput))
-            throw new PartInitException("Invalid editor input"); 
+            throw new PartInitException("Invalid editor input");
         FormInput formInput = (FormInput) input;
 
         adapter = (AbstractAdapterBase) formInput
             .getAdapter(AbstractAdapterBase.class);
         if (adapter != null) {
-            Assert.isNotNull(adapter, "Bad editor input (null value)"); 
+            Assert.isNotNull(adapter, "Bad editor input (null value)");
             if (!formInput.hasPreviousForm()) {
                 currentLinkedForms = new ArrayList<BgcFormBase>();
             }
@@ -196,6 +205,7 @@ public abstract class BiobankFormBase extends BgcFormBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     protected void saveErrorCatch(Exception ex, IProgressMonitor monitor,
         boolean lastThrowException) {
         if (ex instanceof RemoteConnectFailureException) {
@@ -208,19 +218,19 @@ public abstract class BiobankFormBase extends BgcFormBase {
             BgcPlugin.openAccessDeniedErrorMessage(ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankException) {
-            BgcPlugin.openAsyncError("Save error",
+            BgcPlugin.openAsyncError(SAVE_ERROR,
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankServerException) {
-            BgcPlugin.openAsyncError("Save error",
+            BgcPlugin.openAsyncError(SAVE_ERROR,
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof BiobankSessionException) {
-            BgcPlugin.openAsyncError("Save error",
+            BgcPlugin.openAsyncError(SAVE_ERROR,
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof ActionException) {
-            BgcPlugin.openAsyncError("Save error",
+            BgcPlugin.openAsyncError(SAVE_ERROR,
                 ex);
             cancelSave(monitor);
         } else if (ex instanceof ApplicationException) {
@@ -229,12 +239,12 @@ public abstract class BiobankFormBase extends BgcFormBase {
                     getConstraintViolationsMsgs((ConstraintViolationException) ex
                         .getCause());
                 BgcPlugin.openAsyncError(
-                    "Save error",
+                    SAVE_ERROR,
                     StringUtils.join(msgs, "\n"));
 
             } else {
                 BgcPlugin.openAsyncError(
-                    "Save error",
+                    SAVE_ERROR,
                     ex.getLocalizedMessage());
             }
             cancelSave(monitor);
@@ -244,8 +254,9 @@ public abstract class BiobankFormBase extends BgcFormBase {
             if (lastThrowException) {
                 BgcPlugin
                     .openAsyncError(
-                        "Save error",
-                        "An unknown error occurred. Report this issue to your administrator");
+                        SAVE_ERROR,
+                        // dialog message
+                        i18n.tr("An unknown error occurred. Report this issue to your administrator"));
             }
         }
     }

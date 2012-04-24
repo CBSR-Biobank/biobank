@@ -9,10 +9,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
@@ -29,13 +30,15 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class PalletScanManagement {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PalletScanManagement.class);
 
     protected Map<RowColPos, PalletCell> cells =
         new HashMap<RowColPos, PalletCell>();
     private int scansCount = 0;
     private boolean useScanner = true;
 
-    private boolean scanTubeAloneMode = true;
+    private final boolean scanTubeAloneMode = true;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan,
@@ -45,9 +48,12 @@ public class PalletScanManagement {
     public void launchScanAndProcessResult(final String plateToScan,
         final String profile, final boolean isRescanMode) {
         IRunnableWithProgress op = new IRunnableWithProgress() {
+            @SuppressWarnings("nls")
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scan and process...",
+                monitor.beginTask(
+                    // progress monitor message
+                    i18n.tr("Scan and process..."),
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor, plateToScan, profile, isRescanMode);
@@ -59,7 +65,8 @@ public class PalletScanManagement {
                 } catch (Exception e) {
                     BgcPlugin
                         .openAsyncError(
-                            "Scan result error",
+                            // dialog title
+                            i18n.tr("Scan result error"),
                             e);
                     String msg = e.getMessage();
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
@@ -80,9 +87,12 @@ public class PalletScanManagement {
         }
     }
 
+    @SuppressWarnings("nls")
     private void launchScan(IProgressMonitor monitor, String plateToScan,
         String profile, boolean rescanMode) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(
+            // progress monitor text
+            i18n.tr("Launching scan"));
         beforeScan();
         Map<RowColPos, PalletCell> oldCells = cells;
         if (BiobankPlugin.isRealScanEnabled()) {
@@ -92,9 +102,10 @@ public class PalletScanManagement {
                 plateError();
                 BgcPlugin
                     .openAsyncError(
-                        "Scan error",
-                        NLS.bind(
-                            "Plate with barcode {0} is not enabled",
+                        // dialog title
+                        i18n.tr("Scan error"),
+                        // dialog message
+                        i18n.tr("Plate with barcode {0} is not enabled",
                             plateToScan));
                 return;
             }
@@ -104,9 +115,13 @@ public class PalletScanManagement {
                     profile);
                 cells = PalletCell.convertArray(scanCells);
             } catch (Exception ex) {
-                BgcPlugin.openAsyncError(
-                    "Scan error", ex,
-                    "Barcodes can still be scanned with the handheld 2D scanner.");
+                BgcPlugin
+                    .openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan error"),
+                        ex,
+                        // dialog message
+                        i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
                 return;
             } finally {
                 scansCount++;
@@ -136,8 +151,9 @@ public class PalletScanManagement {
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation()
-                                : "") 
-                                + " " + "Rescanned value is different"); 
+                                : "")
+                                + " "
+                                + i18n.tr("Rescanned value is different"));
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
@@ -158,11 +174,13 @@ public class PalletScanManagement {
             }
             if (rescanDifferent)
                 throw new Exception(
-                    "Scan error: Previously scanned specimens has been replaced. Please cancel and start again.");
+                    // exception message
+                    i18n.tr("Scan error: Previously scanned specimens has been replaced. Please cancel and start again."));
         }
         afterSuccessfulScan();
     }
 
+    @SuppressWarnings("nls")
     public void scanTubeAlone(MouseEvent e) {
         if (isScanTubeAloneMode()) {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
@@ -183,7 +201,8 @@ public class PalletScanManagement {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
-                                "Scan tube error",
+                                // dialog title
+                                i18n.tr("Scan tube error"),
                                 ex);
                         }
                     }

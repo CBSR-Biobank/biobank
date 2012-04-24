@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
@@ -69,6 +70,13 @@ public class ContainerType extends AbstractBiobankModel {
         "model",
         "Container Type",
         "Container Types");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString CHILD_LABELING_SCHEME = bundle.trc(
+            "model",
+            "Child Labeling Scheme").format();
+    }
 
     private String name;
     private String nameShort;

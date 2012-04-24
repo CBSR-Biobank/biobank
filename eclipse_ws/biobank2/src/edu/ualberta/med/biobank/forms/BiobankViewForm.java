@@ -18,6 +18,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -33,14 +35,26 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
  * view.
  */
 public abstract class BiobankViewForm extends BiobankFormBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(BiobankViewForm.class);
 
+    @SuppressWarnings("nls")
+    // label, tooltip
+    private static final String EDIT = i18n.tr("Edit");
+    @SuppressWarnings("nls")
+    // label, tooltip
+    private static final String RELOAD = i18n.tr("Reload");
+
+    @SuppressWarnings("nls")
     private static final String RELOAD_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.reload"; 
+        "edu.ualberta.med.biobank.commands.reload";
 
+    @SuppressWarnings("nls")
     private static final String EDIT_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.edit"; 
+        "edu.ualberta.med.biobank.commands.edit";
 
-    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm"; 
+    @SuppressWarnings("nls")
+    private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm";
 
     private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class
         .getName());
@@ -56,12 +70,13 @@ public abstract class BiobankViewForm extends BiobankFormBase {
 
         if (adapter != null) {
             adapterChangedListener = new AdapterChangedListener() {
+                @SuppressWarnings("nls")
                 @Override
                 public void changed(AdapterChangedEvent event) {
                     try {
                         reload();
                     } catch (Exception e) {
-                        logger.error("Error sending event", e); 
+                        logger.error("Error sending event", e);
                     }
                 }
             };
@@ -124,6 +139,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         adapter.openEntryForm();
     }
 
+    @SuppressWarnings("nls")
     protected void addEditAction() {
         if ((adapter != null) && adapter.isEditable()) {
             CommandContributionItem edit = new CommandContributionItem(
@@ -131,23 +147,25 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                     .getActiveWorkbenchWindow(),
                     "Edit", EDIT_COMMAND_ID, null,
                     BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_EDIT_FORM),
-                    null, null, "Edit",
-                    "Edit",
-                    "Edit", SWT.NONE,
+                    null, null,
+                    EDIT,
+                    EDIT,
+                    EDIT, SWT.NONE,
                     "Edit", true));
             form.getToolBarManager().add(edit);
         }
     }
 
+    @SuppressWarnings("nls")
     protected void addReloadAction() {
         CommandContributionItem reload = new CommandContributionItem(
             new CommandContributionItemParameter(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow(),
                 "Reload", RELOAD_COMMAND_ID, null,
                 BiobankPlugin.getImageDescriptor(BgcPlugin.IMG_RELOAD_FORM),
-                null, null, "Reload",
-                "Reload",
-                "Reload", SWT.NONE,
+                null, null, RELOAD,
+                RELOAD,
+                RELOAD, SWT.NONE,
                 "Reload", true));
         form.getToolBarManager().add(reload);
     }

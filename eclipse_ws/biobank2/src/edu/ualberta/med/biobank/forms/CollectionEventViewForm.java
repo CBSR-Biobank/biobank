@@ -6,11 +6,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -29,8 +30,14 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
@@ -39,9 +46,12 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(CollectionEventViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.CollectionEventViewForm"; 
+        "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
 
     private BgcBaseText studyLabel;
 
@@ -65,16 +75,18 @@ public class CollectionEventViewForm extends BiobankViewForm {
         BgcBaseText widget;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         updateCEventInfo();
 
-        setPartName(NLS.bind("CE {0}",
-            ceventInfo.cevent.getVisitNumber()));
+        setPartName(
+        // tab name, {0} is the visit number
+        i18n.tr("CE {0}", ceventInfo.cevent.getVisitNumber()));
     }
 
     private void updateCEventInfo() throws Exception {
@@ -84,10 +96,13 @@ public class CollectionEventViewForm extends BiobankViewForm {
         SessionManager.logLookup(ceventInfo.cevent);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Collection Event for visit {0}",
-            ceventInfo.cevent.getVisitNumber()));
+        form.setText(
+            // form title
+            i18n.tr("Collection Event for visit {0}",
+                ceventInfo.cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
@@ -105,16 +120,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
         studyLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Study");
+                Study.NAME.format(1).toString());
         patientLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Patient");
+                Patient.NAME.format(1).toString());
         visitNumberLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Visit#");
+                CollectionEvent.PropertyName.VISIT_NUMBER.toString());
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Activity status");
+                CollectionEvent.PropertyName.ACTIVITY_STATUS.toString());
 
         createPvDataSection(client);
         createCommentsSection();
@@ -123,7 +138,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.format(2).toString());
         commentTable =
             new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
@@ -189,7 +205,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client =
-            createSectionWithClient("Source specimens");
+            createSectionWithClient(SourceSpecimen.NAME.format(2).toString());
         sourceSpecimenTable =
             new NewSpecimenInfoTable(client, ceventInfo.sourceSpecimenInfos,
                 ColumnsShown.CEVENT_SOURCE_SPECIMENS, 10);
@@ -229,7 +245,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void createAliquotedSpecimensSection() {
         // FIXME should we show that to clinics ?
         Composite client =
-            createSectionWithClient("Aliquoted specimens");
+            createSectionWithClient(AliquotedSpecimen.NAME.format(2).toString());
         aliquotedSpcTable =
             new NewSpecimenInfoTable(client, ceventInfo.aliquotedSpecimenInfos,
                 ColumnsShown.CEVENT_ALIQUOTED_SPECIMENS, 10);
@@ -266,12 +282,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
             });
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind("CE {0}",
-            ceventInfo.cevent.getVisitNumber()));
-        form.setText(NLS.bind("Collection Event for visit {0}",
-            +ceventInfo.cevent.getVisitNumber()));
+        setPartName(
+        // tab name, {0} is visit number
+        i18n.tr("CE {0}", ceventInfo.cevent.getVisitNumber()));
+        form.setText(
+            // form title
+            i18n.tr("Collection Event for visit {0}",
+                ceventInfo.cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setList(ceventInfo.sourceSpecimenInfos);
         aliquotedSpcTable.setList(ceventInfo.aliquotedSpecimenInfos);

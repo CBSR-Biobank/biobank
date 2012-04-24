@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,6 +14,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
@@ -34,6 +35,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -42,25 +45,35 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ClinicEntryForm.class);
+
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 
+    @SuppressWarnings("nls")
+    // title area message
     private static final String MSG_NEW_CLINIC_OK =
-        "New clinic information.";
+        i18n.tr("New clinic information.");
 
-    private static final String MSG_CLINIC_OK = "Clinic information.";
+    @SuppressWarnings("nls")
+    // title area message
+    private static final String MSG_CLINIC_OK = i18n.tr("Clinic information.");
 
+    @SuppressWarnings("nls")
+    // validation error message
     private static final String MSG_NO_CLINIC_NAME =
-        "Clinic must have a name";
+        i18n.tr("Clinic must have a name and short name");
 
-    private ClinicWrapper clinic = new ClinicWrapper(
+    private final ClinicWrapper clinic = new ClinicWrapper(
         SessionManager.getAppService());
 
     private ContactEntryInfoTable contactEntryWidget;
 
     protected Combo session;
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -77,20 +90,21 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     private ClinicInfo clinicInfo;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         updateClinicInfo(adapter.getId());
         String tabName;
         if (clinic.isNew()) {
-            tabName = "New Clinic";
+            // tab name
+            tabName = i18n.tr("New Clinic");
             clinic.setActivityStatus(ActivityStatus.ACTIVE);
         } else
-            tabName =
-                NLS.bind("Clinic {0}",
-                    clinic.getNameShort());
+            // tab name
+            tabName = i18n.tr("Clinic {0}", clinic.getNameShort());
         setPartName(tabName);
     }
 
@@ -116,12 +130,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         return MSG_CLINIC_OK;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText("Clinic Information");
+        // form title
+        form.setText(i18n.tr("Clinic Information"));
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page, "Clinics can be associated with studies after submitting this initial information.",
-            SWT.LEFT);
+        toolkit
+            .createLabel(
+                page,
+                // label
+                i18n.tr("Clinics can be associated with studies after submitting this initial information."),
+                SWT.LEFT);
         createClinicInfoSection();
         createAddressArea(clinic);
         createContactSection();
@@ -129,6 +149,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     }
 
+    @SuppressWarnings("nls")
     private void createClinicInfoSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -138,24 +159,30 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, clinic,
+            SWT.NONE,
+            HasName.Property.NAME.toString(),
+            null, clinic,
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Short name", null, clinic,
+            HasName.Property.NAME_SHORT.toString(),
+            null, clinic,
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Sends Shipments", null, clinic,
+            Clinic.Property.SENDS_SHIPMENTS.toString(),
+            null, clinic,
             ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer =
-            createComboViewer(client, "Activity status",
+            createComboViewer(client,
+                ActivityStatus.NAME.format(1).toString(),
                 ActivityStatus.valuesList(), clinic.getActivityStatus(),
-                "Clinic must have an activity status",
+                // validation error message
+                i18n.tr("Clinic must have an activity status"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -168,8 +195,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client = createSectionWithClient(
+            Comment.NAME.format(2).toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -183,11 +212,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         comment = new CommentWrapper(SessionManager.getAppService());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a Comment", null, comment, "message", null);
+            // label
+            i18n.tr("Add a Comment"), null, comment, "message", null);
     }
 
+    @SuppressWarnings("nls")
     private void createContactSection() {
-        Section section = createSection("Contacts");
+        Section section = createSection(Contact.NAME.format(2).toString());
 
         List<ContactWrapper> contacts =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
@@ -197,7 +228,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, "Add contact",
+        addSectionToolbar(section,
+            // label
+            i18n.tr("Add contact"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
