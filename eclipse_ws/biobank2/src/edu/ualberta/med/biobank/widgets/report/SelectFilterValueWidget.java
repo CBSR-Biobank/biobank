@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class SelectFilterValueWidget implements FilterValueWidget {
-    private ComboViewer listViewer;
+    private final ComboViewer listViewer;
     private Map<String, String> options;
 
     public SelectFilterValueWidget(Composite parent) {
@@ -34,7 +34,8 @@ public class SelectFilterValueWidget implements FilterValueWidget {
 
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values =
+            new ArrayList<ReportFilterValue>();
         ISelection selection = listViewer.getSelection();
         if (selection instanceof IStructuredSelection) {
             Iterator<?> it = ((IStructuredSelection) selection).iterator();
@@ -64,7 +65,9 @@ public class SelectFilterValueWidget implements FilterValueWidget {
                 // that don't exist in the option, as they will be lost. DEAL
                 // WITH THIS! :P
                 if (value != null && value.getValue() != null) {
-                    ViewerEntry entry = new ViewerEntry(value.getValue(), StringUtil.EMPTY_STRING); //$NON-NLS-1$
+                    ViewerEntry entry =
+                        new ViewerEntry(value.getValue(),
+                            StringUtil.EMPTY_STRING);
                     toSelect.add(entry);
                 }
             }

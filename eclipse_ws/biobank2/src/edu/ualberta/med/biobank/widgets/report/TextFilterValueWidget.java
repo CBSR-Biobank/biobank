@@ -9,21 +9,29 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class TextFilterValueWidget implements FilterValueWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(TextFilterValueWidget.class);
+
     private final Text text;
 
+    @SuppressWarnings("nls")
     public TextFilterValueWidget(Composite parent) {
         text = new Text(parent, SWT.BORDER);
-        text.setToolTipText("For string values, use '%' as a wildcard character");
+        text.setToolTipText(
+            i18n.tr("For string values, use '%' as a wildcard character"));
     }
 
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values =
+            new ArrayList<ReportFilterValue>();
         if (!text.isDisposed() && text.getText() != null) {
             String string = text.getText().trim();
             if (!string.isEmpty()) {
@@ -39,7 +47,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
         if (!text.isDisposed()) {
-            text.setText(StringUtil.EMPTY_STRING); 
+            text.setText(StringUtil.EMPTY_STRING);
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     text.setText(value.getValue());
