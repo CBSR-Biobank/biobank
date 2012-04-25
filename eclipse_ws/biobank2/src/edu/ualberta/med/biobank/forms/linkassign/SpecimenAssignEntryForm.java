@@ -298,7 +298,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // inventoryID
         Label inventoryIdLabel = widgetCreator.createLabel(fieldsComposite,
-            Specimen.Property.INVENTORY_ID.toString());
+            Specimen.PropertyName.INVENTORY_ID.toString());
         inventoryIdText = (BgcBaseText) createWidget(fieldsComposite,
             BgcBaseText.class, SWT.NONE, "");
         inventoryIdText.addKeyListener(textFieldKeyListener);

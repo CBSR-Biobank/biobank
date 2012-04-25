@@ -81,7 +81,7 @@ public class SpecimenReport1Editor extends ReportsEditor {
             i18n.tr("Patient Number"),
             // table column name
             i18n.tr("Date Drawn"),
-            Specimen.Property.INVENTORY_ID.toString(),
+            Specimen.PropertyName.INVENTORY_ID.toString(),
             SpecimenType.NAME.format(1).toString(),
             Site.NAME.format(1).toString(),
             // table column name

@@ -154,7 +154,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 contents,
                 BgcBaseText.class,
                 SWT.NONE,
-                Specimen.Property.INVENTORY_ID.toString(),
+                Specimen.PropertyName.INVENTORY_ID.toString(),
                 null,
                 internalSpecimen.specimen,
                 SpecimenPeer.INVENTORY_ID.getName(),

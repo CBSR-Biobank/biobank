@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -129,7 +130,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
                 CollectionEvent.PropertyName.VISIT_NUMBER.toString());
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                CollectionEvent.PropertyName.ACTIVITY_STATUS.toString());
+                ActivityStatus.NAME.singular().toString());
 
         createPvDataSection(client);
         createCommentsSection();

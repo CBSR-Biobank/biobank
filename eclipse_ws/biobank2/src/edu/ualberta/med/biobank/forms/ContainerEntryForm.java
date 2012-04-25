@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -205,7 +206,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer =
             createComboViewer(client,
-                Container.Property.ACTIVITY_STATUS.toString(),
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(), container.getActivityStatus(),
                 // validation error message
                 i18n.tr("Container must have an activity status"),
@@ -227,7 +228,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         containerTypeComboViewer =
             createComboViewer(client,
-                Container.Property.CONTAINER_TYPE.toString(),
+                ContainerType.NAME.singular().toString(),
                 containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
                 new ComboSelectionUpdate() {
                     @Override

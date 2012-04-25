@@ -41,7 +41,7 @@ public class SourceSpecimen extends AbstractBiobankModel {
         "Source Specimens");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString NEED_ORIGINAL_VOLUME = bundle.trc(
             "model",
             "Need Original Volume").format();

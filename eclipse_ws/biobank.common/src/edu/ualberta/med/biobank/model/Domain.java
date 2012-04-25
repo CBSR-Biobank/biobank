@@ -12,10 +12,32 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "DOMAIN")
 public class Domain extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Domain",
+        "Domains");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString ALL_CENTERS = bundle.trc(
+            "model",
+            "All Centers").format();
+        public static final LString ALL_STUDIES = bundle.trc(
+            "model",
+            "All Studies").format();
+    }
 
     private Set<Center> centers = new HashSet<Center>(0);
     private Set<Study> studies = new HashSet<Study>(0);

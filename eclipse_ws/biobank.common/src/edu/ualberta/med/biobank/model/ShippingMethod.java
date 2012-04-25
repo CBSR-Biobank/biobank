@@ -29,8 +29,7 @@ public class ShippingMethod extends AbstractBiobankModel {
         "Shipping Method",
         "Shipping Methods");
 
-    @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString NAME =
             HasName.Property.NAME;
     }

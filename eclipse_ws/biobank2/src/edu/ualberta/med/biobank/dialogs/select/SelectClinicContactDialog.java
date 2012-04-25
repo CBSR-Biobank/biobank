@@ -95,7 +95,7 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
         }
 
         clinicCombo = widgetCreator.createComboViewer(contents,
-            Contact.Property.CLINIC.toString(),
+            Clinic.NAME.singular().toString(),
             new ArrayList<Clinic>(clinics), null, labelProvider);
         clinicCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {

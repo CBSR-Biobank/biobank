@@ -69,16 +69,15 @@ public class Container extends AbstractBiobankModel {
 
     @SuppressWarnings("nls")
     public static class Property {
-        public static final LString ACTIVITY_STATUS =
-            ActivityStatus.NAME.format(1);
-        public static final LString CONTAINER_TYPE =
-            ContainerType.NAME.format(1);
         public static final LString LABEL = bundle.trc(
             "model",
             "Label").format();
         public static final LString PRODUCT_BARCODE = bundle.trc(
             "model",
             "Product Barcode").format();
+        public static final LString TEMPERATURE = bundle.trc(
+            "model",
+            "Temperature").format();
     }
 
     private String productBarcode;

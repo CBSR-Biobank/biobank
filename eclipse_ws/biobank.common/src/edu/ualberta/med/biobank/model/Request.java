@@ -15,6 +15,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 /**
@@ -26,6 +30,23 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Table(name = "REQUEST")
 public class Request extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Request",
+        "Requests");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString CREATED = bundle.trc(
+            "model",
+            "Time Created").format();
+        public static final LString SUBMITTED = bundle.trc(
+            "model",
+            "Time Submitted").format();
+    }
 
     private Date submitted;
     private Date created;

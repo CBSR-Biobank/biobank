@@ -37,9 +37,6 @@ public class Comment extends AbstractBiobankModel {
         public static final LString MESSAGE = bundle.trc(
             "model",
             "Message").format();
-        public static final LString USER = bundle.trc(
-            "model",
-            "User").format();
     }
 
     private String message;

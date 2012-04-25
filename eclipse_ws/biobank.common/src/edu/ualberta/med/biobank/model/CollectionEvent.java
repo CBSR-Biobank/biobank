@@ -47,17 +47,9 @@ public class CollectionEvent extends AbstractBiobankModel {
 
     @SuppressWarnings("nls")
     public static class PropertyName {
-        public static final LString ACTIVITY_STATUS =
-            ActivityStatus.NAME.format(1);
-        public static final LString CENTER =
-            Center.NAME.format(1);
-        public static final LString COMMENTS =
-            Comment.NAME.format(2);
         public static final LString CREATED_AT = bundle.trc(
             "model",
             "Created At").format();
-        public static final LString SPECIMENS =
-            Specimen.NAME.format(2);
         public static final LString VISIT_NUMBER = bundle.trc(
             "model",
             "Visit Number").format();

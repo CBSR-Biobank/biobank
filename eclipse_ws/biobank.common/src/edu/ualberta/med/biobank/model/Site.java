@@ -13,7 +13,6 @@ import javax.persistence.OneToMany;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -45,13 +44,6 @@ public class Site extends Center {
         "model",
         "Site",
         "Sites");
-
-    @SuppressWarnings("nls")
-    public static class Property {
-        public static final LString NEED_ORIGINAL_VOLUME = bundle.trc(
-            "model",
-            "Need Original Volume").format();
-    }
 
     private Set<Study> studies = new HashSet<Study>(0);
     private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);

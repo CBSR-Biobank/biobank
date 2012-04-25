@@ -104,7 +104,7 @@ public class SpecimenReport3Editor extends ReportsEditor implements
     protected String[] getColumnNames() {
         return new String[] {
             Patient.NAME.format(1).toString(),
-            Specimen.Property.INVENTORY_ID.toString(),
+            Specimen.PropertyName.INVENTORY_ID.toString(),
             // table column name
             i18n.tr("Date Drawn"),
             // table column name

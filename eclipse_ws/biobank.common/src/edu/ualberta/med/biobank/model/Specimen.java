@@ -61,7 +61,7 @@ public class Specimen extends AbstractBiobankModel {
         "Specimens");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString INVENTORY_ID = bundle.trc(
             "model",
             "Inventory Id").format();

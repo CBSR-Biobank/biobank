@@ -66,7 +66,7 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            ShippingMethod.Property.NAME.toString(),
+            ShippingMethod.PropertyName.NAME.toString(),
             null, tmpShippingMethod,
             ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
                 // TR: validation error message

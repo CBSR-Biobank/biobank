@@ -151,7 +151,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
         return new String[] {
             // table column name
             i18n.tr("Location"),
-            Specimen.Property.INVENTORY_ID.toString(),
+            Specimen.PropertyName.INVENTORY_ID.toString(),
             Patient.NAME.format(1).toString(),
             // table column name
             i18n.tr("Date Processed"),

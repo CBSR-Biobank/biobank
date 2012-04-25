@@ -111,7 +111,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
-            SourceSpecimen.Property.NEED_ORIGINAL_VOLUME.toString(),
+            SourceSpecimen.PropertyName.NEED_ORIGINAL_VOLUME.toString(),
             new String[0], userSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 

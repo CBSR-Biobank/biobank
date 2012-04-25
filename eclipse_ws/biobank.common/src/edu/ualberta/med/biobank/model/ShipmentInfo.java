@@ -29,9 +29,15 @@ public class ShipmentInfo extends AbstractBiobankModel {
 
     @SuppressWarnings("nls")
     public static class Property {
+        public static final LString BOX_NUMBER = bundle.trc(
+            "model",
+            "Box Number").format();
         public static final LString PACKED_AT = bundle.trc(
             "model",
             "Time Packed").format();
+        public static final LString RECEIVED_AT = bundle.trc(
+            "model",
+            "Received At").format();
         public static final LString SHIPPING_METHOD = bundle.trc(
             "model",
             "Shipping Method").format();

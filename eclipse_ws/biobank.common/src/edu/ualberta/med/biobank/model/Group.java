@@ -40,7 +40,9 @@ public class Group extends Principal {
 
     @SuppressWarnings("nls")
     public static class Property {
-        public static final LString NAME = HasName.Property.NAME;
+        public static final LString DESCRIPTION = bundle.trc(
+            "model",
+            "Description").format();
     }
 
     private String name;

@@ -15,6 +15,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 /**
  * caTissue Term - Transfer Event: Event that refers to moving specimen from one
  * storage location to another storage location.
@@ -24,6 +29,26 @@ import javax.validation.constraints.NotNull;
 @Table(name = "DISPATCH")
 public class Dispatch extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Dispatch",
+        "Dispatches");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString RECEIVER_CENTER = bundle.trc(
+            "model",
+            "Receiver Center").format();
+        public static final LString SENDER_CENTER = bundle.trc(
+            "model",
+            "Sender Center").format();
+        public static final LString STATE = bundle.trc(
+            "model",
+            "State").format();
+    }
 
     private Integer state;
     private Set<DispatchSpecimen> dispatchSpecimens =

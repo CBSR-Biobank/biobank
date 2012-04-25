@@ -326,7 +326,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         final BgcBaseText inventoryIdText =
             (BgcBaseText) createBoundWidgetWithLabel(
                 fieldsComposite, BgcBaseText.class, SWT.NONE,
-                Specimen.Property.INVENTORY_ID.toString(),
+                Specimen.PropertyName.INVENTORY_ID.toString(),
                 new String[0],
                 singleSpecimen, SpecimenPeer.INVENTORY_ID.getName(),
                 idValidator,

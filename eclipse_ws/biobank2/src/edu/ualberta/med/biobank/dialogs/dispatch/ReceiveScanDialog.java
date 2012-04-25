@@ -153,7 +153,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                     // exported report column name, for positions of specimens
                     // according to a labeling scheme
                     i18n.tr("Location"),
-                    Specimen.Property.INVENTORY_ID.toString(),
+                    Specimen.PropertyName.INVENTORY_ID.toString(),
                     Patient.NAME.format(1).toString(),
                     // exported report column name, for specimen's specimen type
                     i18n.tr("Sample Type"),
