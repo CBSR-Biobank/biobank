@@ -69,18 +69,18 @@ public class ContainerTypeAdapter extends AdapterBase {
             SiteWrapper site = type.getSite();
             if (site != null) {
                 return site.getNameShort() + " - " 
-                    + getTooltipText("Container Type");
+                    + getTooltipText(ContainerType.NAME.singular().toString());
             }
         }
-        return getTooltipText("Container Type");
+        return getTooltipText(ContainerType.NAME.singular().toString());
 
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Container Type");
-        addViewMenu(menu, "Container Type");
-        addDeleteMenu(menu, "Container Type");
+        addEditMenu(menu, ContainerType.NAME.singular().toString());
+        addViewMenu(menu, ContainerType.NAME.singular().toString());
+        addDeleteMenu(menu, ContainerType.NAME.singular().toString());
     }
 
     @Override

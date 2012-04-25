@@ -11,6 +11,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 
 public class PalletBarcodeDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -35,17 +36,17 @@ public class PalletBarcodeDialog extends BgcBaseDialog {
         return i18n.tr("Product Barcode Required");
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return i18n.tr("Product Barcode");
+        return Container.PropertyName.PRODUCT_BARCODE.toString();
     }
 
     @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         widgetCreator.createBoundWidgetWithLabel(parent, BgcBaseText.class,
-            SWT.NONE, i18n.tr("Barcode"), new String[] {}, barcode,
+            SWT.NONE, Container.PropertyName.PRODUCT_BARCODE.toString(),
+            new String[] {}, barcode,
             new NonEmptyStringValidator(i18n.tr("Barcode cannot be empty")));
     }
 

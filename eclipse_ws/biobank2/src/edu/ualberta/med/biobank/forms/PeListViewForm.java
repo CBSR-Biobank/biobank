@@ -45,12 +45,12 @@ public class PeListViewForm extends BiobankViewForm {
                 new ProcessingEventGetBriefInfoAction(pe.getId())));
         }
 
-        setPartName("Processing Events");
+        setPartName(ProcessingEvent.NAME.plural().toString());
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Processing Events");
+        form.setText(ProcessingEvent.NAME.plural().toString());
         page.setLayout(new GridLayout(1, false));
         form.setImage(BiobankPlugin.getDefault().getImage(
             new ProcessingEventAdapter(null, null)));

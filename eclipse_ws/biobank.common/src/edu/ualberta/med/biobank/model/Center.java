@@ -62,19 +62,9 @@ public class Center extends AbstractBiobankModel
 
     @SuppressWarnings("nls")
     public static class Property {
-        public static final LString ADDRESS =
-            Address.NAME.format(1);
         public static final LString DST_DISPATCHES = bundle.trc(
             "model",
             "Destination Dispatches").format();
-        public static final LString NAME = bundle.trc(
-            "model",
-            "Name").format();
-        public static final LString NAME_SHORT = bundle.trc(
-            "model",
-            "Short Name").format();
-        public static final LString PROCESSING_EVENTS =
-            ProcessingEvent.NAME.format(2);
         public static final LString SRC_DISPATCHES = bundle.trc(
             "model",
             "Source Dispatches").format();

@@ -75,8 +75,8 @@ public class PatientAdapter extends AbstractNewAdapterBase {
     public String getTooltipTextInternal() {
         if (patient != null && study != null)
             return study.getName()
-                + " - " + getTooltipText("Patient"); 
-        return getTooltipText("Patient");
+                + " - " + getTooltipText(Patient.NAME.singular().toString());
+        return getTooltipText(Patient.NAME.singular().toString());
     }
 
     @Override
@@ -87,9 +87,9 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Patient");
-        addViewMenu(menu, "Patient");
-        addDeleteMenu(menu, "Patient");
+        addEditMenu(menu, Patient.NAME.singular().toString());
+        addViewMenu(menu, Patient.NAME.singular().toString());
+        addDeleteMenu(menu, Patient.NAME.singular().toString());
 
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);

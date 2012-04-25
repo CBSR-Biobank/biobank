@@ -31,7 +31,7 @@ public class ShippingMethod extends AbstractBiobankModel {
 
     public static class PropertyName {
         public static final LString NAME =
-            HasName.Property.NAME;
+            HasName.PropertyName.NAME;
     }
 
     private String name;

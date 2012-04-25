@@ -41,7 +41,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
@@ -117,7 +120,7 @@ public class RequestEntryForm extends BiobankViewForm {
         setTextValue(orderNumberLabel, request.getId());
 
         BgcBaseText researchGroupLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Research Group");
+            SWT.NONE, ResearchGroup.NAME.singular().toString());
 
         setTextValue(researchGroupLabel, request.getResearchGroup()
             .getNameShort());
@@ -127,7 +130,7 @@ public class RequestEntryForm extends BiobankViewForm {
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
 
-        Section s = createSection("Specimens");
+        Section s = createSection(Specimen.NAME.plural().toString());
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
         c.setLayout(new GridLayout());
@@ -144,7 +147,7 @@ public class RequestEntryForm extends BiobankViewForm {
         });
 
         Section s2 =
-            createSection("Dispatches");
+            createSection(Dispatch.NAME.plural().toString());
         Composite dispatchCreation = toolkit.createComposite(s2);
         s2.setClient(dispatchCreation);
         addSectionToolbar(s2, "New dispatch",

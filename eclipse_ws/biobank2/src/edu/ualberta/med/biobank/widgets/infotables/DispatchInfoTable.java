@@ -17,11 +17,12 @@ import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermiss
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    private List<DispatchWrapper> dispatches;
+    private final List<DispatchWrapper> dispatches;
 
     protected static class TableRowData {
         DispatchWrapper dispatch;
@@ -32,6 +33,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         String waybill;
         String dstatus;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils
@@ -39,7 +41,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     new String[] { sender,
                         DateFormatter.formatAsDate(dispatchTime), receiver,
                         DateFormatter.formatAsDate(dateReceived), waybill,
-                        dstatus }, "\t"); 
+                        dstatus }, "\t");
         }
     }
 
@@ -48,10 +50,10 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         "Dispatch Time",
         "Receiver",
         "Date Received",
-        "Waybill",
+        ShipmentInfo.PropertyName.WAYBILL.toString(),
         "Dispatch State" };
 
-    private boolean editMode = false;
+    private final boolean editMode = false;
 
     public DispatchInfoTable(Composite parent,
         List<Dispatch> dispatchesRaw) {
@@ -80,7 +82,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -96,7 +98,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return info.dstatus;
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

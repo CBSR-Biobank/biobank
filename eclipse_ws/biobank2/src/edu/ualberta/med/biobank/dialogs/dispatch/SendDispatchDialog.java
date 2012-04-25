@@ -68,7 +68,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
         widgetCreator.createComboViewer(contents,
-            ShipmentInfo.Property.SHIPPING_METHOD.toString(),
+            ShipmentInfo.PropertyName.SHIPPING_METHOD.toString(),
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -81,13 +81,13 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             // shipping waybill text box label
-            ShipmentInfo.Property.WAYBILL.toString(),
+            ShipmentInfo.PropertyName.WAYBILL.toString(),
             null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
         createDateTimeWidget(contents,
-            ShipmentInfo.Property.PACKED_AT.toString(),
+            ShipmentInfo.PropertyName.PACKED_AT.toString(),
             date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
                 // time packed required validation message

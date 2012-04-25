@@ -29,7 +29,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -53,7 +56,7 @@ public class StudyViewForm extends BiobankViewForm {
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
         ":Date Processed";
 
-    private StudyWrapper study =
+    private final StudyWrapper study =
         new StudyWrapper(SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
@@ -119,11 +122,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Name");
+            HasName.PropertyName.NAME.toString());
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Name Short");
+            HasNameShort.PropertyName.NAME_SHORT.toString());
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity status");
+            ActivityStatus.NAME.singular().toString());
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             "Total patients");
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
@@ -139,7 +142,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 study.getCommentCollection(false));

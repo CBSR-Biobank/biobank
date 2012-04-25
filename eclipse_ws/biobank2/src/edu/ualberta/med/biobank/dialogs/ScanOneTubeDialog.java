@@ -43,7 +43,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
         area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         widgetCreator.createLabel(area,
-            Container.Property.PRODUCT_BARCODE.toString());
+            Container.PropertyName.PRODUCT_BARCODE.toString());
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
     }
 

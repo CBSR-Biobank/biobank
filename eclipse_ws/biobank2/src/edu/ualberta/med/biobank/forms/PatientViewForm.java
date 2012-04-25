@@ -26,6 +26,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasCreatedAt;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -85,7 +88,8 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -113,10 +117,10 @@ public class PatientViewForm extends BiobankViewForm {
 
         studyLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Study");
+                Study.NAME.singular().toString());
         createdAtLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Created At");
+                HasCreatedAt.PropertyName.CREATED_AT.toString());
         visitCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Total Visits");
@@ -129,7 +133,8 @@ public class PatientViewForm extends BiobankViewForm {
     }
 
     private void createCollectionEventSection() {
-        Section section = createSection("Collection Events");
+        Section section =
+            createSection(CollectionEvent.NAME.plural().toString());
 
         collectionEventTable =
             new NewCollectionEventInfoTable(section, patientInfo.ceventInfos);

@@ -63,7 +63,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     }
 
     protected void createAddressArea(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient("Address");
+        Composite client = createSectionWithClient(Address.NAME.singular().toString());
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
 }

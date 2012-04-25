@@ -21,12 +21,16 @@ import edu.ualberta.med.biobank.export.DataExporter;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.logs.LogQuery;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
 
-    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm"; 
+    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
 
     private BgcBaseText userLabel;
     private BgcBaseText typeLabel;
@@ -78,9 +82,9 @@ public class LoggingForm extends BiobankViewForm {
 
         /* a grid might make this easier */
         centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Center");
+            Center.NAME.singular().toString());
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "User");
+            User.NAME.singular().toString());
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
@@ -89,11 +93,11 @@ public class LoggingForm extends BiobankViewForm {
             "Start Date");
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Patient #");
+            Patient.PropertyName.PNUMBER.toString());
         locationLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Location");
         inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Inventory ID");
+            Specimen.PropertyName.INVENTORY_ID.toString());
         detailsLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             "Details");
         endDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
@@ -132,13 +136,13 @@ public class LoggingForm extends BiobankViewForm {
         final Data data = new Data();
         try {
             data.setColumnNames(Arrays.asList(
-                "Center",
-                "User",
+                Center.NAME.singular().toString(),
+                User.NAME.singular().toString(),
                 "Date",
                 "Action",
                 "Type",
-                "Patient #",
-                "Inventory ID",
+                Patient.PropertyName.PNUMBER.toString(),
+                Specimen.PropertyName.INVENTORY_ID.toString(),
                 "Location",
                 "Details"));
             data.setTitle("Log Query: ");

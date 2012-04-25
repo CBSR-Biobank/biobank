@@ -14,6 +14,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -77,8 +78,7 @@ public class SpecimenReport1Editor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] {
-            // table column name
-            i18n.tr("Patient Number"),
+            Patient.PropertyName.PNUMBER.toString(),
             // table column name
             i18n.tr("Date Drawn"),
             Specimen.PropertyName.INVENTORY_ID.toString(),

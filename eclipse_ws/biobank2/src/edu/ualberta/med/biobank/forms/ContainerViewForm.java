@@ -57,7 +57,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -78,7 +83,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ContainerViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerViewForm"; 
+        "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ContainerViewForm.class.getName());
@@ -124,7 +129,7 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
@@ -182,22 +187,22 @@ public class ContainerViewForm extends BiobankViewForm {
 
         siteLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Repository Site");
+                Site.NAME.singular().toString());
         containerLabelLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Label");
+                Container.PropertyName.LABEL.toString());
         productBarcodeLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Product Bar Code");
+                Container.PropertyName.PRODUCT_BARCODE.toString());
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Activity status");
+                ActivityStatus.NAME.singular().toString());
         containerTypeLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Container Type");
+                ContainerType.NAME.singular().toString());
         temperatureLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Temperature");
+                Container.PropertyName.TEMPERATURE.toString());
 
         createCommentsSection();
 
@@ -210,7 +215,8 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 ModelWrapper.wrapModelCollection(
@@ -232,8 +238,8 @@ public class ContainerViewForm extends BiobankViewForm {
             Integer colCap =
                 containerInfo.container.getContainerType().getCapacity()
                     .getColCapacity();
-            Assert.isNotNull(rowCap, "row capacity is null"); 
-            Assert.isNotNull(colCap, "column capacity is null"); 
+            Assert.isNotNull(rowCap, "row capacity is null");
+            Assert.isNotNull(colCap, "column capacity is null");
             if (rowCap == 0) rowCap = 1;
             if (colCap == 0) colCap = 1;
 
@@ -297,8 +303,9 @@ public class ContainerViewForm extends BiobankViewForm {
         s.setClient(containerSection);
         if (!childrenOk) {
             Label label =
-                toolkit.createLabel(client,
-                    "Error in container children : can't display those initialized");
+                toolkit
+                    .createLabel(client,
+                        "Error in container children : can't display those initialized");
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
@@ -622,7 +629,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite parent =
-            createSectionWithClient("Specimens");
+            createSectionWithClient(Specimen.NAME.plural().toString());
         specimensWidget =
             new NewSpecimenInfoTable(parent, specInfo,
                 ColumnsShown.CEVENT_SOURCE_SPECIMENS, 20);

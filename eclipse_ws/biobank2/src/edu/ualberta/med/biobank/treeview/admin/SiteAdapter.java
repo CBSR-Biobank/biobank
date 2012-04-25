@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -67,25 +68,26 @@ public class SiteAdapter extends AdapterBase {
         return adapter;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         SiteWrapper site = (SiteWrapper) getModelObject();
-        Assert.isNotNull(site, "site is null"); 
+        Assert.isNotNull(site, "site is null");
         return site.getNameShort();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Repository Site");
+        return getTooltipText(Site.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Site");
-        addViewMenu(menu, "Site");
+        addEditMenu(menu, Site.NAME.singular().toString());
+        addViewMenu(menu, Site.NAME.singular().toString());
         if (!getModelObject().equals(
             SessionManager.getUser().getCurrentWorkingCenter()))
-            addDeleteMenu(menu, "Site");
+            addDeleteMenu(menu, Site.NAME.singular().toString());
     }
 
     @Override

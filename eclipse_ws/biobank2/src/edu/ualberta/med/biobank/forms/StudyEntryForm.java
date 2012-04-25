@@ -49,6 +49,8 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
@@ -64,7 +66,7 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class StudyEntryForm extends BiobankEntryForm {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyEntryForm"; 
+        "edu.ualberta.med.biobank.forms.StudyEntryForm";
 
     private static final String MSG_NEW_STUDY_OK =
         "Creating a new study.";
@@ -121,7 +123,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         updateStudyInfo(adapter.getId());
@@ -175,17 +177,18 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, study,
+            SWT.NONE, HasName.PropertyName.NAME.toString(), null, study,
             StudyPeer.NAME.getName(), new NonEmptyStringValidator(
                 "Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Name Short", null, study,
+            HasNameShort.PropertyName.NAME_SHORT.toString(), null, study,
             StudyPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 "Study short name cannot be blank"));
 
         activityStatusComboViewer =
-            createComboViewer(client, "Activity status",
+            createComboViewer(client,
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(), study.getActivityStatus(),
                 "Study must have an activity status",
                 new ComboSelectionUpdate() {
@@ -225,7 +228,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -274,7 +278,11 @@ public class StudyEntryForm extends BiobankEntryForm {
         layout.numColumns = 1;
         layout.verticalSpacing = 0;
 
-        toolkit.createLabel(client, "Source Specimen types must be added before any aliquoted specimen types can be added.", SWT.LEFT);
+        toolkit
+            .createLabel(
+                client,
+                "Source Specimen types must be added before any aliquoted specimen types can be added.",
+                SWT.LEFT);
 
         aliquotedSpecimenEntryTable =
             new AliquotedSpecimenEntryInfoTable(client,
@@ -331,7 +339,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyEventAttrCustom.setAllowedValues(permissible
-                        .split(";")); 
+                        .split(";"));
                 }
                 selected =
                     sea.getActivityStatus().equals(ActivityStatus.ACTIVE);
@@ -539,7 +547,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 String permissible = sea.getPermissible();
                 if ((permissible != null) && !permissible.isEmpty()) {
                     studyPvAttrCustom.setAllowedValues(permissible
-                        .split(";")); 
+                        .split(";"));
                 }
                 selected = true;
                 studyPvAttrCustom.inStudy = true;

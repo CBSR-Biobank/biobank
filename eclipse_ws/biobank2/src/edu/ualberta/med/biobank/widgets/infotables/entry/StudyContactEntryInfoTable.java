@@ -38,7 +38,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Clinic",
+        Clinic.NAME.singular().toString(),
         "Contact Name",
         "Title",
         "Email",

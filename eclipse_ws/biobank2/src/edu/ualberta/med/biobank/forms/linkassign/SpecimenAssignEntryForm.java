@@ -61,8 +61,10 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
@@ -235,8 +237,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected void createCommonFields(Composite commonFieldsComposite) {
         BgcBaseText siteLabel = createReadOnlyLabelledField(
             commonFieldsComposite, SWT.NONE,
-            // TR: label
-            i18n.tr("Site"));
+            Site.NAME.singular().toString());
         siteLabel.setText(SessionManager.getUser().getCurrentWorkingCenter()
             .getNameShort());
     }
@@ -501,8 +502,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         // for all modes: position to be assigned to the specimen
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            // TR: label
-            i18n.tr("Position"));
+            AbstractPosition.NAME.singular().toString());
         newSinglePositionValidator = new StringLengthValidator(4,
             // TR: label
             i18n.tr("Enter a position"));

@@ -68,7 +68,7 @@ public class Container extends AbstractBiobankModel {
         "Containers");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString LABEL = bundle.trc(
             "model",
             "Label").format();

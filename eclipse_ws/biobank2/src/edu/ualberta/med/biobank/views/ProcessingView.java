@@ -20,6 +20,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -54,7 +56,7 @@ public class ProcessingView extends AbstractAdministrationView {
 
     private void createNodes() {
         processingNode = new ProcessingEventGroup((RootNode) rootNode, 2,
-            "Processing Events");
+            ProcessingEvent.NAME.plural().toString());
         processingNode.setParent(rootNode);
         rootNode.addChild(processingNode);
     }
@@ -69,7 +71,8 @@ public class ProcessingView extends AbstractAdministrationView {
         composite.setLayout(layout);
 
         radioWorksheet = new Button(composite, SWT.RADIO);
-        radioWorksheet.setText("Worksheet");
+        radioWorksheet.setText(ProcessingEvent.PropertyName.WORKSHEET
+            .toString());
         radioWorksheet.setSelection(true);
         radioWorksheet.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -80,7 +83,7 @@ public class ProcessingView extends AbstractAdministrationView {
             }
         });
         radioPatient = new Button(composite, SWT.RADIO);
-        radioPatient.setText("Patient");
+        radioPatient.setText(Patient.NAME.singular().toString());
         radioPatient.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -162,7 +165,7 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     protected String getTreeTextToolTip() {
-        return ""; 
+        return "";
     }
 
     @Override
@@ -242,7 +245,7 @@ public class ProcessingView extends AbstractAdministrationView {
                 modelWrapper.getClass(), modelWrapper.getId());
             nodeRes.get(0).performDoubleClick();
         } else
-            BgcPlugin.openMessage("Processing Events",
+            BgcPlugin.openMessage(ProcessingEvent.NAME.plural().toString(),
                 NLS.bind("{0} found.",
                     searchedObjects.size()));
     }

@@ -11,6 +11,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -53,8 +54,7 @@ public class SpecimenTypeReport1Editor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] {
-            // table column name
-            i18n.tr("Patient Number"),
+            Patient.PropertyName.PNUMBER.toString(),
             // table column name
             i18n.tr("First Time Processed"),
             // table column name

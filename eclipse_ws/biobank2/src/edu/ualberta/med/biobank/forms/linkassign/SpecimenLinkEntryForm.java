@@ -48,7 +48,9 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
@@ -231,8 +233,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         toolkit.createLabel(typesSelectionPerRowComposite, "");
         toolkit.createLabel(typesSelectionPerRowComposite,
-            // label
-            i18n.tr("Source Specimen"));
+            SourceSpecimen.NAME.singular().toString());
         toolkit.createLabel(typesSelectionPerRowComposite,
             // label
             i18n.tr("Aliquoted Specimen Types"));
@@ -360,8 +361,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         // position field
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            // label
-            i18n.tr("Position"));
+            AbstractPosition.NAME.singular().toString());
         newSinglePositionValidator = new StringLengthValidator(4,
             // validation error message
             i18n.tr("Enter a position"));

@@ -13,6 +13,9 @@ import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEven
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
@@ -29,15 +32,15 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { startDate, studyNameShort,
-                numSVs.toString(), numAliquots.toString() }, "\t"); 
+                numSVs.toString(), numAliquots.toString() }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
         "Start date",
-        "Study",
-        "Source Specimens",
-        "Aliquoted Specimens" };
+        Study.NAME.singular().toString(),
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString() };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventBriefInfo> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS,
@@ -55,7 +58,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -67,7 +70,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                 case 3:
                     return NumberFormatter.format(item.numAliquots);
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

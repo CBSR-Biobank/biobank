@@ -38,8 +38,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -152,7 +154,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Center", pevent.getCenter()
+            Center.NAME.singular().toString(), pevent.getCenter()
                 .getName());
 
         dateWidget =
@@ -167,7 +169,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Worksheet", null, pevent,
+            ProcessingEvent.PropertyName.WORKSHEET.toString(), null, pevent,
             ProcessingEventPeer.WORKSHEET.getName(),
             (!pevent.isNew() && pevent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator(
@@ -176,7 +178,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         activityStatusComboViewer =
             createComboViewer(
                 client,
-                "Activity status",
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(),
                 pevent.getActivityStatus(),
                 "Processing event must have an activity status ",
@@ -199,7 +201,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -220,7 +223,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
         Composite client =
-            createSectionWithClient("Source specimens");
+            createSectionWithClient(SourceSpecimen.NAME.plural().toString());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));

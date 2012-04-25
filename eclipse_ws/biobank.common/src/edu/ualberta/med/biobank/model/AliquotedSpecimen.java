@@ -38,16 +38,10 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
         "Aliquoted Specimens");
 
     @SuppressWarnings("nls")
-    public static class Property {
-        public static final LString ACTIVITY_STATUS =
-            ActivityStatus.NAME.format(1);
+    public static class PropertyName {
         public static final LString QUANTITY = bundle.trc(
             "model",
             "Quantity").format();
-        public static final LString SPECIMEN_TYPE =
-            SpecimenType.NAME.format(1);
-        public static final LString STUDY =
-            Study.NAME.format(1);
         public static final LString VOLUME = bundle.trc(
             "model",
             "Volume (ml)").format();

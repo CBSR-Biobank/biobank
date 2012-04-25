@@ -10,13 +10,14 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DispatchCenterAdapter extends AdapterBase {
 
-    private OutgoingNode out;
-    private IncomingNode inc;
+    private final OutgoingNode out;
+    private final IncomingNode inc;
 
     public DispatchCenterAdapter(AdapterBase parent, CenterWrapper<?> center) {
         super(parent, center);
@@ -29,16 +30,17 @@ public class DispatchCenterAdapter extends AdapterBase {
         this.addChild(inc);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         CenterWrapper<?> site = (CenterWrapper<?>) getModelObject();
-        Assert.isNotNull(site, "site is null"); 
+        Assert.isNotNull(site, "site is null");
         return site.getNameShort();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Repository Site");
+        return getTooltipText(Site.NAME.singular().toString());
     }
 
     @Override

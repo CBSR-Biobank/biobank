@@ -50,6 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
@@ -68,7 +69,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ShipmentEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShipmentEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ShipmentEntryForm";
 
     public static final String MSG_NEW_SHIPMENT_OK =
         "Creating a new shipment record.";
@@ -88,12 +89,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NonEmptyStringValidator waybillValidator;
 
-    private static final String WAYBILL_BINDING = "shipment-waybill-binding"; 
+    private static final String WAYBILL_BINDING = "shipment-waybill-binding";
 
     private static final String DATE_SHIPPED_BINDING =
-        "shipment-date-shipped-binding"; 
+        "shipment-date-shipped-binding";
 
-    private static final String BOX_NUMBER_BINDING = "box-number-binding"; 
+    private static final String BOX_NUMBER_BINDING = "box-number-binding";
 
     private DateTimeWidget dateSentWidget;
 
@@ -103,7 +104,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private BgcBaseText waybillWidget;
 
-    private Set<SpecimenWrapper> removedSpecimensToPersist =
+    private final Set<SpecimenWrapper> removedSpecimensToPersist =
         new HashSet<SpecimenWrapper>();
 
     private BgcBaseText boxNumberWidget;
@@ -119,12 +120,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentReadInfo oiInfo;
 
-    private OriginInfoWrapper originInfo = new OriginInfoWrapper(
+    private final OriginInfoWrapper originInfo = new OriginInfoWrapper(
         SessionManager.getAppService());
-    private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+    private final ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
         SessionManager.getAppService());
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
@@ -133,7 +134,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Assert.isTrue(adapter instanceof ShipmentAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         setOiInfo(adapter.getId());
@@ -172,7 +173,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment Information");
+        form.setText(ShipmentInfo.NAME.singular().toString());
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -218,7 +219,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         waybillLabel =
             widgetCreator.createLabel(client,
-                "Waybill");
+                ShipmentInfo.PropertyName.WAYBILL.toString());
         waybillLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator =
@@ -233,7 +234,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shippingMethodComboViewer =
             createComboViewer(client,
-                "Shipping Method",
+                ShippingMethod.NAME.singular().toString(),
                 ShippingMethodWrapper.getShippingMethods(SessionManager
                     .getAppService()), shipmentInfo
                     .getShippingMethod(), null,
@@ -306,7 +307,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 widgetCreator.addBinding(WAYBILL_BINDING);
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
-                waybillWidget.setText(""); 
+                waybillWidget.setText("");
             }
         }
 
@@ -318,7 +319,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             widgetCreator.addBinding(BOX_NUMBER_BINDING);
         } else {
             widgetCreator.removeBinding(BOX_NUMBER_BINDING);
-            boxNumberWidget.setText(""); 
+            boxNumberWidget.setText("");
         }
         form.layout(true, true);
     }
@@ -339,7 +340,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private void createSpecimensSection() {
         Composite client =
-            createSectionWithClient("Specimens");
+            createSectionWithClient(Specimen.NAME.plural().toString());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
@@ -450,7 +451,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);

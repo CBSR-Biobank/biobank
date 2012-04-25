@@ -22,8 +22,8 @@ public abstract class AbstractPosition extends AbstractBiobankModel {
     @SuppressWarnings("nls")
     public static final Trnc NAME = bundle.trnc(
         "model",
-        "Abstract Position",
-        "Abstract Positions");
+        "Position",
+        "Positions");
 
     @SuppressWarnings("nls")
     public static class Property {

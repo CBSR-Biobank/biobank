@@ -7,13 +7,14 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
 
     private static final String[] HEADINGS =
-        new String[] { "Shipping method" };
+        new String[] { ShippingMethod.NAME.singular().toString() };
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
@@ -32,13 +33,13 @@ public class ShippingMethodInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
                     return item.getName();
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

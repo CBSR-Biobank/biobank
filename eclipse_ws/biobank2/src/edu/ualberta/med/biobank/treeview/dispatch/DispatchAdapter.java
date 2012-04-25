@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -85,32 +86,32 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getDispatchWrapper();
-        Assert.isNotNull(dispatch, "Dispatch is null"); 
-        String label = ""; 
+        Assert.isNotNull(dispatch, "Dispatch is null");
+        String label = "";
         if (dispatch.getSenderCenter() != null
             && dispatch.getReceiverCenter() != null)
-            label += dispatch.getSenderCenter().getNameShort() + " -> " 
+            label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
         ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
         if ((shipInfo != null) && (shipInfo.getPackedAt() != null))
-            label += " [" + dispatch.getFormattedPackedAt() + "]";  
+            label += " [" + dispatch.getFormattedPackedAt() + "]";
         return label;
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Dispatch");
+        return getTooltipText(Dispatch.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         CenterWrapper<?> siteParent = SessionManager.getUser()
             .getCurrentWorkingCenter();
-        addViewMenu(menu, "Dispatch");
+        addViewMenu(menu, Dispatch.NAME.singular().toString());
         try {
             if (isDeletable()) {
-                addDeleteMenu(menu, "Dispatch");
+                addDeleteMenu(menu, Dispatch.NAME.singular().toString());
             }
             if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
                 && isEditable
@@ -163,7 +164,7 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            addEditMenu(menu, "Dispatch");
+            addEditMenu(menu, Dispatch.NAME.singular().toString());
         } catch (Exception e) {
             BgcPlugin.openAsyncError("Error checking permissions",
                 e);

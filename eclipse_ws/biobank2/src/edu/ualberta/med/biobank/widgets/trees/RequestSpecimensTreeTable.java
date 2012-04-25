@@ -32,6 +32,8 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -67,7 +69,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         tc.setWidth(300);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText(Specimen.PropertyName.INVENTORY_ID.toString());
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -75,7 +77,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient");
+        tc.setText(Patient.NAME.singular().toString());
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -129,12 +131,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
                         return ((RequestTableGroup) element).getTitle();
-                    return ""; 
+                    return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return ""; 
+                    return "";
                 } else if (element instanceof Node) {
                     if (columnIndex == 0) {
                         if ((RequestContainerAdapter) ((TreeItemAdapter) element)
@@ -158,9 +160,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                                 ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                                     .getSpecimen()).getState()).getLabel();
                     } else
-                        return ""; 
+                        return "";
                 }
-                return ""; 
+                return "";
             }
         };
         tv.setLabelProvider(labelProvider);

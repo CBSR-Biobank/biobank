@@ -27,10 +27,9 @@ public abstract class RolesPage extends BgcDialogPage {
         super(dialog);
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String getTitle() {
-        return i18n.trc("Roles Page Title", "Roles");
+        return Role.NAME.plural().toString();
     }
 
     @Override

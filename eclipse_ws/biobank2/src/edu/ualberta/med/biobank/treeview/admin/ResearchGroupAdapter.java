@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupUpd
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -67,14 +68,14 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Research Group");
+        return getTooltipText(ResearchGroup.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Research Group");
-        addViewMenu(menu, "Research Group");
-        addDeleteMenu(menu, "Research Group");
+        addEditMenu(menu, ResearchGroup.NAME.singular().toString());
+        addViewMenu(menu, ResearchGroup.NAME.singular().toString());
+        addDeleteMenu(menu, ResearchGroup.NAME.singular().toString());
     }
 
     @Override

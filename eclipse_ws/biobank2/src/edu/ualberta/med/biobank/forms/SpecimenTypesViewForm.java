@@ -38,7 +38,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     @Override
     public void init() throws Exception {
-        setPartName("Specimen Types");
+        setPartName(SpecimenType.NAME.plural().toString());
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SpecimenTypeCreatePermission());
@@ -49,7 +49,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Specimen Types");
+        form.setText(SpecimenType.NAME.plural().toString());
         page.setLayout(new GridLayout(1, false));
 
         updateSpecimenTypeInfo();
@@ -66,7 +66,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
     }
 
     private void createGlobalSpecimenTypeSection() {
-        Section section = createSection("Specimen Types");
+        Section section = createSection(SpecimenType.NAME.plural().toString());
         specimenWidget =
             new SpecimenTypeEntryInfoTree(section,
                 globalSpecimenTypeWrappers,

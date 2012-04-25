@@ -20,6 +20,11 @@ import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
@@ -28,7 +33,7 @@ public class ReportsView extends ViewPart {
         .getName());
 
     public static final String ID =
-        "edu.ualberta.med.biobank.views.ReportsView"; 
+        "edu.ualberta.med.biobank.views.ReportsView";
 
     public static ReportsView currentInstance;
 
@@ -114,7 +119,7 @@ public class ReportsView extends ViewPart {
 
         // Specimens
         specimenTab = new CTabItem(top, SWT.NONE);
-        specimenTab.setText("Specimens");
+        specimenTab.setText(Specimen.NAME.plural().toString());
         Composite specimenBody = new Composite(top, SWT.NONE);
         specimenBody.setLayout(treeLayout);
         specimenBody.setLayoutData(treeGd);
@@ -127,7 +132,7 @@ public class ReportsView extends ViewPart {
 
         // Clinics
         clinicTab = new CTabItem(top, SWT.NONE);
-        clinicTab.setText("Clinics");
+        clinicTab.setText(Clinic.NAME.plural().toString());
         Composite clinicBody = new Composite(top, SWT.NONE);
         clinicBody.setLayout(treeLayout);
         clinicBody.setLayoutData(treeGd);
@@ -138,7 +143,7 @@ public class ReportsView extends ViewPart {
 
         // Patients
         patientTab = new CTabItem(top, SWT.NONE);
-        patientTab.setText("Patients");
+        patientTab.setText(Patient.NAME.plural().toString());
         Composite patientBody = new Composite(top, SWT.NONE);
         patientBody.setLayout(treeLayout);
         patientBody.setLayoutData(treeGd);
@@ -149,7 +154,7 @@ public class ReportsView extends ViewPart {
 
         // Specimen Types
         specimenTypeTab = new CTabItem(top, SWT.NONE);
-        specimenTypeTab.setText("Specimen Types");
+        specimenTypeTab.setText(SpecimenType.NAME.plural().toString());
         Composite specimenTypeBody = new Composite(top, SWT.NONE);
         specimenTypeBody.setLayout(treeLayout);
         specimenTypeBody.setLayoutData(treeGd);
@@ -161,7 +166,7 @@ public class ReportsView extends ViewPart {
 
         // Containers
         containerTab = new CTabItem(top, SWT.NONE);
-        containerTab.setText("Containers");
+        containerTab.setText(Container.NAME.plural().toString());
         Composite containerBody = new Composite(top, SWT.NONE);
         containerBody.setLayout(treeLayout);
         containerBody.setLayoutData(treeGd);
@@ -235,7 +240,7 @@ public class ReportsView extends ViewPart {
             child.setParent(containers);
             break;
         default:
-            throw new Exception(NLS.bind("Unable to place report node: {0}", 
+            throw new Exception(NLS.bind("Unable to place report node: {0}",
                 child.getLabel()));
         }
     }

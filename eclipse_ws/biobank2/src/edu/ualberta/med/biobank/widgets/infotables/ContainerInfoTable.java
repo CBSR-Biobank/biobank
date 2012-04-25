@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -37,18 +38,18 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         public String toString() {
             return StringUtils.join(new String[] { label, typeNameShort,
                 status, barcode,
-                (temperature != null) ? temperature.toString() : "" }, "\t");  
+                (temperature != null) ? temperature.toString() : "" }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Name",
-        "Container Type",
+        HasName.PropertyName.NAME.toString(),
+        ContainerType.NAME.singular().toString(),
         "Status",
-        "Product Barcode",
-        "Temperature" };
+        Container.PropertyName.PRODUCT_BARCODE.toString(),
+        Container.PropertyName.TEMPERATURE.toString() };
 
-    private SiteAdapter siteAdapter;
+    private final SiteAdapter siteAdapter;
 
     public ContainerInfoTable(Composite parent, SiteAdapter site,
         List<Container> containers) {
@@ -67,7 +68,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -81,7 +82,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                 case 4:
                     NumberFormatter.format(item.temperature);
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

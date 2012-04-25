@@ -79,17 +79,15 @@ public class MembershipDomainPage extends BgcWizardPage {
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Group centersGroup = createGroup(container,
-            // TR: GUI group text
-            i18n.tr("Centers"));
+            Center.NAME.plural().toString());
         createAllCentersButton(centersGroup);
         createCentersWidget(centersGroup);
         createCentersValidation(
         // TR: validation message if no center is selected
         i18n.tr("Select at least one center"));
 
-        Group studiesGroup = createGroup(container,
-            // TR: GUI group text
-            i18n.tr("Studies"));
+        Group studiesGroup =
+            createGroup(container, Study.NAME.plural().toString());
         createAllStudiesButton(studiesGroup);
         createStudiesWidget(studiesGroup);
         createStudiesValidation(
@@ -127,7 +125,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     private void createAllCentersButton(Composite parent) {
         allCentersButton = new Button(parent, SWT.CHECK);
         allCentersButton.setText(
-            i18n.trc("Membership Dialog Checkbox", "All Centers"));
+            Domain.PropertyName.ALL_CENTERS.toString());
         allCentersButton.setToolTipText(
             // TR: all centers checkbox tooltip
             i18n.tr("Allow access to all current and future centers"));
@@ -170,8 +168,7 @@ public class MembershipDomainPage extends BgcWizardPage {
     @SuppressWarnings("nls")
     private void createAllStudiesButton(Composite parent) {
         allStudiesButton = new Button(parent, SWT.CHECK);
-        allStudiesButton.setText(
-            i18n.trc("Membership Dialog Checkbox", "All Studies"));
+        allStudiesButton.setText(Domain.PropertyName.ALL_STUDIES.toString());
         allStudiesButton.setToolTipText(
             // TR: all studies checkbox tooltip
             i18n.tr("Allow access to all current and future studies"));

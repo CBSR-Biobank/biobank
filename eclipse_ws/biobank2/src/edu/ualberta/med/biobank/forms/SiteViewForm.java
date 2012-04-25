@@ -24,8 +24,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -38,7 +42,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteViewForm"; 
+        "edu.ualberta.med.biobank.forms.SiteViewForm";
 
     private SiteAdapter siteAdapter;
 
@@ -66,14 +70,15 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private SiteInfo siteInfo;
 
-    private SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
+    private final SiteWrapper site = new SiteWrapper(
+        SessionManager.getAppService());
 
     private CommentsInfoTable commentTable;
 
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
@@ -112,16 +117,17 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Name");
+            createReadOnlyLabelledField(client, SWT.NONE,
+                HasName.PropertyName.NAME.toString());
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Name Short");
+                HasNameShort.PropertyName.NAME_SHORT.toString());
         studyCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Total studies");
         containerTypeCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Container types");
+                ContainerType.NAME.plural().toString());
         topContainerCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 "Top level containers");
@@ -136,7 +142,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 "Total specimens");
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Activity status");
+                ActivityStatus.NAME.singular().toString());
         setSiteSectionValues();
     }
 
@@ -157,7 +163,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createStudySection() {
-        Section section = createSection("Studies");
+        Section section = createSection(Study.NAME.plural().toString());
         studiesTable =
             new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
         studiesTable.adaptToToolkit(toolkit, true);
@@ -192,7 +198,8 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 site.getCommentCollection(false));
@@ -201,7 +208,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerTypesSection() {
-        Section section = createSection("Container types");
+        Section section = createSection(ContainerType.NAME.plural().toString());
         addSectionToolbar(section, "Add container type",
             new SelectionAdapter() {
                 @Override

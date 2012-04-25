@@ -93,8 +93,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         createEveryPermissionButton(container);
         createUserManagerButton(container);
 
-        Group rolesGroup = createGroup(container,
-            i18n.trc("Membership Permissions Dialog Group", "Roles"));
+        Group rolesGroup =
+            createGroup(container, Role.NAME.plural().toString());
         createRolesWidget(rolesGroup);
         updateRoleSelections();
 

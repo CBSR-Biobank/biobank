@@ -8,6 +8,9 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.item.Adapter;
@@ -51,16 +54,16 @@ public class SiteViewFormView extends AbstractViewFormView
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        table.addLabel("Name");
+        table.addLabel(HasName.PropertyName.NAME.toString());
         name.setText(table.addReadOnlyText());
 
-        table.addLabel("Name Short");
+        table.addLabel(HasNameShort.PropertyName.NAME_SHORT.toString());
         nameShort.setText(table.addReadOnlyText());
 
         table.addLabel("Total studies");
         studyCount.setText(table.addReadOnlyText());
 
-        table.addLabel("Container types");
+        table.addLabel(ContainerType.NAME.plural().toString());
         containerTypeCount.setText(table.addReadOnlyText());
 
         table.addLabel("Top level containers");
@@ -75,7 +78,7 @@ public class SiteViewFormView extends AbstractViewFormView
         table.addLabel("Total specimens");
         aliquotedSpecimenCount.setText(table.addReadOnlyText());
 
-        table.addLabel("Activity status");
+        table.addLabel(ActivityStatus.NAME.singular().toString());
         activityStatus.setText(table.addReadOnlyText());
     }
 

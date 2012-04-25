@@ -30,7 +30,7 @@ public class Comment extends AbstractBiobankModel {
         "Comments");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString CREATED_AT = bundle.trc(
             "model",
             "Created At").format();

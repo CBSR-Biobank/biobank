@@ -19,6 +19,10 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class DispatchSpecimenListInfoTable extends
@@ -40,11 +44,11 @@ public abstract class DispatchSpecimenListInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Inventory ID",
+        Specimen.PropertyName.INVENTORY_ID.toString(),
         "Type",
-        "Patient Number",
-        "Activity Status",
-        "Comment" };
+        Patient.PropertyName.PNUMBER.toString(),
+        ActivityStatus.NAME.singular().toString(),
+        Comment.NAME.singular().toString() };
 
     private boolean editMode = false;
 

@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
@@ -40,8 +41,8 @@ public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
     public static final int ROWS_PER_PAGE = 7;
     private static final String[] HEADINGS = new String[] {
-        "Centers",
-        "Studies",
+        Center.NAME.plural().toString(),
+        Study.NAME.plural().toString(),
         "Manager",
         "Roles and Permissions" };
 
@@ -109,7 +110,7 @@ public class MembershipInfoTable
 
     private static String getCentersString(Membership m) {
         if (m.getDomain().isAllCenters()) {
-            return "All Centers";
+            return Domain.PropertyName.ALL_CENTERS.toString();
         }
 
         List<String> centerNames = new ArrayList<String>();
@@ -122,7 +123,7 @@ public class MembershipInfoTable
 
     private static String getStudiesString(Membership m) {
         if (m.getDomain().isAllStudies()) {
-            return "All Studies";
+            return Domain.PropertyName.ALL_STUDIES.toString();
         }
 
         List<String> studyNames = new ArrayList<String>();

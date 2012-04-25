@@ -37,6 +37,9 @@ import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -72,7 +75,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Inventory Id");
+        tc.setText(Specimen.PropertyName.INVENTORY_ID.toString());
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -80,11 +83,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Patient Number");
+        tc.setText(Patient.PropertyName.PNUMBER.toString());
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Activity Status");
+        tc.setText(ActivityStatus.NAME.singular().toString());
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -138,12 +141,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return ""; 
+                    return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return ""; 
+                    return "";
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
                         return CommentWrapper
@@ -152,7 +155,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
-                return ""; 
+                return "";
             }
 
             @Override
@@ -161,7 +164,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         };
         tv.setLabelProvider(labelProvider);
-        tv.setInput("root"); 
+        tv.setInput("root");
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -282,7 +285,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public void refresh() {
-        tv.setInput("refresh"); 
+        tv.setInput("refresh");
     }
 
     public void addClickListener() {

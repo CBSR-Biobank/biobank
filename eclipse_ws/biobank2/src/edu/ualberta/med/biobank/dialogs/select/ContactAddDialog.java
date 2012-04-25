@@ -69,7 +69,7 @@ public class ContactAddDialog extends BgcBaseDialog {
 
         Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER,
-            Contact.Property.NAME.toString(),
+            Contact.PropertyName.NAME.toString(),
             new String[0],
             contactWrapper, ContactPeer.NAME.getName(), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -77,32 +77,32 @@ public class ContactAddDialog extends BgcBaseDialog {
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.TITLE.toString(),
+            Contact.PropertyName.TITLE.toString(),
             new String[0],
             contactWrapper, ContactPeer.TITLE.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.EMAIL_ADDRESS.toString(),
+            Contact.PropertyName.EMAIL_ADDRESS.toString(),
             new String[0],
             contactWrapper, ContactPeer.EMAIL_ADDRESS.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.MOBILE_NUMBER.toString(),
+            Contact.PropertyName.MOBILE_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.MOBILE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.PAGER_NUMBER.toString(),
+            Contact.PropertyName.PAGER_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.PAGER_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.OFFICE_NUMBER.toString(),
+            Contact.PropertyName.OFFICE_NUMBER.toString(),
             new String[0],
             contactWrapper, ContactPeer.OFFICE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            Contact.Property.FAX_NUMBER.toString(),
+            Contact.PropertyName.FAX_NUMBER.toString(),
             new String[0], contactWrapper,
             ContactPeer.FAX_NUMBER.getName(), null);
     }

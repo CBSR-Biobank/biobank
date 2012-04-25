@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
@@ -28,7 +29,8 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        String label = ""; 
+        @SuppressWarnings("nls")
+        String label = "";
 
         ReportWrapper report = (ReportWrapper) getModelObject();
         if (report != null && report.getName() != null) {
@@ -40,7 +42,7 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Report");
+        return getTooltipText(Report.NAME.singular().toString());
     }
 
     @Override
@@ -59,10 +61,12 @@ public class ReportAdapter extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                boolean delete = BgcPlugin.openConfirm(
-                    "Delete Report", NLS.bind(
-                        "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
-                        ((ReportWrapper) getModelObject()).getName()));
+                boolean delete =
+                    BgcPlugin.openConfirm(
+                        "Delete Report",
+                        NLS.bind(
+                            "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
+                            ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
                         AdvancedReportDeleteAction action =
@@ -83,7 +87,7 @@ public class ReportAdapter extends AdapterBase {
             ReportWrapper report = new ReportWrapper(
                 (ReportWrapper) getModelObject());
             report.setName(report.getName()
-                + " " + "Copy"); 
+                + " " + "Copy");
 
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);

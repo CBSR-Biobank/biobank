@@ -12,6 +12,8 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotedSpecimenInfoTable extends
@@ -26,6 +28,7 @@ public class AliquotedSpecimenInfoTable extends
         public Integer quantity;
         public String status;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
@@ -35,10 +38,10 @@ public class AliquotedSpecimenInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Specimen Type",
-        "Volume (ml)",
-        "Quantity",
-        "Activity status" };
+        SpecimenType.NAME.singular().toString(),
+        AliquotedSpecimen.PropertyName.VOLUME.toString(),
+        AliquotedSpecimen.PropertyName.QUANTITY.toString(),
+        ActivityStatus.NAME.singular().toString() };
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
@@ -46,6 +49,7 @@ public class AliquotedSpecimenInfoTable extends
             AliquotedSpecimenWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();

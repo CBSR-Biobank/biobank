@@ -118,16 +118,16 @@ public class ContainerAdapter extends AdapterBase {
             SiteWrapper site = container.getSite();
             if (site != null) {
                 return site.getNameShort() + " - "
-                    + getTooltipText("Container");
+                    + getTooltipText(Container.NAME.singular().toString());
             }
         }
-        return getTooltipText("Container");
+        return getTooltipText(Container.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Container");
-        addViewMenu(menu, "Container");
+        addEditMenu(menu, Container.NAME.singular().toString());
+        addViewMenu(menu, Container.NAME.singular().toString());
 
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
 
@@ -153,7 +153,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, "Container");
+        addDeleteMenu(menu, Container.NAME.singular().toString());
     }
 
     public void moveSpecimens() {

@@ -28,6 +28,8 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasCreatedAt;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -40,10 +42,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientEntryForm"; 
+        "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
     private static final String CREATED_AT_BINDING =
-        "patient-created-at-binding"; 
+        "patient-created-at-binding";
 
     public static final String MSG_NEW_PATIENT_OK =
         "Creating a new patient record.";
@@ -57,24 +59,24 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NotNullValidator createdAtValidator;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator =
+    private final NonEmptyStringValidator pnumberNonEmptyValidator =
         new NonEmptyStringValidator(
             "Patient must have a patient number");
 
     private PatientInfo patientInfo;
 
-    private PatientWrapper patient = new PatientWrapper(
+    private final PatientWrapper patient = new PatientWrapper(
         SessionManager.getAppService());
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         updatePatientInfo();
 
@@ -140,7 +142,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         studiesViewer =
             createComboViewer(client,
-                "Study", studies,
+                Study.NAME.singular().toString(), studies,
                 selectedStudy,
                 "A study should be selected",
                 new ComboSelectionUpdate() {
@@ -160,11 +162,11 @@ public class PatientEntryForm extends BiobankEntryForm {
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Patient Number", null, patient,
+            Patient.PropertyName.PNUMBER.toString(), null, patient,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client,
-            "Created At");
+            HasCreatedAt.PropertyName.CREATED_AT.toString());
         createdAtLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         createdAtValidator = new NotNullValidator(
@@ -178,7 +180,8 @@ public class PatientEntryForm extends BiobankEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);

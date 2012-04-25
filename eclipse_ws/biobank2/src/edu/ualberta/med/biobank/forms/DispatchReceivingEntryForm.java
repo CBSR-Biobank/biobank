@@ -27,6 +27,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -80,12 +83,12 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             SWT.NONE, "Departed");
         setTextValue(departedLabel, dispatch.getFormattedPackedAt());
         BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Shipping Method");
+            SWT.NONE, ShippingMethod.NAME.singular().toString());
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
             .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
             .getShippingMethod().getName());
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Waybill");
+            SWT.NONE, ShipmentInfo.PropertyName.WAYBILL.toString());
         setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
         BgcBaseText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
@@ -97,7 +100,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);

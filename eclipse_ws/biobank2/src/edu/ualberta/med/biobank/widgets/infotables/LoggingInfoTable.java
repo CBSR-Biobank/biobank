@@ -10,17 +10,21 @@ import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.User;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
     private static final String[] HEADINGS = new String[] {
-        "Site",
-        "User",
+        Site.NAME.singular().toString(),
+        User.NAME.singular().toString(),
         "Date",
         "Action",
         "Type",
-        "Patient #",
-        "Inventory ID",
+        Patient.PropertyName.PNUMBER.toString(),
+        Specimen.PropertyName.INVENTORY_ID.toString(),
         "Location",
         "Details" };
 
@@ -45,7 +49,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { center, user, date, action,
                 type, patientNumber, inventoryId, positionLabel, details },
-                "\t"); 
+                "\t");
         }
     }
 
@@ -60,7 +64,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -82,7 +86,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                 case 8:
                     return item.details;
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };
@@ -102,7 +106,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         Date logQueryDate = logQuery.getCreatedAt();
         if (logQueryDate != null) {
             SimpleDateFormat dateTimeSecond =
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             info.date = dateTimeSecond.format(logQueryDate);
         } else {
             info.date = null;

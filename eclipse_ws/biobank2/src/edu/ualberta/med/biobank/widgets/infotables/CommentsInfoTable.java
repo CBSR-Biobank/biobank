@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.User;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -42,9 +44,9 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        "User",
+        User.NAME.singular().toString(),
         "Date",
-        "Message" };
+        Comment.PropertyName.MESSAGE.toString() };
 
     public CommentsInfoTable(Composite parent,
         List<CommentWrapper> collection) {
@@ -101,7 +103,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -112,7 +114,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                 case 2:
                     return StringUtils.join(wrapText(item.message, 80), "\n");
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

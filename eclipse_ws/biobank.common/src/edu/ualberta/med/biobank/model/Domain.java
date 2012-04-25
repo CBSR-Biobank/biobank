@@ -30,7 +30,7 @@ public class Domain extends AbstractBiobankModel {
         "Domains");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString ALL_CENTERS = bundle.trc(
             "model",
             "All Centers").format();

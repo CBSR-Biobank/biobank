@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.Role;
 
 public abstract class RoleInfoTable extends
@@ -29,7 +30,7 @@ public abstract class RoleInfoTable extends
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS =
-        new String[] { "Name" };
+        new String[] { HasName.PropertyName.NAME.toString() };
 
     @SuppressWarnings("unused")
     public RoleInfoTable(Composite parent, List<Role> collection) {

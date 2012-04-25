@@ -52,7 +52,7 @@ public class CollectionView extends AbstractAdministrationView {
         composite.setLayout(layout);
 
         radioPnumber = new Button(composite, SWT.RADIO);
-        radioPnumber.setText("Patient Number");
+        radioPnumber.setText(Patient.PropertyName.PNUMBER.toString());
         radioPnumber.setSelection(true);
 
     }

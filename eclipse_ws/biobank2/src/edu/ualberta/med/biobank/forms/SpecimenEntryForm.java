@@ -42,11 +42,16 @@ import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -228,16 +233,16 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimen.getFormattedCreatedAt());
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
-            "Volume (ml)",
+            AliquotedSpecimen.PropertyName.VOLUME.toString(),
             specimen.getQuantity() == null ? null : specimen.getQuantity()
                 .toString());
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Study", specimen
+            Study.NAME.singular().toString(), specimen
                 .getCollectionEvent().getPatient().getStudy().getNameShort());
 
         Label label = widgetCreator.createLabel(client,
-            "Patient");
+            Patient.NAME.singular().toString());
 
         Composite c = new Composite(client, SWT.NONE);
         GridData gd = new GridData();
@@ -289,7 +294,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         sourceSpecimenField.setVisible(false);
                         isSourceSpcButton.setSelection(true);
                         pEventLabel
-                            .setText("Processing Event");
+                            .setText(ProcessingEvent.NAME.singular().toString());
                     } else {
                         specimen.setParentSpecimen(new SpecimenWrapper(
                             SessionManager.getAppService(),
@@ -340,7 +345,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         setTextValue(centerLabel, getCenterString(specimen));
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Position",
+            AbstractPosition.NAME.singular().toString(),
             specimen.getPositionString(true, false));
 
         boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
@@ -371,7 +376,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         sourceSpecimenLabel.setVisible(!isSourceSpc);
         sourceSpecimenField.setVisible(!isSourceSpc);
         ceventText = createReadOnlyLabelledField(client, SWT.NONE,
-            "Collection Event",
+            CollectionEvent.NAME.singular().toString(),
             specimen.getCollectionInfo());
 
         createProcessingEventSection(client);
@@ -381,7 +386,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             String.valueOf(specimen.getChildSpecimenCollection(false).size()));
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
+            ActivityStatus.NAME.singular().toString(),
             ActivityStatus.valuesList(), specimen.getActivityStatus(),
             "Specimen must have an activity status",
             new ComboSelectionUpdate() {
@@ -436,7 +441,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
         pEventLabel =
             widgetCreator.createLabel(client,
-                "Processing Event");
+                ProcessingEvent.NAME.singular().toString());
         String peventString;
         if (pevent == null)
             peventString = "";
@@ -455,7 +460,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private void createCommentSection() {
         Composite client =
-            createSectionWithClient("Comments");
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);

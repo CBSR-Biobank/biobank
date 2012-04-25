@@ -29,7 +29,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -54,14 +57,15 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     private ResearchGroupAdapter researchGroupAdapter;
 
-    private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
-        SessionManager.getAppService());
+    private final ResearchGroupWrapper researchGroup =
+        new ResearchGroupWrapper(
+            SessionManager.getAppService());
 
     private BgcBaseText commentWidget;
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -139,12 +143,14 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, researchGroup,
+            SWT.NONE, HasName.PropertyName.NAME.toString(), null,
+            researchGroup,
             ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_RG_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Name Short", null, researchGroup,
+            HasNameShort.PropertyName.NAME_SHORT.toString(), null,
+            researchGroup,
             ResearchGroupPeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
 
@@ -156,7 +162,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             availableStudies.add(researchGroup.getStudy());
 
         studyComboViewer = createComboViewer(client,
-            "Study", availableStudies,
+            Study.NAME.singular().toString(), availableStudies,
             researchGroup.getStudy(),
             "Select the associated study",
             new ComboSelectionUpdate() {
@@ -169,7 +175,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             SessionManager.getUser().isSuperAdmin());
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity status",
+            ActivityStatus.NAME.singular().toString(),
             ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
             "Research Group must have an activity status",
             new ComboSelectionUpdate() {
@@ -185,7 +191,8 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);

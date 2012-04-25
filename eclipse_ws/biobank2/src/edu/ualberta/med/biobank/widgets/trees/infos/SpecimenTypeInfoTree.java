@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -15,10 +17,11 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
 
     private static final String[] HEADINGS = new String[] {
-        "Name",
-        "Short Name" };
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString() };
 
-    protected List<SpecimenTypeWrapper> needReload = new ArrayList<SpecimenTypeWrapper>();
+    protected List<SpecimenTypeWrapper> needReload =
+        new ArrayList<SpecimenTypeWrapper>();
 
     public SpecimenTypeInfoTree(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
@@ -34,12 +37,13 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
                 if (element instanceof SpecimenTypeWrapper)
                     item = (SpecimenTypeWrapper) element;
                 else
-                    item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
+                    item =
+                        (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:

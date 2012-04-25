@@ -146,8 +146,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         createMembershipsSection(createTabItem(tb,
             i18n.trc("User Edit Dialog Tab Name", "Roles and Permissions"), 1));
 
-        createGroupsSection(createTabItem(tb,
-            i18n.trc("User Edit Dialog Tab Name", "Groups"), 1));
+        createGroupsSection(createTabItem(tb, Group.NAME.plural().toString(), 1));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {

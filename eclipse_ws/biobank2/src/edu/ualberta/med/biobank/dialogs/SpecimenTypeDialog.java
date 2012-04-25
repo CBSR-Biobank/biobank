@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SpecimenTypeDialog extends BgcBaseDialog {
@@ -85,14 +86,14 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            HasName.Property.NAME.toString(),
+            HasName.PropertyName.NAME.toString(),
             null, tmpSpecimenType,
             SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
                 // TR: validation error message
                 i18n.tr("Specimen type must have a name.")));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            HasName.Property.NAME_SHORT.toString(),
+            HasNameShort.PropertyName.NAME_SHORT.toString(),
             null, tmpSpecimenType,
             SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 // TR: validation error message

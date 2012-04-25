@@ -27,14 +27,14 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Study");
+        return getTooltipText(Study.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Study");
-        addViewMenu(menu, "Study");
-        addDeleteMenu(menu, "Study");
+        addEditMenu(menu, Study.NAME.singular().toString());
+        addViewMenu(menu, Study.NAME.singular().toString());
+        addDeleteMenu(menu, Study.NAME.singular().toString());
     }
 
     @Override

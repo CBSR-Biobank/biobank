@@ -11,15 +11,19 @@ import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
     private static final String[] HEADINGS = new String[] {
-        "Name",
-        "Short Name",
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
         "Status",
-        "Patients",
-        "Patient Visits" };
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString() };
 
     public NewStudyInfoTable(Composite parent, List<StudyCountInfo> studies) {
         super(parent, studies, HEADINGS, 10,
@@ -41,14 +45,14 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return info.getStudy().getNameShort();
                 case 2:
                     return (info.getStudy().getActivityStatus() != null) ? info
-                        .getStudy().getActivityStatus().getName() : ""; 
+                        .getStudy().getActivityStatus().getName() : "";
                 case 3:
                     return NumberFormatter.format(info.getPatientCount());
                 case 4:
                     return NumberFormatter.format(info
                         .getCollectionEventCount());
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

@@ -14,6 +14,9 @@ import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
@@ -37,9 +40,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Name",
-        "Short Name",
-        "Patients",
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        Patient.NAME.plural().toString(),
         "Status",
         "Study Count",
         "Patient Visits" };

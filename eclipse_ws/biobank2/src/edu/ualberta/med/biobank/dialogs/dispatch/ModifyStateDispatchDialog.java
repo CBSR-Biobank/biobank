@@ -13,6 +13,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 
 public class ModifyStateDispatchDialog extends BgcBaseDialog {
@@ -84,7 +85,8 @@ public class ModifyStateDispatchDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.MULTI,
-            i18n.tr("Comment"), null,
+            Comment.NAME.singular().toString(),
+            null,
             commentValue, "value",
             new NonEmptyStringValidator(
                 i18n.tr("Comment should not be empty")));

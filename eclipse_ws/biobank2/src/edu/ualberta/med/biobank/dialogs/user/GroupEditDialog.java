@@ -108,8 +108,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
         createMembershipsSection(createTabItem(tb,
             i18n.trc("Group Edit Dialog Tab Name", "Roles and Permissions"), 1));
 
-        createUsersSection(createTabItem(tb,
-            i18n.trc("Group Edit Dialog Tab Name", "Users"), 1));
+        createUsersSection(createTabItem(tb, User.NAME.plural().toString(), 1));
 
     }
 
@@ -117,7 +116,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
     private void createGeneralFields(Composite createTabItem) {
         createBoundWidgetWithLabel(createTabItem, BgcBaseText.class,
             SWT.BORDER,
-            HasName.Property.NAME.toString(),
+            HasName.PropertyName.NAME.toString(),
             null,
             group, GroupPeer.NAME.getName(),
             new NonEmptyStringValidator(

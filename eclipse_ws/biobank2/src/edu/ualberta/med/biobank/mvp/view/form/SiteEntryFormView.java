@@ -9,6 +9,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -89,7 +92,8 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        name.setValidationControl(table.addLabel("name"));
+        name.setValidationControl(table.addLabel(HasName.PropertyName.NAME
+            .toString()));
         name.setText(table.addText());
 
         nameShort.setValidationControl(table.addLabel("nameShort"));
@@ -99,10 +103,13 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        Composite addressClient = baseForm.createSectionWithClient("Address");
+        Composite addressClient =
+            baseForm
+                .createSectionWithClient(Address.NAME.singular().toString());
         addressEntryView.create(addressClient);
 
-        Section studySection = baseForm.createSection("Studies");
+        Section studySection =
+            baseForm.createSection(Study.NAME.plural().toString());
         WritableApplicationService appService =
             SessionManager.getAppService();
         SiteWrapper siteWrapper = new SiteWrapper(appService);

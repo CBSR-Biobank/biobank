@@ -5,12 +5,13 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 
 public class SiteClinicGroup extends AbstractClinicGroup {
 
     public SiteClinicGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Clinics");
+        super(parent, id, Clinic.NAME.plural().toString());
     }
 
     @Override

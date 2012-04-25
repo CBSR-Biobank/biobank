@@ -13,6 +13,9 @@ import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
@@ -23,18 +26,19 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
         public Long patientCount;
         public Long visitCount;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "", 
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");  
+                (patientCount != null) ? patientCount.toString() : "",
+                (visitCount != null) ? visitCount.toString() : "" }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Study",
-        "#Patients",
-        "#Collection Events" };
+        Study.NAME.singular().toString(),
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString() };
 
     public ClinicStudyInfoTable(Composite parent,
         List<StudyCountInfo> studyCountInfo) {
@@ -53,7 +57,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
 
                 switch (columnIndex) {
@@ -64,7 +68,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                 case 2:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

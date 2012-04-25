@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Comment;
 
 public class EnterCommentPage extends BgcWizardPage {
     public static final String PAGE_NAME = EnterCommentPage.class
@@ -36,8 +37,8 @@ public class EnterCommentPage extends BgcWizardPage {
 
         getWidgetCreator().createBoundWidgetWithLabel(content,
             BgcBaseText.class, SWT.BORDER | SWT.MULTI,
-            "Comment", null,
-            PojoObservables.observeValue(this, "comment"), 
+            Comment.NAME.singular().toString(), null,
+            PojoObservables.observeValue(this, "comment"),
             new NonEmptyStringValidator(COMMENT_REQUIRED));
 
         setControl(content);

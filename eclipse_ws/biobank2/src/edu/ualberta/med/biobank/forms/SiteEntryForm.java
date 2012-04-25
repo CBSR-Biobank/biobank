@@ -34,7 +34,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
@@ -46,7 +49,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SiteEntryForm extends AddressEntryFormCommon {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteEntryForm"; 
+        "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
     private static final String MSG_NEW_SITE_OK =
         "Create a new Biobank site.";
@@ -55,7 +58,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteAdapter siteAdapter;
 
-    private SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
+    private final SiteWrapper site = new SiteWrapper(
+        SessionManager.getAppService());
 
     protected Combo session;
 
@@ -67,10 +71,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -81,7 +85,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
@@ -128,7 +132,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -144,8 +149,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createSiteSection() {
-        toolkit.createLabel(page, "Studies, clinics, containers and container types can be added after submitting this information.",
-            SWT.LEFT);
+        toolkit
+            .createLabel(
+                page,
+                "Studies, clinics, containers and container types can be added after submitting this information.",
+                SWT.LEFT);
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -155,17 +163,19 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, site, SitePeer.NAME.getName(),
+            SWT.NONE, HasName.PropertyName.NAME.toString(), null, site,
+            SitePeer.NAME.getName(),
             new NonEmptyStringValidator(
                 "Site must have a name")));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Name Short", null, site,
+            HasNameShort.PropertyName.NAME_SHORT.toString(), null, site,
             SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 "Site short name cannot be blank"));
 
         activityStatusComboViewer =
-            createComboViewer(client, "Activity status",
+            createComboViewer(client,
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(), site.getActivityStatus(),
                 "Site must have an activity status",
                 new ComboSelectionUpdate() {
@@ -178,7 +188,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createStudySection() {
-        Section section = createSection("Studies");
+        Section section = createSection(Study.NAME.plural().toString());
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
             addSectionToolbar(section, "Add Study ",

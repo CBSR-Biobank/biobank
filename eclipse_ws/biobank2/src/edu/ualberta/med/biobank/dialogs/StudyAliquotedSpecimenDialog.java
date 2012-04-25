@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -128,7 +129,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         specimenTypeComboViewer = getWidgetCreator().createComboViewer(
             contents,
-            AliquotedSpecimen.Property.SPECIMEN_TYPE.toString(),
+            SpecimenType.NAME.singular().toString(),
             availableSpecimenTypes, newAliquotedSpecimen.getSpecimenType(),
             // TR: validation error message
             i18n.tr("A specimen type should be selected"),
@@ -149,7 +150,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         activityStatus =
             getWidgetCreator().createComboViewer(
                 contents,
-                AliquotedSpecimen.Property.ACTIVITY_STATUS.toString(),
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(),
                 newAliquotedSpecimen.getActivityStatus(),
                 // TR: validation error message
@@ -172,7 +173,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            AliquotedSpecimen.Property.VOLUME.toString(),
+            AliquotedSpecimen.PropertyName.VOLUME.toString(),
             new String[0],
             newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
             new DoubleNumberValidator(
@@ -182,7 +183,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
 
         quantity = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            AliquotedSpecimen.Property.QUANTITY.toString(),
+            AliquotedSpecimen.PropertyName.QUANTITY.toString(),
             new String[0], newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
             new IntegerNumberValidator(

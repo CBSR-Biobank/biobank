@@ -36,6 +36,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
@@ -116,7 +119,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             ShippingMethodWrapper selectedShippingMethod = dispatch
                 .getShipmentInfo().getShippingMethod();
             shippingMethodViewer = widgetCreator.createComboViewer(client,
-                "Shipping Method",
+                ShippingMethod.NAME.singular().toString(),
                 ShippingMethodWrapper.getShippingMethods(SessionManager
                     .getAppService()), selectedShippingMethod, null,
                 new ComboSelectionUpdate() {
@@ -128,7 +131,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 }, new BiobankLabelProvider());
 
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                "Waybill", null,
+                ShipmentInfo.PropertyName.WAYBILL.toString(), null,
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
             createDateTimeWidget(client, "Departed", null, shipmentInfo,
@@ -141,7 +144,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -194,7 +198,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
             Section section =
-                createSection("Specimens");
+                createSection(Specimen.NAME.plural().toString());
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
@@ -221,7 +225,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     }
 
     protected void createSpecimensNonProcessedSection(boolean edit) {
-        String title = "Specimens";
+        String title = Specimen.NAME.plural().toString();
         if (dispatch.isInCreationState()) {
             title = "Added specimens";
         }

@@ -28,7 +28,7 @@ public class ShipmentInfo extends AbstractBiobankModel {
         "Shipment Information");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString BOX_NUMBER = bundle.trc(
             "model",
             "Box Number").format();

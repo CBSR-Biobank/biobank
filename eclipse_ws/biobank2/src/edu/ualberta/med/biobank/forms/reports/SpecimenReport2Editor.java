@@ -155,8 +155,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
             Patient.NAME.format(1).toString(),
             // table column name
             i18n.tr("Date Processed"),
-            // table column name
-            i18n.tr("Specimen Type") };
+            SpecimenType.NAME.singular().toString() };
     }
 
     @SuppressWarnings("nls")

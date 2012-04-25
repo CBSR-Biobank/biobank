@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
@@ -60,16 +61,16 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        Assert.isNotNull(ceventInfo, "collection event is null"); 
-        return new StringBuilder("#")  
+        Assert.isNotNull(ceventInfo, "collection event is null");
+        return new StringBuilder("#")
             .append(ceventInfo.cevent.getVisitNumber())
             .append(" - ")
             .append(
                 ceventInfo.minSourceSpecimenDate == null ? "No Specimens"
                     : DateFormatter
                         .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
-            .append(" [").append(ceventInfo.sourceSpecimenCount)  
-            .append("]").toString();  
+            .append(" [").append(ceventInfo.sourceSpecimenCount)
+            .append("]").toString();
     }
 
     @Override
@@ -99,9 +100,9 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Collection Event");
-        addViewMenu(menu, "Collection Event");
-        addDeleteMenu(menu, "Collection Event");
+        addEditMenu(menu, CollectionEvent.NAME.singular().toString());
+        addViewMenu(menu, CollectionEvent.NAME.singular().toString());
+        addDeleteMenu(menu, CollectionEvent.NAME.singular().toString());
     }
 
     @Override

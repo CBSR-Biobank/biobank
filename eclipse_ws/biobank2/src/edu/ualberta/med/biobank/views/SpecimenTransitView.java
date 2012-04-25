@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -42,8 +43,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.SpecimenTransitView"; 
+        "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
@@ -94,7 +96,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         composite.setLayout(layout);
 
         radioWaybill = new Button(composite, SWT.RADIO);
-        radioWaybill.setText("Waybill");
+        radioWaybill.setText(ShipmentInfo.PropertyName.WAYBILL.toString());
         radioWaybill.setSelection(true);
         radioWaybill.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -284,7 +286,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         Object obj) {
         if (currentInstance != null && obj instanceof OriginInfoWrapper) {
             OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
-            String text = ""; 
+            String text = "";
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {

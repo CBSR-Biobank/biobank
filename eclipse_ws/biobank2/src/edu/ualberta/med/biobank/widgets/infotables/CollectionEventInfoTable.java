@@ -13,6 +13,8 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventInfoTable extends
@@ -30,15 +32,15 @@ public class CollectionEventInfoTable extends
             return StringUtils.join(
                 new String[] { visitNumber.toString(),
                     String.valueOf(sourceSpecimenCount),
-                    String.valueOf(aliquotedSpecimenCount), comment }, "\t"); 
+                    String.valueOf(aliquotedSpecimenCount), comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Visit#",
+        CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
         "Num source specimens",
         "Num aliquoted specimens",
-        "Comment" };
+        Comment.NAME.singular().toString() };
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -56,7 +58,7 @@ public class CollectionEventInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -69,7 +71,7 @@ public class CollectionEventInfoTable extends
                     return info.comment;
 
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

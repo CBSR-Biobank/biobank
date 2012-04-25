@@ -30,7 +30,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -39,10 +43,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ResearchGroupViewForm"; 
+        "edu.ualberta.med.biobank.forms.ResearchGroupViewForm";
 
-    private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
-        SessionManager.getAppService());
+    private final ResearchGroupWrapper researchGroup =
+        new ResearchGroupWrapper(
+            SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
 
@@ -61,7 +66,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ResearchGroupAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         setRgInfo(adapter.getId());
@@ -106,7 +111,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         csvSelector =
             new BgcFileBrowser(client,
                 "CSV File", SWT.NONE,
-                new String[] { "*.csv" }); 
+                new String[] { "*.csv" });
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
         uploadButton = new Button(client, SWT.PUSH);
@@ -147,15 +152,15 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
         final CellProcessor[] processors =
             new CellProcessor[] { null, null,
-                new ParseDate("yyyy-MM-dd"), null, null, null }; 
+                new ParseDate("yyyy-MM-dd"), null, null, null };
 
         List<RequestInput> requests = new ArrayList<RequestInput>();
 
         try {
             // Peer class not used because this refers to RequestInput fields
-            String[] header = new String[] { "pnumber", "inventoryID",  
-                "dateDrawn", "specimenTypeNameShort", "location",   
-                "activityStatus" }; 
+            String[] header = new String[] { "pnumber", "inventoryID",
+                "dateDrawn", "specimenTypeNameShort", "location",
+                "activityStatus" };
             RequestInput srequest;
             while ((srequest =
                 reader.read(RequestInput.class, header, processors)) != null) {
@@ -166,7 +171,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             throw new Exception(NLS.bind(
                 "Parse error at line {0}",
                 reader.getLineNumber())
-                + "\n" + e.getCsvContext()); 
+                + "\n" + e.getCsvContext());
         } finally {
             reader.close();
         }
@@ -192,21 +197,25 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         toolkit.paintBordersFor(client);
 
         nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Name");
+            createReadOnlyLabelledField(client, SWT.NONE,
+                HasName.PropertyName.NAME.toString());
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Name Short");
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study"); 
+                HasNameShort.PropertyName.NAME_SHORT.toString());
+        studyLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, Study.NAME.singular()
+                .toString());
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Activity status");
+                ActivityStatus.NAME.singular().toString());
 
         createCommentsSection();
         setResearchGroupValues();
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 researchGroup.getCommentCollection(false));

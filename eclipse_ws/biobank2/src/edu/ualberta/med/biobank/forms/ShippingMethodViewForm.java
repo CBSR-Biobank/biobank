@@ -12,13 +12,15 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodViewForm extends BiobankFormBase {
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm"; 
+        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm";
 
     public static final String OK_MESSAGE =
         "Add or edit a shipping method";
@@ -28,7 +30,7 @@ public class ShippingMethodViewForm extends BiobankFormBase {
 
     @Override
     public void init() throws Exception {
-        setPartName("Shipping Method");
+        setPartName(ShippingMethod.NAME.singular().toString());
         setShippingMethodInfo();
     }
 
@@ -43,13 +45,14 @@ public class ShippingMethodViewForm extends BiobankFormBase {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipping Method");
+        form.setText(ShippingMethod.NAME.singular().toString());
         page.setLayout(new GridLayout(1, false));
         createGlobalShippingMethodSection();
     }
 
     private void createGlobalShippingMethodSection() throws Exception {
-        Section section = createSection("Shipping Method");
+        Section section =
+            createSection(ShippingMethod.NAME.singular().toString());
         if (globalShippingMethods == null) {
             globalShippingMethods = new ArrayList<ShippingMethodWrapper>();
         }

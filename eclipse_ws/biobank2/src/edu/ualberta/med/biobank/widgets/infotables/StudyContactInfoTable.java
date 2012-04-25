@@ -13,6 +13,10 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -40,12 +44,12 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Clinic",
-        "#Patients",
-        "#Collection Events",
-        "Contact(s)" };
+        Clinic.NAME.singular().toString(),
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString(),
+        Contact.NAME.plural().toString() };
 
-    private StudyWrapper study;
+    private final StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10, ContactWrapper.class);
@@ -55,7 +59,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
     public static class ClinicContacts {
         private ClinicWrapper clinic;
-        private StringBuffer contactsBuf;
+        private final StringBuffer contactsBuf;
 
         public ClinicContacts(ClinicWrapper clinic, ContactWrapper contact) {
             this.setClinic(clinic);
@@ -65,7 +69,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
         public void addContact(ContactWrapper contact) {
             if (contactsBuf.length() > 0) {
-                contactsBuf.append("\n"); 
+                contactsBuf.append("\n");
             }
             String name = contact.getName();
             if ((name != null) && !name.isEmpty()) {
@@ -73,9 +77,9 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
             }
             String title = contact.getTitle();
             if ((title != null) && !title.isEmpty()) {
-                contactsBuf.append(" ("); 
+                contactsBuf.append(" (");
                 contactsBuf.append(title);
-                contactsBuf.append(")"); 
+                contactsBuf.append(")");
             }
         }
 
@@ -133,7 +137,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:

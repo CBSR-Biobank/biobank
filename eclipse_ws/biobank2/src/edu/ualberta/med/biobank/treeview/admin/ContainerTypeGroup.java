@@ -38,7 +38,7 @@ public class ContainerTypeGroup extends AdapterBase {
     private Boolean createAllowed;
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Container Types", true);
+        super(parent, id, ContainerType.NAME.plural().toString(), true);
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(

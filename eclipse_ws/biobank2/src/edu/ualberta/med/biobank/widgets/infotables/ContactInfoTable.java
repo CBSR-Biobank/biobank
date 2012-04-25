@@ -9,6 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
@@ -26,23 +28,24 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String officeNumber;
         public String faxNumber;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, title, studies,
                 emailAddress, mobileNumber, pagerNumber, officeNumber,
-                faxNumber }, "\t"); 
+                faxNumber }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Contact Name",
-        "Title",
-        "Studies",
-        "Email",
-        "Mobile #",
-        "Pager #",
-        "Office #",
-        "Fax #" };
+        Contact.PropertyName.NAME.toString(),
+        Contact.PropertyName.TITLE.toString(),
+        Study.NAME.plural().toString(),
+        Contact.PropertyName.EMAIL_ADDRESS.toString(),
+        Contact.PropertyName.MOBILE_NUMBER.toString(),
+        Contact.PropertyName.PAGER_NUMBER.toString(),
+        Contact.PropertyName.OFFICE_NUMBER.toString(),
+        Contact.PropertyName.FAX_NUMBER.toString() };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
@@ -59,7 +62,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -79,7 +82,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 7:
                     return item.faxNumber;
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };
@@ -99,7 +102,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             int count = 0;
             for (StudyWrapper study : studies) {
                 if (count > 0) {
-                    sb.append(", "); 
+                    sb.append(", ");
                 }
                 sb.append(study.getNameShort());
                 ++count;

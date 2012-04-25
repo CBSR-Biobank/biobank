@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 
 /**
@@ -12,7 +13,7 @@ import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 public class SiteStudyGroup extends AbstractStudyGroup {
 
     public SiteStudyGroup(SiteAdapter parent, int id) {
-        super(parent, id, "Studies");
+        super(parent, id, Study.NAME.plural().toString());
     }
 
     @Override

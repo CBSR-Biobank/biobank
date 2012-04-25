@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -123,10 +124,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
         nameLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.Property.NAME.toString());
+                HasName.PropertyName.NAME.toString());
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.Property.NAME_SHORT.toString());
+                HasNameShort.PropertyName.NAME_SHORT.toString());
         hasShipmentsButton =
             (Button) createLabelledWidget(client, Button.class, SWT.NONE,
                 Clinic.Property.SENDS_SHIPMENTS.toString());

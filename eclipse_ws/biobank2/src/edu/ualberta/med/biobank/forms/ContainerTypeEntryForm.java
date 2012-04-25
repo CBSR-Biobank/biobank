@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -218,7 +219,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         BgcBaseText name =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.NONE,
-                HasName.Property.NAME.toString(),
+                HasName.PropertyName.NAME.toString(),
                 null, containerType,
                 ContainerTypePeer.NAME.getName(), new NonEmptyStringValidator(
                     // validation error message
@@ -227,7 +228,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setFirstControl(name);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            HasName.Property.NAME_SHORT.toString(),
+            HasNameShort.PropertyName.NAME_SHORT.toString(),
             null, containerType,
             ContainerTypePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(

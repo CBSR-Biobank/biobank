@@ -186,20 +186,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
                 BgcBaseText.class, SWT.NONE,
-                Container.Property.LABEL.toString(), null, container,
+                Container.PropertyName.LABEL.toString(), null, container,
                 ContainerPeer.LABEL.getName(), new NonEmptyStringValidator(
                     MSG_CONTAINER_NAME_EMPTY)));
             labelIsFirstControl = true;
         } else {
             BgcBaseText l =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Container.Property.LABEL.toString());
+                    Container.PropertyName.LABEL.toString());
             setTextValue(l, container.getLabel());
         }
 
         Control c =
             createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                Container.Property.PRODUCT_BARCODE.toString(),
+                Container.PropertyName.PRODUCT_BARCODE.toString(),
                 null, container,
                 ContainerPeer.PRODUCT_BARCODE.getName(), null);
         if (!labelIsFirstControl) setFirstControl(c);

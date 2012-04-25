@@ -57,6 +57,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
@@ -82,7 +83,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ReportEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ReportEntryForm";
 
     private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME =
         new Comparator<EntityFilter>() {
@@ -152,7 +153,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return ""; 
+        return "";
     }
 
     @Override
@@ -211,7 +212,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(container);
 
         setFirstControl(createBoundWidgetWithLabel(container,
-            BgcBaseText.class, SWT.NONE, "Name",
+            BgcBaseText.class, SWT.NONE, HasName.PropertyName.NAME.toString(),
             null, report, ReportWrapper.PROPERTY_NAME,
             new NonEmptyStringValidator(
                 "Name is required.")));
@@ -418,7 +419,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                         Constructor<?> constructor = entityKlazz
                             .getConstructor();
                         Object instance = constructor.newInstance();
-                        Method setIdMethod = entityKlazz.getMethod("setId", 
+                        Method setIdMethod = entityKlazz.getMethod("setId",
                             Integer.class);
                         setIdMethod.invoke(instance, id);
 
@@ -542,7 +543,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 if (element instanceof EntityFilter) {
                     return ((EntityFilter) element).getName();
                 }
-                return ""; 
+                return "";
             }
         });
 
@@ -585,12 +586,12 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
             "Show count\r\n(for displayed columns)", null, report,
-            "isCount", 
+            "isCount",
             null);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
             "Share report", null, report,
-            "isPublic", null); 
+            "isPublic", null);
 
         GridData layoutData = new GridData();
         layoutData.widthHint = 225;
@@ -727,7 +728,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             if (opId != null) {
                 FilterOperator op = FilterOperator.getFilterOperator(opId);
                 if (op != null) {
-                    sb.append(" "); 
+                    sb.append(" ");
                     sb.append(op.getDisplayString());
                 }
             }
@@ -735,16 +736,16 @@ public class ReportEntryForm extends BiobankEntryForm {
             Collection<ReportFilterValue> values = filter
                 .getReportFilterValues();
             if (values != null) {
-                sb.append(": "); 
+                sb.append(": ");
                 for (ReportFilterValue value : values) {
-                    sb.append("'"); 
-                    sb.append(value.getValue().replace("'", "\'"));  
+                    sb.append("'");
+                    sb.append(value.getValue().replace("'", "\'"));
 
                     if (value.getSecondValue() != null) {
-                        sb.append("' and '"); 
-                        sb.append(value.getSecondValue().replace("'", "\'"));  
+                        sb.append("' and '");
+                        sb.append(value.getSecondValue().replace("'", "\'"));
                     }
-                    sb.append("'; "); 
+                    sb.append("'; ");
                 }
             }
 

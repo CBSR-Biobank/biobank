@@ -85,16 +85,16 @@ public class ProcessingEventAdapter extends AdapterBase {
         ProcessingEventWrapper pevent =
             (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
-            return "Processing event";
+            return ProcessingEvent.NAME.singular().toString();
         return NLS.bind("Processing event on date {0}",
             pevent.getFormattedCreatedAt());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Processing Event");
-        addViewMenu(menu, "Processing Event");
-        addDeleteMenu(menu, "Processing Event");
+        addEditMenu(menu, ProcessingEvent.NAME.singular().toString());
+        addViewMenu(menu, ProcessingEvent.NAME.singular().toString());
+        addDeleteMenu(menu, ProcessingEvent.NAME.singular().toString());
     }
 
     @Override

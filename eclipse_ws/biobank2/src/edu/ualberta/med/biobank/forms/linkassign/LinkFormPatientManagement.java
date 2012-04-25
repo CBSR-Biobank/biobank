@@ -40,6 +40,8 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -86,8 +88,7 @@ public class LinkFormPatientManagement {
     @SuppressWarnings("nls")
     protected void createPatientNumberText(Composite parent) {
         patientLabel = widgetCreator.createLabel(parent,
-            // TR: label
-            i18n.tr("Patient number"));
+            Patient.PropertyName.PNUMBER.toString());
         patientLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         patientValidator = new NonEmptyStringValidator(
@@ -135,8 +136,7 @@ public class LinkFormPatientManagement {
     @SuppressWarnings("nls")
     private void createProcessingEventWidgets(Composite compositeFields) {
         pEventComboLabel = widgetCreator.createLabel(compositeFields,
-            // TR: label
-            i18n.tr("Processing Event"));
+            ProcessingEvent.NAME.singular().toString());
         viewerProcessingEvents = widgetCreator.createComboViewer(
             compositeFields, pEventComboLabel, null, null,
             // TR: validation error message
@@ -198,8 +198,7 @@ public class LinkFormPatientManagement {
         // Will replace the combo in some specific situations (like cabinet
         // form):
         pEventTextLabel = widgetCreator.createLabel(compositeFields,
-            // TR: label
-            i18n.tr("Processing Event"));
+            ProcessingEvent.NAME.singular().toString());
         pEventTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         pEventText = (BgcBaseText) widgetCreator.createWidget(compositeFields,

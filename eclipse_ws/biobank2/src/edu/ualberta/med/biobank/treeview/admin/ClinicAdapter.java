@@ -56,14 +56,14 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Clinic");
+        return getTooltipText(Clinic.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Clinic");
-        addViewMenu(menu, "Clinic");
-        addDeleteMenu(menu, "Clinic");
+        addEditMenu(menu, Clinic.NAME.singular().toString());
+        addViewMenu(menu, Clinic.NAME.singular().toString());
+        addDeleteMenu(menu, Clinic.NAME.singular().toString());
     }
 
     @Override

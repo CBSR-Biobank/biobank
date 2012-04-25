@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
@@ -142,7 +143,8 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        name.setValidationControl(table.addLabel("name"));
+        name.setValidationControl(table.addLabel(HasName.PropertyName.NAME
+            .toString()));
         name.setText(table.addText());
 
         nameShort.setValidationControl(table.addLabel("nameShort"));

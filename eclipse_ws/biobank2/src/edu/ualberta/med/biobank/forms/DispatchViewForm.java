@@ -35,7 +35,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
@@ -46,11 +49,11 @@ import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 public class DispatchViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchViewForm"; 
+        "edu.ualberta.med.biobank.forms.DispatchViewForm";
 
     private DispatchAdapter dispatchAdapter;
 
-    private DispatchWrapper dispatch = new DispatchWrapper(
+    private final DispatchWrapper dispatch = new DispatchWrapper(
         SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
@@ -74,14 +77,14 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
 
         setDispatchInfo(adapter.getId());
 
-        setPartName("Dispatch");
+        setPartName(Dispatch.NAME.singular().toString());
     }
 
     private void setDispatchInfo(Integer id) throws Exception {
@@ -350,10 +353,10 @@ public class DispatchViewForm extends BiobankViewForm {
                     "Packed at");
             shippingMethodLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    "Shipping Method");
+                    ShippingMethod.NAME.singular().toString());
             waybillLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    "Waybill");
+                    ShipmentInfo.PropertyName.WAYBILL.toString());
         }
         if (dispatch.hasBeenReceived()) {
             dateReceivedLabel =
@@ -364,7 +367,8 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 dispatch.getCommentCollection(false));
@@ -387,7 +391,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo 
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());

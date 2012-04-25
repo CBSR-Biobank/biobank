@@ -9,6 +9,9 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventI
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicVisitInfoTable extends
@@ -27,9 +30,9 @@ public class ClinicVisitInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Visit #",
-        "Source Specimens",
-        "Aliquoted Specimens" };
+        CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString() };
 
     public ClinicVisitInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -47,7 +50,7 @@ public class ClinicVisitInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -59,7 +62,7 @@ public class ClinicVisitInfoTable extends
                     return NumberFormatter
                         .format(item.cevent.aliquotedSpecimenCount);
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

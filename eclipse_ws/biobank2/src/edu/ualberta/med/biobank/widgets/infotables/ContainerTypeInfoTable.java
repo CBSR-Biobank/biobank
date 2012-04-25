@@ -18,6 +18,10 @@ import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpd
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -34,24 +38,25 @@ public class ContainerTypeInfoTable extends
         Long inUseCount;
         Double temperature;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : "", status, 
-                (inUseCount != null) ? inUseCount.toString() : "", 
-                (temperature != null) ? temperature.toString() : "" }, "\t");  
+                (capacity != null) ? capacity.toString() : "", status,
+                (inUseCount != null) ? inUseCount.toString() : "",
+                (temperature != null) ? temperature.toString() : "" }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "Name",
-        "Short Name",
-        "Capacity",
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        Capacity.NAME.singular().toString(),
         "Status",
         "In Use",
-        "Temperature" };
+        Container.PropertyName.TEMPERATURE.toString() };
 
-    private SiteAdapter siteAdapter;
+    private final SiteAdapter siteAdapter;
 
     public ContainerTypeInfoTable(Composite parent, SiteAdapter site,
         List<SiteContainerTypeInfo> containerTypeInfo) {
@@ -71,7 +76,7 @@ public class ContainerTypeInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -87,7 +92,7 @@ public class ContainerTypeInfoTable extends
                 case 5:
                     return NumberFormatter.format(item.temperature);
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };

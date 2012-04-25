@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -23,18 +25,19 @@ public class SourceSpecimenInfoTable extends
         public String name;
         public String needOriginalVolume;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] {
                 name,
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
-                    : "" }, "\t");  
+                    : "" }, "\t");
         }
     }
 
     private final static String[] HEADINGS = new String[] {
-        "Specimen type",
-        "Need Original Volume" };
+        SpecimenType.NAME.singular().toString(),
+        SourceSpecimen.PropertyName.NEED_ORIGINAL_VOLUME.toString() };
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
@@ -53,7 +56,7 @@ public class SourceSpecimenInfoTable extends
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return ""; 
+                    return "";
                 }
                 switch (columnIndex) {
                 case 0:
@@ -61,7 +64,7 @@ public class SourceSpecimenInfoTable extends
                 case 1:
                     return info.needOriginalVolume;
                 default:
-                    return ""; 
+                    return "";
                 }
             }
         };
@@ -73,7 +76,7 @@ public class SourceSpecimenInfoTable extends
         TableRowData info = new TableRowData();
         info.studySourceVessel = (SourceSpecimenWrapper) studySourceVessel;
         Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
-            "study specimen type is null"); 
+            "study specimen type is null");
         info.name = info.studySourceVessel.getSpecimenType().getName();
         info.needOriginalVolume =
             (info.studySourceVessel

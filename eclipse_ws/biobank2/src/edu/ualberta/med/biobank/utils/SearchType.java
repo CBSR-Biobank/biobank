@@ -26,13 +26,15 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public enum SearchType {
-    INVENTORY_ID("Inventory ID") {
+    INVENTORY_ID(Specimen.PropertyName.INVENTORY_ID.toString()) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -102,7 +104,7 @@ public enum SearchType {
         }
     },
 
-    WORKSHEET("Worksheet") {
+    WORKSHEET(ProcessingEvent.PropertyName.WORKSHEET.toString()) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -131,7 +133,7 @@ public enum SearchType {
     };
 
     private static final String CAN_T_OPEN_FORM_WITH_ID_MSG =
-        "Can''t open form with id {0}"; 
+        "Can''t open form with id {0}";
 
     private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
         .getName());
@@ -156,10 +158,13 @@ public enum SearchType {
         if (size == 1) {
             openResult(res.get(0));
         } else {
-            boolean open = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(),
-                "Search Result",
-                NLS.bind("Found {0} results. Do you want to open all of them?", size));
+            boolean open =
+                MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(),
+                    "Search Result",
+                    NLS.bind(
+                        "Found {0} results. Do you want to open all of them?",
+                        size));
             if (open) {
                 for (ModelWrapper<?> wrapper : res) {
                     openResult(wrapper);

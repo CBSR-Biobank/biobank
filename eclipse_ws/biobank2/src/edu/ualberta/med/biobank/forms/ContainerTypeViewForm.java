@@ -25,6 +25,8 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -126,14 +128,13 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
         siteLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                // label
-                i18n.tr("Repository Site"));
+                Site.NAME.singular().toString());
         nameLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.Property.NAME.toString());
+                HasName.PropertyName.NAME.toString());
         nameShortLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.Property.NAME_SHORT.toString());
+                HasNameShort.PropertyName.NAME_SHORT.toString());
         isTopLevelButton =
             (Button) createLabelledWidget(client, Button.class, SWT.NONE,
                 ContainerType.Property.TOP_LEVEL.toString());

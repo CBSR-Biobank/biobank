@@ -39,11 +39,9 @@ public abstract class GroupsPage extends BgcDialogPage {
         this.context = context;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String getTitle() {
-        // TR: groups page title
-        return i18n.tr("Groups");
+        return Group.NAME.plural().toString();
     }
 
     @Override

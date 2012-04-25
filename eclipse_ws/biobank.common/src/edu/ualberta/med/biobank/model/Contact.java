@@ -46,7 +46,7 @@ public class Contact extends AbstractBiobankModel {
         "Contacts");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString EMAIL_ADDRESS = bundle.trc(
             "model",
             "Email Address").format();
@@ -61,7 +61,7 @@ public class Contact extends AbstractBiobankModel {
             "Mobile Number").format();
         public static final LString NAME = bundle.trc(
             "model",
-            "Name").format();
+            "Contact Name").format();
         public static final LString OFFICE_NUMBER = bundle.trc(
             "model",
             "Office Number").format();

@@ -41,10 +41,9 @@ public abstract class UsersPage extends BgcDialogPage {
         this.managerContext = managerContext;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String getTitle() {
-        return i18n.trc("users display page title", "Users");
+        return User.NAME.plural().toString();
     }
 
     @Override

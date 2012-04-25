@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.forms.RequestEntryForm;
+import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -26,13 +27,14 @@ public class RequestAdapter extends AdapterBase {
         return false;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         RequestWrapper shipment = (RequestWrapper) getModelObject();
-        Assert.isNotNull(shipment, "Request is null"); 
+        Assert.isNotNull(shipment, "Request is null");
         ResearchGroupWrapper study = shipment.getResearchGroup();
-        String label = shipment.getId() + " - "; 
-        label += study.getNameShort() + " - "; 
+        String label = shipment.getId() + " - ";
+        label += study.getNameShort() + " - ";
         label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;
 
@@ -40,7 +42,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("Request");
+        return getTooltipText(Request.NAME.singular().toString());
     }
 
     @Override
@@ -50,7 +52,7 @@ public class RequestAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Request");
+        addViewMenu(menu, Request.NAME.singular().toString());
     }
 
     @Override

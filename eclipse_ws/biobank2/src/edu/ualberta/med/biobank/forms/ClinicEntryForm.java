@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -160,13 +161,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.NONE,
-            HasName.Property.NAME.toString(),
+            HasName.PropertyName.NAME.toString(),
             null, clinic,
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            HasName.Property.NAME_SHORT.toString(),
+            HasNameShort.PropertyName.NAME_SHORT.toString(),
             null, clinic,
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));

@@ -25,8 +25,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
@@ -39,9 +41,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ShipmentViewForm extends BiobankViewForm {
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShipmentViewForm"; 
+        "edu.ualberta.med.biobank.forms.ShipmentViewForm";
 
-    private OriginInfoWrapper originInfo = new OriginInfoWrapper(
+    private final OriginInfoWrapper originInfo = new OriginInfoWrapper(
         SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
@@ -62,7 +64,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+    private final ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
         SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
@@ -70,7 +72,7 @@ public class ShipmentViewForm extends BiobankViewForm {
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         setOiInfo(adapter.getId());
         setPartName();
@@ -106,7 +108,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite client =
-            createSectionWithClient("Specimens");
+            createSectionWithClient(Specimen.NAME.plural().toString());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -164,10 +166,10 @@ public class ShipmentViewForm extends BiobankViewForm {
                 "Receiver");
         waybillLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Waybill");
+                ShipmentInfo.PropertyName.WAYBILL.toString());
         shippingMethodLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Shipping Method");
+                ShippingMethod.NAME.singular().toString());
         if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
@@ -186,7 +188,8 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -208,14 +211,14 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
         SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : ""); 
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : "");
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
         setTextValue(shippingMethodLabel,
-            shipMethod == null ? "" : shipMethod.getName()); 
+            shipMethod == null ? "" : shipMethod.getName());
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
