@@ -14,7 +14,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.model.Container;
@@ -38,7 +40,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         public String toString() {
             return StringUtils.join(new String[] { label, typeNameShort,
                 status, barcode,
-                (temperature != null) ? temperature.toString() : "" }, "\t");
+                (temperature != null) ? temperature.toString() : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
@@ -66,9 +68,9 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -82,7 +84,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                 case 4:
                     NumberFormatter.format(item.temperature);
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

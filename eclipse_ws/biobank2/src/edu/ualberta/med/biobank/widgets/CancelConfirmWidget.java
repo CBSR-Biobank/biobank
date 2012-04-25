@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.linkassign.AbstractSpecimenAdminForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -118,7 +119,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     }
 
     public void reset() {
-        confirmCancelText.setText(""); 
+        confirmCancelText.setText(StringUtil.EMPTY_STRING); 
     }
 
     @Override

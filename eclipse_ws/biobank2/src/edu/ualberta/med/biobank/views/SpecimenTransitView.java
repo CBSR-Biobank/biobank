@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -286,7 +287,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         Object obj) {
         if (currentInstance != null && obj instanceof OriginInfoWrapper) {
             OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
-            String text = "";
+            String text = StringUtil.EMPTY_STRING;
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {

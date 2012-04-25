@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -391,7 +392,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo
+                    shipInfo.getShippingMethod() == null ? StringUtil.EMPTY_STRING : shipInfo
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());

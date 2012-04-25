@@ -49,6 +49,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -232,7 +233,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return ID;
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void createCommonFields(Composite commonFieldsComposite) {
         BgcBaseText siteLabel = createReadOnlyLabelledField(
@@ -267,7 +267,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Cabinet specimen"));
         cabinetCheckButton =
-            toolkit.createButton(fieldsComposite, "", SWT.CHECK);
+            toolkit.createButton(fieldsComposite, StringUtil.EMPTY_STRING, SWT.CHECK);
         cabinetCheckButton
             // TR: tooltip
             .setToolTipText(i18n
@@ -301,7 +301,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         Label inventoryIdLabel = widgetCreator.createLabel(fieldsComposite,
             Specimen.PropertyName.INVENTORY_ID.toString());
         inventoryIdText = (BgcBaseText) createWidget(fieldsComposite,
-            BgcBaseText.class, SWT.NONE, "");
+            BgcBaseText.class, SWT.NONE, StringUtil.EMPTY_STRING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -375,8 +375,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     protected void retrieveSingleSpecimenData() throws Exception {
         String inventoryId = inventoryIdText.getText();
-        singleTypeText.setText("");
-        singleCollectionDateText.setText("");
+        singleTypeText.setText(StringUtil.EMPTY_STRING);
+        singleCollectionDateText.setText(StringUtil.EMPTY_STRING);
         if (inventoryId.isEmpty()) {
             return;
         }
@@ -494,7 +494,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     SWT.NONE,
                     oldSinglePositionCheckLabel,
                     new String[0],
-                    new WritableValue("", String.class),
+                    new WritableValue(StringUtil.EMPTY_STRING, String.class),
                     oldSinglePositionCheckValidator,
                     OLD_SINGLE_POSITION_BINDING);
         oldSinglePositionCheckText
@@ -509,7 +509,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         displayOldSingleFields(false);
         newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue("",
+            newSinglePositionLabel, new String[0], new WritableValue(StringUtil.EMPTY_STRING,
                 String.class), newSinglePositionValidator,
             NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
@@ -595,7 +595,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Use flatbed scanner"));
         useScannerButton =
-            toolkit.createButton(multipleOptionsFields, "", SWT.CHECK);
+            toolkit.createButton(multipleOptionsFields, StringUtil.EMPTY_STRING, SWT.CHECK);
         useScannerButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -640,7 +640,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     palletTypesViewer.setInput(null);
                     currentMultipleContainer.setContainerType(null);
                     palletPositionText.setEnabled(true);
-                    palletPositionText.setText("");
+                    palletPositionText.setText(StringUtil.EMPTY_STRING);
                 }
             }
         });
@@ -717,7 +717,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // free position for the container
                 parent.addChild(
                     currentMultipleContainer.getLabel().replaceAll(
-                        parent.getLabel(), ""), currentMultipleContainer);
+                        parent.getLabel(), StringUtil.EMPTY_STRING), currentMultipleContainer);
                 possibleTypes = getPossibleTypes(parent.getContainerType()
                     .getChildContainerTypeCollection());
                 if (possibleTypes.size() == 1) {
@@ -943,7 +943,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // want to deactivate it at first in scan mode
                 toggleScanTubeAloneMode();
         } else {
-            palletproductBarcodeText.setText("");
+            palletproductBarcodeText.setText(StringUtil.EMPTY_STRING);
             currentMultipleContainer.setContainerType(null);
             setScanHasBeenLaunched(true);
             setScanValid(true);
@@ -1164,12 +1164,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // the 2 following lines are needed. The validator won't update if don't
         // do that (why ?)
         inventoryIdText.setText("**");
-        inventoryIdText.setText("");
-        singleTypeText.setText("");
-        singleCollectionDateText.setText("");
-        oldSinglePositionText.setText("");
-        oldSinglePositionCheckText.setText("");
-        newSinglePositionText.setText("");
+        inventoryIdText.setText(StringUtil.EMPTY_STRING);
+        singleTypeText.setText(StringUtil.EMPTY_STRING);
+        singleCollectionDateText.setText(StringUtil.EMPTY_STRING);
+        oldSinglePositionText.setText(StringUtil.EMPTY_STRING);
+        oldSinglePositionCheckText.setText(StringUtil.EMPTY_STRING);
+        newSinglePositionText.setText(StringUtil.EMPTY_STRING);
         displayOldSingleFields(false);
 
         showOnlyPallet(true);
@@ -1193,9 +1193,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     public void reset(boolean resetAll) {
         super.reset(resetAll);
         @SuppressWarnings("nls")
-        String productBarcode = "";
+        String productBarcode = StringUtil.EMPTY_STRING;
         @SuppressWarnings("nls")
-        String label = "";
+        String label = StringUtil.EMPTY_STRING;
         ContainerTypeWrapper type = null;
 
         if (!resetAll) { // keep fields values

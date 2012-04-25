@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
 import edu.ualberta.med.biobank.common.reports.filters.SelectableFilterType;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -171,7 +172,7 @@ class FilterRow extends Composite {
                 if (element instanceof FilterOperator) {
                     return ((FilterOperator) element).getDisplayString();
                 }
-                return ""; 
+                return StringUtil.EMPTY_STRING; 
             }
         });
 

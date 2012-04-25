@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -211,14 +212,14 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
         SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : "");
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : StringUtil.EMPTY_STRING);
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
         setTextValue(shippingMethodLabel,
-            shipMethod == null ? "" : shipMethod.getName());
+            shipMethod == null ? StringUtil.EMPTY_STRING : shipMethod.getName());
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());

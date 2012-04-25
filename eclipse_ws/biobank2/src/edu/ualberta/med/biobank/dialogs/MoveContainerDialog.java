@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -26,7 +27,7 @@ public class MoveContainerDialog extends BgcBaseDialog {
     private final String title;
 
     @SuppressWarnings("nls")
-    private String newLabel = "";
+    private String newLabel = StringUtil.EMPTY_STRING;
 
     @SuppressWarnings("nls")
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,

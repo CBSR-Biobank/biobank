@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessIn
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -85,7 +86,7 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, ShippingMethod.NAME.singular().toString());
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+            .getShippingMethod() == null ? StringUtil.EMPTY_STRING : dispatch.getShipmentInfo()
             .getShippingMethod().getName());
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, ShipmentInfo.PropertyName.WAYBILL.toString());

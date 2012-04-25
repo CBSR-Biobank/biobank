@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -22,7 +23,7 @@ public class PalletBarcodeDialog extends BgcBaseDialog {
     }
 
     @SuppressWarnings("nls")
-    IObservableValue barcode = new WritableValue("", String.class);
+    IObservableValue barcode = new WritableValue(StringUtil.EMPTY_STRING, String.class);
 
     @SuppressWarnings("nls")
     @Override

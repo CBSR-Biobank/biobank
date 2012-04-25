@@ -6,7 +6,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -61,9 +63,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -81,7 +83,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                 case 6:
                     return item.officeNumber;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -99,7 +101,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         info.name = info.contact.getName();
         info.title = info.contact.getTitle();
         if (info.title == null) {
-            info.title = "";
+            info.title = StringUtil.EMPTY_STRING;
         }
         info.emailAddress = info.contact.getEmailAddress();
         info.mobileNumber = info.contact.getMobileNumber();

@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.action.request.RequestDispatchAction;
 import edu.ualberta.med.biobank.common.action.request.RequestGetInfoAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -166,7 +167,7 @@ public class RequestEntryForm extends BiobankViewForm {
         toolkit.createLabel(dispatchCreation,
             "Enter/Scan inventory ID to add:");
         newSpecimenText = new BgcBaseText(dispatchCreation, SWT.NONE, toolkit);
-        addButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
+        addButton = toolkit.createButton(dispatchCreation, StringUtil.EMPTY_STRING, SWT.PUSH);
         addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -190,13 +191,13 @@ public class RequestEntryForm extends BiobankViewForm {
                     BgcPlugin.openAsyncError(
                         "Error", e1.getMessage());
                 }
-                newSpecimenText.setText("");
+                newSpecimenText.setText(StringUtil.EMPTY_STRING);
             }
         });
 
         toolkit.createLabel(dispatchCreation,
             "Add Pallet:");
-        openScanButton = toolkit.createButton(dispatchCreation, "", SWT.PUSH);
+        openScanButton = toolkit.createButton(dispatchCreation, StringUtil.EMPTY_STRING, SWT.PUSH);
         openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -279,7 +280,7 @@ public class RequestEntryForm extends BiobankViewForm {
             "Enter inventory ID to add:");
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
+        Button addButton = toolkit.createButton(addComposite, StringUtil.EMPTY_STRING, SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -321,7 +322,7 @@ public class RequestEntryForm extends BiobankViewForm {
                         "Error", e1.getMessage());
                 }
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(StringUtil.EMPTY_STRING);
             }
         });
     }
@@ -380,7 +381,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 .getId(),
                 SessionManager.getUser()
                     .getCurrentWorkingCenter().getId(),
-                DispatchState.CREATION.getId(), "");
+                DispatchState.CREATION.getId(), StringUtil.EMPTY_STRING);
 
         List<Integer> ids =
             new ArrayList<Integer>();

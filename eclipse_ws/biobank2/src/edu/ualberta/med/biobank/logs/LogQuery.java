@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.logging.LogQueryAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Log;
@@ -50,16 +51,16 @@ public class LogQuery {
     @SuppressWarnings("nls")
     protected LogQuery() {
         /* Define all the keys to be used here */
-        searchQuery.put(LogPeer.CENTER.getName(), "");
-        searchQuery.put(LogPeer.USERNAME.getName(), "");
-        searchQuery.put(LogPeer.TYPE.getName(), "");
-        searchQuery.put(LogPeer.ACTION.getName(), "");
-        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), "");
-        searchQuery.put(LogPeer.INVENTORY_ID.getName(), "");
-        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), "");
-        searchQuery.put(LogPeer.DETAILS.getName(), "");
-        searchQuery.put(START_DATE_KEY, "");
-        searchQuery.put(END_DATE_KEY, "");
+        searchQuery.put(LogPeer.CENTER.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.USERNAME.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.TYPE.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.ACTION.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.INVENTORY_ID.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.DETAILS.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(START_DATE_KEY, StringUtil.EMPTY_STRING);
+        searchQuery.put(END_DATE_KEY, StringUtil.EMPTY_STRING);
     }
 
     public static LogQuery getInstance() {
@@ -137,7 +138,7 @@ public class LogQuery {
 
     @SuppressWarnings("nls")
     private String setValueIfEmpty(String value) {
-        if ("".equals(value))
+        if (StringUtil.EMPTY_STRING.equals(value))
             return null;
         return value;
     }
@@ -145,7 +146,7 @@ public class LogQuery {
     @SuppressWarnings("nls")
     private String getValueForNoneAll(String value) {
         if (value.equals(NONE))
-            return "";
+            return StringUtil.EMPTY_STRING;
         if (value.equals(ALL))
             return null;
         return value;

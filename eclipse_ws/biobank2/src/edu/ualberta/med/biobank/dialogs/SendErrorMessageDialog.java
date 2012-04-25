@@ -44,6 +44,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -229,7 +230,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
     // int height = attachmentLine.computeSize(SWT.DEFAULT,
     // SWT.DEFAULT).y;
     // attachments.remove(attachmentText.getText());
-    // attachmentText.setText("");
+    // attachmentText.setText(StringUtil.EMPTY_STRING);
     // attachmentLine.dispose();
     // globalComposite.layout(true, true);
     // Point shellSize = getShell().getSize();
@@ -430,7 +431,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                 public void widgetSelected(SelectionEvent e) {
                     int height = AttachmentComposite.this.computeSize(
                         SWT.DEFAULT, SWT.DEFAULT).y;
-                    attachmentText.setText("");
+                    attachmentText.setText(StringUtil.EMPTY_STRING);
                     AttachmentComposite.this.setVisible(false);
                     GridData gd = (GridData) AttachmentComposite.this
                         .getLayoutData();

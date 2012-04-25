@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -119,13 +120,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void handleEvent(Event e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(StringUtil.EMPTY_STRING);
             }
         });
         if (setAsFirstControl) {
             setFirstControl(newSpecimenText);
         }
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
+        Button addButton = toolkit.createButton(addComposite, StringUtil.EMPTY_STRING, SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -133,14 +134,14 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText("");
+                newSpecimenText.setText(StringUtil.EMPTY_STRING);
             }
         });
         toolkit.createLabel(addComposite,
             // label
             i18n.tr("or open scan dialog:"));
         Button openScanButton = toolkit
-            .createButton(addComposite, "", SWT.PUSH);
+            .createButton(addComposite, StringUtil.EMPTY_STRING, SWT.PUSH);
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -198,7 +199,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
                 .getId(), dispatch.getSenderCenter().getId(),
                 dispatch.getState(), (comment.getMessage() == null)
-                    ? "" : comment.getMessage());
+                    ? StringUtil.EMPTY_STRING : comment.getMessage());
         ShipmentInfoSaveInfo ship = null;
         if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
             ship =

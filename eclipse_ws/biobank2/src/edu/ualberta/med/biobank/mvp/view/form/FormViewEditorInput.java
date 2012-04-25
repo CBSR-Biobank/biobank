@@ -4,6 +4,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.mvp.view.IFormView;
 
 public class FormViewEditorInput implements IEditorInput {
@@ -38,7 +39,7 @@ public class FormViewEditorInput implements IEditorInput {
     @SuppressWarnings("nls")
     @Override
     public String getName() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class FormViewEditorInput implements IEditorInput {
     @SuppressWarnings("nls")
     @Override
     public String getToolTipText() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

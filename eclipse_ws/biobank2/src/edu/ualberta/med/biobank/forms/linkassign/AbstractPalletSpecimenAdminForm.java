@@ -74,7 +74,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected CancelConfirmWidget cancelConfirmWidget;
 
     @SuppressWarnings("nls")
-    private static String plateToScanSessionString = "";
+    private static String plateToScanSessionString = StringUtil.EMPTY_STRING;
 
     private final IObservableValue plateToScanValue = new WritableValue(
         plateToScanSessionString, String.class);
@@ -202,7 +202,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             public void propertyChange(PropertyChangeEvent event) {
                 // force a check on available plates
                 String plateText = plateToScanText.getText();
-                plateToScanText.setText("");
+                plateToScanText.setText(StringUtil.EMPTY_STRING);
                 plateToScanText.setText(plateText);
             }
         };
@@ -233,7 +233,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         synchronized (plateToScanSessionString) {
             plateToScanSessionString = (String) plateToScanValue.getValue();
             if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-                plateToScanSessionString = "";
+                plateToScanSessionString = StringUtil.EMPTY_STRING;
             }
         }
         return super.onClose();
@@ -553,7 +553,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     @SuppressWarnings("nls")
     protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch = toolkit.createLabel(parent, "", SWT.NONE);
+        scanTubeAloneSwitch = toolkit.createLabel(parent, StringUtil.EMPTY_STRING, SWT.NONE);
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);

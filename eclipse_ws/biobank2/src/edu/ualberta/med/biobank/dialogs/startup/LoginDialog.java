@@ -50,6 +50,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -137,7 +138,7 @@ public class LoginDialog extends TitleAreaDialog {
             String[] userNodeNames = prefsUserNames.childrenNames();
             for (String userNodeName : userNodeNames) {
                 Preferences node = prefsUserNames.node(userNodeName);
-                userNames.add(node.get(USER_NAME, ""));
+                userNames.add(node.get(USER_NAME, StringUtil.EMPTY_STRING));
             }
         } catch (BackingStoreException e) {
             logger.error("Could not get " + USER_NAME + " preference", e);
@@ -185,7 +186,7 @@ public class LoginDialog extends TitleAreaDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        String lastServer = pluginPrefs.get(LAST_SERVER, "");
+        String lastServer = pluginPrefs.get(LAST_SERVER, StringUtil.EMPTY_STRING);
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             // validation error when server text box is empty
             i18n.tr("Server field cannot be empty"));
@@ -227,7 +228,7 @@ public class LoginDialog extends TitleAreaDialog {
             i18n.tr("&User Name"),
             userNames.toArray(new String[0]),
             Authentication.USERNAME_PROPERTY_NAME,
-            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
+            pluginPrefs.get(LAST_USER_NAME, StringUtil.EMPTY_STRING), userNameValidator);
 
         passwordWidget = createPassWordText(contents,
             // TR: login dialog password text box label
@@ -359,7 +360,7 @@ public class LoginDialog extends TitleAreaDialog {
             // "You are not allowed to specify a port, only a hostname and path.");
             // return;
             // }
-            if (userNameWidget.getText().equals("")) {
+            if (userNameWidget.getText().isEmpty()) {
                 MessageDialog.openError(getShell(),
                     // TR: error dialog title
                     i18n.tr("Invalid User Name"),

@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteInput;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.RoleEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -82,7 +83,7 @@ public abstract class RoleInfoTable extends
                 case 0:
                     return role.getName();
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

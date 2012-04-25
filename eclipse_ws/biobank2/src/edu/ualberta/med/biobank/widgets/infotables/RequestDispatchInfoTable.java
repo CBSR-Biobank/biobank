@@ -10,7 +10,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -38,9 +40,9 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     (DispatchWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -57,7 +59,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return item.getStateDescription();
                 default:
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
             }
         };

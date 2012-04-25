@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -73,20 +74,20 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return specimen.getInventoryId();
             case 1:
-                return specimen.getSpecimenType() == null ? "" : specimen 
+                return specimen.getSpecimenType() == null ? StringUtil.EMPTY_STRING : specimen 
                     .getSpecimenType().getName();
             case 2:
                 String position = specimen.getPositionString();
                 return (position != null) ? position
                     : "none";
             case 3:
-                return specimen.getCreatedAt() == null ? "" : DateFormatter 
+                return specimen.getCreatedAt() == null ? StringUtil.EMPTY_STRING : DateFormatter 
                     .formatAsDateTime(specimen.getCreatedAt());
             case 4:
-                return specimen.getQuantity() == null ? "" : specimen 
+                return specimen.getQuantity() == null ? StringUtil.EMPTY_STRING : specimen 
                     .getQuantity().toString();
             case 6:
-                return specimen.getCommentCollection(false) == null ? "" : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); 
+                return specimen.getCommentCollection(false) == null ? StringUtil.EMPTY_STRING : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); 
             }
         } else if (element instanceof SpecimenTypeWrapper) {
             final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
@@ -110,7 +111,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 0) {
                 if (info.contact != null)
                     return info.contact.getClinic().getName();
-                return ""; 
+                return StringUtil.EMPTY_STRING; 
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
         } else if (element instanceof DispatchSpecimenWrapper) {
@@ -142,7 +143,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         else {
             Assert.isTrue(false, "invalid object type: " + element.getClass()); 
         }
-        return ""; 
+        return StringUtil.EMPTY_STRING; 
     }
 
     @Override
@@ -220,7 +221,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getFaxNumber();
             break;
         }
-        return ""; 
+        return StringUtil.EMPTY_STRING; 
     }
 
 }

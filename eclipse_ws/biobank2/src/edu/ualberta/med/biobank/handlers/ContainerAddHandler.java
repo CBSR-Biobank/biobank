@@ -5,6 +5,7 @@ import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -39,8 +40,8 @@ public class ContainerAddHandler extends LogoutSensitiveHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("",
-                "");
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
             return false;
         }
     }

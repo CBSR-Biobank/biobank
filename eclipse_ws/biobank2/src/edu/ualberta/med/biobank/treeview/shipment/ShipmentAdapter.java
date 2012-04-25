@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoDeleteAction;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -68,7 +69,7 @@ public class ShipmentAdapter extends AdapterBase {
         OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
-        String label = ""; 
+        String label = StringUtil.EMPTY_STRING; 
         if (shipmentInfo.getReceivedAt() != null)
             label += shipmentInfo.getFormattedDateReceived();
         if (shipmentInfo.getWaybill() != null) {

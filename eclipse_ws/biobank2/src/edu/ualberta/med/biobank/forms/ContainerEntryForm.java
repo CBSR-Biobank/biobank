@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -241,7 +242,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                                 && Boolean.TRUE.equals(ct.getTopLevel())) {
                                 Double temp = ct.getDefaultTemperature();
                                 if (temp == null) {
-                                    temperatureWidget.setText("");
+                                    temperatureWidget.setText(StringUtil.EMPTY_STRING);
                                 } else {
                                     temperatureWidget.setText(temp.toString());
                                 }

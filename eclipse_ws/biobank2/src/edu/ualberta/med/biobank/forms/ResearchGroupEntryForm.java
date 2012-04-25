@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -235,7 +236,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             new ResearchGroupSaveInfo(researchGroup.getId(),
                 researchGroup.getName(), researchGroup.getNameShort(),
                 researchGroup.getStudy().getId(),
-                comment.getMessage() == null ? ""
+                comment.getMessage() == null ? StringUtil.EMPTY_STRING
                     : comment.getMessage(), addressInfo, researchGroup
                     .getActivityStatus());
         ResearchGroupSaveAction save = new ResearchGroupSaveAction(info);

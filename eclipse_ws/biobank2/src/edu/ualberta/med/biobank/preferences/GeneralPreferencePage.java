@@ -8,6 +8,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 
 @SuppressWarnings("restriction")
 public class GeneralPreferencePage extends FieldEditorPreferencePage implements
@@ -37,11 +38,11 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
         showHeapFieldEditor = new BooleanFieldEditor(
             IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR,
-            "",
+            StringUtil.EMPTY_STRING,
             getFieldEditorParent());
         showHeapFieldEditor.getDescriptionControl(getFieldEditorParent())
             .setToolTipText(
-                "");
+                StringUtil.EMPTY_STRING);
         addField(showHeapFieldEditor);
     }
 

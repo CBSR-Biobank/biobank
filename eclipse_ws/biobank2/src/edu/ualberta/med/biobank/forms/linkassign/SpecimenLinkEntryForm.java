@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -231,13 +232,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         typesSelectionPerRowComposite.setLayoutData(gd);
 
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
+        toolkit.createLabel(typesSelectionPerRowComposite, StringUtil.EMPTY_STRING);
         toolkit.createLabel(typesSelectionPerRowComposite,
             SourceSpecimen.NAME.singular().toString());
         toolkit.createLabel(typesSelectionPerRowComposite,
             // label
             i18n.tr("Aliquoted Specimen Types"));
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
+        toolkit.createLabel(typesSelectionPerRowComposite, StringUtil.EMPTY_STRING);
 
         specimenTypesWidgets =
             new ArrayList<AliquotedSpecimenSelectionWidget>();
@@ -354,7 +355,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
-                newSinglePositionText.setText("");
+                newSinglePositionText.setText(StringUtil.EMPTY_STRING);
                 canSaveSingleSpecimen.setValue(false);
             }
         });
@@ -367,7 +368,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             i18n.tr("Enter a position"));
         newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue("",
+            newSinglePositionLabel, new String[0], new WritableValue(StringUtil.EMPTY_STRING,
                 String.class), newSinglePositionValidator,
             NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {

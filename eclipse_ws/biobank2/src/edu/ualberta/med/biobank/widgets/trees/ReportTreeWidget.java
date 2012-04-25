@@ -34,6 +34,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
@@ -164,7 +165,7 @@ public class ReportTreeWidget extends Composite {
         // lengthy tooltip faking code here
         final Tree tree = treeViewer.getTree();
         // Disable native tooltip
-        tree.setToolTipText(""); 
+        tree.setToolTipText(StringUtil.EMPTY_STRING); 
         final Display display = tree.getDisplay();
         final Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
@@ -229,7 +230,7 @@ public class ReportTreeWidget extends Composite {
                         label.setData("_TREEITEM", item); 
                         String text = ((AbstractReportTreeNode) item.getData())
                             .getToolTipText();
-                        if (text == null || text.equalsIgnoreCase("")) 
+                        if (text == null || text.equalsIgnoreCase(StringUtil.EMPTY_STRING)) 
                             return;
                         label.setText(text);
                         label.addListener(SWT.MouseExit, labelListener);

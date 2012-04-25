@@ -19,6 +19,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -72,7 +73,7 @@ public class ContainerReport2Editor extends ReportsEditor {
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
-                labelText, "");
+                labelText, StringUtil.EMPTY_STRING);
         widget.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -102,7 +103,7 @@ public class ContainerReport2Editor extends ReportsEditor {
     @SuppressWarnings("nls")
     protected void validate(String label) {
         try {
-            if (label.equals("")
+            if (label.isEmpty()
                 || ContainerWrapper.getContainersByLabel(
                     SessionManager.getAppService(), label).size() > 0)
                 filterList(label);
@@ -158,9 +159,9 @@ public class ContainerReport2Editor extends ReportsEditor {
     @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        containerLabel.setText("");
+        containerLabel.setText(StringUtil.EMPTY_STRING);
         topContainers.reset();
-        validate("");
+        validate(StringUtil.EMPTY_STRING);
         super.setValues();
     }
 }

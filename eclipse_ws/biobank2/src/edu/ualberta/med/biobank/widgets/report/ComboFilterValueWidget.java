@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class ComboFilterValueWidget implements FilterValueWidget {
@@ -71,7 +72,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     public void setValues(Collection<ReportFilterValue> values) {
         Combo combo = comboViewer.getCombo();
         if (!combo.isDisposed()) {
-            combo.setText(""); 
+            combo.setText(StringUtil.EMPTY_STRING); 
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     combo.setText(value.getValue());
@@ -119,7 +120,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
             @Override
             public void focusGained(FocusEvent e) {
                 if (combo.getText().equals(DEFAULT_TEXT)) {
-                    combo.setText(""); 
+                    combo.setText(StringUtil.EMPTY_STRING); 
                     isShowingDefaultText = false;
                 }
             }

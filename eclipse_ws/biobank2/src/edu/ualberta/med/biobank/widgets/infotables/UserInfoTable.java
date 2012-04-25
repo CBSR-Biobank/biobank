@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.action.security.UserDeleteInput;
 import edu.ualberta.med.biobank.common.action.security.UserGetAction;
 import edu.ualberta.med.biobank.common.action.security.UserGetInput;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -135,7 +136,7 @@ public abstract class UserInfoTable extends
                 case 2:
                     return user.getEmail();
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

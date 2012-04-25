@@ -6,6 +6,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -22,7 +23,7 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return study == null ? "" : study.getNameShort(); 
+        return study == null ? StringUtil.EMPTY_STRING : study.getNameShort(); 
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
 import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -131,17 +132,17 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
                         return ((RequestTableGroup) element).getTitle();
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof Node) {
                     if (columnIndex == 0) {
                         if ((RequestContainerAdapter) ((TreeItemAdapter) element)
                             .getParent() == null)
-                            return ""; //$NON-NLS-1$
+                            return StringUtil.EMPTY_STRING; //$NON-NLS-1$
                         return ((RequestContainerAdapter) ((TreeItemAdapter) element)
                             .getParent()).container.getLabel()
                             + ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
@@ -160,9 +161,9 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                                 ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                                     .getSpecimen()).getState()).getLabel();
                     } else
-                        return "";
+                        return StringUtil.EMPTY_STRING;
                 }
-                return "";
+                return StringUtil.EMPTY_STRING;
             }
         };
         tv.setLabelProvider(labelProvider);

@@ -12,6 +12,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -56,9 +58,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -70,7 +72,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                 case 3:
                     return NumberFormatter.format(item.numAliquots);
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

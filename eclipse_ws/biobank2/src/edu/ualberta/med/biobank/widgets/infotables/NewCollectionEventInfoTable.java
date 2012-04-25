@@ -10,6 +10,8 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -18,10 +20,10 @@ public class NewCollectionEventInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
 
     private static final String[] HEADINGS = new String[] {
-        "",
-        "",
-        "",
-        "" };
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING };
 
     public NewCollectionEventInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -37,9 +39,9 @@ public class NewCollectionEventInfoTable extends
                     (PatientCEventInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -49,11 +51,11 @@ public class NewCollectionEventInfoTable extends
                 case 2:
                     return NumberFormatter.format(info.aliquotedSpecimenCount);
                 case 3:
-                    return info.cevent.getComments().size() == 0 ? ""
-                        : "";
+                    return info.cevent.getComments().size() == 0 ? StringUtil.EMPTY_STRING
+                        : StringUtil.EMPTY_STRING;
 
                 default:
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
             }
         };

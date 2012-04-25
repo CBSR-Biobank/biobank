@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAc
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -105,10 +106,10 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     public void handleEvent(Event e) {
                         addSpecimen();
                         newSpecimenInventoryId.setFocus();
-                        newSpecimenInventoryId.setText(""); 
+                        newSpecimenInventoryId.setText(StringUtil.EMPTY_STRING); 
                     }
                 });
-            addButton = toolkit.createButton(this, "", SWT.PUSH); 
+            addButton = toolkit.createButton(this, StringUtil.EMPTY_STRING, SWT.PUSH); 
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -163,7 +164,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 ispecimen.specimen = bspecimen.getSpecimen();
                 ispecimen.parentLabel =
                     bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                        .pop().getLabel() : ""; 
+                        .pop().getLabel() : StringUtil.EMPTY_STRING; 
                 ispecimen.positionString =
                     bspecimen.getSpecimen().getSpecimenPosition() != null ?
                         bspecimen.getSpecimen().getSpecimenPosition()

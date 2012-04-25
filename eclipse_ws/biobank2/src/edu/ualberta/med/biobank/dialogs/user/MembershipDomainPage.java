@@ -16,6 +16,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
@@ -53,7 +54,7 @@ public class MembershipDomainPage extends BgcWizardPage {
 
     @SuppressWarnings("nls")
     MembershipDomainPage(Membership membership, ManagerContext context) {
-        super("", TITLE, null);
+        super(StringUtil.EMPTY_STRING, TITLE, null);
 
         // TR: membership domain page title area message
         setMessage(i18n.tr("Where the user (or group) is allowed access"));

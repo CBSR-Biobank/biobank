@@ -14,6 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -107,7 +108,7 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return ""; 
+        return StringUtil.EMPTY_STRING; 
     }
 
     @Override
@@ -116,7 +117,7 @@ public class SessionAdapter extends AdapterBase {
             return "Current server version: "
                 + appService.getServerVersion();
         }
-        return ""; 
+        return StringUtil.EMPTY_STRING; 
     }
 
     private SiteGroup getSitesGroupNode() {

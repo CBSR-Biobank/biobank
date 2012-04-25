@@ -14,7 +14,9 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
@@ -80,9 +82,9 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -98,7 +100,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return info.dstatus;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -28,6 +28,7 @@ import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
@@ -184,7 +185,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				return null;
 			}
 		};
-		serverMsgStatusItem.setText(""); 
+		serverMsgStatusItem.setText(StringUtil.EMPTY_STRING); 
 		statusLine.add(serverMsgStatusItem);
 	}
 }

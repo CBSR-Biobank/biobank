@@ -16,6 +16,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -233,8 +234,8 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
                 i18n.tr("Error"), e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText("");
-        volume.setText("");
+        quantity.setText(StringUtil.EMPTY_STRING);
+        volume.setText(StringUtil.EMPTY_STRING);
         activityStatus.getCombo().deselectAll();
     }
 

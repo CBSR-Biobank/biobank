@@ -164,7 +164,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             RequestInput srequest;
             while ((srequest =
                 reader.read(RequestInput.class, header, processors)) != null) {
-                if (!srequest.getInventoryID().equals(""))
+                if (!srequest.getInventoryID().isEmpty())
                     requests.add(srequest);
             }
         } catch (SuperCSVException e) {

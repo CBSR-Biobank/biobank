@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
@@ -227,7 +228,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     public static String containerIdsToString(List<Integer> list) {
-        String containerListString = "";
+        String containerListString = StringUtil.EMPTY_STRING;
         for (Object item : (List<?>) list)
             containerListString = containerListString.concat(item.toString()
                 + ",");
@@ -631,7 +632,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected String getOkMessage() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

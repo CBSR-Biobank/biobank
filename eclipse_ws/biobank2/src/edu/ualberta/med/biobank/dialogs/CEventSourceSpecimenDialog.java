@@ -24,6 +24,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -390,14 +391,14 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
     @SuppressWarnings("nls")
     @Override
     protected void resetFields() {
-        inventoryIdWidget.setText("");
+        inventoryIdWidget.setText(StringUtil.EMPTY_STRING);
         inventoryIdWidget.setFocus();
-        quantityText.setText("");
+        quantityText.setText(StringUtil.EMPTY_STRING);
         timeDrawnWidget.setDate(null);
         specimenTypeComboViewer.getCombo().deselectAll();
         activityStatusComboViewer.setSelection(
             new StructuredSelection(ActivityStatus.ACTIVE));
-        commentWidget.setText("");
+        commentWidget.setText(StringUtil.EMPTY_STRING);
         updateWidgetVisibilityAndValues();
     }
 
@@ -413,7 +414,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.specimen.setQuantity(internalSpecimen.specimen.getQuantity());
         spec.specimen.setCreatedAt(internalSpecimen.specimen.getCreatedAt());
         if (commentWrapper.getMessage() != null
-            && !commentWrapper.getMessage().equals("")) {
+            && !commentWrapper.getMessage().isEmpty()) {
             spec.comments.add(commentWrapper.getMessage());
         }
         if (spec.comments.size() > 0)

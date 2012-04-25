@@ -20,6 +20,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
@@ -125,7 +126,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
                     File f = new File(selected);
                     f.canWrite();
                 } else {
-                    activityLogDirText.setText("");
+                    activityLogDirText.setText(StringUtil.EMPTY_STRING);
                 }
             }
         });
@@ -154,7 +155,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         } else { /* don't save to a log file */
             pstore.setValue(
-                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, StringUtil.EMPTY_STRING);
             pstore.setValue(
                 PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, false);
             super.okPressed();

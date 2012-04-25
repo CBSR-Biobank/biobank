@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -120,7 +121,7 @@ public class DispatchCreateScanDialog extends
         resetScan();
         palletproductBarcodeText.setEnabled(show);
         if (show) {
-            palletproductBarcodeText.setText("");
+            palletproductBarcodeText.setText(StringUtil.EMPTY_STRING);
         } else {
             palletproductBarcodeText
                 .setText(i18n.tr("No previous position"));

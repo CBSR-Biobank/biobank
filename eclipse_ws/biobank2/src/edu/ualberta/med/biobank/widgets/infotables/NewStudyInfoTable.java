@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.HasName;
@@ -45,14 +46,14 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return info.getStudy().getNameShort();
                 case 2:
                     return (info.getStudy().getActivityStatus() != null) ? info
-                        .getStudy().getActivityStatus().getName() : "";
+                        .getStudy().getActivityStatus().getName() : StringUtil.EMPTY_STRING;
                 case 3:
                     return NumberFormatter.format(info.getPatientCount());
                 case 4:
                     return NumberFormatter.format(info
                         .getCollectionEventCount());
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -12,6 +12,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -37,7 +38,7 @@ public class UserState extends AbstractSourceProvider {
     private boolean hasWorkingCenter;
     private boolean hasPrinterLabelsRights;
     private boolean hasUserManagementRights;
-    private String currentCenterType = ""; //$NON-NLS-1$
+    private String currentCenterType = StringUtil.EMPTY_STRING; //$NON-NLS-1$
 
     @Override
     public String[] getProvidedSourceNames() {
@@ -101,7 +102,7 @@ public class UserState extends AbstractSourceProvider {
     }
 
     private void setCurrentCenterType(CenterWrapper<?> currentCenter) {
-        String type = ""; //$NON-NLS-1$
+        String type = StringUtil.EMPTY_STRING; //$NON-NLS-1$
         if (currentCenter != null) {
             type = currentCenter.getWrappedClass().getSimpleName();
         }

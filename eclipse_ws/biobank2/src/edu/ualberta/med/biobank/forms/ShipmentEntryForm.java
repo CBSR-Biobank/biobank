@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -307,7 +308,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 widgetCreator.addBinding(WAYBILL_BINDING);
             } else {
                 widgetCreator.removeBinding(WAYBILL_BINDING);
-                waybillWidget.setText("");
+                waybillWidget.setText(StringUtil.EMPTY_STRING);
             }
         }
 
@@ -319,7 +320,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             widgetCreator.addBinding(BOX_NUMBER_BINDING);
         } else {
             widgetCreator.removeBinding(BOX_NUMBER_BINDING);
-            boxNumberWidget.setText("");
+            boxNumberWidget.setText(StringUtil.EMPTY_STRING);
         }
         form.layout(true, true);
     }
@@ -495,7 +496,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo
                 .getReceiverSite().getId(), originInfo.getCenter().getId(),
-                comment.getMessage() == null ? ""
+                comment.getMessage() == null ? StringUtil.EMPTY_STRING
                     : comment.getMessage(), addedSpecimenIds,
                 removedSpecimenIds);
         ShipmentInfoSaveInfo siInfo =

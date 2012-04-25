@@ -15,7 +15,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -42,9 +44,9 @@ public class ContainerTypeInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : "", status,
-                (inUseCount != null) ? inUseCount.toString() : "",
-                (temperature != null) ? temperature.toString() : "" }, "\t");
+                (capacity != null) ? capacity.toString() : StringUtil.EMPTY_STRING, status,
+                (inUseCount != null) ? inUseCount.toString() : StringUtil.EMPTY_STRING,
+                (temperature != null) ? temperature.toString() : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
@@ -74,9 +76,9 @@ public class ContainerTypeInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -92,7 +94,7 @@ public class ContainerTypeInfoTable extends
                 case 5:
                     return NumberFormatter.format(item.temperature);
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

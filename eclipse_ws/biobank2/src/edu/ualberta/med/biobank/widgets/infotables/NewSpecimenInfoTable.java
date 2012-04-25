@@ -13,7 +13,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -66,13 +68,13 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                         .getPnumber();
                 case 8:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort();
+                    return oi == null ? StringUtil.EMPTY_STRING : oi.getCenter().getNameShort();
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
                     return row.comment;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -115,16 +117,16 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     return row.specimen.getActivityStatus().getName();
                 case 6:
                     ProcessingEvent pe = row.specimen.getProcessingEvent();
-                    return pe == null ? "" : pe.getWorksheet();
+                    return pe == null ? StringUtil.EMPTY_STRING : pe.getWorksheet();
                 case 7:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort();
+                    return oi == null ? StringUtil.EMPTY_STRING : oi.getCenter().getNameShort();
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
                     return row.comment;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -178,7 +180,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 9:
                     return row.comment;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -238,9 +240,9 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     (SpecimenInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 return currentColumnsShowns.getColumnValue(info, columnIndex);
             }

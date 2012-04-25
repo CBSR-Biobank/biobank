@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
@@ -59,19 +60,19 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText("");
+        return getTooltipText(StringUtil.EMPTY_STRING);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "");
-        addViewMenu(menu, "");
-        addDeleteMenu(menu, "");
+        addEditMenu(menu, StringUtil.EMPTY_STRING);
+        addViewMenu(menu, StringUtil.EMPTY_STRING);
+        addDeleteMenu(menu, StringUtil.EMPTY_STRING);
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

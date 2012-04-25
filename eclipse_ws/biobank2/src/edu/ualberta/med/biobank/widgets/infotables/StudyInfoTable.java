@@ -11,7 +11,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -28,17 +30,17 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, nameShort, status,
-                (patientCount != null) ? patientCount.toString() : "", 
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");  
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING, 
+                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t");  
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        "",
-        "",
-        "",
-        "",
-        "" };
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING,
+        StringUtil.EMPTY_STRING };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10, StudyWrapper.class);
@@ -53,9 +55,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
                 switch (columnIndex) {
                 case 0:
@@ -63,13 +65,13 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 1:
                     return info.nameShort;
                 case 2:
-                    return (info.status != null) ? info.status : ""; 
+                    return (info.status != null) ? info.status : StringUtil.EMPTY_STRING; 
                 case 3:
                     return NumberFormatter.format(info.patientCount);
                 case 4:
                     return NumberFormatter.format(info.visitCount);
                 default:
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
             }
         };
@@ -83,7 +85,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.nameShort = info.study.getNameShort();
         info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
-            info.status = ""; 
+            info.status = StringUtil.EMPTY_STRING; 
         }
         info.patientCount = info.study.getPatientCount(true);
         info.visitCount = info.study.getCollectionEventCount();

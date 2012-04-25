@@ -43,6 +43,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
@@ -153,7 +154,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override
@@ -543,7 +544,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 if (element instanceof EntityFilter) {
                     return ((EntityFilter) element).getName();
                 }
-                return "";
+                return StringUtil.EMPTY_STRING;
             }
         });
 

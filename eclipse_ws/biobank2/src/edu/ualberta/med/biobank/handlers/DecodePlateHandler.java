@@ -7,6 +7,7 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.DecodePlateForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -18,7 +19,7 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        FormInput input = new FormInput(null, "");
+        FormInput input = new FormInput(null, StringUtil.EMPTY_STRING);
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, DecodePlateForm.ID, false);

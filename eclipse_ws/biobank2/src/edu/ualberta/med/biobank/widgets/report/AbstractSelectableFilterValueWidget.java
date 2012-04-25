@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Control;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public abstract class AbstractSelectableFilterValueWidget<T extends AbstractListViewer>
@@ -57,7 +58,7 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                 // that don't exist in the option, as they will be lost. DEAL
                 // WITH THIS! :P
                 if (value != null && value.getValue() != null) {
-                    ViewerEntry entry = new ViewerEntry(value.getValue(), ""); //$NON-NLS-1$
+                    ViewerEntry entry = new ViewerEntry(value.getValue(), StringUtil.EMPTY_STRING); //$NON-NLS-1$
                     toSelect.add(entry);
                 }
             }
@@ -107,7 +108,7 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                     ViewerEntry entry = (ViewerEntry) element;
                     return entry.getValue();
                 }
-                return ""; //$NON-NLS-1$
+                return StringUtil.EMPTY_STRING; //$NON-NLS-1$
             }
         });
     }

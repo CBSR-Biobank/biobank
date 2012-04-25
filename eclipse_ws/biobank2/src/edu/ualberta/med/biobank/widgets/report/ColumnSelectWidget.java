@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -211,7 +212,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); 
+        createLabel(subContainer, StringUtil.EMPTY_STRING); 
 
         rightButton = createButton(subContainer, BgcPlugin.IMG_ARROW_RIGHT);
         leftButton = createButton(subContainer, BgcPlugin.IMG_ARROW_LEFT);
@@ -237,7 +238,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); 
+        createLabel(subContainer, StringUtil.EMPTY_STRING); 
 
         upButton = createButton(subContainer, BgcPlugin.IMG_UP);
         downButton = createButton(subContainer, BgcPlugin.IMG_DOWN);
@@ -638,7 +639,7 @@ public class ColumnSelectWidget extends Composite {
                 return ((PropertyModifierWrapper) element)
                     .getPropertyModifier().getName();
             }
-            return ""; 
+            return StringUtil.EMPTY_STRING; 
         }
     }
 

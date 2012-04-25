@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
@@ -37,7 +38,7 @@ public class TopContainerListWidget {
     private class NameFilter extends ViewerFilter {
         @Override
         public boolean select(Viewer viewer, Object top, Object child) {
-            if (filterText.equals("")) 
+            if (filterText.isEmpty()) 
                 return true;
             return filterText.startsWith(((ContainerWrapper) child).getLabel());
         }
@@ -51,7 +52,7 @@ public class TopContainerListWidget {
 
     @SuppressWarnings("unchecked")
     public TopContainerListWidget(final Composite parent, FormToolkit toolkit) {
-        filterText = ""; 
+        filterText = StringUtil.EMPTY_STRING; 
         enabled = true;
         toolkit.createLabel(parent, "Site:");
         final BiobankApplicationService appService = SessionManager

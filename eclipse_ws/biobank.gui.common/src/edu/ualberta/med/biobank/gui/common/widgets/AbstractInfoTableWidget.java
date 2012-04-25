@@ -68,6 +68,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     private static final String EDIT_MENU_ITEM_TEXT = i18n.tr("Edit");
     @SuppressWarnings("nls")
     private static final String DELETE_MENU_ITEM_TEXT = i18n.tr("Delete");
+    @SuppressWarnings("nls")
+    public static final String LOADING = i18n.tr("loading...");
 
     public static class RowItem {
         int itemNumber;

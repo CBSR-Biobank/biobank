@@ -49,6 +49,7 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReportingUtils {
@@ -101,7 +102,7 @@ public class ReportingUtils {
         if (reportURL == null) {
             throw new Exception(NLS.bind(
                 "No report available with name {0}",
-                JASPER_FILE_NAME.replaceAll(JASPER_FILE_EXTENSION, ""))); 
+                JASPER_FILE_NAME.replaceAll(JASPER_FILE_EXTENSION, StringUtil.EMPTY_STRING))); 
         }
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,

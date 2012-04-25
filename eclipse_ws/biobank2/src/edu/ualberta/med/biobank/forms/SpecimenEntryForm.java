@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -210,7 +211,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     BigDecimal volume = specimen.getQuantity();
                     if (volumeField != null) {
                         if (volume == null) {
-                            volumeField.setText("");
+                            volumeField.setText(StringUtil.EMPTY_STRING);
                         } else {
                             volumeField.setText(volume.toString());
                         }
@@ -423,7 +424,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 "Source Processing Event");
         String parentPEventString;
         if (parentPevent == null)
-            parentPEventString = "";
+            parentPEventString = StringUtil.EMPTY_STRING;
         else
             parentPEventString =
                 new StringBuilder(parentPevent.getFormattedCreatedAt())
@@ -444,7 +445,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 ProcessingEvent.NAME.singular().toString());
         String peventString;
         if (pevent == null)
-            peventString = "";
+            peventString = StringUtil.EMPTY_STRING;
         else
             peventString =
                 new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")

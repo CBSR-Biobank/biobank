@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.input;
 
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 
 public class ReportInput extends FormInput {
 
@@ -10,7 +11,7 @@ public class ReportInput extends FormInput {
 
     @Override
     public String getName() {
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
     }
 
     public Object getNode() {

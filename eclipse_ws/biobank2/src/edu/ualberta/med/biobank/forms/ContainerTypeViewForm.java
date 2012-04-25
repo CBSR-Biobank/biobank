@@ -18,6 +18,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -183,7 +184,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
         setTextValue(numSchemeLabel,
-            containerType.getChildLabelingScheme() == null ? "" : containerType
+            containerType.getChildLabelingScheme() == null ? StringUtil.EMPTY_STRING : containerType
                 .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
     }

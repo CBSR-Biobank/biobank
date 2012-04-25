@@ -6,7 +6,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -31,7 +33,7 @@ public class SourceSpecimenInfoTable extends
             return StringUtils.join(new String[] {
                 name,
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
-                    : "" }, "\t");
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
@@ -54,9 +56,9 @@ public class SourceSpecimenInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -64,7 +66,7 @@ public class SourceSpecimenInfoTable extends
                 case 1:
                     return info.needOriginalVolume;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

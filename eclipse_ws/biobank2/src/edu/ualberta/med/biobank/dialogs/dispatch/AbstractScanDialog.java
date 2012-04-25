@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -465,7 +466,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText("");
+        scanTubeAloneSwitch.setText(StringUtil.EMPTY_STRING);
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {

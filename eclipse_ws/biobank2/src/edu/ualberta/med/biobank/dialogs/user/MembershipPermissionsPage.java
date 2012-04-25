@@ -21,6 +21,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
@@ -61,7 +62,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
 
     @SuppressWarnings("nls")
     MembershipPermissionsPage(Membership membership, ManagerContext context) {
-        super("", TITLE, null);
+        super(StringUtil.EMPTY_STRING, TITLE, null);
 
         // TR: membership permissions page dialog title area message
         setMessage(i18n.tr("What the user (or group) is allowed to do"));

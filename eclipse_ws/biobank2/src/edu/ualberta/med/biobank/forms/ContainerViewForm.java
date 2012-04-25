@@ -82,6 +82,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ContainerViewForm";
 

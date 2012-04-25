@@ -9,9 +9,11 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -37,8 +39,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
-                (patientCount != null) ? patientCount.toString() : "",
-                (ceventCount != null) ? ceventCount.toString() : "",
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING,
+                (ceventCount != null) ? ceventCount.toString() : StringUtil.EMPTY_STRING,
                 contactNames }, "\t");
         }
     }
@@ -135,9 +137,9 @@ public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:

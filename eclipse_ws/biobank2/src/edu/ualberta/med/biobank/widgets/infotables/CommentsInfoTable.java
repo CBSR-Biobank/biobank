@@ -13,8 +13,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.User;
@@ -101,9 +103,9 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -114,7 +116,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
                 case 2:
                     return StringUtils.join(wrapText(item.message, 80), "\n");
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Point;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -81,14 +82,14 @@ public abstract class AbstractContainerDisplay {
         Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
-        String parentLabel = ""; //$NON-NLS-1$
+        String parentLabel = StringUtil.EMPTY_STRING; //$NON-NLS-1$
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
     }
 
     @SuppressWarnings("unused")

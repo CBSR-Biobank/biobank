@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveOutput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -333,7 +334,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         if (!user.isNew()) {
             // existing users can have their password field left blank
             passwordValidator = new OrValidator(Arrays.asList(
-                new EmptyStringValidator(""), passwordValidator),
+                new EmptyStringValidator(StringUtil.EMPTY_STRING), passwordValidator),
                 MSG_PASSWORD_REQUIRED);
         }
 

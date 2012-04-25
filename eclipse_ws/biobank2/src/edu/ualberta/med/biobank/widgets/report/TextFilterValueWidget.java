@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class TextFilterValueWidget implements FilterValueWidget {
@@ -38,7 +39,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
         if (!text.isDisposed()) {
-            text.setText(""); 
+            text.setText(StringUtil.EMPTY_STRING); 
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     text.setText(value.getValue());

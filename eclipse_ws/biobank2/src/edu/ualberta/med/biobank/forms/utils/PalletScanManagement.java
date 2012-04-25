@@ -17,6 +17,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
@@ -151,7 +152,7 @@ public class PalletScanManagement {
                         oldScannedCell
                             .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
                                 .getInformation()
-                                : "")
+                                : StringUtil.EMPTY_STRING)
                                 + " "
                                 + i18n.tr("Rescanned value is different"));
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);

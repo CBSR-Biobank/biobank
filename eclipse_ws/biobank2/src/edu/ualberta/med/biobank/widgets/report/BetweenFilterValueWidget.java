@@ -97,7 +97,7 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
     @Override
     public String toString(ReportFilterValue value) {
         return "\"" + value.getValue() + "\" and \"" + value.getSecondValue() //$NON-NLS-1$ //$NON-NLS-2$
-            + "\""; //$NON-NLS-1$
+            + "\"";
     }
 
     private Composite createControls(Composite parent) {

@@ -166,7 +166,7 @@ public class MembershipInfoTable
                 case 3:
                     return getRolesAndPermissionsSummary(m);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING; //$NON-NLS-1$
                 }
             }
         };

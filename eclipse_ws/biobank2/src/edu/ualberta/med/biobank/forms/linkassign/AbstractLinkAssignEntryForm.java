@@ -29,6 +29,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -438,8 +439,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
-        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
+        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
+        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
@@ -721,7 +722,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     ContainerWrapper container = parentContainers.get(0);
                     RowColPos position = container.getContainerType()
                         .getRowColFromPositionString(
-                            positionString.replace(container.getLabel(), ""));
+                            positionString.replace(container.getLabel(), StringUtil.EMPTY_STRING));
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);

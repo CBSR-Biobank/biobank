@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -22,7 +23,7 @@ public class PalletCell extends AbstractUICell {
 
     private String information;
 
-    private String title = "";
+    private String title = StringUtil.EMPTY_STRING;
 
     private SpecimenWrapper sourceSpecimen;
 
@@ -163,7 +164,7 @@ public class PalletCell extends AbstractUICell {
             }
             return type.getName();
         }
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     public SpecimenTypeWrapper getType() {

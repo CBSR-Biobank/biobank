@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -165,7 +166,7 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     protected String getTreeTextToolTip() {
-        return "";
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

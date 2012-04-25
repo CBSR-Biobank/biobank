@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.HasName;
@@ -43,7 +44,7 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:

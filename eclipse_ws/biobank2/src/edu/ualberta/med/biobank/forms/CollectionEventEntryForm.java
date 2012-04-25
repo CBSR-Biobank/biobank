@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
@@ -300,7 +301,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             EventAttrInfo eventAttrInfo = (adapter.getId() == null)
                 ? null : ceventInfo.eventAttrs.get(entry.getKey());
             String origValue = (eventAttrInfo == null)
-                ? "" : eventAttrInfo.attr.getValue();
+                ? StringUtil.EMPTY_STRING : eventAttrInfo.attr.getValue();
             pvCustomInfo.setValue(origValue);
             pvCustomInfo.setOrigValue(origValue);
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);

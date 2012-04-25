@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportDeleteAction;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
@@ -30,7 +31,7 @@ public class ReportAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         @SuppressWarnings("nls")
-        String label = "";
+        String label = StringUtil.EMPTY_STRING;
 
         ReportWrapper report = (ReportWrapper) getModelObject();
         if (report != null && report.getName() != null) {

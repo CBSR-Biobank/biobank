@@ -11,7 +11,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,8 +32,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "" }, "\t");
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING,
+                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
@@ -55,9 +57,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
 
                 switch (columnIndex) {
@@ -68,7 +70,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                 case 2:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -29,6 +29,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -96,7 +97,7 @@ public class LinkFormPatientManagement {
             i18n.tr("Enter a patient number"));
         patientNumberText = (BgcBaseText) widgetCreator.createBoundWidget(
             parent, BgcBaseText.class, SWT.NONE, patientLabel, new String[0],
-            new WritableValue("", String.class), patientValidator);
+            new WritableValue(StringUtil.EMPTY_STRING, String.class), patientValidator);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
         patientNumberText.addFocusListener(new FocusAdapter() {
@@ -202,7 +203,7 @@ public class LinkFormPatientManagement {
         pEventTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         pEventText = (BgcBaseText) widgetCreator.createWidget(compositeFields,
-            BgcBaseText.class, SWT.NONE, "");
+            BgcBaseText.class, SWT.NONE, StringUtil.EMPTY_STRING);
         pEventText.setEnabled(false);
         GridData gd = (GridData) pEventText.getLayoutData();
         gd.horizontalSpan = 2;
@@ -308,7 +309,7 @@ public class LinkFormPatientManagement {
 
         currentPatient = null;
         if (resetAll)
-            patientNumberText.setText("");
+            patientNumberText.setText(StringUtil.EMPTY_STRING);
     }
 
     public PatientWrapper getCurrentPatient() {
@@ -357,7 +358,7 @@ public class LinkFormPatientManagement {
     @SuppressWarnings("nls")
     public void enableValidators(boolean enabled) {
         if (enabled) {
-            patientNumberText.setText("");
+            patientNumberText.setText(StringUtil.EMPTY_STRING);
             viewerProcessingEvents.getCombo().deselectAll();
             viewerCollectionEvents.getCombo().deselectAll();
         } else {
@@ -422,7 +423,7 @@ public class LinkFormPatientManagement {
                 viewerProcessingEvents.setInput(null);
             }
             if (pEventText != null) {
-                pEventText.setText("");
+                pEventText.setText(StringUtil.EMPTY_STRING);
             }
         }
         viewerProcessingEvents.getCombo().setFocus();

@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -87,7 +88,7 @@ public class DispatchAdapter extends AdapterBase {
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getDispatchWrapper();
         Assert.isNotNull(dispatch, "Dispatch is null");
-        String label = "";
+        String label = StringUtil.EMPTY_STRING;
         if (dispatch.getSenderCenter() != null
             && dispatch.getReceiverCenter() != null)
             label += dispatch.getSenderCenter().getNameShort() + " -> "

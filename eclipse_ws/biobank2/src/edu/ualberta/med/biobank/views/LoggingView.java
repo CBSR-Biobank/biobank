@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.permission.logging.LoggingPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -68,7 +69,7 @@ public class LoggingView extends ViewPart {
         public void handleEvent(Event e) {
             /* The user can only enter in alphanumeric */
             /* Applied to Patient#, Inventory ID, Location */
-            e.text = e.text.replaceAll("^(?:(?!\\p{Alnum}+).)*$", "");  
+            e.text = e.text.replaceAll("^(?:(?!\\p{Alnum}+).)*$", StringUtil.EMPTY_STRING);  
         }
     };
 
@@ -347,10 +348,10 @@ public class LoggingView extends ViewPart {
         userCombo.select(0);
         typeCombo.select(0);
         actionCombo.select(0);
-        patientNumTextInput.setText(""); 
-        inventoryIdTextInput.setText(""); 
-        locationTextInput.setText(""); 
-        detailsTextInput.setText(""); 
+        patientNumTextInput.setText(StringUtil.EMPTY_STRING); 
+        inventoryIdTextInput.setText(StringUtil.EMPTY_STRING); 
+        locationTextInput.setText(StringUtil.EMPTY_STRING); 
+        detailsTextInput.setText(StringUtil.EMPTY_STRING); 
         startDateWidget.setDate(null);
         endDateWidget.setDate(null);
 
@@ -395,7 +396,7 @@ public class LoggingView extends ViewPart {
                     LogQuery.START_DATE_KEY, startDateStr);
             } else
                 LogQuery.getInstance().setSearchQueryItem(
-                    LogQuery.START_DATE_KEY, "");
+                    LogQuery.START_DATE_KEY, StringUtil.EMPTY_STRING);
 
             String endDateStr = DateFormatter.formatAsDate(endDateDate);
             if (endDateStr != null && endDateStr.length() > 0) {
@@ -403,7 +404,7 @@ public class LoggingView extends ViewPart {
                     LogQuery.END_DATE_KEY, endDateStr);
             } else
                 LogQuery.getInstance().setSearchQueryItem(
-                    LogQuery.END_DATE_KEY, "");
+                    LogQuery.END_DATE_KEY, StringUtil.EMPTY_STRING);
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()

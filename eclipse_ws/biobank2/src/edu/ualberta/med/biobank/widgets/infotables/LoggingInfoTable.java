@@ -8,7 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
@@ -62,9 +64,9 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                     getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -86,7 +88,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
                 case 8:
                     return item.details;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -34,8 +35,8 @@ public class StudyAddHandler extends LogoutSensitiveHandler {
                 && allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("",
-                "");
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
             return false;
         }
     }

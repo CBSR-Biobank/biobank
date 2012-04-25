@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -380,7 +381,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
                         ReportFilterValue value = ((ReportFilterValue) element);
                         return SetFilterValueWidget.this.toString(value);
                     }
-                    return ""; 
+                    return StringUtil.EMPTY_STRING; 
                 }
             });
             listViewer.setComparator(COMPARATOR);

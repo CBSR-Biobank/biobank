@@ -7,7 +7,9 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -48,9 +50,9 @@ public class ClinicVisitInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -62,7 +64,7 @@ public class ClinicVisitInfoTable extends
                     return NumberFormatter
                         .format(item.cevent.aliquotedSpecimenCount);
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

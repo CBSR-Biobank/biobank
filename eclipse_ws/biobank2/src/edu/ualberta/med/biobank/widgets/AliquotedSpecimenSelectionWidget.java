@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -150,7 +151,7 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         if (oneRow) {
-            textNumber = widgetCreator.getToolkit().createLabel(parent, "", 
+            textNumber = widgetCreator.getToolkit().createLabel(parent, StringUtil.EMPTY_STRING, 
                 SWT.BORDER);
             GridData gd = new GridData();
             gd.widthHint = 20;
@@ -226,7 +227,7 @@ public class AliquotedSpecimenSelectionWidget {
     public void setNumber(Integer number) {
         if (textNumber != null) {
             this.number = number;
-            String text = ""; 
+            String text = StringUtil.EMPTY_STRING; 
             if (number != null) {
                 text = number.toString();
             }

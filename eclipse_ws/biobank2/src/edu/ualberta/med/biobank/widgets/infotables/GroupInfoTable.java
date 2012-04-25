@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAction;
 import edu.ualberta.med.biobank.common.action.security.GroupGetInput;
 import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
 import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -94,7 +95,7 @@ public abstract class GroupInfoTable extends
                 case 0:
                     return group.getName();
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -8,8 +8,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -32,8 +34,8 @@ public class AliquotedSpecimenInfoTable extends
         @Override
         public String toString() {
             return StringUtils.join(new String[] { typeName,
-                (volume != null) ? volume.toString() : "",
-                (quantity != null) ? quantity.toString() : "", status }, "\t");
+                (volume != null) ? volume.toString() : StringUtil.EMPTY_STRING,
+                (quantity != null) ? quantity.toString() : StringUtil.EMPTY_STRING, status }, "\t");
         }
     }
 
@@ -74,9 +76,9 @@ public class AliquotedSpecimenInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -88,7 +90,7 @@ public class AliquotedSpecimenInfoTable extends
                 case 3:
                     return item.status;
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

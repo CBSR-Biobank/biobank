@@ -22,6 +22,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -144,7 +145,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                         } else if (sourceValue
                             .equals(LoginSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            serverItem.setText(""); 
+                            serverItem.setText(StringUtil.EMPTY_STRING); 
                             superAdminItem.setVisible(false);
                         }
                     }

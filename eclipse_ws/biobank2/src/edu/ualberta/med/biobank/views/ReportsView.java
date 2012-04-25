@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginSessionState;
@@ -125,7 +126,7 @@ public class ReportsView extends ViewPart {
         specimenBody.setLayoutData(treeGd);
         specimenTab.setControl(specimenBody);
         specimenTree = new ReportTreeWidget(specimenBody);
-        specimenRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        specimenRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
         specimenTree.setLayoutData(treeGd);
 
         top.setSelection(specimenTab);
@@ -138,7 +139,7 @@ public class ReportsView extends ViewPart {
         clinicBody.setLayoutData(treeGd);
         clinicTab.setControl(clinicBody);
         clinicTree = new ReportTreeWidget(clinicBody);
-        clinicRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        clinicRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
         clinicTree.setLayoutData(treeGd);
 
         // Patients
@@ -149,7 +150,7 @@ public class ReportsView extends ViewPart {
         patientBody.setLayoutData(treeGd);
         patientTab.setControl(patientBody);
         patientTree = new ReportTreeWidget(patientBody);
-        patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        patientRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
         patientTree.setLayoutData(treeGd);
 
         // Specimen Types
@@ -161,7 +162,7 @@ public class ReportsView extends ViewPart {
         specimenTypeTab.setControl(specimenTypeBody);
         specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
         specimenTypeRoot =
-            new AbstractReportTreeNode(""); //$NON-NLS-1$
+            new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
         specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
@@ -172,7 +173,7 @@ public class ReportsView extends ViewPart {
         containerBody.setLayoutData(treeGd);
         containerTab.setControl(containerBody);
         containerTree = new ReportTreeWidget(containerBody);
-        containerRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        containerRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,

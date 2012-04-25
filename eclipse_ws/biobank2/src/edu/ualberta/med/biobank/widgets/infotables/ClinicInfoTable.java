@@ -11,8 +11,10 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
@@ -33,9 +35,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicName, clinicNameShort,
-                studyCount.toString(), (status != null) ? status : "", //$NON-NLS-1$
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                studyCount.toString(), (status != null) ? status : StringUtil.EMPTY_STRING, //$NON-NLS-1$
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING, //$NON-NLS-1$
+                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -60,9 +62,9 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
@@ -78,7 +80,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 case 5:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING; //$NON-NLS-1$
                 }
             }
         };

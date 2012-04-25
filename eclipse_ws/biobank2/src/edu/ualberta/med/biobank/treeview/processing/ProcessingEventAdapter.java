@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
@@ -69,7 +70,7 @@ public class ProcessingEventAdapter extends AdapterBase {
         Assert.isNotNull(pevent, "processing event is null"); 
         String worksheet = pevent.getWorksheet();
         String name = pevent.getFormattedCreatedAt()
-            + (worksheet == null ? "" : " - #" + pevent.getWorksheet());  
+            + (worksheet == null ? StringUtil.EMPTY_STRING : " - #" + pevent.getWorksheet());  
 
         long count = -1;
         try {

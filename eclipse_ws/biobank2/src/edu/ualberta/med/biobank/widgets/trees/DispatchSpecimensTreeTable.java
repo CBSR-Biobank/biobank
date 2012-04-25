@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -141,12 +142,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
                         return CommentWrapper
@@ -155,7 +156,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
-                return "";
+                return StringUtil.EMPTY_STRING;
             }
 
             @Override

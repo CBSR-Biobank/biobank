@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.Patie
 import edu.ualberta.med.biobank.common.action.patient.PatientMergeAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -218,7 +219,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             BgcPlugin.openAsyncError(
                 "Error retrieving patient", e);
             patient2VisitsTable.setList(newContents);
-            study2Text.setText("");
+            study2Text.setText(StringUtil.EMPTY_STRING);
             return;
         }
         if (patient2 == null) {
@@ -226,7 +227,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                 "Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setList(newContents);
-            study2Text.setText("");
+            study2Text.setText(StringUtil.EMPTY_STRING);
             return;
         }
 
@@ -314,8 +315,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         pnumber1Text.setText(patient1.getPnumber());
         study1Text.setText(patient1.getStudy().getNameShort());
         patient1VisitsTable.setList(p.ceventInfos);
-        pnumber2Text.setText("");
-        study2Text.setText("");
+        pnumber2Text.setText(StringUtil.EMPTY_STRING);
+        study2Text.setText(StringUtil.EMPTY_STRING);
         patient2VisitsTable
             .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;

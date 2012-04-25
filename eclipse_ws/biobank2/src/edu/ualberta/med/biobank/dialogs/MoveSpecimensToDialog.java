@@ -27,6 +27,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -152,7 +153,7 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
-        selectedValue = new WritableValue("", String.class);
+        selectedValue = new WritableValue(StringUtil.EMPTY_STRING, String.class);
         listObserveSelection = SWTObservables.observeSelection(lv.getList());
         widgetCreator.bindValue(listObserveSelection, selectedValue, uvs, uvs);
     }

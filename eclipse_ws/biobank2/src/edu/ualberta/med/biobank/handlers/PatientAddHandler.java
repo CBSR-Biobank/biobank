@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
@@ -40,8 +41,8 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("",
-                "");
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
             return false;
         }
     }

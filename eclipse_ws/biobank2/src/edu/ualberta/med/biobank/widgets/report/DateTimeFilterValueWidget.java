@@ -14,6 +14,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
@@ -108,7 +109,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         }
 
         if (date != null) {
-            string = ""; //$NON-NLS-1$
+            string = StringUtil.EMPTY_STRING; //$NON-NLS-1$
 
             if (isDate) {
                 string = DISPLAY_DATE_FORMAT.format(date);

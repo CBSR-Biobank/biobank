@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.PaginationWidget;
@@ -60,7 +61,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
                 if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
-                        return ""; //$NON-NLS-1$
+                        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
                     if (castedVals[columnIndex] instanceof Date)
                         return DateFormatter
                             .formatAsDate((Date) castedVals[columnIndex]);

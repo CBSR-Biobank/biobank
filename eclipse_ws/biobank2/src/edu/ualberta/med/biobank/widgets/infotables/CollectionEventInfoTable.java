@@ -11,7 +11,9 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -56,9 +58,9 @@ public class CollectionEventInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -71,7 +73,7 @@ public class CollectionEventInfoTable extends
                     return info.comment;
 
                 default:
-                    return "";
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

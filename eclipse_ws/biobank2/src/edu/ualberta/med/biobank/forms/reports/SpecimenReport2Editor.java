@@ -16,6 +16,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -135,7 +136,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
     @SuppressWarnings("nls")
     protected BgcBaseText createValidatedIntegerText(String labelText,
         Composite parent) {
-        numSpecimens = new WritableValue("", String.class);
+        numSpecimens = new WritableValue(StringUtil.EMPTY_STRING, String.class);
         BgcBaseText widget = (BgcBaseText) widgetCreator
             .createBoundWidgetWithLabel(parent, BgcBaseText.class, SWT.BORDER,
                 labelText, new String[0], numSpecimens,
@@ -179,7 +180,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
         end.setDate(null);
         topContainers.reset();
         typesViewer.getCombo().deselectAll();
-        numSpecimensText.setText("");
+        numSpecimensText.setText(StringUtil.EMPTY_STRING);
         super.setValues();
     }
 

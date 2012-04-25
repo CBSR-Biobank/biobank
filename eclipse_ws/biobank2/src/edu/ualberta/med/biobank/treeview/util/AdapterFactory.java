@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.cglib.proxy.Enhancer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -32,7 +33,7 @@ public class AdapterFactory {
         }
         String objectClassName = objectClass.getSimpleName();
         String adapterClassName =
-            objectClassName.replace("Wrapper", "") + "Adapter";   
+            objectClassName.replace("Wrapper", StringUtil.EMPTY_STRING) + "Adapter";   
         try {
             for (String packageName : adaptersPackages) {
                 Class<?> klass;
