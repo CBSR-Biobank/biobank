@@ -14,6 +14,7 @@ public class PathValidator extends AbstractValidator {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if (value != null && !(value instanceof String)) {

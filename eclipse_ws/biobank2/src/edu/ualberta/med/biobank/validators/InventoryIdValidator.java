@@ -7,6 +7,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.others.CheckNoDuplicateAction;
@@ -17,14 +19,16 @@ import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class InventoryIdValidator extends AbstractValidator {
+    private static final I18n i18n = I18nFactory
+        .getI18n(InventoryIdValidator.class);
 
     private boolean duplicate;
-    private List<String> inventoryIdExcludeList;
+    private final List<String> inventoryIdExcludeList;
 
     /**
      * Edited specimen. Null if new specimen.
      */
-    private Specimen editedSpecimen;
+    private final Specimen editedSpecimen;
 
     public InventoryIdValidator(List<String> inventoryIdExcludeList,
         String message, Specimen editedSpecimen) {
@@ -33,6 +37,7 @@ public class InventoryIdValidator extends AbstractValidator {
         this.editedSpecimen = editedSpecimen;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(final Object testedValue) {
         if ((testedValue != null) && !(testedValue instanceof String)) {
@@ -63,7 +68,8 @@ public class InventoryIdValidator extends AbstractValidator {
                         }
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(
-                        "Error checking inventory id", e);
+                        // dialog title.
+                        i18n.tr("Error checking inventory id"), e);
                 }
             }
         });

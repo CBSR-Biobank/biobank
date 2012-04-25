@@ -12,6 +12,7 @@ public class TelephoneNumberValidator extends AbstractValidator {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {

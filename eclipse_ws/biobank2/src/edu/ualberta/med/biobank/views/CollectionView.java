@@ -6,6 +6,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
@@ -20,9 +22,12 @@ import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionView extends AbstractAdministrationView {
+    private static final I18n i18n = I18nFactory
+        .getI18n(CollectionView.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.CollectionView"; 
+        "edu.ualberta.med.biobank.views.CollectionView";
 
     private static CollectionView currentInstance;
 
@@ -57,20 +62,24 @@ public class CollectionView extends AbstractAdministrationView {
 
     }
 
+    @SuppressWarnings("nls")
     protected void notFound(String text) throws ApplicationException {
         if (!SessionManager.getAppService().isAllowed(
             new PatientCreatePermission(null))) {
-            BgcPlugin.openInformation("Patient not found",
-                "No patient with id '"
-                    + text
-                    + "' found.");
+            BgcPlugin.openInformation(
+                // dialog title.
+                i18n.tr("Patient not found"),
+                // dialog message.
+                i18n.tr("No patient with id ''{0}'' found.", text));
             return;
         }
 
         boolean create =
             BgcPlugin.openConfirm(
-                "Patient not found",
-                "Do you want to create this patient?");
+                // dialog title.
+                i18n.tr("Patient not found"),
+                // dialog message.
+                i18n.tr("Do you want to create this patient?"));
         if (create) {
             SearchedPatientInfo spi = new SearchedPatientInfo();
             spi.patient = new Patient();
@@ -107,9 +116,11 @@ public class CollectionView extends AbstractAdministrationView {
         return ID;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTreeTextToolTip() {
-        return "Enter a patient number";
+        // tooltip.
+        return i18n.tr("Enter a patient number");
     }
 
     public void showSearchedObjectsInTree(Integer patientId, String pnumber,
@@ -141,6 +152,7 @@ public class CollectionView extends AbstractAdministrationView {
         internalSearch(text);
     }
 
+    @SuppressWarnings("nls")
     protected void internalSearch(String text) {
         try {
             SearchedPatientInfo pinfo =
@@ -155,7 +167,9 @@ public class CollectionView extends AbstractAdministrationView {
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Search error",
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Search error"),
                 e);
         }
     }

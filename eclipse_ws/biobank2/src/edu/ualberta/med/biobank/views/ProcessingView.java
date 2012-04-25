@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,6 +11,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -31,9 +32,11 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingView extends AbstractAdministrationView {
+    private static final I18n i18n = I18nFactory.getI18n(ProcessingView.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.views.ProcessingView";
 
     private static ProcessingView currentInstance;
 
@@ -62,6 +65,7 @@ public class ProcessingView extends AbstractAdministrationView {
         rootNode.addChild(processingNode);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createTreeTextOptions(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
@@ -96,7 +100,9 @@ public class ProcessingView extends AbstractAdministrationView {
 
         radioDateProcessed = new Button(composite, SWT.RADIO);
         radioDateProcessed
-            .setText("Date Processed");
+            .setText(
+            // radio label.
+            i18n.tr("Date Processed"));
         radioDateProcessed.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -124,7 +130,9 @@ public class ProcessingView extends AbstractAdministrationView {
             }
         });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
-        searchButton.setText("Go");
+        searchButton.setText(
+            // button label.
+            i18n.tr("Go"));
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -169,6 +177,7 @@ public class ProcessingView extends AbstractAdministrationView {
         return StringUtil.EMPTY_STRING;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void internalSearch() {
         try {
@@ -176,18 +185,22 @@ public class ProcessingView extends AbstractAdministrationView {
             if (searchedObject.size() == 0) {
                 String msg;
                 if (radioWorksheet.getSelection()) {
-                    msg = NLS.bind(
-                        "No Processing Events found for worksheet {0}",
-                        treeText.getText());
+                    // dialog message.
+                    msg =
+                        i18n.tr("No Processing Events found for worksheet {0}",
+                            treeText.getText());
                 } else if (radioPatient.getSelection()) {
-                    msg = NLS.bind(
-                        "No Processing Events found for patient {0}",
+                    // dialog message.
+                    msg = i18n.tr("No Processing Events found for patient {0}",
                         treeText.getText());
                 } else {
-                    msg = NLS.bind("No Processing Events found for date ",
+                    // dialog message.
+                    msg = i18n.tr("No Processing Events found for date ",
                         DateFormatter.formatAsDate(dateWidget.getDate()));
                 }
-                BgcPlugin.openMessage("Processing Event not found",
+                BgcPlugin.openMessage(
+                    // dialog title.
+                    i18n.tr("Processing Event not found"),
                     msg);
             } else {
                 showSearchedObjectsInTree(searchedObject);
@@ -196,7 +209,8 @@ public class ProcessingView extends AbstractAdministrationView {
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Search error", e);
+                // dialog title
+                i18n.tr("Search error"), e);
         }
     }
 
@@ -226,6 +240,7 @@ public class ProcessingView extends AbstractAdministrationView {
         treeText.getParent().layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects) {
         processingNode.removeAll();
@@ -247,8 +262,8 @@ public class ProcessingView extends AbstractAdministrationView {
             nodeRes.get(0).performDoubleClick();
         } else
             BgcPlugin.openMessage(ProcessingEvent.NAME.plural().toString(),
-                NLS.bind("{0} found.",
-                    searchedObjects.size()));
+                // dialog message
+                i18n.tr("{0} found.", searchedObjects.size()));
     }
 
     public AdapterBase getProcessingNode() {

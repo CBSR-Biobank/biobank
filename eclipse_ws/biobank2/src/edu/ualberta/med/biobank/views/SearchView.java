@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.part.ViewPart;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -28,8 +30,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
 
 public class SearchView extends ViewPart {
+    private static final I18n i18n = I18nFactory.getI18n(SearchView.class);
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SearchView"; 
+    @SuppressWarnings("nls")
+    public static final String ID = "edu.ualberta.med.biobank.views.SearchView";
 
     private BgcBaseText searchText;
     private ComboViewer searchTypeCombo;
@@ -41,6 +45,7 @@ public class SearchView extends ViewPart {
 
     private ISourceProviderListener sourceProviderListener;
 
+    @SuppressWarnings("nls")
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
@@ -99,7 +104,9 @@ public class SearchView extends ViewPart {
         });
 
         searchButton = new Button(parent, SWT.PUSH);
-        searchButton.setText("Search");
+        searchButton.setText(
+            // button label.
+            i18n.trc("search (verb)", "Search"));
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -129,6 +136,7 @@ public class SearchView extends ViewPart {
 
     private void search() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 String searchString = searchText.getText().trim();
@@ -144,12 +152,15 @@ public class SearchView extends ViewPart {
                         type.processResults(res);
                     } else {
                         BgcPlugin.openInformation(
-                            "Search Result",
-                            "no result");
+                            // dialog title.
+                            i18n.tr("Search Result"),
+                            // dialog message.
+                            i18n.tr("no result"));
                     }
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
-                        "Search error", ex);
+                        // dialog title.
+                        i18n.tr("Search error"), ex);
                 }
             }
         });

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.Map;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -11,6 +10,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.part.ViewPart;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
@@ -29,10 +30,12 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
+    private static final I18n i18n = I18nFactory.getI18n(ReportsView.class);
 
     public static BgcLogger logger = BgcLogger.getLogger(ReportsView.class
         .getName());
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.views.ReportsView";
 
@@ -126,7 +129,7 @@ public class ReportsView extends ViewPart {
         specimenBody.setLayoutData(treeGd);
         specimenTab.setControl(specimenBody);
         specimenTree = new ReportTreeWidget(specimenBody);
-        specimenRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        specimenRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         specimenTree.setLayoutData(treeGd);
 
         top.setSelection(specimenTab);
@@ -139,7 +142,7 @@ public class ReportsView extends ViewPart {
         clinicBody.setLayoutData(treeGd);
         clinicTab.setControl(clinicBody);
         clinicTree = new ReportTreeWidget(clinicBody);
-        clinicRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        clinicRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         clinicTree.setLayoutData(treeGd);
 
         // Patients
@@ -150,7 +153,7 @@ public class ReportsView extends ViewPart {
         patientBody.setLayoutData(treeGd);
         patientTab.setControl(patientBody);
         patientTree = new ReportTreeWidget(patientBody);
-        patientRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        patientRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         patientTree.setLayoutData(treeGd);
 
         // Specimen Types
@@ -162,7 +165,7 @@ public class ReportsView extends ViewPart {
         specimenTypeTab.setControl(specimenTypeBody);
         specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
         specimenTypeRoot =
-            new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+            new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
@@ -173,7 +176,7 @@ public class ReportsView extends ViewPart {
         containerBody.setLayoutData(treeGd);
         containerTab.setControl(containerBody);
         containerTree = new ReportTreeWidget(containerBody);
-        containerRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        containerRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,
@@ -214,6 +217,7 @@ public class ReportsView extends ViewPart {
         }
     }
 
+    @SuppressWarnings("nls")
     private void addInTree(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode specimenTypes,
@@ -241,8 +245,9 @@ public class ReportsView extends ViewPart {
             child.setParent(containers);
             break;
         default:
-            throw new Exception(NLS.bind("Unable to place report node: {0}",
-                child.getLabel()));
+            throw new Exception(
+                // exception message.
+                i18n.tr("Unable to place report node: {0}", child.getLabel()));
         }
     }
 

@@ -28,7 +28,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     protected AbstractAdapterBase rootNode;
 
-    private ISourceProviderListener sourceListener;
+    private final ISourceProviderListener sourceListener;
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractViewWithAdapterTree.class.getName());
@@ -87,6 +87,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     public abstract String getId();
 
+    @SuppressWarnings("nls")
     public void activate() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();

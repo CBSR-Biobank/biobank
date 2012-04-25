@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.views;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -11,6 +13,8 @@ import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 
 public abstract class AbstractTodaySearchAdministrationView extends
     AbstractAdministrationView {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractTodaySearchAdministrationView.class);
 
     protected AbstractTodayNode<?> todayNode;
 
@@ -39,6 +43,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
         return searchedNode;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void internalSearch() {
         String text = treeText.getText();
@@ -53,7 +58,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
         } catch (Exception e) {
             BgcPlugin
                 .openAsyncError(
-                    "Search error",
+                    i18n.tr("Search error"),
                     e);
         }
     }
