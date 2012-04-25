@@ -262,7 +262,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         specimenTypeComboViewer =
             getWidgetCreator().createComboViewer(contents,
-                SourceSpecimen.Property.SPECIMEN_TYPE.toString(),
+                SpecimenType.NAME.singular().toString(),
                 mapStudySourceSpecimen.values(), ss,
                 // TR: validation error message
                 i18n.tr("A specimen type should be selected"),

@@ -11,6 +11,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
@@ -34,6 +38,20 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 })
 public class Site extends Center {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Site",
+        "Sites");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString NEED_ORIGINAL_VOLUME = bundle.trc(
+            "model",
+            "Need Original Volume").format();
+    }
 
     private Set<Study> studies = new HashSet<Study>(0);
     private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);

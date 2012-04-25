@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
@@ -96,7 +97,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         typeName = getWidgetCreator().createComboViewer(contents,
-            SourceSpecimen.Property.SPECIMEN_TYPE.toString(),
+            SpecimenType.NAME.singular().toString(),
             specimenTypes, userSourceSpecimen.getSpecimenType(),
             // TR: validation error message
             i18n.tr("A specimen type should be selected"),

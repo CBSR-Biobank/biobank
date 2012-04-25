@@ -65,15 +65,18 @@ public class Specimen extends AbstractBiobankModel {
         public static final LString INVENTORY_ID = bundle.trc(
             "model",
             "Inventory Id").format();
-        public static final LString COLLECTION_EVENT = bundle.trc(
+        public static final LString CHILD_SPECIMENS = bundle.trc(
             "model",
-            "Collection Event").format();
+            "Child Specimens").format();
         public static final LString CURRENT_CENTER = bundle.trc(
             "model",
             "Current Center").format();
         public static final LString CREATED_AT = bundle.trc(
             "model",
             "Created At").format();
+        public static final LString PARENT_SPECIMEN = bundle.trc(
+            "model",
+            "Parent Specimen").format();
         public static final LString QUANTITY = bundle.trc(
             "model",
             "Quantity").format();

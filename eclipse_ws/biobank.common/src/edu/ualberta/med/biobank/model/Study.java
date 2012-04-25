@@ -53,10 +53,6 @@ public class Study extends AbstractBiobankModel
         "Study",
         "Studies");
 
-    @SuppressWarnings("nls")
-    public static class Property {
-    }
-
     private String name;
     private String nameShort;
     private Set<AliquotedSpecimen> aliquotedSpecimens =

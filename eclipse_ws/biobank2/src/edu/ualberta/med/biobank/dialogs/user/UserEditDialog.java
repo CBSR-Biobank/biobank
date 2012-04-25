@@ -171,7 +171,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            User.Property.LOGIN.toString(),
+            User.PropertyName.LOGIN.toString(),
             null, userWrapper,
             UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
                 // TR: validation error message if login name not entered
@@ -179,7 +179,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            User.Property.FULL_NAME.toString(),
+            User.PropertyName.FULL_NAME.toString(),
             null, userWrapper,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
                 // TR: validation error message if full name not entered
@@ -187,7 +187,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            User.Property.EMAIL_ADDRESS.toString(),
+            User.PropertyName.EMAIL_ADDRESS.toString(),
             null, userWrapper,
             UserPeer.EMAIL.getName(), new EmailValidator(
                 // TR: validation error message if email not entered
@@ -195,7 +195,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         Control checkbox = createBoundWidgetWithLabel(contents, Button.class,
             SWT.CHECK | readOnly,
-            User.Property.RECEIVE_BULK_EMAILS.toString(),
+            User.PropertyName.RECEIVE_BULK_EMAILS.toString(),
             null, userWrapper,
             UserPeer.RECV_BULK_EMAILS.getName(), null);
         controls.add(checkbox);

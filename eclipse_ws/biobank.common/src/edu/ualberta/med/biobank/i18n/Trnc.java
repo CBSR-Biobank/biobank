@@ -24,4 +24,26 @@ public class Trnc extends Template {
             }
         };
     }
+
+    public LString singular(final Object... objects) {
+        return new LString(this) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getString() {
+                return bundle.i18n.trnc(context, text, pluralText, 1, objects);
+            }
+        };
+    }
+
+    public LString plural(final Object... objects) {
+        return new LString(this) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getString() {
+                return bundle.i18n.trnc(context, text, pluralText, 2, objects);
+            }
+        };
+    }
 }

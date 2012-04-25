@@ -48,14 +48,6 @@ public class SpecimenType extends AbstractBiobankModel {
         "Specimen Type",
         "Specimen Types");
 
-    @SuppressWarnings("nls")
-    public static class Property {
-        public static final LString NAME =
-            HasName.Property.NAME;
-        public static final LString NAME_SHORT =
-            HasName.Property.NAME_SHORT;
-    }
-
     private String name;
     private String nameShort;
     private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);

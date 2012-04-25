@@ -40,19 +40,24 @@ public class User extends Principal {
         "Users");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
+        public static final LString COMMENTS = Comment.NAME.plural();
         public static final LString EMAIL_ADDRESS = bundle.trc(
             "model",
             "Email").format();
         public static final LString FULL_NAME = bundle.trc(
             "model",
             "Full Name").format();
+        public static final LString GROUPS = Group.NAME.plural();
         public static final LString LOGIN = bundle.trc(
             "model",
             "Login").format();
+        public static final LString NEEDS_PASSWORD_CHANGE = bundle.trc(
+            "model",
+            "Needs Password Change").format();
         public static final LString RECEIVE_BULK_EMAILS = bundle.trc(
             "model",
-            "Receive bulk emails").format();
+            "Receive Bulk Email").format();
     }
 
     private String login;
