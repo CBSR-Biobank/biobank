@@ -48,16 +48,18 @@ public class LogQuery {
     @SuppressWarnings("nls")
     public static final String ALL = "ALL";
 
-    @SuppressWarnings("nls")
     protected LogQuery() {
         /* Define all the keys to be used here */
         searchQuery.put(LogPeer.CENTER.getName(), StringUtil.EMPTY_STRING);
         searchQuery.put(LogPeer.USERNAME.getName(), StringUtil.EMPTY_STRING);
         searchQuery.put(LogPeer.TYPE.getName(), StringUtil.EMPTY_STRING);
         searchQuery.put(LogPeer.ACTION.getName(), StringUtil.EMPTY_STRING);
-        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(), StringUtil.EMPTY_STRING);
-        searchQuery.put(LogPeer.INVENTORY_ID.getName(), StringUtil.EMPTY_STRING);
-        searchQuery.put(LogPeer.LOCATION_LABEL.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.PATIENT_NUMBER.getName(),
+            StringUtil.EMPTY_STRING);
+        searchQuery
+            .put(LogPeer.INVENTORY_ID.getName(), StringUtil.EMPTY_STRING);
+        searchQuery.put(LogPeer.LOCATION_LABEL.getName(),
+            StringUtil.EMPTY_STRING);
         searchQuery.put(LogPeer.DETAILS.getName(), StringUtil.EMPTY_STRING);
         searchQuery.put(START_DATE_KEY, StringUtil.EMPTY_STRING);
         searchQuery.put(END_DATE_KEY, StringUtil.EMPTY_STRING);
@@ -136,14 +138,12 @@ public class LogQuery {
         return date;
     }
 
-    @SuppressWarnings("nls")
     private String setValueIfEmpty(String value) {
         if (StringUtil.EMPTY_STRING.equals(value))
             return null;
         return value;
     }
 
-    @SuppressWarnings("nls")
     private String getValueForNoneAll(String value) {
         if (value.equals(NONE))
             return StringUtil.EMPTY_STRING;

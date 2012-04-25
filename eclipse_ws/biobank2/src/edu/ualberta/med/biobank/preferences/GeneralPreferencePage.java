@@ -6,13 +6,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 
-@SuppressWarnings("restriction")
 public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(GeneralPreferencePage.class);
 
     private BooleanFieldEditor showVersionFieldEditor;
 
@@ -28,11 +31,13 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         //
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFieldEditors() {
         showVersionFieldEditor = new BooleanFieldEditor(
             PreferenceConstants.GENERAL_SHOW_VERSION,
-            "Show software version in main window title",
+            // field editor label
+            i18n.tr("Show software version in main window title"),
             getFieldEditorParent());
         addField(showVersionFieldEditor);
 

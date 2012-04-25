@@ -19,12 +19,16 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.dialogs.NewServerDialog;
 
 public class ServerPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ServerPreferencePage.class);
 
     private class BiobankListEditor extends ListEditor {
 
@@ -42,13 +46,14 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
             super(serverList, title, parent);
         }
 
+        @SuppressWarnings("nls")
         @Override
         protected String createList(String[] items) {
             StringBuffer appendedList = new StringBuffer();
             for (int i = 0; i < items.length; i++) {
                 appendedList.append(items[i]);
                 if (i < items.length - 1)
-                    appendedList.append("\n"); 
+                    appendedList.append("\n");
             }
             return appendedList.toString();
         }
@@ -89,12 +94,14 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
             return listControl;
         }
 
+        @SuppressWarnings("nls")
         @Override
         public Composite getButtonBoxControl(Composite parent) {
             Composite buttonBoxControl = super.getButtonBoxControl(parent);
             if (editButton == null) {
                 editButton = createPushButton(buttonBoxControl,
-                    "Edit");
+                    // button label
+                    i18n.tr("Edit"));
                 editButton.setEnabled(false);
                 editButton.addSelectionListener(new SelectionAdapter() {
                     @Override
@@ -123,10 +130,13 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
         }
 
         protected String getModifiedEntry(String original) {
+            @SuppressWarnings("nls")
             InputDialog entryDialog = new InputDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                "Edit",
-                "Edit Server:", original, null);
+                // label.
+                i18n.tr("Edit"),
+                // label.
+                i18n.tr("Edit Server:"), original, null);
             if (entryDialog.open() == InputDialog.OK) {
                 return entryDialog.getValue();
             }
@@ -145,7 +155,8 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
 
         @Override
         protected String[] parseString(String stringList) {
-            StringTokenizer st = new StringTokenizer(stringList, "\n"); 
+            @SuppressWarnings("nls")
+            StringTokenizer st = new StringTokenizer(stringList, "\n");
             String[] items = new String[st.countTokens()];
             int i = 0;
             while (st.hasMoreTokens()) {
@@ -160,10 +171,12 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
         setPreferenceStore(BiobankPlugin.getDefault().getPreferenceStore());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFieldEditors() {
         addField(new BiobankListEditor(PreferenceConstants.SERVER_LIST,
-            "Servers:", getFieldEditorParent()));
+            // label.
+            i18n.tr("Servers:"), getFieldEditorParent()));
     }
 
     @Override

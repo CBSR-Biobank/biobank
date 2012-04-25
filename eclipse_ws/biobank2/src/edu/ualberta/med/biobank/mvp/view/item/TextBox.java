@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 
 public class TextBox extends AbstractValueField<String> {
-    private final static String EMPTY_STRING = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+    private final static String EMPTY_STRING = StringUtil.EMPTY_STRING;
     private final ModifyListener modifyListener = new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent e) {

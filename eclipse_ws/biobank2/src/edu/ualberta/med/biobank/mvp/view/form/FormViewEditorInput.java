@@ -36,7 +36,6 @@ public class FormViewEditorInput implements IEditorInput {
         return null;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String getName() {
         return StringUtil.EMPTY_STRING;
@@ -47,7 +46,6 @@ public class FormViewEditorInput implements IEditorInput {
         return null;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String getToolTipText() {
         return StringUtil.EMPTY_STRING;

@@ -20,7 +20,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
 
-        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+            StringUtil.EMPTY_STRING);
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
