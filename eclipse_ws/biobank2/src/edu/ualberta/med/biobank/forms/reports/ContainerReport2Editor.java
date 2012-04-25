@@ -69,7 +69,6 @@ public class ContainerReport2Editor extends ReportsEditor {
         });
     }
 
-    @SuppressWarnings("nls")
     protected BgcBaseText createCustomText(String labelText, Composite parent) {
         final BgcBaseText widget = (BgcBaseText) widgetCreator
             .createLabelledWidget(parent, BgcBaseText.class, SWT.NONE,
@@ -156,7 +155,6 @@ public class ContainerReport2Editor extends ReportsEditor {
         return params;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
         containerLabel.setText(StringUtil.EMPTY_STRING);

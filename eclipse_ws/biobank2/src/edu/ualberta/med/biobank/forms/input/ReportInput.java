@@ -11,7 +11,7 @@ public class ReportInput extends FormInput {
 
     @Override
     public String getName() {
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     public Object getNode() {

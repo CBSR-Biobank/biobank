@@ -22,8 +22,8 @@ public class PalletBarcodeDialog extends BgcBaseDialog {
         super(parentShell);
     }
 
-    @SuppressWarnings("nls")
-    IObservableValue barcode = new WritableValue(StringUtil.EMPTY_STRING, String.class);
+    IObservableValue barcode = new WritableValue(StringUtil.EMPTY_STRING,
+        String.class);
 
     @SuppressWarnings("nls")
     @Override

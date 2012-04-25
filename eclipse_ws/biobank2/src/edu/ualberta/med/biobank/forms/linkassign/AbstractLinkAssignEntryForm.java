@@ -430,7 +430,6 @@ public abstract class AbstractLinkAssignEntryForm extends
         }
     }
 
-    @SuppressWarnings("nls")
     protected void createSingleVisualisation(Composite parent) {
         singleVisualisation = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
@@ -439,8 +438,10 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
-        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
+        thirdSingleParentLabel =
+            toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
+        secondSingleParentLabel =
+            toolkit.createLabel(singleVisualisation, StringUtil.EMPTY_STRING);
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
@@ -720,9 +721,11 @@ public abstract class AbstractLinkAssignEntryForm extends
 
                     appendLog(NLS.bind("Checking position {0}", positionString));
                     ContainerWrapper container = parentContainers.get(0);
-                    RowColPos position = container.getContainerType()
-                        .getRowColFromPositionString(
-                            positionString.replace(container.getLabel(), StringUtil.EMPTY_STRING));
+                    RowColPos position =
+                        container.getContainerType()
+                            .getRowColFromPositionString(
+                                positionString.replace(container.getLabel(),
+                                    StringUtil.EMPTY_STRING));
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);

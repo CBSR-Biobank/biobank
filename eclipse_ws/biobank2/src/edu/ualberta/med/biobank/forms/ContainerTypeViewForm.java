@@ -174,7 +174,6 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(commentTable);
     }
 
-    @SuppressWarnings("nls")
     private void setContainerTypeValues() {
         setTextValue(siteLabel, containerType.getSite().getName());
         setTextValue(nameLabel, containerType.getName());
@@ -183,9 +182,11 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
-        setTextValue(numSchemeLabel,
-            containerType.getChildLabelingScheme() == null ? StringUtil.EMPTY_STRING : containerType
-                .getChildLabelingSchemeName());
+        setTextValue(
+            numSchemeLabel,
+            containerType.getChildLabelingScheme() == null ? StringUtil.EMPTY_STRING
+                : containerType
+                    .getChildLabelingSchemeName());
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
     }
 

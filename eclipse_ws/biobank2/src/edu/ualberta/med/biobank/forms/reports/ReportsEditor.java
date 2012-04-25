@@ -629,7 +629,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         //
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getOkMessage() {
         return StringUtil.EMPTY_STRING;

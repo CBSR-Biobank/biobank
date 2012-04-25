@@ -173,7 +173,6 @@ public class SpecimenReport2Editor extends ReportsEditor {
         return paramNames;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
         start.setDate(null);

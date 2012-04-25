@@ -95,9 +95,12 @@ public class LinkFormPatientManagement {
         patientValidator = new NonEmptyStringValidator(
             // TR: validation error message
             i18n.tr("Enter a patient number"));
-        patientNumberText = (BgcBaseText) widgetCreator.createBoundWidget(
-            parent, BgcBaseText.class, SWT.NONE, patientLabel, new String[0],
-            new WritableValue(StringUtil.EMPTY_STRING, String.class), patientValidator);
+        patientNumberText =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                parent, BgcBaseText.class, SWT.NONE, patientLabel,
+                new String[0],
+                new WritableValue(StringUtil.EMPTY_STRING, String.class),
+                patientValidator);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
         patientNumberText.addFocusListener(new FocusAdapter() {
@@ -299,7 +302,6 @@ public class LinkFormPatientManagement {
         setProcessingEventListFromPatient();
     }
 
-    @SuppressWarnings("nls")
     public void reset(boolean resetAll) {
         Assert.isNotNull(viewerProcessingEvents);
         Assert.isNotNull(patientNumberText);

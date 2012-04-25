@@ -388,7 +388,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         return new CommentedSpecimenInfo(new SpecimenInfo());
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void resetFields() {
         inventoryIdWidget.setText(StringUtil.EMPTY_STRING);

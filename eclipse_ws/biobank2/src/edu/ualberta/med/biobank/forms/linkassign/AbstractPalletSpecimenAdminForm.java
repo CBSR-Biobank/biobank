@@ -73,7 +73,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected CancelConfirmWidget cancelConfirmWidget;
 
-    @SuppressWarnings("nls")
     private static String plateToScanSessionString = StringUtil.EMPTY_STRING;
 
     private final IObservableValue plateToScanValue = new WritableValue(
@@ -197,7 +196,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     private void addScannerPreferencesPropertyListener() {
         propertyListener = new IPropertyChangeListener() {
-            @SuppressWarnings("nls")
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 // force a check on available plates
@@ -227,7 +225,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         super.dispose();
     }
 
-    @SuppressWarnings("nls")
     @Override
     public boolean onClose() {
         synchronized (plateToScanSessionString) {
@@ -551,9 +548,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         palletScanManagement.toggleScanTubeAloneMode();
     }
 
-    @SuppressWarnings("nls")
     protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch = toolkit.createLabel(parent, StringUtil.EMPTY_STRING, SWT.NONE);
+        scanTubeAloneSwitch =
+            toolkit.createLabel(parent, StringUtil.EMPTY_STRING, SWT.NONE);
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);

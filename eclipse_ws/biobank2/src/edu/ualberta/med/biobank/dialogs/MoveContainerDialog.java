@@ -26,7 +26,6 @@ public class MoveContainerDialog extends BgcBaseDialog {
 
     private final String title;
 
-    @SuppressWarnings("nls")
     private String newLabel = StringUtil.EMPTY_STRING;
 
     @SuppressWarnings("nls")

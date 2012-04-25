@@ -126,7 +126,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         if (setAsFirstControl) {
             setFirstControl(newSpecimenText);
         }
-        Button addButton = toolkit.createButton(addComposite, StringUtil.EMPTY_STRING, SWT.PUSH);
+        Button addButton =
+            toolkit.createButton(addComposite, StringUtil.EMPTY_STRING,
+                SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -186,7 +188,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         reloadSpecimens();
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
 

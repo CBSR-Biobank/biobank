@@ -267,7 +267,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Cabinet specimen"));
         cabinetCheckButton =
-            toolkit.createButton(fieldsComposite, StringUtil.EMPTY_STRING, SWT.CHECK);
+            toolkit.createButton(fieldsComposite, StringUtil.EMPTY_STRING,
+                SWT.CHECK);
         cabinetCheckButton
             // TR: tooltip
             .setToolTipText(i18n
@@ -507,11 +508,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Enter a position"));
         displayOldSingleFields(false);
-        newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue(StringUtil.EMPTY_STRING,
-                String.class), newSinglePositionValidator,
-            NEW_SINGLE_POSITION_BINDING);
+        newSinglePositionText =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                fieldsComposite, BgcBaseText.class, SWT.NONE,
+                newSinglePositionLabel, new String[0], new WritableValue(
+                    StringUtil.EMPTY_STRING,
+                    String.class), newSinglePositionValidator,
+                NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -595,7 +598,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Use flatbed scanner"));
         useScannerButton =
-            toolkit.createButton(multipleOptionsFields, StringUtil.EMPTY_STRING, SWT.CHECK);
+            toolkit.createButton(multipleOptionsFields,
+                StringUtil.EMPTY_STRING, SWT.CHECK);
         useScannerButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -717,7 +721,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 // free position for the container
                 parent.addChild(
                     currentMultipleContainer.getLabel().replaceAll(
-                        parent.getLabel(), StringUtil.EMPTY_STRING), currentMultipleContainer);
+                        parent.getLabel(), StringUtil.EMPTY_STRING),
+                    currentMultipleContainer);
                 possibleTypes = getPossibleTypes(parent.getContainerType()
                     .getChildContainerTypeCollection());
                 if (possibleTypes.size() == 1) {
@@ -922,7 +927,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         setUseScanner(use);
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void setUseScanner(boolean use) {
         useScanner = use;
@@ -1192,9 +1196,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     public void reset(boolean resetAll) {
         super.reset(resetAll);
-        @SuppressWarnings("nls")
         String productBarcode = StringUtil.EMPTY_STRING;
-        @SuppressWarnings("nls")
         String label = StringUtil.EMPTY_STRING;
         ContainerTypeWrapper type = null;
 

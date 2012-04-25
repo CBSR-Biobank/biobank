@@ -284,7 +284,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         createEventAttrSection(client);
     }
 
-    @SuppressWarnings("nls")
     private void createEventAttrSection(Composite client) throws Exception {
         pvCustomInfoList = new ArrayList<FormPvCustomInfo>();
 

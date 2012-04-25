@@ -458,7 +458,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected abstract void doProceed() throws Exception;
 
-    @SuppressWarnings("nls")
     protected void createScanTubeAloneButton(Composite parent) {
         scanTubeAloneSwitch = new Button(parent, SWT.NONE);
         GridData gd = new GridData();

@@ -132,7 +132,6 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
         });
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         IPreferenceStore pstore =
@@ -155,7 +154,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         } else { /* don't save to a log file */
             pstore.setValue(
-                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, StringUtil.EMPTY_STRING);
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+                StringUtil.EMPTY_STRING);
             pstore.setValue(
                 PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, false);
             super.okPressed();
