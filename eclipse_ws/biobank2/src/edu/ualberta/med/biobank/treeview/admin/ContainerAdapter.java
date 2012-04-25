@@ -54,7 +54,11 @@ public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
-        if (container != null) setHasChildren(container.hasChildren());
+        // assume it has children for now and set it appropriately when user
+        // double clicks on node
+        if (container != null) {
+            setHasChildren(true);
+        }
     }
 
     @Override
@@ -88,6 +92,9 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void setModelObject(Object modelObject) {
         super.setModelObject(modelObject);
+        // assume it has children for now and set it appropriately when user
+        // double clicks on node
+        setHasChildren(true);
     }
 
     private ContainerWrapper getContainer() {

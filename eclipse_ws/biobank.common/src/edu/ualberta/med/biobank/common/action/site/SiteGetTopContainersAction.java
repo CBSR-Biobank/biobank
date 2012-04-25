@@ -33,7 +33,6 @@ public class SiteGetTopContainersAction implements
             + " INNER JOIN FETCH containerType.childContainerTypes"
             + " INNER JOIN FETCH container.site site"
             + " LEFT JOIN FETCH container.specimenPositions"
-            + " LEFT JOIN FETCH container.childPositions"
             + " WHERE site.id = ?"
             + " AND containerType.topLevel IS TRUE"; // only select top-level
                                                      // Container-s
