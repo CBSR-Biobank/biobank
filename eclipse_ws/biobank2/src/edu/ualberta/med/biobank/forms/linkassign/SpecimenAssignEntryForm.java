@@ -109,11 +109,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean positionTextModified;
     private BgcBaseText singleTypeText;
     private BgcBaseText singleCollectionDateText;
-    private WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
+    private final WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
     // for multiple specimens assign
-    private ContainerWrapper currentMultipleContainer;
+    private final ContainerWrapper currentMultipleContainer;
     protected boolean palletproductBarcodeTextModified;
     private NonEmptyStringValidator productBarcodeValidator;
     protected boolean isModifyingMultipleFields;
@@ -135,6 +135,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private boolean checkingMultipleContainerPosition;
 
     private boolean initWithProduct = false;
+
+    protected SpecimenAssignResInfo res;
 
     public SpecimenAssignEntryForm() {
         currentMultipleContainer = new ContainerWrapper(
@@ -971,7 +973,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     private void saveMultipleSpecimens() throws Exception {
         if (saveEvenIfMissing) {
-            SpecimenAssignResInfo res;
             try {
                 Map<RowColPos, PalletCell> cells = getCells();
                 List<SpecimenInfo> specInfos =
@@ -1051,12 +1052,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         sp.patientPNumber, sp.visitNumber));
             }
             appendLog(sb.toString());
-
-            appendLog(MessageFormat
-                .format(
-                    "ASSIGNING: {0} specimens added to pallet {1} of site {2}",
-                    res.specimens.size(), palletPositionText.getText(),
-                    currentMultipleContainer.getSite().getNameShort()));
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    appendLog(MessageFormat
+                        .format(
+                            "ASSIGNING: {0} specimens added to pallet {1} of site {2}",
+                            res.specimens.size(), palletPositionText.getText(),
+                            currentMultipleContainer.getSite().getNameShort()));
+                }
+            });
             setFinished(false);
         }
     }
