@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -71,6 +73,7 @@ import edu.ualberta.med.biobank.widgets.trees.infos.listener.InfoTreeEvent;
  * 
  */
 public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
+    private static final I18n i18n = I18nFactory.getI18n(InfoTreeWidget.class);
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -165,8 +168,9 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         return false;
     }
 
+    @SuppressWarnings("nls")
     protected BiobankCollectionModel getSelectionInternal() {
-        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed"); 
+        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) treeViewer
             .getSelection();
 
@@ -285,7 +289,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e); 
+            logger.error("setCollection error", e);
         }
     }
 

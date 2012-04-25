@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -32,6 +34,17 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import edu.ualberta.med.biobank.treeview.Node;
 
 public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractInfoTreeWidget.class);
+
+    @SuppressWarnings("nls")
+    private static final String FIRST_PAGE = i18n.tr("First Page");
+    @SuppressWarnings("nls")
+    private static final String PREV_PAGE = i18n.tr("Previous Page");
+    @SuppressWarnings("nls")
+    private static final String NEXT_PAGE = i18n.tr("Next Page");
+    @SuppressWarnings("nls")
+    private static final String LAST_PAGE = i18n.tr("Last Page");
 
     class PageInformation {
         int page;
@@ -258,6 +271,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         }
     }
 
+    @SuppressWarnings("nls")
     public void setCollection(final List<T> collection, final T selection) {
         try {
             if ((collection == null)
@@ -296,7 +310,8 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
             backgroundThread.start();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Cannot Load Tree Data", e);
+                // dialog message.
+                i18n.tr("Cannot Load Tree Data"), e);
         }
 
         layout(true, true);
@@ -391,7 +406,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         firstButton = new Button(paginationWidget, SWT.NONE);
         firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_FIRST));
-        firstButton.setToolTipText("First page");
+        firstButton.setToolTipText(FIRST_PAGE);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -403,7 +418,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_PREV));
         prevButton
-            .setToolTipText("Previous page");
+            .setToolTipText(PREV_PAGE);
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -416,7 +431,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         nextButton = new Button(paginationWidget, SWT.NONE);
         nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_NEXT));
-        nextButton.setToolTipText("Next page");
+        nextButton.setToolTipText(NEXT_PAGE);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -427,7 +442,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         lastButton = new Button(paginationWidget, SWT.NONE);
         lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_RESULTSET_LAST));
-        lastButton.setToolTipText("Last page");
+        lastButton.setToolTipText(LAST_PAGE);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
