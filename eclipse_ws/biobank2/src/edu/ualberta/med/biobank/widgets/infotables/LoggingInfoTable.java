@@ -7,6 +7,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
@@ -18,17 +20,19 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
+    public static final I18n i18n = I18nFactory.getI18n(LoggingInfoTable.class);
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         Site.NAME.singular().toString(),
         User.NAME.singular().toString(),
-        "Date",
-        "Action",
-        "Type",
+        i18n.tr("Date"),
+        i18n.tr("Action"),
+        i18n.tr("Type"),
         Patient.PropertyName.PNUMBER.toString(),
         Specimen.PropertyName.INVENTORY_ID.toString(),
-        "Location",
-        "Details" };
+        i18n.tr("Location"),
+        i18n.tr("Details") };
 
     private static final int PAGE_SIZE_ROWS = 20;
 
@@ -47,6 +51,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
         String positionLabel;
         String details;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { center, user, date, action,
@@ -107,6 +112,7 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
         Date logQueryDate = logQuery.getCreatedAt();
         if (logQueryDate != null) {
+            @SuppressWarnings("nls")
             SimpleDateFormat dateTimeSecond =
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             info.date = dateTimeSecond.format(logQueryDate);

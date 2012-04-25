@@ -61,7 +61,7 @@ public class ReportTableWidget<T> extends InfoTableBgrLoader<T> {
                 if (element instanceof Object[]) {
                     Object[] castedVals = (Object[]) element;
                     if (castedVals[columnIndex] == null)
-                        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                        return StringUtil.EMPTY_STRING;
                     if (castedVals[columnIndex] instanceof Date)
                         return DateFormatter
                             .formatAsDate((Date) castedVals[columnIndex]);

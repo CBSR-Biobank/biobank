@@ -11,6 +11,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -28,6 +30,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * 
  */
 public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(CommentsInfoTable.class);
 
     final int TEXT_MARGIN = 3;
 
@@ -45,9 +49,10 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         User.NAME.singular().toString(),
-        "Date",
+        i18n.tr("Date"),
         Comment.PropertyName.MESSAGE.toString() };
 
     public CommentsInfoTable(Composite parent,
@@ -97,6 +102,7 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
+            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 TableRowData item =

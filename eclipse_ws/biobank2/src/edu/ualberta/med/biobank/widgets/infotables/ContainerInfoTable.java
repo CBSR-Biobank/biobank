@@ -8,6 +8,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -27,6 +29,8 @@ import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerInfoTable extends InfoTableWidget<Container> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ContainerInfoTable.class);
 
     private static class TableRowData {
         Container container;
@@ -36,18 +40,24 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         String barcode;
         Double temperature;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { label, typeNameShort,
-                status, barcode,
-                (temperature != null) ? temperature.toString() : StringUtil.EMPTY_STRING }, "\t");
+            return StringUtils.join(new String[] {
+                label,
+                typeNameShort,
+                status,
+                barcode,
+                (temperature != null) ? temperature.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         HasName.PropertyName.NAME.toString(),
         ContainerType.NAME.singular().toString(),
-        "Status",
+        i18n.tr("Status"),
         Container.PropertyName.PRODUCT_BARCODE.toString(),
         Container.PropertyName.TEMPERATURE.toString() };
 
@@ -129,12 +139,13 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void addClickListener(
         IInfoTableDoubleClickItemListener<Container> listener) {
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText("Edit");
+        mi.setText(i18n.tr("Edit"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

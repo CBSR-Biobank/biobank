@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -10,6 +9,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
@@ -28,12 +29,14 @@ import edu.ualberta.med.biobank.model.Role;
 
 public abstract class RoleInfoTable extends
     DefaultAbstractInfoTableWidget<Role> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(RequestDispatchInfoTable.class);
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS =
         new String[] { HasName.PropertyName.NAME.toString() };
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "nls" })
     public RoleInfoTable(Composite parent, List<Role> collection) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
         addEditItemListener(new IInfoTableEditItemListener<Role>() {
@@ -61,7 +64,7 @@ public abstract class RoleInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Duplicate");
+        item.setText(i18n.trc("duplicate (verb)", "Duplicate"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -99,15 +102,18 @@ public abstract class RoleInfoTable extends
         }
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteRole(Role role) {
         try {
             String name = role.getName();
-            String message = MessageFormat.format(
-                "Are you certain you want to delete \"{0}\"?",
-                new Object[] { name });
+            String message =
+                // dialog message.
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    name);
 
             if (BgcPlugin.openConfirm(
-                "Confirm Deletion", message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new RoleDeleteAction(new RoleDeleteInput(role)));
@@ -120,7 +126,9 @@ public abstract class RoleInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError("Unable to delete role.", e);
+                .openAsyncError(
+                    // dialog title.
+                    i18n.tr("Unable to delete role."), e);
         }
         return false;
     }

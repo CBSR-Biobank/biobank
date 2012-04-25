@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBriefInfo;
@@ -21,6 +23,8 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(PeListInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 24;
 
@@ -31,6 +35,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         public Long numSVs;
         public Long numAliquots;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { startDate, studyNameShort,
@@ -38,8 +43,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        "Start date",
+        i18n.tr("Start date"),
         Study.NAME.singular().toString(),
         SourceSpecimen.NAME.plural().toString(),
         AliquotedSpecimen.NAME.plural().toString() };

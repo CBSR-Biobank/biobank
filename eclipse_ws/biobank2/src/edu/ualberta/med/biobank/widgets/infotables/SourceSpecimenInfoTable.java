@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -19,6 +21,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class SourceSpecimenInfoTable extends
     InfoTableWidget<SourceSpecimenWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(SourceSpecimenInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 5;
 
@@ -72,6 +76,7 @@ public class SourceSpecimenInfoTable extends
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object studySourceVessel)
         throws Exception {
@@ -83,9 +88,9 @@ public class SourceSpecimenInfoTable extends
         info.needOriginalVolume =
             (info.studySourceVessel
                 .getNeedOriginalVolume() != null) ? (info.studySourceVessel
-                .getNeedOriginalVolume() ? "Yes"
-                : "No")
-                : "No";
+                .getNeedOriginalVolume() ? i18n.tr("Yes")
+                : i18n.tr("No"))
+                : i18n.tr("No");
         return info;
     }
 

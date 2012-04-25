@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +12,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
@@ -37,12 +38,14 @@ import edu.ualberta.med.biobank.util.NullUtil;
 
 public abstract class GroupInfoTable extends
     DefaultAbstractInfoTableWidget<Group> {
+    public static final I18n i18n = I18nFactory.getI18n(GroupInfoTable.class);
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS =
         new String[] { HasName.PropertyName.NAME.toString() };
 
     private final ManagerContext context;
 
+    @SuppressWarnings("nls")
     public GroupInfoTable(Composite parent, List<Group> collection,
         ManagerContext context) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
@@ -74,7 +77,7 @@ public abstract class GroupInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Duplicate");
+        item.setText(i18n.tr("duplicate (verb)", "Duplicate"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -128,15 +131,18 @@ public abstract class GroupInfoTable extends
         }
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteGroup(Group group) {
         try {
             String name = group.getName();
-            String message = MessageFormat.format(
-                "Are you certain you want to delete \"{0}\"?",
-                new Object[] { name });
+            // dialog message.
+            String message =
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    name);
 
             if (BgcPlugin.openConfirm(
-                "Confirm Deletion", message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new GroupDeleteAction(new GroupDeleteInput(group)));

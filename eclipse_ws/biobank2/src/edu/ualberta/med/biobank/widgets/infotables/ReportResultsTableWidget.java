@@ -38,7 +38,7 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
                     if (columnIndex < row.length) {
                         Object cell = row[columnIndex];
                         if (cell == null)
-                            return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                            return StringUtil.EMPTY_STRING;
                         if (formatNumbers && cell instanceof Number)
                             return NumberFormatter.format((Number) cell);
                         return cell.toString();

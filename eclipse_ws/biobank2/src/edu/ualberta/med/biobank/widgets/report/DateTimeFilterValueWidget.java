@@ -109,7 +109,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         }
 
         if (date != null) {
-            string = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+            string = StringUtil.EMPTY_STRING;
 
             if (isDate) {
                 string = DISPLAY_DATE_FORMAT.format(date);

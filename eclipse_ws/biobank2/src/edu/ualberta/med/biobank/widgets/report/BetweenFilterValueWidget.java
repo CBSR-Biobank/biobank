@@ -94,9 +94,10 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
             && !value.getSecondValue().isEmpty();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString(ReportFilterValue value) {
-        return "\"" + value.getValue() + "\" and \"" + value.getSecondValue() //$NON-NLS-1$ //$NON-NLS-2$
+        return "\"" + value.getValue() + "\" and \"" + value.getSecondValue()
             + "\"";
     }
 

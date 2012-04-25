@@ -127,7 +127,7 @@ public class SelectFilterValueWidget implements FilterValueWidget {
                     ViewerEntry entry = (ViewerEntry) element;
                     return entry.getValue();
                 }
-                return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                return StringUtil.EMPTY_STRING;
             }
         });
     }

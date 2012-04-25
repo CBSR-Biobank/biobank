@@ -91,7 +91,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                 case 5:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

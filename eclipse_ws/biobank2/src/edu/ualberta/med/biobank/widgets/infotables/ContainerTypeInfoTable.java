@@ -8,6 +8,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
@@ -30,6 +32,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeInfoTable extends
     InfoTableWidget<SiteContainerTypeInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ContainerTypeInfoTable.class);
 
     private static class TableRowData {
         SiteContainerTypeInfo containerType;
@@ -43,19 +47,26 @@ public class ContainerTypeInfoTable extends
         @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : StringUtil.EMPTY_STRING, status,
-                (inUseCount != null) ? inUseCount.toString() : StringUtil.EMPTY_STRING,
-                (temperature != null) ? temperature.toString() : StringUtil.EMPTY_STRING }, "\t");
+            return StringUtils.join(new String[] {
+                name,
+                nameShort,
+                (capacity != null) ? capacity.toString()
+                    : StringUtil.EMPTY_STRING,
+                status,
+                (inUseCount != null) ? inUseCount.toString()
+                    : StringUtil.EMPTY_STRING,
+                (temperature != null) ? temperature.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         HasName.PropertyName.NAME.toString(),
         HasNameShort.PropertyName.NAME_SHORT.toString(),
         Capacity.NAME.singular().toString(),
-        "Status",
-        "In Use",
+        i18n.tr("Status"),
+        i18n.tr("In Use"),
         Container.PropertyName.TEMPERATURE.toString() };
 
     private final SiteAdapter siteAdapter;
@@ -146,13 +157,14 @@ public class ContainerTypeInfoTable extends
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void addClickListener(
         IInfoTableDoubleClickItemListener<SiteContainerTypeInfo> listener) {
         doubleClickListeners.add(listener);
         // TODO: this code makes no sense. See jon for why.
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText("Edit");
+        mi.setText(i18n.tr("Edit"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

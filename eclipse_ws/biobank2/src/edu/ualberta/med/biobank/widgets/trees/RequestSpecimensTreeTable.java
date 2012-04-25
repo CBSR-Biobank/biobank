@@ -142,7 +142,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                     if (columnIndex == 0) {
                         if ((RequestContainerAdapter) ((TreeItemAdapter) element)
                             .getParent() == null)
-                            return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                            return StringUtil.EMPTY_STRING;
                         return ((RequestContainerAdapter) ((TreeItemAdapter) element)
                             .getParent()).container.getLabel()
                             + ((RequestSpecimenWrapper) ((TreeItemAdapter) element)

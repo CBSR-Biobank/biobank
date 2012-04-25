@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -19,10 +21,14 @@ import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(NewStudyInfoTable.class);
+
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         HasName.PropertyName.NAME.toString(),
         HasNameShort.PropertyName.NAME_SHORT.toString(),
-        "Status",
+        i18n.tr("Status"),
         Patient.NAME.plural().toString(),
         CollectionEvent.NAME.plural().toString() };
 
@@ -46,7 +52,8 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return info.getStudy().getNameShort();
                 case 2:
                     return (info.getStudy().getActivityStatus() != null) ? info
-                        .getStudy().getActivityStatus().getName() : StringUtil.EMPTY_STRING;
+                        .getStudy().getActivityStatus().getName()
+                        : StringUtil.EMPTY_STRING;
                 case 3:
                     return NumberFormatter.format(info.getPatientCount());
                 case 4:

@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -39,17 +41,19 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UserInfoTable extends
     DefaultAbstractInfoTableWidget<User> {
+    public static final I18n i18n = I18nFactory.getI18n(UserInfoTable.class);
 
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS = new String[] {
-        "Login",
-        "Full Name",
-        "Email" };
+        User.PropertyName.LOGIN.toString(),
+        User.PropertyName.FULL_NAME.toString(),
+        User.PropertyName.EMAIL_ADDRESS.toString() };
 
     private final ManagerContext managerContext;
-    private MenuItem unlockMenuItem;
+    private final MenuItem unlockMenuItem;
 
+    @SuppressWarnings("nls")
     public UserInfoTable(Composite parent, List<User> users,
         ManagerContext managerContext) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
@@ -84,7 +88,9 @@ public abstract class UserInfoTable extends
         });
 
         unlockMenuItem = new MenuItem(menu, SWT.PUSH);
-        unlockMenuItem.setText("Unlock User");
+        unlockMenuItem.setText(
+            // menu item label.
+            i18n.tr("Unlock User"));
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -94,7 +100,8 @@ public abstract class UserInfoTable extends
                     SessionManager.getAppService().unlockUser(userName);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
-                        "Cannot unlock user {0}.",
+                        // dialog title.
+                        i18n.tr("Cannot unlock user {0}."),
                         new Object[] { userName }), e);
                 }
             }
@@ -174,6 +181,7 @@ public abstract class UserInfoTable extends
         return res;
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteUser(User user) {
         try {
             String loginName = user.getLogin();
@@ -181,16 +189,20 @@ public abstract class UserInfoTable extends
 
             if (SessionManager.getUser().equals(user)) {
                 BgcPlugin.openAsyncError(
-                    "Unable to delete user.",
-                    "You may not delete yourself as a user");
+                    // dialog title.
+                    i18n.tr("Unable to delete user."),
+                    // dialog message.
+                    i18n.tr("You may not delete yourself as a user"));
                 return false;
             }
-            message = MessageFormat.format(
-                "Are you certain you want to delete \"{0}\"?",
-                new Object[] { loginName });
+            message =
+                // dialog message.
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    loginName);
 
             if (BgcPlugin.openConfirm(
-                "Confirm Deletion", message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new UserDeleteAction(new UserDeleteInput(user)));
@@ -205,7 +217,9 @@ public abstract class UserInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError("Unable to delete user.", e);
+                .openAsyncError(
+                    // dialog title.
+                    i18n.tr("Unable to delete user."), e);
         }
         return false;
     }

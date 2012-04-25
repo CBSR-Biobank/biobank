@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -15,12 +17,16 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(CollectionEventInfoTable.class);
 
     private static class TableRowData {
         CollectionEventWrapper collectionEvent;
@@ -29,6 +35,7 @@ public class CollectionEventInfoTable extends
         long aliquotedSpecimenCount;
         String comment;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(
@@ -40,8 +47,8 @@ public class CollectionEventInfoTable extends
 
     private static final String[] HEADINGS = new String[] {
         CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
-        "Num source specimens",
-        "Num aliquoted specimens",
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString(),
         Comment.NAME.singular().toString() };
 
     public CollectionEventInfoTable(Composite parent,
@@ -79,6 +86,7 @@ public class CollectionEventInfoTable extends
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
@@ -89,8 +97,9 @@ public class CollectionEventInfoTable extends
         info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
         info.comment =
-            info.collectionEvent.getCommentCollection(false).size() == 0 ? "N"
-                : "Y";
+            info.collectionEvent.getCommentCollection(false).size() == 0
+                ? i18n.trc("no abbeviation", "N")
+                : i18n.trc("yes abbeviation", "Y");
         return info;
     }
 

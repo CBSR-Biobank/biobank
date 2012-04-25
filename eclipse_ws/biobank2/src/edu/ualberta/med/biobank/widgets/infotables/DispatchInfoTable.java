@@ -8,6 +8,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -23,6 +25,8 @@ import edu.ualberta.med.biobank.model.ShipmentInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(DispatchInfoTable.class);
 
     private final List<DispatchWrapper> dispatches;
 
@@ -47,13 +51,14 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        "Sender",
-        "Dispatch Time",
-        "Receiver",
-        "Date Received",
+        i18n.tr("Sender"),
+        i18n.tr("Dispatch Time"),
+        i18n.tr("Receiver"),
+        i18n.tr("Date Received"),
         ShipmentInfo.PropertyName.WAYBILL.toString(),
-        "Dispatch State" };
+        i18n.tr("Dispatch State") };
 
     private final boolean editMode = false;
 

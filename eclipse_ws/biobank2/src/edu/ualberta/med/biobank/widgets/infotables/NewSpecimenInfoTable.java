@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -30,19 +32,22 @@ import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(NewSpecimenInfoTable.class);
 
     public static enum ColumnsShown {
+        @SuppressWarnings("nls")
         PEVENT_SOURCE_SPECIMENS(new String[] {
             Specimen.PropertyName.INVENTORY_ID.toString(),
-            "Type",
+            i18n.tr("Type"),
             AbstractPosition.NAME.singular().toString(),
-            "Time drawn",
-            "Quantity (ml)",
+            i18n.tr("Time drawn"),
+            i18n.tr("Quantity (ml)"),
             ActivityStatus.NAME.singular().toString(),
             Study.NAME.singular().toString(),
             Patient.PropertyName.PNUMBER.toString(),
-            "Origin Center",
-            "Current Center",
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
             Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
@@ -68,7 +73,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                         .getPnumber();
                 case 8:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? StringUtil.EMPTY_STRING : oi.getCenter().getNameShort();
+                    return oi == null ? StringUtil.EMPTY_STRING : oi
+                        .getCenter().getNameShort();
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
@@ -88,16 +94,17 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 return null;
             }
         },
+        @SuppressWarnings("nls")
         CEVENT_SOURCE_SPECIMENS(new String[] {
             Specimen.PropertyName.INVENTORY_ID.toString(),
-            "Type",
+            i18n.tr("Type"),
             AbstractPosition.NAME.singular().toString(),
-            "Time drawn",
+            i18n.tr("Time drawn"),
             AliquotedSpecimen.PropertyName.QUANTITY.toString(),
             ActivityStatus.NAME.singular().toString(),
             ProcessingEvent.PropertyName.WORKSHEET.toString(),
-            "Origin Center",
-            "Current Center",
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
             Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
@@ -117,10 +124,12 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     return row.specimen.getActivityStatus().getName();
                 case 6:
                     ProcessingEvent pe = row.specimen.getProcessingEvent();
-                    return pe == null ? StringUtil.EMPTY_STRING : pe.getWorksheet();
+                    return pe == null ? StringUtil.EMPTY_STRING : pe
+                        .getWorksheet();
                 case 7:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? StringUtil.EMPTY_STRING : oi.getCenter().getNameShort();
+                    return oi == null ? StringUtil.EMPTY_STRING : oi
+                        .getCenter().getNameShort();
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
@@ -142,16 +151,17 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             }
         },
 
+        @SuppressWarnings("nls")
         CEVENT_ALIQUOTED_SPECIMENS(new String[] {
             Specimen.PropertyName.INVENTORY_ID.toString(),
-            "Type",
+            i18n.tr("Type"),
             AbstractPosition.NAME.singular().toString(),
-            "Source worksheet",
+            i18n.tr("Source worksheet"),
             HasCreatedAt.PropertyName.CREATED_AT.toString(),
-            "Quantity (ml)",
+            i18n.tr("Quantity (ml)"),
             ActivityStatus.NAME.singular().toString(),
-            "Origin Center",
-            "Current Center",
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
             Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {

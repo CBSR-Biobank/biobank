@@ -6,6 +6,8 @@ import java.util.Queue;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.ListChangeEvent;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
@@ -14,6 +16,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcTableSorter;
 
 public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(InfoTableBgrLoader.class);
     @SuppressWarnings("unused")
     private final Queue<ListUpdater> updateListQueue =
         new LinkedList<ListUpdater>();
@@ -90,6 +94,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
             this.selection = selection;
         }
 
+        @SuppressWarnings("nls")
         @Override
         public void run() {
             try {
@@ -115,7 +120,8 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                 });
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    "Cannot Load Table Data", e);
+                    // dialog title.
+                    i18n.tr("Cannot Load Table Data"), e);
             }
         }
     }

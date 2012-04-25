@@ -12,11 +12,11 @@ public class MultiSelectNodeContentProvider<T> implements ITreeContentProvider,
     IDeltaListener {
     protected TreeViewer viewer;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     @Override
     public Object[] getChildren(Object parentElement) {
         Assert.isTrue(parentElement instanceof MultiSelectNode,
-            "Invalid object"); 
+            "Invalid object");
         return ((MultiSelectNode<T>) parentElement).getChildren().toArray();
     }
 
@@ -25,10 +25,10 @@ public class MultiSelectNodeContentProvider<T> implements ITreeContentProvider,
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     @Override
     public boolean hasChildren(Object element) {
-        Assert.isTrue(element instanceof MultiSelectNode, "Invalid object"); 
+        Assert.isTrue(element instanceof MultiSelectNode, "Invalid object");
         return (((MultiSelectNode<T>) element).getChildCount() > 0);
     }
 

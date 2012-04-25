@@ -27,11 +27,17 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         Long patientCount;
         Long visitCount;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { name, nameShort, status,
-                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING, 
-                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t");  
+            return StringUtils.join(new String[] {
+                name,
+                nameShort,
+                status,
+                (patientCount != null) ? patientCount.toString()
+                    : StringUtil.EMPTY_STRING,
+                (visitCount != null) ? visitCount.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
@@ -57,7 +63,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                     if (columnIndex == 0) {
                         return AbstractInfoTableWidget.LOADING;
                     }
-                    return StringUtil.EMPTY_STRING; 
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -65,13 +71,14 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
                 case 1:
                     return info.nameShort;
                 case 2:
-                    return (info.status != null) ? info.status : StringUtil.EMPTY_STRING; 
+                    return (info.status != null) ? info.status
+                        : StringUtil.EMPTY_STRING;
                 case 3:
                     return NumberFormatter.format(info.patientCount);
                 case 4:
                     return NumberFormatter.format(info.visitCount);
                 default:
-                    return StringUtil.EMPTY_STRING; 
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -85,7 +92,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         info.nameShort = info.study.getNameShort();
         info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
-            info.status = StringUtil.EMPTY_STRING; 
+            info.status = StringUtil.EMPTY_STRING;
         }
         info.patientCount = info.study.getPatientCount(true);
         info.visitCount = info.study.getCollectionEventCount();

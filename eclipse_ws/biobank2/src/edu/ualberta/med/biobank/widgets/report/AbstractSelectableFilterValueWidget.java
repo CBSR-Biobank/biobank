@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public abstract class AbstractSelectableFilterValueWidget<T extends AbstractListViewer>
     implements SelectableFilterValueWidget {
-    private T viewer;
+    private final T viewer;
 
     public AbstractSelectableFilterValueWidget(T viewer) {
         this.viewer = viewer;
@@ -28,7 +28,8 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
 
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values =
+            new ArrayList<ReportFilterValue>();
         ISelection selection = viewer.getSelection();
         if (selection instanceof IStructuredSelection) {
             Iterator<?> it = ((IStructuredSelection) selection).iterator();
@@ -58,7 +59,9 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                 // that don't exist in the option, as they will be lost. DEAL
                 // WITH THIS! :P
                 if (value != null && value.getValue() != null) {
-                    ViewerEntry entry = new ViewerEntry(value.getValue(), StringUtil.EMPTY_STRING); //$NON-NLS-1$
+                    ViewerEntry entry =
+                        new ViewerEntry(value.getValue(),
+                            StringUtil.EMPTY_STRING);
                     toSelect.add(entry);
                 }
             }
@@ -108,7 +111,7 @@ public abstract class AbstractSelectableFilterValueWidget<T extends AbstractList
                     ViewerEntry entry = (ViewerEntry) element;
                     return entry.getValue();
                 }
-                return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                return StringUtil.EMPTY_STRING;
             }
         });
     }

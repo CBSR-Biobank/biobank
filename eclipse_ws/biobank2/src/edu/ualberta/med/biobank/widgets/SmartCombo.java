@@ -164,7 +164,7 @@ public class SmartCombo extends Composite {
     protected String closestMatch() {
         if (combo.getItemCount() > 0)
             return combo.getItem(0);
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     public void setInput(String[] items) {
