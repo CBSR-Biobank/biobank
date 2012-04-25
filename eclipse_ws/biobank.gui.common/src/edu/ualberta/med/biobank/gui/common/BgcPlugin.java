@@ -360,6 +360,13 @@ public class BgcPlugin extends AbstractUIPlugin {
         openAsyncError(title, message, null, null);
     }
 
+    public static void openAsyncError(final String message) {
+        openAsyncError(
+            // dialog title
+            i18n.tr("Error"),
+            message, null, null);
+    }
+
     public static void openAsyncError(final String title, final String message,
         final Exception e) {
         openAsyncError(title, message, e, null);

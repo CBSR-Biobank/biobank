@@ -4,6 +4,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
@@ -14,9 +16,14 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
-    public static final String ID =
-        "edu.ualberta.med.biobank.commands.editSpecimenTypes"; 
+    private static final I18n i18n = I18nFactory
+        .getI18n(EditSpecimenTypesHandler.class);
 
+    @SuppressWarnings("nls")
+    public static final String ID =
+        "edu.ualberta.med.biobank.commands.editSpecimenTypes";
+
+    @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
@@ -31,12 +38,14 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
                     SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException(
-                "Could not execute handler.", e);
+                // exception message
+                i18n.tr("Could not execute handler."), e);
         }
 
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isEnabled() {
         try {
@@ -47,7 +56,11 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
                 && allowed
                 && (SessionManager.getInstance().getSession() != null);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(
+                // dialog title
+                i18n.tr("Error"),
+                // dialog message
+                i18n.tr("Unable to retrieve permissions"));
             return false;
         }
     }

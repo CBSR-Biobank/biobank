@@ -12,8 +12,9 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeAddHandler extends LogoutSensitiveHandler {
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.containerTypeAdd"; 
+        "edu.ualberta.med.biobank.commands.containerTypeAdd";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

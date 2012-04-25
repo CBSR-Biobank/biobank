@@ -17,6 +17,7 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
     private static BgcLogger logger = BgcLogger
         .getLogger(DecodePlateHandler.class.getName());
 
+    @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         FormInput input = new FormInput(null, StringUtil.EMPTY_STRING);
@@ -24,7 +25,7 @@ public class DecodePlateHandler extends AbstractHandler implements IHandler {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, DecodePlateForm.ID, false);
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + DecodePlateForm.ID, e); 
+            logger.error("Can't open form with id " + DecodePlateForm.ID, e);
             return null;
         }
     }

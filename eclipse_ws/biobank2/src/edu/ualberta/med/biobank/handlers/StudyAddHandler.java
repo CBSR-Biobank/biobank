@@ -12,8 +12,9 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAddHandler extends LogoutSensitiveHandler {
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.addStudy"; 
+        "edu.ualberta.med.biobank.commands.addStudy";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

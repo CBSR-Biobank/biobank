@@ -12,8 +12,9 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAddHandler extends LogoutSensitiveHandler {
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.containerAdd"; 
+        "edu.ualberta.med.biobank.commands.containerAdd";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -30,8 +31,10 @@ public class ContainerAddHandler extends LogoutSensitiveHandler {
     public boolean isEnabled() {
         try {
             if (allowed == null) {
-            	Integer centerId = SessionManager.getUser()
-                .getCurrentWorkingCenter() !=null ? SessionManager.getUser()
+                Integer centerId =
+                    SessionManager.getUser()
+                        .getCurrentWorkingCenter() != null ? SessionManager
+                        .getUser()
                         .getCurrentWorkingCenter().getId() : null;
                 allowed =
                     SessionManager.getAppService().isAllowed(

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
@@ -13,6 +15,8 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAddHandler extends LogoutSensitiveHandler {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentAddHandler.class);
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -27,6 +31,7 @@ public class ShipmentAddHandler extends LogoutSensitiveHandler {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isEnabled() {
         try {
@@ -36,7 +41,9 @@ public class ShipmentAddHandler extends LogoutSensitiveHandler {
                     OriginInfoUpdatePermission(SessionManager.getUser()
                         .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(
+                // exception message
+                i18n.tr("Unable to retrieve permissions"));
             return false;
         }
         return allowed;

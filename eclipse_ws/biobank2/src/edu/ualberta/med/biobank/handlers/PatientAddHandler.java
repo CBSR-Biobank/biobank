@@ -18,6 +18,7 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
     private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
 
+    @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
