@@ -109,11 +109,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean positionTextModified;
     private BgcBaseText singleTypeText;
     private BgcBaseText singleCollectionDateText;
-    private WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
+    private final WritableValue foundSpecNull = new WritableValue(Boolean.TRUE,
         Boolean.class);
 
     // for multiple specimens assign
-    private ContainerWrapper currentMultipleContainer;
+    private final ContainerWrapper currentMultipleContainer;
     protected boolean palletproductBarcodeTextModified;
     private NonEmptyStringValidator productBarcodeValidator;
     protected boolean isModifyingMultipleFields;
@@ -1052,7 +1052,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         sp.patientPNumber, sp.visitNumber));
             }
             appendLog(sb.toString());
-            Display.getDefault().asyncExec(new Runnable() {
+            Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
                     appendLog(MessageFormat
