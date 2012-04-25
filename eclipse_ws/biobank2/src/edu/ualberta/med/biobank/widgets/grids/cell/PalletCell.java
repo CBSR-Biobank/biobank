@@ -20,7 +20,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PalletCell extends AbstractUICell {
-
     private String information;
 
     private String title = StringUtil.EMPTY_STRING;
@@ -277,6 +276,7 @@ public class PalletCell extends AbstractUICell {
             setStatus(UICellStatus.valueOf(status.name()));
     }
 
+    @SuppressWarnings("deprecation")
     public CellInfo transformIntoServerCell() {
         CellInfo serverCell =
             new CellInfo(getRow(), getCol(), getValue(),

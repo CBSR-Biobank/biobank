@@ -12,8 +12,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class ReceivingInTransitDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingInTransitDispatchGroup(AdapterBase parent, int id) {
-        super(parent, id,
-            DispatchState.IN_TRANSIT.getLabel());
+        super(parent, id, DispatchState.IN_TRANSIT.getLabel());
     }
 
     @Override

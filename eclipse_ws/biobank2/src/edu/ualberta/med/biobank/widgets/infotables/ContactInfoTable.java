@@ -90,6 +90,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         if (o == null)

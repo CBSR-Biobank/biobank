@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -22,6 +24,8 @@ import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ClinicInfoTable.class);
 
     private static class TableRowData {
         public ClinicWrapper clinic;
@@ -32,22 +36,29 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         public Long patientCount;
         public Long visitCount;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { clinicName, clinicNameShort,
-                studyCount.toString(), (status != null) ? status : StringUtil.EMPTY_STRING, //$NON-NLS-1$
-                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING, //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+            return StringUtils.join(new String[] {
+                clinicName,
+                clinicNameShort,
+                studyCount.toString(),
+                (status != null) ? status : StringUtil.EMPTY_STRING,
+                (patientCount != null) ? patientCount.toString()
+                    : StringUtil.EMPTY_STRING,
+                (visitCount != null) ? visitCount.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         HasName.PropertyName.NAME.toString(),
         HasNameShort.PropertyName.NAME_SHORT.toString(),
         Patient.NAME.plural().toString(),
-        "Status",
-        "Study Count",
-        "Patient Visits" };
+        i18n.tr("Status"),
+        i18n.tr("Study Count"),
+        i18n.tr("Patient Visits") };
 
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
         super(parent, collection, HEADINGS, 10, ClinicWrapper.class);
@@ -64,7 +75,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
                     if (columnIndex == 0) {
                         return AbstractInfoTableWidget.LOADING;
                     }
-                    return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:

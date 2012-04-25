@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.dialogs.select.SelectClinicContactDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -20,8 +21,10 @@ import edu.ualberta.med.biobank.model.Contact;
  * some clinics may have more than one contact.
  */
 public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ClinicAddInfoTable.class);
 
-    private List<Contact> origContacts;
+    private final List<Contact> origContacts;
 
     public ClinicAddInfoTable(Composite parent,
         List<Contact> contacts) {
@@ -35,6 +38,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         return true;
     }
 
+    @SuppressWarnings("nls")
     public void createClinicContact() {
         SelectClinicContactDialog dlg;
         try {
@@ -51,7 +55,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Unable to retrieve available contacts", e);
+                i18n.tr("Unable to retrieve available contacts"), e);
         }
     }
 
@@ -64,17 +68,19 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener<Contact>() {
+            @SuppressWarnings("nls")
             @Override
             public void deleteItem(InfoTableEvent<Contact> event) {
                 Contact contact = getSelection();
                 if (contact != null) {
                     if (!BgcPlugin
                         .openConfirm(
-                            "Delete Contact",
-                            NLS
-                                .bind(
-                                    "Are you sure you want to delete contact \"{0}\"?",
-                                    contact.getName()))) {
+                            // dialog title.
+                            i18n.tr("Delete Contact"),
+                            // dialog message.
+                            i18n.tr(
+                                "Are you sure you want to delete contact \"{0}\"?",
+                                contact.getName()))) {
                         return;
                     }
                     getList().remove(contact);

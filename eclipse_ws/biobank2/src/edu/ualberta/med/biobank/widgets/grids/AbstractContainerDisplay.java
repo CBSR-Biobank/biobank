@@ -82,14 +82,14 @@ public abstract class AbstractContainerDisplay {
         Map<RowColPos, ? extends AbstractUICell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
-        String parentLabel = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        String parentLabel = StringUtil.EMPTY_STRING;
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
             return parentLabel + containerType.getPositionString(rowcol);
         }
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     @SuppressWarnings("unused")

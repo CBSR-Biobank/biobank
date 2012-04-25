@@ -47,7 +47,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
                         if (msg == null) {
-                            msg = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+                            msg = StringUtil.EMPTY_STRING;
                         } else {
                             msg += ": "; //$NON-NLS-1$
                         }
@@ -103,7 +103,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
             if (cell != null)
                 return cell.getTitle();
         }
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override
@@ -128,7 +128,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
             if (cell != null)
                 return cell.getTypeString();
         }
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

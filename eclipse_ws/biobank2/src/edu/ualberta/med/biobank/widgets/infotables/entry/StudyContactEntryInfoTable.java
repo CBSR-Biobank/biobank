@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -18,6 +20,8 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(StudyContactEntryInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 10;
 
@@ -31,6 +35,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         String pagerNumber;
         String officeNumber;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort, name,
@@ -41,12 +46,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
 
     private static final String[] HEADINGS = new String[] {
         Clinic.NAME.singular().toString(),
-        "Contact Name",
-        "Title",
-        "Email",
-        "Mobile #",
-        "Pager #",
-        "Office #" };
+        Contact.PropertyName.NAME.toString(),
+        Contact.PropertyName.TITLE.toString(),
+        Contact.PropertyName.EMAIL_ADDRESS.toString(),
+        Contact.PropertyName.MOBILE_NUMBER.toString(),
+        Contact.PropertyName.PAGER_NUMBER.toString(),
+        Contact.PropertyName.OFFICE_NUMBER.toString() };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<Contact> contactCollection) {
@@ -89,6 +94,7 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         if (o == null)

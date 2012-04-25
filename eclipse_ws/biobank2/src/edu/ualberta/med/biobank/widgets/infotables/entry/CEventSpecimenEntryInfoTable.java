@@ -9,9 +9,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -28,12 +29,15 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(AliquotedSpecimenEntryInfoTable.class);
 
     protected IObservableValue specimensAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private boolean isEditable;
     private boolean isDeletable;
 
+    @SuppressWarnings("nls")
     public CEventSpecimenEntryInfoTable(Composite parent,
         List<SpecimenInfo> sourceSpecimens, CollectionEvent cevent,
         ColumnsShown columnsShowns) {
@@ -53,8 +57,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                "Permission Error",
-                "Unable to retrieve user permissions");
+                i18n.tr("Permission Error"),
+                i18n.tr("Unable to retrieve user permissions"));
         }
     }
 
@@ -121,6 +125,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         }
         if (isDeletable) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
+                @SuppressWarnings("nls")
                 @Override
                 public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
                     SpecimenInfo si = getSelection();
@@ -129,8 +134,10 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                "Delete specimen",
-                                NLS.bind(
+                                // dialog title.
+                                i18n.tr("Delete specimen"),
+                                // dialog message.
+                                i18n.tr(
                                     "Are you sure you want to delete specimen \"{0}\"?",
                                     si.specimen.getInventoryId()))) {
                             return;

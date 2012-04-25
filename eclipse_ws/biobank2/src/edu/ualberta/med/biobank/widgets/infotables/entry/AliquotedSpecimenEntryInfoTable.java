@@ -9,11 +9,12 @@ import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -33,6 +34,8 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
  * additional aliquoted specimen to the collection.
  */
 public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(AliquotedSpecimenEntryInfoTable.class);
 
     private List<AliquotedSpecimenWrapper> selectedAliquotedSpecimen;
 
@@ -159,6 +162,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         }
         if (isDeletable) {
             addDeleteItemListener(new IInfoTableDeleteItemListener<AliquotedSpecimenWrapper>() {
+                @SuppressWarnings("nls")
                 @Override
                 public void deleteItem(
                     InfoTableEvent<AliquotedSpecimenWrapper> event) {
@@ -168,8 +172,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                             .openConfirm(
                                 PlatformUI.getWorkbench()
                                     .getActiveWorkbenchWindow().getShell(),
-                                "Delete aliquoted specimen",
-                                NLS.bind(
+                                // dialog title.
+                                i18n.tr("Delete aliquoted specimen"),
+                                // dialog message.
+                                i18n.tr(
                                     "Are you sure you want to delete aliquoted specimen \"{0}\"?",
                                     aliquotedSpecimen.getSpecimenType()
                                         .getName()))) {

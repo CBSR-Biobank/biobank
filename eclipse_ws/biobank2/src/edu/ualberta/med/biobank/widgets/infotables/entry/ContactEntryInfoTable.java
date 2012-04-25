@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -20,6 +21,8 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class ContactEntryInfoTable extends ContactInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ContactEntryInfoTable.class);
 
     private List<ContactWrapper> selectedContacts;
 
@@ -59,6 +62,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
+            @SuppressWarnings("nls")
             @Override
             public void deleteItem(InfoTableEvent<ContactWrapper> event) {
                 ContactWrapper contact = getSelection();
@@ -66,8 +70,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     if (!contact.deleteAllowed()) {
                         BgcPlugin
                             .openError(
-                                "Contact Delete Error",
-                                NLS.bind(
+                                i18n.tr("Contact Delete Error"),
+                                i18n.tr(
                                     "Cannot delete contact \"{0}\" since it is associated with one or more studies",
                                     contact.getName()));
                         return;
@@ -75,8 +79,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
                     if (!BgcPlugin
                         .openConfirm(
-                            "Delete Contact",
-                            NLS.bind(
+                            i18n.tr("Delete Contact"),
+                            i18n.tr(
                                 "Are you sure you want to delete contact \"{0}\"?",
                                 contact.getName()))) {
                         return;
@@ -96,6 +100,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         return true;
     }
 
+    @SuppressWarnings("nls")
     private void addOrEditContact(boolean add, ContactWrapper contactWrapper) {
         ContactAddDialog dlg = new ContactAddDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), contactWrapper);
@@ -114,7 +119,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                 contactWrapper.reload();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    "Cancel error", e);
+                    // error dialog
+                    i18n.tr("Cancel error"), e);
             }
             reloadCollection(selectedContacts, null);
         }
