@@ -1150,7 +1150,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             useNewProductBarcode = false;
         }
         canSaveSingleSpecimen.setValue(!isSingleMode());
-        form.reflow(true);
     }
 
     @Override
