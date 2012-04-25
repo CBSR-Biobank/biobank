@@ -157,7 +157,7 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void setContainerType(ContainerType type) {
-        setContainerType(type, null, false);
+        setContainerType(type, ScanPalletDisplay.SAMPLE_WIDTH, false);
     }
 
     public void setContainerType(ContainerType type, Integer cellSize) {
@@ -185,7 +185,8 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
-        initDisplayFromType(createDefaultContainer, null);
+        initDisplayFromType(createDefaultContainer,
+            ScanPalletDisplay.SAMPLE_WIDTH);
     }
 
     public void initDisplayFromType(boolean createDefaultContainer,

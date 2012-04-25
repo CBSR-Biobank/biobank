@@ -1132,7 +1132,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
+            palletLabel.setText("Pallet");
             palletWidget.setCells(null);
+            palletWidget.setContainerType(null, ScanPalletDisplay.SAMPLE_WIDTH,
+                true);
         }
         setScanHasBeenLaunched(isSingleMode() || !useScanner);
         initPalletValues();
@@ -1147,6 +1150,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             useNewProductBarcode = false;
         }
         canSaveSingleSpecimen.setValue(!isSingleMode());
+        form.reflow(true);
     }
 
     @Override
@@ -1274,6 +1278,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             widgetCreator.showWidget(freezerLabel, freezerContainer != null);
             widgetCreator.showWidget(freezerWidget, freezerContainer != null);
             page.layout(true, true);
+            book.reflow(true);
         }
     }
 
