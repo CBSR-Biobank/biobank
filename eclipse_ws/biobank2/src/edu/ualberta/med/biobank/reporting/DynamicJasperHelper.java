@@ -102,10 +102,13 @@ import ar.com.fdvs.dj.util.LayoutUtils;
 public class DynamicJasperHelper {
 
     private static final Log log = LogFactory.getLog(DynamicJasperHelper.class);
+    @SuppressWarnings("nls")
     public static final String DEFAULT_XML_ENCODING = "UTF-8";
+    @SuppressWarnings("nls")
     private static final String DJ_RESOURCE_BUNDLE = DynamicJasperHelper.class
         .getPackage().getName() + ".dj-messages";
 
+    @SuppressWarnings("nls")
     private final static void registerEntities(DynamicJasperDesign jd,
         DynamicReport dr, LayoutManager layoutManager) {
         ColumnRegistrationManager columnRegistrationManager =
@@ -224,6 +227,7 @@ public class DynamicJasperHelper {
 
     }
 
+    @SuppressWarnings("nls")
     protected static DynamicJasperDesign generateJasperDesign(DynamicReport dr)
         throws CoreException {
         DynamicJasperDesign jd = null;
@@ -352,6 +356,7 @@ public class DynamicJasperHelper {
      * @return
      * @throws JRException
      */
+    @SuppressWarnings("nls")
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, JRDataSource ds, Map _parameters)
         throws JRException {
@@ -396,6 +401,7 @@ public class DynamicJasperHelper {
      * @return
      * @throws JRException
      */
+    @SuppressWarnings("nls")
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, Connection con, Map _parameters)
         throws JRException {
@@ -435,6 +441,7 @@ public class DynamicJasperHelper {
      * @return
      * @throws JRException
      */
+    @SuppressWarnings("nls")
     public static JasperPrint generateJasperPrint(DynamicReport dr,
         LayoutManager layoutManager, Map _parameters) throws JRException {
         log.info("generating JasperPrint");
@@ -591,6 +598,7 @@ public class DynamicJasperHelper {
      * @param jd
      * @param _parameters
      */
+    @SuppressWarnings("nls")
     public static void registerParams(DynamicJasperDesign jd, Map _parameters) {
         for (Iterator iterator = _parameters.keySet().iterator(); iterator
             .hasNext();) {
@@ -641,6 +649,7 @@ public class DynamicJasperHelper {
      * @return
      * @throws JRException
      */
+    @SuppressWarnings("nls")
     public final static JasperReport generateJasperReport(DynamicReport dr,
         LayoutManager layoutManager, Map generatedParams) throws JRException {
         log.info("generating JasperReport");

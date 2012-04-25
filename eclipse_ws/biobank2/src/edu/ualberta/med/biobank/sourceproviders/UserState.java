@@ -38,7 +38,7 @@ public class UserState extends AbstractSourceProvider {
     private boolean hasWorkingCenter;
     private boolean hasPrinterLabelsRights;
     private boolean hasUserManagementRights;
-    private String currentCenterType = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+    private String currentCenterType = StringUtil.EMPTY_STRING;
 
     @Override
     public String[] getProvidedSourceNames() {
@@ -102,7 +102,7 @@ public class UserState extends AbstractSourceProvider {
     }
 
     private void setCurrentCenterType(CenterWrapper<?> currentCenter) {
-        String type = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        String type = StringUtil.EMPTY_STRING;
         if (currentCenter != null) {
             type = currentCenter.getWrappedClass().getSimpleName();
         }
