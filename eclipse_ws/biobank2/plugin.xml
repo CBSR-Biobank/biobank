@@ -1093,7 +1093,7 @@
               visible="false">
          </separator>
       </menuContribution>
-         <menuContribution
+      <menuContribution
             locationURI="menu:biobank.help?after=additions">
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorA"
