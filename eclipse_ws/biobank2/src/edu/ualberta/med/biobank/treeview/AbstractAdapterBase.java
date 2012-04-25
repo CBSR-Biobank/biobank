@@ -21,12 +21,16 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -44,6 +48,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public abstract class AbstractAdapterBase implements
     Comparable<AbstractAdapterBase> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractAdapterBase.class);
 
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
@@ -74,6 +80,20 @@ public abstract class AbstractAdapterBase implements
     protected boolean isEditable = false;
 
     protected boolean isReadable = false;
+
+    @SuppressWarnings("nls")
+    protected static boolean isAllowed(Permission p) {
+        try {
+            return SessionManager.getAppService().isAllowed(p);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Permission Error"),
+                // dialog message.
+                i18n.tr("Unable to retrieve user permissions"));
+        }
+        return false;
+    }
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -145,7 +165,7 @@ public abstract class AbstractAdapterBase implements
             return new StringBuilder("New ").append(
                 string).toString();
         }
-        return new StringBuilder(string).append(" ").append(label).toString(); 
+        return new StringBuilder(string).append(" ").append(label).toString();
     }
 
     public List<AbstractAdapterBase> getChildren() {
@@ -187,7 +207,7 @@ public abstract class AbstractAdapterBase implements
         AbstractAdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel()); 
+            "existing node not found: " + existingNode.getLabel());
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -322,7 +342,7 @@ public abstract class AbstractAdapterBase implements
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: " 
+            throw new RuntimeException("adapter has no confirm delete msg: "
                 + getClass().getName());
         }
         boolean doDelete = true;
@@ -432,7 +452,7 @@ public abstract class AbstractAdapterBase implements
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            LOGGER.error("Can't open form with id " + id, e); 
+            LOGGER.error("Can't open form with id " + id, e);
             return null;
         }
 

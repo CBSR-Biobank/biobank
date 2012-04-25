@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
@@ -27,26 +29,22 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContainerGroup.class);
 
     private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
     private List<Container> topContainers = null;
 
-    private boolean createAllowed;
+    private final boolean createAllowed;
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Container.NAME.plural().toString(), true);
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new ContainerCreatePermission(parent.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+        this.createAllowed =
+            isAllowed(new ContainerCreatePermission(parent.getId()));
     }
 
     @Override
@@ -63,6 +61,7 @@ public class ContainerGroup extends AdapterBase {
     public void performExpand() {
         final SiteAdapter siteAdapter = (SiteAdapter) getParent();
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -86,11 +85,14 @@ public class ContainerGroup extends AdapterBase {
         });
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add a Container");
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add a Container"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -139,6 +141,7 @@ public class ContainerGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
+    @SuppressWarnings("nls")
     public void addContainer(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         try {
             SiteWrapper site = (SiteWrapper) siteAdapter.getModelObject();
@@ -146,8 +149,12 @@ public class ContainerGroup extends AdapterBase {
                 .getTopContainerTypesInSite(SessionManager.getAppService(),
                     site);
             if (top.size() == 0) {
-                BgcPlugin.openError("Unable to create container",
-                    "You must define a top-level container type before initializing storage.");
+                BgcPlugin
+                    .openError(
+                        // dialog title.
+                        i18n.tr("Unable to create container"),
+                        // dialog message.
+                        i18n.tr("You must define a top-level container type before initializing storage."));
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());
@@ -159,7 +166,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e); 
+            LOGGER.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 

@@ -48,20 +48,12 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchDeletePermission(getModelObject().getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchReadPermission(getModelObject().getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchUpdatePermission(getModelObject().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable =
+            isAllowed(new DispatchDeletePermission(getModelObject().getId()));
+        this.isReadable =
+            isAllowed(new DispatchReadPermission(getModelObject().getId()));
+        this.isEditable =
+            isAllowed(new DispatchUpdatePermission(getModelObject().getId()));
     }
 
     @Override

@@ -17,9 +17,7 @@ import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyMasterGroup extends AbstractStudyGroup {
 
@@ -29,16 +27,12 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     private StudiesInfo studiesInfo = null;
 
-    private Boolean createAllowed;
+    private final Boolean createAllowed;
 
     public StudyMasterGroup(SessionAdapter parent, int id) {
         super(parent, id, "All Studies");
-        try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
-                new StudyCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+
+        this.createAllowed = isAllowed(new StudyCreatePermission());
     }
 
     @Override

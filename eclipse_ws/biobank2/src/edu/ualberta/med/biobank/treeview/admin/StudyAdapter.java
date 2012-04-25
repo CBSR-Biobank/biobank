@@ -16,11 +16,9 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.StudyEntryForm;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAdapter extends AdapterBase {
 
@@ -30,21 +28,10 @@ public class StudyAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            Integer id = ((StudyWrapper) getModelObject()).getId();
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new StudyDeletePermission(id));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new StudyReadPermission(id));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new StudyUpdatePermission(id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        Integer id = ((StudyWrapper) getModelObject()).getId();
+        this.isDeletable = isAllowed(new StudyDeletePermission(id));
+        this.isReadable = isAllowed(new StudyReadPermission(id));
+        this.isEditable = isAllowed(new StudyUpdatePermission(id));
     }
 
     @Override

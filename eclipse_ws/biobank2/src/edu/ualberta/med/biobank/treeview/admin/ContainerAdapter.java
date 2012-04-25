@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,6 +18,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -42,9 +42,10 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContainerAdapter.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
@@ -63,24 +64,13 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            ContainerWrapper container = (ContainerWrapper) getModelObject();
-            Integer id = container.getId();
+        ContainerWrapper container = (ContainerWrapper) getModelObject();
+        Integer id = container.getId();
 
-            this.isDeletable =
-                SessionManager.getAppService()
-                    .isAllowed(new ContainerDeletePermission(id));
-            this.isReadable =
-                SessionManager.getAppService()
-                    .isAllowed(new ContainerReadPermission(container.getSite()
-                        .getId()));
-            this.isEditable =
-                SessionManager.getAppService()
-                    .isAllowed(new ContainerUpdatePermission(id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable = isAllowed(new ContainerDeletePermission(id));
+        this.isReadable =
+            isAllowed(new ContainerReadPermission(container.getSite().getId()));
+        this.isEditable = isAllowed(new ContainerUpdatePermission(id));
     }
 
     @Override
@@ -101,6 +91,7 @@ public class ContainerAdapter extends AdapterBase {
         return (ContainerWrapper) getModelObject();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         ContainerWrapper container = getContainer();
@@ -111,6 +102,7 @@ public class ContainerAdapter extends AdapterBase {
             + container.getContainerType().getNameShort() + ")";
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         ContainerWrapper container = getContainer();
@@ -124,6 +116,7 @@ public class ContainerAdapter extends AdapterBase {
         return getTooltipText(Container.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, Container.NAME.singular().toString());
@@ -133,7 +126,9 @@ public class ContainerAdapter extends AdapterBase {
 
         if (isEditable() && (topLevel == null || !topLevel)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Move container to");
+            mi.setText(
+                // menu item label.
+                i18n.tr("Move container to"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -144,7 +139,9 @@ public class ContainerAdapter extends AdapterBase {
 
         if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Move all specimens to");
+            mi.setText(
+                // menu item label.
+                i18n.tr("Move all specimens to"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -156,12 +153,14 @@ public class ContainerAdapter extends AdapterBase {
         addDeleteMenu(menu, Container.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     public void moveSpecimens() {
         final MoveSpecimensToDialog msDlg =
             new MoveSpecimensToDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), getContainer());
         if (msDlg.open() == Dialog.OK) {
             try {
+                @SuppressWarnings("unused")
                 final Integer toContainerId = msDlg.getNewContainer().getId();
                 final ContainerWrapper newContainer = msDlg.getNewContainer();
                 IRunnableContext context =
@@ -173,11 +172,11 @@ public class ContainerAdapter extends AdapterBase {
                         @Override
                         public void run(final IProgressMonitor monitor) {
                             monitor.beginTask(
-                                NLS
-                                    .bind(
-                                        "Moving specimens from container {0} to {1}",
-                                        getContainer().getFullInfoLabel(),
-                                        newContainer.getFullInfoLabel()),
+                                // progress monitor message.
+                                i18n.tr(
+                                    "Moving specimens from container {0} to {1}",
+                                    getContainer().getFullInfoLabel(),
+                                    newContainer.getFullInfoLabel()),
                                 IProgressMonitor.UNKNOWN);
                             try {
                                 SessionManager.getAppService()
@@ -186,15 +185,20 @@ public class ContainerAdapter extends AdapterBase {
                                         newContainer.getWrappedObject()));
                                 monitor.done();
                                 BgcPlugin
-                                    .openAsyncInformation("Specimens moved",
-                                        NLS.bind(
+                                    .openAsyncInformation(
+                                        // dialog title.
+                                        i18n.tr("Specimens moved"),
+                                        // dialog message.
+                                        i18n.tr(
                                             "{0} specimens are now in {1}.",
                                             newContainer.getSpecimens().size(),
                                             newContainer.getFullInfoLabel()));
                             } catch (Exception e) {
                                 monitor.setCanceled(true);
                                 BgcPlugin
-                                    .openAsyncError("Move problem", e);
+                                    .openAsyncError(
+                                        // dialog title.
+                                        i18n.tr("Move problem"), e);
                             }
                         }
                     });
@@ -211,16 +215,20 @@ public class ContainerAdapter extends AdapterBase {
             } catch (Exception e) {
                 BgcPlugin
                     .openError(
-                        "Problem while moving specimens", e);
+                        // dialog title.
+                        i18n.tr("Problem while moving specimens"), e);
             }
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this container?";
+        // dialog message.
+        return i18n.tr("Are you sure you want to delete this container?");
     }
 
+    @SuppressWarnings("nls")
     public void moveContainer(ContainerWrapper destParentContainer) {
         final ContainerAdapter oldParent = (ContainerAdapter) getParent();
         final MoveContainerDialog mc =
@@ -249,7 +257,9 @@ public class ContainerAdapter extends AdapterBase {
                 }
             } catch (Exception e) {
                 BgcPlugin
-                    .openError("Problem while moving container",
+                    .openError(
+                        // dialog title.
+                        i18n.tr("Problem while moving container"),
                         e);
             }
         }
@@ -259,20 +269,23 @@ public class ContainerAdapter extends AdapterBase {
      * if address exists and if address is not full and if type is valid for
      * slot: modify this object's position, label and the label of children
      */
+    @SuppressWarnings("nls")
     public boolean setNewPositionFromLabel(final String newLabel)
         throws Exception {
         final ContainerWrapper container = getContainer();
+        @SuppressWarnings("unused")
         final String oldLabel = container.getLabel();
         List<ContainerWrapper> newParentContainers =
             container.getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
             BgcPlugin
                 .openError(
-                    "Container Move Error",
-                    MessageFormat
-                        .format(
-                            "A parent container with child \"{0}\" does not exist.",
-                            newLabel));
+                    // dialog title.
+                    i18n.tr("Container Move Error"),
+                    // dialog message. {0}=label.
+                    i18n.tr(
+                        "A parent container with child \"{0}\" does not exist.",
+                        newLabel));
             return false;
         }
 

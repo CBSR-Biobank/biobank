@@ -16,11 +16,9 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAdapter extends AdapterBase {
 
@@ -38,20 +36,12 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new SiteDeletePermission(getModelObject().getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new SiteReadPermission(getModelObject().getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new SiteUpdatePermission(getModelObject().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable =
+            isAllowed(new SiteDeletePermission(getModelObject().getId()));
+        this.isReadable =
+            isAllowed(new SiteReadPermission(getModelObject().getId()));
+        this.isEditable =
+            isAllowed(new SiteUpdatePermission(getModelObject().getId()));
     }
 
     public ContainerTypeGroup getContainerTypesGroupNode() {

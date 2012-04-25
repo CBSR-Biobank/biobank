@@ -13,16 +13,14 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class OutgoingNode extends AdapterBase {
 
-    private InCreationDispatchGroup creationNode;
-    private SentInTransitDispatchGroup sentTransitNode;
-    private Boolean createAllowed;
+    private final InCreationDispatchGroup creationNode;
+    private final SentInTransitDispatchGroup sentTransitNode;
+    private final Boolean createAllowed;
 
     public OutgoingNode(AdapterBase parent, int id) {
         super(parent, id, "Outgoing", true);
@@ -34,14 +32,9 @@ public class OutgoingNode extends AdapterBase {
         sentTransitNode.setParent(this);
         addChild(sentTransitNode);
 
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchCreatePermission(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+        this.createAllowed = isAllowed(
+            new DispatchCreatePermission(SessionManager.getUser()
+                .getCurrentWorkingCenter().getId()));
     }
 
     @Override

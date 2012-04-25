@@ -9,6 +9,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
@@ -17,12 +19,12 @@ import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicMasterGroup extends AbstractClinicGroup {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ClinicMasterGroup.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
@@ -30,24 +32,25 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
 
     private ClinicsInfo clinicsInfo = null;
 
-    private boolean createAllowed;
+    private final boolean createAllowed;
 
+    @SuppressWarnings("nls")
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, "All Clinics");
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new ClinicCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+        super(sessionAdapter, id,
+            // tree node label.
+            i18n.tr("All Clinics"));
+
+        this.createAllowed = isAllowed(new ClinicCreatePermission());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Clinic");
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add Clinic"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

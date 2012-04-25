@@ -20,11 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventAdapter extends AdapterBase {
 
@@ -38,23 +36,14 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            ProcessingEventWrapper pevent =
-                (ProcessingEventWrapper) getModelObject();
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ProcessingEventDeletePermission(pevent.getId()));
-            this.isReadable =
-                SessionManager.getAppService()
-                    .isAllowed(
-                        new ProcessingEventReadPermission(pevent.getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new ProcessingEventUpdatePermission(pevent.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        ProcessingEventWrapper pevent =
+            (ProcessingEventWrapper) getModelObject();
+        this.isDeletable =
+            isAllowed(new ProcessingEventDeletePermission(pevent.getId()));
+        this.isReadable =
+            isAllowed(new ProcessingEventReadPermission(pevent.getId()));
+        this.isEditable =
+            isAllowed(new ProcessingEventUpdatePermission(pevent.getId()));
     }
 
     @Override
@@ -67,18 +56,20 @@ public class ProcessingEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         ProcessingEventWrapper pevent =
             (ProcessingEventWrapper) getModelObject();
-        Assert.isNotNull(pevent, "processing event is null"); 
+        Assert.isNotNull(pevent, "processing event is null");
         String worksheet = pevent.getWorksheet();
-        String name = pevent.getFormattedCreatedAt()
-            + (worksheet == null ? StringUtil.EMPTY_STRING : " - #" + pevent.getWorksheet());  
+        String name =
+            pevent.getFormattedCreatedAt()
+                + (worksheet == null ? StringUtil.EMPTY_STRING : " - #"
+                    + pevent.getWorksheet());
 
         long count = -1;
         try {
             count = pevent.getSpecimenCount(true);
         } catch (Exception e) {
-            logger.error("Problem counting specimens", e); 
+            logger.error("Problem counting specimens", e);
         }
-        return name + " [" + NumberFormatter.format(count) + "]";  
+        return name + " [" + NumberFormatter.format(count) + "]";
     }
 
     @Override

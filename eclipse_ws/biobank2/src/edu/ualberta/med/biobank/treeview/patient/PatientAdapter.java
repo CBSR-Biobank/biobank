@@ -22,13 +22,11 @@ import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
 
@@ -48,26 +46,17 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientDeletePermission(patient.getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientReadPermission(patient.getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientUpdatePermission(patient.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable =
+            isAllowed(new PatientDeletePermission(patient.getId()));
+        this.isReadable = isAllowed(new PatientReadPermission(patient.getId()));
+        this.isEditable =
+            isAllowed(new PatientUpdatePermission(patient.getId()));
     }
 
     @Override
     protected String getLabelInternal() {
         if (patient == null)
-            return "no patient - should not see this"; 
+            return "no patient - should not see this";
         return patient.getPnumber();
     }
 

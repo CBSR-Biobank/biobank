@@ -16,26 +16,19 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventGroup extends AdapterBase {
 
-    private boolean createAllowed;
+    private final boolean createAllowed;
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
         super(parent, id, name, true);
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchCreatePermission(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+        this.createAllowed = isAllowed(
+            new DispatchCreatePermission(SessionManager.getUser()
+                .getCurrentWorkingCenter().getId()));
     }
 
     @Override

@@ -21,9 +21,10 @@ public abstract class AbstractRequestGroup extends AdapterBase {
         super(parent, id, name, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); 
+        Assert.isTrue(false, "should not be called");
     }
 
     @Override

@@ -6,19 +6,16 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupDeletePermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupUpdatePermission;
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
@@ -40,20 +37,9 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupDeletePermission(rg.id));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupReadPermission(rg.id));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupUpdatePermission(rg.id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable = isAllowed(new ResearchGroupDeletePermission(rg.id));
+        this.isReadable = isAllowed(new ResearchGroupReadPermission(rg.id));
+        this.isEditable = isAllowed(new ResearchGroupUpdatePermission(rg.id));
     }
 
     @Override

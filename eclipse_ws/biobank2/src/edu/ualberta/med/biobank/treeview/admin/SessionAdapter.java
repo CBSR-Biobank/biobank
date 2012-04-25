@@ -28,8 +28,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
 
+    @SuppressWarnings("nls")
     private static final String LOGOUT_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.logout"; 
+        "edu.ualberta.med.biobank.commands.logout";
 
     public static final int CLINICS_BASE_NODE_ID = 0;
 
@@ -41,9 +42,10 @@ public class SessionAdapter extends AdapterBase {
 
     private BiobankApplicationService appService;
 
-    private UserWrapper user;
-    private String serverName;
+    private final UserWrapper user;
+    private final String serverName;
 
+    @SuppressWarnings("nls")
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
         UserWrapper user) {
@@ -53,7 +55,7 @@ public class SessionAdapter extends AdapterBase {
         if (user.getLogin().isEmpty()) {
             setLabel(serverName);
         } else {
-            setLabel(serverName + " [" + user.getLogin() + "]");  
+            setLabel(serverName + " [" + user.getLogin() + "]");
         }
         this.serverName = serverName;
         this.user = user;
@@ -108,7 +110,7 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return StringUtil.EMPTY_STRING; 
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override
@@ -117,7 +119,7 @@ public class SessionAdapter extends AdapterBase {
             return "Current server version: "
                 + appService.getServerVersion();
         }
-        return StringUtil.EMPTY_STRING; 
+        return StringUtil.EMPTY_STRING;
     }
 
     private SiteGroup getSitesGroupNode() {
@@ -159,7 +161,7 @@ public class SessionAdapter extends AdapterBase {
                 try {
                     handlerService.executeCommand(LOGOUT_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found"); 
+                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found");
                 }
             }
         });

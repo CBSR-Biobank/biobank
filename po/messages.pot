@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-25 14:11-0600\n"
+"POT-Creation-Date: 2012-04-25 14:41-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4696,6 +4696,55 @@ msgstr ""
 msgid "Unable to Load User Management Data"
 msgstr ""
 
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:100
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:107
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:122
+msgid "Server Version Error"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:102
+msgid ""
+"The server you are connecting to does not have a version. Cannot "
+"authenticate."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:110
+#, java-format
+msgid "{0} Would you like to download the latest version?"
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:128
+msgid "Client Version Error"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:130
+msgid ""
+"Cannot connect to this server because the Java Client version is invalid."
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:137
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:145
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:152
+msgid "Login Failed"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:139
+msgid ""
+"Bad credentials. Warning: You will be locked out after 3 failed login "
+"attempts."
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/helpers/SessionHelper.java:147
+msgid "Error contacting server."
+msgstr ""
+
 #. TR: error dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/logs/LogQuery.java:128
 msgid "Unable to retrieve logs"
@@ -4769,6 +4818,141 @@ msgstr ""
 #. label.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/preferences/ServerPreferencePage.java:179
 msgid "Servers:"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:82
+msgid "Keyboard Shortcuts..."
+msgstr ""
+
+#. tooltip.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:86
+msgid "Show shorcuts for the current view"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:89
+msgid "Send Error Mail"
+msgstr ""
+
+#. tooltip.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:92
+msgid "Report a problem to developpers"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:94
+msgid "Export Errors Logs"
+msgstr ""
+
+#. tooltip.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:98
+msgid "Export a zip with useful logs data for developers"
+msgstr ""
+
+#. dialog message.
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:120
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:162
+msgid "Problem with command"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:153
+msgid "Show Application Error Logs"
+msgstr ""
+
+#. menu text.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:177
+msgid "&Help"
+msgstr ""
+
+#. menu item text.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationActionBarAdvisor.java:202
+msgid "Super Administrator Mode"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationWorkbenchAdvisor.java:62
+msgid "Can't close"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationWorkbenchAdvisor.java:63
+msgid "Please end specimen management session before closing"
+msgstr ""
+
+#. status line message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationWorkbenchWindowAdvisor.java:98
+msgid "Application ready"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/ApplicationWorkbenchWindowAdvisor.java:201
+#, java-format
+msgid "Center {0}"
+msgstr ""
+
+#. progress monitor message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/P2Util.java:114
+msgid "Checking for application updates..."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/P2Util.java:131
+msgid "No updates were found."
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/P2Util.java:140
+msgid "Updates"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/rcp/P2Util.java:142
+msgid ""
+"Updates have been found. The application will restart after the installation "
+"is done."
+msgstr ""
+
+#. exception message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:114
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:152
+#, java-format
+msgid "No report available with name {0}"
+msgstr ""
+
+#. jasper report data. {0} is a date.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:123
+#, java-format
+msgid "Printed on {0}"
+msgstr ""
+
+#. exception message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:181
+msgid "Not a valid extension. Please use 'pdf' or 'csv'."
+msgstr ""
+
+#. exception message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:222
+msgid "Printing Canceled. Check your printer settings and try again."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:228
+#, java-format
+msgid "Error with printer - No Print Service found with name {0}"
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:249
+msgid "Print document to Pdf file."
+msgstr ""
+
+#. exception message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:269
+msgid "Can't save to file type {0}"
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:301
+msgid "Printing Error"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:305
+msgid "Select a file location to export the printed page."
 msgstr ""
 
 #. dialog title.

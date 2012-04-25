@@ -42,7 +42,7 @@ public class TreeItemAdapter implements Node {
         case 3:
             return raw.getSpecimen().getActivityStatus().getName();
         }
-        return StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

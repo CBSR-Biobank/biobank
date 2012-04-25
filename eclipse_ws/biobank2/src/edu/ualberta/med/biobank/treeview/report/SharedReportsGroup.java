@@ -19,13 +19,17 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class SharedReportsGroup extends AbstractReportGroup {
     private static final String NODE_NAME =
         "Shared Reports";
-    private static final String USER_ID_TOKEN = "{userId}"; 
-    private static final String USER_ID_LIST_TOKEN = "{userIds}"; 
-    private static final String HQL_REPORT_OF_USER = "from " 
-        + Report.class.getName() + " where isPublic <> 0 and userId in (" 
-        + USER_ID_LIST_TOKEN + ")"; 
+    @SuppressWarnings("nls")
+    private static final String USER_ID_TOKEN = "{userId}";
+    @SuppressWarnings("nls")
+    private static final String USER_ID_LIST_TOKEN = "{userIds}";
+    @SuppressWarnings("nls")
+    private static final String HQL_REPORT_OF_USER = "from "
+        + Report.class.getName() + " where isPublic <> 0 and userId in ("
+        + USER_ID_LIST_TOKEN + ")";
+    @SuppressWarnings("nls")
     private static final String SQL_USERS_IN_SAME_GROUP =
-        "SELECT CONVERT(u2.user_id, CHAR) FROM csm_user u2"; 
+        "SELECT CONVERT(u2.user_id, CHAR) FROM csm_user u2";
 
     public SharedReportsGroup(AdapterBase parent, int id) {
         super(parent, id, NODE_NAME);
@@ -58,7 +62,7 @@ public class SharedReportsGroup extends AbstractReportGroup {
             }
 
             if (!userIds.isEmpty()) {
-                String userIdList = StringUtils.join(userIds.toArray(), ","); 
+                String userIdList = StringUtils.join(userIds.toArray(), ",");
 
                 String hqlString = HQL_REPORT_OF_USER.replace(
                     USER_ID_LIST_TOKEN, userIdList);

@@ -24,7 +24,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
 
     private Map<Integer, ResearchGroup> rgs;
-    private Boolean createAllowed;
+    private final Boolean createAllowed;
 
     public ResearchGroupMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id,
@@ -39,12 +39,8 @@ public class ResearchGroupMasterGroup extends AbstractNewAdapterBase {
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Unable to retrieve research groups", e);
         }
-        try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
-                new ResearchGroupCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+
+        this.createAllowed = isAllowed(new ResearchGroupCreatePermission());
 
     }
 

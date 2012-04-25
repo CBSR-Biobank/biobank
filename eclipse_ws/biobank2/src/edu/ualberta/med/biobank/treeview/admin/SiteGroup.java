@@ -17,28 +17,22 @@ import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
-    private Boolean createAllowed;
+    private final Boolean createAllowed;
 
     public SiteGroup(SessionAdapter parent, int id) {
         super(parent, id, "All Sites", true);
-        try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
-                new SiteCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+
+        this.createAllowed = isAllowed(new SiteCreatePermission());
     }
 
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); 
+        Assert.isTrue(false, "should not be called");
     }
 
     @Override

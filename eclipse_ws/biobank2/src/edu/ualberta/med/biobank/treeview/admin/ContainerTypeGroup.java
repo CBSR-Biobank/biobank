@@ -20,12 +20,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeGroup extends AdapterBase {
 
@@ -35,18 +33,13 @@ public class ContainerTypeGroup extends AdapterBase {
 
     private List<SiteContainerTypeInfo> containerTypeInfos = null;
 
-    private Boolean createAllowed;
+    private final Boolean createAllowed;
 
     public ContainerTypeGroup(SiteAdapter parent, int id) {
         super(parent, id, ContainerType.NAME.plural().toString(), true);
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new ContainerTypeCreatePermission(parent.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error",
-                "Unable to retrieve permissions");
-        }
+
+        this.createAllowed =
+            isAllowed(new ContainerTypeCreatePermission(parent.getId()));
     }
 
     @Override
