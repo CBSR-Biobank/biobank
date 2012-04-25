@@ -94,7 +94,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     // global state of the pallet process
     protected UICellStatus currentScanState;
     private Label plateToScanLabel;
-    private ContainerType type;
 
     @Override
     protected void init() throws Exception {
@@ -476,8 +475,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void scanTubeAlone(MouseEvent e) {
-        if (isScanHasBeenLaunched())
-            palletScanManagement.scanTubeAlone(e);
+        palletScanManagement.scanTubeAlone(e);
     }
 
     protected void postprocessScanTubeAlone(PalletCell palletCell)
@@ -485,7 +483,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         appendLog(NLS.bind(
             "Tube {0} scanned and set to position {1}",
             palletCell.getValue(),
-            type.getPositionString(palletCell.getRowColPos())));
+            palletScanManagement.getContainerType().getPositionString(
+                palletCell.getRowColPos())));
         beforeScanTubeAlone();
         CellProcessResult res = (CellProcessResult) SessionManager
             .getAppService()
@@ -615,7 +614,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     .subTask(NLS
                         .bind(
                             "Processing position {0}",
-                            type.getPositionString(rcp)));
+                            palletScanManagement.getContainerType()
+                                .getPositionString(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
@@ -669,7 +669,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void setContainerType(ContainerType type) {
-        this.type = type;
         palletScanManagement.setContainerType(type);
     }
 }
