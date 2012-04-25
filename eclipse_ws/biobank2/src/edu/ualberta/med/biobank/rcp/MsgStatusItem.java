@@ -19,7 +19,7 @@ public class MsgStatusItem extends ContributionItem {
 
     private CLabel label;
 
-    private String text = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+    private String text = StringUtil.EMPTY_STRING;
 
     private int widthHint = -1;
 

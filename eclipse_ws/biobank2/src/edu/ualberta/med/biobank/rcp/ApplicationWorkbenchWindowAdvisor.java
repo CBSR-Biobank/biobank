@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbench;
@@ -19,6 +18,8 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -35,6 +36,8 @@ import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ApplicationWorkbenchWindowAdvisor.class);
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
@@ -55,12 +58,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         return new ApplicationActionBarAdvisor(configurer);
     }
 
+    @SuppressWarnings("nls")
     private String getWindowTitle() {
         IProduct product = Platform.getProduct();
         String windowTitle = product.getName();
 
         if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
-            windowTitle += " " + product.getDefiningBundle().getVersion(); 
+            windowTitle += " " + product.getDefiningBundle().getVersion();
         }
         return windowTitle;
     }
@@ -82,6 +86,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         getWindowConfigurer().setTitle(getWindowTitle());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void postWindowOpen() {
         P2Util.checkForUpdates();
@@ -89,7 +94,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IStatusLineManager statusline = getWindowConfigurer()
             .getActionBarConfigurer().getStatusLineManager();
         statusline.setMessage(null,
-            "Application ready");
+            // status line message.
+            i18n.tr("Application ready"));
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
@@ -100,7 +106,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 workbench.showPerspective(ProcessingPerspective.ID,
                     activeWindow);
             } catch (WorkbenchException e) {
-                logger.error("Error while opening patients perpective", e); 
+                logger.error("Error while opening patients perpective", e);
             }
         }
         page.addPartListener(new BiobankPartListener());
@@ -137,7 +143,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             serverItem.setText(new StringBuffer(
                                 SessionManager.getUser().getLogin())
-                                .append("@") 
+                                .append("@")
                                 .append(SessionManager.getServer())
                                 .toString());
                             superAdminItem.setVisible(SessionManager
@@ -145,7 +151,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                         } else if (sourceValue
                             .equals(LoginSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
-                            serverItem.setText(StringUtil.EMPTY_STRING); 
+                            serverItem.setText(StringUtil.EMPTY_STRING);
                             superAdminItem.setVisible(false);
                         }
                     }
@@ -162,10 +168,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             .activateContextInWorkbench(SessionManager.BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
+    @SuppressWarnings("nls")
     private void activateIfNotInPerspective(String currentPerspectiveId,
         String notId) {
         if (!currentPerspectiveId.equals(notId))
-            BindingContextHelper.activateContextInWorkbench("not." + notId); 
+            BindingContextHelper.activateContextInWorkbench("not." + notId);
     }
 
     private void mainWindowResetTitle() {
@@ -183,15 +190,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         mainWindowUpdateTitle();
     }
 
+    @SuppressWarnings("nls")
     private void mainWindowUpdateTitle() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         String oldTitle = configurer.getTitle();
         StringBuffer newTitle = new StringBuffer(getWindowTitle());
 
         if (currentCenterText != null) {
-            newTitle.append(" - ").append( 
-                NLS.bind(
-                    "Center {0}",
+            newTitle.append(" - ").append(
+                i18n.tr("Center {0}",
                     currentCenterText));
         }
 

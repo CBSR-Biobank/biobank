@@ -122,7 +122,7 @@ public class Sleak {
             // if (object instanceof Region)
             // regions++;
         }
-        String string = StringUtil.EMPTY_STRING; //$NON-NLS-1$
+        String string = StringUtil.EMPTY_STRING;
         if (colors != 0)
             string += colors + " Color(s)\n"; //$NON-NLS-1$
         if (cursors != 0)
@@ -174,7 +174,7 @@ public class Sleak {
         System.arraycopy(diffObjects, 0, objects, 0, count);
         System.arraycopy(diffErrors, 0, errors, 0, count);
         list.removeAll();
-        text.setText(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        text.setText(StringUtil.EMPTY_STRING);
         canvas.redraw();
         for (int i = 0; i < objects.length; i++) {
             list.add(objectName(objects[i]));

@@ -10,6 +10,8 @@ import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -20,6 +22,8 @@ import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ApplicationWorkbenchAdvisor.class);
 
     @Override
     public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
@@ -37,6 +41,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         configurer.setSaveAndRestore(true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean preShutdown() {
         IWorkbench workbench = PlatformUI.getWorkbench();
@@ -52,9 +57,10 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
             if (BiobankPlugin.isAskPrintActivityLog()
                 && page.getPerspective().getId()
                     .equals(LinkAssignPerspective.ID)) {
-                BgcPlugin.openInformation(
-                    "Can't close",
-                    "Please end specimen management session before closing");
+                BgcPlugin
+                    .openInformation(
+                        i18n.tr("Can't close"),
+                        i18n.tr("Please end specimen management session before closing"));
                 return false;
             }
         }
@@ -68,10 +74,11 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         return true;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void postStartup() {
         PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
         // remove the default 'General' preference page of the workbench
-        pm.remove("org.eclipse.ui.preferencePages.Workbench"); 
+        pm.remove("org.eclipse.ui.preferencePages.Workbench");
     }
 }
