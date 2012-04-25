@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -27,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(ClinicAdapter.class);
 
     @SuppressWarnings("nls")
     private static final String LOGOUT_COMMAND_ID =
@@ -113,11 +116,12 @@ public class SessionAdapter extends AdapterBase {
         return StringUtil.EMPTY_STRING;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         if (appService != null) {
-            return "Current server version: "
-                + appService.getServerVersion();
+            return i18n.tr("Current server version: {0}",
+                appService.getServerVersion());
         }
         return StringUtil.EMPTY_STRING;
     }
@@ -148,10 +152,13 @@ public class SessionAdapter extends AdapterBase {
         return adapter;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Logout");
+        mi.setText(
+            // menu item label.
+            i18n.tr("Logout"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -206,11 +213,14 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     public List<ClinicWrapper> getClinicCollection() {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to load clinics from database",
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Unable to load clinics from database"),
                 e);
         }
         return null;

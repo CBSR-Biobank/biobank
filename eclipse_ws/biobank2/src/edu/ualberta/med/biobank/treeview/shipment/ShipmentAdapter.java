@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoDeleteAction;
@@ -21,19 +23,25 @@ import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentAdapter.class);
 
+    @SuppressWarnings("nls")
+    private static final String SHIPMENT = i18n.tr("Shipment");
+
+    @SuppressWarnings("nls")
     public ShipmentAdapter(AdapterBase parent, OriginInfoWrapper originInfo) {
         super(parent, originInfo);
         if (originInfo.getShipmentInfo() == null) {
             throw new NullPointerException(
-                "No shipment information is associated with the given origin information.");
+                // exception message.
+                i18n.tr("No shipment information is associated with the given origin information."));
         }
 
         setHasChildren(false);
@@ -41,44 +49,38 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ShipmentDeletePermission(
-                        ((OriginInfoWrapper) getModelObject())
-                            .getId(),
-                        SessionManager.getUser().getCurrentWorkingCenter()
-                            .getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new OriginInfoReadPermission(getModelObject().getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new OriginInfoUpdatePermission(
-                        ((OriginInfoWrapper) getModelObject())
-                            .getReceiverSite()
-                            .getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable = isAllowed(
+            new ShipmentDeletePermission(
+                ((OriginInfoWrapper) getModelObject())
+                    .getId(),
+                SessionManager.getUser().getCurrentWorkingCenter()
+                    .getId()));
+        this.isReadable = isAllowed(
+            new OriginInfoReadPermission(getModelObject().getId()));
+        this.isEditable = isAllowed(
+            new OriginInfoUpdatePermission(
+                ((OriginInfoWrapper) getModelObject())
+                    .getReceiverSite()
+                    .getId()));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
         ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
-        String label = StringUtil.EMPTY_STRING; 
+        String label = StringUtil.EMPTY_STRING;
         if (shipmentInfo.getReceivedAt() != null)
             label += shipmentInfo.getFormattedDateReceived();
         if (shipmentInfo.getWaybill() != null) {
-            label += " (" + shipmentInfo.getWaybill() + ")";  
+            label += " (" + shipmentInfo.getWaybill() + ")";
         }
 
         return label;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         OriginInfoWrapper originInfo = (OriginInfoWrapper) getModelObject();
@@ -86,21 +88,22 @@ public class ShipmentAdapter extends AdapterBase {
             CenterWrapper<?> center = originInfo.getCenter();
             if (center != null)
                 return center.getName()
-                    + " - " + getTooltipText("Shipment");  
+                    + " - " + getTooltipText(SHIPMENT);
         }
-        return getTooltipText("Shipment");
+        return getTooltipText(SHIPMENT);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Shipment");
-        addViewMenu(menu, "Shipment");
-        addDeleteMenu(menu, "Shipment");
+        addEditMenu(menu, SHIPMENT);
+        addViewMenu(menu, SHIPMENT);
+        addDeleteMenu(menu, SHIPMENT);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this shipment?";
+        return i18n.tr("Are you sure you want to delete this shipment?");
     }
 
     @Override

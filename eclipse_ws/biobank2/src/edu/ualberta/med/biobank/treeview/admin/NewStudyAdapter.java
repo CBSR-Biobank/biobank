@@ -5,6 +5,8 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
@@ -13,8 +15,9 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 
 public class NewStudyAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(NewStudyAdapter.class);
 
-    private Study study;
+    private final Study study;
 
     public NewStudyAdapter(AbstractAdapterBase parent, Study study) {
         super(parent, study.getId(), null, null, false);
@@ -23,7 +26,7 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return study == null ? StringUtil.EMPTY_STRING : study.getNameShort(); 
+        return study == null ? StringUtil.EMPTY_STRING : study.getNameShort();
     }
 
     @Override
@@ -38,9 +41,10 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
         addDeleteMenu(menu, Study.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this study?";
+        return i18n.tr("Are you sure you want to delete this study?");
     }
 
     @Override

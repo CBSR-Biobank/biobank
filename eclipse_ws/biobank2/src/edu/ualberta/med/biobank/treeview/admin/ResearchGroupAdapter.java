@@ -5,6 +5,8 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupDeletePermission;
@@ -18,6 +20,8 @@ import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ResearchGroupAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ResearchGroupAdapter.class);
 
     ResearchGroupAdapterInfo rg;
 
@@ -64,9 +68,10 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
         addDeleteMenu(menu, ResearchGroup.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this research group?";
+        return i18n.tr("Are you sure you want to delete this research group?");
     }
 
     @Override

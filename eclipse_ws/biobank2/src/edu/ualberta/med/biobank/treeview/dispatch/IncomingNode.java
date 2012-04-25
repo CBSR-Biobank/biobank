@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -12,14 +14,16 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 
 public class IncomingNode extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(IncomingNode.class);
 
-    private ReceivingInTransitDispatchGroup receivedTransitNode;
-    private ReceivingNoErrorsDispatchGroup receivingNode;
-    private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
-    private ReceivingRequestGroup requestNode;
+    private final ReceivingInTransitDispatchGroup receivedTransitNode;
+    private final ReceivingNoErrorsDispatchGroup receivingNode;
+    private final ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
+    private final ReceivingRequestGroup requestNode;
 
+    @SuppressWarnings("nls")
     public IncomingNode(AdapterBase parent, int id) {
-        super(parent, id, "Incoming", true);
+        super(parent, id, i18n.tr("Incoming"), true);
         receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);

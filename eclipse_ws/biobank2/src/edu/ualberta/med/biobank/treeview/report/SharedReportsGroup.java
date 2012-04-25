@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
@@ -17,8 +19,11 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SharedReportsGroup extends AbstractReportGroup {
-    private static final String NODE_NAME =
-        "Shared Reports";
+    private static final I18n i18n = I18nFactory
+        .getI18n(SharedReportsGroup.class);
+
+    @SuppressWarnings("nls")
+    private static final String NODE_NAME = i18n.tr("Shared Reports");
     @SuppressWarnings("nls")
     private static final String USER_ID_TOKEN = "{userId}";
     @SuppressWarnings("nls")
@@ -35,6 +40,7 @@ public class SharedReportsGroup extends AbstractReportGroup {
         super(parent, id, NODE_NAME);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Collection<ReportWrapper> getReports() {
         List<ReportWrapper> reports = new ArrayList<ReportWrapper>();

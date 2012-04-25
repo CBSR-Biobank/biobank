@@ -4,9 +4,10 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
@@ -24,6 +25,8 @@ import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(CollectionEventAdapter.class);
 
     public SimpleCEventInfo ceventInfo;
 
@@ -46,6 +49,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             new CollectionEventUpdatePermission(ceventInfo.cevent.getId()));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         Assert.isNotNull(ceventInfo, "collection event is null");
@@ -53,19 +57,21 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
             .append(ceventInfo.cevent.getVisitNumber())
             .append(" - ")
             .append(
-                ceventInfo.minSourceSpecimenDate == null ? "No Specimens"
+                ceventInfo.minSourceSpecimenDate == null ? i18n
+                    .tr("No Specimens")
                     : DateFormatter
                         .formatAsDateTime(ceventInfo.minSourceSpecimenDate))
             .append(" [").append(ceventInfo.sourceSpecimenCount)
             .append("]").toString();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         String tabName = null;
         if (ceventInfo != null)
             if (ceventInfo.cevent.getId() == null) {
-                tabName = "New collection event";
+                tabName = i18n.tr("New collection event");
                 // FIXME this should not be done in a getter!
                 // try {
                 // cEvent
@@ -78,8 +84,7 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
                 // Messages.CollectionEventAdapter_create_error_msg);
                 // }
         } else {
-            tabName = NLS.bind(
-                "Collection Event - #{0}",
+            tabName = i18n.tr("Collection Event - #{0}",
                 ceventInfo.cevent.getVisitNumber());
         }
         return tabName;
@@ -92,9 +97,11 @@ public class CollectionEventAdapter extends AbstractNewAdapterBase {
         addDeleteMenu(menu, CollectionEvent.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this collection event?";
+        return i18n
+            .tr("Are you sure you want to delete this collection event?");
     }
 
     @Override

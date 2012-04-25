@@ -3,13 +3,14 @@ package edu.ualberta.med.biobank.treeview.report;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.reports.AdvancedReportDeleteAction;
@@ -24,13 +25,15 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 
 public class ReportAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ReportAdapter.class);
+
     public ReportAdapter(AdapterBase parent, ReportWrapper report) {
         super(parent, report);
     }
 
     @Override
     protected String getLabelInternal() {
-        @SuppressWarnings("nls")
         String label = StringUtil.EMPTY_STRING;
 
         ReportWrapper report = (ReportWrapper) getModelObject();
@@ -46,10 +49,11 @@ public class ReportAdapter extends AdapterBase {
         return getTooltipText(Report.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Copy");
+        mi.setText(i18n.tr("Copy"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -58,14 +62,14 @@ public class ReportAdapter extends AdapterBase {
         });
 
         mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText("Delete");
+        mi.setText(i18n.tr("Delete"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 boolean delete =
                     BgcPlugin.openConfirm(
-                        "Delete Report",
-                        NLS.bind(
+                        i18n.tr("Delete Report"),
+                        i18n.tr(
                             "Are you sure you want to delete the report named ''{0}''? This action cannot be undone.",
                             ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
@@ -87,8 +91,11 @@ public class ReportAdapter extends AdapterBase {
         if (SessionManager.getInstance().isConnected()) {
             ReportWrapper report = new ReportWrapper(
                 (ReportWrapper) getModelObject());
-            report.setName(report.getName()
-                + " " + "Copy");
+
+            @SuppressWarnings("nls")
+            String reportCopyName =
+                i18n.tr("{0} Report Copy", report.getName());
+            report.setName(reportCopyName);
 
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);

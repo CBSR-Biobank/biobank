@@ -5,12 +5,16 @@ import java.util.List;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SpecimenLinkAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenAssignAdapter.class);
 
     public SpecimenLinkAdapter(AdapterBase parent, int id, String name,
         boolean hasChildren) {
@@ -22,9 +26,10 @@ public class SpecimenLinkAdapter extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
-        return "Specimen Link";
+        return i18n.tr("Specimen Link");
     }
 
     @Override

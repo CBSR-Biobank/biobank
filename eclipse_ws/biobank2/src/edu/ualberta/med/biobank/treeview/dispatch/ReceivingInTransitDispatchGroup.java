@@ -13,7 +13,7 @@ public class ReceivingInTransitDispatchGroup extends AbstractDispatchGroup {
 
     public ReceivingInTransitDispatchGroup(AdapterBase parent, int id) {
         super(parent, id,
-            "In transit");
+            DispatchState.IN_TRANSIT.getLabel());
     }
 
     @Override

@@ -7,6 +7,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
@@ -21,6 +23,7 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SiteAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(SiteAdapter.class);
 
     private int nodeIdOffset = 100;
     public static final int CONTAINER_TYPES_BASE_NODE_ID = 0;
@@ -80,9 +83,10 @@ public class SiteAdapter extends AdapterBase {
             addDeleteMenu(menu, Site.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this repository site?";
+        return i18n.tr("Are you sure you want to delete this repository site?");
     }
 
     @Override

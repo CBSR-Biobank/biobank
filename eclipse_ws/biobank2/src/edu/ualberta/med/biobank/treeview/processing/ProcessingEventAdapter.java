@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
@@ -25,6 +26,8 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ProcessingEventAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ProcessingEventAdapter.class);
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ProcessingEventAdapter.class.getName());
@@ -52,6 +55,7 @@ public class ProcessingEventAdapter extends AdapterBase {
         openViewForm();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         ProcessingEventWrapper pevent =
@@ -72,13 +76,14 @@ public class ProcessingEventAdapter extends AdapterBase {
         return name + " [" + NumberFormatter.format(count) + "]";
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         ProcessingEventWrapper pevent =
             (ProcessingEventWrapper) getModelObject();
         if (pevent == null)
             return ProcessingEvent.NAME.singular().toString();
-        return NLS.bind("Processing event on date {0}",
+        return i18n.tr("Processing event on date {0}",
             pevent.getFormattedCreatedAt());
     }
 
@@ -89,9 +94,11 @@ public class ProcessingEventAdapter extends AdapterBase {
         addDeleteMenu(menu, ProcessingEvent.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this processing event?";
+        return i18n
+            .tr("Are you sure you want to delete this processing event?");
     }
 
     @Override

@@ -8,6 +8,8 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.widgets.TreeItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -17,8 +19,10 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 
 public class ContainerDragDropListener implements DropTargetListener,
     DragSourceListener {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContainerDragDropListener.class);
 
-    private TreeViewer treeViewer;
+    private final TreeViewer treeViewer;
 
     private ContainerAdapter srcContainerAdapter;
     private ContainerWrapper srcContainer;
@@ -30,6 +34,7 @@ public class ContainerDragDropListener implements DropTargetListener,
         this.dstLocationSelected = false;
     }
 
+    @SuppressWarnings("nls")
     private ContainerWrapper getSelectedContainer() {
         TreeSelection ts = (TreeSelection) treeViewer.getSelection();
         if (ts == null || ts.isEmpty())
@@ -39,8 +44,10 @@ public class ContainerDragDropListener implements DropTargetListener,
             if (ts.size() != 1)
                 BgcPlugin
                     .openError(
-                        "Cannot move multiple container",
-                        "You cannot move multiple containers, please drag them one at a time.");
+                        // dialog title.
+                        i18n.tr("Cannot move multiple container"),
+                        // dialog message.
+                        i18n.tr("You cannot move multiple containers, please drag them one at a time."));
 
             srcContainerAdapter = (ContainerAdapter) ts.getFirstElement();
             if (srcContainerAdapter != null)
@@ -50,6 +57,7 @@ public class ContainerDragDropListener implements DropTargetListener,
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void dragOver(DropTargetEvent event) {
         event.feedback = DND.FEEDBACK_NONE;
@@ -85,7 +93,8 @@ public class ContainerDragDropListener implements DropTargetListener,
                 } catch (Exception ex) {
                     BgcPlugin
                         .openAsyncError(
-                            "Error in drag",
+                            // dialog title.
+                            i18n.tr("Error in drag"),
                             ex);
                 }
             }
@@ -109,6 +118,7 @@ public class ContainerDragDropListener implements DropTargetListener,
         //
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void drop(DropTargetEvent event) {
         if (!dstLocationSelected || event.item == null) {
@@ -130,20 +140,23 @@ public class ContainerDragDropListener implements DropTargetListener,
                     && !dstContainer.isContainerFull()) {
 
                     // TODO implement the moving of containers here.
-                    System.out.println("Valid Drag Detected:"); 
-                    System.out.println(srcContainer + " --> " 
+                    System.out.println("Valid Drag Detected:");
+                    System.out.println(srcContainer + " --> "
                         + dstContainer);
                     srcContainerAdapter.moveContainer(dstContainer);
                     return;
                 }
                 BgcPlugin
                     .openError(
-                        "Invalid state",
-                        "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
+                        // dialog title.
+                        i18n.tr("Invalid state"),
+                        // dialog message.
+                        i18n.tr("ERROR: an unexpected state occured in TreeDragDropListener. Please report this."));
             } catch (Exception ex) {
                 BgcPlugin
                     .openAsyncError(
-                        "Drop error",
+                        // dialog title.
+                        i18n.tr("Drop error"),
                         ex);
             }
         }

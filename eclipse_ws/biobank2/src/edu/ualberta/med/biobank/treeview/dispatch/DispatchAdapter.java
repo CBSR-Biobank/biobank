@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(DispatchAdapter.class);
 
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
@@ -76,6 +79,7 @@ public class DispatchAdapter extends AdapterBase {
         return editable;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getDispatchWrapper();
@@ -97,71 +101,78 @@ public class DispatchAdapter extends AdapterBase {
         return getTooltipText(Dispatch.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         CenterWrapper<?> siteParent = SessionManager.getUser()
             .getCurrentWorkingCenter();
         addViewMenu(menu, Dispatch.NAME.singular().toString());
-        try {
-            if (isDeletable()) {
-                addDeleteMenu(menu, Dispatch.NAME.singular().toString());
-            }
-            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
-                && isEditable
-                && getDispatchWrapper().hasErrors()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Close");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doClose();
-                    }
-                });
-            }
-            if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && isEditable
-                && getDispatchWrapper().isInTransitState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Move to Creation");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setDispatchAsCreation();
-                    }
-                });
-            }
-            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
-                && getDispatchWrapper().isInTransitState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Receive");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceive();
-                    }
-                });
-                mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Receive and Process");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceiveAndProcess();
-                    }
-                });
-                mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Mark as Lost");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doSetAsLost();
-                    }
-                });
-            }
-            addEditMenu(menu, Dispatch.NAME.singular().toString());
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error checking permissions",
-                e);
+
+        if (isDeletable()) {
+            addDeleteMenu(menu, Dispatch.NAME.singular().toString());
         }
+        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+            && isEditable
+            && getDispatchWrapper().hasErrors()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Close"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doClose();
+                }
+            });
+        }
+        if (siteParent.equals(getDispatchWrapper().getSenderCenter())
+            && isEditable
+            && getDispatchWrapper().isInTransitState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Move to Creation"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    setDispatchAsCreation();
+                }
+            });
+        }
+        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+            && getDispatchWrapper().isInTransitState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Receive"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doReceive();
+                }
+            });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Receive and Process"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doReceiveAndProcess();
+                }
+            });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Mark as Lost"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doSetAsLost();
+                }
+            });
+        }
+        addEditMenu(menu, Dispatch.NAME.singular().toString());
     }
 
     @Override
@@ -171,9 +182,10 @@ public class DispatchAdapter extends AdapterBase {
         SessionManager.getAppService().doAction(delete);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this dispatch?";
+        return i18n.tr("Are you sure you want to delete this dispatch?");
     }
 
     public void doReceive() {
@@ -214,12 +226,15 @@ public class DispatchAdapter extends AdapterBase {
         openViewForm();
     }
 
+    @SuppressWarnings("nls")
     public void doSetAsLost() {
         try {
             // to be sure has last database data.
             getDispatchWrapper().reload();
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError("Error reloading", ex);
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Error reloading"), ex);
         }
         getDispatchWrapper().setState(DispatchState.LOST);
         persistDispatch();
@@ -232,6 +247,7 @@ public class DispatchAdapter extends AdapterBase {
         persistDispatch();
     }
 
+    @SuppressWarnings("nls")
     private void persistDispatch() {
         DispatchChangeStateAction action =
             new DispatchChangeStateAction(getDispatchWrapper().getId(),
@@ -241,7 +257,9 @@ public class DispatchAdapter extends AdapterBase {
         try {
             SessionManager.getAppService().doAction(action);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to save changes", e);
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Unable to save changes"), e);
         }
         Display.getDefault().syncExec(new Runnable() {
             @Override

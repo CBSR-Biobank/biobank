@@ -55,6 +55,7 @@ public class ContainerTypeAdapter extends AdapterBase {
         return containerType.getName();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         ContainerTypeWrapper type = (ContainerTypeWrapper) getModelObject();
@@ -76,9 +77,10 @@ public class ContainerTypeAdapter extends AdapterBase {
         addDeleteMenu(menu, ContainerType.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this container type?";
+        return i18n.tr("Are you sure you want to delete this container type?");
     }
 
     @Override

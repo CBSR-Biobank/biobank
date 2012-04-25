@@ -51,6 +51,10 @@ public abstract class AbstractAdapterBase implements
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractAdapterBase.class);
 
+    @SuppressWarnings("nls")
+    // dialog title.
+    private static final String DELETE_FAILED = i18n.tr("Delete failed");
+
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
 
@@ -159,11 +163,14 @@ public abstract class AbstractAdapterBase implements
 
     public abstract String getTooltipTextInternal();
 
+    @SuppressWarnings("nls")
     protected String getTooltipText(String string) {
         String label = getLabel();
         if (label == null) {
-            return new StringBuilder("New ").append(
-                string).toString();
+
+            String newObjectLabel = i18n.tr("New {0}", string);
+
+            return newObjectLabel;
         }
         return new StringBuilder(string).append(" ").append(label).toString();
     }
@@ -203,6 +210,7 @@ public abstract class AbstractAdapterBase implements
         child.addListener(deltaListener);
     }
 
+    @SuppressWarnings("nls")
     public void insertAfter(AbstractAdapterBase existingNode,
         AbstractAdapterBase newNode) {
         int pos = children.indexOf(existingNode);
@@ -303,7 +311,11 @@ public abstract class AbstractAdapterBase implements
     protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Edit " + objectName);
+
+            @SuppressWarnings("nls")
+            String editObjectLabel = i18n.tr("Edit {0}", objectName);
+
+            mi.setText(editObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -316,7 +328,11 @@ public abstract class AbstractAdapterBase implements
     protected void addViewMenu(Menu menu, String objectName) {
         if (isReadable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("View " + objectName);
+
+            @SuppressWarnings("nls")
+            String viewObjectLabel = i18n.tr("View {0}", objectName);
+
+            mi.setText(viewObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -329,7 +345,11 @@ public abstract class AbstractAdapterBase implements
     protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Delete " + objectName);
+
+            @SuppressWarnings("nls")
+            String deleteObjectLabel = i18n.tr("Delete {0}", objectName);
+
+            mi.setText(deleteObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -339,6 +359,7 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
+    @SuppressWarnings("nls")
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
@@ -347,7 +368,8 @@ public abstract class AbstractAdapterBase implements
         }
         boolean doDelete = true;
         doDelete = BgcPlugin.openConfirm(
-            "Confirm Delete", msg);
+            // dialog
+            i18n.tr("Confirm Delete"), msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -370,20 +392,21 @@ public abstract class AbstractAdapterBase implements
                                 .getConstraintViolationsMsgs(
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
-                                "Delete failed",
+                                DELETE_FAILED,
                                 StringUtils.join(msgs, "\n"));
                         } else if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
                             BgcPlugin.openAsyncError(
-                                "Delete failed",
-                                "delete not allowed");
+                                DELETE_FAILED,
+                                // dialog message.
+                                i18n.tr("delete not allowed"));
                         } else {
                             BgcPlugin.openAsyncError(
-                                "Delete failed",
+                                DELETE_FAILED,
                                 e.getLocalizedMessage());
                         }
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
-                            "Delete failed", e);
+                            DELETE_FAILED, e);
                         getParent().addChild(AbstractAdapterBase.this);
                         return;
                     }
@@ -396,9 +419,12 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
+    @SuppressWarnings("nls")
     protected void runDelete() throws Exception {
-        BgcPlugin.openAsyncError("Programming Error",
-            "This adapter is missing its implementation for runDelete()");
+        BgcPlugin
+            .openAsyncError(
+                i18n.tr("Programming Error"),
+                i18n.tr("This adapter is missing its implementation for runDelete()"));
     }
 
     /**
@@ -443,6 +469,7 @@ public abstract class AbstractAdapterBase implements
         return openForm(input, id, true);
     }
 
+    @SuppressWarnings("nls")
     public static IEditorPart openForm(FormInput input, String id,
         boolean focusOnEditor) {
         closeEditor(input);
