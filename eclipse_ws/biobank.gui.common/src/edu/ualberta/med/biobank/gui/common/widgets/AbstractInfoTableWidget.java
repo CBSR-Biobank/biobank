@@ -90,6 +90,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected ListenerList deleteItemListeners = new ListenerList();
     protected ListenerList doubleClickListeners = new ListenerList();
 
+    List<MenuItem> items = new ArrayList<MenuItem>();
+
     public AbstractInfoTableWidget(final Composite parent,
         final String[] headings,
         int[] columnWidths, int rowsPerPage) {
@@ -141,10 +143,11 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
+
                 try {
-                    int max = menu.getItemCount();
-                    for (int i = max - 1; i >= 0; i--)
-                        menu.getItem(i).dispose();
+                    for (MenuItem item : items)
+                        item.dispose();
+                    items.clear();
                     if (addItemListeners.getListeners().length > 0) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
                         item.setText(Messages.AbstractInfoTableWidget_add);
@@ -154,6 +157,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                                 addItem();
                             }
                         });
+                        items.add(item);
                     }
                     if (editItemListeners.getListeners().length > 0
                         && canEdit(getSelection())) {
@@ -165,6 +169,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                                 editItem();
                             }
                         });
+                        items.add(item);
                     }
                     if (deleteItemListeners.getListeners().length > 0
                         && canDelete(getSelection())) {
@@ -176,6 +181,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                                 deleteItem();
                             }
                         });
+                        items.add(item);
                     }
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError("Error",
