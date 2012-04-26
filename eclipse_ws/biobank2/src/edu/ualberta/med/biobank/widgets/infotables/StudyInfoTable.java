@@ -15,6 +15,11 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
@@ -42,11 +47,11 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] {
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING };
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        ActivityStatus.NAME.singular().toString(),
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString() };
 
     public StudyInfoTable(Composite parent, List<StudyWrapper> collection) {
         super(parent, collection, HEADINGS, 10, StudyWrapper.class);
