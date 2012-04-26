@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -218,6 +217,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         setCollection(collection, null);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void treeLoader(final List<T> collection, final T selection) {
         final Tree tree = treeViewer.getTree();
@@ -306,10 +306,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         return type;
     }
 
+    @SuppressWarnings("nls")
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText("Edit");
+        editItem.setText(i18n.tr("Edit"));
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -343,12 +344,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
+    @SuppressWarnings("nls")
     public void addAddItemListener(IInfoTreeAddItemListener<T> listener) {
         addItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Add");
+        item.setText(i18n.tr("Add"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -357,12 +359,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
+    @SuppressWarnings("nls")
     public void addEditItemListener(IInfoTreeEditItemListener<T> listener) {
         editItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Edit");
+        item.setText(i18n.tr("Edit"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -371,12 +374,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
+    @SuppressWarnings("nls")
     public void addDeleteItemListener(IInfoTreeDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(i18n.tr("Delete"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -509,10 +513,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText(NLS.bind("Page: {0} of {1}",
-            (pageInfo.page + 1), +pageInfo.pageTotal));
+        pageLabel.setText(i18n.tr("Page: {0} of {1}",
+            (pageInfo.page + 1), pageInfo.pageTotal));
     }
 
     @Override

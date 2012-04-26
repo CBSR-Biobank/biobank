@@ -6,9 +6,8 @@ import java.util.Collections;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionNode implements IPermissionCheckTreeNode {
-
     private PermissionEnum permission;
-    private IPermissionCheckTreeNode parent;
+    private final IPermissionCheckTreeNode parent;
 
     public PermissionNode(IPermissionCheckTreeNode parent,
         PermissionEnum permission) {
@@ -27,8 +26,7 @@ public class PermissionNode implements IPermissionCheckTreeNode {
 
     @Override
     public String getText() {
-        // TODO: localize
-        return permission.name();
+        return permission.getName();
     }
 
     @Override
@@ -44,9 +42,10 @@ public class PermissionNode implements IPermissionCheckTreeNode {
         this.permission = p;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "Permission=" 
+        return "Permission="
             + permission.toString();
     }
 

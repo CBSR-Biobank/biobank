@@ -4,6 +4,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -33,12 +35,15 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
  */
 public class BiobankLabelProvider extends LabelProvider implements
     ITableLabelProvider {
+    private static final I18n i18n = I18nFactory
+        .getI18n(BiobankLabelProvider.class);
 
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getColumnText(Object element, int columnIndex) {
         if (element instanceof SiteWrapper) {
@@ -65,7 +70,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                     return String.valueOf(study.getPatientCount(true));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        "Error in count", e);
+                        i18n.tr("Error in count"), e);
                 }
             }
         } else if (element instanceof SpecimenWrapper) {
@@ -74,20 +79,25 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 0:
                 return specimen.getInventoryId();
             case 1:
-                return specimen.getSpecimenType() == null ? StringUtil.EMPTY_STRING : specimen 
-                    .getSpecimenType().getName();
+                return specimen.getSpecimenType() == null ? StringUtil.EMPTY_STRING
+                    : specimen
+                        .getSpecimenType().getName();
             case 2:
                 String position = specimen.getPositionString();
                 return (position != null) ? position
-                    : "none";
+                    : i18n.tr("none");
             case 3:
-                return specimen.getCreatedAt() == null ? StringUtil.EMPTY_STRING : DateFormatter 
-                    .formatAsDateTime(specimen.getCreatedAt());
+                return specimen.getCreatedAt() == null ? StringUtil.EMPTY_STRING
+                    : DateFormatter
+                        .formatAsDateTime(specimen.getCreatedAt());
             case 4:
-                return specimen.getQuantity() == null ? StringUtil.EMPTY_STRING : specimen 
-                    .getQuantity().toString();
+                return specimen.getQuantity() == null ? StringUtil.EMPTY_STRING
+                    : specimen
+                        .getQuantity().toString();
             case 6:
-                return specimen.getCommentCollection(false) == null ? StringUtil.EMPTY_STRING : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); 
+                return specimen.getCommentCollection(false) == null ? StringUtil.EMPTY_STRING
+                    : CommentWrapper.commentListToString(specimen
+                        .getCommentCollection(false));
             }
         } else if (element instanceof SpecimenTypeWrapper) {
             final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
@@ -104,14 +114,14 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (m.o != null) {
                 return getColumnText(m.o, columnIndex);
             } else if (columnIndex == 0) {
-                return "loading ...";
+                return i18n.tr("loading ...");
             }
         } else if (element instanceof StudyContactInfo) {
             StudyContactInfo info = (StudyContactInfo) element;
             if (columnIndex == 0) {
                 if (info.contact != null)
                     return info.contact.getClinic().getName();
-                return StringUtil.EMPTY_STRING; 
+                return StringUtil.EMPTY_STRING;
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
         } else if (element instanceof DispatchSpecimenWrapper) {
@@ -141,18 +151,19 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof AbstractAdapterBase)
             return ((AbstractAdapterBase) element).getLabel();
         else {
-            Assert.isTrue(false, "invalid object type: " + element.getClass()); 
+            Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
-        return StringUtil.EMPTY_STRING; 
+        return StringUtil.EMPTY_STRING;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getText(Object element) {
         if (element instanceof ContainerTypeWrapper) {
             return ((ContainerTypeWrapper) element).getName();
         } else if (element instanceof StudyWrapper) {
             StudyWrapper study = (StudyWrapper) element;
-            return study.getNameShort() + " - " + study.getName(); 
+            return study.getNameShort() + " - " + study.getName();
         } else if (element instanceof ClinicWrapper) {
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
@@ -167,7 +178,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             StringBuffer res = new StringBuffer(pevent.getFormattedCreatedAt());
             if (pevent.getWorksheet() != null
                 && !pevent.getWorksheet().isEmpty())
-                res.append(" - ").append(pevent.getWorksheet()); 
+                res.append(" - ").append(pevent.getWorksheet());
             return res.toString();
         } else if (element instanceof SpecimenTypeWrapper) {
             return ((SpecimenTypeWrapper) element).getName();
@@ -221,7 +232,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return contact.getFaxNumber();
             break;
         }
-        return StringUtil.EMPTY_STRING; 
+        return StringUtil.EMPTY_STRING;
     }
 
 }

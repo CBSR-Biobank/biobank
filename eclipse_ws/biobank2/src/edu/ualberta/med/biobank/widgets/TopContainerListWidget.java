@@ -21,6 +21,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -28,17 +30,20 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class TopContainerListWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(TopContainerListWidget.class);
 
     private SelectionListener listener;
 
     private class NameFilter extends ViewerFilter {
         @Override
         public boolean select(Viewer viewer, Object top, Object child) {
-            if (filterText.isEmpty()) 
+            if (filterText.isEmpty())
                 return true;
             return filterText.startsWith(((ContainerWrapper) child).getLabel());
         }
@@ -50,11 +55,11 @@ public class TopContainerListWidget {
     private Boolean enabled;
     private List<SiteWrapper> sites;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     public TopContainerListWidget(final Composite parent, FormToolkit toolkit) {
-        filterText = StringUtil.EMPTY_STRING; 
+        filterText = StringUtil.EMPTY_STRING;
         enabled = true;
-        toolkit.createLabel(parent, "Site:");
+        toolkit.createLabel(parent, Site.NAME.singular().toString() + ":");
         final BiobankApplicationService appService = SessionManager
             .getAppService();
         siteCombo = new ComboViewer(parent, SWT.NONE);
@@ -68,25 +73,27 @@ public class TopContainerListWidget {
         try {
             sites = SiteQuery.getSites(appService);
             SiteWrapper allsites = new SiteWrapper(appService);
-            allsites.setNameShort("All Sites");
+            allsites.setNameShort(i18n.tr("All Sites"));
             sites.add(allsites);
             siteCombo.setInput(sites);
             GuiUtil.reset(siteCombo, sites.get(0));
         } catch (Exception e1) {
             BgcPlugin.openAsyncError(
-                "Failed to load sites", e1);
+                i18n.tr("Failed to load sites"), e1);
         }
         siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 if (siteCombo.getSelection() != null) {
-                    List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
+                    List<ContainerWrapper> containers =
+                        new ArrayList<ContainerWrapper>();
                     try {
-                        SiteWrapper s = (SiteWrapper) ((IStructuredSelection) siteCombo
-                            .getSelection()).getFirstElement();
+                        SiteWrapper s =
+                            (SiteWrapper) ((IStructuredSelection) siteCombo
+                                .getSelection()).getFirstElement();
                         if (s != null) {
                             if (s.getNameShort().equals(
-                                "All Sites")) {
+                                i18n.tr("All Sites"))) {
                                 List<SiteWrapper> sites = SiteQuery
                                     .getSites(appService);
                                 for (SiteWrapper site : sites) {
@@ -100,7 +107,7 @@ public class TopContainerListWidget {
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(
-                                "Error retrieving containers",
+                                i18n.tr("Error retrieving containers"),
                                 e);
                     }
                     topContainers.setInput(containers);
@@ -112,18 +119,18 @@ public class TopContainerListWidget {
         siteCombo.getCombo().setLayoutData(
             new GridData(SWT.FILL, SWT.FILL, true, true));
         toolkit.createLabel(parent,
-            "Top Containers\n(select one or more):");
+            i18n.tr("Top Containers\n(select one or more):"));
         topContainers = new ListViewer(parent, SWT.MULTI | SWT.BORDER);
         topContainers.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
                 return ((ContainerWrapper) element).getLabel()
-                    + "(" 
+                    + "("
                     + ((ContainerWrapper) element).getContainerType()
                         .getNameShort()
-                    + ") (" 
+                    + ") ("
                     + ((ContainerWrapper) element).getSite().getNameShort()
-                    + ")"; 
+                    + ")";
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());

@@ -9,6 +9,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -18,6 +20,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
 public class CancelConfirmWidget extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(CancelConfirmWidget.class);
 
     private static BgcLogger logger = BgcLogger
         .getLogger(CancelConfirmWidget.class.getName());
@@ -28,7 +32,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
 
     private Button cancelButton;
 
-    private AbstractSpecimenAdminForm form;
+    private final AbstractSpecimenAdminForm form;
 
     public CancelConfirmWidget(Composite parent, AbstractSpecimenAdminForm form) {
         this(parent, form, false);
@@ -45,9 +49,10 @@ public class CancelConfirmWidget extends BgcBaseWidget {
         showTextField(showTextField);
     }
 
+    @SuppressWarnings("nls")
     private void createContents() {
         form.getToolkit().createLabel(this,
-            "Cancel/Confirm:");
+            i18n.tr("Cancel/Confirm:"));
         confirmCancelText = new BgcBaseText(this, SWT.NONE, form.getToolkit());
         confirmCancelText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         GridData gd = new GridData();
@@ -70,27 +75,29 @@ public class CancelConfirmWidget extends BgcBaseWidget {
                         form.setValues();
                         form.setAfterKeyCancel();
                     } catch (Exception ex) {
-                        logger.error("Error while reseting pallet values", ex); 
+                        logger.error("Error while reseting pallet values", ex);
                     }
                 }
             }
         });
 
         cancelButton = form.getToolkit().createButton(this,
-            "Cancel", SWT.PUSH);
+            // button label.
+            i18n.tr("Cancel"), SWT.PUSH);
         cancelButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
                     form.setValues();
                 } catch (Exception ex) {
-                    logger.error("Error while reseting pallet values", ex); 
+                    logger.error("Error while reseting pallet values", ex);
                 }
             }
         });
 
         confirmButton = form.getToolkit().createButton(this,
-            "Confirm", SWT.PUSH);
+            // button label.
+            i18n.tr("Confirm"), SWT.PUSH);
         confirmButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -119,7 +126,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     }
 
     public void reset() {
-        confirmCancelText.setText(StringUtil.EMPTY_STRING); 
+        confirmCancelText.setText(StringUtil.EMPTY_STRING);
     }
 
     @Override

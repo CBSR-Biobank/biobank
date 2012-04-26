@@ -23,19 +23,24 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class PermissionCheckTreeWidget extends Composite {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PermissionCheckTreeWidget.class);
     private final PermissionsCheckStateHandler permissionsCheckStateHandler =
         new PermissionsCheckStateHandler();
     private final Map<PermissionEnum, PermissionNode> nodes =
         new HashMap<PermissionEnum, PermissionNode>();
     private final Set<PermissionEnum> disabled = new HashSet<PermissionEnum>();
 
-    private ContainerCheckedTreeViewer treeviewer;
+    private final ContainerCheckedTreeViewer treeviewer;
     private PermissionRootNode rootNode;
 
+    @SuppressWarnings("nls")
     public PermissionCheckTreeWidget(Composite parent, boolean title,
         List<PermissionEnum> permissions) {
         super(parent, SWT.NONE);
@@ -50,7 +55,7 @@ public class PermissionCheckTreeWidget extends Composite {
 
         if (title) {
             Label label = new Label(this, SWT.NONE);
-            label.setText("Permissions:");
+            label.setText(i18n.tr("Permissions:"));
             GridData gd = new GridData(SWT.FILL, SWT.NONE, true, false);
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -229,11 +234,12 @@ public class PermissionCheckTreeWidget extends Composite {
             return null;
         }
 
+        @SuppressWarnings("nls")
         @Override
         public String getText(Object element) {
             if (element instanceof IPermissionCheckTreeNode)
                 return ((IPermissionCheckTreeNode) element).getText();
-            return "Problem with display"; 
+            return i18n.tr("Problem with display");
         }
     }
 

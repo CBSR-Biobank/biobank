@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +25,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
@@ -50,16 +51,20 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoExcept
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListener;
 
 public class SpecimenEntryWidget extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenEntryWidget.class);
+
     private List<SpecimenInfo> specimens;
-    private List<SpecimenInfo> addedSpecimens =
+    private final List<SpecimenInfo> addedSpecimens =
         new ArrayList<SpecimenInfo>();
-    private List<SpecimenInfo> removedSpecimens =
+    private final List<SpecimenInfo> removedSpecimens =
         new ArrayList<SpecimenInfo>();
     private NewSpecimenInfoTable specTable;
     private BgcBaseText newSpecimenInventoryId;
-    private boolean editable;
+    private final boolean editable;
     private Button addButton;
-    private IObservableValue hasSpecimens = new WritableValue(Boolean.FALSE,
+    private final IObservableValue hasSpecimens = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
     // TODO: not sure these should all be interruptable
@@ -70,7 +75,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         POST_DELETE;
     }
 
-    private VetoListenerSupport<ItemAction, SpecimenWrapper> vetoListenerSupport =
+    private final VetoListenerSupport<ItemAction, SpecimenWrapper> vetoListenerSupport =
         new VetoListenerSupport<ItemAction, SpecimenWrapper>();
 
     public void addVetoListener(ItemAction action,
@@ -83,10 +88,11 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         vetoListenerSupport.removeListener(action, listener);
     }
 
+    @SuppressWarnings("nls")
     public SpecimenEntryWidget(Composite parent, int style,
         FormToolkit toolkit, boolean editable) {
         super(parent, style);
-        Assert.isNotNull(toolkit, "toolkit is null"); 
+        Assert.isNotNull(toolkit, "toolkit is null");
         this.editable = editable;
 
         setLayout(new GridLayout(2, false));
@@ -95,7 +101,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
         if (editable) {
             Label label = toolkit.createLabel(this,
-                "Enter specimen inventory ID to add:");
+                i18n.tr("Enter specimen inventory ID to add:"));
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -106,10 +112,11 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                     public void handleEvent(Event e) {
                         addSpecimen();
                         newSpecimenInventoryId.setFocus();
-                        newSpecimenInventoryId.setText(StringUtil.EMPTY_STRING); 
+                        newSpecimenInventoryId.setText(StringUtil.EMPTY_STRING);
                     }
                 });
-            addButton = toolkit.createButton(this, StringUtil.EMPTY_STRING, SWT.PUSH); 
+            addButton =
+                toolkit.createButton(this, StringUtil.EMPTY_STRING, SWT.PUSH);
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
@@ -145,6 +152,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         return new ArrayList<SpecimenInfo>(removedSpecimens);
     }
 
+    @SuppressWarnings("nls")
     private void addSpecimen() {
         BiobankApplicationService appService = SessionManager.getAppService();
         String inventoryId = newSpecimenInventoryId.getText().trim();
@@ -164,34 +172,37 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 ispecimen.specimen = bspecimen.getSpecimen();
                 ispecimen.parentLabel =
                     bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                        .pop().getLabel() : StringUtil.EMPTY_STRING; 
+                        .pop().getLabel() : StringUtil.EMPTY_STRING;
                 ispecimen.positionString =
                     bspecimen.getSpecimen().getSpecimenPosition() != null ?
                         bspecimen.getSpecimen().getSpecimenPosition()
                             .getPositionString() : null;
                 ispecimen.comment =
-                    bspecimen.getSpecimen().getComments().size() == 0 ? "N"
-                        : "Y";
+                    bspecimen.getSpecimen().getComments().size() == 0
+                        ? i18n.trc("no abbeviation", "N")
+                        : i18n.trc("yes abbeviation", "Y");
 
                 try {
                     addSpecimen(ispecimen);
                 } catch (VetoException e) {
                     BgcPlugin.openAsyncError(
-                        "Error",
                         e.getMessage());
                 }
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    "Error while looking up specimen",
-                    "Specimen not found.");
+                    // dialog title.
+                    i18n.tr("Error while looking up specimen"),
+                    // dialog message.
+                    i18n.tr("Specimen not found."));
             }
         }
     }
 
+    @SuppressWarnings("nls")
     public void addSpecimen(SpecimenInfo specimen) throws VetoException {
         if (specimen != null && specimens.contains(specimen)) {
-            BgcPlugin.openAsyncError("Error",
-                NLS.bind("Specimen {0} has already been added to this list",
+            BgcPlugin.openAsyncError(
+                i18n.tr("Specimen {0} has already been added to this list",
                     specimen.specimen.getInventoryId()));
             return;
         }
@@ -228,17 +239,21 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
 
         specTable
             .addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
+                @SuppressWarnings("nls")
                 @Override
                 public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
                     SpecimenInfo specimen = specTable.getSelection();
                     if (specimen != null) {
-                        if (!MessageDialog.openConfirm(
-                            PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getShell(),
-                            "Delete Specimen",
-                            NLS.bind(
-                                "Are you sure you want to remove specimen {0}?",
-                                specimen.specimen.getInventoryId()))) {
+                        if (!MessageDialog
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                // dialog title.
+                                i18n.tr("Delete Specimen"),
+                                // dialog message.
+                                i18n.tr(
+                                    "Are you sure you want to remove specimen {0}?",
+                                    specimen.specimen.getInventoryId()))) {
                             return;
                         }
 
@@ -246,7 +261,6 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                             removeSpecimen(specimen);
                         } catch (VetoException e) {
                             BgcPlugin.openAsyncError(
-                                "Error",
                                 e.getMessage());
                         }
                     }

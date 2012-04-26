@@ -1,20 +1,14 @@
 package edu.ualberta.med.biobank.widgets.trees;
 
-import java.io.File;
-
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -24,12 +18,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
@@ -39,6 +33,8 @@ import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReportTreeWidget extends Composite {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ReportTreeWidget.class);
 
     private TreeViewer treeViewer;
 
@@ -121,40 +117,6 @@ public class ReportTreeWidget extends Composite {
         });
 
         addTooltipBehaviour();
-
-        Menu menu = new Menu(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), SWT.NONE);
-        menu.addListener(SWT.Show, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                Menu menu = treeViewer.getTree().getMenu();
-                for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
-                }
-
-                Object element = ((StructuredSelection) treeViewer
-                    .getSelection()).getFirstElement();
-                final ReportTreeNode node = (ReportTreeNode) element;
-                if (node != null
-                    && node.getParent().getLabel()
-                        .compareTo("Custom") == 0) {
-                    MenuItem mi = new MenuItem(menu, SWT.NONE);
-                    mi.setText("Delete");
-                    mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-                        public void widgetSelected(SelectionEvent event) {
-                            File file = new File(Platform.getInstanceLocation()
-                                .getURL().getPath()
-                                + "/saved_reports/" + node.getLabel() + ".xml");  
-                            file.delete();
-                            node.getParent().removeChild(node);
-                            treeViewer.refresh();
-                        }
-                    });
-                }
-            }
-        });
-        treeViewer.getTree().setMenu(menu);
     }
 
     public TreeViewer getTreeViewer() {
@@ -165,12 +127,13 @@ public class ReportTreeWidget extends Composite {
         // lengthy tooltip faking code here
         final Tree tree = treeViewer.getTree();
         // Disable native tooltip
-        tree.setToolTipText(StringUtil.EMPTY_STRING); 
+        tree.setToolTipText(StringUtil.EMPTY_STRING);
         final Display display = tree.getDisplay();
         final Shell shell = new Shell(display);
         shell.setLayout(new FillLayout());
         // Implement a "fake" tooltip
         final Listener labelListener = new Listener() {
+            @SuppressWarnings("nls")
             @Override
             public void handleEvent(Event event) {
                 Label label = (Label) event.widget;
@@ -178,7 +141,7 @@ public class ReportTreeWidget extends Composite {
                 switch (event.type) {
                 case SWT.MouseDown:
                     Event e = new Event();
-                    e.item = (TreeItem) label.getData("_TREEITEM"); 
+                    e.item = (TreeItem) label.getData("_TREEITEM");
                     // Assuming table is single select, set the selection as if
                     // the mouse down event went through to the table
                     tree.setSelection(new TreeItem[] { (TreeItem) e.item });
@@ -197,6 +160,7 @@ public class ReportTreeWidget extends Composite {
             Shell tip = null;
             Label label = null;
 
+            @SuppressWarnings("nls")
             @Override
             public void handleEvent(Event event) {
                 switch (event.type) {
@@ -227,10 +191,11 @@ public class ReportTreeWidget extends Composite {
                             .getSystemColor(SWT.COLOR_INFO_FOREGROUND));
                         label.setBackground(display
                             .getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-                        label.setData("_TREEITEM", item); 
+                        label.setData("_TREEITEM", item);
                         String text = ((AbstractReportTreeNode) item.getData())
                             .getToolTipText();
-                        if (text == null || text.equalsIgnoreCase(StringUtil.EMPTY_STRING)) 
+                        if (text == null
+                            || text.equalsIgnoreCase(StringUtil.EMPTY_STRING))
                             return;
                         label.setText(text);
                         label.addListener(SWT.MouseExit, labelListener);
@@ -251,6 +216,7 @@ public class ReportTreeWidget extends Composite {
         tree.addListener(SWT.MouseHover, tableListener);
     }
 
+    @SuppressWarnings("nls")
     private void executeDoubleClick(DoubleClickEvent event) {
         AbstractReportTreeNode node =
             (AbstractReportTreeNode) ((IStructuredSelection) event
@@ -264,8 +230,11 @@ public class ReportTreeWidget extends Composite {
                     .openEditor(new ReportInput(node),
                         ((ReportTreeNode) node).getReport().getEditorId());
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError("Error", ex,
-                "There was an error while building page.");
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Error"), ex,
+                // dialog message.
+                i18n.tr("There was an error while building page."));
         }
     }
 

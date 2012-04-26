@@ -8,16 +8,21 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 
 public class ComboAndQuantityWidget extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ComboAndQuantityWidget.class);
 
-    private Combo valuesCombo;
+    private final Combo valuesCombo;
 
-    private BgcBaseText quantitiesText;
+    private final BgcBaseText quantitiesText;
 
+    @SuppressWarnings("nls")
     public ComboAndQuantityWidget(Composite parent, int style) {
         super(parent, style | SWT.BORDER);
 
@@ -28,7 +33,7 @@ public class ComboAndQuantityWidget extends BgcBaseWidget {
 
         valuesCombo = new Combo(this, SWT.NONE);
         Label l = new Label(this, SWT.NONE);
-        l.setText("Quantity:");
+        l.setText(i18n.tr("Quantity:"));
         quantitiesText = new BgcBaseText(this, SWT.NONE);
     }
 
@@ -38,16 +43,18 @@ public class ComboAndQuantityWidget extends BgcBaseWidget {
         }
     }
 
+    @SuppressWarnings("nls")
     public void setText(String value, int quantity) {
         valuesCombo.setText(value);
-        quantitiesText.setText(String.format("%d", quantity)); 
+        quantitiesText.setText(String.format("%d", quantity));
     }
 
+    @SuppressWarnings("nls")
     public String getText() {
         if ((valuesCombo.getText().length() != 1)
             || (valuesCombo.getText().length() != 1))
             return null;
-        return valuesCombo.getText() + " " + quantitiesText.getText(); 
+        return valuesCombo.getText() + " " + quantitiesText.getText();
     }
 
     public void addSelectionListener(SelectionListener listener) {

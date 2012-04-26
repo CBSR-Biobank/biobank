@@ -15,13 +15,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class PlateSelectionWidget extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PlateSelectionWidget.class);
 
-    private Map<Integer, Button> plateButtons;
+    private final Map<Integer, Button> plateButtons;
 
     IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -52,6 +56,7 @@ public class PlateSelectionWidget extends BgcBaseWidget {
         }
     };
 
+    @SuppressWarnings("nls")
     public PlateSelectionWidget(Composite parent, int style) {
         super(parent, style);
 
@@ -62,7 +67,7 @@ public class PlateSelectionWidget extends BgcBaseWidget {
         setLayoutData(gd);
 
         Label label = new Label(this, SWT.NONE);
-        label.setText("Select plate:");
+        label.setText(i18n.tr("Select plate:"));
         plateButtons = new HashMap<Integer, Button>();
 
         List<Integer> enabledPlates = new ArrayList<Integer>();

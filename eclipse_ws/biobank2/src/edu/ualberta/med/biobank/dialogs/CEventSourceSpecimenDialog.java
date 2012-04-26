@@ -417,9 +417,9 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             spec.comments.add(commentWrapper.getMessage());
         }
         if (spec.comments.size() > 0)
-            spec.comment = "Y";
+            i18n.trc("yes abbeviation", "Y");
         else
-            spec.comment = "N";
+            i18n.trc("no abbeviation", "N");
         spec.specimen.setActivityStatus(internalSpecimen.specimen
             .getActivityStatus());
         inventoryIdExcludeList.add(internalSpecimen.specimen.getInventoryId());

@@ -50,6 +50,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
@@ -353,7 +354,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         isSourceSpcButton = (Button) createLabelledWidget(client,
             Button.class, SWT.NONE,
-            "Source Specimen");
+            SourceSpecimen.NAME.singular().toString());
         isSourceSpcButton.setEnabled(false);
         isSourceSpcButton.setSelection(isSourceSpc);
 

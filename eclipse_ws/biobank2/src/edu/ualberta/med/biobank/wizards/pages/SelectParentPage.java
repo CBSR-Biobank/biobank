@@ -20,6 +20,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
@@ -56,9 +57,7 @@ public class SelectParentPage extends BgcWizardPage {
         content.setLayout(new GridLayout(1, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         isSourceSpecimen = new Button(content, SWT.CHECK);
-        isSourceSpecimen.setText(
-            // checkbox label.
-            i18n.tr("Source Specimen"));
+        isSourceSpecimen.setText(SourceSpecimen.NAME.singular().toString());
         isSourceSpecimen.setSelection(true);
 
         final Label label = new Label(content, SWT.None);

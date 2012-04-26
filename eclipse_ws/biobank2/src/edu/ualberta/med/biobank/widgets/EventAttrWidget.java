@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
@@ -28,6 +30,9 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 
 public class EventAttrWidget extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(EventAttrWidget.class);
+
     private Button checkButton;
     private Button addButton;
     private Button removeButton;
@@ -47,27 +52,30 @@ public class EventAttrWidget extends BgcBaseWidget {
         }
     };
 
+    @SuppressWarnings("nls")
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
         new HashMap<String, LabelDialogInfo>() {
             private static final long serialVersionUID = 1L;
             {
-                put("Patient Type",
+                put(i18n.tr("Patient Type"),
                     new LabelDialogInfo(
-                        "Patient Type Values",
-                        "Please enter a patient type:",
-                        "To enter multiple patient type values, separate with semicolon."));
-                put("Visit Type",
+                        i18n.tr("Patient Type Values"),
+                        i18n.tr("Please enter a patient type:"),
+                        i18n.tr("To enter multiple patient type values, separate with semicolon.")));
+                put(i18n.tr("Visit Type"),
                     new LabelDialogInfo(
-                        "Visit Type Values",
-                        "Please enter a visit type:",
-                        "To enter multiple visit type values, separate with semicolon."));
-                put("Consent", new LabelDialogInfo(
-                    "Consent Types",
-                    "Please enter a consent type:",
-                    "To enter multiple consent values, separate with semicolon."));
+                        i18n.tr("Visit Type Values"),
+                        i18n.tr("Please enter a visit type:"),
+                        i18n.tr("To enter multiple visit type values, separate with semicolon.")));
+                put(i18n.tr("Consent"),
+                    new LabelDialogInfo(
+                        i18n.tr("Consent Types"),
+                        i18n.tr("Please enter a consent type:"),
+                        i18n.tr("To enter multiple consent values, separate with semicolon.")));
             }
         };
 
+    @SuppressWarnings("nls")
     public EventAttrWidget(Composite parent, int style,
         final EventAttrCustom customInfo, boolean selected) {
         super(parent, style);
@@ -80,7 +88,7 @@ public class EventAttrWidget extends BgcBaseWidget {
 
         if (hasListValues) {
             labelDlgInfo = LABEL_DLG_INFO.get(customInfo.getLabel());
-            Assert.isNotNull(labelDlgInfo, "no dialog info for label " 
+            Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                 + customInfo.getLabel());
 
             createCheckButton(customInfo, selected);
@@ -98,14 +106,14 @@ public class EventAttrWidget extends BgcBaseWidget {
             addButton = new Button(bcomp, SWT.PUSH);
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
-            addButton.setToolTipText("Add");
+            addButton.setToolTipText(i18n.tr("Add"));
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     notifyListeners();
-                    Assert.isNotNull(labelDlgInfo, "no dialog info for label " 
+                    Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                         + customInfo.getLabel());
 
                     ListAddDialog dlg = new ListAddDialog(PlatformUI
@@ -144,7 +152,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             removeButton = new Button(bcomp, SWT.PUSH);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DELETE));
-            removeButton.setToolTipText("Remove");
+            removeButton.setToolTipText(i18n.tr("Remove"));
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
             removeButton.addSelectionListener(new SelectionAdapter() {
@@ -168,7 +176,7 @@ public class EventAttrWidget extends BgcBaseWidget {
                 .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move to Top");
+            mi.setText(i18n.tr("Move to Top"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -190,7 +198,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move Up");
+            mi.setText(i18n.tr("Move Up"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -213,7 +221,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move Down");
+            mi.setText(i18n.tr("Move Down"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -236,7 +244,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             });
 
             mi = new MenuItem(m, SWT.CASCADE);
-            mi.setText("Move to Bottom");
+            mi.setText(i18n.tr("Move to Bottom"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

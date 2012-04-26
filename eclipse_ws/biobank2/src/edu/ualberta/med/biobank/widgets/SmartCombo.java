@@ -24,7 +24,7 @@ public class SmartCombo extends Composite {
 
     List<SelectionListener> listeners;
     private String[] items;
-    private Combo combo;
+    private final Combo combo;
     boolean ignore;
     boolean traversed;
     char keyPress;
@@ -135,7 +135,7 @@ public class SmartCombo extends Composite {
     }
 
     protected void reset() {
-        refineList(StringUtil.EMPTY_STRING); //$NON-NLS-1$
+        refineList(StringUtil.EMPTY_STRING);
         combo.setVisibleItemCount(combo.getItemCount());
         combo.select(0);
         Event event = new Event();

@@ -33,6 +33,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -40,6 +42,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 
 /**
  * Create widgets to show types selection for specimens on a pallet: one label,
@@ -47,6 +50,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
  * and one text showing total number of samples found
  */
 public class AliquotedSpecimenSelectionWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AliquotedSpecimenSelectionWidget.class);
     private ComboViewer cvSource;
     private ComboViewer cvResult;
     private ControlDecoration rowControlDecoration;
@@ -55,13 +60,16 @@ public class AliquotedSpecimenSelectionWidget {
     private Label textNumber;
     private Integer number;
 
-    private IObservableValue bothSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue bothSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
-    private IObservableValue sourceSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue sourceSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
-    private IObservableValue resultSelected = new WritableValue(Boolean.FALSE,
+    private final IObservableValue resultSelected = new WritableValue(
+        Boolean.FALSE,
         Boolean.class);
 
     private Binding oneRowBinding;
@@ -77,6 +85,7 @@ public class AliquotedSpecimenSelectionWidget {
     private List<SpecimenTypeWrapper> sourceChildTypes =
         new ArrayList<SpecimenTypeWrapper>();
 
+    @SuppressWarnings("nls")
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
         BgcWidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
@@ -90,12 +99,12 @@ public class AliquotedSpecimenSelectionWidget {
                 widgetCreator
                     .createLabel(
                         parent,
-                        "Source specimen");
+                        SourceSpecimen.NAME.singular().toString());
             sourceControlDecoration =
                 BgcBaseWidget
                     .createDecorator(
                         sourceLabel,
-                        "A source specimen type and an aliquoted specimen type should be selected");
+                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
         cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -104,8 +113,8 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public String getText(Object element) {
                 SpecimenWrapper spc = (SpecimenWrapper) element;
-                return spc.getSpecimenType().getNameShort() + "(" 
-                    + spc.getInventoryId() + ")"; 
+                return spc.getSpecimenType().getNameShort() + "("
+                    + spc.getInventoryId() + ")";
             }
         });
         cvSource.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -125,12 +134,12 @@ public class AliquotedSpecimenSelectionWidget {
 
         if (!oneRow) {
             resultLabel = widgetCreator.createLabel(parent,
-                "Aliquoted specimen type");
+                i18n.tr("Aliquoted specimen type"));
             resultControlDecoration =
                 BgcBaseWidget
                     .createDecorator(
                         resultLabel,
-                        "A source specimen type and an aliquoted specimen type should be selected");
+                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
         cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
             null, new BiobankLabelProvider());
@@ -151,8 +160,10 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         if (oneRow) {
-            textNumber = widgetCreator.getToolkit().createLabel(parent, StringUtil.EMPTY_STRING, 
-                SWT.BORDER);
+            textNumber =
+                widgetCreator.getToolkit().createLabel(parent,
+                    StringUtil.EMPTY_STRING,
+                    SWT.BORDER);
             GridData gd = new GridData();
             gd.widthHint = 20;
             gd.horizontalAlignment = SWT.LEFT;
@@ -161,7 +172,7 @@ public class AliquotedSpecimenSelectionWidget {
                 BgcBaseWidget
                     .createDecorator(
                         textNumber,
-                        "A source specimen type and an aliquoted specimen type should be selected");
+                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
     }
 
@@ -227,7 +238,7 @@ public class AliquotedSpecimenSelectionWidget {
     public void setNumber(Integer number) {
         if (textNumber != null) {
             this.number = number;
-            String text = StringUtil.EMPTY_STRING; 
+            String text = StringUtil.EMPTY_STRING;
             if (number != null) {
                 text = number.toString();
             }
@@ -321,12 +332,14 @@ public class AliquotedSpecimenSelectionWidget {
         final ControlDecoration decoration) {
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(new IValidator() {
+            @SuppressWarnings("nls")
             @Override
             public IStatus validate(Object value) {
                 if (value instanceof Boolean && !(Boolean) value) {
                     decoration.show();
-                    return ValidationStatus
-                        .error("Type should be selected");
+                    return ValidationStatus.error(
+                        // validation error message.
+                        i18n.tr("Type should be selected"));
                 }
                 decoration.hide();
                 return Status.OK_STATUS;

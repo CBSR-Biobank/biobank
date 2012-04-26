@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -16,6 +18,8 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
 public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTypeInfoTree.class);
 
     private static final String[] HEADINGS = new String[] {
         HasName.PropertyName.NAME.toString(),
@@ -32,6 +36,7 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
+            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 SpecimenTypeWrapper item = null;
@@ -42,7 +47,7 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
                         (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return i18n.tr("loading...");
                     }
                     return StringUtil.EMPTY_STRING;
                 }

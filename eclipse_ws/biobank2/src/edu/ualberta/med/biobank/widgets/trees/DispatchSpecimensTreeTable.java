@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -49,6 +51,8 @@ import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchSpecimensTreeTable.class);
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
@@ -56,6 +60,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private MenuItem editItem;
     private Menu menu;
 
+    @SuppressWarnings("nls")
     public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment,
         final boolean editSpecimensState) {
@@ -80,7 +85,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Type");
+        tc.setText(i18n.tr("Type"));
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
@@ -92,7 +97,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Dispatch comment");
+        tc.setText(i18n.tr("Dispatch comment"));
         tc.setWidth(100);
 
         menu = new Menu(parent);
@@ -203,10 +208,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         return null;
     }
 
+    @SuppressWarnings("nls")
     protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Modify comment");
+        item.setText(
+            // menu item label.
+            i18n.tr("Modify comment"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -216,10 +224,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    @SuppressWarnings("nls")
     private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing");
+        item.setText(
+            // menu item label.
+            i18n.tr("Set as missing"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -229,10 +240,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    @SuppressWarnings("nls")
     private void addDeleteExtraMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Delete");
+        item.setText(
+            // menu item label.
+            i18n.tr("Delete"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -285,10 +299,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         }
     }
 
+    @SuppressWarnings("nls")
     public void refresh() {
-        tv.setInput("refresh");
+        tv.setInput(i18n.tr("refresh"));
     }
 
+    @SuppressWarnings("nls")
     public void addClickListener() {
         tv.addDoubleClickListener(new IDoubleClickListener() {
             @Override
@@ -300,7 +316,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         });
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText("Edit");
+        editItem.setText(
+            // menu item label.
+            i18n.tr("Edit"));
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

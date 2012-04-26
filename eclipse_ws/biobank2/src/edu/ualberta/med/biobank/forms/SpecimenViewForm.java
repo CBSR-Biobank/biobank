@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -178,7 +179,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
             AbstractPosition.NAME.singular().toString());
         isSourceSpcButton = (Button) createLabelledWidget(client, Button.class,
-            SWT.NONE, "Source Specimen");
+            SWT.NONE, SourceSpecimen.NAME.singular().toString());
         if (!specimenWrapper.getTopSpecimen().equals(specimenWrapper)) {
             sourceInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Source Inventory ID");
