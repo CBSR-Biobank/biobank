@@ -90,11 +90,8 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        @SuppressWarnings("unchecked")
-        List<Site> sites =
-            SessionManager.getAppService()
-                .doAction(
-                    new SiteGetAllAction()).getList();
+        List<Site> sites = SessionManager.getAppService()
+            .doAction(new SiteGetAllAction()).getList();
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
             sites, SiteWrapper.class);
     }
