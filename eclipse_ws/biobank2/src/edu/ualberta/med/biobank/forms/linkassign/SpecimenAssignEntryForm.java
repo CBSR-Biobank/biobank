@@ -1198,6 +1198,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             focusControl(palletPositionText);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void reset(boolean resetAll) {
         super.reset(resetAll);
@@ -1217,7 +1218,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
-            palletLabel.setText("Pallet");
+            palletLabel.setText(i18n.tr("Pallet"));
             palletWidget.setCells(null);
             palletWidget.setContainerType(null, ScanPalletDisplay.SAMPLE_WIDTH,
                 true);

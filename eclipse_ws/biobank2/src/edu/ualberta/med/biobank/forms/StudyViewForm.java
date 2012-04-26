@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -29,10 +28,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -47,14 +48,15 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
 
 public class StudyViewForm extends BiobankViewForm {
+    public static final I18n i18n = I18nFactory.getI18n(StudyViewForm.class);
 
-    public static I18n i18n = I18nFactory.getI18n(BiobankViewForm.class);
-
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.StudyViewForm";
 
+    @SuppressWarnings("nls")
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
-        ":Date Processed";
+        i18n.tr(":Date Processed");
 
     private final StudyWrapper study =
         new StudyWrapper(SessionManager.getAppService());
@@ -79,6 +81,7 @@ public class StudyViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert
@@ -106,10 +109,11 @@ public class StudyViewForm extends BiobankViewForm {
         study.setWrappedObject(s);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
         if (study.getName() != null) {
-            form.setText(NLS.bind("Study {0}", study.getName()));
+            form.setText(i18n.tr("Study {0}", study.getName()));
         }
 
         GridLayout layout = new GridLayout(1, false);
@@ -128,9 +132,9 @@ public class StudyViewForm extends BiobankViewForm {
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             ActivityStatus.NAME.singular().toString());
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total patients");
+            i18n.tr("Total {0}", Patient.NAME.plural().toString()));
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total collection events");
+            i18n.tr("Total {0}", CollectionEvent.NAME.plural().toString()));
 
         createCommentsSection();
         createClinicSection();
@@ -152,8 +156,9 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createClinicSection() {
+        @SuppressWarnings("nls")
         Composite client =
-            createSectionWithClient("Clinic Information");
+            createSectionWithClient(i18n.tr("Clinic Information"));
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable
@@ -198,8 +203,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createAliquotedSpecimenSection() {
-        Section section =
-            createSection("Aliquoted specimen types");
+        @SuppressWarnings("nls")
+        Section section = createSection(i18n.tr("Aliquoted specimen types"));
 
         aliquotedSpecimenTable =
             new AliquotedSpecimenInfoTable(section,
@@ -210,8 +215,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimenSection() {
-        Section section =
-            createSection("Source specimen types");
+        @SuppressWarnings("nls")
+        Section section = createSection(i18n.tr("Source specimen types"));
 
         sourceSpecimenTable =
             new SourceSpecimenInfoTable(section,
@@ -221,9 +226,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
+    @SuppressWarnings("nls")
     private void createStudyEventAttrSection() throws Exception {
         Composite client =
-            createSectionWithClient("Patient Visit Information Collected");
+            createSectionWithClient(i18n
+                .tr("Patient Visit Information Collected"));
         client.setLayout(new GridLayout(1, false));
 
         StudyEventAttrCustomInfo combinedStudyEventAttrInfo;
@@ -248,8 +255,10 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         if (pvCustomInfoList.size() == 0) {
-            toolkit.createLabel(client,
-                "Study does not collect additional patient visit information");
+            toolkit
+                .createLabel(
+                    client,
+                    i18n.tr("Study does not collect additional patient visit information"));
             return;
         }
 
@@ -271,6 +280,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void setStudyEventAttrValues() throws Exception {
         for (StudyEventAttrCustomInfo pvCustomInfo : pvCustomInfoList) {
             String label = pvCustomInfo.getLabel();
@@ -283,11 +293,11 @@ public class StudyViewForm extends BiobankViewForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS
-            .bind("Study {0}", study.getNameShort()));
-        form.setText(NLS.bind("Study {0}", study.getName()));
+        setPartName(i18n.tr("Study {0}", study.getNameShort()));
+        form.setText(i18n.tr("Study {0}", study.getName()));
         setStudySectionValues();
         setStudyEventAttrValues();
         aliquotedSpecimenTable.setList(study

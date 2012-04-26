@@ -10,7 +10,6 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -71,6 +70,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenEntryForm";
 
+    @SuppressWarnings("nls")
     public static final String OK_MESSAGE = i18n.tr("Edit specimen");
 
     private final SpecimenWrapper specimen = new SpecimenWrapper(
@@ -123,11 +123,12 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText parentPEventField;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         specimenAdapter = (SpecimenAdapter) adapter;
         updateSpecimenInfo(adapter.getId());
-        setPartName("Specimen Entry");
+        setPartName(i18n.tr("Specimen Entry"));
     }
 
     private void updateSpecimenInfo(Integer id) throws ApplicationException {
@@ -166,9 +167,10 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         ((AdapterBase) adapter).setModelObject(specimen);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Specimen {0} Information",
+        form.setText(i18n.tr("Specimen {0} Information",
             specimen.getInventoryId()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true,
@@ -204,9 +206,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         }
 
         specimenTypeComboViewer = createComboViewer(client,
-            "Type", specimenTypes,
+            i18n.tr("Type"), specimenTypes,
             specimen.getSpecimenType(),
-            "Specimen must have a type",
+            i18n.tr("Specimen must have a type"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -236,7 +238,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             });
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Created",
+            i18n.tr("Created"),
             specimen.getFormattedCreatedAt());
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
@@ -271,7 +273,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         Button editSourceButton = new Button(c, SWT.NONE);
         editSourceButton
-            .setText("Change Source");
+            .setText(i18n.tr("Change Source"));
 
         toolkit.adapt(c);
 
@@ -315,8 +317,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         sourceSpecimenField.setText(newParent.specimen
                             .getInventoryId());
                         isSourceSpcButton.setSelection(false);
-                        pEventLabel
-                            .setText("Source Processing Event");
+                        pEventLabel.setText(i18n.tr("Source Processing Event"));
                     }
 
                     patientField.setText(specimen.getCollectionEvent()
@@ -331,8 +332,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                                 .getFormattedCreatedAt())
                             .append(" (")
                             .append(
-                                NLS.bind(
-                                    "worksheet: {0}",
+                                i18n.tr("worksheet: {0}",
                                     parentPEvent.getWorksheet()))
                             .append(")")
                             .toString());
@@ -344,11 +344,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         });
 
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Origin center");
+            i18n.tr("Origin center"));
         setTextValue(originCenterLabel, specimen.getOriginInfo().getCenter()
             .getNameShort());
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Current center");
+            i18n.tr("Current center"));
         setTextValue(centerLabel, getCenterString(specimen));
 
         createReadOnlyLabelledField(client, SWT.NONE,
@@ -365,7 +365,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         sourceSpecimenLabel =
             widgetCreator.createLabel(client,
-                "Source Inventory ID");
+                i18n.tr("Source Inventory ID"));
         sourceSpecimenField = createReadOnlyWidget(client, SWT.NONE,
             specimen
                 .getTopSpecimen().getInventoryId());
@@ -389,13 +389,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         createProcessingEventSection(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Children #",
+            i18n.tr("Children #"),
             String.valueOf(specimen.getChildSpecimenCollection(false).size()));
 
         activityStatusComboViewer = createComboViewer(client,
             ActivityStatus.NAME.singular().toString(),
             ActivityStatus.valuesList(), specimen.getActivityStatus(),
-            "Specimen must have an activity status",
+            i18n.tr("Specimen must have an activity status"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -409,6 +409,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         setFirstControl(specimenTypeComboViewer.getControl());
     }
 
+    @SuppressWarnings("nls")
     private static String getCenterString(SpecimenWrapper specimen) {
         CenterWrapper<?> center = specimen.getCurrentCenter();
         if (center != null) {
@@ -416,9 +417,10 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         }
         // TODO should never see that ? should never retrieve a Specimen which
         // site cannot be displayed ?
-        return "CANNOT DISPLAY INFORMATION";
+        return i18n.tr("CANNOT DISPLAY INFORMATION");
     }
 
+    @SuppressWarnings({ "nls" })
     private void createProcessingEventSection(Composite client) {
 
         // create top section
@@ -427,7 +429,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 specimen.getParentSpecimen().getProcessingEvent();
         parentPEventLabel =
             widgetCreator.createLabel(client,
-                "Source Processing Event");
+                i18n.tr("Source Processing Event"));
         String parentPEventString;
         if (parentPevent == null)
             parentPEventString = StringUtil.EMPTY_STRING;
@@ -436,8 +438,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 new StringBuilder(parentPevent.getFormattedCreatedAt())
                     .append(" (")
                     .append(
-                        NLS.bind("worksheet: {0}",
-                            parentPevent.getWorksheet()))
+                        i18n.tr("worksheet: {0}", parentPevent.getWorksheet()))
                     .append(")").toString();
         parentPEventField = createReadOnlyWidget(
             client,
@@ -455,9 +456,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         else
             peventString =
                 new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")
-                    .append(
-                        NLS.bind("worksheet: {0}",
-                            pevent.getWorksheet())).append(")").toString();
+                    .append(i18n.tr("worksheet: {0}",
+                        pevent.getWorksheet())).append(")").toString();
         pEventField = createReadOnlyWidget(
             client,
             SWT.NONE,
@@ -465,6 +465,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
         Composite client =
             createSectionWithClient(Comment.NAME.plural().toString());
@@ -482,7 +483,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         commentText =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.MULTI,
-                "Add a comment", null, comment,
+                i18n.tr("Add a comment"), null, comment,
                 "message", null);
 
     }
