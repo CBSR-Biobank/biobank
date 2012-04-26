@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -91,16 +90,13 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         @SuppressWarnings("unchecked")
         List<Site> sites =
             SessionManager.getAppService()
                 .doAction(
                     new SiteGetAllAction()).getList();
-        for (Site site : sites) {
-            wrappers.add(new SiteWrapper(SessionManager.getAppService(), site));
-        }
-        return wrappers;
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            sites, SiteWrapper.class);
     }
 
     @Override
