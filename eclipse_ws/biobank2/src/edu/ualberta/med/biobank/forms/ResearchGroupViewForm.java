@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,6 +18,8 @@ import org.supercsv.exception.SuperCSVException;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
@@ -42,6 +43,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupViewForm extends AddressViewFormCommon implements
     IBgcFileBrowserListener {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ResearchGroupViewForm.class);
+
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ResearchGroupViewForm";
 
@@ -63,6 +68,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
 
     private CommentsInfoTable commentTable;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ResearchGroupAdapter,
@@ -70,7 +76,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                 + adapter.getClass().getName());
 
         setRgInfo(adapter.getId());
-        setPartName(NLS.bind("Research Group {0}",
+        setPartName(i18n.tr("Research Group {0}",
             researchGroup.getNameShort()));
     }
 
@@ -87,9 +93,10 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Research Group {0}",
+        form.setText(i18n.tr("Research Group {0}",
             researchGroup.getName()));
 
         GridLayout layout = new GridLayout(1, false);
@@ -100,17 +107,18 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         createUploadSection();
     }
 
+    @SuppressWarnings("nls")
     private void createUploadSection() {
         Composite client =
-            createSectionWithClient("Request Upload");
+            createSectionWithClient(i18n.tr("Request Upload"));
         client.setLayout(new GridLayout(3, false));
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         toolkit.createLabel(client,
-            "Submit a request on behalf of this research group:");
+            i18n.tr("Submit a request on behalf of this research group:"));
         csvSelector =
             new BgcFileBrowser(client,
-                "CSV File", SWT.NONE,
+                i18n.tr("CSV File"), SWT.NONE,
                 new String[] { "*.csv" });
         csvSelector.addFileSelectedListener(this);
         csvSelector.adaptToToolkit(toolkit, true);
@@ -123,8 +131,8 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                     saveRequest();
                 } catch (Exception e1) {
                     BgcPlugin.openAsyncError(
-                        "Error Uploading",
-                        "There was an error creating the request.");
+                        i18n.tr("Error Uploading"),
+                        i18n.tr("There was an error creating the request."));
                 }
             }
         });
@@ -136,6 +144,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         uploadButton.setEnabled(true);
     }
 
+    @SuppressWarnings({ "nls" })
     public void saveRequest() throws Exception {
         // RequestWrapper request =
         // new RequestWrapper(SessionManager.getAppService());
@@ -168,8 +177,7 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
                     requests.add(srequest);
             }
         } catch (SuperCSVException e) {
-            throw new Exception(NLS.bind(
-                "Parse error at line {0}",
+            throw new Exception(i18n.tr("Parse error at line {0}",
                 reader.getLineNumber())
                 + "\n" + e.getCsvContext());
         } finally {
@@ -185,8 +193,10 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
             new RequestSubmitAction(researchGroup.getId(), specs);
         SessionManager.getAppService().doAction(action);
 
-        BgcPlugin.openMessage("Success",
-            "Request successfully uploaded");
+        BgcPlugin.openMessage(
+            // dialog title.
+            i18n.tr("Success"),
+            i18n.tr("Request successfully uploaded"));
         SpecimenTransitView.reloadCurrent();
     }
 
@@ -230,11 +240,12 @@ public class ResearchGroupViewForm extends AddressViewFormCommon implements
         setTextValue(activityStatusLabel, researchGroup.getActivityStatus());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind("Research Group {0}",
+        setPartName(i18n.tr("Research Group {0}",
             researchGroup.getName()));
-        form.setText(NLS.bind("Research Group {0}",
+        form.setText(i18n.tr("Research Group {0}",
             researchGroup.getName()));
         setResearchGroupValues();
         setAddressValues(researchGroup);

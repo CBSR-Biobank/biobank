@@ -19,6 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
@@ -62,11 +64,14 @@ import edu.ualberta.med.biobank.wizards.ReparentingWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenEntryForm";
 
-    public static final String OK_MESSAGE = "Edit specimen";
+    public static final String OK_MESSAGE = i18n.tr("Edit specimen");
 
     private final SpecimenWrapper specimen = new SpecimenWrapper(
         SessionManager.getAppService());

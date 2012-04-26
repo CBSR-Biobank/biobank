@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -9,6 +8,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
@@ -30,6 +31,9 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -41,6 +45,9 @@ import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewStudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
+    private static final I18n i18n = I18nFactory.getI18n(SiteViewForm.class);
+
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SiteViewForm";
 
@@ -75,6 +82,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private CommentsInfoTable commentTable;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
@@ -83,7 +91,7 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         siteAdapter = (SiteAdapter) adapter;
         updateSiteInfo();
-        setPartName(NLS.bind("Repository site {0}",
+        setPartName(i18n.tr("Repository site {0}",
             siteInfo.getSite().getNameShort()));
     }
 
@@ -95,9 +103,10 @@ public class SiteViewForm extends AddressViewFormCommon {
         site.setWrappedObject(siteInfo.getSite());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Repository site {0}", site.getName()));
+        form.setText(i18n.tr("Repository site {0}", site.getName()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -110,6 +119,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         createContainerSection();
     }
 
+    @SuppressWarnings("nls")
     private void createSiteSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
@@ -124,22 +134,22 @@ public class SiteViewForm extends AddressViewFormCommon {
                 HasNameShort.PropertyName.NAME_SHORT.toString());
         studyCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total studies");
+                i18n.tr("Total {0}", Study.NAME.plural().toString()));
         containerTypeCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 ContainerType.NAME.plural().toString());
         topContainerCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Top level containers");
+                i18n.tr("Top level containers"));
         patientCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total patients");
+                i18n.tr("Total {0}", Patient.NAME.plural().toString()));
         processingEventCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total processing events");
+                i18n.tr("Total {0}", ProcessingEvent.NAME.plural().toString()));
         specimenCountLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total specimens");
+                i18n.tr("Total {0}", Specimen.NAME.plural().toString()));
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 ActivityStatus.NAME.singular().toString());
@@ -207,9 +217,10 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(commentTable);
     }
 
+    @SuppressWarnings("nls")
     private void createContainerTypesSection() {
         Section section = createSection(ContainerType.NAME.plural().toString());
-        addSectionToolbar(section, "Add container type",
+        addSectionToolbar(section, i18n.tr("Add container type"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -239,10 +250,11 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(containerTypesTable);
     }
 
+    @SuppressWarnings("nls")
     private void createContainerSection() {
         Section section =
-            createSection("Top level containers");
-        addSectionToolbar(section, "Add container",
+            createSection(i18n.tr("Top level containers"));
+        addSectionToolbar(section, i18n.tr("Add container"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -271,11 +283,12 @@ public class SiteViewForm extends AddressViewFormCommon {
         section.setClient(topContainersTable);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind("Repository site {0}",
+        setPartName(i18n.tr("Repository site {0}",
             siteInfo.getSite().getNameShort()));
-        form.setText(NLS.bind("Repository site {0}",
+        form.setText(i18n.tr("Repository site {0}",
             siteInfo.getSite().getName()));
         setSiteSectionValues();
         setAddressValues(site);

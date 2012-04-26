@@ -15,6 +15,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -50,13 +53,18 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchSendingEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
+    @SuppressWarnings("nls")
     public static final String MSG_NEW_DISPATCH_OK =
         "Creating a new dispatch record.";
 
+    @SuppressWarnings("nls")
     public static final String MSG_DISPATCH_OK =
         "Editing an existing dispatch record.";
 
@@ -98,9 +106,10 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch Information");
+        form.setText(i18n.tr("Dispatch Information"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -134,7 +143,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 ShipmentInfo.PropertyName.WAYBILL.toString(), null,
                 shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
-            createDateTimeWidget(client, "Departed", null, shipmentInfo,
+            createDateTimeWidget(client, i18n.tr("Departed"), null,
+                shipmentInfo,
                 ShipmentInfoPeer.PACKED_AT.getName(), null);
         }
 
@@ -143,6 +153,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         createSpecimensSelectionSection();
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
         Composite client =
             createSectionWithClient(Comment.NAME.plural().toString());
@@ -157,14 +168,15 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null);
+            i18n.tr("Add a comment"), null, comment, "message", null);
 
     }
 
+    @SuppressWarnings("nls")
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
             BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Receiver");
+                SWT.NONE, Dispatch.PropertyName.RECEIVER_CENTER.toString());
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
@@ -172,12 +184,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 .isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             try {
                 destSiteComboViewer = createComboViewer(client,
-                    "Receiver",
+                    Dispatch.PropertyName.RECEIVER_CENTER.toString(),
                     CenterWrapper.getOtherCenters(SessionManager
                         .getAppService(), SessionManager.getUser()
                         .getCurrentWorkingCenter()),
                     dispatch.getReceiverCenter(),
-                    "Dispatch must have a receiver",
+                    // validation error message.
+                    i18n.tr("Dispatch must have a receiver"),
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {
@@ -189,12 +202,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             } catch (ApplicationException e) {
                 BgcPlugin
                     .openAsyncError(
-                        "Error",
-                        "Unable to retrieve Centers");
+                    // dialog message.
+                    i18n.tr("Unable to retrieve Centers"));
             }
         }
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
             Section section =
@@ -204,7 +218,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
                 addSectionToolbar(section,
-                    "Add specimens to this dispatch",
+                    i18n.tr("Add specimens to this dispatch"),
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
@@ -224,10 +238,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     protected void createSpecimensNonProcessedSection(boolean edit) {
         String title = Specimen.NAME.plural().toString();
         if (dispatch.isInCreationState()) {
-            title = "Added specimens";
+            title = i18n.tr("Added specimens");
         }
         Composite parent = createSectionWithClient(title);
         specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent,
@@ -291,6 +306,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         reloadSpecimens();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void doSpecimenTextAction(String inventoryId) {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
@@ -318,14 +334,13 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
                 break;
             case ERROR:
                 BgcPlugin.openAsyncError(
-                    "Invalid specimen",
+                    i18n.tr("Invalid specimen"),
                     res.getCell().getInformation().toString());
                 break;
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Error",
-                "Error adding the specimen", e);
+                i18n.tr("Error adding the specimen"), e);
         }
     }
 
@@ -355,10 +370,11 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         GuiUtil.reset(destSiteComboViewer, dispatch.getReceiverCenter());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTextForPartName() {
         if (dispatch.isNew()) {
-            return "New Dispatch";
+            return i18n.tr("New Dispatch");
         }
         Assert.isNotNull(dispatch, "Dispatch is null");
         String label = dispatch.getSenderCenter().getNameShort() + " -> "

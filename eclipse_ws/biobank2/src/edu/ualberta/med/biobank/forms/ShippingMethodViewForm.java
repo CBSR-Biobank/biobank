@@ -7,6 +7,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction;
@@ -17,13 +19,16 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfo
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodViewForm extends BiobankFormBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShippingMethodViewForm.class);
 
     @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ShippingMethodViewForm";
 
+    @SuppressWarnings("nls")
     public static final String OK_MESSAGE =
-        "Add or edit a shipping method";
+        i18n.tr("Add or edit a shipping method");
 
     private ShippingMethodEntryInfoTable statusWidget;
     private List<ShippingMethodWrapper> globalShippingMethods;
@@ -50,6 +55,7 @@ public class ShippingMethodViewForm extends BiobankFormBase {
         createGlobalShippingMethodSection();
     }
 
+    @SuppressWarnings("nls")
     private void createGlobalShippingMethodSection() throws Exception {
         Section section =
             createSection(ShippingMethod.NAME.singular().toString());
@@ -57,13 +63,14 @@ public class ShippingMethodViewForm extends BiobankFormBase {
             globalShippingMethods = new ArrayList<ShippingMethodWrapper>();
         }
         statusWidget = new ShippingMethodEntryInfoTable(section,
-            globalShippingMethods, "Add a new global shipping method",
-            "Edit the global shipping method");
+            globalShippingMethods,
+            i18n.tr("Add a new global shipping method"),
+            i18n.tr("Edit the global shipping method"));
         statusWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(statusWidget);
 
         addSectionToolbar(section,
-            "Add a shipping method",
+            i18n.tr("Add a shipping method"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

@@ -38,13 +38,13 @@ public class Dispatch extends AbstractBiobankModel {
         "Dispatches");
 
     @SuppressWarnings("nls")
-    public static class Property {
+    public static class PropertyName {
         public static final LString RECEIVER_CENTER = bundle.trc(
             "model",
-            "Receiver Center").format();
+            "Receiver").format();
         public static final LString SENDER_CENTER = bundle.trc(
             "model",
-            "Sender Center").format();
+            "Sender").format();
         public static final LString STATE = bundle.trc(
             "model",
             "State").format();

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,6 +12,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.export.CsvDataExporter;
@@ -29,7 +30,10 @@ import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(LoggingForm.class);
 
+    @SuppressWarnings("nls")
     public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm";
 
     private BgcBaseText userLabel;
@@ -46,17 +50,19 @@ public class LoggingForm extends BiobankViewForm {
 
     private LoggingInfoTable loggingTable;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
-        setPartName("Logging: results");
+        setPartName(i18n.tr("Logging: results"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
 
         PlatformUI.getWorkbench().getViewRegistry().find(LoggingView.ID);
 
-        form.setText("Logging: Browse through your search results");
+        form.setText(i18n.tr("Logging: Browse through your search results"));
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -86,36 +92,37 @@ public class LoggingForm extends BiobankViewForm {
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
             User.NAME.singular().toString());
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Type");
+            i18n.tr("Type"));
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Action");
+            i18n.tr("Action"));
         startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            "Start Date");
+            i18n.tr("Start Date"));
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             Patient.PropertyName.PNUMBER.toString());
         locationLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Location");
+            i18n.tr("Location"));
         inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
             Specimen.PropertyName.INVENTORY_ID.toString());
         detailsLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "Details");
+            i18n.tr("Details"));
         endDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            "End Date");
+            i18n.tr("End Date"));
 
         getSearchRequestFields();
 
         generateSearchQueryTable();
     }
 
+    @SuppressWarnings("nls")
     private void generateSearchQueryTable() {
         LogQuery.getInstance().queryDatabase();
 
         Composite client =
-            createSectionWithClient("Search Results");
+            createSectionWithClient(i18n.tr("Search Results"));
         client.setLayout(new GridLayout(1, false));
         Button button = new Button(client, SWT.PUSH);
-        button.setText("Export CSV");
+        button.setText(i18n.tr("Export CSV"));
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -131,21 +138,21 @@ public class LoggingForm extends BiobankViewForm {
         toolkit.paintBordersFor(loggingTable);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     private void export(final DataExporter exporter) {
         final Data data = new Data();
         try {
             data.setColumnNames(Arrays.asList(
                 Center.NAME.singular().toString(),
                 User.NAME.singular().toString(),
-                "Date",
-                "Action",
-                "Type",
+                i18n.tr("Date"),
+                i18n.tr("Action"),
+                i18n.tr("Type"),
                 Patient.PropertyName.PNUMBER.toString(),
                 Specimen.PropertyName.INVENTORY_ID.toString(),
-                "Location",
-                "Details"));
-            data.setTitle("Log Query: ");
+                i18n.tr("Location"),
+                i18n.tr("Details")));
+            data.setTitle(i18n.tr("Log Query: "));
 
             data.setRows((List<Object>) (List<?>) LogQuery.getInstance()
                 .getDatabaseResults());
@@ -155,15 +162,15 @@ public class LoggingForm extends BiobankViewForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                "Cannot Export", e.getMessage());
+                i18n.tr("Cannot Export"), e.getMessage());
             return;
         }
 
         // confirm exporting
         if (!MessageDialog.openQuestion(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            "Confirm Report Results Export",
-            NLS.bind("Are you sure you want to {0}?",
+            i18n.tr("Confirm Report Results Export"),
+            i18n.tr("Are you sure you want to {0}?",
                 exporter.getName()))) {
             return;
         }
@@ -174,7 +181,7 @@ public class LoggingForm extends BiobankViewForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                "Error Exporting", e.getMessage());
+                i18n.tr("Error Exporting"), e.getMessage());
             return;
         }
     }

@@ -12,12 +12,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
@@ -49,6 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -68,13 +70,18 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ShipmentEntryForm";
 
+    @SuppressWarnings("nls")
     public static final String MSG_NEW_SHIPMENT_OK =
         "Creating a new shipment record.";
 
+    @SuppressWarnings("nls")
     public static final String MSG_SHIPMENT_OK =
         "Editing an existing shipment record.";
 
@@ -90,11 +97,14 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NonEmptyStringValidator waybillValidator;
 
+    @SuppressWarnings("nls")
     private static final String WAYBILL_BINDING = "shipment-waybill-binding";
 
+    @SuppressWarnings("nls")
     private static final String DATE_SHIPPED_BINDING =
         "shipment-date-shipped-binding";
 
+    @SuppressWarnings("nls")
     private static final String BOX_NUMBER_BINDING = "box-number-binding";
 
     private DateTimeWidget dateSentWidget;
@@ -131,6 +141,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private List<SpecimenInfo> specimens;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
@@ -144,10 +155,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (oiInfo == null) {
-            tabName = "New Shipment";
+            tabName = i18n.tr("New Shipment");
         } else {
             tabName =
-                NLS.bind("Shipment {0}", originInfo
+                i18n.tr("Shipment {0}", originInfo
                     .getShipmentInfo().getFormattedDateReceived());
         }
         setPartName(tabName);
@@ -181,6 +192,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() throws Exception, ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -190,10 +202,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         senderComboViewer =
-            createComboViewer(client, "Sender",
+            createComboViewer(client,
+                Dispatch.PropertyName.SENDER_CENTER.toString(),
                 ClinicWrapper.getAllClinics(SessionManager.getAppService()),
                 (ClinicWrapper) originInfo.getCenter(),
-                "A sender center should be selected",
+                // validation error message.
+                i18n.tr("A sender center should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -206,10 +220,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         receiverComboViewer =
             createComboViewer(client,
-                "Receiver",
+                Dispatch.PropertyName.RECEIVER_CENTER.toString(),
                 SiteQuery.getSites(SessionManager.getAppService()),
                 originInfo.getReceiverSite(),
-                "A receiving site should be selected",
+                // validation error message.
+                i18n.tr("A receiving site should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -225,7 +240,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator =
             new NonEmptyStringValidator(
-                "A waybill should be set");
+                // validation error message.
+                i18n.tr("A waybill should be set"));
         waybillWidget =
             (BgcBaseText) createBoundWidget(client, BgcBaseText.class,
                 SWT.NONE, waybillLabel, new String[0],
@@ -253,12 +269,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         departedLabel =
             widgetCreator.createLabel(client,
-                "Packed");
+                i18n.tr("Packed"));
         departedLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         departedValidator =
             new NotNullValidator(
-                "Date Packed should be set");
+                // validation error message.
+                i18n.tr("Date Packed should be set"));
 
         dateSentWidget =
             createDateTimeWidget(client, departedLabel,
@@ -271,7 +288,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         boxLabel =
             widgetCreator.createLabel(client,
-                "Box Number");
+                i18n.tr("Box Number"));
         boxLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
         boxNumberWidget =
             (BgcBaseText) createBoundWidget(client, BgcBaseText.class,
@@ -284,11 +301,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             activateWidgets(clinic.getSendsShipments());
         }
 
-        createDateTimeWidget(client, "Received",
+        createDateTimeWidget(client, i18n.tr("Received"),
             shipmentInfo.getReceivedAt(),
             shipmentInfo,
             ShipmentInfoPeer.RECEIVED_AT.getName(), new NotNullValidator(
-                "Date Received should be set"));
+                i18n.tr("Date Received should be set")));
 
         createCommentSection();
 
@@ -339,6 +356,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         form.layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimensSection() {
         Composite client =
             createSectionWithClient(Specimen.NAME.plural().toString());
@@ -373,7 +391,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             });
 
         specimenEntryWidget.addBinding(widgetCreator,
-            "Specimens should be added to a shipment");
+            i18n.tr("Specimens should be added to a shipment"));
 
         VetoListener<ItemAction, SpecimenWrapper> vetoListener =
             new VetoListener<ItemAction, SpecimenWrapper>() {
@@ -385,26 +403,31 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     case PRE_ADD:
                         if (specimen == null)
                             throw new VetoException(
-                                "No specimen found for that inventory id.");
+                                // exception message.
+                                i18n.tr("No specimen found for that inventory id."));
                         if (!SessionManager.getUser().getCurrentWorkingCenter()
                             .equals(specimen.getCurrentCenter()))
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "Specimen ''{0}'' is currently in center ''{1}''. You can create shipments only for specimens that are currently in you center.",
                                     specimen.getInventoryId(), specimen
                                         .getCurrentCenter().getNameShort()));
                         if (specimen.isUsedInDispatch())
                             throw new VetoException(
-                                "Specimen is currently listed in a dispatch.");
+                                // exception message.
+                                i18n.tr("Specimen is currently listed in a dispatch."));
                         if (specimen.getParentContainer() != null)
                             throw new VetoException(
-                                "Specimen is currently listed as stored in a container.");
+                                // exception message.
+                                i18n.tr("Specimen is currently listed as stored in a container."));
                         if (specimen.getOriginInfo() != null
                             && specimen.getOriginInfo().getShipmentInfo() != null
                             && !specimen.getOriginInfo().getShipmentInfo()
                                 .equals(shipmentInfo))
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "Specimen is currently part of another shipment: {0}. You must remove this specimen from that shipment before it can be added to this one.",
                                     specimen.getOriginInfo().getShipmentInfo()));
                         break;
@@ -425,7 +448,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                                     removedSpecimensToPersist.add(specimen);
                                 } else {
                                     throw new VetoException(
-                                        "Must select a new center for this specimen to originate from.");
+                                        // exception message.
+                                        i18n.tr(
+                                            "Must select a new center for this specimen to originate from."));
                                 }
                             } catch (ApplicationException e) {
                                 throw new VetoException(e.getMessage());
@@ -451,6 +476,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         specimenEntryWidget.setSpecimens(specimens);
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
         Composite client =
             createSectionWithClient(Comment.NAME.plural().toString());
@@ -466,7 +492,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.MULTI, "Add a comment", null, comment, "message", null);
+            SWT.MULTI, i18n.tr("Add a comment"), null, comment, "message", null);
 
     }
 

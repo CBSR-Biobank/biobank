@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
@@ -27,6 +28,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -40,7 +42,10 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ShipmentViewForm";
 
@@ -70,6 +75,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private List<SpecimenInfo> specimens;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
@@ -151,6 +157,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             });
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -161,10 +168,10 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         senderLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Sender");
+                Dispatch.PropertyName.SENDER_CENTER.toString());
         receiverLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Receiver");
+                Dispatch.PropertyName.RECEIVER_CENTER.toString());
         waybillLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 ShipmentInfo.PropertyName.WAYBILL.toString());
@@ -174,14 +181,14 @@ public class ShipmentViewForm extends BiobankViewForm {
         if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    "Packed");
+                    i18n.tr("Packed"));
         }
         boxNumberLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Box number");
+                i18n.tr("Box number"));
         dateReceivedLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Received");
+                i18n.tr("Received"));
 
         createCommentSection();
 
@@ -212,7 +219,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
         SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : StringUtil.EMPTY_STRING);
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName()
+            : StringUtil.EMPTY_STRING);
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
@@ -235,14 +243,16 @@ public class ShipmentViewForm extends BiobankViewForm {
         specimenTable.setList(specimens);
     }
 
+    @SuppressWarnings("nls")
     private void setPartName() {
-        setPartName(NLS.bind("Shipment {0}", originInfo
+        setPartName(i18n.tr("Shipment {0}", originInfo
             .getShipmentInfo().getFormattedDateReceived()));
     }
 
+    @SuppressWarnings("nls")
     private void setFormText() {
         if (!form.isDisposed()) {
-            form.setText(NLS.bind("Shipment received on {0} from {1}",
+            form.setText(i18n.tr("Shipment received on {0} from {1}",
                 originInfo.getShipmentInfo().getFormattedDateReceived(),
                 originInfo.getCenter().getNameShort()));
         }

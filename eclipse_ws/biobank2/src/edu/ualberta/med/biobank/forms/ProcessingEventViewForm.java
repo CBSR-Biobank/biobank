@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
@@ -37,7 +38,10 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class ProcessingEventViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ProcessingEventViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ProcessingEventViewForm";
 
@@ -58,6 +62,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private List<SpecimenInfo> specimens;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ProcessingEventAdapter),
@@ -65,7 +70,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
         setPEventInfo(adapter.getId());
 
-        setPartName(NLS.bind("Processing event for date {0}",
+        setPartName(i18n.tr("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
     }
 
@@ -85,9 +90,10 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Processing event for date {0}",
+        form.setText(i18n.tr("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -96,6 +102,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         setValues();
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -111,7 +118,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             createReadOnlyLabelledField(client, SWT.NONE,
                 ProcessingEvent.PropertyName.WORKSHEET.toString());
         dateCreationLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Start time");
+            createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("Start time"));
         activityLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
                 ActivityStatus.NAME.singular().toString());
@@ -128,11 +135,12 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(commentTable);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind("Processing event for date {0}",
+        setPartName(i18n.tr("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
-        form.setText(NLS.bind("Processing event for date {0}",
+        form.setText(i18n.tr("Processing event for date {0}",
             DateFormatter.formatAsDateTime(pevent.getCreatedAt())));
         sourceSpecimenTable.setList(specimens);
         commentTable.setList(pevent.getCommentCollection(false));
