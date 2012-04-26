@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -31,7 +31,8 @@ public class ProcessingEventGroup extends AdapterBase {
         try {
             this.createAllowed =
                 SessionManager.getAppService().isAllowed(
-                    new DispatchCreatePermission(SessionManager.getUser()
+                    new ProcessingEventCreatePermission(SessionManager
+                        .getUser()
                         .getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");

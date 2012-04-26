@@ -55,7 +55,8 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     public boolean isAllowed(ActionContext context) {
         Permission permission;
         if (peventId == null) {
-            permission = new ProcessingEventCreatePermission();
+            permission =
+                new ProcessingEventCreatePermission(centerId);
         } else {
             permission = new ProcessingEventUpdatePermission(peventId);
         }

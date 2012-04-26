@@ -45,7 +45,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         if (session != null) {
             session.rebuild();
         }
-        if (SessionManager.isSuperAdminMode())
+        if (SessionManager.getUser().getCurrentWorkingCenter() == null)
             setPartName(Messages.SessionsView_admin_title);
         else
             setPartName(Messages.SessionsView_center_admin_title);

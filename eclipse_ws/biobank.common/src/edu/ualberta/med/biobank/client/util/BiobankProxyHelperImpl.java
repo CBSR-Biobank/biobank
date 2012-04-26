@@ -28,8 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 
 public class BiobankProxyHelperImpl extends ProxyHelperImpl {
-    private static Logger log = LoggerFactory.getLogger(ProxyHelperImpl.class
-        .getName());
+    private static Logger log = LoggerFactory
+        .getLogger(BiobankProxyHelperImpl.class
+            .getName());
 
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {
@@ -260,7 +261,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             if (obj instanceof AbstractBiobankListProxy)
                 ((AbstractBiobankListProxy<?>) obj).setAppService(as);
 
-            if (!Collection.class.isAssignableFrom(field.getType())) { //$NON-NLS-1$
+            if (!Collection.class.isAssignableFrom(field.getType())) {
                 Collection<?> results = (Collection<?>) obj;
                 if (results.size() == 1)
                     value = results.iterator().next();

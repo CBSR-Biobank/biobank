@@ -21,12 +21,16 @@ public class SiteGetTopContainersAction implements
     // tree adapter needing to know this to display additional menu selections
     // when a right click is done on a container node.
     //
+    // Also has to initialize containerType.childContainerTypes to support
+    // container drag and drop.
+    //
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String SELECT_TOP_CONTAINERS_HQL = 
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
+            + " INNER JOIN FETCH containerType.childContainerTypes"
             + " INNER JOIN FETCH container.site site"
             + " LEFT JOIN FETCH container.specimenPositions"
             + " WHERE site.id = ?"

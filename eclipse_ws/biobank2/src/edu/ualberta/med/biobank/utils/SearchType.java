@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -52,7 +51,7 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 SpecimenByPositionSearchAction action =
                     new SpecimenByPositionSearchAction(searchString,
-                        (SiteWrapper) center);
+                        center.getId());
                 return wrapIds(SessionManager.getAppService()
                     .doAction(action).getList(), SpecimenWrapper.class);
             }
@@ -88,7 +87,7 @@ public enum SearchType {
             if (center instanceof SiteWrapper) {
                 ContainerByBarcodeSearchAction action =
                     new ContainerByBarcodeSearchAction(searchString,
-                        (SiteWrapper) center);
+                        center.getId());
                 List<ModelWrapper<?>> list =
                     new ArrayList<ModelWrapper<?>>(
                         ModelWrapper.wrapModelCollection(SessionManager
@@ -108,7 +107,7 @@ public enum SearchType {
             CenterWrapper<?> center) throws Exception {
             PEventByWSSearchAction action =
                 new PEventByWSSearchAction(searchString,
-                    (Site) center.getWrappedObject());
+                    center.getId());
             return wrapIds(SessionManager.getAppService()
                 .doAction(action).getList(), ProcessingEventWrapper.class);
         }

@@ -47,7 +47,6 @@ public class PerspectiveSecurity {
                 for (Entry<String, List<String>> entry : map.entrySet()) {
                     boolean show = true;
                     if (user.getCurrentWorkingCenter() == null
-                        && user.isInSuperAdminMode()
                         && ProcessingPerspective.ID.equals(perspectiveId)) {
                         show = false;
                     }

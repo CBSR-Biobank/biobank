@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -27,22 +28,28 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
-    private Boolean createAllowed;
+    private Boolean readAllowed;
+    private Boolean addAllowed;
 
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
         setLabel(Messages.ShipmentTodayNode_today_label);
         try {
-            this.createAllowed = false;
-
+            this.readAllowed = false;
+            this.addAllowed = false;
             if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
-                this.createAllowed =
+                this.readAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new OriginInfoReadPermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getWrappedObject()));
+                this.addAllowed =
                     SessionManager.getAppService().isAllowed(
                         new OriginInfoUpdatePermission(SessionManager.getUser()
                             .getCurrentWorkingCenter().getId()));
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0, Messages.ShipmentTodayNode_1);
+            BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0,
+                Messages.ShipmentTodayNode_1);
         }
     }
 
@@ -61,7 +68,8 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     protected List<OriginInfoWrapper> getTodayElements()
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().getCurrentWorkingCenter() != null)
+            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            && readAllowed)
             return OriginInfoWrapper.getTodayShipments(SessionManager
                 .getAppService(), SessionManager.getUser()
                 .getCurrentWorkingCenter());
@@ -89,7 +97,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (createAllowed) {
+        if (addAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ShipmentTodayNode_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
