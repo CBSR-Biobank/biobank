@@ -2008,7 +2008,7 @@
       <sourceProvider
             provider="edu.ualberta.med.biobank.sourceproviders.UserState">
          <variable
-               name="biobank2.variable1"
+               name="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
