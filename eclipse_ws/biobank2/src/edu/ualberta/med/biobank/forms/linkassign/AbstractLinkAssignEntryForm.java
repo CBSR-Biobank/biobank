@@ -403,7 +403,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-<<<<<<< HEAD
         log.debug("manageDoubleClick");
 
         PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
