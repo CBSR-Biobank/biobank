@@ -58,9 +58,9 @@
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"
                   outputDirectory="${po.output.dir}"
-                  percentage="65"/>
+                  percentage="5"/>
       <jar destfile="jars/messages.jar"
-           basedir="${po.dir}"
+           basedir="${po.output.dir}"
            includes="i18n/**"/>
   </target>
 </project>
