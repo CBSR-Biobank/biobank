@@ -162,13 +162,14 @@ public class BbpdbConsent {
                     + " does not have any collection events");
             }
 
-            if (entry.getKey().equals("1532")) {
-                LOGGER.info("HERE");
-            }
-
             for (CollectionEventWrapper ce : cevents) {
-                Date ceDateDrawn = DateFormatter.parseToDateTime(DateFormatter
-                    .formatAsDateTime(ce.getMinSourceSpecimenDate()));
+                Date ceDateDrawn = DateFormatter.dateNoSeconds(ce
+                    .getMinSourceSpecimenDate());
+
+                LOGGER.info("checking collection event for patient "
+                    + pt.getPnumber() + " and cevent with date drawn "
+                    + DateFormatter.formatAsDateTime(ceDateDrawn));
+
                 if (entry.getValue().keySet().contains(ceDateDrawn)) {
                     // mark visit as found
                     entry.getValue().put(ceDateDrawn, true);
@@ -196,6 +197,9 @@ public class BbpdbConsent {
                 }
             }
         }
+
+        LOGGER.info("must update " + ceventsToCorrect.size()
+            + " consent entries");
 
         for (Entry<String, Map<Date, Boolean>> entry : consentData.entrySet()) {
             for (Date dateDrawn : entry.getValue().keySet()) {

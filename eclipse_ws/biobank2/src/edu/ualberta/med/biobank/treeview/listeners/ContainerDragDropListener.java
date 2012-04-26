@@ -13,6 +13,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -21,6 +22,9 @@ public class ContainerDragDropListener implements DropTargetListener,
     DragSourceListener {
     private static final I18n i18n = I18nFactory
         .getI18n(ContainerDragDropListener.class);
+
+    protected static BgcLogger log = BgcLogger
+        .getLogger(ContainerDragDropListener.class.getName());
 
     private final TreeViewer treeViewer;
 
@@ -71,8 +75,10 @@ public class ContainerDragDropListener implements DropTargetListener,
             if ((wrapper instanceof ContainerWrapper)) {
                 try {
                     ContainerWrapper container = (ContainerWrapper) wrapper;
+
                     if (container.getContainerType()
                         .getChildContainerTypeCollection().size() != 0) {
+
                         if (container.getContainerType()
                             .getChildContainerTypeCollection()
                             .contains(srcContainer.getContainerType())) {

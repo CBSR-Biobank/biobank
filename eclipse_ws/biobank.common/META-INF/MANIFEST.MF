@@ -180,6 +180,7 @@ Export-Package: antlr;
  org.springframework.remoting;uses:="org.springframework.core",
  org.xnap.commons.i18n
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: edu.ualberta.med.biobank.common,edu.ualberta.med.bioba
- nk.model
+Import-Package: edu.ualberta.med.biobank.common,
+ edu.ualberta.med.biobank.common.util,
+ edu.ualberta.med.biobank.model
 

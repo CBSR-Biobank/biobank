@@ -9,7 +9,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerByBarcodeSearchAction implements
@@ -28,9 +27,9 @@ public class ContainerByBarcodeSearchAction implements
     private Integer currentCenter;
 
     public ContainerByBarcodeSearchAction(String barcode,
-        SiteWrapper site) {
+        Integer currentCenter) {
         this.barcode = barcode;
-        this.currentCenter = site.getId();
+        this.currentCenter = currentCenter;
     }
 
     @Override

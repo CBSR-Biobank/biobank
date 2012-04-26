@@ -153,8 +153,16 @@ public class ProcessingView extends AbstractAdministrationView {
     @Override
     public void reload() {
         if (processingNode == null) createNodes();
-        for (AbstractAdapterBase adaper : processingNode.getChildren()) {
-            adaper.rebuild();
+        try {
+            for (AbstractAdapterBase adaper : processingNode.getChildren()) {
+                ((AdapterBase) adaper).resetObject();
+            }
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new ProcessingEventReadPermission(SessionManager
+                    .getUser()
+                    .getCurrentWorkingCenter().getWrappedObject())));
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
         }
         try {
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(

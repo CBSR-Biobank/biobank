@@ -28,8 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 
 public class BiobankProxyHelperImpl extends ProxyHelperImpl {
-    private static Logger log = LoggerFactory.getLogger(ProxyHelperImpl.class
-        .getName());
+    private static Logger log = LoggerFactory
+        .getLogger(BiobankProxyHelperImpl.class
+            .getName());
 
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {

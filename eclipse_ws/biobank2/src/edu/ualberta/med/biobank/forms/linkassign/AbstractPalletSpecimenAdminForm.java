@@ -45,11 +45,11 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResu
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -498,8 +498,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void scanTubeAlone(MouseEvent e) {
-        if (isScanHasBeenLaunched())
-            palletScanManagement.scanTubeAlone(e);
+        palletScanManagement.scanTubeAlone(e);
     }
 
     @SuppressWarnings("nls")
@@ -507,8 +506,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         throws Exception {
         appendLog(NLS.bind(
             "Tube {0} scanned and set to position {1}",
-            palletCell.getValue(), ContainerLabelingSchemeWrapper
-                .rowColToSbs(palletCell.getRowColPos())));
+            palletCell.getValue(),
+            palletScanManagement.getContainerType().getPositionString(
+                palletCell.getRowColPos())));
         beforeScanTubeAlone();
         CellProcessResult res = (CellProcessResult) SessionManager
             .getAppService()
@@ -640,7 +640,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     .subTask(
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
-                        ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                        palletScanManagement.getContainerType()
+                            .getPositionString(rcp)));
                 PalletCell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
@@ -687,9 +688,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void initCellsWithContainer(
         ContainerWrapper currentMultipleContainer) {
-        if (currentMultipleContainer != null)
+        if (currentMultipleContainer != null) {
             palletScanManagement
                 .initCellsWithContainer(currentMultipleContainer);
+        }
     }
 
+    protected void setContainerType(ContainerType type) {
+        palletScanManagement.setContainerType(type);
+    }
 }

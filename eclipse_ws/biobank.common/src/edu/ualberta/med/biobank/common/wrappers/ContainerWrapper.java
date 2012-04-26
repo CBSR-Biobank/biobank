@@ -876,9 +876,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 if (res.length() != 0)
                     res.append(", ");
 
-                if (crop < positionText.length())
+                if (crop < positionText.length()) {
                     res.append(positionText.substring(0, positionText.length()
                         - crop));
+                    res.append("(");
+                    res.append(positionText.substring(positionText.length()
+                        - crop));
+                    res.append(")");
+                }
             }
 
             String errorMsg;

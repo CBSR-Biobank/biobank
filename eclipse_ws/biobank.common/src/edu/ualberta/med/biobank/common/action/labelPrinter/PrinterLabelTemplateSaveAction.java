@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.common.action.labelPrinter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -11,11 +14,14 @@ import edu.ualberta.med.biobank.model.PrinterLabelTemplate;
 public class PrinterLabelTemplateSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
+    private static Logger log = LoggerFactory
+        .getLogger(PrinterLabelTemplateSaveAction.class.getName());
+
     private Integer id = null;
-    private String name;
-    private String printerName;
-    private String configData;
-    private JasperTemplate jasperTemplate;
+    private final String name;
+    private final String printerName;
+    private final String configData;
+    private final JasperTemplate jasperTemplate;
 
     public PrinterLabelTemplateSaveAction(
         PrinterLabelTemplate printerLabelTemplate) {
@@ -34,6 +40,8 @@ public class PrinterLabelTemplateSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
+        log.debug("run: id={} name={}", id, name);
+
         PrinterLabelTemplate printerLabelTemplate =
             context.get(PrinterLabelTemplate.class, id,
                 new PrinterLabelTemplate());

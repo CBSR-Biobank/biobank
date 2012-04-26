@@ -29,13 +29,15 @@ public class PrinterLabelTemplateWrapper extends
     private static final String TEMPLATES_QRY = "from " //$NON-NLS-1$
         + PrinterLabelTemplate.class.getName();
 
+    @Deprecated
     public static List<PrinterLabelTemplateWrapper> getAllTemplates(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(TEMPLATES_QRY);
 
         HQLCriteria criteria = new HQLCriteria(qry.toString());
         List<PrinterLabelTemplate> templates = appService.query(criteria);
-        List<PrinterLabelTemplateWrapper> wrappers = new ArrayList<PrinterLabelTemplateWrapper>();
+        List<PrinterLabelTemplateWrapper> wrappers =
+            new ArrayList<PrinterLabelTemplateWrapper>();
         for (PrinterLabelTemplate t : templates) {
             wrappers.add(new PrinterLabelTemplateWrapper(appService, t));
         }
@@ -45,6 +47,7 @@ public class PrinterLabelTemplateWrapper extends
     private static final String TEMPLATE_NAMES_QRY = "select name from " //$NON-NLS-1$
         + PrinterLabelTemplate.class.getName();
 
+    @Deprecated
     public static List<String> getTemplateNames(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(TEMPLATE_NAMES_QRY);
@@ -56,6 +59,7 @@ public class PrinterLabelTemplateWrapper extends
     private static final String TEMPLATE_BY_NAME_QRY = "from " //$NON-NLS-1$
         + PrinterLabelTemplate.class.getName() + " where name=?"; //$NON-NLS-1$
 
+    @Deprecated
     public static PrinterLabelTemplateWrapper getTemplateByName(
         WritableApplicationService appService, String name)
         throws ApplicationException {

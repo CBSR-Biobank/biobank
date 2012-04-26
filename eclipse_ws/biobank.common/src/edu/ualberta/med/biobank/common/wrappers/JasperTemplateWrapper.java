@@ -23,13 +23,15 @@ public class JasperTemplateWrapper extends JasperTemplateBaseWrapper {
     private static final String TEMPLATES_QRY = "from " //$NON-NLS-1$
         + JasperTemplate.class.getName();
 
+    @Deprecated
     public static List<JasperTemplateWrapper> getAllTemplates(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(TEMPLATES_QRY);
 
         HQLCriteria criteria = new HQLCriteria(qry.toString());
         List<JasperTemplate> templates = appService.query(criteria);
-        List<JasperTemplateWrapper> wrappers = new ArrayList<JasperTemplateWrapper>();
+        List<JasperTemplateWrapper> wrappers =
+            new ArrayList<JasperTemplateWrapper>();
         for (JasperTemplate t : templates) {
             wrappers.add(new JasperTemplateWrapper(appService, t));
         }
@@ -50,6 +52,7 @@ public class JasperTemplateWrapper extends JasperTemplateBaseWrapper {
     private static final String TEMPLATE_BY_NAME_QRY = "from " //$NON-NLS-1$
         + JasperTemplate.class.getName() + " where name=?"; //$NON-NLS-1$
 
+    @Deprecated
     public static JasperTemplateWrapper getTemplateByName(
         WritableApplicationService appService, String name)
         throws ApplicationException {

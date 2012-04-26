@@ -273,6 +273,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
+        if (row == -1 || col == -1) return null;
         return new RowColPos(row, col);
     }
 
@@ -294,7 +295,9 @@ public class ContainerLabelingSchemeWrapper extends
             throw new Exception("binPos has an invalid length: " + pos);
         }
         int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
+        if (row == -1) return null;
         int col = Integer.parseInt(pos.substring(1)) - 1;
+        if (row == -1 || col == -1) return null;
         return new RowColPos(row, col);
     }
 
@@ -303,8 +306,11 @@ public class ContainerLabelingSchemeWrapper extends
      * standard. 2:1 will return C2.
      */
     public static String rowColToSbs(RowColPos rcp) {
-        return SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
-            + String.valueOf(rcp.getCol() + 1);
+        if (rcp.getRow() < 0
+            || rcp.getRow() > SBS_ROW_LABELLING_PATTERN.length() - 1)
+            return null;
+        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
+            + (rcp.getCol() + 1);
     }
 
     /**
@@ -312,8 +318,11 @@ public class ContainerLabelingSchemeWrapper extends
      * standard. 2:1 will return C2.
      */
     private static String rowColtoCbsrSbs(RowColPos rcp) {
-        return BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
-            + String.valueOf(rcp.getCol() + 1);
+        if (rcp.getRow() < 0
+            || rcp.getRow() > BOX81_LABELLING_PATTERN.length() - 1)
+            return null;
+        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
+            + (rcp.getCol() + 1);
     }
 
     /**
@@ -554,6 +563,7 @@ public class ContainerLabelingSchemeWrapper extends
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
+        if (letterPosition == -1) return null;
         Integer row = letterPosition / totalCol;
         Integer col = letterPosition % totalCol;
         RowColPos rowColPos = new RowColPos(row, col);

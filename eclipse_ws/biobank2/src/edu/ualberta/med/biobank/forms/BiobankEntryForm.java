@@ -173,12 +173,23 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                         // not when the form close)
                         SessionManager.updateAllSimilarNodes(adapter, true);
                         monitor.done();
+
+                        Display.getDefault().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    doAfterSave();
+                                } catch (Exception e) {
+                                    setDirty(true);
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
                     } catch (Exception ex) {
                         saveErrorCatch(ex, monitor, true);
                     }
                 }
             });
-            doAfterSave();
         } catch (Exception e) {
             setDirty(true);
             throw new RuntimeException(e);
@@ -205,6 +216,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     /**
+     * Invoked in GUI thread.
+     * 
      * Called after the monitor start. Can be used to get values on the GUI
      * objects.
      */

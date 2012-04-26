@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -120,10 +119,14 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
                     scanCell.getExpectedSpecimenId());
         }
         String value = scanCell.getValue();
-        String positionString = data
-            .getPalletLabel(session)
-            + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
-                .getRow(), scanCell.getCol()));
+        String positionString =
+            data
+                .getPalletLabel(session)
+                + data.getContainerType(session, actionContext)
+                    .getPositionString(
+                        new RowColPos(
+                            scanCell
+                                .getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
             updateCellAsMissing(positionString, scanCell, expectedSpecimen,
                 movedAndMissingSpecimensFromPallet);

@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 
@@ -26,12 +27,15 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     private BgcBaseText valueText;
     private final RowColPos position;
     private final Map<RowColPos, PalletCell> cells;
+    private final ContainerType type;
 
     public ScanOneTubeDialog(Shell parentShell,
-        Map<RowColPos, PalletCell> cells, RowColPos rcp) {
+        Map<RowColPos, PalletCell> cells, RowColPos rcp,
+        ContainerType type) {
         super(parentShell);
         this.cells = cells;
         this.position = rcp;
+        this.type = type;
     }
 
     @Override

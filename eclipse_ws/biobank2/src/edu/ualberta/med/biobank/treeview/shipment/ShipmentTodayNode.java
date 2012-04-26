@@ -14,6 +14,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -31,17 +32,22 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     private static final I18n i18n = I18nFactory
         .getI18n(ShipmentTodayNode.class);
 
-    private Boolean createAllowed;
+    private Boolean readAllowed;
+    private Boolean addAllowed;
 
     @SuppressWarnings("nls")
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
         setLabel(i18n.tr("Today's shipments"));
         try {
-            this.createAllowed = false;
-
+            this.readAllowed = false;
+            this.addAllowed = false;
             if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
-                this.createAllowed =
+                this.readAllowed =
+                    SessionManager.getAppService().isAllowed(
+                        new OriginInfoReadPermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getWrappedObject()));
+                this.addAllowed =
                     SessionManager.getAppService().isAllowed(
                         new OriginInfoUpdatePermission(SessionManager.getUser()
                             .getCurrentWorkingCenter().getId()));
@@ -66,7 +72,8 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     protected List<OriginInfoWrapper> getTodayElements()
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().getCurrentWorkingCenter() != null)
+            && SessionManager.getUser().getCurrentWorkingCenter() != null
+            && readAllowed)
             return OriginInfoWrapper.getTodayShipments(SessionManager
                 .getAppService(), SessionManager.getUser()
                 .getCurrentWorkingCenter());
@@ -95,7 +102,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (createAllowed) {
+        if (addAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(
                 // menu item label.

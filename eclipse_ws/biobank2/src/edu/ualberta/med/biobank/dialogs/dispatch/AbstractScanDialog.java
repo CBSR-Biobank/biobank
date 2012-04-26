@@ -100,6 +100,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         palletScanManagement = new PalletScanManagement() {
 
             @Override
+            public boolean isScanTubeAloneMode() {
+                // FIXME: see issue #1230. always activate this mode
+                return true;
+            }
+
+            @Override
             protected void beforeThreadStart() {
                 AbstractScanDialog.this.beforeScanThreadStart();
             }

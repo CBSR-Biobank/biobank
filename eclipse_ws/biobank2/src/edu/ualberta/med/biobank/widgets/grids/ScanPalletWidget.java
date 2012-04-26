@@ -45,8 +45,9 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
     public void initDisplayFromType(boolean createDefaultContainer,
         Integer cellSize) {
         ScanPalletDisplay display = (ScanPalletDisplay) getContainerDisplay();
-        if (containerType == null)
-            display.setDefaultStorageSize();
+        if (containerType == null) {
+            setContainerDisplay(new ScanPalletDisplay(this));
+        }
         else
             display.setContainerType(containerType);
         display.setCellWidth(cellSize);

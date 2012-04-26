@@ -294,7 +294,7 @@ public abstract class AbstractAdapterBase implements
     }
 
     public void performDoubleClick() {
-        executeDoubleClick();
+        if (isReadable()) executeDoubleClick();
     }
 
     public abstract void performExpand();
