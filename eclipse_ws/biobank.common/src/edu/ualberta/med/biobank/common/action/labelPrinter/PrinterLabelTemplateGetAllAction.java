@@ -31,6 +31,7 @@ public class PrinterLabelTemplateGetAllAction implements
         return new LabelPrintingPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ListResult<PrinterLabelTemplate> run(ActionContext context)
         throws ActionException {

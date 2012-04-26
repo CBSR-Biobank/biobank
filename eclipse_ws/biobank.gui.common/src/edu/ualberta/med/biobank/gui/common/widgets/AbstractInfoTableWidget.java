@@ -152,6 +152,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         // This code serves to provide menus on a selection basis, with
         // permission checking
         menu.addListener(SWT.Show, new Listener() {
+            @SuppressWarnings("nls")
             @Override
             public void handleEvent(Event event) {
                 try {
@@ -191,8 +192,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                         });
                     }
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error",
-                        "Unable to load menu for selection", e);
+                    BgcPlugin.openAsyncError(
+                        // dialog message.
+                        i18n.tr("Unable to load menu for selection"), e);
                 }
                 BgcClipboard.addClipboardCopySupport(tableViewer, menu,
                     labelProvider,
@@ -395,14 +397,15 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
      */
     public abstract T getSelection();
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     public void doubleClick() {
         // get selection as derived class object
         Object selection = getSelection();
         try {
             if (!canView(getSelection())) return;
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", "Unable to open form.", e);
+            BgcPlugin.openAsyncError(
+                i18n.tr("Unable to open form."), e);
         }
         final InfoTableEvent<T> event = new InfoTableEvent<T>(this,
             new InfoTableSelection(selection));

@@ -46,6 +46,7 @@ public class PalletScanManagement {
     private final boolean scanTubeAloneMode = true;
     private ContainerType type;
 
+    @SuppressWarnings("nls")
     public PalletScanManagement() {
         try {
             this.type =

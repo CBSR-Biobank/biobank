@@ -17,6 +17,7 @@ public class CommentWrapper extends CommentBaseWrapper {
         super(appService, comment);
     }
 
+    @SuppressWarnings("nls")
     public static String commentListToString(List<CommentWrapper> comments) {
         StringBuilder sb = new StringBuilder();
         for (CommentWrapper comment : comments) {

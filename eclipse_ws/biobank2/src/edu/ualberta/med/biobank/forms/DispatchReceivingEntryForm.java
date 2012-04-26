@@ -15,6 +15,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -37,7 +39,10 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchReceivingEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchSpecimensTreeTable specimensTree;
@@ -45,9 +50,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         new ArrayList<SpecimenWrapper>();
     private CommentsInfoTable commentEntryTable;
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Dispatch sent on {0} from ",
+        form.setText(i18n.tr("Dispatch sent on {0} from ",
             dispatch.getFormattedPackedAt(), dispatch.getSenderCenter()
                 .getNameShort()));
         page.setLayout(new GridLayout(1, false));
@@ -86,7 +92,8 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         BgcBaseText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, ShippingMethod.NAME.singular().toString());
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-            .getShippingMethod() == null ? StringUtil.EMPTY_STRING : dispatch.getShipmentInfo()
+            .getShippingMethod() == null ? StringUtil.EMPTY_STRING : dispatch
+            .getShipmentInfo()
             .getShippingMethod().getName());
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, ShipmentInfo.PropertyName.WAYBILL.toString());

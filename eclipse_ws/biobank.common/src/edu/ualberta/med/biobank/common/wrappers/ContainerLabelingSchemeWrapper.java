@@ -10,6 +10,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -309,7 +310,8 @@ public class ContainerLabelingSchemeWrapper extends
         if (rcp.getRow() < 0
             || rcp.getRow() > SBS_ROW_LABELLING_PATTERN.length() - 1)
             return null;
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
+        return StringUtil.EMPTY_STRING
+            + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
             + (rcp.getCol() + 1);
     }
 
@@ -321,7 +323,8 @@ public class ContainerLabelingSchemeWrapper extends
         if (rcp.getRow() < 0
             || rcp.getRow() > BOX81_LABELLING_PATTERN.length() - 1)
             return null;
-        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
+        return StringUtil.EMPTY_STRING
+            + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
             + (rcp.getCol() + 1);
     }
 
