@@ -81,6 +81,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
  */
 @SuppressWarnings("restriction")
 public class BiobankPlugin extends AbstractUIPlugin {
+
     private static final I18n i18n = I18nFactory.getI18n(BiobankPlugin.class);
 
     public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$

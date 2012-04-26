@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -56,7 +55,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     protected String getTitleAreaMessage() {
         // TR: dialog title area message
         return i18n.tr("Scan the missing tube for position {0}",
-            ContainerLabelingSchemeWrapper.rowColToSbs(position));
+            type.getPositionString(position));
     }
 
     @SuppressWarnings("nls")
@@ -85,9 +84,9 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
                     i18n.tr("Tube Scan Error"),
                     // TR: dialog message
                     i18n.tr("The value entered already exists in position {0}",
-                        ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(otherCell.getRow(),
-                                otherCell.getCol()))));
+                        type.getPositionString(new RowColPos(
+                            otherCell.getRow(),
+                            otherCell.getCol()))));
                 valueText.setFocus();
                 valueText.setSelection(0, scannedValue.length());
                 return;
