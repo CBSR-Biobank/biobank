@@ -19,11 +19,9 @@ public class RequestAdapter extends AdapterBase {
 
     public RequestAdapter(AdapterBase parent, RequestWrapper ship) {
         super(parent, ship);
-    }
-
-    @Override
-    public boolean isEditable() {
-        return false;
+        this.isReadable = true;
+        this.isDeletable = false;
+        this.isEditable = false;
     }
 
     @Override
@@ -41,11 +39,6 @@ public class RequestAdapter extends AdapterBase {
     @Override
     public String getTooltipTextInternal() {
         return getTooltipText(Messages.RequestAdapter_tooltip);
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
     @Override
