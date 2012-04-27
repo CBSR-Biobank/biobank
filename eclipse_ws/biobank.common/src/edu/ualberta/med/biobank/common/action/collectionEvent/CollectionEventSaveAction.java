@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -56,7 +57,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public ActivityStatus activityStatus;
         public Integer specimenTypeId;
         public Integer centerId;
-        public List<String> comments;
+        public List<String> comments = new ArrayList<String>();
         public BigDecimal quantity;
     }
 
