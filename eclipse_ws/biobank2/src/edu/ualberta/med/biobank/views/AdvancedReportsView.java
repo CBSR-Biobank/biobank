@@ -8,7 +8,7 @@ import org.eclipse.ui.ISourceProviderListener;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
@@ -47,12 +47,12 @@ public class AdvancedReportsView extends AbstractAdministrationView {
                     String sourceName, Object sourceValue) {
                     try {
                         if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_OUT))
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT))
                             allowed = false;
                         else if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
                             allowed =
                                 SessionManager.getAppService().isAllowed(
                                     new ReportsPermission());

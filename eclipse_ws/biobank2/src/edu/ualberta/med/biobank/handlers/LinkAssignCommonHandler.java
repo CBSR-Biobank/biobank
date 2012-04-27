@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 

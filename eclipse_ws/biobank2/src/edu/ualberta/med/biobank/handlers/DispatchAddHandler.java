@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;

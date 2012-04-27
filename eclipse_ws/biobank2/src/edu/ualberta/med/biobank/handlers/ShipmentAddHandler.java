@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermi
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
