@@ -420,11 +420,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
+        singleTypesWidget.removeBindings();
         if (isSingleMode) {
             singleTypesWidget.addBindings();
             singleTypesWidget.deselectAll();
-        } else {
-            singleTypesWidget.removeBindings();
         }
     }
 

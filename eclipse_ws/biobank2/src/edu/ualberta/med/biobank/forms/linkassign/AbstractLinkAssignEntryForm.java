@@ -773,10 +773,9 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
+        widgetCreator.removeBinding(canSaveSingleBinding);
         if (isSingleMode)
             widgetCreator.addBinding(canSaveSingleBinding);
-        else
-            widgetCreator.removeBinding(canSaveSingleBinding);
         canSaveSingleSpecimen.setValue(true);
     }
 
