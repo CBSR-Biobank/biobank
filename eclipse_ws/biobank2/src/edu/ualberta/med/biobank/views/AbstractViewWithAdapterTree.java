@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
@@ -39,12 +39,12 @@ public abstract class AbstractViewWithAdapterTree extends
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
                 if (sourceName
-                    .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)) {
+                    .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(LoginSessionState.LOGGED_IN))
+                        if (sourceValue.equals(LoginPermissionSessionState.LOGGED_IN))
                             reload();
                         else if (sourceValue
-                            .equals(LoginSessionState.LOGGED_OUT))
+                            .equals(LoginPermissionSessionState.LOGGED_OUT))
                             clear();
                     }
                 }

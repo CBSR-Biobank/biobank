@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreat
 import edu.ualberta.med.biobank.forms.SpecimenTypesViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 

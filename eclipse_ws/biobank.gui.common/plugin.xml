@@ -4,9 +4,13 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="edu.ualberta.med.biobank.gui.common.LoginSessionState">
+            provider="edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState">
          <variable
                name="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"
+               priorityLevel="workbench">
+         </variable>
+         <variable
+               name="edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
@@ -28,6 +32,15 @@
                variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
             <equals
                   value="loggedOut">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="edu.ualberta.med.biobank.gui.common.labelPrintingPermission">
+         <with
+               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>
