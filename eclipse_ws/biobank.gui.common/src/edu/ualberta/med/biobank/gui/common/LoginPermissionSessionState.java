@@ -6,9 +6,13 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
-public class LoginSessionState extends AbstractSourceProvider {
+public class LoginPermissionSessionState extends AbstractSourceProvider {
 
-    public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
+    public final static String LOGIN_STATE_SOURCE_NAME =
+        "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
+
+    public static final String LABEL_PRINTING_PERMISSION =
+        "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission"; //$NON-NLS-1$
 
     public final static String LOGGED_IN = "loggedIn"; //$NON-NLS-1$
 
@@ -16,9 +20,12 @@ public class LoginSessionState extends AbstractSourceProvider {
 
     private boolean loggedIn;
 
+    private boolean labelPrintingPermission;
+
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { LOGIN_STATE_SOURCE_NAME };
+        return new String[] { LOGIN_STATE_SOURCE_NAME,
+            LABEL_PRINTING_PERMISSION };
     }
 
     @Override
@@ -40,6 +47,14 @@ public class LoginSessionState extends AbstractSourceProvider {
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
         fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
             currentState);
+    }
+
+    public void setLabelPrintingPermissionState(boolean labelPrintingPermission) {
+        if (this.labelPrintingPermission == labelPrintingPermission)
+            return; // no change
+        this.labelPrintingPermission = labelPrintingPermission;
+        fireSourceChanged(ISources.WORKBENCH, LABEL_PRINTING_PERMISSION,
+            labelPrintingPermission);
     }
 
 }

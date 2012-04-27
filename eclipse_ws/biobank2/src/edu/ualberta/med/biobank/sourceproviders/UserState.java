@@ -11,7 +11,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 
 public class UserState extends AbstractSourceProvider {
 
@@ -62,7 +62,7 @@ public class UserState extends AbstractSourceProvider {
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (LoginSessionState) service
+        return (LoginPermissionSessionState) service
             .getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
     }
 

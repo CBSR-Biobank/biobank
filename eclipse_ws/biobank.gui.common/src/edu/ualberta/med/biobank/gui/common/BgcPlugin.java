@@ -415,13 +415,13 @@ public class BgcPlugin extends AbstractUIPlugin {
         }
     }
 
-    public static LoginSessionState getLoginStateSourceProvider() {
+    public static LoginPermissionSessionState getLoginStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (LoginSessionState) service
-            .getSourceProvider(LoginSessionState.LOGIN_STATE_SOURCE_NAME);
+        return (LoginPermissionSessionState) service
+            .getSourceProvider(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME);
     }
 
 }

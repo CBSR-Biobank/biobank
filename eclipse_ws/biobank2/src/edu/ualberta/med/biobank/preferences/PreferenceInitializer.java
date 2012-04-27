@@ -38,6 +38,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store
             .setDefault(
                 PreferenceConstants.SERVER_LIST,
-                "biobank.cbsr.ualberta.ca\ncbsr.med.ualberta.ca\n10.8.31.50\ncbsr-training.med.ualberta.ca\n10.8.31.51\naicml-med.cs.ualberta.ca"); //$NON-NLS-1$
+                "biobank.cbsr.ualberta.ca\ncbsr-training.med.ualberta.ca\n10.8.31.51\naicml-med.cs.ualberta.ca"); //$NON-NLS-1$
     }
 }

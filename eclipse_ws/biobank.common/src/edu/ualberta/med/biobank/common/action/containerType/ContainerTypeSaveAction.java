@@ -174,7 +174,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         ContainerType containerType) {
         Set<SpecimenType> specimenTypes =
             context.load(SpecimenType.class, specimenTypeIds);
-        containerType.setSpecimenTypes(specimenTypes);
+        containerType.getSpecimenTypes().clear();
+        containerType.getSpecimenTypes().addAll(specimenTypes);
     }
 
     private void setChildContainerTypes(ActionContext context,

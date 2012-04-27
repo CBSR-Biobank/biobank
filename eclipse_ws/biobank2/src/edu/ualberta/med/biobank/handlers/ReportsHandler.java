@@ -6,6 +6,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ReportsHandler extends LogoutSensitiveHandler {

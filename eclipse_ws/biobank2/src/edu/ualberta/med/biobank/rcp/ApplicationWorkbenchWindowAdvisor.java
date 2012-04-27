@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
@@ -115,7 +115,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        LoginSessionState sessionSourceProvider = BgcPlugin
+        LoginPermissionSessionState sessionSourceProvider = BgcPlugin
             .getLoginStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
@@ -132,7 +132,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                         MsgStatusItem superAdminItem =
                             (MsgStatusItem) statusline
                                 .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
-                        if (sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                        if (sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
                             serverItem.setText(new StringBuffer(
                                 SessionManager.getUser().getLogin())
@@ -142,7 +142,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                             superAdminItem.setVisible(SessionManager
                                 .getUser().isSuperAdmin());
                         } else if (sourceValue
-                            .equals(LoginSessionState.LOGGED_OUT)) {
+                            .equals(LoginPermissionSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
                             serverItem.setText(""); //$NON-NLS-1$
                             superAdminItem.setVisible(false);
