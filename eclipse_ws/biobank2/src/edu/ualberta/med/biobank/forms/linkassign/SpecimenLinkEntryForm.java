@@ -122,7 +122,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean isSingleMode() {
-        log.debug("isSingleMode");
+        log.debug("isSingleMode:" + mode.isSingleMode());
         return mode.isSingleMode();
     }
 
@@ -428,6 +428,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @Override
+    protected void updateAvailableSpecimenTypes() {
+        log.debug("updateAvailableSpecimenTypes");
+        setTypeCombos();
+    }
+
     /**
      * Get types only defined in the patient's study. Then set these types to
      * the types combos
@@ -438,15 +444,20 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void setTypeCombos() {
         log.debug("setTypeCombos");
+
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
         if (isSingleMode()) {
-            if (singleSpecimen.getParentContainer() != null) {
+            log.debug("setTypeCombos: single mode");
+
+            if ((parentContainers != null) && (parentContainers.size() >= 1)) {
                 authorizedTypesInContainers =
-                    singleSpecimen.getParentContainer().getContainerType()
+                    parentContainers.get(0).getContainerType()
                         .getSpecimenTypeCollection();
             }
         } else {
+            log.debug("setTypeCombos: multiple mode");
+
             /*
              * If the current center is a site, and if this site defines
              * containers of 8*12 size, then get the specimen types these

@@ -622,7 +622,9 @@ public abstract class AbstractLinkAssignEntryForm extends
      */
     protected void initContainersFromPosition(BgcBaseText positionText,
         boolean isContainerPosition, ContainerTypeWrapper type) {
-        log.debug("initContainersFromPosition: ");
+        log.debug("initContainersFromPosition: pos=" + positionText.getText()
+            + " isContainerPosition=" + isContainerPosition + " containerType="
+            + ((type == null) ? "null" : type.getName()));
 
         parentContainers = null;
         try {
@@ -686,7 +688,10 @@ public abstract class AbstractLinkAssignEntryForm extends
         }
         appendLog(NLS.bind("Parent containers found: {0}",
             parentMsg.toString()));
+        updateAvailableSpecimenTypes();
     }
+
+    protected abstract void updateAvailableSpecimenTypes();
 
     /**
      * Single assign. Check can really add to the position
