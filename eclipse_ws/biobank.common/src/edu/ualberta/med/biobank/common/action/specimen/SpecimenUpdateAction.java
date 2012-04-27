@@ -120,8 +120,8 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
         Specimen specimen,
         CollectionEvent cEvent) {
         for (Specimen childSpecimen : specimen.getChildSpecimens()) {
-            specimen.setCollectionEvent(cEvent);
-            context.getSession().saveOrUpdate(specimen);
+            childSpecimen.setCollectionEvent(cEvent);
+            context.getSession().saveOrUpdate(childSpecimen);
             updateChildSpecimensCEvent(context, childSpecimen, cEvent);
         }
     }
