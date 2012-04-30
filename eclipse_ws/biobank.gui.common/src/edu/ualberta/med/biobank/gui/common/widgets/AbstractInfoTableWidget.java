@@ -187,11 +187,11 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     BgcPlugin.openAsyncError("Error",
                         "Unable to load menu for selection", e);
                 }
-                BgcClipboard.addClipboardCopySupport(tableViewer, menu,
-                    labelProvider,
-                    headings.length);
             }
         });
+        BgcClipboard.addClipboardCopySupport(tableViewer, menu,
+            labelProvider,
+            headings.length);
 
         // need to autosize at creation to be sure the size is well initialized
         // the first time. (if don't do that, display problems in UserManagement
