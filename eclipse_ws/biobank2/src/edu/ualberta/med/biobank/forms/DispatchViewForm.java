@@ -8,8 +8,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -22,33 +20,38 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchSpecimenListInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.trees.DispatchSpecimensTreeTable;
 
 public class DispatchViewForm extends BiobankViewForm {
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(DispatchViewForm.class.getName());
-
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchViewForm"; 
 
     private DispatchAdapter dispatchAdapter;
 
-    private DispatchWrapper dispatch;
+    private DispatchWrapper dispatch = new DispatchWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
 
@@ -62,41 +65,42 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BgcBaseText dateReceivedLabel;
 
-    private BgcBaseText commentLabel;
-
     private DispatchSpecimensTreeTable specimensTree;
 
     private DispatchSpecimenListInfoTable specimensNonProcessedTable;
 
-    private boolean canSeeEverything;
+    private CommentsInfoTable commentTable;
 
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
 
         dispatchAdapter = (DispatchAdapter) adapter;
-        dispatch = (DispatchWrapper) getModelObject();
-        SessionManager.logLookup(dispatch);
-        retrieveDispatch();
-        setPartName(Messages.DispatchViewForm_title);
+
+        setDispatchInfo(adapter.getId());
+
+        setPartName("Dispatch");
     }
 
-    private void retrieveDispatch() {
-        try {
-            dispatch.reload();
-        } catch (Exception ex) {
-            logger.error(Messages.DispatchViewForm_retrieve_ship_error_msg
-                + dispatch.getShipmentInfo().getWaybill(), ex);
+    private void setDispatchInfo(Integer id) throws Exception {
+        if (id == null) {
+            Dispatch d = new Dispatch();
+            dispatch.setWrappedObject(d);
+        } else {
+            DispatchReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new DispatchGetInfoAction(adapter.getId()));
+            read.dispatch.setDispatchSpecimens(read.specimens);
+            dispatch.setWrappedObject(read.dispatch);
+            SessionManager.logLookup(read.dispatch);
         }
     }
 
     @Override
-    public void reload() throws Exception {
-        retrieveDispatch();
-        setPartName(Messages.DispatchViewForm_fulltitle
-            + dispatch.getShipmentInfo().getPackedAt());
+    public void setValues() throws Exception {
+        commentTable.setList(dispatch.getCommentCollection(false));
         setDispatchValues();
         specimensTree.refresh();
     }
@@ -108,79 +112,74 @@ public class DispatchViewForm extends BiobankViewForm {
             && dispatch.getShipmentInfo().getPackedAt() != null) {
             dateString = dispatch.getFormattedPackedAt();
         }
-        canSeeEverything = true;
-        if (dispatch.getSenderCenter() == null) {
-            canSeeEverything = false;
-            BgcPlugin.openAsyncError(
-                Messages.DispatchViewForm_access_denied_error_title,
-                Messages.DispatchViewForm_access_denied_sender_error_msg);
-        } else {
-            if (dateString == null)
-                form.setText(NLS.bind(
-                    Messages.DispatchViewForm_preparation_title, dateString,
-                    dispatch.getSenderCenter().getNameShort()));
-            else
-                form.setText(NLS.bind(Messages.DispatchViewForm_sent_title,
-                    dateString, dispatch.getSenderCenter().getNameShort()));
-        }
-        if (dispatch.getReceiverCenter() == null) {
-            canSeeEverything = false;
-            BgcPlugin.openAsyncError(
-                Messages.DispatchViewForm_access_denied_error_title,
-                Messages.DispatchViewForm_access_denied_receiver_error_msg);
-        }
+        if (dateString == null)
+            form.setText(NLS.bind(
+                "Dispatch created for {1}", dateString,
+                dispatch.getSenderCenter().getNameShort()));
+        else
+            form.setText(NLS.bind("Dispatch sent on {0} from {1}",
+                dateString, dispatch.getSenderCenter().getNameShort()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
 
-        if (canSeeEverything) {
-            createTreeTableSection();
-        }
+        createTreeTableSection();
 
         setDispatchValues();
 
-        if (canSeeEverything) {
-            User user = SessionManager.getUser();
-            if (dispatch.canBeSentBy(user))
+        DispatchChangeStatePermission perm =
+            new DispatchChangeStatePermission(dispatch.getId());
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+        if (SessionManager.getAppService().isAllowed(perm)) {
+            if (dispatch.isInCreationState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getSenderCenter()))
                 createSendButton();
-            else if (dispatch.canBeReceivedBy(user))
+            else if (dispatch.isInTransitState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter()))
                 createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user)
-                && dispatch.isInReceivedState()
+            else if (dispatch.isInReceivedState()
+                && SessionManager.getUser().getCurrentWorkingCenter()
+                    .equals(dispatch.getReceiverCenter())
                 && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
+
+        commentTable.setList(dispatch.getCommentCollection(false));
     }
 
     @Override
     protected void addEditAction() {
-        if (canSeeEverything) {
-            super.addEditAction();
-        }
+        super.addEditAction();
     }
 
     private void createTreeTableSection() {
         if (dispatch.isInCreationState()) {
-            Composite parent = createSectionWithClient(Messages.DispatchViewForm_specimen_section_label);
-            specimensNonProcessedTable = new DispatchSpecimenListInfoTable(
-                parent, dispatch, false) {
-                @Override
-                public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
-                    return dispatch.getNonProcessedDispatchSpecimenCollection();
-                }
+            Composite parent =
+                createSectionWithClient("Specimens added");
+            specimensNonProcessedTable =
+                new DispatchSpecimenListInfoTable(parent, dispatch, false) {
+                    @Override
+                    public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
+                        return dispatch.getDispatchSpecimenCollection(false);
+                    }
 
-            };
+                };
             specimensNonProcessedTable.adaptToToolkit(toolkit, true);
             specimensNonProcessedTable
-                .addClickListener(new IDoubleClickListener() {
+                .addClickListener(new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
                     @Override
-                    public void doubleClick(DoubleClickEvent event) {
+                    public void doubleClick(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
                         Object selection = event.getSelection();
                         if (selection instanceof InfoTableSelection) {
-                            InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                            DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
-                                .getObject();
+                            InfoTableSelection tableSelection =
+                                (InfoTableSelection) selection;
+                            DispatchSpecimenWrapper dsa =
+                                (DispatchSpecimenWrapper) tableSelection
+                                    .getObject();
                             if (dsa != null) {
                                 SessionManager.openViewForm(dsa.getSpecimen());
                             }
@@ -194,9 +193,30 @@ public class DispatchViewForm extends BiobankViewForm {
                         specimensNonProcessedTable.reloadCollection();
                     }
                 });
+            specimensNonProcessedTable
+                .addEditItemListener(new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
+
+                    @Override
+                    public void editItem(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
+                        Object selection = event.getSelection();
+                        if (selection instanceof InfoTableSelection) {
+                            InfoTableSelection tableSelection =
+                                (InfoTableSelection) selection;
+                            DispatchSpecimenWrapper dsa =
+                                (DispatchSpecimenWrapper) tableSelection
+                                    .getObject();
+                            if (dsa != null) {
+                                new SpecimenAdapter(null, dsa.getSpecimen())
+                                    .openEntryForm();
+                            }
+                        }
+                    }
+                });
         } else {
-            specimensTree = new DispatchSpecimensTreeTable(page, dispatch,
-                false, false);
+            specimensTree =
+                new DispatchSpecimensTreeTable(page, dispatch,
+                    false);
             specimensTree.addClickListener();
         }
     }
@@ -204,8 +224,9 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createReceiveButtons() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(3, false));
-        Button sendButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_receive_button_label, SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite,
+                "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -213,8 +234,10 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button sendProcessButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_receive_process_button_label, SWT.PUSH);
+        Button sendProcessButton =
+            toolkit.createButton(composite,
+                "Receive and Process",
+                SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -222,8 +245,9 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button lostProcessButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_lost_button_label, SWT.PUSH);
+        Button lostProcessButton =
+            toolkit.createButton(composite,
+                "Lost", SWT.PUSH);
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -235,8 +259,9 @@ public class DispatchViewForm extends BiobankViewForm {
     private void createCloseButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit.createButton(composite,
-            Messages.DispatchViewForm_done_button_label, SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite,
+                "Done", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -246,29 +271,27 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void createSendButton() {
-        final Button sendButton = toolkit.createButton(page,
-            Messages.DispatchViewForm_send_button_label, SWT.PUSH);
+        final Button sendButton =
+            toolkit.createButton(page,
+                "Send", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (new SendDispatchDialog(Display.getDefault()
                     .getActiveShell(), dispatch).open() == Dialog.OK) {
-                    IRunnableContext context = new ProgressMonitorDialog(
-                        Display.getDefault().getActiveShell());
+                    IRunnableContext context =
+                        new ProgressMonitorDialog(Display.getDefault()
+                            .getActiveShell());
                     try {
                         context.run(true, true, new IRunnableWithProgress() {
                             @Override
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask(
-                                    Messages.DispatchViewForm_saving_text,
+                                    "Saving...",
                                     IProgressMonitor.UNKNOWN);
                                 try {
-                                    ShipmentInfoWrapper si = dispatch
-                                        .getShipmentInfo();
-                                    dispatch.reload();
-                                    dispatch.setShipmentInfo(si);
-                                    dispatch.setState(DispatchState.IN_TRANSIT);
-                                    dispatch.persist();
+                                    dispatchAdapter.setModelObject(dispatch);
+                                    dispatchAdapter.doSend();
                                 } catch (Exception ex) {
                                     saveErrorCatch(ex, monitor, false);
                                     return;
@@ -278,7 +301,7 @@ public class DispatchViewForm extends BiobankViewForm {
                         });
                     } catch (Exception e1) {
                         BgcPlugin.openAsyncError(
-                            Messages.DispatchViewForm_save_error_title, e1);
+                            "Save error", e1);
                     }
                     SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
@@ -297,12 +320,13 @@ public class DispatchViewForm extends BiobankViewForm {
 
         String stateMessage = null;
         if (dispatch.isInLostState())
-            stateMessage = Messages.DispatchViewForm_lost_msg;
+            stateMessage = " Dispatch Lost ";
         else if (dispatch.isInClosedState())
-            stateMessage = Messages.DispatchViewForm_complete_msg;
+            stateMessage = " Dispatch Complete ";
         if (stateMessage != null) {
-            Label label = widgetCreator.createLabel(client, stateMessage,
-                SWT.CENTER, false);
+            Label label =
+                widgetCreator.createLabel(client, stateMessage, SWT.CENTER,
+                    false);
             label.setBackground(Display.getDefault().getSystemColor(
                 SWT.COLOR_RED));
             label.setForeground(Display.getDefault().getSystemColor(
@@ -314,35 +338,47 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.DispatchViewForm_sender_label);
-        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.DispatchViewForm_receiver_label);
+        senderLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                "Sender");
+        receiverLabel =
+            createReadOnlyLabelledField(client, SWT.NONE,
+                "Receiver");
         if (!dispatch.isInCreationState()) {
-            departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_packedAt_label);
-            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_shippingMethod_label);
-            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_waybill_label);
+            departedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    "Packed at");
+            shippingMethodLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    "Shipping Method");
+            waybillLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    "Waybill");
         }
         if (dispatch.hasBeenReceived()) {
-            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.DispatchViewForm_received_label);
+            dateReceivedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE,
+                    "Date received");
         }
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.DispatchViewForm_comments_label);
+        createCommentsSection();
+    }
+
+    private void createCommentsSection() {
+        Composite client = createSectionWithClient("Comments");
+        commentTable =
+            new CommentsInfoTable(client,
+                dispatch.getCommentCollection(false));
+        commentTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(commentTable);
     }
 
     private void setDispatchValues() {
         setTextValue(
             senderLabel,
-            dispatch.getSenderCenter() == null ? Messages.DispatchViewForm_access_denied_value
-                : dispatch.getSenderCenter().getName());
+            dispatch.getSenderCenter().getName());
         setTextValue(
             receiverLabel,
-            dispatch.getReceiverCenter() == null ? Messages.DispatchViewForm_access_denied_value
-                : dispatch.getReceiverCenter().getName());
+            dispatch.getReceiverCenter().getName());
         if (departedLabel != null)
             setTextValue(departedLabel, dispatch.getFormattedPackedAt());
 
@@ -351,7 +387,7 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipInfo != null) {
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel,
-                    shipInfo.getShippingMethod() == null ? "" : shipInfo //$NON-NLS-1$
+                    shipInfo.getShippingMethod() == null ? "" : shipInfo 
                         .getShippingMethod().getName());
             if (waybillLabel != null)
                 setTextValue(waybillLabel, shipInfo.getWaybill());
@@ -359,7 +395,6 @@ public class DispatchViewForm extends BiobankViewForm {
                 setTextValue(dateReceivedLabel,
                     shipInfo.getFormattedDateReceived());
         }
-        setTextValue(commentLabel, dispatch.getComment());
     }
 
 }

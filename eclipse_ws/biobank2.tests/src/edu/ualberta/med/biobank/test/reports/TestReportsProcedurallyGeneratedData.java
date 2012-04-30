@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
-import edu.ualberta.med.biobank.test.AllTests;
+import edu.ualberta.med.biobank.test.AllTestsSuite;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -48,6 +48,9 @@ import org.junit.runners.Suite.SuiteClasses;
     FvLPatientVisitsTest.class, PatientVisitSummaryTest.class,
     QaSpecimensTest.class, SpecimenTypePvCountTest.class,
     SpecimenTypeSUsageTest.class })
+@Deprecated
+@SuppressWarnings("all")
+// old tests
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;
@@ -77,21 +80,27 @@ public final class TestReportsProcedurallyGeneratedData implements
     private final Random random = new Random(1); // consistent randomness (;
 
     private final List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-    private final List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
-    private final List<AliquotedSpecimenWrapper> sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
-    private final List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
-    private final List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
+    private final List<SpecimenTypeWrapper> sampleTypes =
+        new ArrayList<SpecimenTypeWrapper>();
+    private final List<AliquotedSpecimenWrapper> sampleStorages =
+        new ArrayList<AliquotedSpecimenWrapper>();
+    private final List<SpecimenWrapper> aliquots =
+        new ArrayList<SpecimenWrapper>();
+    private final List<ContainerWrapper> containers =
+        new ArrayList<ContainerWrapper>();
     private final List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-    private final List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
-    private final List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+    private final List<ProcessingEventWrapper> patientVisits =
+        new ArrayList<ProcessingEventWrapper>();
+    private final List<PatientWrapper> patients =
+        new ArrayList<PatientWrapper>();
 
     private TestReportsProcedurallyGeneratedData() {
         try {
-            AllTests.setUp();
+            AllTestsSuite.setUp();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        appService = AllTests.appService;
+        appService = AllTestsSuite.appService;
         Assert.assertNotNull("setUp: appService is null", appService);
     }
 
@@ -142,7 +151,8 @@ public final class TestReportsProcedurallyGeneratedData implements
 
     private static List<SpecimenTypeWrapper> generateSampleTypes(
         final int numSampleTypes) throws Exception {
-        List<SpecimenTypeWrapper> spcTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> spcTypes =
+            new ArrayList<SpecimenTypeWrapper>();
 
         for (int i = 0; i < numSampleTypes; i++) {
             spcTypes.add(SpecimenTypeHelper.addSpecimenType(getInstance()
@@ -171,6 +181,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME"
         Assert.assertTrue(PredicateUtil.filter(spcTypes,
             new Predicate<SpecimenTypeWrapper>() {
+                @Override
                 public boolean evaluate(SpecimenTypeWrapper sampleType) {
                     return sampleType.getNameShort().equals(
                         AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
@@ -269,7 +280,8 @@ public final class TestReportsProcedurallyGeneratedData implements
             return Arrays.asList();
         }
 
-        List<ContainerTypeWrapper> childContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> childContainerTypes =
+            new ArrayList<ContainerTypeWrapper>();
 
         final boolean isTopLevel = parentContainerType == null;
 
@@ -313,7 +325,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 .addToChildContainerTypeCollection(childContainerTypes);
         }
 
-        List<ContainerTypeWrapper> descendantContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> descendantContainerTypes =
+            new ArrayList<ContainerTypeWrapper>();
 
         for (ContainerTypeWrapper containerType : childContainerTypes) {
             descendantContainerTypes.addAll(generateChildContainerTypes(site,
@@ -368,8 +381,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 for (ContainerTypeWrapper containerType : allContainerTypes) {
                     if (containerType.getTopLevel()) {
                         containers.add(ContainerHelper.addContainer(labelPrefix
-                            + getInstance().getRandString(), null,
-                            parentContainer, site, containerType));
+                            + getInstance().getRandString(), null, site,
+                            containerType));
                     }
                 }
             }
@@ -379,8 +392,9 @@ public final class TestReportsProcedurallyGeneratedData implements
                 .getContainerType();
 
             ContainerTypeWrapper childContainerType;
-            List<ContainerTypeWrapper> childContainerTypes = parentContainerType
-                .getChildContainerTypeCollection();
+            List<ContainerTypeWrapper> childContainerTypes =
+                parentContainerType
+                    .getChildContainerTypeCollection();
 
             if (childContainerTypes.size() > 0) {
                 // middle-level (not a top- or bottom-level Container): can add
@@ -412,7 +426,8 @@ public final class TestReportsProcedurallyGeneratedData implements
             }
         }
 
-        List<ContainerWrapper> descendantContainers = new ArrayList<ContainerWrapper>();
+        List<ContainerWrapper> descendantContainers =
+            new ArrayList<ContainerWrapper>();
 
         // add children Container-s for each container we just added
         for (ContainerWrapper container : containers) {
@@ -432,7 +447,8 @@ public final class TestReportsProcedurallyGeneratedData implements
     private static List<AliquotedSpecimenWrapper> generateSampleStorages(
         List<StudyWrapper> studies, List<SpecimenTypeWrapper> sampleTypes)
         throws Exception {
-        List<AliquotedSpecimenWrapper> sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        List<AliquotedSpecimenWrapper> sampleStorages =
+            new ArrayList<AliquotedSpecimenWrapper>();
 
         // FIXME: commented out code
         // for (StudyWrapper study : studies) {
@@ -573,7 +589,8 @@ public final class TestReportsProcedurallyGeneratedData implements
     private static List<ProcessingEventWrapper> generatePatientVisits(
         List<CollectionEventWrapper> shipments, List<PatientWrapper> allPatients)
         throws Exception {
-        List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> patientVisits =
+            new ArrayList<ProcessingEventWrapper>();
 
         // FIXME
         // Calendar calendar = Calendar.getInstance();
@@ -720,20 +737,23 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         List<SiteWrapper> sites = generateSites(NUM_SITES);
         List<StudyWrapper> studies = generateStudies(NUM_STUDIES);
-        List<SpecimenTypeWrapper> sampleTypes = generateSampleTypes(NUM_SAMPLE_TYPES);
+        List<SpecimenTypeWrapper> sampleTypes =
+            generateSampleTypes(NUM_SAMPLE_TYPES);
         List<ClinicWrapper> clinics = generateClinics(NUM_CLINICS);
 
         for (SiteWrapper site : sites) {
 
             generateContacts(clinics, studies);
 
-            List<ContainerTypeWrapper> containerTypes = generateChildContainerTypes(
-                site, null, sampleTypes, CONTAINER_DEPTH);
+            List<ContainerTypeWrapper> containerTypes =
+                generateChildContainerTypes(
+                    site, null, sampleTypes, CONTAINER_DEPTH);
 
             List<ContainerWrapper> containers = generateContainers(site, null,
                 containerTypes);
-            List<AliquotedSpecimenWrapper> sampleStorages = generateSampleStorages(
-                studies, sampleTypes);
+            List<AliquotedSpecimenWrapper> sampleStorages =
+                generateSampleStorages(
+                    studies, sampleTypes);
             List<PatientWrapper> patients = generatePatients(studies,
                 PATIENTS_PER_STUDY);
 
@@ -775,6 +795,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         }
     }
 
+    @Override
     public WritableApplicationService getAppService() {
         return appService;
     }
@@ -787,34 +808,42 @@ public final class TestReportsProcedurallyGeneratedData implements
         return random;
     }
 
+    @Override
     public List<SiteWrapper> getSites() {
         return sites;
     }
 
+    @Override
     public List<SpecimenTypeWrapper> getSpecimenTypes() {
         return sampleTypes;
     }
 
+    @Override
     public List<SpecimenWrapper> getSpecimens() {
         return aliquots;
     }
 
+    @Override
     public List<ContainerWrapper> getContainers() {
         return containers;
     }
 
+    @Override
     public List<StudyWrapper> getStudies() {
         return studies;
     }
 
+    @Override
     public List<ProcessingEventWrapper> getPatientVisits() {
         return patientVisits;
     }
 
+    @Override
     public List<PatientWrapper> getPatients() {
         return patients;
     }
 
+    @Override
     public List<AliquotedSpecimenWrapper> getAliquotedSpecimens() {
         return sampleStorages;
     }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -16,16 +17,20 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PerspectiveSecurity;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -33,13 +38,16 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut"; //$NON-NLS-1$
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT =
+        "biobank.context.loggedOut"; //$NON-NLS-1$
 
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn"; //$NON-NLS-1$
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN =
+        "biobank.context.loggedIn"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
         .getName());
@@ -80,7 +88,7 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user) {
+        String serverName, UserWrapper user) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()); //$NON-NLS-1$ //$NON-NLS-2$
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
@@ -126,11 +134,20 @@ public class SessionManager {
                 .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
         }
 
-        // assign logged in state
-        BgcSessionState guiCommonSessionState = BgcPlugin
-            .getSessionStateSourceProvider();
+        // assign logged in state and label permissions
+        LoginPermissionSessionState guiCommonSessionState = BgcPlugin
+            .getLoginStateSourceProvider();
         guiCommonSessionState.setLoggedInState(sessionAdapter != null);
-
+        try {
+            guiCommonSessionState
+                .setLabelPrintingPermissionState(sessionAdapter != null ? SessionManager
+                    .getAppService().isAllowed(
+                        new LabelPrintingPermission())
+                    : false);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve labelprinting permissions");
+        }
         BiobankPlugin.getSessionStateSourceProvider().setUser(
             sessionAdapter == null ? null : sessionAdapter.getUser());
 
@@ -156,38 +173,34 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public static void updateAdapterTreeNode(final AdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+    public static void updateAdapterTreeNode(final AbstractAdapterBase node) {
+        final AbstractViewWithAdapterTree view =
+            getCurrentAdapterViewWithTree();
         if ((view != null) && (node != null)) {
             view.getTreeViewer().update(node, null);
         }
     }
 
-    public static void refreshTreeNode(final AdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+    public static void refreshTreeNode(final AbstractAdapterBase node) {
+        final AbstractViewWithAdapterTree view =
+            getCurrentAdapterViewWithTree();
         if (view != null && !view.getTreeViewer().getControl().isDisposed()) {
             view.getTreeViewer().refresh(node, true);
         }
     }
 
-    public static void setSelectedNode(final AdapterBase node) {
-        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-        if (view != null && node != null) {
-            view.setSelectedNode(node);
-        }
-    }
-
-    public static AdapterBase getSelectedNode() {
+    public static AbstractAdapterBase getSelectedNode() {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
-            AdapterBase selectedNode = view.getSelectedNode();
+            AbstractAdapterBase selectedNode = view.getSelectedNode();
             return selectedNode;
         }
         return null;
     }
 
     public static void openViewForm(ModelWrapper<?> wrapper) {
-        AdapterBase adapter = searchFirstNode(wrapper);
+        AbstractAdapterBase adapter = searchFirstNode(wrapper.getClass(),
+            wrapper.getId());
         if (adapter != null) {
             adapter.performDoubleClick();
             return;
@@ -206,16 +219,18 @@ public class SessionManager {
         return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static List<AdapterBase> searchNodes(ModelWrapper<?> wrapper) {
+    public static List<AbstractAdapterBase> searchNodes(Class<?> searchedClass,
+        Integer objectId) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
-            return view.searchNode(wrapper);
+            return view.searchNode(searchedClass, objectId);
         }
-        return new ArrayList<AdapterBase>();
+        return new ArrayList<AbstractAdapterBase>();
     }
 
-    public static AdapterBase searchFirstNode(ModelWrapper<?> wrapper) {
-        List<AdapterBase> nodes = searchNodes(wrapper);
+    public static AbstractAdapterBase searchFirstNode(Class<?> searchedClass,
+        Integer objectId) {
+        List<AbstractAdapterBase> nodes = searchNodes(searchedClass, objectId);
         if (nodes.size() > 0) {
             return nodes.get(0);
         }
@@ -231,32 +246,12 @@ public class SessionManager {
         getInstance().currentAdministrationViewId = view.getId();
     }
 
-    public static User getUser() {
+    public static UserWrapper getUser() {
         return getInstance().getSession().getUser();
     }
 
     public static String getServer() {
         return getInstance().getSession().getServerName();
-    }
-
-    public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
-    }
-
-    public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
-    }
-
-    public static boolean canDelete(ModelWrapper<?> wrapper) {
-        return wrapper.canDelete(getUser());
-    }
-
-    public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
-    }
-
-    public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
     }
 
     public boolean isConnected() {
@@ -269,45 +264,60 @@ public class SessionManager {
             type);
     }
 
-    public static void logLookup(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logLookup(getUser().getCurrentWorkingCenter()
-                .getNameShort());
-    }
-
-    public static void logEdit(ModelWrapper<?> wrapper) throws Exception {
-        if (!wrapper.isNew())
-            wrapper.logEdit(getUser().getCurrentWorkingCenter().getNameShort());
+    public static void logLookup(IBiobankModel object) {
+        try {
+            Class<?> clazz = object.getClass();
+            StringBuilder loggerName =
+                new StringBuilder(clazz.getSimpleName());
+            loggerName.append("LogProvider"); //$NON-NLS-1$
+            loggerName.insert(0,
+                "edu.ualberta.med.biobank.common.wrappers.loggers."); //$NON-NLS-1$
+            WrapperLogProvider<?> provider =
+                (WrapperLogProvider<?>) Class
+                    .forName(
+                        loggerName.toString())
+                    .getConstructor().newInstance();
+            Log log = provider.getObjectLog(object);
+            log.setAction("select"); //$NON-NLS-1$
+            log.setType(clazz.getSimpleName());
+            getAppService().logActivity(log);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(Messages.SessionManager_error_message, e);
+        }
     }
 
     /**
      * do an update on node holding the same wrapper than the given adapter.
      * 
-     * @param canRest if true, then the node found will be reloaded from the
+     * @param canReset if true, then the node found will be reloaded from the
      *            database (might not want that if the object could be open in
      *            an entry form).
      * @param expandParent if true will expand the parent node of 'adapter'
      * 
      */
-    public static void updateAllSimilarNodes(final AdapterBase adapter,
+    public static void updateAllSimilarNodes(final AbstractAdapterBase adapter,
         final boolean canReset) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 try {
-                    // add to add the correct node if it is a new adapter:
-                    AdapterBase parent = adapter.getParent();
+                    // add to the correct node if it is a new adapter:
+                    AbstractAdapterBase parent = adapter.getParent();
                     if (parent != null)
                         parent.addChild(adapter);
-                    List<AdapterBase> res = searchNodes(adapter
-                        .getModelObject());
-                    final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+                    Integer id = adapter.getId();
+                    List<AbstractAdapterBase> res =
+                        searchNodes(adapter.getClass(), id);
+                    final AbstractViewWithAdapterTree view =
+                        getCurrentAdapterViewWithTree();
                     if (view != null) {
-                        for (AdapterBase ab : res) {
+                        for (AbstractAdapterBase ab : res) {
                             if (canReset)
                                 try {
-                                    if (ab != adapter)
-                                        ab.resetObject();
+                                    if (ab != adapter) {
+                                        if (ab instanceof AdapterBase)
+                                            ((AdapterBase) ab).resetObject();
+                                    }
                                 } catch (Exception ex) {
                                     logger.error("Problem reseting object", ex); //$NON-NLS-1$
                                 }
@@ -325,36 +335,41 @@ public class SessionManager {
         getInstance().currentAdministrationViewId = id;
     }
 
-    public static boolean isSuperAdminMode() {
-        return getUser().isInSuperAdminMode();
-    }
-
-    public static void updateViewsVisibility(IWorkbenchPage page, boolean login) {
-        try {
-            SessionManager sm = getInstance();
-            if (sm.isConnected()) {
-                String perspectiveId = page.getPerspective().getId();
-                Boolean done = sm.perspectivesUpdateDone.get(perspectiveId);
-                if (done == null || !done) {
-                    PerspectiveSecurity.updateVisibility(getUser(), page);
-                    sm.perspectivesUpdateDone.put(perspectiveId, true);
+    public static void updateViewsVisibility(final IWorkbenchPage page,
+        final boolean login) {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SessionManager sm = getInstance();
+                    if (sm.isConnected()) {
+                        String perspectiveId = page.getPerspective().getId();
+                        Boolean done = sm.perspectivesUpdateDone
+                            .get(perspectiveId);
+                        if (done == null || !done) {
+                            PerspectiveSecurity.updateVisibility(getUser(),
+                                page);
+                            sm.perspectivesUpdateDone.put(perspectiveId, true);
+                        }
+                    }
+                } catch (PartInitException e) {
+                    BgcPlugin.openAsyncError(
+                        Messages.SessionManager_actions_error_title, e);
+                }
+                // don't want to switch if was activated by an handler after
+                // login
+                // (display is weird otherwise)
+                if (login && page.getViewReferences().length == 0)
+                    try {
+                        page.getWorkbenchWindow()
+                            .getWorkbench()
+                            .showPerspective(MainPerspective.ID,
+                                page.getWorkbenchWindow());
+                    } catch (WorkbenchException e) {
+                        logger.error("Error opening main perspective", e); //$NON-NLS-1$
                 }
             }
-        } catch (PartInitException e) {
-            BgcPlugin.openAsyncError(
-                Messages.SessionManager_actions_error_title, e);
-        }
-        // don't want to switch if was activated by an handler after login
-        // (display is weird otherwise)
-        if (login && page.getViewReferences().length == 0)
-            try {
-                page.getWorkbenchWindow()
-                    .getWorkbench()
-                    .showPerspective(MainPerspective.ID,
-                        page.getWorkbenchWindow());
-            } catch (WorkbenchException e) {
-                logger.error("Error opening main perspective", e); //$NON-NLS-1$
-            }
-
+        });
     }
+
 }

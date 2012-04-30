@@ -27,11 +27,12 @@ import org.eclipse.ui.part.ViewPart;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.permission.logging.LoggingPermission;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.logs.LogQuery;
@@ -39,12 +40,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LoggingView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
-
-    private ISourceProviderListener siteStateListener;
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.LoggingView"; //$NON-NLS-1$
 
     private static enum ComboListType {
-        CENTER, USER, TYPE, ACTION
+        CENTER,
+        USER,
+        TYPE,
+        ACTION
     }
 
     private BgcBaseText patientNumTextInput, inventoryIdTextInput,
@@ -78,8 +81,47 @@ public class LoggingView extends ViewPart {
         }
     };
 
+    private boolean allowed = false;
+
     public LoggingView() {
-        //
+        try {
+            if (SessionManager.getInstance().isConnected()) allowed =
+                SessionManager.getAppService().isAllowed(
+                    new LoggingPermission());
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage(e);
+        }
+        BgcPlugin.getLoginStateSourceProvider()
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    try {
+                        if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT))
+                            allowed = false;
+                        else if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
+                            allowed =
+                                SessionManager.getAppService().isAllowed(
+                                    new LoggingPermission());
+                        }
+                        setEnableAllFields(allowed);
+                        loadComboFields();
+                    } catch (Exception e) {
+                        BgcPlugin.openAccessDeniedErrorMessage(e);
+                    }
+                }
+            });
     }
 
     @Override
@@ -175,30 +217,6 @@ public class LoggingView extends ViewPart {
         locationTextInput.addListener(SWT.Verify, alphaNumericListener);
         locationTextInput.addKeyListener(enterListener);
 
-        /*
-         * new Label(top, SWT.NONE); new Label(top, SWT.NONE);
-         * 
-         * label = new Label(top, SWT.NO_BACKGROUND);
-         * label.setText("Container Type:"); label.setAlignment(SWT.LEFT);
-         * 
-         * containerTypeCombo = new Combo(top, SWT.READ_ONLY);
-         * containerTypeCombo.setItems(this.loadContainerTypeList());
-         * containerTypeCombo.select(0); containerTypeCombo.setVisible(true);
-         * containerTypeCombo .setLayoutData(new
-         * GridData(GridData.FILL_HORIZONTAL));
-         * 
-         * label = new Label(top, SWT.NO_BACKGROUND);
-         * label.setText("Container Label:"); label.setAlignment(SWT.LEFT);
-         * 
-         * labelTextInput = new BiobankText(top, SWT.SINGLE | SWT.BORDER);
-         * labelTextInput.setVisible(true); labelTextInput.setLayoutData(new
-         * GridData( GridData.FILL_HORIZONTAL));
-         * labelTextInput.addListener(SWT.Verify, new Listener() { public void
-         * handleEvent(Event e) { String string = e.text; for (int i = 0; i <
-         * string.length(); i++) { // input must be alpha numeric if
-         * (!(string.matches("\\p{Alnum}+"))) { e.doit = false; return; } } }
-         * });
-         */
         label = new Label(parent, SWT.NO_BACKGROUND);
         label.setText(Messages.LoggingView_details_label);
         label.setAlignment(SWT.LEFT);
@@ -281,50 +299,15 @@ public class LoggingView extends ViewPart {
             }
         });
 
-        sessionMonitor();
         clearFields();
 
         // if logged in and select the site selected in "working site" combo
         // box, only if not "All Sites" are selected
-        if (SessionManager.getInstance().isConnected()) {
+        if (SessionManager.getInstance().isConnected() && allowed) {
             setEnableAllFields(true);
             loadComboFields();
         } else
             setEnableAllFields(false);
-    }
-
-    // monitors the logged in / out state
-    private void sessionMonitor() {
-        siteStateListener = new ISourceProviderListener() {
-            @Override
-            public void sourceChanged(int sourcePriority, String sourceName,
-                Object sourceValue) {
-                if (sourceValue.equals(BgcSessionState.LOGGED_OUT)) {
-                    setEnableAllFields(false);
-                } else if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
-                    loadComboFields();
-                    setEnableAllFields(true);
-                }
-            }
-
-            @SuppressWarnings("rawtypes")
-            @Override
-            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-                //
-            }
-        };
-
-        BgcPlugin.getSessionStateSourceProvider().addSourceProviderListener(
-            siteStateListener);
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (siteStateListener != null) {
-            BgcPlugin.getSessionStateSourceProvider()
-                .removeSourceProviderListener(siteStateListener);
-        }
     }
 
     @Override
@@ -383,7 +366,8 @@ public class LoggingView extends ViewPart {
             return;
         }
 
-        FormInput input = new FormInput(null, Messages.LoggingView_resform_title);
+        FormInput input =
+            new FormInput(null, Messages.LoggingView_resform_title);
         try {
             LogQuery.getInstance().setSearchQueryItem(LogPeer.CENTER.getName(),
                 centerCombo.getText());
@@ -409,13 +393,17 @@ public class LoggingView extends ViewPart {
             if (startDateStr != null && startDateStr.length() > 0) {
                 LogQuery.getInstance().setSearchQueryItem(
                     LogQuery.START_DATE_KEY, startDateStr);
-            }
+            } else
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.START_DATE_KEY, "");
 
             String endDateStr = DateFormatter.formatAsDate(endDateDate);
             if (endDateStr != null && endDateStr.length() > 0) {
                 LogQuery.getInstance().setSearchQueryItem(
                     LogQuery.END_DATE_KEY, endDateStr);
-            }
+            } else
+                LogQuery.getInstance().setSearchQueryItem(
+                    LogQuery.END_DATE_KEY, "");
             /*
              * LogQuery.getInstance().setSearchQueryItem( "containerType",
              * containerTypeCombo.getText()); LogQuery.getInstance()

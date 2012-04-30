@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -20,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class TestCollectionEvent extends TestDatabase {
 
     private StudyWrapper study;
@@ -507,8 +508,7 @@ public class TestCollectionEvent extends TestDatabase {
 
         // lock an attribute
         study.setStudyEventAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
+            ActivityStatus.CLOSED);
         study.persist();
         cevent.reload();
         try {
@@ -519,8 +519,7 @@ public class TestCollectionEvent extends TestDatabase {
         }
 
         // unlock the attribute
-        study.setStudyEventAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActiveActivityStatus(appService));
+        study.setStudyEventAttrActivityStatus("Worksheet", ActivityStatus.ACTIVE);
         study.persist();
         cevent.reload();
         cevent.setEventAttrValue("Worksheet", "xyz");
@@ -549,13 +548,14 @@ public class TestCollectionEvent extends TestDatabase {
         cevent.reload();
 
         // make sure only one value in database
-        HQLCriteria c = new HQLCriteria(
-            "select eattr from "
-                + CollectionEvent.class.getName()
-                + " as ce "
-                + "join ce.eventAttrCollection as eattr "
-                + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
-            Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
+        HQLCriteria c =
+            new HQLCriteria(
+                "select eattr from "
+                    + CollectionEvent.class.getName()
+                    + " as ce "
+                    + "join ce.eventAttrs as eattr "
+                    + "join eattr.studyEventAttr as seattr where ce.id = ? and seattr.label= ?",
+                Arrays.asList(new Object[] { cevent.getId(), "Worksheet" }));
         List<EventAttr> results = appService.query(c);
         Assert.assertEquals(1, results.size());
     }

@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PrintPdfDataExporter extends PdfDataExporter {
     public PrintPdfDataExporter() {
-        super(Messages.PrintPdfDataExporter_name);
+        super("Print");
     }
 
     @Override
@@ -22,8 +22,14 @@ public class PrintPdfDataExporter extends PdfDataExporter {
         IProgressMonitor monitor) throws DataExportException {
         canExport(data);
 
-        List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor, true);
+        List<Map<String, String>> maps;
+        try {
+            maps = getPropertyMaps(data, labelProvider,
+                monitor, true);
+        } catch (Exception e1) {
+            // cancelled
+            return;
+        }
 
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
@@ -32,15 +38,15 @@ public class PrintPdfDataExporter extends PdfDataExporter {
             ReportingUtils.printReport(jasperPrint);
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError(Messages.PrintPdfDataExporter_error_msg, e);
+                .openAsyncError("Error printing PDF", e);
             return;
         }
         try {
-            SessionManager.log(Messages.PrintPdfDataExporter_log_msg,
+            SessionManager.log("print",
                 data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.PrintPdfDataExporter_logging_error_msg, e);
+                "Error Logging Print", e);
         }
     }
 }

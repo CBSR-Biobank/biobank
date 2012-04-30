@@ -6,10 +6,15 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicDeletePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
 
@@ -44,14 +49,15 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ClinicInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -76,21 +82,20 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(ClinicWrapper clinic)
-        throws Exception {
+    public Object getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.clinic = clinic;
-        info.clinicName = clinic.getName();
-        info.clinicNameShort = clinic.getNameShort();
-        List<StudyWrapper> studies = clinic.getStudyCollection();
+        info.clinic = (ClinicWrapper) obj;
+        info.clinicName = info.clinic.getName();
+        info.clinicNameShort = info.clinic.getNameShort();
+        List<StudyWrapper> studies = info.clinic.getStudyCollection();
         if (studies == null) {
             info.studyCount = 0;
         } else {
             info.studyCount = studies.size();
         }
-        info.status = clinic.getActivityStatus().getName();
-        info.patientCount = clinic.getPatientCount();
-        info.visitCount = clinic.getCollectionEventCount();
+        info.status = info.clinic.getActivityStatus().getName();
+        info.patientCount = info.clinic.getPatientCount();
+        info.visitCount = info.clinic.getCollectionEventCount();
         return info;
     }
 
@@ -116,12 +121,23 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         return null;
     }
 
-    /*
-     * @Override public void setSelection(ClinicWrapper item) {
-     * BiobankCollectionModel modelItem = null; for (BiobankCollectionModel m :
-     * model) { if (item.equals(m.o)) { modelItem = m; break; } } if (modelItem
-     * == null) return;
-     * 
-     * tableViewer.setSelection(new StructuredSelection(modelItem)); }
-     */
+    @Override
+    protected Boolean canEdit(ClinicWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(ClinicWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(ClinicWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new ClinicReadPermission(target.getId()));
+    }
+
 }

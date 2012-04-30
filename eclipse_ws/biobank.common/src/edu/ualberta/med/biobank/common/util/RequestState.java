@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.util;
 
 public enum RequestState {
-    NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"), CLOSED(
-        3, "Closed");
+    NEW(0, Messages.getString("RequestState.new.label")), SUBMITTED(1, Messages.getString("RequestState.submitted.label")), APPROVED(2, Messages.getString("RequestState.approved.label")), CLOSED( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        3, Messages.getString("RequestState.closed.label")); //$NON-NLS-1$
 
     private Integer id;
     private String label;

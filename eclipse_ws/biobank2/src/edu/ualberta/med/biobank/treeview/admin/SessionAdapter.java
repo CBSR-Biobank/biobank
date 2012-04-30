@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -15,19 +14,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
 
-    private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
+    private static final String LOGOUT_COMMAND_ID =
+        "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
 
     public static final int CLINICS_BASE_NODE_ID = 0;
 
@@ -39,19 +38,19 @@ public class SessionAdapter extends AdapterBase {
 
     private BiobankApplicationService appService;
 
-    private User user;
+    private UserWrapper user;
     private String serverName;
 
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
-        User user) {
-        super(parent, null, false);
+        UserWrapper user) {
+        super(parent, null);
         this.appService = appService;
         setId(sessionId);
         if (user.getLogin().isEmpty()) {
-            setName(serverName);
+            setLabel(serverName);
         } else {
-            setName(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+            setLabel(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         this.serverName = serverName;
         this.user = user;
@@ -60,32 +59,17 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addSubNodes() {
-        if (SessionManager.getInstance().isConnected()) {
-            if (SessionManager.isSuperAdminMode()) {
-                addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
-                addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-                addChild(new ResearchGroupMasterGroup(this,
-                    RESEARCH_GROUPS_BASE_NODE_ID));
-                SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
-                addChild(siteGroup);
-                siteGroup.performExpand();
-            } else {
-                CenterWrapper<?> currentCenter = SessionManager.getUser()
-                    .getCurrentWorkingCenter();
-                CenterWrapper<?> clonedCenter;
-                try {
-                    clonedCenter = (CenterWrapper<?>) currentCenter
-                        .getDatabaseClone();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                if (clonedCenter != null) {
-                    AdapterBase child = AdapterFactory.getAdapter(clonedCenter);
-                    addChild(child);
-                    child.performExpand();
-                }
-            }
-        }
+        if (!SessionManager.getInstance().isConnected()) return;
+
+        addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+        addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+        ResearchGroupMasterGroup rgroups = new ResearchGroupMasterGroup(this,
+            RESEARCH_GROUPS_BASE_NODE_ID);
+        addChild(rgroups);
+        rgroups.performExpand();
+        SiteGroup siteGroup = new SiteGroup(this, SITES_NODE_ID);
+        addChild(siteGroup);
+        siteGroup.performExpand();
     }
 
     @Override
@@ -109,7 +93,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         if (appService != null) {
             return Messages.SessionAdapter_current_session_label
                 + appService.getServerVersion();
@@ -118,27 +102,29 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private SiteGroup getSitesGroupNode() {
-        AdapterBase adapter = getChild(SITES_NODE_ID);
+        SiteGroup adapter = (SiteGroup) getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
-        return (SiteGroup) adapter;
+        return adapter;
     }
 
     private StudyMasterGroup getStudiesGroupNode() {
-        AdapterBase adapter = getChild(STUDIES_NODE_ID);
+        StudyMasterGroup adapter = (StudyMasterGroup) getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
-        return (StudyMasterGroup) adapter;
+        return adapter;
     }
 
     private ClinicMasterGroup getClinicGroupNode() {
-        AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
+        ClinicMasterGroup adapter =
+            (ClinicMasterGroup) getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ClinicMasterGroup) adapter;
+        return adapter;
     }
 
     private ResearchGroupMasterGroup getResearchGroupGroupNode() {
-        AdapterBase adapter = getChild(RESEARCH_GROUPS_BASE_NODE_ID);
+        ResearchGroupMasterGroup adapter =
+            (ResearchGroupMasterGroup) getChild(RESEARCH_GROUPS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ResearchGroupMasterGroup) adapter;
+        return adapter;
     }
 
     @Override
@@ -160,7 +146,7 @@ public class SessionAdapter extends AdapterBase {
         });
     }
 
-    public User getUser() {
+    public UserWrapper getUser() {
         return user;
     }
 
@@ -169,8 +155,9 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -179,18 +166,13 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() {
-        return 0;
     }
 
     @Override
@@ -203,8 +185,7 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
-    @SuppressWarnings("unused")
-    public List<ClinicWrapper> getClinicCollection(boolean sort) {
+    public List<ClinicWrapper> getClinicCollection() {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
@@ -241,4 +222,8 @@ public class SessionAdapter extends AdapterBase {
         }
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

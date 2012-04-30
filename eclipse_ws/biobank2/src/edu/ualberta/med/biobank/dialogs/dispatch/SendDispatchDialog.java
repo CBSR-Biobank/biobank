@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SendDispatchDialog extends BgcBaseDialog {
 
-    private static final String TITLE = Messages.SendDispatchDialog_title;
+    private static final String TITLE = "Dispatching specimens";
     private DispatchWrapper shipment;
 
     public SendDispatchDialog(Shell parentShell, DispatchWrapper shipment) {
@@ -31,7 +31,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SendDispatchDialog_description;
+        return "Fill the following fields to complete the shipment";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
-        widgetCreator.createComboViewer(contents, Messages.SendDispatchDialog_shippingMethod_label,
+        widgetCreator.createComboViewer(contents, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -68,13 +68,13 @@ public class SendDispatchDialog extends BgcBaseDialog {
             }, new BiobankLabelProvider());
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
-            Messages.SendDispatchDialog_waybill_label, null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
-        createDateTimeWidget(contents, Messages.SendDispatchDialog_timePacked_label, date, shipInfo,
+        createDateTimeWidget(contents, "Time Packed", date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
-                Messages.SendDispatchDialog_timePacked_validator_msg));
+                "Packed should be set"));
     }
 
 }

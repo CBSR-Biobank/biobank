@@ -1,10 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -31,10 +28,9 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
 
     private String currentTitle;
 
-    private MultiSelectWidget multiSelectChildren;
+    private MultiSelectWidget<SpecimenTypeWrapper> multiSelectChildren;
 
-    private Map<Integer, SpecimenTypeWrapper> allOthersTypesObjects;
-    private LinkedHashMap<Integer, String> allOthersTypesStrings;
+    private List<SpecimenTypeWrapper> allOthersTypes;
 
     public SpecimenTypeDialog(Shell parent, SpecimenTypeWrapper specimenType,
         String message, List<SpecimenTypeWrapper> allTypes) {
@@ -45,17 +41,11 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         simpleCopyTo(origSpecimenType, tmpSpecimenType);
         this.message = message;
 
-        allOthersTypesStrings = new LinkedHashMap<Integer, String>();
-        allOthersTypesObjects = new HashMap<Integer, SpecimenTypeWrapper>();
-        for (SpecimenTypeWrapper type : allTypes) {
-            if (!type.equals(specimenType)) {
-                Integer id = type.getId();
-                allOthersTypesStrings.put(id, type.getName());
-                allOthersTypesObjects.put(id, type);
-            }
-        }
-        currentTitle = (specimenType.getName() == null ? Messages.SpecimenTypeDialog_title_add
-            : Messages.SpecimenTypeDialog_title_edit);
+        currentTitle = (specimenType.getName() == null ? "Add Specimen Type "
+            : "Edit Specimen Type");
+
+        allOthersTypes = new ArrayList<SpecimenTypeWrapper>(allTypes);
+        allOthersTypes.remove(specimenType);
     }
 
     private void simpleCopyTo(SpecimenTypeWrapper src, SpecimenTypeWrapper dest) {
@@ -85,18 +75,25 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_name_label, null, tmpSpecimenType,
+            "Name", null, tmpSpecimenType,
             SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
-                Messages.SpecimenTypeDialog_name_validation_msg));
+                "Specimen type must have a name."));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            Messages.SpecimenTypeDialog_nameShort_label, null, tmpSpecimenType,
+            "Short Name", null, tmpSpecimenType,
             SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                Messages.SpecimenTypeDialog_shortName_validation_msg));
+                "Specimen type must have a short name."));
 
-        multiSelectChildren = new MultiSelectWidget(content, SWT.NONE,
-            Messages.SpecimenTypeDialog_availableTypes_label,
-            Messages.SpecimenTypeDialog_selectedTypes_label, 300);
+        multiSelectChildren = new MultiSelectWidget<SpecimenTypeWrapper>(
+            content, SWT.NONE,
+            "Available types",
+            "Child types", 300) {
+
+            @Override
+            protected String getTextForObject(SpecimenTypeWrapper nodeObject) {
+                return nodeObject.getName();
+            }
+        };
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.widthHint = 700;
@@ -105,27 +102,18 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
 
         // use origSpecimenType on purpose. tmpSpecimenType doesn't have the
         // children.
-        List<Integer> selectedTypes = new ArrayList<Integer>();
-        for (SpecimenTypeWrapper child : origSpecimenType
-            .getChildSpecimenTypeCollection(false)) {
-            selectedTypes.add(child.getId());
-        }
-        multiSelectChildren.setSelections(allOthersTypesStrings, selectedTypes);
+        multiSelectChildren.setSelections(allOthersTypes,
+            origSpecimenType.getChildSpecimenTypeCollection(false));
     }
 
     @Override
     protected void okPressed() {
         simpleCopyTo(tmpSpecimenType, origSpecimenType);
-        List<SpecimenTypeWrapper> addedTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (Integer addedId : multiSelectChildren.getAddedToSelection()) {
-            addedTypes.add(allOthersTypesObjects.get(addedId));
-        }
-        origSpecimenType.addToChildSpecimenTypeCollection(addedTypes);
-        List<SpecimenTypeWrapper> removedTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (Integer removedId : multiSelectChildren.getRemovedToSelection()) {
-            removedTypes.add(allOthersTypesObjects.get(removedId));
-        }
-        origSpecimenType.removeFromChildSpecimenTypeCollection(removedTypes);
+        origSpecimenType.addToChildSpecimenTypeCollection(multiSelectChildren
+            .getAddedToSelection());
+        origSpecimenType
+            .removeFromChildSpecimenTypeCollection(multiSelectChildren
+                .getRemovedFromSelection());
         super.okPressed();
     }
 }

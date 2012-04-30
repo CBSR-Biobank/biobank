@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,10 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.hibernate.criterion.DetachedCriteria;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -21,10 +20,10 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -33,8 +32,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
-
-    private Set<SpecimenWrapper> removedSpecimens = new HashSet<SpecimenWrapper>();
+    private static final ProcessingEventLogProvider LOG_PROVIDER =
+        new ProcessingEventLogProvider();
+    private static final String HAS_DERIVED_SPECIMENS_MSG = Messages
+        .getString("ProcessingEventWrapper.has.derived.specimens.msg"); //$NON-NLS-1$
+    private Set<SpecimenWrapper> removedSpecimens =
+        new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
         ProcessingEvent wrappedObject) {
@@ -45,104 +48,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         super(appService);
     }
 
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        // TODO: new checks required
-        // TODO at least one specimen added ?
-        if (isNew()) {
-            if (getWorksheet() == null || getWorksheet().isEmpty())
-                throw new BiobankCheckException("Worksheet cannot be empty.");
-            else if (getProcessingEventsWithWorksheetCount(appService,
-                getWorksheet()) > 0)
-                throw new BiobankCheckException("Worksheet " + getWorksheet()
-                    + " is already used.");
-        }
-    }
-
-    @Override
-    protected void persistDependencies(ProcessingEvent origObject)
-        throws Exception {
-        for (SpecimenWrapper ss : removedSpecimens) {
-            if (!ss.isNew()) {
-                ss.setProcessingEvent(null);
-                ss.setActivityStatus(ActivityStatusWrapper
-                    .getActiveActivityStatus(appService));
-                ss.persist();
-            }
-        }
-    }
-
-    @Override
-    public void addToSpecimenCollection(List<SpecimenWrapper> specimenCollection) {
-        removedSpecimens.removeAll(specimenCollection);
-        super.addToSpecimenCollection(specimenCollection);
-    }
-
-    @Override
-    public void removeFromSpecimenCollection(
-        List<SpecimenWrapper> specimenCollection) {
-        removedSpecimens.addAll(specimenCollection);
-        super.removeFromSpecimenCollection(specimenCollection);
-    }
-
-    @Override
-    protected void deleteChecks() throws ApplicationException, BiobankException {
-        if (getDerivedSpecimenCount(false) > 0) {
-            throw new BiobankDeleteException(
-                "Unable to delete processing event '"
-                    + getWorksheet()
-                    + "' ("
-                    + getFormattedCreatedAt()
-                    + ") since some of its specimens have already been derived "
-                    + "into others specimens.");
-        }
-    }
-
-    @Override
-    protected void deleteDependencies() throws Exception {
-        for (SpecimenWrapper ss : getSpecimenCollection(false)) {
-            if (!ss.isNew()) {
-                ss.setProcessingEvent(null);
-                ss.persist();
-            }
-        }
-    }
-
-    private static final String SPECIMEN_COUNT_QRY = "select count(specimen) from "
-        + Specimen.class.getName()
-        + " as specimen where specimen."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?";
-
     public long getSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getSpecimenCollection(false).size();
-    }
-
-    private static final String DERIVED_SPECIMEN_COUNT_QRY = "select count(specimen) from "
-        + Specimen.class.getName()
-        + " as specimen where specimen."
-        + Property.concatNames(SpecimenPeer.PARENT_SPECIMEN,
-            SpecimenPeer.PROCESSING_EVENT, ProcessingEventPeer.ID) + "=?";
-
-    public long getDerivedSpecimenCount(boolean fast) throws BiobankException,
-        ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(DERIVED_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getDerivedSpecimenCollection(false).size();
+        return getPropertyCount(ProcessingEventPeer.SPECIMENS, fast);
     }
 
     public List<SpecimenWrapper> getDerivedSpecimenCollection(boolean sort) {
-        List<SpecimenWrapper> derivedSpecimens = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> derivedSpecimens =
+            new ArrayList<SpecimenWrapper>();
         for (SpecimenWrapper spec : getSpecimenCollection(false)) {
             derivedSpecimens.addAll(spec.getChildSpecimenCollection(false));
         }
@@ -171,7 +84,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     public String toString() {
-        return "Date created:" + getFormattedCreatedAt() + " - Worksheet:"
+        return "Date created:" + getFormattedCreatedAt() + " - Worksheet:" //$NON-NLS-1$ //$NON-NLS-2$
             + getWorksheet();
     }
 
@@ -180,41 +93,20 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details)
-        throws Exception {
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(getCenter().getNameShort());
-        } else {
-            log.setCenter(site);
-        }
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("Source Specimens: ").append(
-            getSpecimenCount(false)).toString());
-        String worksheet = getWorksheet();
-        if (worksheet != null) {
-            detailsList.add(new StringBuilder("Worksheet: ").append(worksheet)
-                .toString());
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("ProcessingEvent");
-        return log;
+    public ProcessingEventLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
-    private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent."
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + ">=? and pEvent."
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + "<? and pEvent."
-        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
-        + "= ?";
+    private static final String PROCESSING_EVENT_BY_DATE_QRY =
+        "select pEvent from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.CREATED_AT.getName()
+            + ">=? and pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.CREATED_AT.getName()
+            + "<? and pEvent." //$NON-NLS-1$
+            + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
+            + "= ?"; //$NON-NLS-1$
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
         WritableApplicationService appService, Date date,
@@ -223,7 +115,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             Arrays.asList(new Object[] { startOfDay(date), endOfDay(date),
                 center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
-        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pvws =
+            new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
@@ -231,10 +124,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return pvws;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent."
-        + ProcessingEventPeer.WORKSHEET.getName() + "=?";
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY =
+        "select pEvent from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
         WritableApplicationService appService, String worksheetNumber)
@@ -242,7 +136,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_WORKSHEET_QRY,
             Arrays.asList(new Object[] { worksheetNumber }));
         List<ProcessingEvent> pvs = appService.query(c);
-        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pvws =
+            new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
@@ -250,10 +145,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return pvws;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY = "select count(pEvent) from "
-        + ProcessingEvent.class.getName()
-        + " pEvent where pEvent."
-        + ProcessingEventPeer.WORKSHEET.getName() + "=?";
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY =
+        "select count(pEvent) from " //$NON-NLS-1$
+            + ProcessingEvent.class.getName()
+            + " pEvent where pEvent." //$NON-NLS-1$
+            + ProcessingEventPeer.WORKSHEET.getName() + "=?"; //$NON-NLS-1$
 
     public static long getProcessingEventsWithWorksheetCount(
         WritableApplicationService appService, String worksheetNumber)
@@ -267,10 +163,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {
         return ModelWrapper.wrapModelCollection(appService,
-            appService.search(ProcessingEvent.class, new ProcessingEvent()),
+            appService.query(DetachedCriteria.forClass(ProcessingEvent.class)),
             ProcessingEventWrapper.class);
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
@@ -287,15 +184,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return count;
     }
 
-    private static String CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY = "select distinct(cEvent) from "
-        + CollectionEvent.class.getName()
-        + " as cEvent join cEvent."
-        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-        + " as specs where cEvent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=? and specs."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?";
+    private static String CEVENT_FROM_SPECIMEN_AND_PATIENT_QRY =
+        "select distinct(cEvent) from " //$NON-NLS-1$
+            + CollectionEvent.class.getName()
+            + " as cEvent join cEvent." //$NON-NLS-1$
+            + CollectionEventPeer.ALL_SPECIMENS.getName()
+            + " as specs where cEvent." //$NON-NLS-1$
+            + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+            + "=? and specs." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+                ProcessingEventPeer.ID) + "=?"; //$NON-NLS-1$
 
     public List<CollectionEventWrapper> getCollectionEventFromSpecimensAndPatient(
         PatientWrapper patient) throws ApplicationException {
@@ -306,34 +204,64 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
+    @Deprecated
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(ProcessingEventPeer.WORKSHEET));
+        tasks.add(check().unique(ProcessingEventPeer.WORKSHEET));
+
+        super.addPersistTasks(tasks);
+
+        tasks.persistAdded(this, ProcessingEventPeer.SPECIMENS);
+    }
+
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.persistRemoved(this, ProcessingEventPeer.SPECIMENS);
+
+        String hasDerivedSpecimensMsg = MessageFormat.format(
+            HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
+        tasks.add(check().notUsedBy(Specimen.class,
+            SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.PROCESSING_EVENT),
+            hasDerivedSpecimensMsg));
+
+        tasks.add(check().notUsedBy(Specimen.class,
+            SpecimenPeer.PROCESSING_EVENT));
+
+        super.addDeleteTasks(tasks);
+    }
+
     /**
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
-                getCenter()));
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getCenter() == null || getCenter().equals(
+                user.getCurrentWorkingCenter()));
     }
 
     /**
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getCenter() == null || user.getCurrentWorkingCenter().equals(
-                getCenter()));
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getCenter() == null || getCenter().equals(
+                user.getCurrentWorkingCenter()));
     }
 
-    public static String PE_BY_PATIENT_STRING = "select distinct s."
+    public static String PE_BY_PATIENT_STRING = "select distinct s." //$NON-NLS-1$
         + SpecimenPeer.PROCESSING_EVENT.getName()
-        + " from "
+        + " from " //$NON-NLS-1$
         + Specimen.class.getName()
-        + " s where s."
+        + " s where s." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.PATIENT, PatientPeer.PNUMBER)
-        + " = ? order by s."
+        + " = ? order by s." //$NON-NLS-1$
         + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
             ProcessingEventPeer.CREATED_AT);
 
@@ -353,6 +281,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * when want to try to re-add the specimens)
      */
     public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
-        setWrapperCollection(ProcessingEventPeer.SPECIMEN_COLLECTION, specs);
+        setWrapperCollection(ProcessingEventPeer.SPECIMENS, specs);
     }
 }

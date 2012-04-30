@@ -3,11 +3,12 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@Deprecated
 public class ContainerHelper extends DbHelper {
 
     /**
@@ -16,15 +17,13 @@ public class ContainerHelper extends DbHelper {
      * @param label If the container is a top level container provide a label,
      *            otherwise this parameter should be null.
      * @param barcode The product barcode for this container.
-     * @param parent The containers parent container.
      * @param site The site this container belongs to.
      * @param type The container type for this container.
      * @return The container wrapper for the container.
      * @throws Exception
      */
     public static ContainerWrapper newContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
+        SiteWrapper site, ContainerTypeWrapper type) throws Exception {
         ContainerWrapper container;
 
         container = new ContainerWrapper(appService);
@@ -33,12 +32,8 @@ public class ContainerHelper extends DbHelper {
             container.setLabel(label);
         }
         container.setProductBarcode(barcode);
-        if ((parent != null) && !parent.isNew()) {
-            container.setParent(parent);
-        }
         container.setSite(site);
-        container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        container.setActivityStatus(ActivityStatus.ACTIVE);
         return container;
     }
 
@@ -48,7 +43,6 @@ public class ContainerHelper extends DbHelper {
      * @param label If the container is a top level container provide a label,
      *            otherwise this parameter should be null.
      * @param barcode The product barcode for this container.
-     * @param parent The containers parent container.
      * @param site The site this container belongs to.
      * @param type The container type for this container.
      * @param row If the container is a child container then this is the row
@@ -62,9 +56,8 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
         Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
-        container.setPositionAsRowCol(new RowColPos(row, col));
+        ContainerWrapper container = newContainer(label, barcode, site, type);
+        container.setParent(parent, new RowColPos(row, col));
         return container;
     }
 
@@ -74,7 +67,6 @@ public class ContainerHelper extends DbHelper {
      * @param label If the container is a top level container provide a label,
      *            otherwise this parameter should be null.
      * @param barcode The product barcode for this container.
-     * @param parent The containers parent container.
      * @param site The site this container belongs to.
      * @param type The container type for this container.
      * 
@@ -84,10 +76,8 @@ public class ContainerHelper extends DbHelper {
      *             thrown if the container could not be added to the database.
      */
     public static ContainerWrapper addContainer(String label, String barcode,
-        ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
-        throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
+        SiteWrapper site, ContainerTypeWrapper type) throws Exception {
+        ContainerWrapper container = newContainer(label, barcode, site, type);
         container.persist();
         return container;
     }
@@ -128,10 +118,9 @@ public class ContainerHelper extends DbHelper {
         if ((type.getTopLevel() != null) && type.getTopLevel()) {
             label = String.valueOf(r.nextInt());
         }
-        ContainerWrapper container = addContainer(label, name, null, site, type);
+        ContainerWrapper container = addContainer(label, name, site, type);
         if (label == null) {
-            container.setParent(parent);
-            container.setPositionAsRowCol(new RowColPos(0, 0));
+            container.setParent(parent, new RowColPos(0, 0));
         }
         container.persist();
         return container;
@@ -141,7 +130,7 @@ public class ContainerHelper extends DbHelper {
         String name, int typeCapacityRow, int typeCapacityCol) throws Exception {
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             name, name, 1, typeCapacityRow, typeCapacityCol, true);
-        ContainerWrapper container = addContainer(name, name, null, site, type);
+        ContainerWrapper container = addContainer(name, name, site, type);
         return container;
     }
 
@@ -159,7 +148,7 @@ public class ContainerHelper extends DbHelper {
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {
                 ContainerWrapper child = newContainer(null, barcode + "child"
-                    + (i + 1) + "_" + j, topContainer, site, type);
+                    + (i + 1) + "_" + j, site, type);
                 int posRow = j % maxRow;
                 int posCol = j / maxRow;
                 topContainer.addChild(posRow, posCol, child);
@@ -167,6 +156,6 @@ public class ContainerHelper extends DbHelper {
             topContainer.persist();
         }
         site.reload();
-        return count + count * 5;
+        return count + (count * 5);
     }
 }

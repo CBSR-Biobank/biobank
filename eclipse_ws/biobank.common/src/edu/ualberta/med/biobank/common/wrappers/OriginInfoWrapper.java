@@ -5,17 +5,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.common.wrappers.loggers.OriginInfoLogProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -23,10 +17,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
-
-    private static final String SHIPMENT_HQL_STRING = "from "
-        + OriginInfo.class.getName() + " as o inner join fetch o."
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s ";
+    private static final OriginInfoLogProvider LOG_PROVIDER =
+        new OriginInfoLogProvider();
+    private static final String SHIPMENT_HQL_STRING = "from " //$NON-NLS-1$
+        + OriginInfo.class.getName() + " as o inner join fetch o." //$NON-NLS-1$
+        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "; //$NON-NLS-1$
 
     public OriginInfoWrapper(WritableApplicationService appService) {
         super(appService);
@@ -56,87 +51,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
-    @Override
-    protected void deleteDependencies() throws Exception {
-        // all specimen should be linked to another origin info. This origin
-        // info center will be the specimen current center.
-        for (SpecimenWrapper spc : getSpecimenCollection()) {
-            OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-            oi.setCenter(spc.getCurrentCenter());
-            oi.persist();
-            spc.setOriginInfo(oi);
-            spc.persist();
-        }
-    }
-
-    public void checkAtLeastOneSpecimen() {
-        // FIXME don't want that when create from collection event
-        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        // if (spc == null || spc.isEmpty()) {
-        // throw new BiobankCheckException(
-        // "At least one specimen should be added to this Collection Event.");
-        // }
-    }
-
-    private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "
-        + Clinic.class.getName() + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName() + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as si where clinic."
-        + ClinicPeer.ID.getName() + "=? and si."
-        + ShipmentInfoPeer.WAYBILL.getName() + "=?";
-
-    private boolean checkWaybillUniqueForClinic(ClinicWrapper clinic)
-        throws ApplicationException {
-        List<Object> params = new ArrayList<Object>();
-        params.add(clinic.getId());
-        params.add(getShipmentInfo().getWaybill());
-
-        StringBuilder qry = new StringBuilder(
-            WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY);
-        if (!isNew()) {
-            qry.append(" and oi.").append(OriginInfoPeer.ID.getName())
-                .append(" <> ?");
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria(qry.toString(), params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        CenterWrapper<?> center = getCenter();
-        if (center == null) {
-            throw new BiobankCheckException("A Center should be set.");
-        }
-        checkAtLeastOneSpecimen();
-
-        if (center instanceof ClinicWrapper && getShipmentInfo() != null) {
-            ClinicWrapper clinic = (ClinicWrapper) center;
-            String waybill = getShipmentInfo().getWaybill();
-
-            if (Boolean.TRUE.equals(clinic.getSendsShipments())) {
-                if (waybill == null || waybill.isEmpty()) {
-                    throw new BiobankCheckException(
-                        "A waybill should be set on this shipment");
-                }
-                if (!checkWaybillUniqueForClinic(clinic)) {
-                    throw new BiobankCheckException("A shipment with waybill "
-                        + waybill + " already exist in clinic "
-                        + clinic.getNameShort());
-                }
-            } else {
-                if (waybill != null) {
-                    throw new BiobankCheckException(
-                        "This clinic doesn't send shipments: waybill should not be set");
-                }
-            }
-        }
-
-    }
-
     public static List<OriginInfoWrapper> getTodayShipments(
         BiobankApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
@@ -144,7 +58,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     private static final String SHIPMENTS_BY_WAYBILL_QRY = SHIPMENT_HQL_STRING
-        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?";
+        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     /**
      * Search for shipments in the site with the given waybill
@@ -165,16 +79,17 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     // Don't run this on the server unless you take into account timezones in
     // your inputs
-    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY = SHIPMENT_HQL_STRING
-        + " where s."
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " >= ? and s."
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " < ? and (o."
-        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-        + "= ? or o."
-        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-        + " = ?)";
+    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY =
+        SHIPMENT_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " >= ? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + " < ? and (o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+            + "= ? or o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -199,16 +114,17 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     // Don't run this on the server unless you take into account timezones in
     // your inputs
-    private static final String SHIPMENTS_BY_DATE_SENT_QRY = SHIPMENT_HQL_STRING
-        + " where s."
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " >= ? and s."
-        + ShipmentInfoPeer.PACKED_AT.getName()
-        + " < ? and (o."
-        + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-        + "= ? or o."
-        + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-        + " = ?)";
+    private static final String SHIPMENTS_BY_DATE_SENT_QRY =
+        SHIPMENT_HQL_STRING
+            + " where s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " >= ? and s." //$NON-NLS-1$
+            + ShipmentInfoPeer.PACKED_AT.getName()
+            + " < ? and (o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
+            + "= ? or o." //$NON-NLS-1$
+            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + " = ?)"; //$NON-NLS-1$
 
     public static List<OriginInfoWrapper> getShipmentsByDateSent(
         WritableApplicationService appService, Date dateSent,
@@ -238,34 +154,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
-        ShipmentInfoWrapper shipInfo = getShipmentInfo();
-        if (shipInfo == null) {
-            // nothing to log since origin info does not yet point to any
-            // shipping information
-            return null;
-        }
-
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(getCenter().getNameShort());
-        } else {
-            log.setCenter(site);
-        }
-
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("waybill:").append(
-            shipInfo.getWaybill()).toString());
-        detailsList.add(new StringBuilder("specimens:").append(
-            getSpecimenCollection(false).size()).toString());
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("Shipment");
-        return log;
+    public OriginInfoLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
     /**
@@ -274,6 +164,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
      * originInfo when want to try to re-add the specimens)
      */
     public void setSpecimenWrapperCollection(List<SpecimenWrapper> specs) {
-        setWrapperCollection(OriginInfoPeer.SPECIMEN_COLLECTION, specs);
+        setWrapperCollection(OriginInfoPeer.SPECIMENS, specs);
     }
+
 }

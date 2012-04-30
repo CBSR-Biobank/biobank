@@ -37,20 +37,25 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     public static final String SUPER_ADMIN_MSG_ID = "biobank.superAdminMsg"; //$NON-NLS-1$
 
-    private static final String SHORTCUTS_COMMAND_ID = "org.eclipse.ui.window.showKeyAssist"; //$NON-NLS-1$
+    private static final String SHORTCUTS_COMMAND_ID =
+        "org.eclipse.ui.window.showKeyAssist"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
-    public static final String VIEW_ID_PARM = "org.eclipse.ui.views.showView.viewId"; //$NON-NLS-1$
+    public static final String VIEW_ID_PARM =
+        "org.eclipse.ui.views.showView.viewId"; //$NON-NLS-1$
 
-    public static final String ERROR_LOGS_VIEW = "org.eclipse.pde.runtime.LogView"; //$NON-NLS-1$
+    public static final String ERROR_LOGS_VIEW =
+        "org.eclipse.pde.runtime.LogView"; //$NON-NLS-1$
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
 
-    public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail"; //$NON-NLS-1$
+    public static final String SEND_ERROR_EMAIL_ID =
+        "edu.ualberta.med.biobank.commands.sendErrorMail"; //$NON-NLS-1$
 
-    public static final String EXPORT_ERRORS_LOGS_ID = "edu.ualberta.med.biobank.commands.exportErrorsLogs"; //$NON-NLS-1$
+    public static final String EXPORT_ERRORS_LOGS_ID =
+        "edu.ualberta.med.biobank.commands.exportErrorsLogs"; //$NON-NLS-1$
 
     private IWorkbenchAction resetPerspectiveAction;
 
@@ -146,7 +151,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     protected void fillMenuBar(IMenuManager menuBar) {
         MenuManager helpMenu = new MenuManager(
             Messages.ApplicationActionBarAdvisor_help_menu_name,
-            IWorkbenchActionConstants.M_HELP);
+            "biobank.help");
+
         menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         menuBar.add(helpMenu);
 
@@ -158,8 +164,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             helpMenu.add(action);
         }
         helpMenu.add(resetPerspectiveAction);
-        helpMenu.add(new Separator());
-        helpMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     @Override
@@ -177,7 +181,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             STATUS_SERVER_MSG_ID) {
             @Override
             public Color getBackgroundColor(String text) {
-                if (text != null && !text.endsWith("@cbsr.med.ualberta.ca")) { //$NON-NLS-1$
+                if (text != null && !text.endsWith("@biobank.cbsr.ualberta.ca")) { //$NON-NLS-1$
                     return PlatformUI.getWorkbench().getDisplay()
                         .getSystemColor(SWT.COLOR_YELLOW);
                 }

@@ -20,7 +20,7 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="biobank.biobank"
-            name="BioBank2">
+            name="BioBank">
          <property
                name="appName"
                value="BioBank">
@@ -78,11 +78,6 @@
             defaultHandler="edu.ualberta.med.biobank.handlers.QuitHandler"
             id="edu.ualberta.med.biobank.commands.quit"
             name="%Quit.command">
-      </command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.reset"
-            name="%Reset.command">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
@@ -228,14 +223,9 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.reloadViewForm"
+            id="edu.ualberta.med.biobank.commands.reload"
             name="%Reload.command">
 	  </command>
-	  <command
-         categoryId="org.eclipse.ui.category.edit"
-         id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-         name="%EditActivityStatus.command">
-      </command>
       <command
             categoryId="biobank.command.category.server"
             id="edu.ualberta.med.biobank.commands.userManagement"
@@ -285,8 +275,21 @@
              name="Add Research Group">
        </command>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+       	  class="edu.ualberta.med.biobank.handlers.DisabledNewEditorHandler"
+          commandId="org.eclipse.ui.window.newEditor">
+       		<enabledWhen>
+          		<count value="-1">
+          		</count>
+       		</enabledWhen>
+       		<activeWhen>
+          		<not>
+             		<count value="-1">
+             		</count>
+          		</not>
+       		</activeWhen>
+      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.LoginHandler"
             commandId="edu.ualberta.med.biobank.commands.login">
@@ -328,15 +331,6 @@
             </and>
          </activeWhen>
       </handler>   
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ResetHandler"
-            commandId="edu.ualberta.med.biobank.commands.reset">
-         <activeWhen>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankEntryForm">
-               </reference>
-         </activeWhen>
-      </handler>         
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
             commandId="edu.ualberta.med.biobank.commands.print">
@@ -399,11 +393,6 @@
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
-               <not>
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </not>
             </and>
          </activeWhen>
       </handler>
@@ -418,11 +407,6 @@
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
-               <not>
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </not>
             </and>
          </activeWhen>
       </handler>
@@ -441,7 +425,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditShippingMethodsHandler"
+            class="edu.ualberta.med.biobank.handlers.ShippingMethodsEditHandler"
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods">
          <activeWhen>
             <and>
@@ -507,9 +491,6 @@
               <reference
                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
               </reference>
-              <reference
-                    definitionId="biobank.hasClinicShipmentRights">
-              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -560,8 +541,6 @@
                      </instanceof>
                   </iterate>
           	  </with>
-              <reference definitionId="biobank.canUpdate">
-              </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -592,11 +571,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
-         <activeWhen>
-               <reference
-                     definitionId="biobank.processingPerspectiveSelected">
-               </reference>
-         </activeWhen>
          <enabledWhen>
             <and>
                <reference
@@ -612,8 +586,6 @@
                      </instanceof>
                   </iterate>
           	  </with>
-      		  <reference definitionId="biobank.canUpdate">
-      		  </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -630,9 +602,21 @@
             class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"      
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
          <enabledWhen>
-            <reference
-                  definitionId="biobank.canDelete">
-            </reference>
+            <and>
+               <reference
+                     definitionId="biobank.oneElementSelected">
+               </reference>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <test
+                           property="edu.ualberta.med.biobank.treeview.canDelete">
+                     </test>
+                  </iterate>
+               </with>
+            </and>
          </enabledWhen>
       </handler>
       <handler
@@ -667,54 +651,23 @@
             commandId="edu.ualberta.med.biobank.commands.scanner.decodeImage">
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.LoggingHandler"
-            commandId="edu.ualberta.med.biobank.commands.logging">
+            class="edu.ualberta.med.biobank.handlers.EditHandler"
+            commandId="edu.ualberta.med.biobank.commands.edit">
          <enabledWhen>
-            <and>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
-            </and>
+            <reference
+                  definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankViewForm">
+            </reference>
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditHandler"
-            commandId="edu.ualberta.med.biobank.commands.edit">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
-               </instanceof>
-            </with>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadViewFormHandler"
-            commandId="edu.ualberta.med.biobank.commands.reloadViewForm">
-         <activeWhen>
-            <with
-                  variable="activeEditor">
-               <instanceof
-                     value="edu.ualberta.med.biobank.forms.BiobankViewForm">
-               </instanceof>
-            </with>
-            </activeWhen>
+            class="edu.ualberta.med.biobank.handlers.ReloadHandler"
+            commandId="edu.ualberta.med.biobank.commands.reload">
+         <enabledWhen>
+            <reference
+                  definitionId="edu.ualberta.med.biobank.form.instanceof.BiobankFormBase">
+            </reference>
+         </enabledWhen>
             </handler>
-	   <handler
-            class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
-            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank.mainPerspectiveSelected">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.ChangePasswordHandler"
             commandId="edu.ualberta.med.biobank.commands.changePassword">
@@ -737,26 +690,11 @@
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
-               <or>
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-                  <reference
-                        definitionId="biobank.isCurrentCenterAdmin">
-                  </reference>
-               </or>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
             </and>
          </activeWhen>
-         <enabledWhen>
-            <or>
-               <reference
-                     definitionId="biobank.isSuperAdminMode">
-               </reference>
-               <reference
-                     definitionId="biobank.isCurrentCenterAdmin">
-               </reference>
-            </or>
-         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
@@ -768,9 +706,6 @@
               </reference>
               <reference
                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-              </reference>
-              <reference
-                    definitionId="biobank.hasDispatchRights">
               </reference>
             </and>
          </activeWhen>
@@ -889,24 +824,12 @@
                      icon="icons/sites_add.png"
                      id="edu.ualberta.med.biobank.menu.siteAdd"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                      icon="icons/clinics_add.png"
                      id="edu.ualberta.med.biobank.menu.clinicAdd"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
@@ -914,111 +837,39 @@
                      id="edu.ualberta.med.biobank.menu.researchGroupAdd"
                      label="Add Research Group"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.studyAdd"
                      icon="icons/studies_add.png"
                      id="edu.ualberta.med.biobank.menu.studyAdd"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <reference
-                           definitionId="biobank.isSuperAdminMode">
-                     </reference>
-                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                      id="edu.ualberta.med.biobank.menu.containerTypeAdd"
                   icon="icons/containerTypes_add.png"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <and>
-                       <not>
-                          <reference
-                                definitionId="biobank.isSuperAdminMode">
-                          </reference>
-                       </not>
-                       <reference
-                             definitionId="biobank.isSite">
-                       </reference>
-                     </and>
-                  </visibleWhen>
                </command>
                <command
                      commandId="edu.ualberta.med.biobank.commands.containerAdd"
                      id="edu.ualberta.med.biobank.menu.containerAdd"
                   icon="icons/containers_add.png"
                      style="push">
-                  <visibleWhen
-                        checkEnabled="false">
-                     <and>
-                       <not>
-                          <reference
-                                definitionId="biobank.isSuperAdminMode">
-                          </reference>
-                       </not>
-                       <reference
-                             definitionId="biobank.isSite">
-                       </reference>
-                     </and>
-                  </visibleWhen>
                </command>
                 <command
                      commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes"
                      id="edu.ualberta.med.biobank.menu.editSpecimenTypes"
                      style="push">
-                   <visibleWhen
-                         checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
-                   </visibleWhen>
                </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
-                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
+                      id="edu.ualberta.med.biobank.menu.editShippingMethods"
                       style="push">
-                   <visibleWhen
-                         checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
-                   </visibleWhen>
-                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-                      id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
-                      style="push">
-                   <visibleWhen
-                         checkEnabled="false">
-                      <reference
-                            definitionId="biobank.isSuperAdminMode">
-                      </reference>
-                   </visibleWhen>
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.userManagement"
                       id="edu.ualberta.med.biobank.menu.userManagement"
                       style="push">
-                   <visibleWhen
-                         checkEnabled="false">
-                      <or>
-                         <reference
-                               definitionId="biobank.isSuperAdminMode">
-                         </reference>
-                         <reference
-                               definitionId="biobank.isCurrentCenterAdmin">
-                         </reference>
-                      </or>
-                   </visibleWhen>
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.changePassword"
@@ -1072,23 +923,11 @@
                   commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.hasDispatchRights">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
                   icon="icons/shipment_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.hasClinicShipmentRights">
-                  </reference>
-               </visibleWhen>
             </command>
             <separator
                   name="biobank.separator3"
@@ -1161,19 +1000,31 @@
               visible="false">
          </separator>
       </menuContribution>
-         <menuContribution
-            locationURI="menu:help?after=additions">
+      <menuContribution
+            locationURI="menu:biobank.help?after=additions">
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorA"
                   visible="true">
             </separator>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
+                  style="push">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  visible="true">
+            </separator>  
             <command
                   commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
                   label="%CbsrHelp.command"
                   id="edu.ualberta.med.biobank.menu.cbsrHelp">
             </command>
             <separator
-                  name="edu.ualberta.med.biobank.menu.update.separatorB"
+                  name="edu.ualberta.med.biobank.menu.update.separatorC"
                   visible="true">
             </separator>  
             <command
@@ -1239,82 +1090,22 @@
                   icon="icons/sites_add.png"
                   id="edu.ualberta.med.biobank.menu.siteAdd"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                   icon="icons/clinics_add.png"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.researchGroupAdd"
                   icon="icons/rg_add.png"
                   label="Add Research Group"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank.isSuperAdminMode">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
-                  icon="icons/containerTypes_add.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                    <and>
-                       <not>
-                          <reference
-                                definitionId="biobank.isSuperAdminMode">
-                          </reference>
-                       </not>
-                       <reference
-                             definitionId="biobank.isSite">
-                       </reference>
-                     </and>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.containerAdd"
-                  icon="icons/containers_add.png"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                     <and>
-                       <not>
-                          <reference
-                                definitionId="biobank.isSuperAdminMode">
-                          </reference>
-                       </not>
-                       <reference
-                             definitionId="biobank.isSite">
-                       </reference>
-                     </and>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
@@ -1433,14 +1224,9 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <and>
                   <reference
                         definitionId="biobank.processingPerspectiveSelected">
                   </reference>
-                  <reference
-                        definitionId="biobank.hasDispatchRights">
-                  </reference>
-                  </and>
                </visibleWhen>
             </command>
             <command
@@ -1449,15 +1235,16 @@
                   style="push">
                <visibleWhen
                      checkEnabled="false">
-                  <and>
                   <reference
                         definitionId="biobank.processingPerspectiveSelected">
                   </reference>
-				  <reference
-                        definitionId="biobank.hasClinicShipmentRights">
-                  </reference>
-                  </and>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  style="push"
+                  tooltip="Delete Selected Item">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -1656,6 +1443,13 @@
             name="%SiteEntry.editor">
       </editor>
       <editor
+            class="edu.ualberta.med.biobank.mvp.view.form.FormViewEditorPart"
+            default="false"
+            icon="icons/site.png"
+            id="edu.ualberta.med.biobank.mvp.view.FormViewEditorPart"
+            name="%SiteEntry.editor">
+      </editor>
+      <editor
             class="edu.ualberta.med.biobank.forms.SiteViewForm"
             default="false"
             icon="icons/site.png"
@@ -1822,13 +1616,6 @@
             name="%DecodeImage.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            default="false"
-            icon="icons/specimen.png"
-            id="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
-            name="%SpecimenList.editor">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.PeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"
@@ -1850,73 +1637,67 @@
             name="%Logging.editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenRequestEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenReport3Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenRequestEditor"
-            name="%ReportSpecimenRequest.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenReport3Editor"
+            name="SpecimenReport3Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.FvLPatientVisitsEditor"
+            class="edu.ualberta.med.biobank.forms.reports.ClinicReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.FvLPatientVisitsEditor"
-            name="Clinic Activity">
+            id="edu.ualberta.med.biobank.editors.ClinicReport1Editor"
+            name="ClinicReport1Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypePvCountEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenTypePvCountEditor"
-            name="%ReportSpecimenTypeTotals.editor">            
+            id="edu.ualberta.med.biobank.editors.SpecimenTypeReport1Editor"
+            name="SpecimenTypeReport1Editor">            
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.QaSpecimensEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenReport2Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.QaSpecimensEditor"
-            name="%ReportSpecimenQA.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenReport2Editor"
+            name="SpecimenReport2Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeSUsageEditor"
+            class="edu.ualberta.med.biobank.forms.reports.SpecimenTypeReport2Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.SpecimenTypeSUsageEditor"
-            name="%ReportSpecimenTypeUsage.editor">
+            id="edu.ualberta.med.biobank.editors.SpecimenTypeReport2Editor"
+            name="SpecimenTypeReport2Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.reports.PatientVisitSummaryEditor"
+            class="edu.ualberta.med.biobank.forms.reports.PatientReport1Editor"
             default="false"
             icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor"
-            name="%ReportPatientVisitSummary.editor">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
-            default="false"
-            id="edu.ualberta.med.biobank.forms.ActivityStatusViewForm"
-            name="%ActivityStatusEntry.editor">
+            id="edu.ualberta.med.biobank.editors.PatientReport1Editor"
+            name="PatientReport1Editor">
       </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.ContainerCapacityEditor"
+      class="edu.ualberta.med.biobank.forms.reports.ContainerReport1Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.ContainerCapacityEditor"
-      name="%ReportContainerCapacity.editor">
+      id="edu.ualberta.med.biobank.editors.ContainerReport1Editor"
+      name="ContainerReport1Editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.ContainerEmptyLocationsEditor"
+      class="edu.ualberta.med.biobank.forms.reports.ContainerReport2Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.ContainerEmptyLocationsEditor"
-      name="%ReportContainerEmptyLocations.editor">
+      id="edu.ualberta.med.biobank.editors.ContainerReport2Editor"
+      name="ContainerReport2Editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.reports.FTAReportEditor"
+      class="edu.ualberta.med.biobank.forms.reports.SpecimenReport1Editor"
       default="false"
       icon="icons/reportsPerspective.png"
-      id="edu.ualberta.med.biobank.editors.FTAReportEditor"
-      name="%ReportFTA.editor">
+      id="edu.ualberta.med.biobank.editors.SpecimenReport1Editor"
+      name="SpecimenReport1Editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.DispatchViewForm"
@@ -1977,14 +1758,14 @@
       default="false"
       icon="icons/research_group.png"
       id="edu.ualberta.med.biobank.forms.ResearchGroupEntryForm"
-      name="Research Group Entry">
+      name="%ResearchGroupEntry.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
       default="false"
       icon="icons/research_group.png"
       id="edu.ualberta.med.biobank.forms.ResearchGroupViewForm"
-      name="Research Group View">
+      name="%ResearchGroupView.editor">
 </editor>
    </extension>
    <extension
@@ -2066,8 +1847,8 @@
             sequence="M2+M3+A">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.reset"
-            contextId="biobank.context.entryForm"
+            commandId="edu.ualberta.med.biobank.commands.reload"
+            contextId="biobank.context.form"
             schemeId="biobank.scheme"
             sequence="M1+R"/>
       <key
@@ -2102,12 +1883,6 @@
             name="Scheme Biobank">
       </scheme>
       <key
-            commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
-            contextId="biobank.context.viewForm"
-            schemeId="biobank.scheme"
-            sequence="M1+R">
-      </key>
-      <key
             commandId="edu.ualberta.med.biobank.commands.edit"
             contextId="biobank.context.viewForm"
             schemeId="biobank.scheme"
@@ -2137,12 +1912,6 @@
             schemeId="biobank.scheme"
             sequence="M3+M">
       </key> 
-	  <key
-            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-            contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank.scheme"
-            sequence="M3+A">
-      </key>  
 	  <key
             commandId="edu.ualberta.med.biobank.commands.changePassword"
             contextId="edu.ualberta.med.biobank.perspective.main"
@@ -2223,13 +1992,6 @@
    <extension
          point="org.eclipse.ui.services">
       <sourceProvider
-            provider="edu.ualberta.med.biobank.sourceproviders.SessionState">
-         <variable
-               name="edu.ualberta.med.biobank.commands.sourceprovider.loginState"
-               priorityLevel="workbench">
-         </variable>
-      </sourceProvider>
-      <sourceProvider
             provider="edu.ualberta.med.biobank.sourceproviders.DebugState">
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.debugState"
@@ -2241,6 +2003,13 @@
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.confirmState"
                priorityLevel="activeEditorId">
+         </variable>
+      </sourceProvider>
+      <sourceProvider
+            provider="edu.ualberta.med.biobank.sourceproviders.UserState">
+         <variable
+               name="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter"
+               priorityLevel="workbench">
          </variable>
       </sourceProvider>
    </extension>
@@ -2346,21 +2115,28 @@
            </instanceof>
         </with>
       </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankViewForm">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankViewForm">
+           </instanceof>
+        </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.BiobankFormBase">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.BiobankFormBase">
+           </instanceof>
+        </with>
+      </definition>
       <definition
             id="biobank.sampleManagementPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.linkAssign">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isSuperAdminMode">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.isSuperAdminMode">
-            <equals
-                  value="true">
             </equals>
          </with>
       </definition>
@@ -2412,19 +2188,6 @@
          </with>
       </definition>
        <definition
-           id="biobank.canDelete">
-        <with
-              variable="selection">
-           <iterate
-                 ifEmpty="false"
-                 operator="and">
-              <test
-                    property="biobank.canDelete">
-              </test>
-           </iterate>
-        </with>
-     </definition>
-       <definition
              id="biobank.hasWorkingCenter">
           <with
                 variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
@@ -2433,98 +2196,12 @@
              </equals>
           </with>
        </definition>
-       <definition
-             id="biobank.hasClinicShipmentRights">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.clinicShipmentRights">
-             <equals
-                   value="true">
-             </equals>
-          </with>
-       </definition>
-  	   <definition
-             id="biobank.hasDispatchRights">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.dispatchRights">
-             <equals
-                   value="true">
-             </equals>
-          </with>
-       </definition>
-      <definition
-            id="biobank.canUpdate">
-         <with
-               variable="selection">
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <test
-                     property="biobank.canUpdate">
-               </test>
-            </iterate>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isCurrentCenterAdmin">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.isCurrentCenterAdmin">
-            <equals
-                  value="true">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.hasPrinterLabelsRights">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.hasPrinterLabelsRights">
-            <equals
-                  value="true">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isClinic">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
-            <equals
-                  value="Clinic">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isSite">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
-            <equals
-                  value="Site">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank.isResearchGroup">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.currentCenterType">
-            <equals
-                  value="ResearchGroup">
-            </equals>
-         </with>
-      </definition>       
    </extension>
    <extension
          point="org.eclipse.ui.startup">
       <startup
             class="edu.ualberta.med.biobank.rcp.BiobankStartup">
       </startup>
-   </extension>
-   <extension
-         point="org.eclipse.core.expressions.propertyTesters">
-      <propertyTester
-            class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
-            id="biobank.adapterBasePropertyTester"
-            namespace="biobank"
-            properties="canDelete,canUpdate"
-            type="edu.ualberta.med.biobank.treeview.AdapterBase">
-      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
@@ -2553,6 +2230,10 @@
             name="Biobank View Form">
       </context>
       <context
+            id="biobank.context.form"
+            name="Biobank Form">
+      </context>
+      <context
             id="biobank.context.loggedIn"
             name="Logged In">
       </context>
@@ -2576,5 +2257,27 @@
          id="edu.ualberta.med.biobank.perspective.linkAssign"
          name="Link or Assign perspective">
    </context>  
+   </extension>
+   <extension
+         id="product1"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="biobank.biobank"
+            name="Biobank">
+         <property
+               name="appName"
+               value="Biobank">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
+            id="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
+            namespace="edu.ualberta.med.biobank.treeview"
+            properties="canDelete"
+            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
+      </propertyTester>
    </extension>
 </plugin>

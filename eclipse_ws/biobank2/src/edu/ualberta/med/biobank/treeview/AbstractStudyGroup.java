@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -15,7 +14,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public abstract class AbstractStudyGroup extends AdapterBase {
 
     public AbstractStudyGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
     }
 
     @Override
@@ -39,13 +38,14 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, StudyWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, StudyWrapper.class);
     }
 
     @Override
@@ -54,7 +54,7 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof StudyWrapper);
         return new StudyAdapter(this, (StudyWrapper) child);
     }
@@ -72,6 +72,11 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     @Override
     public String getViewFormId() {
         return null;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 
 }

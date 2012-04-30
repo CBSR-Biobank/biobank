@@ -17,8 +17,13 @@ public class BgcBaseWidget extends Composite {
 
     public static ControlDecoration createDecorator(Control control,
         String message) {
+        return createDecorator(control, message, SWT.RIGHT | SWT.TOP);
+    }
+
+    public static ControlDecoration createDecorator(Control control,
+        String message, int style) {
         ControlDecoration controlDecoration = new ControlDecoration(control,
-            SWT.RIGHT | SWT.TOP);
+            style);
         controlDecoration.setDescriptionText(message);
         FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);

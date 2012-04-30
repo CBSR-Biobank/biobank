@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.report;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
@@ -12,10 +12,12 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.AdvancedReportDeleteAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 
@@ -37,7 +39,7 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.ReportAdapter_report_label);
     }
 
@@ -63,7 +65,10 @@ public class ReportAdapter extends AdapterBase {
                         ((ReportWrapper) getModelObject()).getName()));
                 if (delete) {
                     try {
-                        getModelObject().delete();
+                        AdvancedReportDeleteAction action =
+                            new AdvancedReportDeleteAction(getModelObject()
+                                .getId());
+                        SessionManager.getAppService().doAction(action);
                         parent.removeChild(ReportAdapter.this);
                         AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {
@@ -83,7 +88,8 @@ public class ReportAdapter extends AdapterBase {
             int userId = SessionManager.getUser().getId().intValue();
             report.setUserId(userId);
 
-            ReportAdapter reportAdapter = new ReportAdapter(this.parent, report);
+            ReportAdapter reportAdapter =
+                new ReportAdapter(getParent(), report);
             reportAdapter.openEntryForm();
         }
     }
@@ -94,19 +100,14 @@ public class ReportAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -117,6 +118,13 @@ public class ReportAdapter extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return ReportEntryForm.ID;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof ReportAdapter)
+            return internalCompareTo(o);
+        return 0;
     }
 
 }

@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Status;
@@ -18,32 +21,47 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAliquotedSpecimensAction;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
-import edu.ualberta.med.biobank.wizards.SelectCollectionEventWizard;
+import edu.ualberta.med.biobank.wizards.ReparentingWizard;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenEntryForm"; //$NON-NLS-1$
 
     public static final String OK_MESSAGE = Messages.SpecimenEntryForm_ok_msg;
 
-    private SpecimenWrapper specimen;
+    private SpecimenWrapper specimen = new SpecimenWrapper(
+        SessionManager.getAppService());
 
     private ComboViewer activityStatusComboViewer;
 
@@ -61,18 +79,72 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText commentText;
 
-    private List<SpecimenWrapper> origchildren;
-    private List<SpecimenWrapper> allchildren;
-
     protected CollectionEventWrapper newCollectionEvent;
+    protected CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
+    private CommentsInfoTable commentEntryTable;
+
+    private SpecimenBriefInfo specimenInfo;
+    private SpecimenInfo newParent;
+
+    private SpecimenAdapter specimenAdapter;
+
+    private Button isSourceSpcButton;
+
+    private BgcBaseText sourceSpecimenField;
+
+    private Set<AliquotedSpecimen> aliquotedSpecTypes;
+
+    private Set<SpecimenType> containerSpecimenTypeList;
+
+    private Label sourceSpecimenLabel;
+
+    protected ReparentingWizard wizard;
+
+    private BgcBaseText parentPEventField;
 
     @Override
     protected void init() throws Exception {
-        specimen = (SpecimenWrapper) getModelObject();
-        SessionManager.logEdit(specimen);
+        specimenAdapter = (SpecimenAdapter) adapter;
+        updateSpecimenInfo(adapter.getId());
         setPartName(Messages.SpecimenEntryForm_title);
-        allchildren = new ArrayList<SpecimenWrapper>();
-        origchildren = new ArrayList<SpecimenWrapper>();
+    }
+
+    private void updateSpecimenInfo(Integer id) throws ApplicationException {
+        if (id != null) {
+            specimenInfo = SessionManager.getAppService().doAction(
+                new SpecimenGetInfoAction(id));
+            aliquotedSpecTypes =
+                SessionManager.getAppService().doAction(
+                    new StudyGetAliquotedSpecimensAction(specimenInfo
+                        .getSpecimen().getCollectionEvent().
+                        getPatient().getStudy().getId())).getSet();
+            if (specimenInfo
+                .getSpecimen().getSpecimenPosition() != null)
+                containerSpecimenTypeList =
+                    SessionManager
+                        .getAppService()
+                        .doAction(
+                            new ContainerTypeGetInfoAction(specimenInfo
+                                .getSpecimen().getSpecimenPosition()
+                                .getContainer()
+                                .getContainerType().getId()))
+                        .getContainerType()
+                        .getSpecimenTypes();
+            else
+                containerSpecimenTypeList = new HashSet<SpecimenType>();
+            specimen.setWrappedObject(specimenInfo.getSpecimen());
+        } else {
+            specimenInfo = new SpecimenBriefInfo();
+            aliquotedSpecTypes = new HashSet<AliquotedSpecimen>();
+            containerSpecimenTypeList = new HashSet<SpecimenType>();
+            specimen.setWrappedObject((Specimen) specimenAdapter
+                .getModelObject().getWrappedObject());
+        }
+        comment.setWrappedObject(new Comment());
+        SessionManager.logLookup(specimen.getWrappedObject());
+        ((AdapterBase) adapter).setModelObject(specimen);
     }
 
     @Override
@@ -83,43 +155,33 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true,
             false));
 
-        Composite client = toolkit.createComposite(page);
+        final Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        StudyWrapper study = specimen.getCollectionEvent().getPatient()
-            .getStudy();
-        study.reload();
-
-        List<AliquotedSpecimenWrapper> allowedAliquotedSpecimen = study
-            .getAliquotedSpecimenCollection(true);
-
-        List<SpecimenTypeWrapper> containerSpecimenTypeList = null;
-        if (specimen.hasParent()) {
-            ContainerTypeWrapper ct = specimen.getParentContainer()
-                .getContainerType();
-            ct.reload();
-            containerSpecimenTypeList = ct.getSpecimenTypeCollection();
-        }
-
-        List<SpecimenTypeWrapper> specimenTypes = new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimenWrapper ss : allowedAliquotedSpecimen) {
-            SpecimenTypeWrapper sst = ss.getSpecimenType();
+        List<SpecimenTypeWrapper> specimenTypes =
+            new ArrayList<SpecimenTypeWrapper>();
+        for (AliquotedSpecimen ss : aliquotedSpecTypes) {
+            SpecimenType sst = ss.getSpecimenType();
             if (containerSpecimenTypeList == null) {
-                specimenTypes.add(sst);
+                specimenTypes.add(new SpecimenTypeWrapper(SessionManager
+                    .getAppService(), sst));
             } else {
-                for (SpecimenTypeWrapper st : containerSpecimenTypeList) {
+                for (SpecimenType st : containerSpecimenTypeList) {
                     if (sst.equals(st))
-                        specimenTypes.add(st);
+                        specimenTypes.add(new SpecimenTypeWrapper(
+                            SessionManager.getAppService(), st));
                 }
             }
         }
         if (specimen.getSpecimenType() != null
             && !specimenTypes.contains(specimen.getSpecimenType())) {
-            specimenTypes.add(specimen.getSpecimenType());
+            specimenTypes
+                .add(new SpecimenTypeWrapper(SessionManager.getAppService(),
+                    specimenInfo.getSpecimen().getSpecimenType()));
         }
 
         specimenTypeComboViewer = createComboViewer(client,
@@ -131,8 +193,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 public void doSelection(Object selectedObject) {
                     specimen
                         .setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                    specimen.setQuantityFromType();
-                    Double volume = specimen.getQuantity();
+                    specimen.setQuantity(setQuantityFromType(specimen
+                        .getSpecimenType().getWrappedObject()));
+                    BigDecimal volume = specimen.getQuantity();
                     if (volumeField != null) {
                         if (volume == null) {
                             volumeField.setText(""); //$NON-NLS-1$
@@ -140,6 +203,16 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                             volumeField.setText(volume.toString());
                         }
                     }
+                }
+
+                private BigDecimal setQuantityFromType(
+                    SpecimenType specimenType) {
+                    for (AliquotedSpecimen as : aliquotedSpecTypes) {
+                        if (specimenType.equals(as.getSpecimenType())) {
+                            return as.getVolume();
+                        }
+                    }
+                    return null;
                 }
             });
 
@@ -177,34 +250,75 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     PatientPeer.PNUMBER)), null);
         patientField.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
 
-        Button editPatientButton = new Button(c, SWT.NONE);
-        editPatientButton
+        Button editSourceButton = new Button(c, SWT.NONE);
+        editSourceButton
             .setText(Messages.SpecimenEntryForm_change_button_label);
 
         toolkit.adapt(c);
 
-        editPatientButton.addListener(SWT.MouseUp, new Listener() {
+        editSourceButton.addListener(SWT.MouseUp, new Listener() {
+
             @Override
             public void handleEvent(Event event) {
-                SelectCollectionEventWizard wizard = new SelectCollectionEventWizard(
-                    appService);
+                wizard =
+                    new ReparentingWizard(
+                        SessionManager.getAppService(), specimen
+                            .getWrappedObject());
                 WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
                     wizard);
                 int res = dialog.open();
                 if (res == Status.OK) {
                     newCollectionEvent = wizard.getCollectionEvent();
-                    transferSpecimen(specimen, newCollectionEvent,
-                        wizard.getComment());
+                    specimen.setCollectionEvent(newCollectionEvent);
+                    newParent = wizard.getSpecimen();
+                    ProcessingEventWrapper parentPEvent;
+                    if (newParent == null) {
+                        specimen.setParentSpecimen(null);
+                        ((GridData) sourceSpecimenLabel.getLayoutData()).exclude =
+                            true;
+                        ((GridData) sourceSpecimenField.getLayoutData()).exclude =
+                            true;
+                        sourceSpecimenLabel.setVisible(false);
+                        sourceSpecimenField.setVisible(false);
+                        isSourceSpcButton.setSelection(true);
+                    } else {
+                        specimen.setParentSpecimen(new SpecimenWrapper(
+                            SessionManager.getAppService(),
+                            newParent.specimen));
+                        ((GridData) sourceSpecimenLabel.getLayoutData()).exclude =
+                            false;
+                        ((GridData) sourceSpecimenField.getLayoutData()).exclude =
+                            false;
+                        sourceSpecimenLabel.setVisible(true);
+                        sourceSpecimenField.setVisible(true);
+                        sourceSpecimenField.setText(newParent.specimen
+                            .getInventoryId());
+                        isSourceSpcButton.setSelection(false);
+                    }
+
                     patientField.setText(specimen.getCollectionEvent()
                         .getPatient().getPnumber());
                     ceventText.setText(specimen.getCollectionInfo());
+                    parentPEvent =
+                        specimen.getParentSpecimen() == null ? null :
+                            specimen.getParentSpecimen().getProcessingEvent();
+                    if (parentPEvent != null)
+                        parentPEventField.setText(new StringBuilder(
+                            parentPEvent
+                                .getFormattedCreatedAt())
+                            .append(" (") //$NON-NLS-1$
+                            .append(
+                                NLS.bind(
+                                    Messages.SpecimenEntryForm_worksheet_string,
+                                    parentPEvent.getWorksheet()))
+                            .append(")") //$NON-NLS-1$
+                            .toString());
                     commentText.setText(wizard.getComment());
                     setDirty(true); // so changes can be saved
+                    client.getParent().layout(true, true);
                 }
             }
         });
-        editPatientButton
-            .setEnabled(specimen.getTopSpecimen().equals(specimen));
 
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenEntryForm_origin_center_label);
@@ -220,47 +334,36 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         boolean isSourceSpc = specimen.getTopSpecimen().equals(specimen);
 
-        Button isSourceSpcButton = (Button) createLabelledWidget(client,
+        isSourceSpcButton = (Button) createLabelledWidget(client,
             Button.class, SWT.NONE,
             Messages.SpecimenEntryForm_source_specimen_label);
         isSourceSpcButton.setEnabled(false);
         isSourceSpcButton.setSelection(isSourceSpc);
 
-        if (!isSourceSpc) {
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SpecimenEntryForm_source_inventoryid_label, specimen
-                    .getTopSpecimen().getInventoryId());
-        }
+        sourceSpecimenLabel =
+            widgetCreator.createLabel(client,
+                Messages.SpecimenEntryForm_source_inventoryid_label);
+        sourceSpecimenField = createReadOnlyWidget(client, SWT.NONE,
+            specimen
+                .getTopSpecimen().getInventoryId());
 
+        GridData gds1 = new GridData();
+        gds1.exclude = isSourceSpc;
+        gds1.horizontalAlignment = SWT.FILL;
+        sourceSpecimenLabel.setLayoutData(gds1);
+
+        GridData gds2 = new GridData();
+        gds2.exclude = isSourceSpc;
+        gds2.horizontalAlignment = SWT.FILL;
+        sourceSpecimenField.setLayoutData(gds2);
+
+        sourceSpecimenLabel.setVisible(!isSourceSpc);
+        sourceSpecimenField.setVisible(!isSourceSpc);
         ceventText = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenEntryForm_cEvent_label,
             specimen.getCollectionInfo());
 
-        if (!isSourceSpc) {
-            ProcessingEventWrapper topPevent = specimen.getTopSpecimen()
-                .getProcessingEvent();
-            createReadOnlyLabelledField(
-                client,
-                SWT.NONE,
-                Messages.SpecimenEntryForm_source_pevent,
-                new StringBuilder(topPevent.getFormattedCreatedAt())
-                    .append(" (") //$NON-NLS-1$
-                    .append(
-                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
-                            topPevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
-        }
-
-        ProcessingEventWrapper pevent = specimen.getProcessingEvent();
-        if (pevent != null) {
-            createReadOnlyLabelledField(
-                client,
-                SWT.NONE,
-                Messages.SpecimenEntryForm_pevent_label,
-                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
-                    .append(
-                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
-                            pevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
-        }
+        createProcessingEventSection(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
             Messages.SpecimenEntryForm_children_nber_label,
@@ -268,55 +371,110 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.SpecimenEntryForm_status_label,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            specimen.getActivityStatus(),
+            ActivityStatus.valuesList(), specimen.getActivityStatus(),
             Messages.SpecimenEntryForm_status_validation_msg,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        .setActivityStatus((ActivityStatus) selectedObject);
                 }
             });
 
-        commentText = (BgcBaseText) createBoundWidgetWithLabel(client,
-            BgcBaseText.class, SWT.WRAP | SWT.MULTI,
-            Messages.SpecimenEntryForm_comments_label, null, specimen,
-            SpecimenPeer.COMMENT.getName(), null);
+        createCommentSection();
 
         setFirstControl(specimenTypeComboViewer.getControl());
     }
 
-    protected void transferSpecimen(SpecimenWrapper specimen2,
-        CollectionEventWrapper collectionEvent, String wcomment) {
-        if (specimen2.equals(specimen.getTopSpecimen())) {
-            // is original
-            origchildren.add(specimen2);
-            specimen2.setOriginalCollectionEvent(collectionEvent);
-        }
-        allchildren.add(specimen2);
-        specimen2.setCollectionEvent(collectionEvent);
-        String comment = specimen2.getComment();
-        if (comment == null)
-            comment = ""; //$NON-NLS-1$
+    private void createProcessingEventSection(Composite client) {
+
+        // create top section
+        ProcessingEventWrapper parentPevent =
+            specimen.getParentSpecimen() == null ? null :
+                specimen.getParentSpecimen().getProcessingEvent();
+        widgetCreator.createLabel(client,
+            Messages.SpecimenEntryForm_source_pevent);
+        String parentPEventString;
+        if (parentPevent == null)
+            parentPEventString = ""; //$NON-NLS-1$
         else
-            comment += "\n"; //$NON-NLS-1$
-        comment += Messages.SpecimenEntryForm_cevent_modification + wcomment;
-        specimen2.setComment(comment);
-        for (SpecimenWrapper spec : specimen2.getChildSpecimenCollection(false)) {
-            transferSpecimen(spec, collectionEvent, wcomment);
-        }
+            parentPEventString =
+                new StringBuilder(parentPevent.getFormattedCreatedAt())
+                    .append(" (") //$NON-NLS-1$
+                    .append(
+                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
+                            parentPevent.getWorksheet()))
+                    .append(")").toString(); //$NON-NLS-1$
+        parentPEventField = createReadOnlyWidget(
+            client,
+            SWT.NONE,
+            parentPEventString);
+
+        // create regular pevent section
+        ProcessingEventWrapper pevent = specimen.getProcessingEvent();
+        widgetCreator.createLabel(client,
+            Messages.SpecimenEntryForm_pevent_label);
+        String peventString;
+        if (pevent == null)
+            peventString = ""; //$NON-NLS-1$
+        else
+            peventString =
+                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
+                    .append(
+                        NLS.bind(Messages.SpecimenEntryForm_worksheet_string,
+                            pevent.getWorksheet())).append(")").toString(); //$NON-NLS-1$
+        createReadOnlyWidget(
+            client,
+            SWT.NONE,
+            peventString);
+
+    }
+
+    private void createCommentSection() {
+        Composite client =
+            createSectionWithClient(Messages.SpecimenEntryForm_4);
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable =
+            new CommentsInfoTable(client,
+                specimen.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        commentText =
+            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+                SWT.MULTI,
+                Messages.SpecimenEntryForm_5, null, comment,
+                Messages.SpecimenEntryForm_6, null);
+
     }
 
     @Override
     protected void saveForm() throws Exception {
-        if (newCollectionEvent == null)
-            specimen.persist();
-        else {
-            newCollectionEvent.addToAllSpecimenCollection(allchildren);
-            newCollectionEvent.addToOriginalSpecimenCollection(origchildren);
-            newCollectionEvent.persist();
-        }
+        SpecimenUpdateAction updateAction = new SpecimenUpdateAction();
+        updateAction.setSpecimenId(specimen.getId());
+        updateAction.setSpecimenTypeId(specimen.getSpecimenType().getId());
+        updateAction
+            .setCollectionEventId(specimen.getCollectionEvent().getId());
+        updateAction
+            .setParentSpecimenId(specimen.getParentSpecimen() == null ? null
+                : specimen.getParentSpecimen().getId());
+
+        final Holder<String> commentMessage = new Holder<String>(null);
+        commentText.getDisplay().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                commentMessage.setValue(commentText.getText());
+            }
+        });
+
+        updateAction.setCommentMessage(commentMessage.getValue());
+        updateAction.setActivityStatus(specimen.getActivityStatus());
+
+        SessionManager.getAppService().doAction(updateAction);
     }
 
     @Override
@@ -325,7 +483,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return SpecimenViewForm.ID;
     }
 
@@ -336,10 +494,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
-        specimen.reset();
-        allchildren.clear();
-        origchildren.clear();
+    public void setValues() throws Exception {
         GuiUtil.reset(activityStatusComboViewer, specimen.getActivityStatus());
         GuiUtil.reset(specimenTypeComboViewer, specimen.getSpecimenType());
     }

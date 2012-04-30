@@ -1,16 +1,19 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientAddHandler extends AbstractHandler {
+public class PatientAddHandler extends LogoutSensitiveHandler {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
@@ -18,9 +21,9 @@ public class PatientAddHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
-            PatientWrapper patient = new PatientWrapper(
-                SessionManager.getAppService());
-            AdapterBase adapter = new PatientAdapter(null, patient);
+            SearchedPatientInfo spi = new SearchedPatientInfo();
+            spi.patient = new Patient();
+            PatientAdapter adapter = new PatientAdapter(null, spi);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error(Messages.PatientAddHandler_patient_open_error, exp);
@@ -30,7 +33,17 @@ public class PatientAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(PatientWrapper.class);
+        try {
+            if (allowed == null)
+                allowed =
+                    SessionManager.getAppService().isAllowed(
+                        new PatientCreatePermission(null));
+            return SessionManager.getInstance().getSession() != null &&
+                allowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
+            return false;
+        }
     }
-
 }

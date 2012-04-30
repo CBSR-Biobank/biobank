@@ -2,25 +2,22 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.List;
 
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.util.Assert;
 
+@Deprecated
 public class ModelUtils {
-
-    // private static final Logger logger = Logger.getLogger(ModelUtils.class
-    // .getName());
 
     public static <E> E getObjectWithId(WritableApplicationService appService,
         Class<E> classType, Integer id) throws Exception {
-        Constructor<?> constructor = classType.getConstructor();
-        Object instance = constructor.newInstance();
-        Method setIdMethod = classType.getMethod("setId", Integer.class);
-        setIdMethod.invoke(instance, id);
 
-        List<E> list = appService.search(classType, instance);
+        DetachedCriteria criteria = DetachedCriteria.forClass(classType)
+            .add(Restrictions.idEq(id));
+
+        List<E> list = appService.query(criteria);
         if (list.size() == 0)
             return null;
         Assert.isTrue(list.size() == 1);

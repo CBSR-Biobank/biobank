@@ -14,6 +14,7 @@ public class PatientVisitSummaryPostProcessTester implements PostProcessTester {
     private static final int NUM_SUMS = 7;
     private static final int SUM_OFFSET = 2;
 
+    @Override
     public List<Object> postProcess(WritableApplicationService appService,
         Collection<Object> results) {
 

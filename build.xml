@@ -1,76 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="biobank" basedir="." default="deploy">
-
   <!--
-  Overall build file
-  use command "ant -projecthelp" to display the targets.
-  -->
+      Overall build file
+      use command "ant -projecthelp" to display the targets.
 
-<!--
-  Local Variables:
-  compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
-  End:
--->
+Local Variables:
+compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
+End:
+  -->
 
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
   </exec>
 
-  <property name="server.version.num" value="3.1.1" />
-  <property name="java.client.version.num" value="3.1.1" />
-
   <property environment="env" />
-  <property name="host" value="aicml-med.cs.ualberta.ca" />
-  <!--property name="${host}/" value="" /-->
-  <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
-  <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
-  <property name="eclipse.workspace.dir" location="eclipse_ws" />
-  <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
-  <property name="eclipse.proj.dir.gui.common"
-            location="eclipse_ws/biobank.gui.common" />
-  <property name="eclipse.proj.dir.common"
-            location="eclipse_ws/biobank.common" />
-  <property name="eclipse.proj.dir.tools"
-            location="eclipse_ws/biobank2.tools" />
-  <property name="eclipse.proj.dir.junit"
-            location="eclipse_ws/biobank2.tests" />
-  <property name="scripts.proj.dir" location="scripts" />
-  <property name="model.proj.dir" location="model" />
-  <property name="data.dir" location="data" />
-  <property name="data.sql.dir" location="${data.dir}/sql" />
-  <property name="schema.dir" location="schema" />
-  <property name="security.dir" location="security" />
-  <property name="secu-log.dir" location="security-logs" />
-  <property name="product.dir" location="${basedir}/product" />
-  <property name="database.host" value="localhost" />
-  <property name="database.name" value="biobank" />
-  <property name="database.username" value="dummy" />
-  <property name="database.password" value="ozzy498" />
-  <property name="req.jars.dir" value="jars" />
-  <property name="lib-sources.dir" value="lib-sources" />
-  <property name="biobank.gui.common.jar.files"
-            value="commons-beanutils-1.8.0.jar,commons-io-1.4.jar,commons-digester-1.7.jar,commons-javaflow-20060411.jar,iText-2.1.7.jar,jasperreports-4.0.1.jar,jdt-compiler-3.1.1.jar,DynamicJasper-3.0.14.jar" />
-  <property name="biobank.jar.files"
-            value="gluegen.jar,jdom.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
-  <property name="biobank.common.jar.files"
-            value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
-  <property name="biobank.tools.jar.files"
-            value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
-  <property name="cacore.system.jar.files"
-            value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
-  <property name="converage.output" location="coverage" />
+  <property name="doxygen" location="/usr/bin/doxygen" />
+  <property name="xsltproc" location="/usr/bin/xsltproc" />
+
+  <!-- TODO: move as many properties as possible into build.properties -->
+  <!-- TODO: add tasks to push database properties to various files -->
+  <!-- TODO: create a cacore directory with all the cacore stuff in it
+       that we can throw into the war file and use to create the database -->
+  <property file="build.properties" />
+
+  <!-- must use a property with a LOCATION attribute because it is converted
+       to be an absolute value, which the product builder seems to require in
+       order to load its build.properties in product/build.properties -->
+  <property name="product.dir" location="product" />
+  <property name="buildDirectory" value="${product.dir}/buildDirectory" />
+
+  <import file="build-db.xml"/>
+
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
-    <equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
-  </condition>
-  <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
-	<equals arg1="${log-debug}" arg2="true" casesensitive="false" trim="true" />
-  </condition>
+
+  <!-- TODO: someday, does client need all keystores? -->
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
             arg2="aicml-med"
@@ -95,172 +63,66 @@
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostBiobankAict">
+    <equals arg1="${host.name}"
+            arg2="biobank.cbsr.ualberta.ca"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
       <isfalse value="${isHostAicml5}" />
       <isfalse value="${isHostCbsr}" />
       <isfalse value="${isHostCbsrTraining}" />
+      <isfalse value="${isHostBiobankAict}" />
     </and>
-  </condition>
-  <condition property="cacore.sdk.tar.available">
-    <available file="${cacore.sdk.filename}" />
-  </condition>
-  <condition property="cacore.sdk.available">
-    <available file="${cacore.sdk.dir}/build.xml" />
   </condition>
 
   <path id="biobank.common.build.classpath">
-    <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib">
-      <include name="*.jar" />
-    </fileset>
-    <fileset dir="${cacore.sdk.dir}/output/biobank/package/local-client/lib">
-      <include name="*.jar" />
-    </fileset>
-    <fileset dir="${cacore.sdk.dir}/writable-api/dist">
-      <include name="*.jar" />
-    </fileset>
-    <fileset dir="${cacore.sdk.dir}/system/security/dist">
-      <include name="*.jar" />
-    </fileset>
     <fileset dir="${req.jars.dir}">
       <include name="*.jar" />
     </fileset>
   </path>
 
+  <!-- for tests -->
   <path id="biobank.common.run.classpath">
     <path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
-    <pathelement location="${eclipse.proj.dir.common}/conf" />
   </path>
-
-  <target name="cacore-download"
-          unless="cacore.sdk.tar.available"
-          description="downloads caCORE SDK from the host machine">
-    <echo message="downloading caCORE SDK..." />
-    <exec executable="curl">
-      <arg value="--silent" />
-      <arg value="-o${cacore.sdk.filename}" />
-      <arg value="http://${host}/${cacore.sdk.filename}" />
-    </exec>
-  </target>
-  <target name="cacore-untar"
-          depends="cacore-download"
-          unless="cacore.sdk.available"
-          description="untars the caCORE SDK tarball">
-    <echo message="untaring caCORE SDK..." />
-    <untar src="${cacore.sdk.filename}"
-           compression="gzip"
-           dest="${cacore.sdk.dir}" />
-  </target>
-  <target name="check-cacore-sdk-uptodate">
-    <uptodate property="cacore.sdk.uptodate"
-              targetfile="${cacore.sdk.dir}/output/biobank">
-      <srcfiles file="sdk_conf/deploy.properties" />
-      <srcfiles file="sdk_conf/build.properties" />
-      <srcfiles file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
-      <srcfiles file="sdk_conf/config.xml" />
-      <srcfiles file="sdk_conf/application-config-client.xml" />
-      <srcfiles file="${model.proj.dir}/biobank.uml" />
-    </uptodate>
-  </target>
-
-  <target name="sdk-nodeps">
-    <copy file="sdk_conf/deploy.properties"
-          tofile="${cacore.sdk.dir}/conf/deploy.properties" />
-    <copy file="sdk_conf/build.properties"
-          tofile="${cacore.sdk.dir}/build.properties" />
-    <copy file="sdk_conf/application-config.xml"
-          tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
-    <copy file="sdk_conf/application-config-client.xml"
-          tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
-    <copy file="sdk_conf/application-config-client-info.xml"
-          tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
-    <copy file="sdk_conf/application-config-security.xml"
-          tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
-    <copy file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar"
-          tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.15-bin.jar" />
-    <delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar" />
-    <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
-  </target>
-
-  <target name="sdk"
-          depends="validators,check-cacore-sdk-uptodate"
-          unless="cacore.sdk.uptodate"
-          description="builds the caCORE SDK from the data model">
-    <antcall target="sdk-nodeps" />
-  </target>
-
-  <target name="log4j-conf">
-    <copy file="security-logs/log4j.xml"
-          tofile="${cacore.sdk.dir}/output/biobank/conf/system/web/WEB-INF/classes/log4j.xml"
-          overwrite="true" />
-    <replace file="${cacore.sdk.dir}/output/biobank/conf/system/web/WEB-INF/classes/log4j.xml">
-      <replacefilter token="@LOG4J_LEVEL_WARN@" value="${LOG4J_LEVEL_WARN}" />
-      <replacefilter token="@LOG4J_LEVEL_DEBUG@" value="${LOG4J_LEVEL_DEBUG}" />
-      <!-- these one are copied from the caCore ant build file. -->
-      <replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />
-      <replacefilter token="@CLM_DB_CONNECTION_URL@"
-                     value="${CLM_DB_CONNECTION_URL}" />
-      <replacefilter token="@CLM_DB_USERNAME@" value="${CLM_DB_USERNAME}" />
-      <replacefilter token="@CLM_DB_PASSWORD@" value="${CLM_DB_PASSWORD}" />
-      <replacefilter token="@CLM_PROJECT_NAME@" value="${CLM_PROJECT_NAME}" />
-    </replace>
-
-  </target>
-
-  <target name="sdk-files" depends="sdk">
-    <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib"
-             id="sdk.jar.files">
-      <include name="*.jar" />
-    </fileset>
-    <pathconvert pathsep="," property="sdk.jar.files.basename"
-      refid="sdk.jar.files">
-      <map from="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/"
-        to="" />
-    </pathconvert>
-    <fileset dir="${cacore.sdk.dir}/output/biobank/package/local-client/lib"
-             id="sdk.local.jar.files">
-      <include name="*.jar" />
-    </fileset>
-    <pathconvert pathsep="," property="sdk.local.jar.files.basename"
-      refid="sdk.local.jar.files">
-      <map from="${cacore.sdk.dir}/output/biobank/package/local-client/lib/"
-           to="" />
-    </pathconvert>
-  </target>
 
   <!-- Eclipse -->
   <target name="biobank-product-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.product" />
+              prefix="biobank2.product" />
     <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
-      style="scripts/biobank-product.xsl">
+          style="scripts/biobank-product.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
+
   <target name="biobank-feature-core-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-      prefix="biobank2.feature.core" />
+              prefix="biobank2.feature.core" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-feature-platform-version-modify">
     <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-    prefix="biobank2.feature.platform" />
+              prefix="biobank2.feature.platform" />
     <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
-      style="scripts/biobank-feature.xsl">
+          style="scripts/biobank-feature.xsl">
       <param name="version" expression="${java.client.version.num}" />
     </xslt>
     <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
-      overwrite="true"/>
+          overwrite="true"/>
   </target>
 
   <target name="biobank-version-modify">
@@ -268,6 +130,7 @@
     <antcall target="biobank-feature-core-version-modify" />
     <antcall target="biobank-feature-platform-version-modify" />
   </target>
+
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
       <attribute name="Bundle-Version" value="${java.client.version.num}" />
@@ -282,98 +145,131 @@
       <entry key="0" value="${java.client.version.num}" />
     </propertyfile>
   </target>
+
   <target name="deploy-eclipse"
-          depends="sdk-files,java-client-manifest,biobank-version-modify"
+          depends="java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/system/lib"
-                   files="${cacore.system.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${cacore.system.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${biobank.common.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.gui.common}/lib"
-                      files="${biobank.gui.commmon.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir}/lib"
-                      files="${biobank.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.tools}/lib"
-                      files="${biobank.tools.jar.files}" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/writable-api/dist"
-                   files="sdk-writable-client-framework.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="sdk-writable-client-framework.jar" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/system/security/dist"
-                   files="sdk-security.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="sdk-security.jar" />
-    </dependset>
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib"
-                   files="${sdk.jar.files.basename}" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="${sdk.jar.files.basename}" />
-    </dependset>
     <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
-      <fileset dir="${cacore.sdk.dir}/output/biobank/package/remote-client/lib" />
-      <fileset dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib" />
-      <filelist dir="${cacore.sdk.dir}/system/lib"
-                files="${cacore.system.jar.files}" />
-      <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
-      <fileset file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar" />
-      <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
-      <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar" />
+      <fileset dir="${req.jars.dir}">
+        <include name="acegi-security-1.0.4.jar" />
+        <include name="antlr-2.7.6.jar" />
+        <include name="asm.jar" />
+        <include name="axis.jar" />
+        <include name="caGrid-CQL-cql.1.0-1.2.jar" />
+        <include name="castor-1.0.2.jar" />
+        <include name="cglib-2.1.3.jar" />
+        <include name="cog-jglobus.jar" />
+        <include name="commons-codec-1.3.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-discovery-0.2.jar" />
+        <include name="commons-lang-2.4.jar" />
+        <include name="commons-logging-1.1.jar" />
+        <include name="dom4j-1.6.1.jar" />
+        <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+        <include name="hibernate-validator-4.2.0.Final.jar" />
+        <include name="hibernate3.jar" />
+        <include name="javassist-3.12.0.GA.jar" />
+        <include name="jaxrpc.jar" />
+        <include name="jta-1.1.jar" />
+        <include name="log4j-1.2.14.jar" />
+        <include name="mysql-connector-java-5.1.15-bin.jar" />
+	<include name="ognl-2.6.7.jar" />
+        <include name="saaj.jar" />
+        <include name="sdk-client-framework.jar" />
+        <include name="sdk-grid-remoting.jar" />
+        <include name="sdk-security.jar" />
+        <include name="sdk-writable-client-framework.jar" />
+        <include name="slf4j-api-1.6.1.jar" />
+        <include name="slf4j-log4j12-1.6.4.jar" />
+        <include name="spring.jar" />
+        <include name="validation-api-1.0.0.GA.jar" />
+        <include name="wsdl4j-1.5.1.jar" />
+        <include name="xercesImpl.jar" />
+        <include name="xpp3-1.1.3.4.C.jar" />
+        <include name="xstream-1.3.1.jar" />
+      </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="true">
-      <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
-      <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
-      <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
-      <filelist dir="${cacore.sdk.dir}/output/biobank/package/remote-client/conf"
-                files="application-config-client.xml,application-config-client-info.xml" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
-      <filelist dir="${req.jars.dir}" files="${biobank.gui.common.jar.files}" />
+      <fileset dir="${req.jars.dir}">
+        <include name="csmapi-4.1.jar" />
+        <include name="jta-1.1.jar" />
+        <include name="sdk-core.jar" />
+        <include name="sdk-writable-core.jar" />
+      </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
-      <filelist dir="${cacore.sdk.dir}/system/lib" files="commons-collections-3.2.jar,commons-logging-1.1.jar" />
+      <fileset dir="${req.jars.dir}">
+        <include name="commons-beanutils-1.8.0.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-io-1.4.jar" />
+        <include name="commons-digester-1.7.jar" />
+        <include name="commons-javaflow-20060411.jar" />
+        <include name="commons-logging-1.1.jar" />
+        <include name="iText-2.1.7.jar" />
+        <include name="jasperreports-4.0.1.jar" />
+        <include name="jdt-compiler-3.1.1.jar" />
+        <include name="DynamicJasper-3.0.14.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="aopalliance.jar" />
+        <include name="guice-3.0.jar" />
+        <include name="gwt-pectin-0.8.1.jar" />
+        <include name="gwt-user.jar" />
+        <include name="javax.inject.jar" />
+        <include name="peaberry-1.2.jar" />
+      </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
-      <filelist dir="${req.jars.dir}" files="${biobank.jar.files}" />
+      <fileset dir="${req.jars.dir}">
+        <include name="gluegen.jar" />
+        <include name="jdom.jar" />
+        <include name="mailapi.jar" />
+        <include name="smtp.jar" />
+        <include name="spiffy-all-0.05.jar" />
+        <include name="SuperCSV-1.52.jar" />
+      </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
-      <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
+      <fileset dir="${req.jars.dir}">
+        <include name="commons-io-1.4.jar" />
+        <include name="jargs.jar" />
+        <include name="mysql-connector-java-5.1.15-bin.jar" />
+        <include name="spiffy-all-0.05.jar" />
+        <include name="SuperCSV-1.52.jar" />
+      </fileset>
     </copy>
-    <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
-      <filelist dir="${cacore.sdk.dir}/output/biobank/package/ws-client/lib"
-                files="biobank-beans.jar" />
-    </copy-->
+    <copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">
+      <!-- File needed in the test project to call csm api methods -->
+      <fileset file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="c3p0-0.9.0.jar" />
+        <include name="clm-4.1.jar" />
+	<include name="dom4j-1.4.jar" />
+	<include name="ehcache-1.2.2.jar" />
+	<include name="jta-1.1.jar" />
+        <include name="mockito-all-1.9.0-rc1.jar" />
+      </fileset>
+    </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
-      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
+      <fileset dir="${req.jars.dir}">
+        <include name="log4j-1.2.14.jar" />
+      </fileset>
     </copy>
   </target>
+
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
     <uptodate property="jboss.uptodate"
               targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-              srcfile="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war" />
+              srcfile="${war.file}" />
   </target>
+
+  <!-- TODO: require as a single target to update the keyfile -->
   <target name="hostAicmlMed" if="isHostAicmlMed">
     <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
@@ -389,7 +285,17 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="HostBiobank1" if="isHostBiobank1">
+    <copy file="${secu-log.dir}/jboss/biobank.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
   <target name="hostCbsrTraining" if="isHostCbsrTraining">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostBiobankAict" if="isHostBiobankAict">
     <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
@@ -399,6 +305,8 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+
+  <!-- version number on server side -->
   <target name="server-manifest">
     <manifest file="${eclipse.proj.dir.common}/META-INF/MANIFEST.MF"
               mode="update">
@@ -414,12 +322,14 @@
       <entry key="server.version" value="${server.version.num}" />
     </propertyfile>
   </target>
+
   <target name="jboss.home.env">
     <fail unless="env.JBOSS_HOME"
           message="JBOSS_HOME environment variable not defined" />
   </target>
+
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostBiobankAict,hostLocal"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -438,10 +348,11 @@
           overwrite="true" />
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <!-- TODO: fix this? -->
         <include name="biobank*.war"/>
       </fileset>
     </delete>
-    <copy file="${cacore.sdk.dir}/output/biobank/package/webapp/biobank.war"
+    <copy file="${war.file}"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
           overwrite="true" />
   </target>
@@ -451,285 +362,9 @@
     <antcall target="deploy-jboss" />
     <antcall target="deploy-eclipse" />
   </target>
-  <target name="schema"
-          depends="sdk"
-          description="generates the database schema for the caCORE SDK data model">
-    <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
-  </target>
-  <target name="dbcreate-add-tables" depends="sdk,package-webapp-orm">
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      DROP DATABASE IF EXISTS ${PROJECT_NAME};
-      CREATE DATABASE ${PROJECT_NAME};
-      ALTER DATABASE `${PROJECT_NAME}` DEFAULT CHARACTER SET latin1 COLLATE latin1_general_cs;
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-    <antcall target="schema" />
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      <transaction src="${data.sql.dir}/createIndices.sql" />
-      <transaction src="${data.sql.dir}/uniqueConstraints.sql" />
-      <transaction src="${data.sql.dir}/activityStatus.sql" />
-      <transaction src="${data.sql.dir}/eventAttrType.sql" />
-      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
-      <transaction src="${data.sql.dir}/specimenTypes.sql" />
-      <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
-      <transaction src="${data.sql.dir}/shippingMethod.sql" />
-      <transaction src="${data.sql.dir}/patientLabels.sql" />
-      <transaction src="${data.sql.dir}/advancedReportsData.sql" />
-      <transaction src="${secu-log.dir}/schemaSecurity.sql" />
-      <transaction>commit;</transaction>
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-  </target>
-  <target name="dbcreate-add-testuser" if="debug">
-    <sql driver="${DB_DRIVER}"
-         url="${DB_CONNECTION_URL}"
-         userid="${DB_USERNAME}"
-         password="${DB_PASSWORD}">
-      <transaction src="${secu-log.dir}/addTestUser.sql" />
-      <classpath>
-        <fileset dir="${cacore.sdk.dir}/system/lib">
-          <include name="*.jar" />
-        </fileset>
-      </classpath>
-    </sql>
-  </target>
-  <target name="dbcreate"
-          depends="dbcreate-add-tables,dbcreate-add-testuser"
-          description="creates the default tables">
-  </target>
-  <target name="dbbackup"
-          description="makes a copy of the current biobank database">
-    <echo message="running scripts/dbbackup..." />
-    <exec executable="scripts/dbbackup"
-          failonerror="true"
-          output="biobank.sql">
-      <arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
-    </exec>
-  </target>
-
-  <fileset id="modelextender.class.files"
-           dir="${eclipse.proj.dir.tools}/output">
-    <include name="**/tools/modelextender/*.class" />
-    <include name="**/tools/modelumlparser/*.class" />
-    <include name="**/tools/utils/*.class" />
-    <include name="**/common/util/TypeReference.class" />
-    <include name="**/common/wrappers/Property.class" />
-  </fileset>
-
-  <target name="build-modelextender" depends="sdk">
-    <echo message="Building model peer tool" />
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
-                   files="biobank-beans.jar" />
-      <targetfileset refid="modelextender.class.files" />
-    </dependset>
-    <mkdir dir="${eclipse.proj.dir.tools}/output" />
-    <javac debug="on"
-           debuglevel="source,lines,vars"
-           destdir="${eclipse.proj.dir.tools}/output"
-           source="1.6"
-           target="1.6"
-           includeantruntime="false">
-      <src path="${eclipse.proj.dir.tools}/src" />
-      <src path="${eclipse.proj.dir.common}/src" />
-      <include name="**/tools/modelextender/*.java" />
-      <include name="**/tools/modelumlparser/*.java" />
-      <include name="**/tools/utils/*.java" />
-      <include name="**/common/util/TypeReference.java" />
-      <include name="**/common/wrappers/Property.java" />
-      <classpath>
-        <pathelement location="${req.jars.dir}/jargs.jar" />
-        <pathelement location="${req.jars.dir}/commons-lang-2.4.jar" />
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-      </classpath>
-    </javac>
-  </target>
-
-  <target name="check-run-modelextender">
-    <uptodate property="modelextender.uptodate"
-              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer/SitePeer.java">
-      <srcfiles dir="${cacore.sdk.dir}/output/biobank/build/jar"
-                includes="biobank-beans.jar" />
-      <srcfiles refid="modelextender.class.files" />
-    </uptodate>
-  </target>
-
-  <target name="modelextender"
-          depends="build-modelextender,check-run-modelextender"
-          unless="modelextender.uptodate"
-          description="Builds wrapper peer classes based on UML logical model.">
-    <java classname="edu.ualberta.med.biobank.tools.modelextender.ModelExtender"
-          failonerror="true"
-          fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank.uml" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
-      <classpath>
-        <pathelement location="${req.jars.dir}/jargs.jar" />
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-        <pathelement location="${eclipse.proj.dir.tools}/output" />
-      </classpath>
-    </java>
-  </target>
-
-  <fileset id="validators.class.files"
-           dir="${eclipse.proj.dir.tools}/output-validators">
-    <include name="**/tools/validator/*.class" />
-    <include name="**/tools/modelumlparser/*.class" />
-    <include name="**/tools/utils/*.class" />
-  </fileset>
-
-  <!--
-    build-validators uses a different destination directory from build-hbmpostproc and
-    build-modelextender due to dependency restrictions
-  -->
-  <target name="build-validators" depends="cacore-untar">
-    <echo message="Building hibernate validators generation tool" />
-    <dependset>
-      <srcfilelist dir="${model.proj.dir}" files="biobank.uml" />
-      <targetfileset refid="validators.class.files" />
-    </dependset>
-    <mkdir dir="${eclipse.proj.dir.tools}/output-validators" />
-    <copy includeemptydirs="false"
-          todir="${eclipse.proj.dir.tools}/output-validators" overwrite="true">
-      <fileset dir="${eclipse.proj.dir.tools}/src">
-        <exclude name="**/*.launch" />
-        <exclude name="**/*.java" />
-      </fileset>
-    </copy>
-    <javac debug="on"
-           debuglevel="source,lines,vars"
-           destdir="${eclipse.proj.dir.tools}/output-validators"
-           source="1.6"
-           target="1.6"
-           includeantruntime="false">
-      <src path="${eclipse.proj.dir.tools}/src" />
-      <include name="**/tools/validator/*.java" />
-      <include name="**/tools/modelumlparser/*.java" />
-      <include name="**/tools/utils/*.java" />
-      <classpath>
-        <pathelement location="${req.jars.dir}/jargs.jar" />
-        <pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-      </classpath>
-    </javac>
-  </target>
-
-  <target name="check-run-validators">
-    <uptodate property="validators.uptodate"
-              targetfile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml">
-      <srcfiles dir="${model.proj.dir}" includes="biobank.uml" />
-      <srcfiles refid="validators.class.files" />
-    </uptodate>
-  </target>
-
-  <target name="validators"
-          depends="build-validators,check-run-validators"
-          unless="validators.uptodate"
-          description="create the validators xml file used by cacore to generate the source code">
-    <java classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
-          failonerror="true"
-          fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank.uml" />
-      <arg value="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
-      <classpath>
-        <pathelement location="${req.jars.dir}/jargs.jar" />
-        <pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-        <pathelement location="${eclipse.proj.dir.tools}/output-validators" />
-      </classpath>
-    </java>
-  </target>
-
-  <fileset id="hbmpostproc.class.files" dir="${eclipse.proj.dir.tools}/output">
-    <include name="**/tools/hbmpostproc/*.class" />
-    <include name="**/tools/modelumlparser/*.class" />
-    <include name="**/tools/utils/*.class" />
-  </fileset>
-
-  <target name="build-hbmpostproc" depends="sdk" unless="hmbstrings.uptodate">
-    <mkdir dir="${eclipse.proj.dir.tools}/output" />
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
-                   files="biobank-beans.jar" />
-      <targetfileset refid="hbmpostproc.class.files" />
-    </dependset>
-    <javac debug="on"
-           debuglevel="source,lines,vars"
-           srcdir="${eclipse.proj.dir.tools}/src"
-           destdir="${eclipse.proj.dir.tools}/output"
-           source="1.6"
-           target="1.6"
-           includeantruntime="false">
-      <include name="**/tools/hbmpostproc/*.java" />
-      <include name="**/tools/modelumlparser/*.java" />
-      <include name="**/tools/utils/*.java" />
-      <classpath>
-        <path id="biobank.tools.classpath">
-          <fileset dir="${eclipse.proj.dir.tools}/lib">
-            <include name="*.jar" />
-          </fileset>
-        </path>
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-      </classpath>
-    </javac>
-    <touch file="${eclipse.proj.dir.tools}/output/build.timestamp" />
-  </target>
-
-  <target name="check-run-hbmpostproc">
-    <uptodate property="hbmpostproc.uptodate"
-              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java">
-
-      <srcfiles dir="${cacore.sdk.dir}/output/biobank/build/jar"
-                includes="biobank-beans.jar" />
-      <srcfiles refid="hbmpostproc.class.files" />
-    </uptodate>
-  </target>
-
-  <target name="hbmpostproc"
-          depends="build-hbmpostproc,check-run-hbmpostproc"
-          unless="hbmpostproc.uptodate"
-          description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)">
-    <dependset>
-      <srcfilelist dir="${cacore.sdk.dir}/output/biobank/build/jar"
-                   files="biobank-beans.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common"
-                      files="VarCharLengths.java" />
-    </dependset>
-    <java classname="edu.ualberta.med.biobank.tools.hbmpostproc.HbmPostProcess"
-          failonerror="true"
-          fork="true">
-      <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
-      <arg value="${model.proj.dir}/biobank.uml" />
-      <arg value="${cacore.sdk.dir}/output/biobank/src/edu/ualberta/med/biobank/model" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
-      <classpath>
-        <pathelement location="${req.jars.dir}/jargs.jar" />
-        <pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
-        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-        <pathelement location="${eclipse.proj.dir.tools}/output" />
-      </classpath>
-    </java>
-  </target>
 
   <target name="build-common-project"
-          depends="sdk-files,prepare-webapp-orm,package-codegen-orm,modelextender">
+          depends="server-manifest">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
@@ -749,231 +384,118 @@
     </javac>
   </target>
 
-  <target name="compile-generated-beans"
-    depends="prepare-webapp-orm"
-    description="REDO:: Compiles the generated beans">
-    <copy todir="${cacore.sdk.dir}/${output.src.dir}/edu/ualberta/med/biobank/model"
-      overwrite="true">
-      <fileset dir="sdk_conf/specialSrc" />
-    </copy>
-    <antcall target="hbmpostproc" />
-    <delete>
-      <fileset dir="${cacore.sdk.dir}/${build.classes.dir}"/>
-    </delete>
-
-    <javac srcdir="${cacore.sdk.dir}/${output.src.dir}" destdir="${cacore.sdk.dir}/${build.classes.dir}"
-      debug="true" includeantruntime="false" >
-      <classpath >
-        <fileset dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-      <include name="**/*.java"/>
-    </javac>
+  <target name="log4j-config">
+    <!-- create the file only if not present -->
+    <copy file="webapp/WEB-INF/classes/log4j.xml.default"
+          tofile="webapp/WEB-INF/classes/log4j.xml"
+          overwrite="false"/>
   </target>
 
-  <target name="package-codegen-orm" depends="compile-generated-beans"
-    description="REDO:: Packages the generated ORM and bean artifacts">
-    <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}" basedir="${cacore.sdk.dir}/${build.classes.dir}">
+  <target name="package-webapp" depends="build-common-project,log4j-config">
+    <mkdir dir="${output.dir}" />
+    <war destfile="${war.file}"
+         webxml="webapp/WEB-INF/web.xml">
       <manifest>
-        <attribute name="Generated-By" value="caCORE SDK Code Generator"/>
-        <attribute name="Version" value="${VERSION}"/>
+        <attribute name="Version" value="${server.version.num}" />
       </manifest>
-      <fileset dir="${cacore.sdk.dir}/${output.src.dir}" includes="**/*.java" />
-    </jar>
-    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/remote-client/lib/${bean.file}"/>
-    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/ws-client/lib/${bean.file}"/>
-    <copy overwrite="true" file="${cacore.sdk.dir}/${build.jar.dir}/${bean.file}"
-      tofile="${cacore.sdk.dir}/output/biobank/package/local-client/lib/${bean.file}"/>
-    <jar destfile="${cacore.sdk.dir}/${build.jar.dir}/${orm.file}"
-      basedir="${cacore.sdk.dir}/${output.src.dir}">
-      <manifest>
-        <attribute name="Generated-By" value="caCORE SDK Code Generator" />
-        <attribute name="Version" value="${VERSION}" />
-      </manifest>
-      <include name="**/*.hbm.xml" />
-      <include name="*.cfg.xml" />
-      <include name="ehcache.xml" />
-      <exclude name="${csm.security.config.file}" />
-    </jar>
-  </target>
-
-  <target name="prepare-webapp-orm" >
-    <!--
-    files included in the sdk build.xml - necessary to be sure that we have
-    all the keys for the target we redefined
-    -->
-    <property file="${cacore.sdk.dir}/installer.properties" />
-    <property file="${cacore.sdk.dir}/local.properties" />
-    <property file="sdk_conf/deploy.properties" />
-    <property file="sdk_conf/build.properties" />
-    <property file="${cacore.sdk.dir}/${codegen.dir}/build.properties"
-      prefix="codegen" />
-    <property file="${cacore.sdk.dir}/${codegen.validator.dir}/build.properties"
-      prefix="validator" />
-    <property file="${cacore.sdk.dir}/${system.dir}/build.properties"
-      prefix="system" />
-    <property file="${cacore.sdk.dir}/${writable-api.dir}/build.properties"
-      prefix="writable-api" />
-    <property file="${cacore.sdk.dir}/${security.dir}/build.properties"
-      prefix="security" />
-    <property file="${cacore.sdk.dir}/${grid-remoting.dir}/build.properties"
-      prefix="grid-remoting" />
-    <property file="${cacore.sdk.dir}/${grid-jaas.dir}/build.properties"
-      prefix="grid-jaas" />
-    <condition property="server-exclude-commons-logging"
-      value="commons-logging*.*"
-      else="">
-      <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
-    </condition>
-    <condition property="server-exclude-log4j" value="log4j*.*" else="">
-      <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
-    </condition>
-    <condition property="server-exclude-classes-list" value="**/log4j*.*" else="">
-      <equals arg1="${SERVER_TYPE}"
-        arg2="jboss"
-        casesensitive="false"
-        trim="true" />
-    </condition>
-    <condition property="WRITABLE_API_EXTENSION_ENABLED"
-      value="true"
-      else="false">
-      <or>
-        <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-          arg2="true"
-          casesensitive="false"
-          trim="true" />
-        <equals arg1="${ENABLE_WRITABLE_API_EXTENSION}"
-          arg2="yes"
-          casesensitive="false"
-          trim="true" />
-      </or>
-    </condition>
-    <condition property="read-api-exclude-list" value="" else="*.jar">
-      <equals arg1="${WRITABLE_API_EXTENSION_ENABLED}"
-        arg2="true"
-        casesensitive="false"
-        trim="true" />
-    </condition>
-    <condition property="SECURITY_ENABLED" value="true" else="false">
-      <or>
-        <equals arg1="${ENABLE_SECURITY}"
-          arg2="true"
-          casesensitive="false"
-          trim="true" />
-        <equals arg1="${ENABLE_SECURITY}"
-          arg2="yes"
-          casesensitive="false"
-          trim="true" />
-      </or>
-    </condition>
-    <!-- end of copied part -->
-    <!-- caCORE SDK -->
-  </target>
-
-  <!-- copied from sdk build.xml -->
-  <target name="package-webapp-orm"
-          depends="sdk-nodeps,sdk-files,prepare-webapp-orm,log4j-conf,package-codegen-orm,build-common-project">
-    <war destfile="${cacore.sdk.dir}/${package.system.dir}/${PROJECT_NAME}.war"
-         webxml="${cacore.sdk.dir}/${build.conf.web-inf.dir}/web.xml">
-      <manifest>
-        <attribute name="Generated-By"
-                   value="biobank caCORE SDK Code Generator" />
-        <attribute name="Version" value="${VERSION}" />
-      </manifest>
-      <lib dir="${cacore.sdk.dir}/${system.dir}/${system.dist.dir}"
-           includes="*.jar" />
-      <lib dir="${cacore.sdk.dir}/${writable-api.dir}/${writable-api.dist.dir}"
-           includes="*.jar">
-        <exclude name="${read-api-exclude-list}" />
+      <!-- TODO: could put things in right folders (e.g. biobank.common), but for now
+           just use an explicit list of what needs to be in the war -->
+      <lib dir="${req.jars.dir}">
+        <include name="acegi-security-1.0.4.jar" />
+        <include name="antlr-2.7.6.jar" />
+        <include name="asm.jar" />
+        <include name="axis.jar" />
+        <include name="backport-util-concurrent.jar" />
+        <include name="c3p0-0.9.0.jar" />
+        <include name="caGrid-CQL-cql.1.0-1.2.jar" />
+        <include name="caGrid-data-common-1.2.jar" />
+        <include name="caGrid-data-utils-1.2.jar" />
+        <include name="caGrid-metadata-data-1.2.jar" />
+        <include name="caGrid-sdkQuery4-beans-1.2.jar" />
+        <include name="caGrid-sdkQuery4-processor-1.2.jar" />
+        <include name="castor-1.0.2.jar" />
+        <include name="cglib-2.1.3.jar" />
+        <include name="clm-4.1.jar" />
+        <include name="commons-codec-1.3.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-discovery-0.2.jar" />
+        <include name="commons-logging-1.1.jar" />
+        <include name="csmapi-4.1.jar" />
+        <include name="dom4j-1.4.jar" />
+        <include name="dom4j-1.6.1.jar" />
+        <include name="ehcache-1.2.2.jar" />
+        <include name="freemarker-2.3.4.jar" />
+        <include name="hibernate3.jar" />
+        <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+        <include name="hibernate-validator-4.2.0.Final.jar" />
+        <include name="javassist-3.12.0.GA.jar" />
+        <include name="jaxrpc.jar" />
+        <include name="jdom.jar" />
+        <include name="jta-1.1.jar" />
+        <include name="log4j-1.2.14.jar" />
+        <include name="mmbase.jar" />
+        <include name="mysql-connector-java-5.1.15-bin.jar" />
+        <include name="ognl-2.6.7.jar" />
+        <include name="ojdbc14.jar" />
+        <include name="oro-2.0.8.jar" />
+        <include name="saaj.jar" />
+        <include name="sdk-client-framework.jar" />
+        <include name="sdk-core.jar" />
+        <include name="sdk-grid-jaas-executor.jar" />
+        <include name="sdk-grid-jaas.jar" />
+        <include name="sdk-security.jar" />
+        <include name="sdk-web-framework.jar" />
+        <include name="sdk-writable-client-framework.jar" />
+        <include name="sdk-writable-core.jar" />
+        <include name="sdk-ws-framework.jar" />
+        <include name="slf4j-api-1.6.1.jar" />
+        <include name="slf4j-log4j12-1.6.4.jar" />
+        <include name="spring.jar" />
+        <include name="struts2-api-2.0.1.jar" />
+        <include name="struts2-core-2.0.1.jar" />
+        <include name="validation-api-1.0.0.GA.jar" />
+        <include name="wsdl4j-1.5.1.jar" />
+        <include name="xwork-2.0-beta-1.jar" />
       </lib>
-      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${bean.file}" />
-      <lib dir="${cacore.sdk.dir}/${build.jar.dir}" includes="${orm.file}" />
-      <lib dir="${cacore.sdk.dir}/${system.dir}/${system.lib.dir}"
-           includes="*.jar">
-        <exclude name="${server-exclude-commons-logging}" />
-        <exclude name="${server-exclude-log4j}" />
-        <exclude name="servlet.jar" />
-        <exclude name="xercesImpl*.*" />
-        <exclude name="cog*.*" />
-      </lib>
-      <lib dir="${cacore.sdk.dir}/${grid-jaas.dir}/${grid-jaas.dist.dir}"
-           includes="*.*"
-           excludes="${grid-jaas.file.output.jaas.jndibinder.name}" />
-      <fileset dir="${cacore.sdk.dir}/${build.conf.system.web.dir}">
-        <include name="**/*" />
-        <exclude name="**/web.xml" />
-        <exclude name="${server-exclude-classes-list}" />
+      <fileset dir="webapp">
+        <exclude name="**/WEB-INF/**" />
       </fileset>
-      <fileset dir="${cacore.sdk.dir}/${system.dir}/${system.web.dir}">
-        <include name="**/*" />
-      </fileset>
-      <fileset dir="${cacore.sdk.dir}/${build.dir}">
-        <include name="docs/**/*" />
-      </fileset>
-      <classes dir="${cacore.sdk.dir}/${output.src.dir}">
-        <include name="${csm.security.config.file}" />
-        <include name="${csm.ehcache.file}" />
-        <include name="${clm.object.state.logger.config}" />
-      </classes>
       <classes dir="${eclipse.proj.dir.common}/output">
         <exclude name="**/client/**" />
       </classes>
-      <webinf dir="${cacore.sdk.dir}/${output.src.dir}">
-        <include name="server-config.wsdd" />
+      <webinf dir="webapp/WEB-INF">
+        <include name="**/*" />
+	<exclude name="**/web.xml" />
       </webinf>
     </war>
   </target>
 
   <target name="clean-jars" description="deletes jars from eclipse projects">
     <delete>
+      <!-- TODO: add lib folders from other projects? -->
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
     </delete>
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars,clean-caCore"
-          description="cleans caCORE SDK and deletes jars from eclipse projects">
+          depends="clean-tests,clean-jars,clean-product,clean-doxygen"
+          description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
-    <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
-    <delete>
-      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer"
-      includes="*Peer.java"/>
-    </delete>
-    <delete>
-      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base"
-      includes="*BaseWrapper.java"/>
-    </delete>
-  </target>
-
-  <target name="clean-caCore" if="cacore.sdk.available">
-    <ant dir="${cacore.sdk.dir}" target="clean" inheritRefs="false" />
-  </target>
-
-  <target name="clean-all"
-          depends="clean-tests,clean-jars"
-          description="deletes caCORE SDK directory and deletes jars from eclipse projects">
-    <delete dir="${cacore.sdk.dir}" />
-    <delete dir="${buildDirectory}" />
   </target>
 
   <!-- JUnit -->
 
+  <property name="doxygen.output" location="docs/doxygen" />
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
-  <property name="test.build.dir" value="${eclipse.proj.dir.junit}/output" />
+  <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
 
   <path id="common.class.path">
     <fileset dir="${eclipse.proj.dir.common}/lib/client">
@@ -992,42 +514,67 @@
     <delete dir="${test.build.dir}" />
   </target>
 
-  <target name="prepare">
+  <target name="test-prepare">
     <mkdir dir="${test.build.dir}" />
     <mkdir dir="${test.output}" />
     <mkdir dir="${test.output.raw}" />
   </target>
 
-  <target name="tests-compile" depends="build-common-project,prepare">
+  <!---->
+  <target name="tests-compile" depends="build-common-project,test-prepare" >
+    <copy includeemptydirs="false"
+          todir="${test.build.dir}" overwrite="true">
+      <fileset dir="${eclipse.proj.dir.tests}/src">
+        <exclude name="**/*.launch" />
+        <exclude name="**/*.java" />
+      </fileset>
+      <fileset dir="${eclipse.proj.dir.tools}/src">
+    	<exclude name="**/*.launch" />
+    	<exclude name="**/*.java" />
+      </fileset>
+    </copy>
     <javac destdir="${test.build.dir}"
            debug="true"
            debuglevel="lines,source"
            includeantruntime="false">
-      <src path="${eclipse.proj.dir.junit}/src" />
+      <src path="${eclipse.proj.dir.tests}/src" />
       <src path="${eclipse.proj.dir.tools}/src" />
       <include name="**/tools/utils/*.java" />
       <include name="**/test/reports/**/*.java" />
       <include name="**/Test*.java" />
-      <classpath>
+      <exclude name="**/presenters/**" />
+      <exclude name="**/TestingDispatcher.java" />
+     <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
+        <pathelement location="${req.jars.dir}" />
       </classpath>
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
 
-  <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
-    <include name="**/Test*.java" />
+  <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
     <exclude name="**/speed/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
+    <exclude name="**/TestAction.java" />
     <exclude name="**/TestCommon.java" />
+    <exclude name="**/TestingDispatcher.java" />
+    <exclude name="**/TestHibernateLocking.java" />
     <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestFunctionalities.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
     <exclude name="**/AllTests.java" />
+    <exclude name="**/wrappers/**" />
+    <exclude name="**/presenters/**" />
+    <include name="**/Test*.java" />
   </fileset>
 
-  <target name="test" depends="tests-compile" description="executes test cases">
+  <!-- target name="test-debug">
+    <pathconvert pathsep="${line.separator}" property="sounds" refid="testcase.files"/>
+    <echo file="sounds.txt">${sounds}</echo>
+  </target -->
+
+  <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
@@ -1111,32 +658,35 @@
   </target>
 
 
-  <target name="product" depends="biobank-version-modify,eclipse.home.env,deploy" description="build the product">
-  	<!-- buildDirectory is the folder where the plugins and products are found and build -->
-    <property name="buildDirectory" value="${product.dir}/buildDirectory" />
+  <target name="clean-product">
     <delete dir="${buildDirectory}" />
-  	<!-- plugins and features are copied into the buildDirectory -->
+  </target>
+
+
+  <target name="product" depends="clean-product,biobank-version-modify,eclipse.home.env,deploy" description="build the product">
+    <!-- buildDirectory is the folder where the plugins and products are found and build -->
+    <!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
       <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
-  	<!-- TODO : copy all project containing .nl1. into the plugins folder -->
-  	<copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
-  	      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
-  	</copy>
+    <!-- TODO : copy all project containing .nl1. into the plugins folder -->
+    <copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
+      <fileset dir="${eclipse.workspace.dir}/biobank.nl1.fr_CA" />
+    </copy>
     <copy todir="${buildDirectory}/plugins/scannerConfig">
       <fileset dir="${eclipse.workspace.dir}/scannerConfig" />
     </copy>
     <copy todir="${buildDirectory}/plugins/biobank.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.common" />
     </copy>
-    <copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
-      <fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot" />
-    </copy>
-    <copy todir="${buildDirectory}/plugins/barcodeGenerator">
-      <fileset dir="${eclipse.workspace.dir}/barcodeGenerator" />
+    <copy todir="${buildDirectory}/plugins/labelPrinter">
+      <fileset dir="${eclipse.workspace.dir}/labelPrinter" />
     </copy>
     <copy todir="${buildDirectory}/plugins/biobank.gui.common">
       <fileset dir="${eclipse.workspace.dir}/biobank.gui.common" />
+    </copy>
+    <copy todir="${buildDirectory}/plugins/biobank.mvp">
+      <fileset dir="${eclipse.workspace.dir}/biobank.mvp" />
     </copy>
     <copy todir="${buildDirectory}/features/biobank2.feature.core">
       <fileset dir="${eclipse.workspace.dir}/biobank2.feature.core" />
@@ -1176,6 +726,7 @@
 
       <!-- uncomment line below to build a single executable product -->
       <!-- arg line="-Dconfigs='win32, win32, x86'" / -->
+      <!-- arg line="-Dconfigs='linux, gtk, x86_64'" / -->
     </java>
     <antcall target="updateSiteMetadata" />
   </target>
@@ -1231,6 +782,24 @@
       <arg line="-metadataRepository file:${updateSiteFolder}" />
     </java>
   </target>
+
+  <target name="doxygen" description="generates documentation for the model classes">
+    <exec executable="${doxygen}">
+      <arg value="docs/doxygen/doxygen.cfg" />
+    </exec>
+    <echo message="point your browser to: file://${doxygen.output}/html/index.html" />
+    <exec executable="${xsltproc}" dir="docs/doxygen/xml" output="docs/doxygen/xml/all.xml">
+      <arg value="combine.xslt" />
+      <arg value="index.xml" />
+    </exec>
+  </target>
+
+  <target name="clean-doxygen">
+    <delete dir="docs/doxygen/html" />
+    <delete dir="docs/doxygen/xml" />
+  </target>
+
+<!-- (setq nxml-slash-auto-complete-flag t) -->
 
 
 </project>

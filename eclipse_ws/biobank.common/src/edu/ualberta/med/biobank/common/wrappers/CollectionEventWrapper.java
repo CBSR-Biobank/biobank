@@ -1,49 +1,52 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.loggers.CollectionEventLogProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-@SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
+    private static final CollectionEventLogProvider LOG_PROVIDER =
+        new CollectionEventLogProvider();
+    private static final String HAS_SPECIMENS_MSG = Messages
+        .getString("CollectionEventWrapper.has_specimen_delete_msg"); //$NON-NLS-1$
+    private static final Collection<Property<?, ? super CollectionEvent>> UNIQUE_VISIT_NUMBER_PROPS;
+    static {
+        Collection<Property<?, ? super CollectionEvent>> tmp =
+            new ArrayList<Property<?, ? super CollectionEvent>>();
+        tmp.add(CollectionEventPeer.PATIENT.to(PatientPeer.ID));
+        tmp.add(CollectionEventPeer.VISIT_NUMBER);
+
+        UNIQUE_VISIT_NUMBER_PROPS = Collections.unmodifiableCollection(tmp);
+    };
 
     private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
-
     private Map<String, EventAttrWrapper> eventAttrMap;
-
-    private Set<SpecimenWrapper> deletedSourceSpecimens = new HashSet<SpecimenWrapper>();
 
     public CollectionEventWrapper(WritableApplicationService appService) {
         super(appService);
@@ -55,157 +58,74 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     private void removeFromSpecimenCollections(
-        List<SpecimenWrapper> specimenCollection) {
-        deletedSourceSpecimens.addAll(specimenCollection);
-        super.removeFromAllSpecimenCollection(specimenCollection);
-        super.removeFromOriginalSpecimenCollection(specimenCollection);
+        List<? extends SpecimenBaseWrapper> specimenCollection) {
+        // super.removeFromAllSpecimenCollection(specimenCollection); is not
+        // called because it will set the collectionEvent of specimens to null
+        // Since hibernate will check that it is not null, it is a problem.
+        // Specimens are deleted after that, so that's ok to keep the cevent
+        // reference
+        removeFromWrapperCollection(
+            CollectionEventPeer.ALL_SPECIMENS, specimenCollection);
+        removeFromWrapperCollection(
+            CollectionEventPeer.ORIGINAL_SPECIMENS,
+            specimenCollection);
     }
 
     private void removeFromSpecimenCollectionsWithCheck(
-        List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
-        deletedSourceSpecimens.addAll(specimenCollection);
+        List<? extends SpecimenBaseWrapper> specimenCollection)
+        throws BiobankCheckException {
         super.removeFromAllSpecimenCollectionWithCheck(specimenCollection);
         super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
     }
 
     @Override
     public void removeFromAllSpecimenCollection(
-        List<SpecimenWrapper> specCollection) {
+        List<? extends SpecimenBaseWrapper> specCollection) {
         removeFromSpecimenCollections(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollection(
-        List<SpecimenWrapper> specCollection) {
+        List<? extends SpecimenBaseWrapper> specCollection) {
         removeFromSpecimenCollections(specCollection);
     }
 
     @Override
     public void removeFromAllSpecimenCollectionWithCheck(
-        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        List<? extends SpecimenBaseWrapper> specCollection)
+        throws BiobankCheckException {
         removeFromSpecimenCollectionsWithCheck(specCollection);
     }
 
     @Override
     public void removeFromOriginalSpecimenCollectionWithCheck(
-        List<SpecimenWrapper> specCollection) throws BiobankCheckException {
+        List<? extends SpecimenBaseWrapper> specCollection)
+        throws BiobankCheckException {
         removeFromSpecimenCollectionsWithCheck(specCollection);
     }
 
     @Override
-    public void addToOriginalSpecimenCollection(List<SpecimenWrapper> specs) {
+    public void addToOriginalSpecimenCollection(
+        List<? extends SpecimenBaseWrapper> specs) {
         super.addToOriginalSpecimenCollection(specs);
         super.addToAllSpecimenCollection(specs);
-        deletedSourceSpecimens.removeAll(specs);
-    }
-
-    private void deleteSpecimens() throws Exception {
-        // FIXME delete only if no children ??
-        for (SpecimenWrapper sv : deletedSourceSpecimens) {
-            if (!sv.isNew()) {
-                sv.delete();
-            }
-        }
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        List<SpecimenWrapper> specimens = getAllSpecimenCollection(false);
-        if (specimens != null && !specimens.isEmpty()) {
-            throw new BiobankDeleteException(
-                "Specimens are still linked to this Collection Event. "
-                    + "Delete them before attempting to remove this Collection Event");
-        }
+    public CollectionEventLogProvider getLogProvider() {
+        return LOG_PROVIDER;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkVisitNumberUnused();
-    }
+    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from " //$NON-NLS-1$
+        + CollectionEvent.class.getName()
+        + " ce join ce." //$NON-NLS-1$
+        + CollectionEventPeer.ORIGINAL_SPECIMENS
+        + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName() //$NON-NLS-1$
+        + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName() //$NON-NLS-1$
+        + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
-    private static final String CHECK_VISIT_NUMBER_UNUSED = "select ce from "
-        + CollectionEvent.class.getName() + " ce where ce."
-        + CollectionEventPeer.VISIT_NUMBER.getName() + "=? and ce."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=? {0}";
-
-    private void checkVisitNumberUnused() throws BiobankCheckException,
-        ApplicationException {
-        List<Object> params = new ArrayList<Object>();
-        params.add(getVisitNumber());
-        params.add(getPatient().getId());
-        String equalsTest = "";
-        if (!isNew()) {
-            equalsTest = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria(MessageFormat.format(
-            CHECK_VISIT_NUMBER_UNUSED, equalsTest), params);
-        List<Object> result = appService.query(c);
-        if (result.size() != 0)
-            throw new BiobankCheckException("Visit #" + getVisitNumber()
-                + " has already been added for patient "
-                + getPatient().getPnumber() + ".");
-    }
-
-    @Override
-    protected void persistDependencies(CollectionEvent origObject)
-        throws Exception {
-        deleteSpecimens();
-        if (eventAttrMap != null) {
-            setWrapperCollection(CollectionEventPeer.EVENT_ATTR_COLLECTION,
-                eventAttrMap.values());
-        }
-    }
-
-    public void checkAtLeastOneSourceSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getOriginalSpecimenCollection(false);
-        if (spc == null || spc.isEmpty()) {
-            throw new BiobankCheckException(
-                "At least one specimen should be added to this Collection Event.");
-        }
-    }
-
-    @Override
-    protected Log getLogMessage(String action, String site, String details)
-        throws Exception {
-        Log log = new Log();
-        log.setAction(action);
-        if (site == null) {
-            log.setCenter(null);
-        } else {
-            log.setCenter(site);
-        }
-        log.setPatientNumber(getPatient().getPnumber());
-        List<String> detailsList = new ArrayList<String>();
-        if (details.length() > 0) {
-            detailsList.add(details);
-        }
-
-        detailsList.add(new StringBuilder("visit:").append(getVisitNumber())
-            .toString());
-
-        try {
-            detailsList.add(new StringBuilder("specimens:").append(
-                getSourceSpecimensCount(false)).toString());
-        } catch (BiobankException e) {
-            e.printStackTrace();
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
-        log.setDetails(StringUtils.join(detailsList, ", "));
-        log.setType("CollectionEvent");
-        return log;
-    }
-
-    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
-        + CollectionEvent.class.getName() + " ce join ce."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
-        + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?";
+    // TODO: make sure that these count methods are actually correct if the
+    // memory contents have been altered...
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, String waybill)
@@ -220,15 +140,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from "
-        + CollectionEvent.class.getName()
-        + " ce join ce."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
-        + " as spcs join spcs."
-        + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?";
+    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY =
+        "from " //$NON-NLS-1$
+            + CollectionEvent.class.getName()
+            + " ce join ce." //$NON-NLS-1$
+            + CollectionEventPeer.ORIGINAL_SPECIMENS
+            + " as spcs join spcs." //$NON-NLS-1$
+            + SpecimenPeer.ORIGIN_INFO.getName()
+            + " as oi join oi." //$NON-NLS-1$
+            + OriginInfoPeer.SHIPMENT_INFO.getName()
+            + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, Date dateReceived)
@@ -243,86 +164,62 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(specimens) from "
-        + CollectionEvent.class.getName()
-        + " as cEvent join cEvent."
-        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
-        + " as specimens where cEvent."
-        + CollectionEventPeer.ID.getName()
-        + "=?";
-
     public long getSourceSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(
+            CollectionEventPeer.ORIGINAL_SPECIMENS, fast);
     }
-
-    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spc) from "
-        + Specimen.class.getName()
-        + " as spc where spc."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID) + "=?";
 
     public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return list.size();
+        return getPropertyCount(CollectionEventPeer.ALL_SPECIMENS,
+            fast);
     }
 
-    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
-        + Specimen.class.getName()
-        + " as spc where spc."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.ID)
-        + "=? and spc."
-        + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null";
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY =
+        "select count(spc) from " //$NON-NLS-1$
+            + Specimen.class.getName()
+            + " as spc where spc." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+                CollectionEventPeer.ID) + "=? and spc." //$NON-NLS-1$
+            + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null"; //$NON-NLS-1$
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
-        if (fast) {
+        long count = 0;
+
+        if (fast
+            && !isInitialized(CollectionEventPeer.ORIGINAL_SPECIMENS)
+            && !isInitialized(CollectionEventPeer.ALL_SPECIMENS)) {
             HQLCriteria criteria = new HQLCriteria(
                 ALIQUOTED_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
+            count = getCountResult(appService, criteria);
+        } else {
+            count = getAllSpecimensCount(fast) - getSourceSpecimensCount(fast);
         }
-        List<SpecimenWrapper> aliquotedSpecimens = getAliquotedSpecimenCollection(false);
-        if (aliquotedSpecimens == null)
-            return 0;
-        return aliquotedSpecimens.size();
+
+        return count;
     }
 
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
-        List<SpecimenWrapper> aliquotedSpecimens = new ArrayList<SpecimenWrapper>(
-            getAllSpecimenCollection(true));
+        List<SpecimenWrapper> aliquotedSpecimens =
+            new ArrayList<SpecimenWrapper>(
+                getAllSpecimenCollection(sort));
         aliquotedSpecimens.removeAll(getOriginalSpecimenCollection(false));
         return aliquotedSpecimens;
     }
 
-    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY = "select spec from "
-        + Specimen.class.getName()
-        + " as spec where spec."
-        + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
-            CollectionEventPeer.ID)
-        + " = ? and spec."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
-            ProcessingEventPeer.ID)
-        + " = ? and spec."
-        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != 'Flagged'";
+    private static String SOURCE_SPEC_IN_PROCESS_NOT_FLAGGED_QRY =
+        "select spec from " //$NON-NLS-1$
+            + Specimen.class.getName()
+            + " as spec where spec." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.ORIGINAL_COLLECTION_EVENT,
+                CollectionEventPeer.ID)
+            + " = ? and spec." //$NON-NLS-1$
+            + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+                ProcessingEventPeer.ID)
+            + " = ? and spec.activityStatus != " + ActivityStatus.FLAGGED.getId(); //$NON-NLS-1$
 
     /**
      * source specimen that are in a process event
@@ -353,11 +250,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
         studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
         if (patient != null && patient.getStudy() != null) {
-            Collection<StudyEventAttrWrapper> studyEventAttrCollection = patient
-                .getStudy().getStudyEventAttrCollection();
+            Collection<StudyEventAttrWrapper> studyEventAttrCollection =
+                patient
+                    .getStudy().getStudyEventAttrCollection();
             if (studyEventAttrCollection != null) {
                 for (StudyEventAttrWrapper studyEventAttr : studyEventAttrCollection) {
-                    studyEventAttrMap.put(studyEventAttr.getLabel(),
+                    studyEventAttrMap.put(studyEventAttr.getGlobalEventAttr()
+                        .getLabel(),
                         studyEventAttr);
                 }
             }
@@ -374,7 +273,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         List<EventAttrWrapper> pvAttrCollection = getEventAttrCollection(false);
         if (pvAttrCollection != null) {
             for (EventAttrWrapper pvAttr : pvAttrCollection) {
-                eventAttrMap.put(pvAttr.getStudyEventAttr().getLabel(), pvAttr);
+                eventAttrMap.put(pvAttr.getStudyEventAttr()
+                    .getGlobalEventAttr().getLabel(), pvAttr);
             }
         }
         return eventAttrMap;
@@ -392,8 +292,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("StudyEventAttr with label \"" + label
-                    + "\" is invalid");
+                throw new Exception("StudyEventAttr with label \"" + label //$NON-NLS-1$
+                    + "\" is invalid"); //$NON-NLS-1$
             }
             // not assigned yet so return null
             return null;
@@ -411,11 +311,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("StudyEventAttr withr label \"" + label
-                    + "\" does not exist");
+                throw new Exception("StudyEventAttr withr label \"" + label //$NON-NLS-1$
+                    + "\" does not exist"); //$NON-NLS-1$
             }
         }
-        return studyEventAttr.getEventAttrType().getName();
+        return studyEventAttr.getGlobalEventAttr().getEventAttrType().getName();
     }
 
     public String[] getEventAttrPermissible(String label) throws Exception {
@@ -428,15 +328,15 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             studyEventAttr = studyEventAttrMap.get(label);
             // make sure "label" is a valid study pv attr
             if (studyEventAttr == null) {
-                throw new Exception("EventAttr for label \"" + label
-                    + "\" does not exist");
+                throw new Exception("EventAttr for label \"" + label //$NON-NLS-1$
+                    + "\" does not exist"); //$NON-NLS-1$
             }
         }
         String permissible = studyEventAttr.getPermissible();
         if (permissible == null) {
             return null;
         }
-        return permissible.split(";");
+        return permissible.split(";"); //$NON-NLS-1$
     }
 
     /**
@@ -465,21 +365,23 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         } else {
             studyEventAttr = studyEventAttrMap.get(label);
             if (studyEventAttr == null) {
-                throw new Exception("no StudyEventAttr found for label \""
-                    + label + "\"");
+                throw new Exception("no StudyEventAttr found for label \"" //$NON-NLS-1$
+                    + label + "\""); //$NON-NLS-1$
             }
         }
 
-        if (!studyEventAttr.getActivityStatus().isActive()) {
-            throw new Exception("attribute for label \"" + label
-                + "\" is locked, changes not premitted");
+        if (ActivityStatus.ACTIVE != studyEventAttr.getActivityStatus()) {
+            throw new Exception("attribute for label \"" + label //$NON-NLS-1$
+                + "\" is locked, changes not premitted"); //$NON-NLS-1$
         }
 
         if (value != null) {
             // validate the value
             value = value.trim();
             if (value.length() > 0) {
-                String type = studyEventAttr.getEventAttrType().getName();
+                String type =
+                    studyEventAttr.getGlobalEventAttr().getEventAttrType()
+                        .getName();
                 List<String> permissibleSplit = null;
 
                 if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)
@@ -487,21 +389,21 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     String permissible = studyEventAttr.getPermissible();
                     if (permissible != null) {
                         permissibleSplit = Arrays
-                            .asList(permissible.split(";"));
+                            .asList(permissible.split(";")); //$NON-NLS-1$
                     }
                 }
 
                 if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)) {
                     if (!permissibleSplit.contains(value)) {
-                        throw new Exception("value " + value
-                            + "is invalid for label \"" + label + "\"");
+                        throw new Exception("value " + value //$NON-NLS-1$
+                            + "is invalid for label \"" + label + "\""); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } else if (EventAttrTypeEnum.SELECT_MULTIPLE.isSameType(type)) {
-                    for (String singleVal : value.split(";")) {
+                    for (String singleVal : value.split(";")) { //$NON-NLS-1$
                         if (!permissibleSplit.contains(singleVal)) {
-                            throw new Exception("value " + singleVal + " ("
-                                + value + ") is invalid for label \"" + label
-                                + "\"");
+                            throw new Exception("value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
+                                + value + ") is invalid for label \"" + label //$NON-NLS-1$
+                                + "\""); //$NON-NLS-1$
                         }
                     }
                 } else if (EventAttrTypeEnum.NUMBER.isSameType(type)) {
@@ -511,7 +413,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 } else if (EventAttrTypeEnum.TEXT.isSameType(type)) {
                     // do nothing
                 } else {
-                    throw new Exception("type \"" + type + "\" not tested");
+                    throw new Exception("type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             }
         }
@@ -520,7 +422,14 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             pvAttr = new EventAttrWrapper(appService);
             pvAttr.setCollectionEvent(this);
             pvAttr.setStudyEventAttr(studyEventAttr);
-            eventAttrMap.put(label, pvAttr);
+
+            EventAttrWrapper oldValue = eventAttrMap.put(label, pvAttr);
+
+            if (oldValue != null) {
+                removeFromEventAttrCollection(Arrays.asList(oldValue));
+            }
+
+            addToEventAttrCollection(Arrays.asList(pvAttr));
         }
         pvAttr.setValue(value);
     }
@@ -546,16 +455,39 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public static Integer getNextVisitNumber(
         WritableApplicationService appService, CollectionEventWrapper cevent)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from "
-            + CollectionEvent.class.getName() + " ce where ce.patient.id=?",
+        HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from " //$NON-NLS-1$
+            + CollectionEvent.class.getName() + " ce where ce.patient.id=?", //$NON-NLS-1$
             Arrays.asList(cevent.getPatient().getId()));
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)
             return 1;
-        else
-            return (Integer) result.get(0) + 1;
+        return (Integer) result.get(0) + 1;
     }
 
+    @Deprecated
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(CollectionEventPeer.VISIT_NUMBER));
+
+        tasks.add(check().unique(UNIQUE_VISIT_NUMBER_PROPS));
+
+        tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMENS);
+        tasks.deleteRemoved(this,
+            CollectionEventPeer.ORIGINAL_SPECIMENS);
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.add(check().empty(CollectionEventPeer.ALL_SPECIMENS,
+            HAS_SPECIMENS_MSG));
+
+        super.addDeleteTasks(tasks);
+    }
+
+    @Deprecated
     public void merge(CollectionEventWrapper p2event) throws Exception {
         List<SpecimenWrapper> ospecs = p2event
             .getOriginalSpecimenCollection(false);
@@ -573,9 +505,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can delete this object
      */
     @Override
-    public boolean canDelete(User user) {
-        return super.canDelete(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canDelete(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canDelete(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
@@ -584,17 +518,20 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user)
-            && (getPatient() == null || getPatient().getStudy() == null || user
+    public boolean canUpdate(UserWrapper user, CenterWrapper<?> center,
+        StudyWrapper study) {
+        return super.canUpdate(user, center, study)
+            && (getPatient() == null || getPatient().getStudy() == null
+                || user.getCurrentWorkingCenter() == null || user
                 .getCurrentWorkingCenter().getStudyCollection()
                 .contains(getPatient().getStudy()));
     }
 
     public Date getMinSourceSpecimenDate() {
-        Date min = new Date();
+        Date min = null;
         for (SpecimenWrapper spec : getOriginalSpecimenCollection(false))
-            min = min.before(spec.getCreatedAt()) ? min : spec.getCreatedAt();
+            min = (min != null && min.before(spec.getCreatedAt())) ? min : spec
+                .getCreatedAt();
         return min;
     }
 }

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
@@ -50,14 +50,15 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
     }
 
     @Override
-    public BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    public BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = getCollectionModelObject((LogWrapper) element);
+                TableRowData item =
+                    getCollectionModelObject((LogWrapper) element);
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.LoggingInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -100,8 +101,8 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
         Date logQueryDate = logQuery.getCreatedAt();
         if (logQueryDate != null) {
-            SimpleDateFormat dateTimeSecond = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+            SimpleDateFormat dateTimeSecond =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
             info.date = dateTimeSecond.format(logQueryDate);
         } else {
             info.date = null;
@@ -112,11 +113,6 @@ public class LoggingInfoTable extends ReportTableWidget<LogWrapper> {
 
     public Table getTable() {
         return tableViewer.getTable();
-    }
-
-    @Override
-    public List<LogWrapper> getCollection() {
-        return null;
     }
 
 }

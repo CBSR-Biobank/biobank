@@ -1,16 +1,18 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -21,6 +23,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestAliquotedSpecimen extends TestDatabase {
 
     @Test
@@ -116,18 +119,15 @@ public class TestAliquotedSpecimen extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        ActivityStatusWrapper as = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
-        ss.setActivityStatus(as);
+        ss.setActivityStatus(ActivityStatus.ACTIVE);
         ss.persist();
-        Assert.assertTrue(as.equals(ss.getActivityStatus()));
+        Assert.assertTrue(ActivityStatus.ACTIVE == ss.getActivityStatus());
 
-        ActivityStatusWrapper as2 = ActivityStatusWrapper.getActivityStatus(
-            appService, "Flagged");
-        ss.setActivityStatus(as2);
+
+        ss.setActivityStatus(ActivityStatus.FLAGGED);
         ss.persist();
-        Assert.assertTrue(as2.equals(ss.getActivityStatus()));
-        Assert.assertFalse(as.equals(ss.getActivityStatus()));
+        Assert.assertTrue(ActivityStatus.FLAGGED == ss.getActivityStatus());
+        Assert.assertFalse(ActivityStatus.ACTIVE == ss.getActivityStatus());
     }
 
     @Test
@@ -145,10 +145,12 @@ public class TestAliquotedSpecimen extends TestDatabase {
             AliquotedSpecimen.class, aliquotedSpec.getId());
         Assert.assertNotNull(ssInDB);
 
+        Integer aliquotedSpecId = aliquotedSpec.getId();
+
         aliquotedSpec.delete();
 
         ssInDB = ModelUtils.getObjectWithId(appService,
-            AliquotedSpecimen.class, aliquotedSpec.getId());
+            AliquotedSpecimen.class, aliquotedSpecId);
         // object is not anymore in database
         Assert.assertNull(ssInDB);
     }
@@ -164,8 +166,8 @@ public class TestAliquotedSpecimen extends TestDatabase {
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
 
         aliquotedSpec.reload();
-        Double oldVolume = aliquotedSpec.getVolume();
-        aliquotedSpec.setVolume(6.3);
+        BigDecimal oldVolume = aliquotedSpec.getVolume();
+        aliquotedSpec.setVolume(new BigDecimal(6.3));
         aliquotedSpec.reset();
         Assert.assertEquals(oldVolume, aliquotedSpec.getVolume());
     }
@@ -174,7 +176,7 @@ public class TestAliquotedSpecimen extends TestDatabase {
     public void testResetNew() throws Exception {
         AliquotedSpecimenWrapper aliquotedSpec = new AliquotedSpecimenWrapper(
             appService);
-        aliquotedSpec.setVolume(5.2);
+        aliquotedSpec.setVolume(new BigDecimal(5.2));
         aliquotedSpec.reset();
         Assert.assertEquals(null, aliquotedSpec.getVolume());
     }
@@ -205,6 +207,11 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         Assert.assertTrue(aliquotedSpec1.compareTo(aliquotedSpec2) > 0);
         Assert.assertTrue(aliquotedSpec2.compareTo(aliquotedSpec1) < 0);
+
+        AliquotedSpecimenBaseWrapper as = new AliquotedSpecimenBaseWrapper(
+            appService);
+        as.setSpecimenType(typeWrapperHair);
+        Assert.assertEquals(0, aliquotedSpec2.compareTo(as));
     }
 
     @Test
@@ -254,4 +261,5 @@ public class TestAliquotedSpecimen extends TestDatabase {
         String s = aliquotedSpec.toString();
         Assert.assertTrue((s != null) && !s.isEmpty());
     }
+
 }

@@ -7,7 +7,10 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
@@ -16,6 +19,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 
+@Deprecated
 public class DbHelper {
 
     protected static WritableApplicationService appService;
@@ -66,6 +70,7 @@ public class DbHelper {
         for (DispatchWrapper dispatch : dispaches) {
             dispatch.reload();
             deleteFromList(dispatch.getDispatchSpecimenCollection(false));
+            dispatch.reload();
             dispatch.delete();
         }
     }
@@ -76,9 +81,19 @@ public class DbHelper {
             if (ce.isNew())
                 continue;
             ce.reload();
-            deleteFromList(ce.getAllSpecimenCollection(false));
+            // cannot use all here! otherwise you delete twice
+            deleteSpecimensAndChildren(ce.getOriginalSpecimenCollection(false));
             ce.reload();
             ce.delete();
+        }
+    }
+
+    private static void deleteSpecimensAndChildren(
+        List<SpecimenWrapper> specimenCollection) throws Exception {
+        for (SpecimenWrapper child : specimenCollection) {
+            deleteSpecimensAndChildren(child.getChildSpecimenCollection(false));
+            child.reload();
+            child.delete();
         }
     }
 
@@ -115,8 +130,30 @@ public class DbHelper {
         for (ClinicWrapper clinic : clinics) {
             clinic.reload();
             deleteFromList(clinic.getOriginInfoCollection(false));
+
+            List<StudyWrapper> studies = clinic.getStudyCollection();
+            for (StudyWrapper study : studies) {
+                List<PatientWrapper> patients = study
+                    .getPatientCollection(false);
+                for (PatientWrapper patient : patients) {
+                    List<CollectionEventWrapper> collectionEvents = patient
+                        .getCollectionEventCollection(false);
+                    for (CollectionEventWrapper collectionEvent : collectionEvents) {
+                        deleteFromList(collectionEvent
+                            .getAllSpecimenCollection(false));
+                    }
+                    deleteFromList(collectionEvents);
+                }
+                deleteFromList(patients);
+            }
+            deleteFromList(studies);
             clinic.delete();
         }
+    }
+
+    public static void deleteResearchGroups(
+        List<ResearchGroupWrapper> researchGroups) throws Exception {
+        deleteFromList(researchGroups);
     }
 
     public static void deleteFromList(Collection<? extends ModelWrapper<?>> list)
@@ -128,6 +165,14 @@ public class DbHelper {
             object.reload();
             object.delete();
         }
+    }
+
+    public static void deleteRequests(List<RequestWrapper> createdRequests)
+        throws Exception {
+        for (RequestWrapper r : createdRequests) {
+            deleteFromList(r.getRequestSpecimenCollection(false));
+        }
+        deleteFromList(createdRequests);
     }
 
 }

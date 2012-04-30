@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@Deprecated
 public class ContainerTypeHelper extends DbHelper {
 
     /**
@@ -39,8 +40,7 @@ public class ContainerTypeHelper extends DbHelper {
         if (colCapacity != null)
             ct.setColCapacity(colCapacity);
         ct.setTopLevel(isTopLevel);
-        ct.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        ct.setActivityStatus(ActivityStatus.ACTIVE);
         return ct;
     }
 

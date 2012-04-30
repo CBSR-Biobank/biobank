@@ -1,37 +1,52 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
+import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerGroup extends AdapterBase {
 
-    private static BgcLogger logger = BgcLogger.getLogger(ContainerGroup.class
+    private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
+    private List<Container> topContainers = null;
+
+    private boolean createAllowed;
+
     public ContainerGroup(SiteAdapter parent, int id) {
-        super(parent, id, Messages.ContainerGroup_containers_node_label, true,
-            true);
+        super(parent, id, Messages.ContainerGroup_containers_node_label, true);
+        try {
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ContainerCreatePermission(parent.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -45,8 +60,35 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
+    public void performExpand() {
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    topContainers =
+                        SessionManager
+                            .getAppService()
+                            .doAction(
+                                new SiteGetTopContainersAction(siteAdapter
+                                    .getId())).getList();
+                    ContainerGroup.super.performExpand();
+                } catch (Exception e) {
+                    String text = getClass().getName();
+                    if (getModelObject() != null) {
+                        text = getModelObject().toString();
+                    }
+                    LOGGER.error(
+                        "Error while loading children of node " + text, e); //$NON-NLS-1$
+                }
+
+            }
+        });
+    }
+
+    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ContainerGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -60,46 +102,15 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        List<AdapterBase> res = new ArrayList<AdapterBase>();
-        if (searchedObject instanceof ContainerWrapper) {
-            ContainerWrapper container = (ContainerWrapper) searchedObject;
-            if (container.getContainerType() != null) {
-                if (Boolean.TRUE.equals(container.getContainerType()
-                    .getTopLevel())) {
-                    AdapterBase child = getChild(
-                        (ModelWrapper<?>) searchedObject, true);
-                    if (child != null)
-                        res.add(child);
-                } else {
-                    List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
-                    ContainerWrapper currentContainer = container;
-                    while (currentContainer.hasParentContainer()) {
-                        currentContainer = currentContainer
-                            .getParentContainer();
-                        parents.add(currentContainer);
-                    }
-                    for (AdapterBase child : getChildren()) {
-                        if (child instanceof ContainerAdapter) {
-                            res = searchChildContainers(searchedObject,
-                                (ContainerAdapter) child, parents);
-                        } else {
-                            res = child.search(searchedObject);
-                        }
-                        if (res.size() > 0)
-                            break;
-                    }
-                    if (res.size() == 0)
-                        res = searchChildren(searchedObject);
-                }
-            }
-        }
-        return res;
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ContainerTypeWrapper.class);
     }
 
     @Override
@@ -108,24 +119,19 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ContainerWrapper);
         return new ContainerAdapter(this, (ContainerWrapper) child);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper parentSite = (SiteWrapper) ((SiteAdapter) getParent())
-            .getModelObject();
-        Assert.isNotNull(parentSite, "site null"); //$NON-NLS-1$
-        parentSite.reload();
-        return parentSite.getTopContainerCollection();
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        final SiteAdapter siteAdapter = (SiteAdapter) getParent();
+        topContainers = SessionManager.getAppService().doAction(
+            new SiteGetTopContainersAction(siteAdapter.getId())).getList();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            topContainers, ContainerWrapper.class);
     }
 
     @Override
@@ -153,7 +159,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
+            LOGGER.error("BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
     }
 
@@ -165,5 +171,10 @@ public class ContainerGroup extends AdapterBase {
     @Override
     public String getViewFormId() {
         return null;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 }

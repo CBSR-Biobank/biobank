@@ -9,8 +9,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,8 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -37,6 +36,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestSpecimenType extends TestDatabase {
 
     @Test
@@ -52,7 +52,8 @@ public class TestSpecimenType extends TestDatabase {
         String name = "testGetContainerTypeCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name);
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
@@ -76,7 +77,8 @@ public class TestSpecimenType extends TestDatabase {
         String name = "testGetContainerTypeCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         SpecimenTypeWrapper type = SpecimenTypeHelper.addSpecimenType(name);
-        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes =
+            new ArrayList<SpecimenTypeWrapper>();
         sampleTypes.add(type);
         int containerTypeNber = 10;
         ContainerTypeHelper.addContainerTypesRandom(site, name,
@@ -111,8 +113,10 @@ public class TestSpecimenType extends TestDatabase {
         ContainerTypeWrapper containerType2 = ContainerTypeHelper
             .addContainerTypeRandom(site, "TYPE2");
 
-        List<SpecimenTypeWrapper> sampleTypes1 = new ArrayList<SpecimenTypeWrapper>();
-        List<SpecimenTypeWrapper> sampleTypes2 = new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes1 =
+            new ArrayList<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes2 =
+            new ArrayList<SpecimenTypeWrapper>();
         SpecimenTypeWrapper sampleType1 = SpecimenTypeHelper
             .addSpecimenType("ST1");
         sampleTypes1.add(sampleType1);
@@ -177,23 +181,6 @@ public class TestSpecimenType extends TestDatabase {
     }
 
     @Test
-    public void testPersistSpecimenTypes() throws Exception {
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false);
-        int startSize = types.size();
-
-        String name = "testPersistSpecimenTypes" + r.nextInt();
-        SpecimenTypeWrapper type = SpecimenTypeHelper.newSpecimenType(name);
-        SpecimenTypeWrapper.persistSpecimenTypes(Arrays.asList(type), null);
-        Assert.assertEquals(startSize + 1, SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false).size());
-
-        SpecimenTypeWrapper.persistSpecimenTypes(null, Arrays.asList(type));
-        Assert.assertEquals(startSize,
-            SpecimenTypeWrapper.getAllSpecimenTypes(appService, false).size());
-    }
-
-    @Test
     public void testPersist() throws Exception {
         String name = "testPersist" + r.nextInt();
         int oldTotal = appService
@@ -213,9 +200,7 @@ public class TestSpecimenType extends TestDatabase {
         try {
             type.persist();
             Assert.fail("name should be set");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
@@ -232,9 +217,7 @@ public class TestSpecimenType extends TestDatabase {
         try {
             type.persist();
             Assert.fail("nameshort should be set");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
 
@@ -254,7 +237,7 @@ public class TestSpecimenType extends TestDatabase {
         try {
             type.persist();
             Assert.fail("name should be unique");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
 
@@ -273,7 +256,7 @@ public class TestSpecimenType extends TestDatabase {
         try {
             type.persist();
             Assert.fail("name short should be unique");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
 
@@ -293,10 +276,12 @@ public class TestSpecimenType extends TestDatabase {
             SpecimenType.class, type.getId());
         Assert.assertNotNull(typeInDB);
 
+        Integer id = type.getId();
+
         type.delete();
 
         typeInDB = ModelUtils.getObjectWithId(appService, SpecimenType.class,
-            type.getId());
+            id);
         // object is not anymore in database
         Assert.assertNull(typeInDB);
     }
@@ -317,7 +302,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -343,7 +328,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 
@@ -377,7 +362,7 @@ public class TestSpecimenType extends TestDatabase {
             type.delete();
             Assert
                 .fail("Should not be able to delete it - deleteCheck should fail");
-        } catch (BiobankDeleteException bde) {
+        } catch (ModelIsUsedException e) {
             Assert.assertTrue(true);
         }
 

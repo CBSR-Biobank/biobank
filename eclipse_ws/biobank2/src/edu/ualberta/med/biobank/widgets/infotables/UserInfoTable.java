@@ -1,60 +1,84 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.UserDeleteAction;
+import edu.ualberta.med.biobank.common.action.security.UserDeleteInput;
+import edu.ualberta.med.biobank.common.action.security.UserGetAction;
+import edu.ualberta.med.biobank.common.action.security.UserGetInput;
+import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
+import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.DefaultAbstractInfoTableWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.util.NullHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class UserInfoTable extends InfoTableWidget<User> {
-    public static final int ROWS_PER_PAGE = 12;
-    private static final String[] HEADINGS = new String[] {
-        Messages.UserInfoTable_login_label, Messages.UserInfoTable_email_label,
-        Messages.UserInfoTable_firstname_label,
-        Messages.UserInfoTable_lastname_label };
-    private static final String LOADING_ROW = Messages.UserInfoTable_loading;
-    private static final String USER_DELETE_ERROR = Messages.UserInfoTable_delete_error_msg;
-    private static final String CANNOT_UNLOCK_USER = Messages.UserInfoTable_unlock_error_msg;
-    private static final String CONFIRM_DELETE_TITLE = Messages.UserInfoTable_confirm_delete_title;
-    private static final String CONFIRM_DELETE_MESSAGE = Messages.UserInfoTable_confirm_delete_msg;
-    private static final String CONFIRM_SUICIDE_MESSAGE = Messages.UserInfoTable_confirm_delete_suicide_msg;
+public abstract class UserInfoTable extends
+    DefaultAbstractInfoTableWidget<User> {
 
+    public static final int ROWS_PER_PAGE = 12;
+
+    private static final String[] HEADINGS = new String[] {
+        Messages.UserInfoTable_login_label,
+        Messages.UserInfoTable_fullname_label,
+        Messages.UserInfoTable_email_label };
+
+    private final ManagerContext managerContext;
     private MenuItem unlockMenuItem;
 
-    public UserInfoTable(Composite parent, List<User> collection) {
-        super(parent, collection, HEADINGS, ROWS_PER_PAGE, User.class);
+    public UserInfoTable(Composite parent, List<User> users,
+        ManagerContext managerContext) {
+        super(parent, HEADINGS, ROWS_PER_PAGE);
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        setList(users);
+        update();
+
+        this.managerContext = managerContext;
+
+        addEditItemListener(new IInfoTableEditItemListener<User>() {
             @Override
-            public void editItem(InfoTableEvent event) {
-                editUser((User) getSelection());
+            public void editItem(InfoTableEvent<User> event) {
+                User user = getSelection();
+                editUser(user);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<User>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
-                deleteUser((User) getSelection());
+            public void deleteItem(InfoTableEvent<User> event) {
+                User user = getSelection();
+                deleteUser(user);
+            }
+        });
+
+        addClickListener(new IInfoTableDoubleClickItemListener<User>() {
+            @Override
+            public void doubleClick(InfoTableEvent<User> event) {
+                User u = getSelection();
+                if (u != null) editUser(u);
             }
         });
 
@@ -63,17 +87,14 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                User selectedUser = (User) getSelection();
-                String userName = selectedUser.getLogin();
+                User user = getSelection();
+                String userName = user.getLogin();
                 try {
-                    SessionManager.getAppService().unlockUser(
-                        SessionManager.getUser(),
-                        ((User) getSelection()).getLogin());
-                    selectedUser.setLockedOut(false);
-                    reloadCollection(getCollection(), selectedUser);
+                    SessionManager.getAppService().unlockUser(userName);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
-                        CANNOT_UNLOCK_USER, new Object[] { userName }), e);
+                        Messages.UserInfoTable_unlock_error_msg,
+                        new Object[] { userName }), e);
                 }
             }
         });
@@ -81,74 +102,38 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                unlockMenuItem.setEnabled(((User) getSelection()).isLockedOut());
+                User user = getSelection();
+                unlockMenuItem.setEnabled(isLockedOut(user));
             }
         });
     }
 
-    @SuppressWarnings("serial")
-    @Override
-    protected BiobankTableSorter getComparator() {
-        return new BiobankTableSorter() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                if (o1 instanceof User && o2 instanceof User) {
-                    User u1 = (User) o1;
-                    User u2 = (User) o2;
-
-                    int cmp = u1.getLogin().compareToIgnoreCase(u2.getLogin());
-                    if (cmp != 0) {
-                        return cmp;
-                    }
-                }
-                return 0;
+    private static boolean isLockedOut(User user) {
+        boolean lockedOut = false;
+        try {
+            Long csmUserId = user.getCsmUserId();
+            if (csmUserId != null) {
+                lockedOut = SessionManager.getAppService()
+                    .isUserLockedOut(user.getCsmUserId());
             }
-        };
-    }
-
-    @Override
-    protected String getCollectionModelObjectToString(Object o) {
-        if (o == null) {
-            return null;
+        } catch (ApplicationException e) {
         }
-
-        User user = (User) o;
-        return StringUtils.join(Arrays.asList(user.getLogin(), user.getEmail(),
-            user.getFirstName(), user.getLastName()), "\t"); //$NON-NLS-1$
+        return lockedOut;
     }
 
     @Override
-    protected IBaseLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
-            @Override
-            public Image getColumnImage(Object element, int columnIndex) {
-                User user = (User) ((BiobankCollectionModel) element).o;
-                if (user != null && user.isLockedOut() && columnIndex == 0) {
-                    return BiobankPlugin.getDefault().getImage(
-                        BgcPlugin.IMG_LOCK);
-                }
-                return null;
-            }
-
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                User user = (User) ((BiobankCollectionModel) element).o;
-                if (user == null) {
-                    if (columnIndex == 0) {
-                        return LOADING_ROW;
-                    }
-                    return ""; //$NON-NLS-1$
-                }
-
+                User user = (User) element;
                 switch (columnIndex) {
                 case 0:
                     return user.getLogin();
                 case 1:
-                    return user.getEmail();
+                    return user.getFullName();
                 case 2:
-                    return user.getFirstName();
-                case 3:
-                    return user.getLastName();
+                    return user.getEmail();
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -160,24 +145,33 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
      * return an integer representing the type of result
      */
     protected int editUser(User user) {
-        List<Group> groups = getGroups();
-        if (groups == null) {
-            BgcPlugin.openAsyncError(Messages.UserInfoTable_error_title,
-                Messages.UserInfoTable_nogroups_msg);
-            return Dialog.CANCEL;
+        UserGetOutput output = null;
+
+        try {
+            output = SessionManager.getAppService()
+                .doAction(new UserGetAction(new UserGetInput(user)));
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
         }
 
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user, groups, false);
+            .getActiveWorkbenchWindow().getShell(), output, managerContext);
         int res = dlg.open();
         if (res == Dialog.OK) {
-            reloadCollection(getCollection(), user);
+            User modifiedUser = output.getUser();
+
+            List<User> tmp = new ArrayList<User>(getList());
+            tmp.remove(user);
+            tmp.add(modifiedUser);
+            Collections.sort(tmp, new UserComparator());
+            setList(tmp);
+
+            setSelection(modifiedUser);
+
             notifyListeners();
         }
         return res;
     }
-
-    protected abstract List<Group> getGroups();
 
     protected boolean deleteUser(User user) {
         try {
@@ -185,26 +179,41 @@ public abstract class UserInfoTable extends InfoTableWidget<User> {
             String message;
 
             if (SessionManager.getUser().equals(user)) {
-                message = CONFIRM_SUICIDE_MESSAGE;
-            } else {
-                message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
-                    new Object[] { loginName });
+                BgcPlugin.openAsyncError(
+                    Messages.UserInfoTable_delete_error_msg,
+                    Messages.UserInfoTable_confirm_delete_suicide_msg);
+                return false;
             }
+            message = MessageFormat.format(
+                Messages.UserInfoTable_confirm_delete_msg,
+                new Object[] { loginName });
 
-            if (BgcPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-                SessionManager.getAppService().deleteUser(
-                    SessionManager.getUser(), loginName);
+            if (BgcPlugin.openConfirm(
+                Messages.UserInfoTable_confirm_delete_title, message)) {
+
+                SessionManager.getAppService().doAction(
+                    new UserDeleteAction(new UserDeleteInput(user)));
 
                 // remove the user from the collection
-                getCollection().remove(user);
+                getList().remove(user);
 
-                reloadCollection(getCollection(), null);
+                reload();
+
                 notifyListeners();
                 return true;
             }
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(USER_DELETE_ERROR, e);
+        } catch (Exception e) {
+            BgcPlugin
+                .openAsyncError(Messages.UserInfoTable_delete_error_msg, e);
         }
         return false;
+    }
+
+    public static class UserComparator implements Comparator<User> {
+        @Override
+        public int compare(User a, User b) {
+            return NullHelper.safeCompareTo(a.getLogin(), b.getLogin(),
+                String.CASE_INSENSITIVE_ORDER);
+        }
     }
 }

@@ -4,7 +4,13 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
-	<classpathentry kind="lib" path="/biobank.common/lib/client/log4j-1.2.14.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/biobank2.tools"/>
+	<classpathentry kind="lib" path="lib/ehcache-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.9.0.jar"/>
+	<classpathentry kind="lib" path="lib/clm-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/jta-1.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/biobank.mvp"/>
+	<classpathentry kind="lib" path="lib/mockito-all-1.9.0-rc1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

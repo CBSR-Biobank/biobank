@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.gui.common.forms;
 
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -12,7 +11,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
-public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
+public abstract class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcEntryForm.class
         .getName());
@@ -32,12 +31,6 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
 
     @Override
     protected void init() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    protected void performDoubleClick(DoubleClickEvent event) {
         // TODO Auto-generated method stub
 
     }
@@ -82,7 +75,7 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
     }
 
     protected void addResetAction() {
-        formActions.addResetAction(Actions.GUI_COMMON_RESET);
+        formActions.addResetAction(Actions.GUI_COMMON_RELOAD);
     }
 
     protected void addCancelAction() {
@@ -111,11 +104,6 @@ public class BgcEntryForm extends BgcFormBase implements IBgcEntryForm {
     @Override
     public void cancel() {
         // override me
-    }
-
-    @Override
-    public void reset() {
-        setDirty(false);
     }
 
     @Override

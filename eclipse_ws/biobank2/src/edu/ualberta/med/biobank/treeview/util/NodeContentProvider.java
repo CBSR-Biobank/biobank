@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public class NodeContentProvider implements ITreeContentProvider,
     IDeltaListener {
@@ -20,8 +20,8 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public Object[] getChildren(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
-        return ((AdapterBase) element).getChildren().toArray();
+        Assert.isTrue(element instanceof AbstractAdapterBase, "Invalid object"); //$NON-NLS-1$
+        return ((AbstractAdapterBase) element).getChildren().toArray();
     }
 
     /*
@@ -33,8 +33,8 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public Object getParent(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
-        return ((AdapterBase) element).getParent();
+        Assert.isTrue(element instanceof AbstractAdapterBase, "Invalid object"); //$NON-NLS-1$
+        return ((AbstractAdapterBase) element).getParent();
     }
 
     /*
@@ -46,8 +46,8 @@ public class NodeContentProvider implements ITreeContentProvider,
      */
     @Override
     public boolean hasChildren(Object element) {
-        Assert.isTrue(element instanceof AdapterBase, "Invalid object"); //$NON-NLS-1$
-        return ((AdapterBase) element).hasChildren();
+        Assert.isTrue(element instanceof AbstractAdapterBase, "Invalid object"); //$NON-NLS-1$
+        return ((AbstractAdapterBase) element).hasChildren();
     }
 
     /*
@@ -83,30 +83,31 @@ public class NodeContentProvider implements ITreeContentProvider,
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = (TreeViewer) viewer;
         if (oldInput != null) {
-            removeListenerFrom((AdapterBase) oldInput);
+            removeListenerFrom((AbstractAdapterBase) oldInput);
         }
         if (newInput != null) {
-            addListenerTo((AdapterBase) newInput);
+            addListenerTo((AbstractAdapterBase) newInput);
         }
     }
 
-    protected void addListenerTo(AdapterBase node) {
+    protected void addListenerTo(AbstractAdapterBase node) {
         node.addListener(this);
-        for (AdapterBase child : node.getChildren()) {
+        for (AbstractAdapterBase child : node.getChildren()) {
             addListenerTo(child);
         }
     }
 
-    protected void removeListenerFrom(AdapterBase node) {
+    protected void removeListenerFrom(AbstractAdapterBase node) {
         node.removeListener(this);
-        for (AdapterBase child : node.getChildren()) {
+        for (AbstractAdapterBase child : node.getChildren()) {
             removeListenerFrom(child);
         }
     }
 
     @Override
     public void add(DeltaEvent event) {
-        AdapterBase node = ((AdapterBase) event.receiver()).getParent();
+        AbstractAdapterBase node = ((AbstractAdapterBase) event.receiver())
+            .getParent();
         if (!viewer.isBusy()) {
             viewer.refresh(node, false);
         }

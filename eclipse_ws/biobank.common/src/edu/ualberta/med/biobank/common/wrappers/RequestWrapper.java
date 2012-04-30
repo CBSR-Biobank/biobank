@@ -16,11 +16,14 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends RequestBaseWrapper {
 
-    private static final String NON_PROCESSED_SPECIMENS_CACHE_KEY = "nonProcessedRequestSpecimenCollection";
+    private static final String NON_PROCESSED_SPECIMENS_CACHE_KEY =
+        "nonProcessedRequestSpecimenCollection"; //$NON-NLS-1$
 
-    private static final String PROCESSED_SPECIMENS_CACHE_KEY = "processedRequestSpecimens";
+    private static final String PROCESSED_SPECIMENS_CACHE_KEY =
+        "processedRequestSpecimens"; //$NON-NLS-1$
 
-    private static final String UNAVAILABLE_SPECIMENS_KEY = "unavailableRequestSpecimens";
+    private static final String UNAVAILABLE_SPECIMENS_KEY =
+        "unavailableRequestSpecimens"; //$NON-NLS-1$
 
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
@@ -32,8 +35,10 @@ public class RequestWrapper extends RequestBaseWrapper {
 
     public void receiveSpecimens(List<SpecimenWrapper> specimens)
         throws Exception {
-        List<RequestSpecimenWrapper> flagged = new ArrayList<RequestSpecimenWrapper>();
-        List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
+        List<RequestSpecimenWrapper> flagged =
+            new ArrayList<RequestSpecimenWrapper>();
+        List<RequestSpecimenWrapper> ras =
+            getNonProcessedRequestSpecimenCollection();
         for (RequestSpecimenWrapper r : ras)
             for (SpecimenWrapper a : specimens)
                 if (r.getSpecimen().getInventoryId().equals(a.getInventoryId())) {
@@ -42,6 +47,7 @@ public class RequestWrapper extends RequestBaseWrapper {
         flagSpecimens(flagged);
     }
 
+    @Deprecated
     public void flagSpecimens(List<RequestSpecimenWrapper> scanned)
         throws Exception {
         for (RequestSpecimenWrapper a : scanned) {
@@ -67,10 +73,12 @@ public class RequestWrapper extends RequestBaseWrapper {
     @SuppressWarnings("unchecked")
     private List<RequestSpecimenWrapper> getRequestSpecimenCollectionWithState(
         String mapKey, boolean sort, RequestSpecimenState... states) {
-        List<RequestSpecimenWrapper> dsaCollection = (List<RequestSpecimenWrapper>) cache
-            .get(mapKey);
+        List<RequestSpecimenWrapper> dsaCollection =
+            (List<RequestSpecimenWrapper>) cache
+                .get(mapKey);
         if (dsaCollection == null) {
-            Collection<RequestSpecimenWrapper> children = getRequestSpecimenCollection(sort);
+            Collection<RequestSpecimenWrapper> children =
+                getRequestSpecimenCollection(sort);
             if (children != null) {
                 dsaCollection = new ArrayList<RequestSpecimenWrapper>();
                 for (RequestSpecimenWrapper dsa : children) {
@@ -111,14 +119,14 @@ public class RequestWrapper extends RequestBaseWrapper {
         return null;
     }
 
-    private static final String REQUEST_BY_NUMBER_QRY = "from "
-        + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?";
+    private static final String REQUEST_BY_NUMBER_QRY = "from " //$NON-NLS-1$
+        + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<RequestWrapper> getRequestByNumber(
-        WritableApplicationService appService, String requestNumber)
+        WritableApplicationService appService, Integer requestNumber)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(REQUEST_BY_NUMBER_QRY,
-            Arrays.asList(new Object[] { Integer.parseInt(requestNumber) }));
+            Arrays.asList(new Object[] { requestNumber }));
         List<Request> shipments = appService.query(criteria);
         List<RequestWrapper> wrappers = new ArrayList<RequestWrapper>();
         for (Request s : shipments) {
@@ -126,5 +134,4 @@ public class RequestWrapper extends RequestBaseWrapper {
         }
         return wrappers;
     }
-
 }

@@ -11,11 +11,15 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class DispatchSpecimenListInfoTable extends
     InfoTableWidget<DispatchSpecimenWrapper> {
@@ -47,14 +51,16 @@ public abstract class DispatchSpecimenListInfoTable extends
     public DispatchSpecimenListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, 15, DispatchSpecimenWrapper.class);
-        setCollection(getInternalDispatchSpecimens());
+        setList(getInternalDispatchSpecimens());
         this.editMode = editMode;
         if (editMode) {
             if (shipment.isInCreationState()) {
-                addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchSpecimenWrapper>() {
                     @Override
-                    public void deleteItem(InfoTableEvent event) {
-                        List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
+                    public void deleteItem(
+                        InfoTableEvent<DispatchSpecimenWrapper> event) {
+                        List<DispatchSpecimenWrapper> dsaList =
+                            getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
                                 && !BgcPlugin
@@ -98,14 +104,15 @@ public abstract class DispatchSpecimenListInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.DispatchSpecimenListInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return Messages.DispatchSpecimenListInfoTable_14;
                 }
@@ -128,18 +135,19 @@ public abstract class DispatchSpecimenListInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(DispatchSpecimenWrapper dsa)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.dsa = dsa;
-        info.inventoryId = dsa.getSpecimen().getInventoryId();
-        info.pnumber = dsa.getSpecimen().getCollectionEvent().getPatient()
+        info.dsa = (DispatchSpecimenWrapper) obj;
+        info.inventoryId = info.dsa.getSpecimen().getInventoryId();
+        info.pnumber = info.dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
-        SpecimenTypeWrapper type = dsa.getSpecimen().getSpecimenType();
+        SpecimenTypeWrapper type = info.dsa.getSpecimen().getSpecimenType();
         Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
         info.type = type.getName();
-        info.status = dsa.getSpecimen().getActivityStatus().toString();
-        info.comment = dsa.getComment();
+        info.status = info.dsa.getSpecimen().getActivityStatus().toString();
+        info.comment =
+            CommentWrapper.commentListToString(info.dsa
+                .getCommentCollection(false));
         return info;
     }
 
@@ -178,7 +186,8 @@ public abstract class DispatchSpecimenListInfoTable extends
             Messages.DispatchSpecimenListInfoTable_17);
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
-        List<DispatchSpecimenWrapper> dsaList = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> dsaList =
+            new ArrayList<DispatchSpecimenWrapper>();
 
         for (Iterator<?> iter = stSelection.iterator(); iter.hasNext();) {
             BiobankCollectionModel bcm = (BiobankCollectionModel) iter.next();
@@ -202,6 +211,24 @@ public abstract class DispatchSpecimenListInfoTable extends
             dsaList = new ArrayList<DispatchSpecimenWrapper>();
         }
         reloadCollection(dsaList);
+    }
+
+    @Override
+    protected Boolean canEdit(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(DispatchSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

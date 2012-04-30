@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,16 +13,30 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventGroup extends AdapterBase {
 
+    private boolean createAllowed;
+
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
-        super(parent, id, name, true, true);
+        super(parent, id, name, true);
+        try {
+            this.createAllowed =
+                SessionManager.getAppService().isAllowed(
+                    new ProcessingEventCreatePermission(SessionManager
+                        .getUser()
+                        .getCurrentWorkingCenter().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -33,7 +46,7 @@ public class ProcessingEventGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.getInstance().isConnected()) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.ProcessingEventGroup_pevent_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -43,8 +56,9 @@ public class ProcessingEventGroup extends AdapterBase {
                         SessionManager.getAppService());
                     pEvent.setCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter());
-                    ProcessingEventAdapter adapter = new ProcessingEventAdapter(
-                        ProcessingEventGroup.this, pEvent);
+                    ProcessingEventAdapter adapter =
+                        new ProcessingEventAdapter(
+                            ProcessingEventGroup.this, pEvent);
                     adapter.openEntryForm();
                 }
             });
@@ -57,13 +71,15 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ClinicWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            ProcessingEventWrapper.class);
     }
 
     @Override
@@ -72,7 +88,7 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
         return new ProcessingEventAdapter(this, (ProcessingEventWrapper) child);
     }
@@ -93,18 +109,17 @@ public class ProcessingEventGroup extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        List<AdapterBase> children = getChildren();
+        List<AbstractAdapterBase> children = getChildren();
         List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
-        for (AdapterBase child : children)
-            wrappers.add(child.getModelObject());
+        for (AbstractAdapterBase child : children)
+            wrappers.add(((AdapterBase) child).getModelObject());
         return wrappers;
     }
 
     @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
-
 }

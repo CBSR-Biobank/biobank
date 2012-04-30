@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.GlobalEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,12 +22,6 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         super(appService);
     }
 
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        // FIXME if used by any study then it cannot be deleted
-    }
-
     public String getTypeName() {
         return getEventAttrType().getName();
     }
@@ -39,22 +33,18 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
 
     @Override
     public String toString() {
-        return "" + getId() + ":" + getLabel() + ":"
+        return "" + getId() + ":" + getLabel() + ":" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + getEventAttrType().getName();
     }
 
-    @Override
-    public void reload() throws Exception {
-        super.reload();
-    }
-
-    public static final String ALL_GLOBAL_EVENT_ATTRS_QRY = "from "
+    public static final String ALL_GLOBAL_EVENT_ATTRS_QRY = "from " //$NON-NLS-1$
         + GlobalEventAttr.class.getName();
 
     public static List<GlobalEventAttrWrapper> getAllGlobalEventAttrs(
         WritableApplicationService appService) throws ApplicationException {
 
-        List<GlobalEventAttrWrapper> EventAttrs = new ArrayList<GlobalEventAttrWrapper>();
+        List<GlobalEventAttrWrapper> EventAttrs =
+            new ArrayList<GlobalEventAttrWrapper>();
 
         HQLCriteria c = new HQLCriteria(ALL_GLOBAL_EVENT_ATTRS_QRY);
         List<GlobalEventAttr> result = appService.query(c);
@@ -66,4 +56,9 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
         return EventAttrs;
     }
 
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
+    }
 }

@@ -2,14 +2,18 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -32,19 +36,14 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     }
 
     @Override
-    protected ProcessData getProcessData() {
-        return new ShipmentProcessData(null, currentShipment, false, false);
-    }
-
-    @Override
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     BgcPlugin.openInformation(
-                        Messages.RequestReceiveScanDialog_extra_title,
-                        Messages.RequestReceiveScanDialog_extra_msg);
+                        "Extra specimens",
+                        "Some of the specimens in this pallet were not supposed to be in this shipment.");
                 }
             });
         }
@@ -56,7 +55,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
             dispatchSpecimens.addAll(specimens);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.RequestReceiveScanDialog_receiveError_title, e);
+                "Error receiving request", e);
         }
     }
 
@@ -89,6 +88,25 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
 
     public List<SpecimenWrapper> getSpecimens() {
         return dispatchSpecimens;
+    }
+
+    @Override
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        CellInfo cell, Locale locale) {
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cell,
+            locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Locale locale) {
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells,
+            isRescanMode, locale);
+    }
+
+    private ShipmentProcessInfo getProcessData() {
+        return new ShipmentProcessInfo(null, currentShipment, false);
     }
 
 }

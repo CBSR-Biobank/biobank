@@ -20,23 +20,25 @@ public class JasperTemplateWrapper extends JasperTemplateBaseWrapper {
         super(appService);
     }
 
-    private static final String TEMPLATES_QRY = "from "
+    private static final String TEMPLATES_QRY = "from " //$NON-NLS-1$
         + JasperTemplate.class.getName();
 
+    @Deprecated
     public static List<JasperTemplateWrapper> getAllTemplates(
         WritableApplicationService appService) throws ApplicationException {
         StringBuilder qry = new StringBuilder(TEMPLATES_QRY);
 
         HQLCriteria criteria = new HQLCriteria(qry.toString());
         List<JasperTemplate> templates = appService.query(criteria);
-        List<JasperTemplateWrapper> wrappers = new ArrayList<JasperTemplateWrapper>();
+        List<JasperTemplateWrapper> wrappers =
+            new ArrayList<JasperTemplateWrapper>();
         for (JasperTemplate t : templates) {
             wrappers.add(new JasperTemplateWrapper(appService, t));
         }
         return wrappers;
     }
 
-    private static final String TEMPLATE_NAMES_QRY = "select name from "
+    private static final String TEMPLATE_NAMES_QRY = "select name from " //$NON-NLS-1$
         + JasperTemplate.class.getName();
 
     public static List<String> getTemplateNames(
@@ -47,9 +49,10 @@ public class JasperTemplateWrapper extends JasperTemplateBaseWrapper {
         return appService.query(criteria);
     }
 
-    private static final String TEMPLATE_BY_NAME_QRY = "from "
-        + JasperTemplate.class.getName() + " where name=?";
+    private static final String TEMPLATE_BY_NAME_QRY = "from " //$NON-NLS-1$
+        + JasperTemplate.class.getName() + " where name=?"; //$NON-NLS-1$
 
+    @Deprecated
     public static JasperTemplateWrapper getTemplateByName(
         WritableApplicationService appService, String name)
         throws ApplicationException {

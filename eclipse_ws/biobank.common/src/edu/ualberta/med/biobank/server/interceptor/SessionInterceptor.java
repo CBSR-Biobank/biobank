@@ -1,20 +1,18 @@
 package edu.ualberta.med.biobank.server.interceptor;
 
 import java.io.Serializable;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Iterator;
 
 import org.hibernate.CallbackException;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
+import org.hibernate.type.Type;
 
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.server.BiobankThreadVariable;
-import edu.ualberta.med.biobank.server.LocalInfo;
-import edu.ualberta.med.biobank.server.LocalInfo.ActionType;
-import edu.ualberta.med.biobank.server.LocalInfo.CenterInfo;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
+import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
+import edu.ualberta.med.biobank.server.logging.BiobankObjectStateLogger;
+import edu.ualberta.med.biobank.server.logging.BiobankThreadVariable;
+import edu.ualberta.med.biobank.server.logging.ExceptionUtils;
+import edu.ualberta.med.biobank.server.logging.LocalInfo;
 
 /**
  * 
@@ -28,6 +26,22 @@ public class SessionInterceptor extends EmptyInterceptor {
 
     private static final long serialVersionUID = 1L;
 
+    private void log(Object entity, String action) {
+        try {
+            WrapperLogProvider<?> logProvider =
+                BiobankObjectStateLogger.getLogProvider(entity.getClass());
+            if (logProvider != null) {
+                BiobankObjectStateLogger
+                    .logMessage(logProvider, entity, action);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            ExceptionUtils.writeMsgToTmpFile(entity.getClass().getSimpleName()
+                + "_sessioninterceptor", //$NON-NLS-1$
+                ex);
+        }
+    }
+
     /**
      * This method gets called before an object is saved.
      */
@@ -35,67 +49,60 @@ public class SessionInterceptor extends EmptyInterceptor {
     public boolean onSave(Object entity, Serializable id, Object[] state,
         String[] propertyNames, org.hibernate.type.Type[] types)
         throws CallbackException {
-        if (entity instanceof Center) {
-            addCenterInfo((Integer) id, state, propertyNames,
-                entity.getClass(), ActionType.INSERT);
-        }
+        log(entity, "insert"); //$NON-NLS-1$
+        return false;
+    }
+
+    @Override
+    public boolean onFlushDirty(Object entity, Serializable id,
+        Object[] currentState, Object[] previousState, String[] propertyNames,
+        Type[] types) {
+        log(entity, "update"); //$NON-NLS-1$
         return false;
     }
 
     @Override
     public void onDelete(Object entity, Serializable id, Object[] state,
         String[] propertyNames, org.hibernate.type.Type[] types) {
-        if (entity instanceof Center) {
-            addCenterInfo((Integer) id, state, propertyNames,
-                entity.getClass(), ActionType.DELETE);
-        }
-    }
-
-    private void addCenterInfo(Integer id, Object[] state,
-        String[] propertyNames, Class<?> centerClass, ActionType actionType) {
-        LocalInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new LocalInfo();
-        String nameShort = getNameShort(state, propertyNames);
-        userInfo.addNewCenterInfo(id, nameShort, centerClass, actionType);
-        BiobankThreadVariable.set(userInfo);
-    }
-
-    private String getNameShort(Object[] state, String[] propertyNames) {
-        int i = 0;
-        String nameShort = null;
-        while (nameShort == null && i < propertyNames.length) {
-            if (CenterPeer.NAME_SHORT.getName().equals(propertyNames[i]))
-                nameShort = (String) state[i];
-            i++;
-        }
-        return nameShort;
+        log(entity, "delete"); //$NON-NLS-1$
     }
 
     /**
      * Really write logs registered in the buffer.
      */
     @Override
-    public void afterTransactionCompletion(Transaction tx) {
-        LocalInfo info = BiobankThreadVariable.get();
-        if (info.hasCenterInfos() && tx.wasCommitted() && !tx.wasRolledBack()) {
-            Set<Entry<Integer, CenterInfo>> entries = info
-                .getCenterInfosEntrySet();
-            if (entries != null)
-                for (Entry<Integer, CenterInfo> entry : entries) {
-                    if (entry.getValue().type == ActionType.INSERT)
-                        BiobankSecurityUtil.newCenterSecurity(entry.getKey(),
-                            entry.getValue().nameShort,
-                            entry.getValue().centerClass);
-                    else if (entry.getValue().type == ActionType.DELETE)
-                        BiobankSecurityUtil.deleteCenterSecurity(
-                            entry.getKey(), entry.getValue().nameShort,
-                            entry.getValue().centerClass);
-                }
+    public void afterTransactionCompletion(Transaction arg0) {
+        LocalInfo user = BiobankThreadVariable.get();
+        if (arg0.wasCommitted() && user.getTransactionLogs() != null) {
+            Iterator<String> it = user.getTransactionLogs().iterator();
+            while (it.hasNext()) {
+                String str = it.next();
+                BiobankObjectStateLogger.log(str);
+                it.remove();
+            }
+        } else {
+            // clear the logs Buffer
+            clearTransactionLogs();
         }
-        info.clearCenterInfos();
+        user.setIsIntransaction(false);
         // set back the local thread variable
-        BiobankThreadVariable.set(info);
+        BiobankThreadVariable.set(user);
+    }
+
+    @Override
+    public void afterTransactionBegin(Transaction tx) {
+        LocalInfo userInfo = BiobankThreadVariable.get();
+        if (null == userInfo) userInfo = new LocalInfo();
+        userInfo.setIsIntransaction(true);
+        BiobankThreadVariable.set(userInfo);
+    }
+
+    private void clearTransactionLogs() {
+        LocalInfo user = BiobankThreadVariable.get();
+        if (user.getTransactionLogs() != null) {
+            user.getTransactionLogs().clear();
+            BiobankThreadVariable.set(user);
+        }
     }
 
 }

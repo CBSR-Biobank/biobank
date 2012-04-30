@@ -1,18 +1,24 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
+public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
 
     private static class TableRowData {
-        public StudyWrapper study;
+        public StudyCountInfo study;
         public String studyShortName;
         public Long patientCount;
         public Long visitCount;
@@ -30,23 +36,22 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         Messages.ClinicStudyInfoTable_patient_count_label,
         Messages.ClinicStudyInfoTable_cvent_count_label };
 
-    private ClinicWrapper clinic;
-
-    public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic) {
+    public ClinicStudyInfoTable(Composite parent,
+        List<StudyCountInfo> studyCountInfo) {
         super(parent, null, HEADINGS, 10, StudyWrapper.class);
-        this.clinic = clinic;
-        setCollection(clinic.getStudyCollection());
+        setList(studyCountInfo);
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ClinicStudyInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -66,15 +71,14 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(StudyWrapper study) throws Exception {
+    public Object getCollectionModelObject(Object rawInfo) throws Exception {
         TableRowData info = new TableRowData();
-        info.study = study;
-        info.studyShortName = study.getNameShort();
-        if (info.studyShortName == null) {
-            info.studyShortName = ""; //$NON-NLS-1$
-        }
-        info.patientCount = clinic.getPatientCountForStudy(study);
-        info.visitCount = clinic.getCollectionEventCountForStudy(study);
+        StudyCountInfo studyCountInfo = (StudyCountInfo) rawInfo;
+        info.study =
+            studyCountInfo;
+        info.studyShortName = info.study.getStudy().getNameShort();
+        info.patientCount = studyCountInfo.getPatientCount();
+        info.visitCount = studyCountInfo.getCollectionEventCount();
         return info;
     }
 
@@ -86,17 +90,36 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    public StudyWrapper getSelection() {
+    public StudyCountInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.study;
+        return ((TableRowData) item.o).study;
     }
 
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyUpdatePermission(target.getStudy().getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyDeletePermission(target.getStudy().getId()));
+    }
+
+    @Override
+    protected Boolean canView(StudyCountInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyReadPermission(target.getStudy().getId()));
     }
 }

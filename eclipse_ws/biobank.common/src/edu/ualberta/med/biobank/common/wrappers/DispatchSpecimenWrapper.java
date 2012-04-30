@@ -26,9 +26,10 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
         return super.compareTo(object);
     }
 
+    // TODO: uhhhh, don't override equals?
     @Override
     public boolean equals(Object object) {
-        if (object instanceof DispatchSpecimenWrapper && object != null) {
+        if (object instanceof DispatchSpecimenWrapper) {
             DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) object;
             if (isNew() && dsa.isNew()) {
                 return getSpecimen() != null && dsa.getSpecimen() != null
@@ -53,5 +54,4 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
     public String getStateDescription() {
         return DispatchSpecimenState.getState(getState()).getLabel();
     }
-
 }

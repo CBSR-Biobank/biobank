@@ -34,18 +34,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.reports.ReportAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
 public abstract class ReportsEditor extends BiobankEntryForm {
@@ -54,7 +56,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     protected ReportTreeNode node;
     protected BiobankReport report;
 
-    public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor"; //$NON-NLS-1$
+    public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
     // Sections
     protected Composite buttonSection;
@@ -76,9 +78,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     // Global status
     private IObservableValue statusObservable;
 
-    QueryHandle query;
-    ProgressMonitorDialogBusyListener listener = new ProgressMonitorDialogBusyListener(
-        "Generating report..."); //$NON-NLS-1$
+    ProgressMonitorDialogBusyListener listener =
+        new ProgressMonitorDialogBusyListener("Generating report...");
 
     @Override
     protected void init() throws Exception {
@@ -86,7 +87,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         reportData = new ArrayList<Object>();
         node = (ReportTreeNode) ((ReportInput) getEditorInput()).getNode();
         report = node.getReport();
-        this.setPartName(report.getName());
+        this.setPartName(report.getClassName());
     }
 
     @Override
@@ -128,7 +129,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         toolkit.adapt(buttonSection);
 
         generateButton = toolkit.createButton(buttonSection,
-            Messages.ReportsEditor_generate_label, SWT.NONE);
+            "Generate", SWT.NONE);
         generateButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -137,7 +138,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         });
         setFirstControl(generateButton);
 
-        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE); //$NON-NLS-1$
+        printButton = toolkit.createButton(buttonSection, "Print", SWT.NONE);
         printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_PRINTER));
         printButton.setEnabled(false);
@@ -148,12 +149,12 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     printTable(false, false);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
-                        "Error while printing the results", ex); //$NON-NLS-1$
+                        "Error while printing the results", ex);
                 }
             }
         });
 
-        exportPDFButton = toolkit.createButton(buttonSection, "Export PDF", //$NON-NLS-1$
+        exportPDFButton = toolkit.createButton(buttonSection, "Export PDF",
             SWT.NONE);
         exportPDFButton.setEnabled(false);
         exportPDFButton.addSelectionListener(new SelectionAdapter() {
@@ -163,12 +164,12 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     printTable(false, true);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
-                        "Error while exporting the results", ex); //$NON-NLS-1$
+                        "Error while exporting the results", ex);
                 }
             }
         });
 
-        exportCSVButton = toolkit.createButton(buttonSection, "Export CSV", //$NON-NLS-1$
+        exportCSVButton = toolkit.createButton(buttonSection, "Export CSV",
             SWT.NONE);
         exportCSVButton.setEnabled(false);
         exportCSVButton.addSelectionListener(new SelectionAdapter() {
@@ -178,7 +179,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     printTable(true, false);
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
-                        "Error while exporting the results", ex); //$NON-NLS-1$
+                        "Error while exporting the results", ex);
                 }
             }
         });
@@ -209,51 +210,59 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     public static String containerIdsToString(List<Integer> list) {
-        String containerListString = ""; //$NON-NLS-1$
+        String containerListString = "";
         for (Object item : (List<?>) list)
             containerListString = containerListString.concat(item.toString()
-                + ","); //$NON-NLS-1$
+                + ",");
         containerListString = containerListString.substring(0,
             Math.max(containerListString.length() - 1, 0));
         return containerListString;
     }
 
     private void generate() {
-        appService = SessionManager.getAppService();
         try {
             initReport();
+            Log logMessage = new Log();
+            logMessage.setType("report");
+            logMessage.setAction(report.getName());
+            SessionManager.getAppService().logActivity(logMessage);
         } catch (Exception e1) {
-            BgcPlugin.openAsyncError("Failed to load parameters", e1); //$NON-NLS-1$
+            BgcPlugin.openAsyncError("Failed to load parameters", e1);
         }
 
         try {
-            query = appService.createQuery(report);
 
             IRunnableContext context = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    Thread t = new Thread("Querying") { //$NON-NLS-1$
+                    Thread t = new Thread("Querying") {
                         @Override
                         public void run() {
                             try {
-                                reportData = appService.startQuery(query);
+                                reportData =
+                                    SessionManager.getAppService()
+                                        .doAction(new ReportAction(report))
+                                        .getList();
+                                if (reportData instanceof AbstractBiobankListProxy)
+                                    ((AbstractBiobankListProxy<?>) reportData)
+                                        .setAppService(SessionManager
+                                            .getAppService());
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
-                                BgcPlugin.openAsyncError("Query Error", e); //$NON-NLS-1$
+                                BgcPlugin.openAsyncError("Query Error", e);
                             }
                         }
                     };
-                    monitor.beginTask("Generating Report...", //$NON-NLS-1$
+                    monitor.beginTask("Generating Report...",
                         IProgressMonitor.UNKNOWN);
                     t.start();
                     while (true) {
                         if (monitor.isCanceled()) {
                             try {
-                                appService.stopQuery(query);
                             } catch (Exception e) {
-                                BgcPlugin.openAsyncError("Stop Failed", e); //$NON-NLS-1$
+                                BgcPlugin.openAsyncError("Stop Failed", e);
                             }
                             reportData = new ArrayList<Object>();
                             break;
@@ -268,7 +277,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                 };
             });
         } catch (Exception e1) {
-            BgcPlugin.openAsyncError("Failed to load query", e1); //$NON-NLS-1$
+            BgcPlugin.openAsyncError("Failed to load query", e1);
         }
 
         if (reportData instanceof HQLCriteriaListProxy)
@@ -297,7 +306,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         try {
             printTable(false, false);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.ReportsEditor_print_error_msg, e);
+            BgcPlugin.openAsyncError("Error while printing", e);
         }
         return true;
     }
@@ -307,7 +316,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             reportTable.dispose();
         }
         reportTable = new ReportTableWidget<Object>(page,
-            new ArrayList<Object>(), new String[] { " " }); //$NON-NLS-1$
+            new ArrayList<Object>(), new String[] { " " });
         reportTable.adaptToToolkit(toolkit, true);
         page.layout(true, true);
         book.reflow(true);
@@ -330,29 +339,28 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         try {
             bw = new PrintWriter(new FileWriter(path));
         } catch (IOException e) {
-            BgcPlugin.openAsyncError("Error writing to CSV.", e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError("Error writing to CSV.", e);
             return;
         }
         // write title
-        bw.println("#" + report.getName()); //$NON-NLS-1$
+        bw.println("#" + report.getName());
         // write params
         for (Object[] ob : params)
-            bw.println("#" + ob[0] + ":" + ob[1]); //$NON-NLS-1$ //$NON-NLS-2$
+            bw.println("#" + ob[0] + ":" + ob[1]);
         // write columnnames
-        bw.println("#"); //$NON-NLS-1$
-        bw.print("#" + columnInfo.get(0)); //$NON-NLS-1$
+        bw.println("#");
+        bw.print("#" + columnInfo.get(0));
         for (int j = 1; j < columnInfo.size(); j++) {
-            bw.write("," + columnInfo.get(j)); //$NON-NLS-1$
+            bw.write("," + columnInfo.get(j));
         }
         bw.println();
-        BiobankLabelProvider stringConverter = reportTable
-            .getLabelProvider(false);
+        BgcLabelProvider stringConverter = reportTable.getLabelProvider(false);
         for (Object row : reportData) {
             Object[] castOb = (Object[]) row;
-            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+            bw.write("\"" + stringConverter.getColumnText(castOb, 0) + "\"");
             for (int j = 1; j < columnInfo.size(); j++) {
-                bw.write(",\"" + stringConverter.getColumnText(castOb, j) //$NON-NLS-1$
-                    + "\""); //$NON-NLS-1$
+                bw.write(",\"" + stringConverter.getColumnText(castOb, j)
+                    + "\"");
             }
             bw.println();
 
@@ -363,7 +371,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     private String runExportDialog(String name, String[] exts) {
         FileDialog fd = new FileDialog(form.getShell(), SWT.SAVE);
         fd.setOverwrite(true);
-        fd.setText("Export as"); //$NON-NLS-1$
+        fd.setText("Export as");
         fd.setFilterExtensions(exts);
         fd.setFileName(name);
         return fd.open();
@@ -374,20 +382,21 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         if (exportCSV == false
             && ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() == -1 || ((HQLCriteriaListProxy<?>) reportData)
-                .getRealSize() > 1000)) || reportData.size() > 1000)) {
-            throw new Exception(Messages.ReportsEditor_exceed_1000_msg);
+                .size() == -1 || ((HQLCriteriaListProxy<?>) reportData)
+                .size() > 1000)) || reportData.size() > 1000)) {
+            throw new Exception(
+                "Results exceed 1000 rows and cannot be exported. Please export to CSV or refine your search.");
         }
 
         boolean doPrint;
         if (exportCSV || exportPDF)
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Confirm", //$NON-NLS-1$
-                "Export table contents?"); //$NON-NLS-1$
+                .getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Export table contents?");
         else
             doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), "Confirm", //$NON-NLS-1$
-                "Print table contents?"); //$NON-NLS-1$
+                .getActiveWorkbenchWindow().getShell(), "Confirm",
+                "Print table contents?");
         if (doPrint) {
             final List<Object[]> printParams = new ArrayList<Object[]>();
             final List<Object> paramVals = getPrintParams();
@@ -403,14 +412,12 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             }
 
             if (exportCSV || exportPDF) {
-                String fileName = report.getName().replaceAll(" ", "_") //$NON-NLS-1$ //$NON-NLS-2$
-                    + "_" + DateFormatter.formatAsDate(new Date()); //$NON-NLS-1$ /
-                String[] filterExt = (exportCSV) ? new String[] { "*.csv" } //$NON-NLS-1$ 
-                    : new String[] { ".pdf" }; //$NON-NLS-1$
+                String fileName = report.getName().replaceAll(" ", "_")
+                    + "_" + DateFormatter.formatAsDate(new Date());
+                String[] filterExt = (exportCSV) ? new String[] { "*.csv" }
+                    : new String[] { ".pdf" };
                 path = runExportDialog(fileName, filterExt);
                 if (path == null) {
-                    BgcPlugin.openAsyncError("Exporting canceled.", //$NON-NLS-1$
-                        "Select a valid path and try again."); //$NON-NLS-1$
                     return;
                 }
             }
@@ -419,17 +426,19 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Preparing Report...", //$NON-NLS-1$
+                    monitor.beginTask("Preparing Report...",
                         IProgressMonitor.UNKNOWN);
-                    final List<Map<String, String>> listData = new ArrayList<Map<String, String>>();
+                    final List<Map<String, String>> listData =
+                        new ArrayList<Map<String, String>>();
                     try {
                         if (exportCSV) {
                             exportCSV(columnInfo, printParams, path);
-                            SessionManager.log("exportCSV", report.getName(), //$NON-NLS-1$
-                                "report"); //$NON-NLS-1$
+                            SessionManager.log("exportCSV", report.getName(),
+                                "report");
                         } else {
                             for (Object object : reportData) {
-                                Map<String, String> map = new HashMap<String, String>();
+                                Map<String, String> map =
+                                    new HashMap<String, String>();
                                 for (int j = 0; j < columnInfo.size(); j++) {
                                     map.put(columnInfo.get(j), (reportTable
                                         .getLabelProvider().getColumnText(
@@ -442,7 +451,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                                 path, exportPDF);
                         }
                     } catch (Exception e) {
-                        BgcPlugin.openAsyncError("Error exporting results", e); //$NON-NLS-1$
+                        BgcPlugin.openAsyncError("Error exporting results", e);
                         return;
                     }
                 }
@@ -455,7 +464,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
         List<String> stringParams = new ArrayList<String>();
         for (int i = 0; i < params.size(); i++) {
-            stringParams.add(params.get(i)[0] + " : " + params.get(i)[1]); //$NON-NLS-1$
+            stringParams.add(params.get(i)[0] + " : " + params.get(i)[1]);
         }
 
         if (exportPDF) {
@@ -464,13 +473,13 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                     ReportingUtils.createDynamicReport(report.getName(),
                         stringParams, columnInfo, listData, false), path);
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Error saving to PDF", e); //$NON-NLS-1$
+                BgcPlugin.openAsyncError("Error saving to PDF", e);
                 return;
             }
             try {
-                SessionManager.log("exportPDF", report.getName(), "report"); //$NON-NLS-1$ //$NON-NLS-2$
+                SessionManager.log("exportPDF", report.getName(), "report");
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Error logging export", e); //$NON-NLS-1$
+                BgcPlugin.openAsyncError("Error logging export", e);
             }
         } else {
             try {
@@ -479,13 +488,13 @@ public abstract class ReportsEditor extends BiobankEntryForm {
                         report.getName(), stringParams, columnInfo, listData,
                         false));
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Printer Error", e); //$NON-NLS-1$
+                BgcPlugin.openAsyncError("Printer Error", e);
                 return;
             }
             try {
-                SessionManager.log("print", report.getName(), "report"); //$NON-NLS-1$ //$NON-NLS-2$
+                SessionManager.log("print", report.getName(), "report");
             } catch (Exception e) {
-                BgcPlugin.openAsyncError("Error logging print", e); //$NON-NLS-1$
+                BgcPlugin.openAsyncError("Error logging print", e);
             }
         }
     }
@@ -544,8 +553,8 @@ public abstract class ReportsEditor extends BiobankEntryForm {
             c.add(Calendar.DAY_OF_YEAR, 1);
             c.add(Calendar.MINUTE, -1);
             return (c.getTime());
-        } else
-            return processedDate;
+        }
+        return processedDate;
     }
 
     @Override
@@ -565,11 +574,11 @@ public abstract class ReportsEditor extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return ""; //$NON-NLS-1$
+        return "";
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         createEmptyReportTable();
         setEnablePrintAction(false);
 
@@ -585,7 +594,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ID;
     }
 

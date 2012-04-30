@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import junit.framework.Assert;
 
@@ -10,6 +12,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.TestDatabase;
 
+@Deprecated
 public class TestCaCore extends TestDatabase {
     /**
      * Check whether ApplicationService method() arguments are incorrectly
@@ -24,21 +27,21 @@ public class TestCaCore extends TestDatabase {
 
         Specimen s1 = new Specimen();
         s1.setId(1);
-        s1.setComment("hi");
+        s1.setQuantity(new BigDecimal(0.1));
 
         Specimen s2 = new Specimen();
         s2.setId(1);
-        s2.setComment("bye");
+        s1.setQuantity(new BigDecimal(0.2));
 
-        ce.setAllSpecimenCollection(Arrays.asList(s1));
-        ce.setOriginalSpecimenCollection(Arrays.asList(s2));
+        ce.setAllSpecimens(new HashSet<Specimen>(Arrays.asList(s1)));
+        ce.setOriginalSpecimens(new HashSet<Specimen>(Arrays.asList(s2)));
 
         appService.search(CollectionEvent.class, ce);
 
-        Specimen after1 = ce.getAllSpecimenCollection().iterator().next();
-        Specimen after2 = ce.getOriginalSpecimenCollection().iterator().next();
+        Specimen after1 = ce.getAllSpecimens().iterator().next();
+        Specimen after2 = ce.getOriginalSpecimens().iterator().next();
 
         Assert.assertTrue(after1 != after2);
-        Assert.assertTrue(!after1.getComment().equals(after2.getComment()));
+        Assert.assertTrue(!after1.getQuantity().equals(after2.getQuantity()));
     }
 }

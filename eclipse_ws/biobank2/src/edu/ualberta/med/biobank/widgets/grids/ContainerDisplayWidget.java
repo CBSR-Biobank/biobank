@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
@@ -25,9 +27,9 @@ public class ContainerDisplayWidget extends Canvas {
 
     protected Map<RowColPos, ? extends AbstractUICell> cells;
 
-    protected ContainerWrapper container;
+    protected Container container;
 
-    protected ContainerTypeWrapper containerType;
+    protected ContainerType containerType;
     /**
      * true if we want the container to display full info in each box displayed
      */
@@ -142,7 +144,7 @@ public class ContainerDisplayWidget extends Canvas {
         this.displayFullInfoString = display;
     }
 
-    public void setContainer(ContainerWrapper container) {
+    public void setContainer(Container container) {
         this.container = container;
         if (container != null) {
             setContainerType(container.getContainerType());
@@ -150,28 +152,41 @@ public class ContainerDisplayWidget extends Canvas {
         }
     }
 
-    public void setContainerType(ContainerTypeWrapper type) {
-        setContainerType(type, null, false);
+    public void setContainer(ContainerWrapper container) {
+        setContainer(container.getWrappedObject());
     }
 
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+    public void setContainerType(ContainerType type) {
+        setContainerType(type, ScanPalletDisplay.SAMPLE_WIDTH, false);
+    }
+
+    public void setContainerType(ContainerType type, Integer cellSize) {
         setContainerType(type, cellSize, false);
     }
 
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize,
+    public void setContainerType(ContainerType type, Integer cellSize,
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer, cellSize);
     }
 
-    public void setContainerType(ContainerTypeWrapper type,
+    public void setContainerType(ContainerTypeWrapper type) {
+        setContainerType(type.getWrappedObject());
+    }
+
+    public void setContainerType(ContainerType type,
         boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer);
     }
 
+    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+        setContainerType(type.getWrappedObject(), cellSize, false);
+    }
+
     public void initDisplayFromType(boolean createDefaultContainer) {
-        initDisplayFromType(createDefaultContainer, null);
+        initDisplayFromType(createDefaultContainer,
+            ScanPalletDisplay.SAMPLE_WIDTH);
     }
 
     public void initDisplayFromType(boolean createDefaultContainer,

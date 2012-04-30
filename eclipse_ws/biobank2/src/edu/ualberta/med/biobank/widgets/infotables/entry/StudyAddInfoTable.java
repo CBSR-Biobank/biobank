@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectStudyDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 /**
@@ -60,7 +60,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
                     dummyList.add(study);
                     site.addToStudyCollection(dummyList);
-                    setCollection(site.getStudyCollection(true));
+                    setList(site.getStudyCollection(true));
                 }
             }
         } catch (Exception e) {
@@ -70,16 +70,16 @@ public class StudyAddInfoTable extends StudyInfoTable {
     }
 
     private void addDeleteCreateSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<StudyWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<StudyWrapper> event) {
                 createStudyDlg();
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<StudyWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<StudyWrapper> event) {
                 StudyWrapper study = getSelection();
                 if (study == null)
                     return;
@@ -94,7 +94,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 try {
                     site.removeFromStudyCollectionWithCheck(Arrays
                         .asList(study));
-                    setCollection(site.getStudyCollection(true));
+                    setList(site.getStudyCollection(true));
                     notifyListeners();
                 } catch (BiobankCheckException e) {
                     BgcPlugin.openAsyncError(
@@ -105,11 +105,12 @@ public class StudyAddInfoTable extends StudyInfoTable {
     }
 
     public void setStudies(List<StudyWrapper> studies) {
-        setCollection(studies);
+        setList(studies);
     }
 
+    @Override
     public void reload() {
-        setCollection(site.getStudyCollection(true));
+        setList(site.getStudyCollection(true));
     }
 
 }

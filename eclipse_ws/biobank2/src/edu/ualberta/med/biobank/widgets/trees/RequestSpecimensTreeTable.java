@@ -24,6 +24,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.request.RequestClaimAction;
+import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
@@ -92,8 +94,10 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = RequestTableGroup
-                    .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
+                if (newInput != null)
+                    groups =
+                        RequestTableGroup
+                            .getGroupsForRequest(RequestSpecimensTreeTable.this.request);
             }
 
             @Override
@@ -133,8 +137,15 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                     return ""; //$NON-NLS-1$
                 } else if (element instanceof Node) {
                     if (columnIndex == 0) {
-                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
-                            .getSpecimen()).getSpecimen().getPositionString();
+                        if ((RequestContainerAdapter) ((TreeItemAdapter) element)
+                            .getParent() == null)
+                            return ""; //$NON-NLS-1$
+                        return ((RequestContainerAdapter) ((TreeItemAdapter) element)
+                            .getParent()).container.getLabel()
+                            + ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                                .getSpecimen()).getSpecimen()
+                                .getWrappedObject()
+                                .getSpecimenPosition().getPositionString();
                     } else if (columnIndex < 4)
                         return ((TreeItemAdapter) element)
                             .getColumnText(columnIndex - 1);
@@ -208,10 +219,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
 
     protected void claim(List<RequestSpecimenWrapper> specs) {
         try {
+            List<Integer> rs = new ArrayList<Integer>();
             for (RequestSpecimenWrapper spec : specs) {
-                spec.setClaimedBy(SessionManager.getUser().getFirstName());
-                spec.persist();
+                spec.setClaimedBy(SessionManager.getUser().getLogin());
+                rs.add(spec.getId());
             }
+            SessionManager.getAppService().doAction(new RequestClaimAction(rs));
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 Messages.RequestSpecimensTreeTable_claim_error_title, e);
@@ -225,12 +238,16 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
+                List<Integer> rs =
+                    new ArrayList<Integer>();
                 for (RequestSpecimenWrapper spec : getSelectionWrappers()) {
                     spec.setState(RequestSpecimenState.UNAVAILABLE_STATE
                         .getId());
+                    rs.add(spec.getId());
                     try {
-                        spec.persist();
-                        spec.reload();
+                        SessionManager.getAppService().doAction(
+                            new RequestStateChangeAction(rs,
+                                RequestSpecimenState.UNAVAILABLE_STATE));
                     } catch (Exception e) {
                         BgcPlugin
                             .openAsyncError(
@@ -252,10 +269,12 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     }
 
     public List<RequestSpecimenWrapper> getWrappers(Node parent) {
-        List<RequestSpecimenWrapper> list = new ArrayList<RequestSpecimenWrapper>();
+        List<RequestSpecimenWrapper> list =
+            new ArrayList<RequestSpecimenWrapper>();
         if (parent instanceof TreeItemAdapter) {
-            RequestSpecimenWrapper spec = (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
-                .getSpecimen();
+            RequestSpecimenWrapper spec =
+                (RequestSpecimenWrapper) ((TreeItemAdapter) parent)
+                    .getSpecimen();
             list.add(spec);
         } else {
             for (Node child : parent.getChildren()) {
@@ -286,18 +305,17 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
     public Node search(Node startNode, String text) {
         if (startNode instanceof TreeItemAdapter
             && ((RequestSpecimenWrapper) ((TreeItemAdapter) startNode)
-                .getSpecimen()).getSpecimen().getInventoryId().equals(text))
+                .getSpecimen()).getSpecimen().getInventoryId().equals(text)) {
             return startNode;
-        else {
-            Node found = null;
-            List<Node> children = startNode.getChildren();
-            for (Node child : children) {
-                found = search(child, text);
-                if (found != null)
-                    return found;
-            }
-            return null;
         }
+        Node found = null;
+        List<Node> children = startNode.getChildren();
+        for (Node child : children) {
+            found = search(child, text);
+            if (found != null)
+                return found;
+        }
+        return null;
     }
 
     public void pull(Node updateNode) {

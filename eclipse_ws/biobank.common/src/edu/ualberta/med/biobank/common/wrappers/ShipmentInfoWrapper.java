@@ -48,7 +48,7 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
     public String toString() {
         String s = getFormattedDateReceived();
         if (getWaybill() != null) {
-            s += " (" + getWaybill() + ")";
+            s += " (" + getWaybill() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         }
         return s;
     }
@@ -70,9 +70,9 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
             && dateReveived.compareTo(endDate) <= 0;
     }
 
-    private static final String ALL_SHIP_INFOS_BY_METHOD = "from "
-        + ShipmentInfo.class.getName() + " ship where ship."
-        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
+    private static final String ALL_SHIP_INFOS_BY_METHOD = "from " //$NON-NLS-1$
+        + ShipmentInfo.class.getName() + " ship where ship." //$NON-NLS-1$
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?"; //$NON-NLS-1$
 
     public static List<ShipmentInfoWrapper> getAllShipmentInfosByMethod(
         WritableApplicationService appService, ShippingMethodWrapper method)

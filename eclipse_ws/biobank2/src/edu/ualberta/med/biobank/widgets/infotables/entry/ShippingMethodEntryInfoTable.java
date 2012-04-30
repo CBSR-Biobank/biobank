@@ -10,17 +10,19 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodDeleteAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.dialogs.ShippingMethodDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.ShippingMethodInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -83,7 +85,9 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                     selectedShippingMethod.add(shippingMethod);
                 }
                 try {
-                    shippingMethod.persist();
+                    SessionManager.getAppService().doAction(
+                        new ShippingMethodSaveAction(shippingMethod.getId(),
+                            shippingMethod.getName()));
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
                         Messages.ShippingMethodEntryInfoTable_save_error_title,
@@ -91,41 +95,40 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                 }
                 reloadCollection(selectedShippingMethod);
                 return true;
-            } else {
-                try {
-                    shippingMethod.reload();
-                } catch (Exception e) {
-                    BgcPlugin
-                        .openAsyncError(
-                            Messages.ShippingMethodEntryInfoTable_refresh_error_title,
-                            e);
-                }
-                reloadCollection(selectedShippingMethod);
             }
+            try {
+                shippingMethod.reload();
+            } catch (Exception e) {
+                BgcPlugin
+                    .openAsyncError(
+                        Messages.ShippingMethodEntryInfoTable_refresh_error_title,
+                        e);
+            }
+            reloadCollection(selectedShippingMethod);
         }
         return false;
     }
 
     private void addEditSupport() {
-        addAddItemListener(new IInfoTableAddItemListener() {
+        addAddItemListener(new IInfoTableAddItemListener<ShippingMethodWrapper>() {
             @Override
-            public void addItem(InfoTableEvent event) {
+            public void addItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 addShippingMethod();
             }
         });
 
-        addEditItemListener(new IInfoTableEditItemListener() {
+        addEditItemListener(new IInfoTableEditItemListener<ShippingMethodWrapper>() {
             @Override
-            public void editItem(InfoTableEvent event) {
+            public void editItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 ShippingMethodWrapper type = getSelection();
                 if (type != null)
                     addOrEditShippingMethod(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ShippingMethodWrapper>() {
             @Override
-            public void deleteItem(InfoTableEvent event) {
+            public void deleteItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 ShippingMethodWrapper type = getSelection();
                 if (type != null) {
                     try {
@@ -153,8 +156,10 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         // equals method now compare toString() results if both
                         // ids are null.
                         selectedShippingMethod.remove(type);
-                        type.delete();
-                        setCollection(selectedShippingMethod);
+                        SessionManager.getAppService().doAction(
+                            new ShippingMethodDeleteAction(
+                                type.getId()));
+                        setList(selectedShippingMethod);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
@@ -186,6 +191,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         reloadCollection(shippingMethodCollection);
     }
 
+    @Override
     public void reload() {
         try {
             setLists(ShippingMethodWrapper.getShippingMethods(SessionManager

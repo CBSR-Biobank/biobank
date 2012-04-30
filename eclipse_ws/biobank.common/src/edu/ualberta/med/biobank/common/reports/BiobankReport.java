@@ -16,13 +16,15 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class BiobankReport implements QueryCommand {
 
     private static final long serialVersionUID = 1L;
-    private static Map<String, ReportData> REPORTS = new TreeMap<String, ReportData>();
-    public static final String EDITOR_PATH = "edu.ualberta.med.biobank.editors."; //$NON-NLS-1$
+    private static Map<String, ReportData> REPORTS =
+        new TreeMap<String, ReportData>();
+    public static final String EDITOR_PATH =
+        "edu.ualberta.med.biobank.editors."; //$NON-NLS-1$
     private static final String REPORTS_FILE_NAME = "reports"; //$NON-NLS-1$
 
     static {
         ResourceBundle rb = ResourceBundle.getBundle(BiobankReport.class
-            .getPackage().getName() + "." + REPORTS_FILE_NAME,
+            .getPackage().getName() + "." + REPORTS_FILE_NAME, //$NON-NLS-1$
             Locale.getDefault());
         // load map
         Enumeration<String> keysEnum = rb.getKeys();

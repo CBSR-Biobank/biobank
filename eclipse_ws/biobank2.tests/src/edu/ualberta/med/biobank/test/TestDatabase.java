@@ -11,6 +11,7 @@ import java.util.Random;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -20,39 +21,51 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.StringValueLengthServerException;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
+import edu.ualberta.med.biobank.test.internal.GroupHelper;
+import edu.ualberta.med.biobank.test.internal.RequestHelper;
+import edu.ualberta.med.biobank.test.internal.ResearchGroupHelper;
+import edu.ualberta.med.biobank.test.internal.RoleHelper;
 import edu.ualberta.med.biobank.test.internal.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
+import edu.ualberta.med.biobank.test.internal.UserHelper;
 
+@Deprecated
 public class TestDatabase {
     protected static BiobankApplicationService appService;
 
-    protected Random r;
+    protected static Random r;
 
-    private static final List<Class<?>> IGNORE_RETURN_TYPES = new ArrayList<Class<?>>() {
-        private static final long serialVersionUID = 1L;
-        {
-            add(java.lang.Class.class);
-            add(java.lang.Object.class);
-        }
-    };
+    private static final List<Class<?>> IGNORE_RETURN_TYPES =
+        new ArrayList<Class<?>>() {
+            private static final long serialVersionUID = 1L;
+            {
+                add(java.lang.Class.class);
+                add(java.lang.Object.class);
+            }
+        };
 
     private class GetterInfo {
         Method getMethod;
         Method setMethod;
     }
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
         r = new Random();
-        appService = AllTests.appService;
+        appService = AllTestsSuite.appService;
         if (appService == null) {
-            AllTests.setUp();
-            appService = AllTests.appService;
+            AllTestsSuite.setUp();
+            appService = AllTestsSuite.appService;
             Assert.assertNotNull("setUp: appService is null", appService);
         }
+    }
+
+    @Before
+    public void setUp() throws Exception {
+
     }
 
     @After
@@ -60,12 +73,18 @@ public class TestDatabase {
         Assert.assertNotNull("appService is null", appService);
         try {
             DispatchHelper.deleteCreatedDispatches();
+            RequestHelper.deleteCreatedRequests();
+            StudyHelper.deleteStudyDependencies();
             SiteHelper.deleteCreatedSites();
+            ResearchGroupHelper.deleteCreatedResearchGroups();
             StudyHelper.deleteCreatedStudies();
             ShipmentInfoHelper.deleteCreatedShipInfos();
             ClinicHelper.deleteCreatedClinics();
             SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
+            GroupHelper.deleteCreatedGroups();
+            UserHelper.deleteCreatedUsers();
+            RoleHelper.deleteCreatedRoles();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();
@@ -158,6 +177,8 @@ public class TestDatabase {
                     parameter = new Boolean(r.nextBoolean());
                 } else if (returnType.equals(java.lang.Integer.class)) {
                     parameter = new Integer(r.nextInt(Integer.MAX_VALUE));
+                } else if (returnType.equals(java.lang.Long.class)) {
+                    parameter = new Long(r.nextLong());
                 } else if (returnType.equals(java.lang.Double.class)) {
                     parameter = new Double(r.nextDouble());
                 } else if (returnType.equals(java.lang.String.class)) {

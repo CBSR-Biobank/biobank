@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class ModifyStateDispatchDialog extends BgcBaseDialog {
 
-    private static final String TITLE_STATE = Messages.ModifyStateDispatchDialog_title_state;
-    private static final String TITLE_COMMENT_ONLY = Messages.ModifyStateDispatchDialog_title_comment_only;
+    private static final String TITLE_STATE = "Setting {0} state to specimens in current dispatch";
+    private static final String TITLE_COMMENT_ONLY = "Modifying comment of specimens in current dispatch";
     private String currentTitle;
     private String message;
 
@@ -40,12 +40,12 @@ public class ModifyStateDispatchDialog extends BgcBaseDialog {
         commentValue.setValue(oldComment);
         if (newState == null) {
             currentTitle = TITLE_COMMENT_ONLY;
-            message = Messages.ModifyStateDispatchDialog_description_newState;
+            message = "Set a comment";
 
         } else {
             currentTitle = MessageFormat.format(TITLE_STATE,
                 newState.getLabel());
-            message = Messages.ModifyStateDispatchDialog_description_edit;
+            message = "Set a comment to explain the state modification";
         }
     }
 
@@ -71,10 +71,10 @@ public class ModifyStateDispatchDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.MULTI,
-            Messages.ModifyStateDispatchDialog_comment_label, null,
-            commentValue, "value", //$NON-NLS-1$
+            "Comment", null,
+            commentValue, "value", 
             new NonEmptyStringValidator(
-                Messages.ModifyStateDispatchDialog_comment_validator_msg));
+                "Comment should not be empty"));
     }
 
     public String getComment() {

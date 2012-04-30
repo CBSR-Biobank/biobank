@@ -5,18 +5,19 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@Deprecated
 public class StudyHelper extends DbHelper {
 
-    public static List<StudyWrapper> createdStudies = new ArrayList<StudyWrapper>();
+    public static List<StudyWrapper> createdStudies =
+        new ArrayList<StudyWrapper>();
 
     public static StudyWrapper newStudy(String name) throws Exception {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
-        study.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        study.setActivityStatus(ActivityStatus.ACTIVE);
         if (name != null) {
             if (name.length() < 50) {
                 study.setNameShort(name);
@@ -53,18 +54,20 @@ public class StudyHelper extends DbHelper {
     public static void deleteCreatedStudies() throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (StudyWrapper study : createdStudies) {
-            deleteStudyAndDependencies(study);
+            deleteCreatedStudy(study);
         }
         createdStudies.clear();
     }
 
-    public static void deleteStudyAndDependencies(StudyWrapper study) throws Exception {
-        study.reload();
-        deletePatients(study.getPatientCollection(false));
-        deleteFromList(study.getAliquotedSpecimenCollection(false));
-        deleteFromList(study.getSourceSpecimenCollection(false));
-        study.reload();
-        study.delete();
+    public static void deleteStudyDependencies() throws Exception {
+        for (StudyWrapper study : createdStudies) {
+            study.reload();
+            deletePatients(study.getPatientCollection(false));
+            deleteFromList(study.getAliquotedSpecimenCollection(false));
+            deleteFromList(study.getSourceSpecimenCollection(false));
+            study.reload();
+        }
+
     }
 
     public static void deleteCreatedStudy(StudyWrapper study) throws Exception {
@@ -72,7 +75,6 @@ public class StudyHelper extends DbHelper {
             throw new Exception("Study " + study.getNameShort()
                 + " was not created by this helper");
         }
-        createdStudies.remove(study);
         study.delete();
     }
 

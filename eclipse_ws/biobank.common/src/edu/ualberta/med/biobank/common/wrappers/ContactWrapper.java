@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -15,6 +17,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * contact
  */
 public class ContactWrapper extends ContactBaseWrapper {
+    private static final String HAS_STUDIES_MSG = Messages
+        .getString("ContactWrapper.delete.error.msg"); //$NON-NLS-1$
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -27,15 +31,6 @@ public class ContactWrapper extends ContactBaseWrapper {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        if (!deleteAllowed()) {
-            throw new BiobankDeleteException("Unable to delete contact "
-                + getName() + ". No more study reference should exist.");
-        }
     }
 
     public boolean deleteAllowed() {
@@ -57,10 +52,10 @@ public class ContactWrapper extends ContactBaseWrapper {
 
     @Override
     public String toString() {
-        return getName() + " (" + getMobileNumber() + ")";
+        return getName() + " (" + getMobileNumber() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private static final String ALL_CONTACTS_QRY = "from "
+    private static final String ALL_CONTACTS_QRY = "from " //$NON-NLS-1$
         + Contact.class.getName();
 
     public static List<ContactWrapper> getAllContacts(
@@ -73,4 +68,33 @@ public class ContactWrapper extends ContactBaseWrapper {
         }
         return wrappers;
     }
+
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        String hasStudiesMsg = MessageFormat.format(HAS_STUDIES_MSG, getName());
+
+        tasks.add(check().empty(ContactPeer.STUDIES, hasStudiesMsg));
+
+        super.addDeleteTasks(tasks);
+    }
+
+    // /**
+    // * contact is part of a clinic. Can update the contact if can read the
+    // * clinic
+    // */
+    // @Override
+    // public boolean canUpdate(UserWrapper user) {
+    // return getClinic() == null || getClinic().canUpdate(user);
+    // }
+    //
+    // /**
+    // * contact is part of a clinic. Can delete the contact if can update the
+    // * clinic
+    // */
+    // @Override
+    // public boolean canDelete(UserWrapper user) {
+    // return getClinic() == null || getClinic().canUpdate(user);
+    // }
+
 }

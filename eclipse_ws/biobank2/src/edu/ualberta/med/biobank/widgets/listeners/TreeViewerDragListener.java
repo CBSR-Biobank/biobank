@@ -8,22 +8,21 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
 
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNode;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 
 /**
  * Drag support for moving items between TreeViewers in this widget.
  * 
  */
-public class TreeViewerDragListener implements DragSourceListener {
+public class TreeViewerDragListener<T> implements DragSourceListener {
     private TreeViewer viewer;
 
-    private MultiSelectNode[] dragData;
+    private MultiSelectNode<T>[] dragData;
 
-    public TreeViewerDragListener(TreeViewer viewer) {
+    public TreeViewerDragListener(TreeViewer viewer, Transfer dndTransfer) {
         this.viewer = viewer;
 
         viewer.addDragSupport(DND.DROP_MOVE | DND.DROP_COPY,
-            new Transfer[] { MultiSelectNodeTransfer.getInstance() }, this);
+            new Transfer[] { dndTransfer }, this);
     }
 
     @Override
@@ -31,15 +30,16 @@ public class TreeViewerDragListener implements DragSourceListener {
         event.doit = !viewer.getSelection().isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void dragSetData(DragSourceEvent event) {
         Object[] selections = ((IStructuredSelection) viewer.getSelection())
             .toArray();
 
         int count = 0;
-        MultiSelectNode[] nodes = new MultiSelectNode[selections.length];
+        MultiSelectNode<T>[] nodes = new MultiSelectNode[selections.length];
         for (Object sel : selections) {
-            nodes[count] = (MultiSelectNode) sel;
+            nodes[count] = (MultiSelectNode<T>) sel;
             count++;
         }
         event.data = nodes;
@@ -47,13 +47,14 @@ public class TreeViewerDragListener implements DragSourceListener {
         dragFinished(event);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void dragFinished(DragSourceEvent event) {
         if (!event.doit || dragData == null)
             return;
 
-        MultiSelectNode rootNode = (MultiSelectNode) viewer.getInput();
-        for (MultiSelectNode node : dragData) {
+        MultiSelectNode<T> rootNode = (MultiSelectNode<T>) viewer.getInput();
+        for (MultiSelectNode<T> node : dragData) {
             rootNode.removeChild(node);
         }
     }

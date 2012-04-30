@@ -1,0 +1,2 @@
+Any .sql files in this directory or in the sub-directories should be run when
+re-generating the database

@@ -7,20 +7,15 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public abstract class AbstractDispatchGroup extends AdapterBase {
 
-    CenterWrapper<?> center;
-
-    public AbstractDispatchGroup(AdapterBase parent, int id, String name,
-        CenterWrapper<?> center) {
-        super(parent, id, name, true, true);
-        this.center = center;
+    public AbstractDispatchGroup(AdapterBase parent, int id, String name) {
+        super(parent, id, name, false);
     }
 
     @Override
@@ -39,18 +34,13 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         //
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren() == null ? 0 : getWrapperChildren().size();
     }
 
     @Override
@@ -69,8 +59,9 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -79,9 +70,13 @@ public abstract class AbstractDispatchGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AbstractAdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof DispatchWrapper);
         return new DispatchAdapter(this, (DispatchWrapper) child);
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
+    }
 }

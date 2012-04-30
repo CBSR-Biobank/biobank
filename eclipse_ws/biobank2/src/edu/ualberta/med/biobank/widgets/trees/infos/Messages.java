@@ -3,7 +3,8 @@ package edu.ualberta.med.biobank.widgets.trees.infos;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.widgets.trees.infos.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.widgets.trees.infos.messages"; //$NON-NLS-1$
     public static String AbstractInfoTreeWidget_first_label;
     public static String AbstractInfoTreeWidget_last_label;
     public static String AbstractInfoTreeWidget_load_error_title;
@@ -13,7 +14,8 @@ public class Messages extends NLS {
     public static String InfoTreeWidget_delete_label;
     public static String InfoTreeWidget_edit_label;
     public static String InfoTreeWidget_pages_text;
-    public static String SpecimenTypeEntryInfoTree_already_added_error_msg;
+    public static String SpecimenTypeEntryInfoTree_name_already_added_error_msg;
+    public static String SpecimenTypeEntryInfoTree_name_short_already_added_error_msg;
     public static String SpecimenTypeEntryInfoTree_check_error_title;
     public static String SpecimenTypeEntryInfoTree_delete_error_msg;
     public static String SpecimenTypeEntryInfoTree_delete_error_title;

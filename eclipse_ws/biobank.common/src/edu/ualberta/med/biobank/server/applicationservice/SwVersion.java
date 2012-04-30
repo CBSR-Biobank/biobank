@@ -73,10 +73,10 @@ public class SwVersion {
         this.qualifier = qualifier;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return getMajor() + "." + getMinor() + "." + getService() + "."
-            + getQualifier();
+        return getMajor() + "." + getMinor() + "." + getService()
+            + (qualifier != null ? "." + getQualifier() : "");
     }
-
 }

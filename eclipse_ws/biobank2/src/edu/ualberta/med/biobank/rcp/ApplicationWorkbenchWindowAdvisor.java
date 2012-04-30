@@ -22,11 +22,11 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.BgcSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
@@ -115,8 +115,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        BgcSessionState sessionSourceProvider = BgcPlugin
-            .getSessionStateSourceProvider();
+        LoginPermissionSessionState sessionSourceProvider = BgcPlugin
+            .getLoginStateSourceProvider();
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
@@ -124,20 +124,25 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
                         IStatusLineManager statusline = getWindowConfigurer()
-                            .getActionBarConfigurer().getStatusLineManager();
-                        MsgStatusItem serverItem = (MsgStatusItem) statusline
-                            .find(ApplicationActionBarAdvisor.STATUS_SERVER_MSG_ID);
-                        MsgStatusItem superAdminItem = (MsgStatusItem) statusline
-                            .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
-                        if (sourceValue.equals(BgcSessionState.LOGGED_IN)) {
+                            .getActionBarConfigurer()
+                            .getStatusLineManager();
+                        MsgStatusItem serverItem =
+                            (MsgStatusItem) statusline
+                                .find(ApplicationActionBarAdvisor.STATUS_SERVER_MSG_ID);
+                        MsgStatusItem superAdminItem =
+                            (MsgStatusItem) statusline
+                                .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
+                        if (sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
                             mainWindowUpdateTitle(SessionManager.getUser());
-                            serverItem.setText(new StringBuffer(SessionManager
-                                .getUser().getLogin()).append("@") //$NON-NLS-1$
-                                .append(SessionManager.getServer()).toString());
-                            superAdminItem.setVisible(SessionManager.getUser()
-                                .isInSuperAdminMode());
+                            serverItem.setText(new StringBuffer(
+                                SessionManager.getUser().getLogin())
+                                .append("@") //$NON-NLS-1$
+                                .append(SessionManager.getServer())
+                                .toString());
+                            superAdminItem.setVisible(SessionManager
+                                .getUser().isSuperAdmin());
                         } else if (sourceValue
-                            .equals(BgcSessionState.LOGGED_OUT)) {
+                            .equals(LoginPermissionSessionState.LOGGED_OUT)) {
                             mainWindowResetTitle();
                             serverItem.setText(""); //$NON-NLS-1$
                             superAdminItem.setVisible(false);
@@ -166,7 +171,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         mainWindowUpdateTitle(null);
     }
 
-    private void mainWindowUpdateTitle(User user) {
+    private void mainWindowUpdateTitle(UserWrapper user) {
         if (user == null) {
             this.currentCenterText = null;
         } else {

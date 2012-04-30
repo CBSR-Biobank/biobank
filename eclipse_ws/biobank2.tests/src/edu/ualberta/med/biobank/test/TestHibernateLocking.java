@@ -6,13 +6,13 @@ import java.util.Date;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+@Deprecated
 public class TestHibernateLocking extends TestDatabase {
 
     @Test
@@ -28,8 +29,7 @@ public class TestHibernateLocking extends TestDatabase {
             SpecimenWrapper newSpec = new SpecimenWrapper(appService);
             newSpec.setInventoryId("aaaa");
             newSpec.setCreatedAt(new Date());
-            newSpec.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+            newSpec.setActivityStatus(ActivityStatus.ACTIVE);
 
             StudyWrapper study = StudyHelper.addStudy("teststudy");
             SiteWrapper site = SiteHelper.addSite("testsite");

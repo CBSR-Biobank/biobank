@@ -10,9 +10,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -22,9 +19,13 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.CollectionNotEmptyException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.NullPropertyException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -38,8 +39,8 @@ import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestStudy extends TestDatabase {
-
     @Test
     public void testGetSiteCollection() throws Exception {
         String name = "testGetSiteCollection" + r.nextInt();
@@ -48,7 +49,7 @@ public class TestStudy extends TestDatabase {
         SiteHelper.addSites(name, sitesNber);
 
         SiteWrapper site = SiteHelper.addSite(name, false);
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();
@@ -61,6 +62,8 @@ public class TestStudy extends TestDatabase {
 
         // delete a site
         sites.remove(site);
+        site.reload(); // because stale from adding study through a different
+                       // wrapper
         site.delete();
         SiteHelper.createdSites.remove(site);
 
@@ -75,7 +78,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteHelper.addSites(name, r.nextInt(15) + 5);
 
-        List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+        List<SiteWrapper> sites = SiteQuery.getSites(appService);
         for (SiteWrapper s : sites) {
             s.addToStudyCollection(Arrays.asList(study));
             s.persist();
@@ -118,7 +121,7 @@ public class TestStudy extends TestDatabase {
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
-            for (int i = 0; i < contacts.size() - 1; i++) {
+            for (int i = 0; i < (contacts.size() - 1); i++) {
                 ContactWrapper contact1 = contacts.get(i);
                 ContactWrapper contact2 = contacts.get(i + 1);
                 Assert.assertTrue(contact1.compareTo(contact2) <= 0);
@@ -218,7 +221,7 @@ public class TestStudy extends TestDatabase {
         List<AliquotedSpecimenWrapper> storages = study
             .getAliquotedSpecimenCollection(true);
         if (storages.size() > 1) {
-            for (int i = 0; i < storages.size() - 1; i++) {
+            for (int i = 0; i < (storages.size() - 1); i++) {
                 AliquotedSpecimenWrapper storage1 = storages.get(i);
                 AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
                 Assert.assertTrue(storage1.compareTo(storage2) <= 0);
@@ -267,7 +270,7 @@ public class TestStudy extends TestDatabase {
         List<SourceSpecimenWrapper> sources = study
             .getSourceSpecimenCollection(true);
         if (sources.size() > 1) {
-            for (int i = 0; i < sources.size() - 1; i++) {
+            for (int i = 0; i < (sources.size() - 1); i++) {
                 SourceSpecimenWrapper source1 = sources.get(i);
                 SourceSpecimenWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
@@ -422,15 +425,14 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, study
+            .getStudyEventAttrActivityStatus("Patient Type 2"));
 
         // lock the attribute
         study.setStudyEventAttrActivityStatus("Patient Type 2",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
-        Assert.assertEquals(ActivityStatusWrapper.CLOSED_STATUS_STRING, study
-            .getStudyEventAttrActivityStatus("Patient Type 2").getName());
+            ActivityStatus.CLOSED);
+        Assert.assertEquals(ActivityStatus.CLOSED, study
+            .getStudyEventAttrActivityStatus("Patient Type 2"));
 
         // get lock for non existing label, expect exception
         try {
@@ -445,7 +447,7 @@ public class TestStudy extends TestDatabase {
         try {
             study.setStudyEventAttrActivityStatus(
                 Utils.getRandomString(10, 20),
-                ActivityStatusWrapper.getActiveActivityStatus(appService));
+                ActivityStatus.ACTIVE);
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -453,8 +455,7 @@ public class TestStudy extends TestDatabase {
         // add patient visit that uses the locked attribute
         study.setStudyEventAttr("Patient Type 2", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttrActivityStatus("Patient Type 2",
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING));
+            ActivityStatus.CLOSED);
         study.persist();
         study.reload();
         SiteWrapper site = SiteHelper.addSite("testsite");
@@ -575,7 +576,7 @@ public class TestStudy extends TestDatabase {
 
         List<PatientWrapper> patients = study.getPatientCollection(true);
         if (patients.size() > 1) {
-            for (int i = 0; i < patients.size() - 1; i++) {
+            for (int i = 0; i < (patients.size() - 1); i++) {
                 PatientWrapper patient1 = patients.get(i);
                 PatientWrapper patient2 = patients.get(i + 1);
                 Assert.assertTrue(patient1.compareTo(patient2) <= 0);
@@ -618,7 +619,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
 
-        Map<StudyWrapper, List<PatientWrapper>> studyPatientsMap = new HashMap<StudyWrapper, List<PatientWrapper>>();
+        Map<StudyWrapper, List<PatientWrapper>> studyPatientsMap =
+            new HashMap<StudyWrapper, List<PatientWrapper>>();
         studyPatientsMap.put(study1, new ArrayList<PatientWrapper>());
         studyPatientsMap.put(study2, new ArrayList<PatientWrapper>());
 
@@ -683,40 +685,35 @@ public class TestStudy extends TestDatabase {
         List<CollectionEventWrapper> set1_1 = CollectionEventHelper
             .addCollectionEvents(clinic1, study1, study1.getName() + "_set1");
         study1.reload();
-        Assert
-            .assertEquals(set1_1.size(), study1.getCollectionEventCount(true));
+        Assert.assertEquals(set1_1.size(), study1.getCollectionEventCount());
 
         List<CollectionEventWrapper> set1_2 = CollectionEventHelper
             .addCollectionEvents(clinic1, study1, study1.getName() + "_set2");
         study1.reload();
         Assert.assertEquals(set1_1.size() + set1_2.size(),
-            study1.getCollectionEventCount(true));
+            study1.getCollectionEventCount());
 
         List<CollectionEventWrapper> set2_1 = CollectionEventHelper
             .addCollectionEvents(clinic2, study2, study2.getName() + "_set1");
         study2.reload();
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
         // ensure count for study1 does not change
         Assert.assertEquals(set1_1.size() + set1_2.size(),
-            study1.getCollectionEventCount(true));
+            study1.getCollectionEventCount());
 
         DbHelper.deleteCollectionEvents(set1_1);
         study1.reload();
-        Assert
-            .assertEquals(set1_2.size(), study1.getCollectionEventCount(true));
+        Assert.assertEquals(set1_2.size(), study1.getCollectionEventCount());
 
         // ensure count does not change for study2
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
 
         DbHelper.deleteCollectionEvents(set1_2);
         study1.reload();
-        Assert.assertEquals(0, study1.getCollectionEventCount(true));
+        Assert.assertEquals(0, study1.getCollectionEventCount());
 
         // ensure count does not change for study2
-        Assert
-            .assertEquals(set2_1.size(), study2.getCollectionEventCount(true));
+        Assert.assertEquals(set2_1.size(), study2.getCollectionEventCount());
     }
 
     @Test
@@ -763,7 +760,7 @@ public class TestStudy extends TestDatabase {
             StudyHelper.addStudy(name);
             Assert
                 .fail("Should not insert the study : same name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -774,9 +771,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -789,9 +784,7 @@ public class TestStudy extends TestDatabase {
         try {
             s1.persist();
             Assert.fail("Should not insert the study : name short empty");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        } catch (ValidationException e) {
+        } catch (NullPropertyException e) {
             Assert.assertTrue(true);
         }
     }
@@ -810,7 +803,7 @@ public class TestStudy extends TestDatabase {
             s2.persist();
             Assert
                 .fail("Should not insert the study : same short name already in database");
-        } catch (DuplicateEntryException e) {
+        } catch (DuplicatePropertySetException e) {
             Assert.assertTrue(true);
         }
     }
@@ -828,8 +821,7 @@ public class TestStudy extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        s1.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        s1.setActivityStatus(ActivityStatus.ACTIVE);
         s1.persist();
         StudyHelper.createdStudies.add(s1);
     }
@@ -844,10 +836,12 @@ public class TestStudy extends TestDatabase {
             study.getId());
         Assert.assertNotNull(studyInDB);
 
+        Integer studyId = study.getId();
+
         study.delete();
 
-        studyInDB = ModelUtils.getObjectWithId(appService, Study.class,
-            study.getId());
+        studyInDB = ModelUtils
+            .getObjectWithId(appService, Study.class, studyId);
         // object is not anymore in database
         Assert.assertNull(studyInDB);
     }
@@ -862,7 +856,7 @@ public class TestStudy extends TestDatabase {
             study.delete();
             Assert
                 .fail("Should not delete : patients need to be removed first");
-        } catch (BiobankCheckException bce) {
+        } catch (CollectionNotEmptyException e) {
             Assert.assertTrue(true);
         }
     }

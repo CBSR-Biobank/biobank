@@ -1,35 +1,45 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContext;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetAction;
+import edu.ualberta.med.biobank.common.action.security.MembershipContextGetInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.TableFilter;
+import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class GroupsPage extends BgcDialogPage {
 
-    private GroupInfoTable groupInfoTable;
-    private ArrayList<Group> internalGroupList;
+    private final ManagerContext context;
 
-    public GroupsPage(BgcDialogWithPages dialog) {
+    private GroupInfoTable groupInfoTable;
+
+    public GroupsPage(BgcDialogWithPages dialog, ManagerContext context) {
         super(dialog);
+
+        this.context = context;
     }
 
     @Override
     public String getTitle() {
-        return Messages.GroupsPage_page_title;
+        return "Groups";
     }
 
     @Override
@@ -45,97 +55,93 @@ public abstract class GroupsPage extends BgcDialogPage {
 
             @Override
             public List<Group> getAllCollection() {
-                return getInternalAllGroupsList();
+                return getCurrentAllGroupsList();
             }
 
             @Override
             public void setFilteredList(List<Group> filteredObjects) {
-                groupInfoTable.reloadCollection(filteredObjects);
+                groupInfoTable.setList(filteredObjects);
             }
         };
 
-        groupInfoTable = new GroupInfoTable(content, null) {
-            @Override
-            protected boolean deleteGroup(Group group) {
-                boolean deleted = super.deleteGroup(group);
-                if (deleted)
-                    getCurrentAllGroupsList().remove(group);
-                return deleted;
-            }
-
-            @Override
-            protected void duplicate(Group origGroup) {
-                final Group newGroup = new Group();
-                newGroup.copy(origGroup);
-                newGroup.setName("CopyOf" + newGroup.getName()); //$NON-NLS-1$
-                addGroup(newGroup);
-            }
-        };
-        List<Group> tmpGroups = new ArrayList<Group>();
-        for (int i = 0; i < GroupInfoTable.ROWS_PER_PAGE + 1; i++) {
-            Group group = new Group();
-            group.setName(Messages.UserManagementDialog_loading);
-            tmpGroups.add(group);
-        }
-        groupInfoTable.setCollection(tmpGroups);
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    final List<Group> groups = getInternalAllGroupsList();
-                    sleep(200); // FIXME for some reason, if the group list is
-                                // already loaded and therefore is retrieved
-                                // right away, the setCollection method is not
-                                // working because the current thread is still
-                                // alive (see setCollection implementation).
-                                // With a small pause, it is ok.
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            groupInfoTable.setCollection(groups);
-                        }
-                    });
-                } catch (final Exception ex) {
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            BgcPlugin
-                                .openAsyncError(
-                                    Messages.UserManagementDialog_get_users_groups_error_title,
-                                    ex);
-                        }
-                    });
+        groupInfoTable =
+            new GroupInfoTable(content, context.getGroups(), context) {
+                @Override
+                protected boolean deleteGroup(Group group) {
+                    boolean deleted = super.deleteGroup(group);
+                    if (deleted)
+                        getCurrentAllGroupsList().remove(group);
+                    return deleted;
                 }
-            }
-        };
-        t.start();
+
+                @Override
+                protected void duplicate(Group src) {
+                    Group newGroup = new Group();
+                    newGroup.setName("Copy of " + src.getName());
+                    newGroup.setDescription(src.getDescription());
+
+                    for (Membership srcMemb : src.getMemberships()) {
+                        new Membership(srcMemb, newGroup);
+                    }
+
+                    addGroup(newGroup);
+                }
+
+                @Override
+                protected Boolean canEdit(Group target)
+                    throws ApplicationException {
+                    return true;
+                }
+
+                @Override
+                protected Boolean canDelete(Group target)
+                    throws ApplicationException {
+                    return true;
+                }
+
+                @Override
+                protected Boolean canView(Group target)
+                    throws ApplicationException {
+                    return true;
+                }
+            };
+
         setControl(content);
     }
 
-    private List<Group> getInternalAllGroupsList() {
-        if (internalGroupList == null) {
-            internalGroupList = new ArrayList<Group>();
-            for (Group g : getCurrentAllGroupsList()) {
-                if (!g.isSuperAdministratorGroup())
-                    internalGroupList.add(g);
-            }
-        }
-        return internalGroupList;
-    }
+    protected void addGroup(Group group) {
+        MembershipContext membershipContext = null;
 
-    protected void addGroup(Group newGroup) {
+        try {
+            membershipContext =
+                SessionManager
+                    .getAppService()
+                    .doAction(
+                        new MembershipContextGetAction(
+                            new MembershipContextGetInput())).getContext();
+        } catch (Throwable t) {
+            TmpUtil.displayException(t);
+            return;
+        }
+
+        GroupGetOutput output = new GroupGetOutput(group, membershipContext);
+
         GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), newGroup, true);
+            .getActiveWorkbenchWindow().getShell(), output, context);
+
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                Messages.UserManagementDialog_group_added_title, MessageFormat
-                    .format(Messages.UserManagementDialog_group_added_msg,
-                        newGroup.getName()));
-            getCurrentAllGroupsList().add(newGroup);
-            internalGroupList.add(newGroup);
-            groupInfoTable.reloadCollection(getInternalAllGroupsList(),
-                newGroup);
+                "Group Added", MessageFormat
+                    .format("Successfully added new group {0}.",
+                        group.getName()));
+
+            List<Group> allCurrent = getCurrentAllGroupsList();
+            allCurrent.add(group);
+            Collections.sort(allCurrent, new GroupInfoTable.GroupComparator());
+
+            groupInfoTable.reload();
+            groupInfoTable.setSelection(group);
         }
     }
 
@@ -145,5 +151,4 @@ public abstract class GroupsPage extends BgcDialogPage {
     }
 
     protected abstract List<Group> getCurrentAllGroupsList();
-
 }

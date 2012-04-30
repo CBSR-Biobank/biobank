@@ -17,6 +17,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -24,20 +26,24 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchCenterAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.SpecimenTransitView"; //$NON-NLS-1$
 
     private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
@@ -61,16 +67,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         SessionManager.addView(this);
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-    }
-
     public void createNodes() throws Exception {
         if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
-            SessionManager.getUser().getCurrentWorkingCenter().reload();
-            centerNode = new DispatchCenterAdapter(rootNode, SessionManager
-                .getUser().getCurrentWorkingCenter());
+            centerNode = new DispatchCenterAdapter((RootNode) rootNode,
+                SessionManager.getUser().getCurrentWorkingCenter());
             centerNode.setParent(rootNode);
             rootNode.addChild(centerNode);
         }
@@ -172,9 +172,19 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 logger.error(Messages.SpecimenTransitView_nodes_error_title, e);
 
             }
-            for (AdapterBase adaper : rootNode.getChildren()) {
+            for (AbstractAdapterBase adaper : rootNode.getChildren()) {
                 adaper.rebuild();
             }
+        }
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new DispatchReadPermission(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getWrappedObject()))
+                || SessionManager.getAppService().isAllowed(
+                    new OriginInfoReadPermission(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getWrappedObject())));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
         }
         super.reload();
     }
@@ -186,10 +196,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             if (searchedObject == null || searchedObject.size() == 0) {
                 String msg;
                 if (radioWaybill.getSelection()) {
-                    msg = NLS
-                        .bind(
-                            Messages.SpecimenTransitView_notfound_waybill_error_msg,
-                            treeText.getText());
+                    msg =
+                        NLS
+                            .bind(
+                                Messages.SpecimenTransitView_notfound_waybill_error_msg,
+                                treeText.getText());
                 } else {
                     msg = NLS.bind(
                         Messages.SpecimenTransitView_notfound_date_error_msg,
@@ -246,33 +257,41 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
-            if (nodeRes.size() == 0)
-                searchedNode.addSearchObject(searchedObject);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                searchedObject.getClass(), searchedObject.getId());
+            if (nodeRes.size() == 0) {
+                searchedNode.addSearchObject(searchedObject,
+                    searchedObject.getId());
+                SpecimenTransitView.addToNode(searchedNode, searchedObject);
+            }
         }
-        searchedNode.performExpand();
         if (searchedObjects.size() == 1) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
+            ModelWrapper<?> searchedWrap = searchedObjects.get(0);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                searchedWrap.getClass(), searchedWrap.getId());
             if (nodeRes.size() > 0)
                 nodeRes.get(0).performDoubleClick();
-        } else
+        } else {
+            searchedNode.performExpand();
             BgcPlugin.openMessage(
                 Messages.SpecimenTransitView_res_dialog_title, NLS.bind(
                     Messages.SpecimenTransitView_found_multiple_msg,
                     searchedObjects.size()));
+        }
     }
 
-    public static AdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper) {
-        if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
-            OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
+    public static AbstractAdapterBase addToNode(AdapterBase parentNode,
+        Object obj) {
+        if (currentInstance != null && obj instanceof OriginInfoWrapper) {
+            OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
             String text = ""; //$NON-NLS-1$
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
-                    text = Messages.SpecimenTransitView_date_received_node_label;
+                    text =
+                        Messages.SpecimenTransitView_date_received_node_label;
                     date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
                     text = Messages.SpecimenTransitView_date_packed_node_label;
@@ -287,36 +306,37 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 c.set(Calendar.MINUTE, 0);
                 c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
-                List<AdapterBase> dateNodeRes = parentNode.search((int) date
-                    .getTime() + text.hashCode());
-                AdapterBase dateNode = null;
+                List<AbstractAdapterBase> dateNodeRes =
+                    parentNode.search(
+                        date.getClass(), DateNode.idBuilder(text, date)
+                        );
+                AbstractAdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
                     dateNode = new DateNode(parentNode, text, date);
                     parentNode.addChild(dateNode);
                 }
-                topNode = dateNode;
+                topNode = (AdapterBase) dateNode;
             }
 
-            List<AdapterBase> centerAdapterList = topNode.search(originInfo
-                .getCenter());
+            List<AbstractAdapterBase> centerAdapterList = topNode.search(
+                originInfo.getCenter().getClass(), originInfo.getCenter()
+                    .getId());
             AdapterBase centerAdapter = null;
 
             if (centerAdapterList.size() > 0)
-                centerAdapter = centerAdapterList.get(0);
+                centerAdapter = (AdapterBase) centerAdapterList.get(0);
             else if (originInfo.getCenter() instanceof ClinicWrapper) {
                 centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
-                centerAdapter.setEditable(false);
-                centerAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(centerAdapter);
             }
 
             if (centerAdapter != null) {
                 ShipmentAdapter shipmentAdapter = null;
-                List<AdapterBase> shipmentAdapterList = centerAdapter
-                    .search(originInfo);
+                List<AbstractAdapterBase> shipmentAdapterList = centerAdapter
+                    .search(OriginInfoWrapper.class, originInfo.getId());
                 if (shipmentAdapterList.size() > 0)
                     shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
                         .get(0);
@@ -327,12 +347,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 }
                 return shipmentAdapter;
             }
-        } else if (currentInstance != null
-            && wrapper instanceof DispatchWrapper) {
-            List<AdapterBase> res = parentNode.search(wrapper);
+        } else if (currentInstance != null && obj instanceof DispatchWrapper) {
+            List<AbstractAdapterBase> res = parentNode.search(
+                DispatchWrapper.class, ((DispatchWrapper) obj).getId());
             if (res.size() == 0) {
                 DispatchAdapter dispatch = new DispatchAdapter(parentNode,
-                    (DispatchWrapper) wrapper);
+                    (DispatchWrapper) obj);
                 parentNode.addChild(dispatch);
             }
         }
@@ -356,15 +376,14 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected AbstractTodayNode<?> createTodayNode() {
-        return new ShipmentTodayNode(rootNode, 1);
+        return new ShipmentTodayNode((RootNode) rootNode, 1);
     }
 
     @Override
     protected AbstractSearchedNode createSearchedNode() {
         if (searchedNode == null)
-            return new OriginInfoSearchedNode(rootNode, 2);
-        else
-            return searchedNode;
+            return new OriginInfoSearchedNode((RootNode) rootNode, 2);
+        return searchedNode;
     }
 
     @Override
@@ -395,7 +414,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public static ShipmentAdapter getCurrentShipment() {
-        AdapterBase selectedNode = currentInstance.getSelectedNode();
+        AbstractAdapterBase selectedNode = currentInstance.getSelectedNode();
         if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
             return (ShipmentAdapter) selectedNode;
         }
@@ -409,4 +428,10 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         setSearchFieldsEnablement(false);
         super.clear();
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

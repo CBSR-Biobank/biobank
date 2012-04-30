@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.trees.infos.listener;
 
-
-public interface IInfoTreeDeleteItemListener {
-    void deleteItem(InfoTreeEvent event);
+public interface IInfoTreeDeleteItemListener<T> {
+    void deleteItem(InfoTreeEvent<T> event);
 }

@@ -10,8 +10,9 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 
+@Deprecated
 public class Group implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
@@ -103,10 +104,10 @@ public class Group implements Serializable, NotAProxy {
             pgp = new ProtectionGroupPrivilege(id, name, description);
             pgMap.put(name, pgp);
             if (pgp.getName().startsWith(
-                BiobankSecurityUtil.CENTER_FEATURE_START_NAME)) {
+                BiobankCSMSecurityUtil.CENTER_FEATURE_START_NAME)) {
                 centerFeaturesEnabledId.add((int) pgp.getId().longValue());
             } else if (pgp.getName().startsWith(
-                BiobankSecurityUtil.GLOBAL_FEATURE_START_NAME)) {
+                BiobankCSMSecurityUtil.GLOBAL_FEATURE_START_NAME)) {
                 globalFeaturesEnabledId.add((int) pgp.getId().longValue());
             }
         }

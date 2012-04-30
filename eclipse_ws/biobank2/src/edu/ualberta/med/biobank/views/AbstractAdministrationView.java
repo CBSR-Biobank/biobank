@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.treeview.NewRootNode;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
@@ -21,7 +22,7 @@ public abstract class AbstractAdministrationView extends
     private Composite searchComposite;
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControlInternal(Composite parent) {
         GridLayout gl = new GridLayout(1, false);
         gl.marginWidth = 0;
         gl.marginHeight = 0;
@@ -58,16 +59,28 @@ public abstract class AbstractAdministrationView extends
         adaptersTree = new AdapterTreeWidget(parent, false);
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
 
-        rootNode = new RootNode();
-        rootNode.setTreeViewer(adaptersTree.getTreeViewer());
+        createRootNode();
         adaptersTree.getTreeViewer().setInput(rootNode);
         adaptersTree.getTreeViewer().expandAll();
     }
 
+    // FIXME temporary method until only one possible rootnode is possible
+    protected abstract void createRootNode();
+
+    protected void createOldRootNode() {
+        rootNode = new RootNode();
+        ((RootNode) rootNode).setTreeViewer(adaptersTree.getTreeViewer());
+    }
+
+    protected void createNewRootNode() {
+        rootNode = new NewRootNode();
+        ((NewRootNode) rootNode).setTreeViewer(adaptersTree.getTreeViewer());
+    }
+
     protected abstract String getTreeTextToolTip();
 
-    protected void createTreeTextOptions(
-        @SuppressWarnings("unused") Composite parent) {
+    @SuppressWarnings("unused")
+    protected void createTreeTextOptions(Composite parent) {
         // default do nothing
     }
 
@@ -78,7 +91,6 @@ public abstract class AbstractAdministrationView extends
         if (!getTreeViewer().getControl().isDisposed()) {
             getTreeViewer().refresh(true);
             getTreeViewer().expandToLevel(3);
-            setSearchFieldsEnablement(true);
         }
     }
 

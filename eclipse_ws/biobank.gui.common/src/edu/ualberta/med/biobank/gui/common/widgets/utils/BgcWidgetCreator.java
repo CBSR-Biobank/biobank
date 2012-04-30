@@ -13,6 +13,8 @@ import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
@@ -23,6 +25,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -58,6 +61,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.util.NullHelper;
 
 public class BgcWidgetCreator {
 
@@ -265,7 +269,7 @@ public class BgcWidgetCreator {
     }
 
     public BgcBaseText createText(Composite composite, int widgetOptions,
-        IObservableValue modelObservableValue, UpdateValueStrategy uvs,
+        final IObservableValue modelObservableValue, UpdateValueStrategy uvs,
         String bindingKey) {
         if (widgetOptions == SWT.NONE) {
             widgetOptions = SWT.SINGLE;
@@ -296,6 +300,20 @@ public class BgcWidgetCreator {
                 }
             });
         }
+        // Integer and Double fields should not accept alpha characters. Really
+        // should block all symbols but . and +- too. FIXME for a later date
+        text.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((modelObservableValue != null)
+                    && (modelObservableValue.getValueType().equals(
+                        Integer.class)
+                    || modelObservableValue.getValueType().equals(
+                        Double.class))
+                    && Character.isLetter(e.character))
+                    e.doit = false;
+            }
+        });
         text.setLayoutData(gd);
         if (keyListener != null) {
             text.addKeyListener(keyListener);
@@ -440,7 +458,8 @@ public class BgcWidgetCreator {
                 fieldLabel, errorMessage));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
-            IObservableValue selectedValue = new WritableValue("", String.class); //$NON-NLS-1$
+            IObservableValue selectedValue =
+                new WritableValue("", String.class); //$NON-NLS-1$
             Binding binding = dbc.bindValue(
                 SWTObservables.observeSelection(combo), selectedValue, uvs,
                 null);
@@ -458,8 +477,9 @@ public class BgcWidgetCreator {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection = (IStructuredSelection) comboViewer
-                            .getSelection();
+                        IStructuredSelection selection =
+                            (IStructuredSelection) comboViewer
+                                .getSelection();
                         if ((selection != null) && (selection.size() > 0)) {
                             csu.doSelection(selection.getFirstElement());
                         } else {
@@ -574,6 +594,32 @@ public class BgcWidgetCreator {
         return widget;
     }
 
+    public Binding addBooleanBinding(Control control,
+        final WritableValue writableValue,
+        final IObservableValue observableValue, final String errorMsg) {
+
+        final ControlDecoration decoration = BgcBaseWidget
+            .createDecorator(control, errorMsg, SWT.LEFT | SWT.TOP);
+        Binding b = addBooleanBinding(writableValue, observableValue, errorMsg,
+            IStatus.ERROR);
+
+        b.getValidationStatus().addChangeListener(new IChangeListener() {
+            @Override
+            public void handleChange(ChangeEvent event) {
+                boolean equal = NullHelper.safeEquals(
+                    writableValue.getValue(), observableValue.getValue());
+
+                if (equal) {
+                    decoration.hide();
+                } else {
+                    decoration.show();
+                }
+            }
+        });
+
+        return b;
+    }
+
     public Binding addBooleanBinding(WritableValue writableValue,
         IObservableValue observableValue, final String errorMsg) {
         return addBooleanBinding(writableValue, observableValue, errorMsg,
@@ -595,9 +641,8 @@ public class BgcWidgetCreator {
                             return ValidationStatus.warning(errorMsg);
                         }
                         return ValidationStatus.error(errorMsg);
-                    } else {
-                        return Status.OK_STATUS;
                     }
+                    return Status.OK_STATUS;
                 }
 
             });
@@ -751,8 +796,10 @@ public class BgcWidgetCreator {
     public BgcBaseText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value,
         boolean useBackgroundColor) {
-        BgcBaseText widget = (BgcBaseText) createLabelledWidget(parent,
-            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BgcBaseText widget =
+            (BgcBaseText) createLabelledWidget(parent,
+                BgcBaseText.class, SWT.READ_ONLY | widgetOptions, fieldLabel,
+                value);
         if (useBackgroundColor)
             widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;

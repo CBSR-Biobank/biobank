@@ -26,7 +26,7 @@ public class LogoutHandler extends AbstractHandler {
                 SessionManager.getInstance().deleteSession();
             } catch (Exception e) {
                 logger.error("Error while deleting the session", e); //$NON-NLS-1$
-            }
+        }
         return null;
     }
 }

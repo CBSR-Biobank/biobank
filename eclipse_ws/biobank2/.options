@@ -1,6 +1,0 @@
-# Debugging options for org.eclipsercp.hyperbola.ui
-
-# Turn on debugging for the plugin.
-biobank/debug=true
-# Enable real scan
-biobank/realScan=true

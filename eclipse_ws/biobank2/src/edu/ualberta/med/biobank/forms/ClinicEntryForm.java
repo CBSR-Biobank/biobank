@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashSet;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
@@ -14,63 +17,95 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm"; 
 
-    private static final String MSG_NEW_CLINIC_OK = Messages.ClinicEntryForm_creation_msg;
+    private static final String MSG_NEW_CLINIC_OK =
+        "New clinic information.";
 
-    private static final String MSG_CLINIC_OK = Messages.ClinicEntryForm_msg_ok;
+    private static final String MSG_CLINIC_OK = "Clinic information.";
 
-    private static final String MSG_NO_CLINIC_NAME = Messages.ClinicEntryForm_msg_noClinicName;
+    private static final String MSG_NO_CLINIC_NAME =
+        "Clinic must have a name";
 
-    private ClinicAdapter clinicAdapter;
-
-    private ClinicWrapper clinic;
+    private ClinicWrapper clinic = new ClinicWrapper(
+        SessionManager.getAppService());
 
     private ContactEntryInfoTable contactEntryWidget;
 
     protected Combo session;
 
-    private BgcEntryFormWidgetListener listener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BgcEntryFormWidgetListener listener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private ComboViewer activityStatusComboViewer;
+
+    private CommentsInfoTable commentEntryTable;
+
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
+    private ClinicInfo clinicInfo;
 
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ClinicAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
-        clinicAdapter = (ClinicAdapter) adapter;
-        clinic = (ClinicWrapper) getModelObject();
-
+        updateClinicInfo(adapter.getId());
         String tabName;
         if (clinic.isNew()) {
-            tabName = Messages.ClinicEntryForm_title_new;
-            clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+            tabName = "New Clinic";
+            clinic.setActivityStatus(ActivityStatus.ACTIVE);
         } else
-            tabName = NLS.bind(Messages.ClinicEntryForm_title_edit,
-                clinic.getNameShort());
+            tabName =
+                NLS.bind("Clinic {0}",
+                    clinic.getNameShort());
         setPartName(tabName);
+    }
+
+    private void updateClinicInfo(Integer id) throws Exception {
+        if (id != null) {
+            clinicInfo =
+                SessionManager.getAppService().doAction(
+                    new ClinicGetInfoAction(id));
+            clinic.setWrappedObject(clinicInfo.clinic);
+        } else {
+            clinicInfo = new ClinicInfo();
+            clinic.setWrappedObject(new Clinic());
+        }
+        comment.setWrappedObject(new Comment());
+        ((AdapterBase) adapter).setModelObject(clinic);
     }
 
     @Override
@@ -83,9 +118,9 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.ClinicEntryForm_main_title);
+        form.setText("Clinic Information");
         page.setLayout(new GridLayout(1, false));
-        toolkit.createLabel(page, Messages.ClinicEntryForm_main_description,
+        toolkit.createLabel(page, "Clinics can be associated with studies after submitting this initial information.",
             SWT.LEFT);
         createClinicInfoSection();
         createAddressArea(clinic);
@@ -94,7 +129,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     }
 
-    private void createClinicInfoSection() throws ApplicationException {
+    private void createClinicInfoSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -103,46 +138,66 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, Messages.label_name, null, clinic,
+            SWT.NONE, "Name", null, clinic,
             ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.label_nameShort, null, clinic,
+            "Short name", null, clinic,
             ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
                 MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            Messages.clinic_field_label_sendsShipments, null, clinic,
+            "Sends Shipments", null, clinic,
             ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(),
-            Messages.ClinicEntryForm_activity_validator_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    clinic
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                }
-            });
+        activityStatusComboViewer =
+            createComboViewer(client, "Activity status",
+                ActivityStatus.valuesList(), clinic.getActivityStatus(),
+                "Clinic must have an activity status",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        clinic
+                            .setActivityStatus((ActivityStatus) selectedObject);
+                    }
+                });
+
+        createCommentSection();
+
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient("Comments");
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable =
+            new CommentsInfoTable(client, clinic.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        comment = new CommentWrapper(SessionManager.getAppService());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            Messages.label_comments, null, clinic,
-            ClinicPeer.COMMENT.getName(), null);
+            "Add a Comment", null, comment, "message", null);
     }
 
     private void createContactSection() {
-        Section section = createSection(Messages.clinic_contact_title);
+        Section section = createSection("Contacts");
 
-        contactEntryWidget = new ContactEntryInfoTable(section, clinic);
+        List<ContactWrapper> contacts =
+            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+                clinicInfo.contacts, ContactWrapper.class);
+
+        contactEntryWidget = new ContactEntryInfoTable(section, contacts);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, Messages.ClinicEntryForm_contact_button_add,
+        addSectionToolbar(section, "Add contact",
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -163,31 +218,50 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
+        ClinicSaveAction saveClinic = new ClinicSaveAction();
+        saveClinic.setId(clinic.getId());
+        saveClinic.setName(clinic.getName());
+        saveClinic.setNameShort(clinic.getNameShort());
+        saveClinic.setActivityStatus(clinic.getActivityStatus());
+        saveClinic.setSendsShipments(clinic.getSendsShipments());
+        saveClinic.setContactSaveInfos(getNewContactInfo());
+        saveClinic.setAddress(clinic.getAddress().getWrappedObject());
+        saveClinic.setCommentText(comment.getMessage());
+        Integer id =
+            SessionManager.getAppService().doAction(saveClinic).getId();
+        updateClinicInfo(id);
+        SessionManager.getUser().updateCurrentCenter(clinic);
+    }
+
+    private HashSet<ContactSaveInfo> getNewContactInfo() {
         clinic.addToContactCollection(contactEntryWidget
             .getAddedOrModifedContacts());
         clinic.removeFromContactCollection(contactEntryWidget
             .getDeletedContacts());
-        clinic.persist();
-        SessionManager.updateAllSimilarNodes(clinicAdapter, true);
-        SessionManager.getUser().updateCurrentCenter(clinic);
+
+        HashSet<ContactSaveInfo> contactSaveInfos =
+            new HashSet<ContactSaveInfo>();
+
+        for (ContactWrapper wrapper : clinic.getContactCollection(false)) {
+            contactSaveInfos
+                .add(new ContactSaveInfo(wrapper.getWrappedObject()));
+        }
+        return contactSaveInfos;
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ClinicViewForm.ID;
     }
 
     @Override
-    protected void onReset() throws Exception {
-        clinic.reset();
-
+    public void setValues() throws Exception {
         if (clinic.isNew()) {
-            clinic.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+            clinic.setActivityStatus(ActivityStatus.ACTIVE);
         }
 
         GuiUtil.reset(activityStatusComboViewer, clinic.getActivityStatus());
-
         contactEntryWidget.reload();
+        commentEntryTable.setList(clinic.getCommentCollection(false));
     }
 }

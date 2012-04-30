@@ -1,8 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -25,13 +26,14 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    protected List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
+    protected Set<Object> searchedObjects = new HashSet<Object>();
+    protected Set<Integer> searchedObjectIds = new HashSet<Integer>();
 
     private boolean keepDirectLeafChild;
 
     public AbstractSearchedNode(AdapterBase parent, int id,
         boolean keepDirectLeafChild) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, true, false);
+        super(parent, id, Messages.AbstractSearchedNode_searched, true);
         this.keepDirectLeafChild = keepDirectLeafChild;
     }
 
@@ -49,48 +51,70 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     @Override
     public void performExpand() {
-        List<ModelWrapper<?>> alreadyHasListener = new ArrayList<ModelWrapper<?>>();
+        List<ModelWrapper<?>> alreadyHasListener =
+            new ArrayList<ModelWrapper<?>>();
         try {
-            for (AdapterBase child : getChildren()) {
-                ModelWrapper<?> childWrapper = child.getModelObject();
-                if (childWrapper != null) {
-                    childWrapper.reload();
-                }
-                List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
-                    child.getChildren());
-                List<AdapterBase> toRemove = new ArrayList<AdapterBase>();
-                for (AdapterBase subChild : subChildren) {
-                    ModelWrapper<?> subChildWrapper = subChild.getModelObject();
-                    subChildWrapper.reload();
-                    if (!searchedObjects.contains(subChildWrapper)) {
-                        toRemove.add(subChild);
-                    } else {
-                        subChild.rebuild();
-                        alreadyHasListener.add(subChildWrapper);
+            for (AbstractAdapterBase child : getChildren()) {
+                if (child instanceof AdapterBase) {
+                    ModelWrapper<?> childWrapper = ((AdapterBase) child)
+                        .getModelObject();
+                    if (childWrapper != null) {
+                        childWrapper.reload();
                     }
                 }
-                for (AdapterBase subChild : toRemove)
+                List<AbstractAdapterBase> subChildren =
+                    new ArrayList<AbstractAdapterBase>(
+                        child.getChildren());
+                List<AbstractAdapterBase> toRemove =
+                    new ArrayList<AbstractAdapterBase>();
+                for (AbstractAdapterBase subChild : subChildren) {
+                    ModelWrapper<?> wrapper = null;
+                    if (subChild instanceof AdapterBase) {
+                        Object subChildObj = ((AdapterBase) subChild)
+                            .getModelObject();
+                        if (subChildObj instanceof ModelWrapper) {
+                            wrapper = (ModelWrapper<?>) subChildObj;
+                            // wrapper.reload();
+                            // FIXME: using reload here breaks a lot of stuff,
+                            // why?
+                        }
+                    }
+                    Integer subChildId = subChild.getId();
+                    if (!searchedObjectIds.contains(subChildId)) {
+                        toRemove.add(subChild);
+                    } else {
+                        // subChild.rebuild();
+                        if (wrapper != null) {
+                            alreadyHasListener.add(wrapper);
+                        }
+                    }
+                }
+                for (AbstractAdapterBase subChild : toRemove)
                     child.removeChild(subChild);
             }
             // add searched objects is not yet there
-            for (final ModelWrapper<?> wrapper : searchedObjects) {
-                if (!alreadyHasListener.contains(wrapper)) {
-                    wrapper.addWrapperListener(new WrapperListenerAdapter() {
-                        @Override
-                        public void deleted(WrapperEvent event) {
-                            searchedObjects.remove(wrapper);
-                            performExpand();
-                        }
-                    });
+            for (final Object o : searchedObjects) {
+                if (o instanceof ModelWrapper) {
+                    ModelWrapper<?> w = (ModelWrapper<?>) o;
+                    if (!alreadyHasListener.contains(w)) {
+                        w.addWrapperListener(new WrapperListenerAdapter() {
+                            @Override
+                            public void deleted(WrapperEvent event) {
+                                searchedObjects.remove(o);
+                                performExpand();
+                            }
+                        });
+                    }
                 }
-                addNode(wrapper);
+                addNode(o);
             }
 
             if (!keepDirectLeafChild) {
                 // remove sub children without any children
-                List<AdapterBase> children = new ArrayList<AdapterBase>(
-                    getChildren());
-                for (AdapterBase child : children) {
+                List<AbstractAdapterBase> children =
+                    new ArrayList<AbstractAdapterBase>(
+                        getChildren());
+                for (AbstractAdapterBase child : children) {
                     if (!(child instanceof DispatchAdapter)
                         && child.getChildren().size() == 0) {
                         removeChild(child);
@@ -104,7 +128,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         }
     }
 
-    protected abstract void addNode(ModelWrapper<?> wrapper);
+    protected abstract void addNode(Object obj);
 
     @Override
     protected void executeDoubleClick() {
@@ -112,14 +136,9 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -128,7 +147,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -142,24 +161,28 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         return null;
     }
 
-    public void addSearchObject(ModelWrapper<?> searchedObject) {
+    public void addSearchObject(Object searchedObject, Integer id) {
         searchedObjects.add(searchedObject);
+        searchedObjectIds.add(id);
     }
 
-    protected abstract boolean isParentTo(ModelWrapper<?> parent,
-        ModelWrapper<?> child);
+    protected abstract boolean isParentTo(Object parent, Object child);
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     public void clear() {
         searchedObjects.clear();
+        searchedObjectIds.clear();
         removeAll();
+        performExpand();
     }
 
-    public void removeObjects(List<? extends ModelWrapper<?>> children) {
-        searchedObjects.removeAll(children);
+    public void removeObject(Object child, Integer childId) {
+        searchedObjects.remove(child);
+        searchedObjectIds.remove(childId);
     }
 }

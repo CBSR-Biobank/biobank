@@ -1,21 +1,25 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -25,8 +29,10 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
 
@@ -36,6 +42,24 @@ public class DispatchAdapter extends AdapterBase {
 
     private DispatchWrapper getDispatchWrapper() {
         return (DispatchWrapper) getModelObject();
+    }
+
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchDeletePermission(getModelObject().getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new DispatchUpdatePermission(getModelObject().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Permission Error",
+                "Unable to retrieve user permissions");
+        }
     }
 
     @Override
@@ -75,20 +99,8 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.DispatchAdapter_dispatch_label);
-    }
-
-    @Override
-    public boolean isDeletable() {
-        if (SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().getCurrentWorkingCenter() != null)
-            return SessionManager.getUser().getCurrentWorkingCenter()
-                .equals(getDispatchWrapper().getSenderCenter())
-                && getDispatchWrapper().canDelete(SessionManager.getUser())
-                && getDispatchWrapper().isInCreationState();
-        else
-            return false;
     }
 
     @Override
@@ -100,8 +112,20 @@ public class DispatchAdapter extends AdapterBase {
             if (isDeletable()) {
                 addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
             }
+            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+                && isEditable
+                && getDispatchWrapper().hasErrors()) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText(Messages.DispatchAdapter_close_label);
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doClose();
+                    }
+                });
+            }
             if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && getDispatchWrapper().canUpdate(SessionManager.getUser())
+                && isEditable
                 && getDispatchWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText(Messages.DispatchAdapter_move_creation_label);
@@ -147,13 +171,42 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
+    public void runDelete() throws Exception {
+        DispatchDeleteAction delete =
+            new DispatchDeleteAction(getDispatchWrapper().getWrappedObject());
+        SessionManager.getAppService().doAction(delete);
+    }
+
+    @Override
     protected String getConfirmDeleteMessage() {
         return Messages.DispatchAdapter_delete_confirm_msg;
     }
 
     public void doReceive() {
         setDispatchAsReceived();
-        openViewForm();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                openViewForm();
+            }
+        });
+
+    }
+
+    public void doSend() {
+        setDispatchAsSent();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                openViewForm();
+            }
+        });
+
+    }
+
+    private void setDispatchAsSent() {
+        getDispatchWrapper().setState(DispatchState.IN_TRANSIT);
+        persistDispatch();
     }
 
     public void doReceiveAndProcess() {
@@ -180,37 +233,35 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     private void setDispatchAsReceived() {
-        try {
-            // to be sure has last database data.
-            getDispatchWrapper().reload();
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
-        }
         getDispatchWrapper().getShipmentInfo().setReceivedAt(new Date());
         getDispatchWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
-    private void setDispatchAsCreation() {
-        getDispatchWrapper().setState(DispatchState.CREATION);
-        getDispatchWrapper().getShipmentInfo().setPackedAt(null);
-        persistDispatch();
+    private void persistDispatch() {
+        DispatchChangeStateAction action =
+            new DispatchChangeStateAction(getDispatchWrapper().getId(),
+                getDispatchWrapper().getDispatchState(),
+                DispatchSaveAction.prepareShipInfo(getDispatchWrapper()
+                    .getShipmentInfo()));
+        try {
+            SessionManager.getAppService().doAction(action);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Unable to save changes", e);
+        }
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                SpecimenTransitView.reloadCurrent();
+            }
+        });
+
     }
 
-    private void persistDispatch() {
-        try {
-            getDispatchWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BgcPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BgcPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BgcPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_save_error_title,
-                ex);
-        }
-        SpecimenTransitView.getCurrent().reload();
+    private void setDispatchAsCreation() {
+        getDispatchWrapper().setState(DispatchState.CREATION);
+        getDispatchWrapper().setShipmentInfo(null);
+        persistDispatch();
     }
 
     @Override
@@ -219,19 +270,14 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -248,4 +294,12 @@ public class DispatchAdapter extends AdapterBase {
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof DispatchAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
+
 }

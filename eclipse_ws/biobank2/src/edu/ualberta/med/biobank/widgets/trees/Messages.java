@@ -3,7 +3,8 @@ package edu.ualberta.med.biobank.widgets.trees;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "edu.ualberta.med.biobank.widgets.trees.messages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME =
+        "edu.ualberta.med.biobank.widgets.trees.messages"; //$NON-NLS-1$
     public static String DispatchSpecimensTreeTable_edit_label;
     public static String DispatchSpecimensTreeTable_comment_label;
     public static String DispatchSpecimensTreeTable_inventoryid_label;
@@ -26,6 +27,7 @@ public class Messages extends NLS {
     public static String RequestSpecimensTreeTable_save_error_title;
     public static String RequestSpecimensTreeTable_state_label;
     public static String RequestSpecimensTreeTable_type_label;
+    public static String DispatchSpecimensTreeTable_delete_label;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

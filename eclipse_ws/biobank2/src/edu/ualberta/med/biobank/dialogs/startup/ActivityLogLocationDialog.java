@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs.startup;
 import java.io.File;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -35,17 +36,17 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.ActivityLogLocationDialog_title;
+        return "Activity Logs Location";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.ActivityLogLocationDialog_description;
+        return "Do you wish to save activity logs to files?";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.ActivityLogLocationDialog_title;
+        return "Activity Logs Location";
     }
 
     @Override
@@ -59,8 +60,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         activityLogDirBtn = new Button(contents, SWT.CHECK);
-        activityLogDirBtn
-            .setText(Messages.ActivityLogLocationDialog_button_save_label);
+        activityLogDirBtn.setText(
+            "Save activity logs to files");
         activityLogDirBtn.setSelection(true);
         activityLogDirBtn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -72,12 +73,13 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
             }
         });
         createFileLocationSelector(contents,
-            Messages.ActivityLogLocationDialog_folder_selection_label);
+            "Folder");
     }
 
     private void createFileLocationSelector(final Composite parent,
         String labelText) {
-        final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
+        final Composite fileSelectionComposite =
+            new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
         fileSelectionComposite.setLayout(layout);
         fileSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -85,8 +87,8 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobankDir = System.getProperty("user.home") //$NON-NLS-1$
-            + System.getProperty("file.separator") + "biobank"; //$NON-NLS-1$ //$NON-NLS-2$
+        final String biobankDir = System.getProperty("user.home") 
+            + System.getProperty("file.separator") + "biobank";  
         activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
             | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
@@ -95,13 +97,13 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
         browseBtn = new Button(fileSelectionComposite, SWT.BUTTON1);
         browseBtn
-            .setText(Messages.ActivityLogLocationDialog_browse_button_label);
+            .setText("  Browse...  ");
         browseBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
                     .getShell(), SWT.SAVE);
-                fd.setText(Messages.ActivityLogLocationDialog_directory_select_label);
+                fd.setText("Select Directory");
                 fd.setFilterPath(biobankDir);
                 String selected = fd.open();
                 if (selected != null) {
@@ -109,7 +111,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
                     File f = new File(selected);
                     f.canWrite();
                 } else {
-                    activityLogDirText.setText(""); //$NON-NLS-1$
+                    activityLogDirText.setText(""); 
                 }
             }
         });
@@ -117,41 +119,29 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     @Override
     protected void okPressed() {
+        IPreferenceStore pstore =
+            BiobankPlugin.getDefault().getPreferenceStore();
 
         String activityLogDir = activityLogDirText.getText();
 
         if (activityLogDirBtn.getSelection()) {
-
             File activityLogDirFile = new File(activityLogDir);
 
             if (!FilePromptUtil.isWritableDir(activityLogDirFile)) {
                 return;
             }
 
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-                    activityLogDir.toString());
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(
-                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-                    true);
+            pstore.setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+                activityLogDir.toString());
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
             super.okPressed();
 
         } else { /* don't save to a log file */
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); //$NON-NLS-1$
-            BiobankPlugin
-                .getDefault()
-                .getPreferenceStore()
-                .setValue(
-                    PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-                    false);
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); 
+            pstore.setValue(
+                PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, false);
             super.okPressed();
         }
 
@@ -159,7 +149,7 @@ public class ActivityLogLocationDialog extends BgcBaseDialog {
 
     private Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(labelText + ": "); //$NON-NLS-1$
+        label.setText(labelText + ": "); 
         label.setLayoutData(new GridData(GridData.END, GridData.CENTER, false,
             false));
         return label;

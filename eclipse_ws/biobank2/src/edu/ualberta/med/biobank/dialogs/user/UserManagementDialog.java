@@ -7,36 +7,35 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogWithPages;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.User;
 
 public class UserManagementDialog extends BgcDialogWithPages {
+    private final ManagerContext context;
 
-    private List<User> currentAllUsersList;
-    private List<Group> currentAllGroupsList;
-
-    public UserManagementDialog(Shell parentShell) {
+    public UserManagementDialog(Shell parentShell, ManagerContext context) {
         super(parentShell);
+
+        this.context = context;
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.UserManagementDialog_description;
+        return "Select the security information to display";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.UserManagementDialog_title;
+        return "User/Group Management";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.UserManagementDialog_title;
+        return "User/Group Management";
     }
 
     @Override
@@ -48,23 +47,29 @@ public class UserManagementDialog extends BgcDialogWithPages {
     @Override
     protected List<BgcDialogPage> createPages() {
         List<BgcDialogPage> nodes = new ArrayList<BgcDialogPage>();
-        nodes.add(new UsersPage(this) {
+        nodes.add(new UsersPage(this, context) {
             @Override
             protected List<User> getCurrentAllUsersList() {
-                return getUsers();
+                return context.getUsers();
             }
 
-            @Override
-            protected List<Group> getGroups() {
-                return UserManagementDialog.this.getGroups();
-            }
         });
-        nodes.add(new GroupsPage(this) {
+        nodes.add(new GroupsPage(this, context) {
             @Override
             protected List<Group> getCurrentAllGroupsList() {
-                return getGroups();
+                return context.getGroups();
             }
         });
+
+        if (context.isRoleManager()) {
+            nodes.add(new RolesPage(this) {
+                @Override
+                protected List<Role> getCurrentAllRolesList() {
+                    return context.getRoles();
+                }
+            });
+        }
+
         return nodes;
     }
 
@@ -72,30 +77,4 @@ public class UserManagementDialog extends BgcDialogWithPages {
     protected BgcDialogPage getDefaultSelection() {
         return getPages().get(0);
     }
-
-    protected List<User> getUsers() {
-        if (currentAllUsersList == null) {
-            try {
-                currentAllUsersList = SessionManager.getAppService()
-                    .getSecurityUsers(SessionManager.getUser());
-            } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError(
-                    Messages.UserManagementDialog_users_load_error_title, e);
-            }
-        }
-        return currentAllUsersList;
-    }
-
-    protected List<Group> getGroups() {
-        if (currentAllGroupsList == null)
-            try {
-                currentAllGroupsList = SessionManager.getAppService()
-                    .getSecurityGroups(SessionManager.getUser(), true);
-            } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError(
-                    Messages.UserManagementDialog_groups_load_error_title, e);
-            }
-        return currentAllGroupsList;
-    }
-
 }

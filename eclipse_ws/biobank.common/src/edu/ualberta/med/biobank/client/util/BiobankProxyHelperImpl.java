@@ -8,6 +8,7 @@ import gov.nih.nci.system.client.proxy.ProxyHelperImpl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -17,32 +18,57 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Transient;
+
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.DetachedCriteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 
 public class BiobankProxyHelperImpl extends ProxyHelperImpl {
-    private static Logger log = Logger.getLogger(ProxyHelperImpl.class
-        .getName());
+    private static Logger log = LoggerFactory
+        .getLogger(BiobankProxyHelperImpl.class
+            .getName());
 
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {
         if (obj instanceof AbstractBiobankListProxy) {
             return convertListProxyToProxy(as,
                 (AbstractBiobankListProxy<?>) obj);
-        }
-        if (obj instanceof NotAProxy) {
+        } else if (obj instanceof NotAProxy) {
+            return obj;
+        } else if (obj instanceof BigDecimal) {
             return obj;
         }
+
         return super.convertToProxy(as, obj);
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    protected Object convertCollectionToProxy(ApplicationService as,
+        Collection collection) {
+        if (null == collection) return null;
+        Collection<Object> modifiedCollection;
+        if (collection instanceof List)
+            modifiedCollection = new ArrayList<Object>();
+        else if (collection instanceof Set)
+            modifiedCollection = new HashSet<Object>();
+        else
+            throw new RuntimeException("Unable to convert collection to proxy");
+        for (Object obj : collection)
+            modifiedCollection.add(convertToProxy(as, obj));
+        return modifiedCollection;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Object convertToObject(Object proxyObject) throws Throwable {
         if (proxyObject instanceof NotAProxy) {
+            return proxyObject;
+        } else if (proxyObject instanceof BigDecimal) {
             return proxyObject;
         }
 
@@ -57,13 +83,12 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                 unwrapedProxyObjects.add(unwrapedProxyObject);
             }
             return unwrapedProxyObjects;
-        } else {
-            Object unwrapedProxyObject = convertToObject(map, proxyObject);
-            return unwrapedProxyObject;
         }
+        Object unwrapedProxyObject = convertToObject(map, proxyObject);
+        return unwrapedProxyObject;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     private Object convertToObject(Map<Object, Object> map, Object proxyObject)
         throws Exception {
         if (isPrimitiveObject(proxyObject) || proxyObject instanceof Class
@@ -79,8 +104,9 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         map.put(plainObject, plainObject);
         Method[] methods = plainObject.getClass().getMethods();
         for (Method method : methods) {
-            if (method.getName().startsWith("get") //$NON-NLS-1$
-                && method.getParameterTypes().length == 0) {
+            if (method.getName().startsWith("get")
+                && method.getParameterTypes().length == 0
+                && !method.isAnnotationPresent(Transient.class)) {
                 Object childObject = method.invoke(plainObject);
                 if (!(childObject == null || isPrimitiveObject(childObject) || childObject instanceof Class)
                     && Hibernate.isInitialized(childObject)) {
@@ -95,32 +121,35 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                                 String cglibClassName = objectProxy
                                     .getListChunk().get(0).getClass().getName();
                                 int startindex = cglibClassName
-                                    .indexOf("$$EnhancerByCGLIB"); //$NON-NLS-1$
+                                    .indexOf("$$EnhancerByCGLIB");
                                 associationName = cglibClassName.substring(0,
                                     startindex);
                             }
                             String className = objectProxy.getTargetClassName();
                             throw new Exception(
-                                "update or delete elements for the association " //$NON-NLS-1$
+                                "update or delete elements for the association "
                                     + associationName
-                                    + " is not allowed.association " //$NON-NLS-1$
+                                    + " is not allowed.association "
                                     + associationName
-                                    + " for Class " //$NON-NLS-1$
+                                    + " for Class "
                                     + className
-                                    + " is not fully initialized. Total size of assocation in database " //$NON-NLS-1$
-                                    + associationSize + " retrieved size is " //$NON-NLS-1$
-                                    + objectProxy.getListChunk().size() + "."); //$NON-NLS-1$
+                                    + " is not fully initialized. Total size of assocation in database "
+                                    + associationSize + " retrieved size is "
+                                    + objectProxy.getListChunk().size() + ".");
                         }
                     }
-                    log.debug("invoking " + method.getName() + " on class " //$NON-NLS-1$ //$NON-NLS-2$
-                        + plainObject.getClass());
-                    String setterMethodName = "set" //$NON-NLS-1$
+                    log.debug("invoking {} on class {}", method.getName(),
+                        plainObject.getClass());
+                    String setterMethodName = "set"
                         + method.getName().substring(3);
                     if (childObject instanceof List
                         && !(childObject instanceof Set)) {
-                        Object plainObjectCollection = convertProxyToObject(childObject);
-                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
-                        Collection<Object> tempObjects = new ArrayList<Object>();
+                        Object plainObjectCollection =
+                            convertProxyToObject(childObject);
+                        Collection<Object> objects =
+                            (Collection<Object>) plainObjectCollection;
+                        Collection<Object> tempObjects =
+                            new ArrayList<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
                             tempObjects.add(child);
@@ -130,8 +159,10 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                             new Class[] { method.getReturnType() });
                         setterMethod.invoke(plainObject, tempObjects);
                     } else if (childObject instanceof Collection) {
-                        Object plainObjectCollection = convertProxyToObject(childObject);
-                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
+                        Object plainObjectCollection =
+                            convertProxyToObject(childObject);
+                        Collection<Object> objects =
+                            (Collection<Object>) plainObjectCollection;
                         Collection<Object> tempObjects = new HashSet<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
@@ -165,8 +196,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             || obj instanceof Byte || obj instanceof Short
             || obj instanceof String || obj instanceof Date) {
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     private Object convertProxyToObject(Object obj) {
@@ -230,8 +261,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             if (obj instanceof AbstractBiobankListProxy)
                 ((AbstractBiobankListProxy<?>) obj).setAppService(as);
 
-            if (!field.getType().getName()
-                .equalsIgnoreCase("java.util.Collection")) { //$NON-NLS-1$
+            if (!Collection.class.isAssignableFrom(field.getType())) {
                 Collection<?> results = (Collection<?>) obj;
                 if (results.size() == 1)
                     value = results.iterator().next();
@@ -247,7 +277,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
             Class<?>[] params = new Class[] { field.getType() };
             Method setter = getMethod(bean,
                 "set" + method.getName().substring(3), params); //$NON-NLS-1$
-            if (setter != null && params != null && params.length == 1)
+            if (setter != null && params.length == 1)
                 setter.invoke(bean, new Object[] { value });
 
             return value;

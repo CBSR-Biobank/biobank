@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -22,7 +21,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     private List<E> currentTodayElements;
 
     public AbstractTodayNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractTodayNode_today, true, false);
+        super(parent, id, Messages.AbstractTodayNode_today, true);
     }
 
     @Override
@@ -36,13 +35,8 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     }
 
     @Override
-    protected Collection<E> getWrapperChildren() throws Exception {
+    protected List<E> getWrapperChildren() throws Exception {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
     }
 
     @Override
@@ -51,7 +45,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
@@ -71,13 +65,15 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
             currentTodayElements = getTodayElements();
 
             // remove elements that are not in today list
-            for (AdapterBase child : getChildren()) {
-                ModelWrapper<?> childWrapper = child.getModelObject();
+            for (AbstractAdapterBase child : getChildren()) {
+                ModelWrapper<?> childWrapper = ((AdapterBase) child)
+                    .getModelObject();
                 childWrapper.reload();
 
-                for (AdapterBase grandchild : child.getChildren()) {
-                    ModelWrapper<?> grandchildWrapper = grandchild
-                        .getModelObject();
+                for (AbstractAdapterBase grandchild : child.getChildren()) {
+                    ModelWrapper<?> grandchildWrapper =
+                        ((AdapterBase) grandchild)
+                            .getModelObject();
                     grandchildWrapper.reload();
                     if (!currentTodayElements.contains(grandchildWrapper)
                         || !isParentTo(childWrapper, grandchildWrapper)) {
@@ -94,7 +90,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
             }
 
             // remove sub children without any children
-            for (AdapterBase child : getChildren()) {
+            for (AbstractAdapterBase child : getChildren()) {
                 if (child.getChildren().isEmpty()) {
                     removeChild(child);
                 }
@@ -114,11 +110,17 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     protected abstract void addChild(E child);
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return searchChildren(searchedClass, objectId);
     }
 
     public List<E> getCurrentTodayElements() {
         return currentTodayElements;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 }

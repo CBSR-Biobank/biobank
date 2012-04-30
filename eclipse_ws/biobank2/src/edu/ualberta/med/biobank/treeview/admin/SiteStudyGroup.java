@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -16,16 +16,9 @@ public class SiteStudyGroup extends AbstractStudyGroup {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteAdapter site = getParentFromClass(SiteAdapter.class);
         return ((SiteWrapper) site.getModelObject()).getStudyCollection();
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        SiteAdapter site = getParentFromClass(SiteAdapter.class);
-        return ((SiteWrapper) site.getModelObject()).getStudyCollection()
-            .size();
     }
 }

@@ -75,8 +75,9 @@ public class ProtectionElementPrivilegeContext implements Comparable,
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ProtectionElementPrivilegeContext) {
-            ProtectionElementPrivilegeContext other = (ProtectionElementPrivilegeContext) obj;
-            if (null == other || null == this) {
+            ProtectionElementPrivilegeContext other =
+                (ProtectionElementPrivilegeContext) obj;
+            if (null == this) {
                 return false;
             }
             if (null == other.getProtectionElement()
@@ -88,9 +89,8 @@ public class ProtectionElementPrivilegeContext implements Comparable,
                 .getProtectionElementName()
                 .equals(other.getProtectionElement().getProtectionElementName())) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         }
         return false;
     }
@@ -98,7 +98,8 @@ public class ProtectionElementPrivilegeContext implements Comparable,
     @Override
     public int compareTo(Object object) {
         if (object instanceof ProtectionElementPrivilegeContext) {
-            ProtectionElementPrivilegeContext a = (ProtectionElementPrivilegeContext) object;
+            ProtectionElementPrivilegeContext a =
+                (ProtectionElementPrivilegeContext) object;
             return this
                 .getProtectionElement()
                 .getProtectionElementName()

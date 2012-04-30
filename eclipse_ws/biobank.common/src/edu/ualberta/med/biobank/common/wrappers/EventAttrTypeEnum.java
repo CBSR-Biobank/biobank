@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 public enum EventAttrTypeEnum {
-    SELECT_SINGLE("select_single"), SELECT_MULTIPLE("select_multiple"), NUMBER(
-        "number"), DATE_TIME("date_time"), TEXT("text");
+    SELECT_SINGLE("select_single"), //$NON-NLS-1$
+    SELECT_MULTIPLE("select_multiple"), //$NON-NLS-1$
+    NUMBER("number"), //$NON-NLS-1$
+    DATE_TIME("date_time"), //$NON-NLS-1$
+    TEXT("text"); //$NON-NLS-1$
 
     private String name;
 
@@ -19,7 +22,7 @@ public enum EventAttrTypeEnum {
     }
 
     public boolean isSelectType() {
-        return name.startsWith("select_");
+        return name.startsWith("select_"); //$NON-NLS-1$
     }
 
     public static EventAttrTypeEnum getEventAttrType(String name) {

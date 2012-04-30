@@ -51,10 +51,17 @@ import edu.ualberta.med.biobank.gui.common.widgets.nebula.IControlPainter;
  * oval).</li>
  * </ul>
  */
+@SuppressWarnings("unused")
 public abstract class VControl {
 
     public enum Type {
-        Button, Custom, Label, Native, Panel, Text, Spacer
+        Button,
+        Custom,
+        Label,
+        Native,
+        Panel,
+        Text,
+        Spacer
     }
 
     /**
@@ -142,7 +149,8 @@ public abstract class VControl {
 
     IControlPainter painter;
     Map<String, Object> dataMap;
-    Map<Integer, List<Listener>> listeners = new HashMap<Integer, List<Listener>>();
+    Map<Integer, List<Listener>> listeners =
+        new HashMap<Integer, List<Listener>>();
     private Set<Integer> eventTypes = new HashSet<Integer>();
 
     private Listener listener = new Listener() {

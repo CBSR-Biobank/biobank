@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="db" basedir=".">
+  <property file="build.properties" />
+
+  <path id="schemaupdate.classpath">
+      <pathelement location="${schema.dir}/log4j.properties" />
+      <pathelement location="${codegen.biobank.src}" />
+      <fileset dir="${req.jars.dir}" >
+        <include name="**/*.jar" />
+      </fileset>
+  </path>
+
+  <property name="model.classpath" value="${eclipse.proj.dir.common}/output" />
+
+  <path id="sql.classpath">
+    <fileset dir="${req.jars.dir}">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <path id="hibernatetool.lib">
+    <path location="${lib.dir}/c3p0-0.9.0.jar" />
+    <path location="${lib.dir}/commons-logging-1.1.1.jar" />
+    <path location="${lib.dir}/dom4j-1.6.1.jar" />
+    <path location="${lib.dir}/freemarker.jar" />
+    <path location="${lib.dir}/hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+    <path location="${lib.dir}/hibernate-tools.jar" />
+    <path location="${lib.dir}/hibernate-validator-4.2.0.Final.jar" />
+    <path location="${lib.dir}/hibernate3.jar" />
+    <path location="${lib.dir}/ognl-2.6.7.jar" />
+    <path location="${lib.dir}/slf4j-api-1.6.1.jar" />
+    <path location="${lib.dir}/slf4j-nop-1.6.4.jar" />
+    <path location="${lib.dir}/validation-api-1.0.0.GA.jar" />
+    <path location="${lib.dir}/${jdbc.driver.jar}" />
+  </path>
+
+  <!-- hibernatetool is much faster and more powerful than schemaexport and
+       works with jpa annotations -->
+  <taskdef name="hibernatetool"
+           classname="org.hibernate.tool.ant.HibernateToolTask"
+           classpathref="hibernatetool.lib" />
+
+<!-- was to generate java files from hbm.xml files
+  <target name="hbm2java">
+    <mkdir dir="gen" />
+    <hibernatetool destdir="gen" classpath="${model.classpath}">
+      <configuration configurationfile="${eclipse.proj.dir.common}/src/hibernate.cfg.xml"/>
+      <hbm2java jdk5="true" ejb3="true" />
+    </hibernatetool>
+  </target>
+-->
+
+  <target name="schemaupdate"
+          depends="build-common-project">
+    <echo message="classpath:${model.classpath}" />
+    <hibernatetool destdir="." classpath="${model.classpath}">
+      <annotationconfiguration configurationfile="${eclipse.proj.dir.common}/output/hibernate.cfg.xml"/>
+      <hbm2ddl export="true"
+               drop="true"
+               create="true" />
+    </hibernatetool>
+  </target>
+
+  <target name="dbcreate-add-tables">
+    <sql driver="${database.driver}"
+         url="${database.url}"
+         userid="${database.username}"
+         password="${database.password}"
+         classpathref="sql.classpath">
+      DROP DATABASE IF EXISTS ${database.name};
+      CREATE DATABASE ${database.name};
+      ALTER DATABASE `${database.name}` DEFAULT CHARACTER SET latin1 COLLATE latin1_general_cs;
+    </sql>
+    <antcall target="schemaupdate" />
+    <sql driver="${database.driver}"
+         url="${database.url}"
+         userid="${database.username}"
+         password="${database.password}"
+         classpathref="sql.classpath">
+      <path>
+        <fileset dir="${db.import.dir}">
+          <include name="**/*.sql"/>
+        </fileset>
+      </path>
+      <transaction>commit;</transaction>
+    </sql>
+  </target>
+
+  <target name="dbcreate-add-testuser" if="debug">
+    <sql driver="${database.driver}"
+         url="${database.url}"
+         userid="${database.username}"
+         password="${database.password}"
+         classpathref="sql.classpath">
+      <transaction src="${secu-log.dir}/addTestUser.sql" />
+    </sql>
+  </target>
+
+  <target name="dbcreate"
+          depends="dbcreate-add-tables,dbcreate-add-testuser"
+          description="creates the default tables">
+  </target>
+
+  <target name="dbbackup"
+          description="exports the current database to a file">
+    <echo message="running scripts/dbbackup..." />
+    <exec executable="scripts/dbbackup"
+          failonerror="true">
+      <arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
+    </exec>
+  </target>
+</project>

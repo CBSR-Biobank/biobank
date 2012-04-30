@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<bean id="biobankServiceInfo" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="APPLICATION_SERVICE_BEAN" value-ref="biobankApplicationService"/>
+				<entry key="AUTHENTICATION_SERVICE_BEAN" value-ref="biobankAuthenticationManager"/>
+				<entry key="APPLICATION_SERVICE_CONFIG"  value-ref="biobankApplicationServiceConfig"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="biobankInterceptor" class="gov.nih.nci.system.client.proxy.ApplicationServiceProxy" singleton="true">
+		<property name="proxyFactory">
+			<bean class="edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl"/>
+		</property>
+	</bean>
+	
+	<bean id="biobankApplicationService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+				<property name="serviceUrl" value="http://localhost:8080/biobank/http/applicationService"/>
+				<property name="serviceInterface" value="edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService"/>
+				<property name="httpInvokerRequestExecutor">
+				<bean class="gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor"/>
+				</property>
+			</bean>
+		</property>
+		<property name="interceptorNames" value="biobankInterceptor"/>
+		<property name="interfaces" value="edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService"/>
+	</bean>	
+	
+	<bean id="biobankAuthenticationManager" class="org.acegisecurity.providers.ProviderManager">
+		<property name="providers">
+			<list>
+				<bean class="org.acegisecurity.providers.rcp.RemoteAuthenticationProvider">
+					<property name="remoteAuthenticationManager">
+						<bean class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean">
+						    <property name="serviceUrl" value="http://localhost:8080/biobank/http/remoteAuthenticationManager"/>
+						    <property name="serviceInterface" value="org.acegisecurity.providers.rcp.RemoteAuthenticationManager"/>
+						</bean>
+					</property>
+				</bean>
+				<bean class="gov.nih.nci.system.security.acegi.authentication.NullGroupNameAuthenticationProvider"/>
+				<bean class="gov.nih.nci.system.security.acegi.authentication.NullX509AuthenticationProvider"/>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- Dont touch this unless you know what you are doing -->
+	<bean id="biobankApplicationServiceConfig" class="java.lang.String">
+		<constructor-arg>
+			<value>
+				&lt;bean id=&quot;biobankServiceInfo&quot; class=&quot;java.util.HashMap&quot;&gt;
+					&lt;constructor-arg&gt;
+						&lt;map&gt;
+							&lt;entry key=&quot;APPLICATION_SERVICE_BEAN&quot; value-ref=&quot;biobankApplicationService&quot;/&gt;
+							&lt;entry key=&quot;AUTHENTICATION_SERVICE_BEAN&quot; value-ref=&quot;biobankAuthenticationManager&quot;/&gt;
+						&lt;/map&gt;
+					&lt;/constructor-arg&gt;
+				&lt;/bean&gt;
+			
+				&lt;bean id=&quot;biobankInterceptor&quot; class=&quot;gov.nih.nci.system.client.proxy.ApplicationServiceProxy&quot; singleton=&quot;true&quot;&gt;
+					&lt;property name=&quot;proxyFactory&quot;&gt;
+						&lt;bean class=&quot;edu.ualberta.med.biobank.client.util.BiobankProxyHelperImpl&quot;/&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+				
+				&lt;bean id=&quot;biobankApplicationService&quot; class=&quot;org.springframework.aop.framework.ProxyFactoryBean&quot;&gt;
+					&lt;property name=&quot;target&quot;&gt;
+						&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+							&lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/applicationService&quot;/&gt;
+							&lt;property name=&quot;serviceInterface&quot; value=&quot;edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService&quot;/&gt;
+							&lt;property name=&quot;httpInvokerRequestExecutor&quot;&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.springframework.remoting.httpinvoker.GSIHttpInvokerRequestExecutor&quot;/&gt;
+							&lt;/property&gt;
+						&lt;/bean&gt;
+					&lt;/property&gt;
+					&lt;property name=&quot;interceptorNames&quot; value=&quot;biobankInterceptor&quot;/&gt;
+					&lt;property name=&quot;interfaces&quot; value=&quot;edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService&quot;/&gt;
+				&lt;/bean&gt;	
+				
+				&lt;bean id=&quot;biobankAuthenticationManager&quot; class=&quot;org.acegisecurity.providers.ProviderManager&quot;&gt;
+					&lt;property name=&quot;providers&quot;&gt;
+						&lt;list&gt;
+							&lt;bean class=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationProvider&quot;&gt;
+								&lt;property name=&quot;remoteAuthenticationManager&quot;&gt;
+									&lt;bean class=&quot;org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean&quot;&gt;
+									    &lt;property name=&quot;serviceUrl&quot; value=&quot;URL_KEY/http/remoteAuthenticationManager&quot;/&gt;
+									    &lt;property name=&quot;serviceInterface&quot; value=&quot;org.acegisecurity.providers.rcp.RemoteAuthenticationManager&quot;/&gt;
+									&lt;/bean&gt;
+								&lt;/property&gt;
+							&lt;/bean&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.security.acegi.authentication.NullGroupNameAuthenticationProvider&quot;/&gt;
+							&lt;bean class=&quot;gov.nih.nci.system.security.acegi.authentication.NullX509AuthenticationProvider&quot;/&gt;
+						&lt;/list&gt;
+					&lt;/property&gt;
+				&lt;/bean&gt;
+				
+				&lt;alias alias="ServiceInfo" name="biobankServiceInfo"/&gt;
+			</value>
+		</constructor-arg>
+	</bean>
+
+</beans>

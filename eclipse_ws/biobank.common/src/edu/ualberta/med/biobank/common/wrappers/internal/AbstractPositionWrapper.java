@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.wrappers.base.AbstractPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractPositionWrapper<E extends AbstractPosition>
-    extends ModelWrapper<E> {
-
+    extends AbstractPositionBaseWrapper<E> {
     public AbstractPositionWrapper(WritableApplicationService appService,
         E wrappedObject) {
         super(appService, wrappedObject);
@@ -25,25 +24,53 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         super(appService);
     }
 
-    public Integer getRow() {
-        return getProperty(AbstractPositionPeer.ROW);
-    }
+    private RowColPos position = null;
 
+    @Override
+    @Deprecated
     public void setRow(Integer row) {
-        setProperty(AbstractPositionPeer.ROW, row);
+        throw new UnsupportedOperationException(
+            "Use setPosition() instead of setRow()."); //$NON-NLS-1$
     }
 
-    public Integer getCol() {
-        return getProperty(AbstractPositionPeer.COL);
-    }
-
+    @Override
+    @Deprecated
     public void setCol(Integer col) {
-        setProperty(AbstractPositionPeer.COL, col);
+        throw new UnsupportedOperationException(
+            "Use setPosition() instead of setCol()."); //$NON-NLS-1$
+    }
+
+    public RowColPos getPosition() {
+        if (position == null && getRow() != null && getCol() != null) {
+            position = new RowColPos(getRow(), getCol());
+        }
+        return position;
+    }
+
+    protected void setPosition(RowColPos newPosition) {
+        if (newPosition == null) {
+            throw new IllegalArgumentException(
+                "Position cannot be set to null."); //$NON-NLS-1$
+        }
+
+        super.setRow(newPosition.getRow());
+        super.setCol(newPosition.getCol());
+
+        position = newPosition;
     }
 
     public abstract ContainerWrapper getParent();
 
-    public abstract void setParent(ContainerWrapper parent);
+    public void setParent(ContainerWrapper parent, RowColPos position) {
+        if (parent == null) {
+            throw new IllegalArgumentException(
+                "Parent container cannot be set null."); //$NON-NLS-1$
+        }
+        setParent(parent);
+        setPosition(position);
+    }
+
+    protected abstract void setParent(ContainerWrapper parent);
 
     @Override
     protected List<Property<?, ? super E>> getProperties() {
@@ -52,31 +79,12 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
                 AbstractPositionPeer.PROPERTIES));
     }
 
+    @Deprecated
     @Override
-    public void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        ContainerWrapper parent = getParent();
-        if (parent != null) {
-            checkPositionValid(parent);
-            checkObjectAtPosition();
-        } else if (getRow() != null || getCol() != null) {
-            throw new BiobankCheckException(
-                "Position should not be set when no parent set");
-        }
-    }
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(AbstractPositionPeer.ROW));
+        tasks.add(check().notNull(AbstractPositionPeer.COL));
 
-    public void checkPositionValid(ContainerWrapper parent)
-        throws BiobankCheckException {
-        int rowCapacity = parent.getRowCapacity();
-        int colCapacity = parent.getColCapacity();
-        if (getRow() >= rowCapacity || getCol() >= colCapacity) {
-            throw new BiobankCheckException("Position " + getRow() + ":"
-                + getCol() + " is invalid. Row should be between 0 and "
-                + rowCapacity + " (excluded) and Col should be between 0 and "
-                + colCapacity + "(excluded)");
-        }
+        super.addPersistTasks(tasks);
     }
-
-    protected abstract void checkObjectAtPosition()
-        throws ApplicationException, BiobankCheckException;
 }

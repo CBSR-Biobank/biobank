@@ -6,9 +6,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -21,8 +21,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 
 /**
@@ -85,7 +86,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return specimen.getQuantity() == null ? "" : specimen //$NON-NLS-1$
                     .getQuantity().toString();
             case 6:
-                return specimen.getComment() == null ? "" : specimen.getComment(); //$NON-NLS-1$
+                return specimen.getCommentCollection(false) == null ? "" : CommentWrapper.commentListToString(specimen.getCommentCollection(false)); //$NON-NLS-1$
             }
         } else if (element instanceof SpecimenTypeWrapper) {
             final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
@@ -117,26 +118,27 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 0)
                 return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getSpecimen().getSpecimenType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getName();
             if (columnIndex == 2)
                 return dsa.getSpecimen().getCollectionEvent().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
                 return dsa.getSpecimen().getActivityStatus().toString();
             if (columnIndex == 4)
-                return dsa.getComment();
+                return CommentWrapper.commentListToString(dsa
+                    .getCommentCollection(false));
         } else if (element instanceof RequestSpecimenWrapper) {
             RequestSpecimenWrapper dsa = (RequestSpecimenWrapper) element;
             if (columnIndex == 0)
                 return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getSpecimen().getSpecimenType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getName();
             if (columnIndex == 2)
                 return dsa.getSpecimen().getPositionString(true, true);
             if (columnIndex == 3)
                 return dsa.getClaimedBy();
-        } else if (element instanceof AdapterBase)
-            return ((AdapterBase) element).getLabel();
+        } else if (element instanceof AbstractAdapterBase)
+            return ((AbstractAdapterBase) element).getLabel();
         else {
             Assert.isTrue(false, "invalid object type: " + element.getClass()); //$NON-NLS-1$
         }
@@ -167,16 +169,16 @@ public class BiobankLabelProvider extends LabelProvider implements
                 res.append(" - ").append(pevent.getWorksheet()); //$NON-NLS-1$
             return res.toString();
         } else if (element instanceof SpecimenTypeWrapper) {
-            return ((SpecimenTypeWrapper) element).getNameShort();
+            return ((SpecimenTypeWrapper) element).getName();
         } else if (element instanceof SourceSpecimenWrapper) {
             return ((SourceSpecimenWrapper) element).getSpecimenType()
                 .getNameShort();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
-        } else if (element instanceof ActivityStatusWrapper) {
-            return ((ActivityStatusWrapper) element).getName();
-        } else if (element instanceof AdapterBase) {
-            return ((AdapterBase) element).getLabel();
+        } else if (element instanceof ActivityStatus) {
+            return ((ActivityStatus) element).getName();
+        } else if (element instanceof AbstractAdapterBase) {
+            return ((AbstractAdapterBase) element).getLabel();
         }
         return element.toString();
     }

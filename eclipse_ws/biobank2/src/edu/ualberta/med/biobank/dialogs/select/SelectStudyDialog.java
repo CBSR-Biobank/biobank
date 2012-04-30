@@ -32,17 +32,17 @@ public class SelectStudyDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.SelectStudyDialog_dialog_title;
+        return "Associated Studies";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.SelectStudyDialog_main_message;
+        return "Select a study";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.SelectStudyDialog_main_title;
+        return "Add a study to this site";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class SelectStudyDialog extends BgcBaseDialog {
                         .setEnabled(true);
             }
         });
-        studyInfoTable.setCollection(studies);
+        studyInfoTable.setList(studies);
         studyInfoTable.setEnabled(true);
     }
 

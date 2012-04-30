@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
@@ -34,13 +35,15 @@ public class CachedReportDataSource implements ReportDataSource {
         this.appService = appService;
     }
 
+    @Override
     public List<SiteWrapper> getSites() throws Exception {
         if (sites == null) {
-            sites = SiteWrapper.getSites(appService);
+            sites = SiteQuery.getSites(appService);
         }
         return sites;
     }
 
+    @Override
     public List<SpecimenTypeWrapper> getSpecimenTypes()
         throws ApplicationException {
         if (sampleTypes == null) {
@@ -50,6 +53,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return sampleTypes;
     }
 
+    @Override
     public List<AliquotedSpecimenWrapper> getAliquotedSpecimens()
         throws ApplicationException {
         if (sampleStorages == null) {
@@ -67,6 +71,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return sampleStorages;
     }
 
+    @Override
     public List<SpecimenWrapper> getSpecimens() throws ApplicationException {
         if (aliquots == null) {
             HQLCriteria criteria = new HQLCriteria("from "
@@ -81,6 +86,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return aliquots;
     }
 
+    @Override
     public List<ContainerWrapper> getContainers() throws ApplicationException {
         if (containers == null) {
             HQLCriteria criteria = new HQLCriteria("from "
@@ -92,6 +98,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return containers;
     }
 
+    @Override
     public List<StudyWrapper> getStudies() throws ApplicationException {
         if (studies == null) {
             studies = StudyWrapper.getAllStudies(appService);
@@ -99,6 +106,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return studies;
     }
 
+    @Override
     public List<ProcessingEventWrapper> getPatientVisits()
         throws ApplicationException {
         return null;
@@ -116,6 +124,7 @@ public class CachedReportDataSource implements ReportDataSource {
         // return patientVisits;
     }
 
+    @Override
     public List<PatientWrapper> getPatients() throws ApplicationException {
         if (patients == null) {
             HQLCriteria criteria = new HQLCriteria("from "
@@ -130,6 +139,7 @@ public class CachedReportDataSource implements ReportDataSource {
         return patients;
     }
 
+    @Override
     public WritableApplicationService getAppService() {
         return appService;
     }

@@ -79,7 +79,6 @@ import org.eclipse.swt.widgets.Widget;
  * 
  */
 
-@SuppressWarnings("unused")
 public class TableCombo extends Composite {
     private Shell popup;
     private Button arrow;
@@ -610,14 +609,14 @@ public class TableCombo extends Composite {
         popup = new Shell(getShell(), SWT.NO_TRIM | SWT.ON_TOP);
 
         // set style
-        int style = getStyle();
-        int tableStyle = SWT.SINGLE | SWT.V_SCROLL;
-        if ((style & SWT.FLAT) != 0)
-            tableStyle |= SWT.FLAT;
-        if ((style & SWT.RIGHT_TO_LEFT) != 0)
-            tableStyle |= SWT.RIGHT_TO_LEFT;
-        if ((style & SWT.LEFT_TO_RIGHT) != 0)
-            tableStyle |= SWT.LEFT_TO_RIGHT;
+        // int style = getStyle();
+        // int tableStyle = SWT.SINGLE | SWT.V_SCROLL;
+        // if ((style & SWT.FLAT) != 0)
+        // tableStyle |= SWT.FLAT;
+        // if ((style & SWT.RIGHT_TO_LEFT) != 0)
+        // tableStyle |= SWT.RIGHT_TO_LEFT;
+        // if ((style & SWT.LEFT_TO_RIGHT) != 0)
+        // tableStyle |= SWT.LEFT_TO_RIGHT;
 
         // create table
         table = new Table(popup, SWT.SINGLE | SWT.FULL_SELECTION);
@@ -757,7 +756,8 @@ public class TableCombo extends Composite {
 
         // calculate the table width and table height.
         double pct = tableWidthPercentage / 100d;
-        int tableWidth = (int) (Math.max(tableComboSize.x - 2, tableSize.x) * pct);
+        int tableWidth =
+            (int) (Math.max(tableComboSize.x - 2, tableSize.x) * pct);
         int tableHeight = tableSize.y;
 
         // add the width of a horizontal scrollbar to the table height if we are
@@ -1267,7 +1267,8 @@ public class TableCombo extends Composite {
         arrow.getAccessible().addAccessibleListener(new AccessibleAdapter() {
             @Override
             public void getName(AccessibleEvent e) {
-                e.result = isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
+                e.result =
+                    isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             @Override
@@ -1349,7 +1350,8 @@ public class TableCombo extends Composite {
             new AccessibleControlAdapter() {
                 @Override
                 public void getDefaultAction(AccessibleControlEvent e) {
-                    e.result = isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
+                    e.result =
+                        isDropped() ? SWT.getMessage("SWT_Close") : SWT.getMessage("SWT_Open"); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             });
     }

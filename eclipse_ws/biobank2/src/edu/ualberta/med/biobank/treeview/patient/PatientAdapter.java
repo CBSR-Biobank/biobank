@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -13,54 +13,69 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
+import edu.ualberta.med.biobank.common.permission.patient.PatientDeletePermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
+import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientAdapter extends AdapterBase {
+public class PatientAdapter extends AbstractNewAdapterBase {
 
-    private static BgcLogger logger = BgcLogger.getLogger(PatientAdapter.class
-        .getName());
+    private Patient patient;
+    private Study study;
 
-    public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
-        super(parent, patientWrapper);
-        if (patientWrapper != null) {
-            boolean hasChildren = false;
-            try {
-                hasChildren = patientWrapper.getCollectionEventCount(true) > 0;
-            } catch (Exception e) {
-                logger.error("error counting events in patient", e); //$NON-NLS-1$
-            }
-            setHasChildren(hasChildren);
-        }
+    @SuppressWarnings("unused")
+    private Long ceventsCount;
+
+    public PatientAdapter(AbstractAdapterBase parent, SearchedPatientInfo pinfo) {
+        super(parent, pinfo == null ? null : pinfo.patient.getId(), null, null,
+            (pinfo == null || pinfo.ceventsCount == null) ? false
+                : pinfo.ceventsCount > 0);
+        setValue(pinfo);
+
     }
 
-    private PatientWrapper getPatientWrapper() {
-        return (PatientWrapper) getModelObject();
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientDeletePermission(patient.getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientReadPermission(patient.getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new PatientUpdatePermission(patient.getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(Messages.PatientAdapter_error,
+                Messages.PatientAdapter_message);
+        }
     }
 
     @Override
     protected String getLabelInternal() {
-        PatientWrapper patientWrapper = getPatientWrapper();
-        Assert.isNotNull(patientWrapper, "patient is null"); //$NON-NLS-1$
-        return patientWrapper.getPnumber();
+        if (patient == null)
+            return "no patient - should not see this"; //$NON-NLS-1$
+        return patient.getPnumber();
     }
 
     @Override
-    public String getTooltipText() {
-        PatientWrapper patient = getPatientWrapper();
-        if (patient != null) {
-            StudyWrapper study = patient.getStudy();
-            if (study != null)
-                return study.getName()
-                    + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
-        }
+    public String getTooltipTextInternal() {
+        if (patient != null && study != null)
+            return study.getName()
+                + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
         return getTooltipText(Messages.PatientAdapter_patient_label);
     }
 
@@ -76,18 +91,18 @@ public class PatientAdapter extends AdapterBase {
         addViewMenu(menu, Messages.PatientAdapter_patient_label);
         addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
 
-        if (isEditable()
-            && SessionManager.canCreate(CollectionEventWrapper.class)) {
+        if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.PatientAdapter_add_cevent_label);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    CollectionEventAdapter ceventAdapter = new CollectionEventAdapter(
-                        PatientAdapter.this, new CollectionEventWrapper(
-                            getAppService()));
-                    ((CollectionEventWrapper) ceventAdapter.getModelObject())
-                        .setPatient(getPatientWrapper());
+                    SimpleCEventInfo cevent = new SimpleCEventInfo();
+                    cevent.cevent = new CollectionEvent();
+                    cevent.cevent.setPatient(patient);
+                    CollectionEventAdapter ceventAdapter =
+                        new CollectionEventAdapter(
+                            null, cevent);
                     ceventAdapter.openEntryForm();
                 }
             });
@@ -95,30 +110,28 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId,
+            CollectionEvent.class);
     }
 
     @Override
-    protected AdapterBase createChildNode() {
+    protected CollectionEventAdapter createChildNode() {
         return new CollectionEventAdapter(this, null);
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new CollectionEventAdapter(this, (CollectionEventWrapper) child);
+    protected CollectionEventAdapter createChildNode(Object child) {
+        Assert.isTrue(child instanceof SimpleCEventInfo);
+        return new CollectionEventAdapter(this, (SimpleCEventInfo) child);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
-        return getPatientWrapper().getCollectionEventCollection(true);
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return (getWrapperChildren() == null) ? 0 : getWrapperChildren().size();
+    protected Map<Integer, ?> getChildrenObjects() throws Exception {
+        return SessionManager.getAppService().doAction(
+            new PatientGetSimpleCollectionEventInfosAction(patient.getId()))
+            .getMap();
     }
 
     @Override
@@ -136,8 +149,37 @@ public class PatientAdapter extends AdapterBase {
         return Messages.PatientAdapter_delete_confirm_msg;
     }
 
-    @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
+    public Patient getPatient() {
+        return patient;
     }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof PatientAdapter)
+            return patient.getPnumber().compareTo(
+                ((PatientAdapter) o).patient.getPnumber());
+        return 0;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof SearchedPatientInfo) {
+            SearchedPatientInfo pinfo = (SearchedPatientInfo) value;
+            this.patient = pinfo.patient;
+            this.study = pinfo.study;
+            this.ceventsCount = pinfo.ceventsCount;
+            if (patient.getId() != null) {
+                setId(patient.getId());
+                init();
+            }
+        }
+
+    }
+
+    @Override
+    protected void runDelete() throws Exception {
+        SessionManager.getAppService().doAction(
+            new PatientDeleteAction(patient));
+    }
+
 }

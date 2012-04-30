@@ -15,17 +15,22 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.ProcessingView"; //$NON-NLS-1$
 
     private static ProcessingView currentInstance;
 
@@ -47,11 +52,8 @@ public class ProcessingView extends AbstractAdministrationView {
         SessionManager.addView(this);
     }
 
-    @Override
-    public void createPartControl(Composite parent) {
-        super.createPartControl(parent);
-
-        processingNode = new ProcessingEventGroup(rootNode, 2,
+    private void createNodes() {
+        processingNode = new ProcessingEventGroup((RootNode) rootNode, 2,
             Messages.ProcessingView_pevent_group_label);
         processingNode.setParent(rootNode);
         rootNode.addChild(processingNode);
@@ -137,6 +139,31 @@ public class ProcessingView extends AbstractAdministrationView {
     }
 
     @Override
+    public void reload() {
+        if (processingNode == null) createNodes();
+        try {
+            for (AbstractAdapterBase adaper : processingNode.getChildren()) {
+                ((AdapterBase) adaper).resetObject();
+            }
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new ProcessingEventReadPermission(SessionManager
+                    .getUser()
+                    .getCurrentWorkingCenter().getWrappedObject())));
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+        }
+        try {
+            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
+                new ProcessingEventReadPermission(SessionManager
+                    .getUser()
+                    .getCurrentWorkingCenter().getId())));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAccessDeniedErrorMessage();
+        }
+        super.reload();
+    }
+
+    @Override
     public String getId() {
         return ID;
     }
@@ -207,7 +234,8 @@ public class ProcessingView extends AbstractAdministrationView {
         List<? extends ModelWrapper<?>> searchedObjects) {
         processingNode.removeAll();
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                searchedObject.getClass(), searchedObject.getId());
             if (nodeRes.size() == 0) {
                 ProcessingEventAdapter newChild = new ProcessingEventAdapter(
                     processingNode, (ProcessingEventWrapper) searchedObject);
@@ -217,7 +245,9 @@ public class ProcessingView extends AbstractAdministrationView {
         }
         processingNode.performExpand();
         if (searchedObjects.size() == 1) {
-            List<AdapterBase> nodeRes = rootNode.search(searchedObjects.get(0));
+            ModelWrapper<?> modelWrapper = searchedObjects.get(0);
+            List<AbstractAdapterBase> nodeRes = rootNode.search(
+                modelWrapper.getClass(), modelWrapper.getId());
             nodeRes.get(0).performDoubleClick();
         } else
             BgcPlugin.openMessage(Messages.ProcessingView_pevent_info_title,
@@ -231,7 +261,14 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     public void clear() {
-        processingNode.removeAll();
+        rootNode.removeAll();
+        processingNode = null;
         setSearchFieldsEnablement(false);
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

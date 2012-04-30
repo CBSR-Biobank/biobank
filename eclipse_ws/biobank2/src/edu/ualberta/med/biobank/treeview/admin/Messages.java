@@ -10,6 +10,7 @@ public class Messages extends NLS {
     public static String ClinicMasterGroup_clinics_node_label;
     public static String ContainerAdapter_container_label;
     public static String ContainerAdapter_delete_confirm_msg;
+    public static String ContainerAdapter_message;
     public static String ContainerAdapter_move_cont_error_title;
     public static String ContainerAdapter_move_empty_error_msg;
     public static String ContainerAdapter_move_erro_title;
@@ -22,6 +23,7 @@ public class Messages extends NLS {
     public static String ContainerAdapter_moving_cont;
     public static String ContainerAdapter_moving_specs;
     public static String ContainerAdapter_cont_moved_info_title;
+    public static String ContainerAdapter_error;
     public static String ContainerAdapter_spec_moved_info_msg;
     public static String ContainerAdapter_spec_moved_info_title;
     public static String ContainerGroup_add_label;
@@ -31,6 +33,8 @@ public class Messages extends NLS {
     public static String ContainerTypeAdapter_delete_confirm_msg;
     public static String ContainerTypeAdapter_type_label;
     public static String ContainerTypeGroup_add_label;
+    public static String ContainerTypeGroup_error;
+    public static String ContainerTypeGroup_message;
     public static String ContainerTypeGroup_types_node_label;
     public static String ResearchGroupAdapter_delete_confirm_msg;
     public static String ResearchGroupAdapter_menu_label;
@@ -40,6 +44,8 @@ public class Messages extends NLS {
     public static String SessionAdapter_current_session_label;
     public static String SessionAdapter_load_error_title;
     public static String SessionAdapter_logout_label;
+    public static String SiteAdapter_0;
+    public static String SiteAdapter_1;
     public static String SiteAdapter_delete_confirm_msg;
     public static String SiteAdapter_site_label;
     public static String SiteAdapter_tooltip_label;

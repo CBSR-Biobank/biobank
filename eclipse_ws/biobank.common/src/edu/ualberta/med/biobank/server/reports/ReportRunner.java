@@ -20,6 +20,7 @@ import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.impl.CriteriaImpl;
+import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
@@ -39,13 +40,15 @@ public class ReportRunner {
     private static final String PROPERTY_DELIMITER = "."; //$NON-NLS-1$
     private static final String ALIAS_DELIMITER = "__"; //$NON-NLS-1$
     private static final String PROPERTY_VALUE_TOKEN = "{value}"; //$NON-NLS-1$
-    private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias"; //$NON-NLS-1$
-    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION = new Comparator<ReportColumn>() {
-        @Override
-        public int compare(ReportColumn lhs, ReportColumn rhs) {
-            return lhs.getPosition() - rhs.getPosition();
-        }
-    };
+    private static final String MODIFIED_PROPERTY_ALIAS =
+        "_modifiedPropertyAlias"; //$NON-NLS-1$
+    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION =
+        new Comparator<ReportColumn>() {
+            @Override
+            public int compare(ReportColumn lhs, ReportColumn rhs) {
+                return lhs.getPosition() - rhs.getPosition();
+            }
+        };
 
     private final Session session;
     private final Report report;
@@ -78,9 +81,9 @@ public class ReportRunner {
     private Collection<ReportColumn> getOrderedReportColumns() {
         List<ReportColumn> orderedCols = new ArrayList<ReportColumn>();
 
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
         Collection<ReportColumn> reportCols = report
-            .getReportColumnCollection();
+            .getReportColumns();
         if (reportCols != null) {
             orderedCols.addAll(reportCols);
         }
@@ -96,8 +99,8 @@ public class ReportRunner {
     }
 
     private Criteria createCriteria() {
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
-        if (!isCount() && report.getReportColumnCollection().isEmpty()) {
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
+        if (!isCount() && report.getReportColumns().isEmpty()) {
             return null;
         }
 
@@ -116,7 +119,7 @@ public class ReportRunner {
             // results
             pList.add(Projections.sqlProjection("NULL as null_value_", //$NON-NLS-1$
                 new String[] { "null_value_" }, //$NON-NLS-1$
-                new Type[] { Hibernate.INTEGER }));
+                new Type[] { StandardBasicTypes.INTEGER }));
         }
 
         int colNum = 1;
@@ -142,11 +145,11 @@ public class ReportRunner {
                     projection = Projections.sqlGroupProjection(
                         modifiedProperty + " as " + sqlAlias, sqlAlias, //$NON-NLS-1$
                         new String[] { sqlAlias },
-                        new Type[] { Hibernate.STRING });
+                        new Type[] { StandardBasicTypes.STRING });
                 } else {
                     projection = Projections.sqlProjection(modifiedProperty
                         + " as " + sqlAlias, new String[] { sqlAlias }, //$NON-NLS-1$
-                        new Type[] { Hibernate.STRING });
+                        new Type[] { StandardBasicTypes.STRING });
                 }
             } else {
                 if (isCount()) {
@@ -166,9 +169,9 @@ public class ReportRunner {
 
         criteria.setProjection(pList);
 
-        loadProperty(report, "reportFilterCollection"); //$NON-NLS-1$
+        loadProperty(report, "reportFilters"); //$NON-NLS-1$
         Collection<ReportFilter> rfCollection = report
-            .getReportFilterCollection();
+            .getReportFilters();
         if (rfCollection != null) {
             for (ReportFilter reportFilter : rfCollection) {
                 loadProperty(reportFilter, "entityFilter"); //$NON-NLS-1$
@@ -181,7 +184,7 @@ public class ReportRunner {
                 String aliasedProperty = getAliasedProperty(propertyPath);
 
                 Collection<ReportFilterValue> rfvCollection = reportFilter
-                    .getReportFilterValueCollection();
+                    .getReportFilterValues();
 
                 if (rfvCollection == null) {
                     rfvCollection = new HashSet<ReportFilterValue>();
@@ -249,8 +252,8 @@ public class ReportRunner {
     private void createAssociations(Criteria criteria) {
         Set<String> createdPoperties = new HashSet<String>();
 
-        loadProperty(report, "reportColumnCollection"); //$NON-NLS-1$
-        Collection<ReportColumn> cols = report.getReportColumnCollection();
+        loadProperty(report, "reportColumns"); //$NON-NLS-1$
+        Collection<ReportColumn> cols = report.getReportColumns();
         if (cols != null) {
             for (ReportColumn reportColumn : cols) {
                 loadProperty(reportColumn, "entityColumn"); //$NON-NLS-1$
@@ -262,8 +265,8 @@ public class ReportRunner {
             }
         }
 
-        loadProperty(report, "reportFilterCollection"); //$NON-NLS-1$
-        Collection<ReportFilter> filters = report.getReportFilterCollection();
+        loadProperty(report, "reportFilters"); //$NON-NLS-1$
+        Collection<ReportFilter> filters = report.getReportFilters();
         if (filters != null) {
             for (ReportFilter filter : filters) {
                 loadProperty(filter, "entityFilter"); //$NON-NLS-1$
@@ -303,18 +306,10 @@ public class ReportRunner {
         String parentProperty = getParentProperty(property);
         while (parentProperty != null) {
             if (!createdProperties.contains(parentProperty)) {
-                int joinType = Criteria.INNER_JOIN;
-
-                // TODO: do not hardcode "specimenPosition.", read a list or
-                // config from somewhere. This is necessary because some
-                // aliquots legitimately do not have a position in a container
-                if (parentProperty.equals("specimenPosition") //$NON-NLS-1$
-                    || parentProperty.startsWith("specimenPosition.")) { //$NON-NLS-1$
-                    joinType = Criteria.LEFT_JOIN;
-                }
-
+                // Always use a left join to support the "is not set" option of
+                // many filters.
                 criteria.createCriteria(parentProperty,
-                    getPropertyAlias(parentProperty), joinType);
+                    getPropertyAlias(parentProperty), Criteria.LEFT_JOIN);
                 createdProperties.add(parentProperty);
             }
             parentProperty = getParentProperty(parentProperty);

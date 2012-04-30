@@ -3,12 +3,14 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 
+@Deprecated
 public class ClinicHelper extends CenterHelper {
 
-    private static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
+    private static List<ClinicWrapper> createdClinics =
+        new ArrayList<ClinicWrapper>();
 
     public static ClinicWrapper newClinic(String name) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);
@@ -22,8 +24,7 @@ public class ClinicHelper extends CenterHelper {
         }
         clinic.setCity("");
         clinic.setSendsShipments(false);
-        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        clinic.setActivityStatus(ActivityStatus.ACTIVE);
 
         return clinic;
     }

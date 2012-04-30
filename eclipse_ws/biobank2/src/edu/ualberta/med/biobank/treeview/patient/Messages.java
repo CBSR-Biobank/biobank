@@ -13,12 +13,18 @@ public class Messages extends NLS {
 
     public static String CollectionEventAdapter_error_title;
 
+    public static String CollectionEventAdapter_nospecimens_label;
+
     public static String CollectionEventEntryForm_title_new;
     public static String CollectionEventEntryForm_title_edit;
 
     public static String PatientAdapter_add_cevent_label;
 
     public static String PatientAdapter_delete_confirm_msg;
+
+    public static String PatientAdapter_error;
+
+    public static String PatientAdapter_message;
 
     public static String PatientAdapter_patient_label;
 

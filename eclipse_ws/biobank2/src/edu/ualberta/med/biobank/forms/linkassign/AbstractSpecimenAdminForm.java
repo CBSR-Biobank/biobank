@@ -18,6 +18,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
@@ -32,14 +33,14 @@ import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
-    private static final String FILE_NAME_SEPARATOR = "_"; //$NON-NLS-1$
-    private static final String LOG_EXTENSION = ".log"; //$NON-NLS-1$
-    private static final String FORM_USERNAME_PARAM = "username"; //$NON-NLS-1$
-    private static final String LOG_ACTION_PRINT = "print"; //$NON-NLS-1$
-    private static final String FORM_NAME_SUFFIX = "EntryForm"; //$NON-NLS-1$
-    private static final String JASPER_FORM_NAME = "ActivityReportForm"; //$NON-NLS-1$
+    private static final String FILE_NAME_SEPARATOR = "_"; 
+    private static final String LOG_EXTENSION = ".log"; 
+    private static final String FORM_USERNAME_PARAM = "username"; 
+    private static final String LOG_ACTION_PRINT = "print"; 
+    private static final String FORM_NAME_SUFFIX = "EntryForm"; 
+    private static final String JASPER_FORM_NAME = "ActivityReportForm"; 
     private static final SimpleDateFormat fileDateFormatter = new SimpleDateFormat(
-        "yyyy-MM-dd_HHmmss"); //$NON-NLS-1$
+        "yyyy-MM-dd_HHmmss"); 
 
     protected boolean finished = true;
     protected boolean printed = false;
@@ -102,15 +103,18 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     }
 
     public boolean onClose() {
-        if (finished) {
+        IEditorReference[] refs = getSite().getPage().getEditorReferences();
+        // will really finish only if this is the last editor open (in case user
+        // used the 'new editor' menu to have more than one editor opened)
+        if (finished && refs.length == 0) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BiobankPlugin.isAskPrintActivityLog()) {
                     boolean doPrint = MessageDialog
                         .openQuestion(
                             PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                            Messages.AbstractSpecimenAdminForm_print_question_title,
-                            Messages.AbstractSpecimenAdminForm_print_question_msg);
+                            "Print",
+                            "Do you want to print information?");
                     if (doPrint) {
                         print();
                     }
@@ -132,8 +136,8 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     public boolean print() {
         if (appender == null) {
             BgcPlugin.openError(
-                Messages.AbstractSpecimenAdminForm_print_error_title,
-                Messages.AbstractSpecimenAdminForm_print_error_msg);
+                "Print error",
+                "Can't print: log error.");
         }
         try {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -155,7 +159,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
             return true;
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.AbstractSpecimenAdminForm_print_error_title, e);
+                "Print error", e);
             printed = false;
             return false;
         }

@@ -5,9 +5,11 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 
+@Deprecated
 public class ShippingMethodHelper extends DbHelper {
 
-    public static List<ShippingMethodWrapper> createdShipMethods = new ArrayList<ShippingMethodWrapper>();
+    public static List<ShippingMethodWrapper> createdShipMethods =
+        new ArrayList<ShippingMethodWrapper>();
 
     public static ShippingMethodWrapper newShippingMethod(String name) {
         ShippingMethodWrapper company = new ShippingMethodWrapper(appService);

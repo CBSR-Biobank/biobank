@@ -27,12 +27,15 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -42,8 +45,13 @@ import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
 
+    protected static BgcLogger log = BgcLogger
+        .getLogger(AbstractLinkAssignEntryForm.class.getName());
+
     enum Mode {
-        SINGLE_NO_POSITION, SINGLE_POSITION, MULTIPLE;
+        SINGLE_NO_POSITION,
+        SINGLE_POSITION,
+        MULTIPLE;
 
         public boolean isSingleMode() {
             return this == SINGLE_NO_POSITION || this == SINGLE_POSITION;
@@ -92,11 +100,13 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     protected void init() throws Exception {
         super.init();
-        singleSpecimen = new SpecimenWrapper(appService);
-        canSaveSingleBinding = widgetCreator.addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            canSaveSingleSpecimen,
-            Messages.AbstractLinkAssignEntryForm_fill_fields_or_previous_errors);
+        singleSpecimen = new SpecimenWrapper(SessionManager.getAppService());
+        canSaveSingleBinding =
+            widgetCreator
+                .addBooleanBinding(
+                    new WritableValue(Boolean.FALSE, Boolean.class),
+                    canSaveSingleSpecimen,
+                    "Please fill in the fields and hit enter or tab or resolve previous errors");
     }
 
     protected abstract String getFormTitle();
@@ -145,7 +155,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         form.layout(true, true);
     }
 
-    protected void setFirstControl(@SuppressWarnings("unused") Mode mode) {
+    @SuppressWarnings("unused")
+    protected void setFirstControl(Mode mode) {
         // default does nothing
     }
 
@@ -157,8 +168,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         // default does nothing
     }
 
-    protected void setNeedSinglePosition(
-        @SuppressWarnings("unused") boolean position) {
+    @SuppressWarnings("unused")
+    protected void setNeedSinglePosition(boolean position) {
         // default does nothing
     }
 
@@ -227,15 +238,13 @@ public abstract class AbstractLinkAssignEntryForm extends
         // radio button to choose single or multiple
         radioSingle = toolkit
             .createButton(buttonsComposite,
-                Messages.AbstractLinkAssignEntryForm_choice_radio_single,
+                "Single",
                 SWT.RADIO);
         // used only for linking (but faster and easier to add it in this class)
         radioSinglePosition = toolkit.createButton(buttonsComposite,
-            Messages.AbstractLinkAssignEntryForm_choice_radio_single_position,
-            SWT.RADIO);
+            "Single with position", SWT.RADIO);
         radioMultiple = toolkit.createButton(buttonsComposite,
-            Messages.AbstractLinkAssignEntryForm_choice_radio_multiple,
-            SWT.RADIO);
+            "Multiple", SWT.RADIO);
 
         singleFieldsComposite = toolkit.createComposite(leftComposite);
         layout = new GridLayout(1, false);
@@ -295,6 +304,8 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Show either single or multiple selection fields
      */
     protected void showModeComposite(Mode mode) {
+        log.debug("showModeComposite: " + mode);
+
         setMode(mode);
         boolean single = mode.isSingleMode();
         widgetCreator.showWidget(singleFieldsComposite, single);
@@ -311,8 +322,8 @@ public abstract class AbstractLinkAssignEntryForm extends
         book.reflow(true);
     }
 
-    protected Composite getFocusedComposite(
-        @SuppressWarnings("unused") boolean single) {
+    @SuppressWarnings("unused")
+    protected Composite getFocusedComposite(boolean single) {
         return null;
     }
 
@@ -341,7 +352,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         gdFreezer.horizontalAlignment = SWT.RIGHT;
         freezerComposite.setLayoutData(gdFreezer);
         freezerLabel = toolkit.createLabel(freezerComposite,
-            Messages.AbstractLinkAssignEntryForm_freezer_label);
+            "Freezer");
         freezerLabel.setLayoutData(new GridData());
         freezerWidget = new ContainerDisplayWidget(freezerComposite);
         freezerWidget.initDisplayFromType(true);
@@ -357,7 +368,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         hotelComposite.setLayout(layout);
         hotelComposite.setLayoutData(new GridData());
         hotelLabel = toolkit.createLabel(hotelComposite,
-            Messages.AbstractLinkAssignEntryForm_hotel_label);
+            "Hotel");
         hotelWidget = new ContainerDisplayWidget(hotelComposite);
         hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
@@ -373,7 +384,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         palletComposite.setLayout(layout);
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite,
-            Messages.AbstractLinkAssignEntryForm_pallet_label);
+            "Pallet");
         palletWidget = new ScanPalletWidget(palletComposite,
             UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
         toolkit.adapt(palletWidget);
@@ -392,11 +403,13 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        if (isScanTubeAloneMode()) {
+        log.debug("manageDoubleClick");
+
+        PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
+            .getObjectAtCoordinates(e.x, e.y);
+        if (canScanTubeAlone(cell) && isScanTubeAloneMode()) {
             scanTubeAlone(e);
         } else {
-            PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
-                .getObjectAtCoordinates(e.x, e.y);
             if (cell != null) {
                 switch (cell.getStatus()) {
                 case ERROR:
@@ -418,11 +431,11 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
-        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); //$NON-NLS-1$
-        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, ""); //$NON-NLS-1$
+        thirdSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
+        secondSingleParentLabel = toolkit.createLabel(singleVisualisation, "");
 
-        ContainerTypeWrapper thirdSingleParentType = null;
-        ContainerTypeWrapper secondSingleParentType = null;
+        ContainerType thirdSingleParentType = null;
+        ContainerType secondSingleParentType = null;
         thirdSingleParentWidget = new ContainerDisplayWidget(
             singleVisualisation);
         thirdSingleParentWidget.setContainerType(thirdSingleParentType, true);
@@ -450,11 +463,11 @@ public abstract class AbstractLinkAssignEntryForm extends
         gd = new GridData();
         gd.horizontalSpan = 3;
         comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values", //$NON-NLS-1$
+        fakeScanRandom = toolkit.createButton(comp, "Get random scan values",
             SWT.RADIO);
         fakeScanRandom.setSelection(true);
         toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO); //$NON-NLS-1$
+            "Get random and already linked specimens", SWT.RADIO);
     }
 
     /**
@@ -503,9 +516,10 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     @Override
-    protected void onReset() throws Exception {
-        super.onReset();
-        singleSpecimen.initObjectWith(new SpecimenWrapper(appService));
+    public void setValues() throws Exception {
+        super.setValues();
+        singleSpecimen.initObjectWith(new SpecimenWrapper(SessionManager
+            .getAppService()));
         singleSpecimen.reset();
         setDirty(false);
         reset(true);
@@ -543,6 +557,8 @@ public abstract class AbstractLinkAssignEntryForm extends
      * single assign. Display containers
      */
     protected void displaySinglePositions(boolean show) {
+        log.debug("displaySinglePositions: " + show);
+
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {
                 widgetCreator.showWidget(secondSingleParentWidget, show);
@@ -557,6 +573,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     ContainerWrapper thirdParent = null;
                     ContainerWrapper secondParent = null;
                     ContainerWrapper firstParent = null;
+
                     if (parentContainers.size() >= 3)
                         thirdParent = parentContainers.get(2);
                     if (parentContainers.size() >= 2)
@@ -605,50 +622,44 @@ public abstract class AbstractLinkAssignEntryForm extends
      */
     protected void initContainersFromPosition(BgcBaseText positionText,
         boolean isContainerPosition, ContainerTypeWrapper type) {
+        log.debug("initContainersFromPosition: pos=" + positionText.getText()
+            + " isContainerPosition=" + isContainerPosition + " containerType="
+            + ((type == null) ? "null" : type.getName()));
+
         parentContainers = null;
         try {
             parentContainers = null;
-            List<ContainerWrapper> foundContainers = ContainerWrapper
-                .getPossibleContainersFromPosition(appService,
-                    SessionManager.getUser(), positionText.getText(),
+            List<ContainerWrapper> foundContainers =
+                ContainerWrapper.getPossibleContainersFromPosition(
+                    SessionManager.getAppService(), SessionManager.getUser()
+                        .getCurrentWorkingSite(), positionText.getText(),
                     isContainerPosition, type);
             if (foundContainers.size() == 1) {
                 initParentContainers(foundContainers.get(0));
             } else if (foundContainers.size() > 1) {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), foundContainers);
+                SelectParentContainerDialog dlg =
+                    new SelectParentContainerDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
                     for (ContainerWrapper cont : foundContainers) {
                         sb.append(cont.getFullInfoLabel());
                     }
-                    BgcPlugin
-                        .openError(
-                            Messages.AbstractLinkAssignEntryForm_single_checkParent_error_toomany_title,
-                            NLS.bind(
-                                Messages.AbstractLinkAssignEntryForm_single_checkParent_error_toomany_msg,
-                                sb.toString()));
+                    BgcPlugin.openError("Container problem",
+                        NLS.bind("More than one container found matching {0}",
+                            sb.toString()));
                     focusControl(positionText);
                 } else
                     initParentContainers(dlg.getSelectedContainer());
             }
         } catch (BiobankException be) {
-            BgcPlugin
-                .openError(
-                    Messages.AbstractLinkAssignEntryForm_container_init_position_error_title,
-                    be);
-            appendLog(NLS
-                .bind(
-                    Messages.AbstractLinkAssignEntryForm_single_activitylog_checkParent_error,
-                    be.getMessage()));
+            BgcPlugin.openError("Init container from position", be);
+            appendLog(NLS.bind("ERROR: {0}", be.getMessage()));
             focusControl(positionText);
         } catch (Exception ex) {
-            BgcPlugin
-                .openError(
-                    Messages.AbstractLinkAssignEntryForm_container_init_position_error_title,
-                    ex);
+            BgcPlugin.openError("Init container from position", ex);
             focusControl(positionText);
         }
     }
@@ -657,6 +668,8 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Initialise parents
      */
     private void initParentContainers(ContainerWrapper bottomContainer) {
+        log.debug("initParentContainers: " + bottomContainer.getLabel());
+
         parentContainers = new ArrayList<ContainerWrapper>();
         ContainerWrapper parent = bottomContainer;
         while (parent != null) {
@@ -671,51 +684,54 @@ public abstract class AbstractLinkAssignEntryForm extends
                 label = parent.getLabel();
             parentMsg.append(label);
             if (i != 0)
-                parentMsg.append("|"); //$NON-NLS-1$
+                parentMsg.append("|");
         }
-        appendLog(NLS.bind(
-            Messages.AbstractLinkAssignEntryForm_activitylog_containers_init,
+        appendLog(NLS.bind("Parent containers found: {0}",
             parentMsg.toString()));
+        updateAvailableSpecimenTypes();
     }
+
+    protected abstract void updateAvailableSpecimenTypes();
 
     /**
      * Single assign. Check can really add to the position
      */
     protected void checkPositionAndSpecimen(final BgcBaseText inventoryIdField,
         final BgcBaseText positionField) {
+        log.debug("checkPositionAndSpecimen");
+
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
                 try {
-                    appendLog("----"); //$NON-NLS-1$
+                    appendLog("----");
                     String positionString = positionField.getText();
                     if (parentContainers == null
                         || parentContainers.size() == 0) {
                         displaySinglePositions(false);
                         return;
                     }
-                    appendLog(NLS
-                        .bind(
-                            Messages.AbstractLinkAssignEntryForm_single_activitylog_checkingPosition,
-                            positionString));
-                    singleSpecimen.setSpecimenPositionFromString(
-                        positionString, parentContainers.get(0));
-                    if (singleSpecimen.isPositionFree(parentContainers.get(0))) {
-                        singleSpecimen.setParent(parentContainers.get(0));
+
+                    appendLog(NLS.bind("Checking position {0}", positionString));
+                    ContainerWrapper container = parentContainers.get(0);
+                    RowColPos position = container.getContainerType()
+                        .getRowColFromPositionString(
+                            positionString.replace(container.getLabel(), ""));
+
+                    if (container.isPositionFree(position)) {
+                        singleSpecimen.setParent(container, position);
                         displaySinglePositions(true);
                         canSaveSingleSpecimen.setValue(true);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        BgcPlugin
-                            .openError(
-                                Messages.AbstractLinkAssignEntryForm_single_position_error_msg,
-                                NLS.bind(
-                                    Messages.AbstractLinkAssignEntryForm_single_checkStatus_error,
-                                    positionString, parentContainers.get(0)
-                                        .getLabel()));
+                        BgcPlugin.openError("Position not free",
+                            NLS.bind(
+                                "Position {0} already in use in container {1}",
+                                positionString, parentContainers.get(0)
+                                    .getLabel()));
                         appendLog(NLS
                             .bind(
-                                Messages.AbstractLinkAssignEntryForm_single_activitylog_checkPosition_error,
+                                "ERROR: Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
                                     .getLabel()));
                         focusControl(positionField);
@@ -726,14 +742,14 @@ public abstract class AbstractLinkAssignEntryForm extends
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
                     BgcPlugin.openError(
-                        Messages.AbstractLinkAssignEntryForm_check_error_title,
+                        "Error while checking position",
                         bce);
-                    appendLog(Messages.AbstractLinkAssignEntryForm_log_error_label
+                    appendLog("ERROR: "
                         + bce.getMessage());
                     focusControl(inventoryIdField);
                 } catch (Exception e) {
                     BgcPlugin.openError(
-                        Messages.AbstractLinkAssignEntryForm_check_error_title,
+                        "Error while checking position",
                         e);
                     focusControl(positionField);
                 }
@@ -745,6 +761,8 @@ public abstract class AbstractLinkAssignEntryForm extends
      * assign multiple
      */
     protected void showOnlyPallet(boolean onlyPallet) {
+        log.debug("showOnlyPallet: " + onlyPallet);
+
         widgetCreator.showWidget(freezerLabel, !onlyPallet);
         widgetCreator.showWidget(freezerWidget, !onlyPallet);
         widgetCreator.showWidget(hotelLabel, !onlyPallet);
@@ -755,10 +773,9 @@ public abstract class AbstractLinkAssignEntryForm extends
     @Override
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
+        widgetCreator.removeBinding(canSaveSingleBinding);
         if (isSingleMode)
             widgetCreator.addBinding(canSaveSingleBinding);
-        else
-            widgetCreator.removeBinding(canSaveSingleBinding);
         canSaveSingleSpecimen.setValue(true);
     }
 
@@ -766,6 +783,8 @@ public abstract class AbstractLinkAssignEntryForm extends
      * assign multiple
      */
     protected void showOnlyPallet(final boolean show, boolean async) {
+        log.debug("showOnlyPallet: show=" + show + " async=" + async);
+
         if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override

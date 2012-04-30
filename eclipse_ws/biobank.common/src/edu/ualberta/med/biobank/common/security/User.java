@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class User implements Serializable, NotAProxy {
     private static final long serialVersionUID = 1L;
 

@@ -1,36 +1,41 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Used to display clinic and contact information. Meant to be used by
  * StudyViewForm only.
  */
-public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
+public class StudyContactInfoTable extends InfoTableWidget<ClinicContacts> {
 
     protected static class TableRowData {
-        ContactWrapper contact;
+        ClinicContacts clinic;
         String clinicNameShort;
         Long patientCount;
         Long ceventCount;
-        String contactName;
-        String contactTitle;
+        String contactNames;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (ceventCount != null) ? ceventCount.toString() : "", //$NON-NLS-1$
-                contactName, contactTitle }, "\t"); //$NON-NLS-1$
-
+                (patientCount != null) ? patientCount.toString() : "",
+                (ceventCount != null) ? ceventCount.toString() : "",
+                contactNames }, "\t");
         }
     }
 
@@ -38,36 +43,95 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         Messages.StudyContactInfoTable_clinic_label,
         Messages.StudyContactInfoTable_patient_count_label,
         Messages.StudyContactInfoTable_cEvent_count_label,
-        Messages.StudyContactInfoTable_contact_name_label,
-        Messages.StudyContactInfoTable_contact_title_label };
+        Messages.StudyContactInfoTable_contact_names_label };
 
     private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10, ContactWrapper.class);
         this.study = study;
-        this.setCollection(study.getContactCollection(true));
+        setCollectionByStudy(study);
+    }
+
+    public static class ClinicContacts {
+        private ClinicWrapper clinic;
+        private StringBuffer contactsBuf;
+
+        public ClinicContacts(ClinicWrapper clinic, ContactWrapper contact) {
+            this.setClinic(clinic);
+            contactsBuf = new StringBuffer();
+            addContact(contact);
+        }
+
+        public void addContact(ContactWrapper contact) {
+            if (contactsBuf.length() > 0) {
+                contactsBuf.append("\n"); //$NON-NLS-1$
+            }
+            String name = contact.getName();
+            if ((name != null) && !name.isEmpty()) {
+                contactsBuf.append(contact.getName());
+            }
+            String title = contact.getTitle();
+            if ((title != null) && !title.isEmpty()) {
+                contactsBuf.append(" ("); //$NON-NLS-1$
+                contactsBuf.append(title);
+                contactsBuf.append(")"); //$NON-NLS-1$
+            }
+        }
+
+        public String getFormattedContacts() {
+            return contactsBuf.toString();
+        }
+
+        public ClinicWrapper getClinic() {
+            return clinic;
+        }
+
+        public void setClinic(ClinicWrapper clinic) {
+            this.clinic = clinic;
+        }
+    }
+
+    public void setCollectionByStudy(StudyWrapper study) {
+        super.setList(new ArrayList<ClinicContacts>(processClinics(study
+            .getContactCollection(true))));
+    }
+
+    private Collection<ClinicContacts> processClinics(
+        List<ContactWrapper> contactCollection) {
+        HashMap<ClinicWrapper, ClinicContacts> tableData =
+            new HashMap<ClinicWrapper, ClinicContacts>();
+        for (ContactWrapper contact : contactCollection) {
+            ClinicWrapper clinic = contact.getClinic();
+            if (tableData.containsKey(clinic)) {
+                ClinicContacts prevEntry = tableData.get(clinic);
+                prevEntry.addContact(contact);
+                tableData.put(clinic, prevEntry);
+            } else {
+                tableData.put(clinic, new ClinicContacts(clinic, contact));
+            }
+        }
+        return tableData.values();
     }
 
     @Override
-    public ClinicWrapper getSelection() {
+    public ClinicContacts getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.contact.getClinic();
+        return ((TableRowData) item.o).clinic;
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.StudyContactInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -79,29 +143,26 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 2:
                     return NumberFormatter.format(item.ceventCount);
                 case 3:
-                    return item.contactName;
-                case 4:
-                    return item.contactTitle;
+                    return item.contactNames;
                 default:
-                    return ""; //$NON-NLS-1$
+                    throw new IllegalArgumentException(
+                        "column index is invalid " + columnIndex);
                 }
             }
         };
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ContactWrapper contact)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
-        info.contact = contact;
-        ClinicWrapper clinic = contact.getClinic();
-        if (clinic != null) {
-            info.clinicNameShort = clinic.getNameShort();
-            info.patientCount = clinic.getPatientCountForStudy(study);
-            info.ceventCount = clinic.getCollectionEventCountForStudy(study);
-        }
-        info.contactName = contact.getName();
-        info.contactTitle = contact.getTitle();
+        ClinicContacts cc = (ClinicContacts) o;
+        info.clinic = cc;
+        info.clinicNameShort = info.clinic.getClinic().getNameShort();
+        info.patientCount =
+            info.clinic.getClinic().getPatientCountForStudy(study);
+        info.ceventCount =
+            info.clinic.getClinic().getCollectionEventCountForStudy(study);
+        info.contactNames = cc.getFormattedContacts();
         return info;
     }
 
@@ -115,5 +176,23 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ClinicContacts target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canDelete(ClinicContacts target)
+        throws ApplicationException {
+        return false;
+    }
+
+    @Override
+    protected Boolean canView(ClinicContacts target)
+        throws ApplicationException {
+        return false;
     }
 }

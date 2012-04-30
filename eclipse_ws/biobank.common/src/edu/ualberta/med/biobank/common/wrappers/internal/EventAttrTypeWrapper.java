@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.criterion.DetachedCriteria;
+
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.EventAttrTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttrType;
@@ -28,9 +30,10 @@ public class EventAttrTypeWrapper extends EventAttrTypeBaseWrapper {
 
     public static Map<String, EventAttrTypeWrapper> getAllEventAttrTypesMap(
         WritableApplicationService appService) throws ApplicationException {
-        List<EventAttrType> objects = appService.search(EventAttrType.class,
-            new EventAttrType());
-        Map<String, EventAttrTypeWrapper> EventAttrTypeMap = new HashMap<String, EventAttrTypeWrapper>();
+        List<EventAttrType> objects = appService.query(DetachedCriteria
+            .forClass(EventAttrType.class));
+        Map<String, EventAttrTypeWrapper> EventAttrTypeMap =
+            new HashMap<String, EventAttrTypeWrapper>();
         for (EventAttrType pv : objects) {
             EventAttrTypeMap.put(pv.getName(), new EventAttrTypeWrapper(
                 appService, pv));

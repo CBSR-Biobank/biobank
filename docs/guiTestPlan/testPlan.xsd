@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
+  <xs:element name="test_suite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="test_section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="attlist.test_suite"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.test_suite">
+    <xs:attribute name="name" use="required"/>
+    <xs:attribute ref="xsi:noNamespaceSchemaLocation" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="test_section">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element ref="test_section"/>
+        <xs:element ref="test_case"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="attlist.test_section"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.test_section">
+    <xs:attribute name="id" use="required"/>
+    <xs:attribute name="name" use="required"/>
+  </xs:attributeGroup>
+  <xs:element name="test_case">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="description"/>
+        <xs:element ref="precondition"/>
+        <xs:element ref="expected_result"/>
+        <xs:element ref="note"/>
+        <xs:element ref="dependency"/>
+        <xs:element ref="steps"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="attlist.test_case"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.test_case">
+    <xs:attribute name="id" use="required"/>
+    <xs:attribute name="name" use="required"/>
+    <xs:attribute name="variety" use="required" type="xs:NMTOKEN"/>
+  </xs:attributeGroup>
+  <xs:element name="description" type="xs:string"/>
+  <xs:element name="precondition" type="xs:string"/>
+  <xs:element name="expected_result" type="xs:string"/>
+  <xs:element name="note" type="xs:string"/>
+  <xs:element name="dependency">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="steps">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="step"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="step" type="xs:string"/>
+</xs:schema>

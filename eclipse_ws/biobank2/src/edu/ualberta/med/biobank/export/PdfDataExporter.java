@@ -16,10 +16,10 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public class PdfDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.pdf" }; //$NON-NLS-1$
+    private static final String[] VALID_EXTS = { "*.pdf" }; 
 
     public PdfDataExporter() {
-        super(Messages.PdfDataExporter_name);
+        super("Export PDF");
     }
 
     protected PdfDataExporter(String name) {
@@ -31,11 +31,9 @@ public class PdfDataExporter extends GuiDataExporter {
         super.canExport(data);
 
         if (data.getRows() instanceof AbstractBiobankListProxy) {
-            AbstractBiobankListProxy<?> proxy = (AbstractBiobankListProxy<?>) data
-                .getRows();
-            if (proxy.getRealSize() == -1) {
+            if (data.getRows().size() < 0 || data.getRows().size() >= 1000) {
                 throw new DataExportException(
-                    Messages.PdfDataExporter_toomanyrows_error_msg);
+                    "Results exceed 1000 rows and cannot be exported. Please export to CSV or refine your search.");
             }
         }
     }
@@ -45,26 +43,31 @@ public class PdfDataExporter extends GuiDataExporter {
         IProgressMonitor monitor) throws DataExportException {
         canExport(data);
 
+        List<Map<String, String>> maps;
         String path = getPath(data, VALID_EXTS);
-        List<Map<String, String>> maps = getPropertyMaps(data, labelProvider,
-            monitor, true);
-
+        try {
+            maps = getPropertyMaps(data, labelProvider,
+                monitor, true);
+        } catch (Exception e) {
+            // canceled
+            return;
+        }
         try {
             JasperPrint jasperPrint = ReportingUtils.createDynamicReport(
                 data.getTitle(), data.getDescription(), data.getColumnNames(),
                 maps, true);
             ReportingUtils.saveReport(jasperPrint, path);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.PdfDataExporter_saving_error_msg,
+            BgcPlugin.openAsyncError("Error saving to PDF",
                 e);
             return;
         }
         try {
-            SessionManager.log(Messages.PdfDataExporter_log_export,
+            SessionManager.log("exportPDF",
                 data.getTitle(), LOG_TYPE);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.PdfDataExporter_logging_error_msg, e);
+                "Error Logging Export", e);
         }
     }
 
@@ -74,13 +77,12 @@ public class PdfDataExporter extends GuiDataExporter {
      */
     protected static List<Map<String, String>> getPropertyMaps(Data data,
         ITableLabelProvider labelProvider, IProgressMonitor monitor,
-        boolean useIntegerProperties) throws DataExportException {
+        boolean useIntegerProperties) throws Exception {
         List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
         for (Object row : data.getRows()) {
             if (monitor.isCanceled()) {
-                throw new DataExportException(
-                    Messages.PdfDataExporter_cancel_msg);
+                throw new Exception();
             }
 
             Map<String, String> map = getPropertyMap(data, row, labelProvider,

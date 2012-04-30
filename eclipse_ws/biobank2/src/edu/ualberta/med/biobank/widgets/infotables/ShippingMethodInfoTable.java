@@ -6,12 +6,14 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShippingMethodInfoTable extends
     InfoTableWidget<ShippingMethodWrapper> {
 
-    private static final String[] HEADINGS = new String[] { Messages.ShippingMethodInfoTable_ship_label };
+    private static final String[] HEADINGS =
+        new String[] { Messages.ShippingMethodInfoTable_ship_label };
 
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
@@ -20,14 +22,15 @@ public class ShippingMethodInfoTable extends
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                ShippingMethodWrapper item = (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
+                ShippingMethodWrapper item =
+                    (ShippingMethodWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ShippingMethodInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -61,5 +64,23 @@ public class ShippingMethodInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(ShippingMethodWrapper target)
+        throws ApplicationException {
+        return true;
     }
 }

@@ -31,11 +31,11 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReportTreeWidget extends Composite {
 
@@ -135,7 +135,8 @@ public class ReportTreeWidget extends Composite {
                     .getSelection()).getFirstElement();
                 final ReportTreeNode node = (ReportTreeNode) element;
                 if (node != null
-                    && node.getParent().getLabel().compareTo(Messages.ReportTreeWidget_custom_label) == 0) {
+                    && node.getParent().getLabel()
+                        .compareTo(Messages.ReportTreeWidget_custom_label) == 0) {
                     MenuItem mi = new MenuItem(menu, SWT.NONE);
                     mi.setText(Messages.ReportTreeWidget_delete_label);
                     mi.addSelectionListener(new SelectionAdapter() {
@@ -230,8 +231,7 @@ public class ReportTreeWidget extends Composite {
                             .getToolTipText();
                         if (text == null || text.equalsIgnoreCase("")) //$NON-NLS-1$
                             return;
-                        else
-                            label.setText(text);
+                        label.setText(text);
                         label.addListener(SWT.MouseExit, labelListener);
                         label.addListener(SWT.MouseDown, labelListener);
                         Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -251,8 +251,9 @@ public class ReportTreeWidget extends Composite {
     }
 
     private void executeDoubleClick(DoubleClickEvent event) {
-        AbstractReportTreeNode node = (AbstractReportTreeNode) ((IStructuredSelection) event
-            .getSelection()).getFirstElement();
+        AbstractReportTreeNode node =
+            (AbstractReportTreeNode) ((IStructuredSelection) event
+                .getSelection()).getFirstElement();
         try {
             if (((ReportTreeNode) node).getReport() != null)
                 PlatformUI

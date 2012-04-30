@@ -5,13 +5,13 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public class NodeLabelProvider implements ILabelProvider {
 
     @Override
     public Image getImage(Object element) {
-        if (element instanceof AdapterBase) {
+        if (element instanceof AbstractAdapterBase) {
             return BiobankPlugin.getDefault().getImage(element);
         }
         return null;
@@ -19,10 +19,10 @@ public class NodeLabelProvider implements ILabelProvider {
 
     @Override
     public String getText(Object element) {
-        if (element instanceof AdapterBase) {
-            return ((AdapterBase) element).getLabel();
+        if (element instanceof AbstractAdapterBase) {
+            return ((AbstractAdapterBase) element).getLabel();
         }
-        return ""; //$NON-NLS-1$
+        return "error in getText"; //$NON-NLS-1$
     }
 
     @Override

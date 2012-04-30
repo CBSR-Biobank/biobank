@@ -1,5 +1,5 @@
 package edu.ualberta.med.biobank.widgets.trees.infos.listener;
 
-public interface IInfoTreeEditItemListener {
-    void editItem(InfoTreeEvent event);
+public interface IInfoTreeEditItemListener<T> {
+    void editItem(InfoTreeEvent<T> event);
 }

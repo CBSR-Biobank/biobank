@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -28,11 +29,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.Cell;
-import edu.ualberta.med.biobank.common.scanprocess.CellStatus;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.result.CellProcessResult;
-import edu.ualberta.med.biobank.common.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -51,7 +53,7 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BgcBaseDialog {
 
-    private static final String TITLE = Messages.AbstractScanDialog_title;
+    private static final String TITLE = "Scanning specimens";
 
     private BgcBaseText plateToScanText;
 
@@ -79,6 +81,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
         palletScanManagement = new PalletScanManagement() {
+
+            @Override
+            public boolean isScanTubeAloneMode() {
+                // FIXME: see issue #1230. always activate this mode
+                return true;
+            }
 
             @Override
             protected void beforeThreadStart() {
@@ -137,11 +145,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void setRescanMode(boolean isOn) {
         if (isOn) {
-            scanButton.setText(Messages.AbstractScanDialog_retryScan_label);
+            scanButton.setText("Retry scan");
         } else {
-            String scanButtonText = Messages.AbstractScanDialog_launchScan_label;
+            String scanButtonText =
+                "Launch Scan";
             if (!BiobankPlugin.isRealScanEnabled()) {
-                scanButtonText = Messages.AbstractScanDialog_fakeScan_label;
+                scanButtonText = "Fake scan";
             }
             scanButton.setText(scanButtonText);
         }
@@ -161,33 +170,39 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected void processScanResult(IProgressMonitor monitor,
         CenterWrapper<?> currentCenter) throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletCell> cells = getCells();
             // conversion for server side call
-            Map<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> serverCells = null;
+            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
+                null;
             if (cells != null) {
-                serverCells = new HashMap<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell>();
+                serverCells =
+                    new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
                 for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue()
                         .transformIntoServerCell());
                 }
             }
             // server side call
-            ScanProcessResult res = SessionManager.getAppService()
-                .processScanResult(serverCells, getProcessData(),
-                    isRescanMode(), SessionManager.getUser(),
-                    Locale.getDefault());
+            ScanProcessResult res = (ScanProcessResult) SessionManager
+                .getAppService().doAction(
+                    getPalletProcessAction(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId(),
+                        serverCells, isRescanMode(),
+                        Locale.getDefault()));
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
-                for (Entry<RowColPos, edu.ualberta.med.biobank.common.scanprocess.Cell> entry : res
+                for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
                     .getCells().entrySet()) {
                     RowColPos rcp = entry.getKey();
                     monitor.subTask(NLS.bind(
-                        Messages.AbstractScanDialog_processCell_task_position,
+                        "Processing position {0} ",
                         ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                     PalletCell palletCell = cells.get(entry.getKey());
-                    Cell servercell = entry.getValue();
+                    CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing
                         palletCell = new PalletCell(new ScanCell(
                             servercell.getRow(), servercell.getCol(),
@@ -199,7 +214,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     specificScanPosProcess(palletCell);
                 }
             }
-            setScanOkValue(res.getProcessStatus() != CellStatus.ERROR);
+            setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
         } else {
             setScanOkValue(false);
         }
@@ -224,11 +239,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createCustomDialogPreContents(contents);
 
-        plateToScanText = (BgcBaseText) createBoundWidgetWithLabel(contents,
-            BgcBaseText.class, SWT.NONE,
-            Messages.AbstractScanDialog_plateToScan_label, new String[0], this,
-            "plateToScan", new ScannerBarcodeValidator( //$NON-NLS-1$
-                Messages.AbstractScanDialog_plateToScan_validationMsg));
+        plateToScanText =
+            (BgcBaseText) createBoundWidgetWithLabel(contents,
+                BgcBaseText.class, SWT.NONE,
+                "Plate to scan", new String[0],
+                this, "plateToScan", new ScannerBarcodeValidator(
+                    "Enter a valid plate barcode"));
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -238,9 +254,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
         });
 
-        String scanButtonText = Messages.AbstractScanDialog_launchScan_label;
+        String scanButtonText = "Launch Scan";
         if (!BiobankPlugin.isRealScanEnabled()) {
-            scanButtonText = Messages.AbstractScanDialog_fakeScan_label;
+            scanButtonText = "Fake scan";
         }
         scanButton = new Button(contents, SWT.PUSH);
         scanButton.setText(scanButtonText);
@@ -269,12 +285,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanOkValue,
-            Messages.AbstractScanDialog_scanResults_errors_msg, IStatus.ERROR);
+            "Error in scan result. Please keep only specimens with no errors.",
+            IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
-            Messages.AbstractScanDialog_scan_validation_msg, IStatus.ERROR);
+            "Scan should be launched", IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), hasValues, Messages.AbstractScanDialog_no_values,
+            Boolean.class), hasValues, "No values scanned",
             IStatus.ERROR);
 
     }
@@ -340,11 +357,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID,
-            Messages.AbstractScanDialog_cancelPallet_label, false);
+            "Cancel current pallet", false);
         createButton(parent, IDialogConstants.PROCEED_ID,
             getProceedButtonlabel(), false);
         createButton(parent, IDialogConstants.NEXT_ID,
-            Messages.AbstractScanDialog_startPallet_label, false);
+            "Start next Pallet", false);
         createButton(parent, IDialogConstants.FINISH_ID,
             IDialogConstants.FINISH_LABEL, false);
     }
@@ -406,7 +423,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 doProceed();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                    Messages.AbstractScanDialog_proceedError_title, e);
+                    "Error", e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);
@@ -433,7 +450,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.RIGHT;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText(""); //$NON-NLS-1$
+        scanTubeAloneSwitch.setText("");
         scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
@@ -461,12 +478,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        CellProcessResult res = SessionManager
-            .getAppService()
-            .processCellStatus(cell.transformIntoServerCell(),
-                getProcessData(), SessionManager.getUser(), Locale.getDefault());
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+        CellProcessResult res = (CellProcessResult) SessionManager
+            .getAppService().doAction(
+                getCellProcessAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId(),
+                    cell.transformIntoServerCell(),
+                    Locale.getDefault()));
         cell.merge(SessionManager.getAppService(), res.getCell());
-        if (res.getProcessStatus() == CellStatus.ERROR) {
+        if (res.getProcessStatus() == CellInfoStatus.ERROR) {
             Button okButton = getButton(IDialogConstants.PROCEED_ID);
             okButton.setEnabled(false);
         }
@@ -474,7 +494,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         spw.redraw();
     }
 
-    protected abstract ProcessData getProcessData();
+    protected abstract Action<ProcessResult> getCellProcessAction(
+        Integer centerId, CellInfo cell, Locale locale);
+
+    protected abstract Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Locale locale);
 
     protected void resetScan() {
         if (spw != null)

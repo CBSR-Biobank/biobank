@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -15,28 +15,41 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.center.CenterGetStudyListAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.CollectionView;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientEntryForm"; 
 
-    private static final String CREATED_AT_BINDING = "patient-created-at-binding"; //$NON-NLS-1$
+    private static final String CREATED_AT_BINDING =
+        "patient-created-at-binding"; 
 
-    public static final String MSG_NEW_PATIENT_OK = Messages.PatientEntryForm_creation_msg;
+    public static final String MSG_NEW_PATIENT_OK =
+        "Creating a new patient record.";
 
-    public static final String MSG_PATIENT_OK = Messages.PatientEntryForm_edition_msg;
-
-    private PatientWrapper patient;
+    public static final String MSG_PATIENT_OK =
+        "Editing an existing patient record.";
 
     private ComboViewer studiesViewer;
 
@@ -44,42 +57,66 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NotNullValidator createdAtValidator;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
-        Messages.PatientEntryForm_patientNumber_validation_msg);
+    private NonEmptyStringValidator pnumberNonEmptyValidator =
+        new NonEmptyStringValidator(
+            "Patient must have a patient number");
+
+    private PatientInfo patientInfo;
+
+    private PatientWrapper patient = new PatientWrapper(
+        SessionManager.getAppService());
+
+    private CommentsInfoTable commentEntryTable;
+
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
 
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type " 
                 + adapter.getClass().getName());
+        updatePatientInfo();
 
-        patient = (PatientWrapper) getModelObject();
-
-        SessionManager.logEdit(patient);
         String tabName;
-        if (patient.isNew()) {
-            tabName = Messages.PatientEntryForm_new_title;
+        if (patientInfo == null) {
+            tabName = "New Patient";
         } else {
-            tabName = NLS.bind(Messages.PatientEntryForm_edit_title,
-                patient.getPnumber());
+            tabName =
+                NLS.bind("Patient {0}",
+                    patientInfo.patient.getPnumber());
         }
         setPartName(tabName);
     }
 
+    protected void updatePatientInfo() throws ApplicationException {
+        if (adapter.getId() != null) {
+            patientInfo = SessionManager.getAppService().doAction(
+                new PatientGetInfoAction(adapter.getId()));
+            patient.setWrappedObject(patientInfo.patient);
+            SessionManager.logLookup(patientInfo.patient);
+        } else {
+            patient.setWrappedObject(((PatientAdapter) adapter).getPatient());
+        }
+        patient.setCreatedAt(new Date());
+        comment.setWrappedObject(new Comment());
+    }
+
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.PatientEntryForm_main_title);
+        form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
         createPatientSection();
 
-        if (patient.isNew()) {
+        if (patientInfo == null) {
             setDirty(true);
         }
     }
 
-    private void createPatientSection() {
+    private void createPatientSection() throws Exception {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -87,49 +124,78 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        List<StudyWrapper> studies = SessionManager.getUser()
-            .getCurrentWorkingCenter().getStudyCollection();
-        StudyWrapper selectedStudy = null;
-        if (patient.isNew()) {
+        List<Study> studies = SessionManager.getAppService().doAction(
+            new CenterGetStudyListAction(SessionManager.getUser()
+                .getCurrentWorkingCenter())).getList();
+        Study selectedStudy = null;
+        if (patientInfo == null) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
-                patient.setStudy(selectedStudy);
+                patient.setStudy(new StudyWrapper(SessionManager
+                    .getAppService(), selectedStudy));
             }
         } else {
-            selectedStudy = patient.getStudy();
+            selectedStudy = patient.getStudy().getWrappedObject();
         }
 
-        studiesViewer = createComboViewer(client,
-            Messages.PatientEntryForm_field_study_label, studies,
-            selectedStudy,
-            Messages.PatientEntryForm_field_study_validation_msg,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    patient.setStudy((StudyWrapper) selectedObject);
-                }
-            });
+        studiesViewer =
+            createComboViewer(client,
+                "Study", studies,
+                selectedStudy,
+                "A study should be selected",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        patient.setStudy(new StudyWrapper(
+                            SessionManager.getAppService(),
+                            (Study) selectedObject));
+                    }
+                });
+        studiesViewer.setLabelProvider(new BiobankLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return ((Study) element).getNameShort();
+            }
+        });
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Messages.PatientEntryForm_field_pNumber_label, null, patient,
+            "Patient Number", null, patient,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client,
-            Messages.PatientEntryForm_created_label);
+            "Created At");
         createdAtLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         createdAtValidator = new NotNullValidator(
-            Messages.PatientEntryForm_created_validation_msg);
+            "Created At should be set");
 
         createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
             patient, PatientPeer.CREATED_AT.getName(), createdAtValidator,
             SWT.DATE | SWT.TIME, CREATED_AT_BINDING);
+
+        createCommentSection();
+    }
+
+    private void createCommentSection() {
+        Composite client = createSectionWithClient("Comments");
+        GridLayout gl = new GridLayout(2, false);
+
+        client.setLayout(gl);
+        commentEntryTable = new CommentsInfoTable(client,
+            patient.getCommentCollection(false));
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        commentEntryTable.setLayoutData(gd);
+        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
+            "Add a comment", null, comment, "message", null);
     }
 
     @Override
     protected String getOkMessage() {
-        if (patient.isNew()) {
+        if (patientInfo == null) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -137,26 +203,42 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        patient.persist();
-        SessionManager.updateAllSimilarNodes(adapter, true);
+        SessionManager.getAppService().doAction(
+            new PatientSaveAction(patient.getId(), patient
+                .getStudy().getId(), patient.getPnumber(), patient
+                .getCreatedAt(), comment.getMessage())).getId();
+        ((PatientAdapter) adapter).setValue(SessionManager.getAppService()
+            .doAction(new PatientSearchAction(patient.getPnumber())));
+    }
+
+    @Override
+    protected void doAfterSave() throws Exception {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
+                // FIXME how to display new patient without explicitly calling
+                // the collection tree view?
                 CollectionView.getCurrent().showSearchedObjectsInTree(
-                    Arrays.asList(patient), true);
+                    adapter.getId(), patient.getPnumber(), true, true);
+                // the node is not highlighted because the entryform is opening
+                // a viewform with a different adapter
             }
         });
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return PatientViewForm.ID;
     }
 
     @Override
-    protected void onReset() throws Exception {
-        patient.reset();
-
+    public void setValues() throws Exception {
         GuiUtil.reset(studiesViewer, patient.getStudy());
+    }
+
+    @Override
+    protected boolean openViewAfterSaving() {
+        // already done by showSearchedObjectsInTree called in doAfterSave
+        return false;
     }
 }

@@ -2,25 +2,20 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -30,16 +25,19 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
-    private static final String RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY = "receivingWithErrorsDispatchCollection";
-    private static final String RECEIVING_DISPATCH_COLLECTION_CACHE_KEY = "receivingDispatchCollection";
-    private static final String IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY = "inTransitReceiveDispatchCollection";
-    private static final String IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY = "inCreationDispatchCollection";
-    private static final String IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY = "inTransitSentDispatchCollection";
+    private static final String RECEIVING_WITH_ERRORS_DISPATCH_COLLECTION_CACHE_KEY =
+        "receivingWithErrorsDispatchCollection"; //$NON-NLS-1$
+    private static final String RECEIVING_DISPATCH_COLLECTION_CACHE_KEY =
+        "receivingDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_TRANSIT_RECEIVE_DISPATCH_COLLECTION_CACHE_KEY =
+        "inTransitReceiveDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_CREATION_DISPATCH_COLLECTION_CACHE_KEY =
+        "inCreationDispatchCollection"; //$NON-NLS-1$
+    private static final String IN_TRANSIT_SENT_DISPATCH_COLLECTION_CACHE_KEY =
+        "inTransitSentDispatchCollection"; //$NON-NLS-1$
 
-    private static final String ALL_CENTERS_HQL_STRING = "from "
+    private static final String ALL_CENTERS_HQL_STRING = "from " //$NON-NLS-1$
         + Center.class.getName();
-
-    private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
     public CenterWrapper(WritableApplicationService appService) {
         super(appService);
@@ -50,8 +48,25 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     @Override
+    public int compareTo(ModelWrapper<E> wrapper) {
+        if (wrapper instanceof CenterWrapper) {
+            String name1 = wrappedObject.getName();
+            String name2 = wrapper.wrappedObject.getName();
+            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
+                : -1));
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
     protected List<Property<?, ? super E>> getProperties() {
-        List<Property<?, ? super E>> aList = new ArrayList<Property<?, ? super E>>();
+        List<Property<?, ? super E>> aList =
+            new ArrayList<Property<?, ? super E>>();
 
         aList.addAll(super.getProperties());
 
@@ -149,60 +164,14 @@ public abstract class CenterWrapper<E extends Center> extends
         initAddress().setProperty(AddressPeer.COUNTRY, country);
     }
 
-    public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
-        + ProcessingEvent.class.getName()
-        + " as proc where "
-        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
-        + " = ?";
-
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
         return getProcessingEventCount(false);
     }
 
-    /**
-     * fast = true will execute a hql query. fast = false will call the
-     * getCollectionEventCollection().size method
-     */
     public long getProcessingEventCount(boolean fast)
         throws ApplicationException, BiobankException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        List<ProcessingEventWrapper> list = getProcessingEventCollection(false);
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
-    }
-
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getCollectionEventCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
-
-    /**
-     * Collection event count for this center. This count is different for each
-     * center: the method should be defined in each center type
-     */
-    public abstract long getPatientCountForStudy(StudyWrapper study)
-        throws ApplicationException, BiobankException;
-
-    @Override
-    protected void persistDependencies(Center origObject) throws Exception {
-        deleteCollectionEvents();
-    }
-
-    private void deleteCollectionEvents() throws Exception {
-        for (CollectionEventWrapper ce : deletedCollectionEvents) {
-            if (!ce.isNew()) {
-                ce.delete();
-            }
-        }
+        return getPropertyCount(CenterPeer.PROCESSING_EVENTS, fast);
     }
 
     public static List<CenterWrapper<?>> getCenters(
@@ -331,38 +300,40 @@ public abstract class CenterWrapper<E extends Center> extends
         return shipCollection;
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInTransitReceiveDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
         CenterWrapper<?> center) {
         return center.getReceivingNoErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInCreationDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInCreationDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
         CenterWrapper<?> center) {
         return center.getReceivingWithErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
+    public static List<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
         CenterWrapper<?> center) {
         return center.getInTransitSentDispatchCollection();
     }
 
-    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(childSpcs) from "
-        + Specimen.class.getName()
-        + " sp join sp."
-        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as childSpcs where childSpcs."
-        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + "=?";
+    @SuppressWarnings("nls")
+    private static final String CHILD_SPECIMENS_COUNT_QRY =
+        "select count(childSpcs) from "
+            + Specimen.class.getName()
+            + " sp join sp."
+            + SpecimenPeer.CHILD_SPECIMENS.getName()
+            + " as childSpcs where childSpcs."
+            + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
+            + "=?";
 
     public Long getAliquotedSpecimenCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,
@@ -370,16 +341,15 @@ public abstract class CenterWrapper<E extends Center> extends
         return getCountResult(appService, criteria);
     }
 
-    public abstract Long getPatientCount() throws Exception;
-
-    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct cevent) from "
-        + Center.class.getName()
-        + " as c join c."
-        + CenterPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where c."
-        + CenterPeer.ID.getName() + "=?";
+    @SuppressWarnings("nls")
+    public static final String COLLECTION_EVENT_COUNT_QRY =
+        "select count(distinct cevent) from "
+            + Specimen.class.getName()
+            + " as spc join spc."
+            + SpecimenPeer.COLLECTION_EVENT.getName()
+            + " as cevent where spc."
+            + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
+            + "=?";
 
     /**
      * Count events for specimen that are currently at this site
@@ -397,6 +367,7 @@ public abstract class CenterWrapper<E extends Center> extends
         return Arrays.asList(this);
     }
 
+    @SuppressWarnings("nls")
     public static final String CENTER_FROM_ID_QRY = "from "
         + Center.class.getName() + " where " + CenterPeer.ID.getName() + " = ?";
 
@@ -408,11 +379,60 @@ public abstract class CenterWrapper<E extends Center> extends
         List<Center> centers = appService.query(criteria);
         if (centers.size() == 0)
             return null;
-        else
-            return wrapModel(appService, centers.get(0), null);
+        return WrapperUtil.wrapModel(appService, centers.get(0), null);
 
     }
 
+    @Deprecated
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(CenterPeer.NAME));
+        tasks.add(check().notNull(CenterPeer.NAME_SHORT));
+
+        tasks.add(check().unique(CenterPeer.NAME));
+        tasks.add(check().unique(CenterPeer.NAME_SHORT));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        super.addDeleteTasks(tasks);
+    }
+
+    // TODO: remove if allowing bi-direcitonal links.
+    // public List<DispatchWrapper> getSrcDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.SENDER_CENTER, Dispatch.class, DispatchWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<DispatchWrapper> getDstDispatchCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // DispatchPeer.RECEIVER_CENTER, Dispatch.class,
+    // DispatchWrapper.class, sort);
+    // }
+    //
+    // public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // SpecimenPeer.CURRENT_CENTER, Specimen.class, SpecimenWrapper.class,
+    // sort);
+    // }
+    //
+    // public List<OriginInfoWrapper> getOriginInfoCollection(boolean sort) {
+    // return HQLAccessor.getCachedCollection(this, OriginInfoPeer.CENTER,
+    // OriginInfo.class, OriginInfoWrapper.class, sort);
+    // }
+    //
+    // public List<ProcessingEventWrapper> getProcessingEventCollection(
+    // boolean sort) {
+    // return HQLAccessor.getCachedCollection(this,
+    // ProcessingEventPeer.CENTER, ProcessingEvent.class,
+    // ProcessingEventWrapper.class, sort);
+    // }
+
+    @SuppressWarnings("nls")
     private static final String PENDING_REQUEST_STRING = "select distinct(ra."
         + RequestSpecimenPeer.REQUEST.getName()
         + ") from "
@@ -423,26 +443,20 @@ public abstract class CenterWrapper<E extends Center> extends
         + RequestSpecimenState.AVAILABLE_STATE.getId() + " or ra.state = "
         + RequestSpecimenState.PULLED_STATE.getId();
 
-    public static Collection<? extends ModelWrapper<?>> getRequestCollection(
+    public static List<? extends ModelWrapper<?>> getRequestCollection(
         WritableApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PENDING_REQUEST_STRING,
             Arrays.asList(new Object[] { center.getWrappedObject() }));
         List<Request> requests = appService.query(criteria);
         if (requests.size() == 0)
-            return null;
-        else
-            return wrapModelCollection(appService, requests,
-                RequestWrapper.class);
+            return new ArrayList<RequestWrapper>();
+        return wrapModelCollection(appService, requests,
+            RequestWrapper.class);
     }
 
     public List<StudyWrapper> getStudyCollection() {
         return Collections.emptyList();
     }
 
-    @Override
-    public boolean canUpdate(User user) {
-        return user.isInSuperAdminMode()
-            || user.isAdministratorForCurrentCenter();
-    }
 }

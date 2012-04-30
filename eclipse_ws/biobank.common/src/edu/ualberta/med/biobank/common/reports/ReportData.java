@@ -6,4 +6,5 @@ public class ReportData {
     public String description;
     public String editorId;
     public ReportType type;
+    public String id;
 }

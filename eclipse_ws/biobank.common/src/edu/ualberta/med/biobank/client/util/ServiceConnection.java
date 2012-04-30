@@ -30,7 +30,7 @@ public class ServiceConnection {
                 .getApplicationServiceFromUrl(serverUrl, userName, password);
         }
         Log logMessage = new Log();
-        logMessage.action = "login"; //$NON-NLS-1$
+        logMessage.setAction("login"); //$NON-NLS-1$
         appService.logActivity(logMessage);
         return appService;
     }
@@ -61,7 +61,7 @@ public class ServiceConnection {
         throws Exception {
         if (appService != null) {
             Log logMessage = new Log();
-            logMessage.action = "logout"; //$NON-NLS-1$
+            logMessage.setAction("logout"); //$NON-NLS-1$
             ((BiobankApplicationService) appService).logActivity(logMessage);
         }
     }

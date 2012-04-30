@@ -17,10 +17,9 @@ public class NotNullValidator extends AbstractValidator {
         if (value == null) {
             showDecoration();
             return ValidationStatus.error(errorMessage);
-        } else {
-            hideDecoration();
-            return Status.OK_STATUS;
         }
+        hideDecoration();
+        return Status.OK_STATUS;
     }
 
 }

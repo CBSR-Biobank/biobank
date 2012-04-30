@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.trees;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -26,20 +29,20 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.utils.BiobankClipboard;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
 
@@ -50,8 +53,8 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private Menu menu;
 
     public DispatchSpecimensTreeTable(Composite parent,
-        final DispatchWrapper shipment, final boolean editSpecimensState,
-        final boolean editSpecimensComment) {
+        final DispatchWrapper shipment,
+        final boolean editSpecimensState) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -100,8 +103,11 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
-                groups = DispatchTableGroup
-                    .getGroupsForShipment(DispatchSpecimensTreeTable.this.shipment);
+                if (newInput != null)
+                    groups =
+                        DispatchTableGroup
+                            .getGroupsForShipment(
+                            DispatchSpecimensTreeTable.this.shipment);
             }
 
             @Override
@@ -126,7 +132,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         };
         tv.setContentProvider(contentProvider);
 
-        final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
+        final BgcLabelProvider labelProvider = new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof TableGroup) {
@@ -140,12 +146,18 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ""; //$NON-NLS-1$
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
-                        return ((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
-                            .getSpecimen()).getComment();
+                        return CommentWrapper
+                            .commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) element)
+                                .getSpecimen()).getCommentCollection(false));
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
                 return ""; //$NON-NLS-1$
+            }
+
+            @Override
+            public Image getColumnImage(Object element, int columnIndex) {
+                return null;
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -153,20 +165,23 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                for (MenuItem menuItem : menu.getItems()) {
-                    if (!menuItem.equals(editItem))
-                        menuItem.dispose();
-                }
-                BiobankClipboard.addClipboardCopySupport(tv, menu,
-                    labelProvider, 5);
-                if (editSpecimensState || editSpecimensComment) {
-                    DispatchSpecimenWrapper dsa = getSelectedSpecimen();
-                    if (dsa != null) {
-                        if (editSpecimensState
-                            && DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
+                DispatchSpecimenWrapper dsa = getSelectedSpecimen();
+                if (dsa != null) {
+                    for (MenuItem menuItem : menu.getItems()) {
+                        if (!menuItem.equals(editItem))
+                            menuItem.dispose();
+                    }
+
+                    BgcClipboard
+                        .addClipboardCopySupport(tv, menu, labelProvider, 5);
+
+                    if (editSpecimensState) {
+                        if (
+                        DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
                             addSetMissingMenu(menu);
-                        if (editSpecimensComment)
-                            addModifyCommentMenu(menu);
+                        addModifyCommentMenu(menu);
+                        if (DispatchSpecimenState.getState(dsa.getState()) != DispatchSpecimenState.NONE)
+                            addDeleteExtraMenu(menu);
                     }
                 }
             }
@@ -210,13 +225,34 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    private void addDeleteExtraMenu(final Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText(Messages.DispatchSpecimensTreeTable_delete_label);
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                DispatchSpecimensTreeTable.this.shipment.removeDispatchSpecimens(Arrays
+                    .asList((DispatchSpecimenWrapper) ((TreeItemAdapter) ((IStructuredSelection) tv
+                        .getSelection())
+                        .getFirstElement())
+                        .getSpecimen()));
+                notifyListeners();
+                tv.refresh();
+            }
+        });
+    }
+
     private void modifyCommentAndState(
         IStructuredSelection iStructuredSelection,
         DispatchSpecimenState newState) {
         String previousComment = null;
         if (iStructuredSelection.size() == 1) {
-            previousComment = ((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
-                .getFirstElement()).getSpecimen()).getComment();
+            previousComment =
+                CommentWrapper
+                    .commentListToString(((DispatchSpecimenWrapper) ((TreeItemAdapter) iStructuredSelection
+                        .getFirstElement()).getSpecimen())
+                        .getCommentCollection(false));
         }
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
@@ -226,16 +262,22 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             String comment = dialog.getComment();
             for (Iterator<?> iter = iStructuredSelection.iterator(); iter
                 .hasNext();) {
-                DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
-                    .next()).getSpecimen();
-                dsa.setComment(comment);
+                DispatchSpecimenWrapper dsa =
+                    (DispatchSpecimenWrapper) ((TreeItemAdapter) iter
+                        .next()).getSpecimen();
+                CommentWrapper commentOb = new CommentWrapper(
+                    SessionManager.getAppService());
+                commentOb.setCreatedAt(new Date());
+                commentOb.setUser(SessionManager.getUser());
+                commentOb.setMessage(comment);
+                dsa.addToCommentCollection(Arrays.asList(commentOb));
                 if (newState != null) {
                     dsa.setDispatchSpecimenState(newState);
                 }
             }
             shipment.resetMap();
-            tv.refresh();
             notifyListeners();
+            tv.refresh();
         }
     }
 
@@ -253,21 +295,19 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 }
             }
         });
-        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
-            editItem = new MenuItem(getMenu(), SWT.PUSH);
-            editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
-            editItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    DispatchSpecimenWrapper selection = getSelectedSpecimen();
-                    if (selection != null) {
-                        AdapterBase adapter = AdapterFactory
-                            .getAdapter(selection.getSpecimen());
-                        adapter.openEntryForm();
-                    }
+        editItem = new MenuItem(getMenu(), SWT.PUSH);
+        editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+        editItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                DispatchSpecimenWrapper selection = getSelectedSpecimen();
+                if (selection != null) {
+                    AbstractAdapterBase adapter = AdapterFactory
+                        .getAdapter(selection.getSpecimen());
+                    adapter.openEntryForm();
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override

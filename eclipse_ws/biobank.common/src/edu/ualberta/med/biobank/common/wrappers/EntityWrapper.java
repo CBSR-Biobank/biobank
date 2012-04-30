@@ -35,7 +35,7 @@ public class EntityWrapper extends EntityBaseWrapper {
         if (properties == null) {
             Collection<EntityProperty> properties = new ArrayList<EntityProperty>();
             Collection<EntityProperty> epc = wrappedObject
-                .getEntityPropertyCollection();
+                .getEntityProperties();
 
             if (epc != null) {
                 properties.addAll(epc);
@@ -76,7 +76,7 @@ public class EntityWrapper extends EntityBaseWrapper {
         EntityProperty entityProperty) {
         Collection<EntityColumn> columns = new ArrayList<EntityColumn>();
         Collection<EntityColumn> ecc = entityProperty
-            .getEntityColumnCollection();
+            .getEntityColumns();
 
         if (ecc != null) {
             columns.addAll(ecc);
@@ -89,7 +89,7 @@ public class EntityWrapper extends EntityBaseWrapper {
         EntityProperty entityProperty) {
         Collection<EntityFilter> filters = new ArrayList<EntityFilter>();
         Collection<EntityFilter> efc = entityProperty
-            .getEntityFilterCollection();
+            .getEntityFilters();
 
         if (efc != null) {
             filters.addAll(efc);
@@ -98,7 +98,7 @@ public class EntityWrapper extends EntityBaseWrapper {
         return filters;
     }
 
-    private static final String GET_ENTTITIES_QRY = "from "
+    private static final String GET_ENTTITIES_QRY = "from " //$NON-NLS-1$
         + Entity.class.getName();
 
     public static Collection<Entity> getEntities(

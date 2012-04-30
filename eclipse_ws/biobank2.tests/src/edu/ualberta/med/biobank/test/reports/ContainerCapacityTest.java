@@ -16,6 +16,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
     private static final Mapper<ContainerWrapper, String, ResultRow> groupByTopContainerId(
         final Collection<ContainerWrapper> containers) {
         return new Mapper<ContainerWrapper, String, ResultRow>() {
+            @Override
             public String getKey(ContainerWrapper container) {
                 String path = getPath(container);
 
@@ -29,6 +30,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
                 return null;
             }
 
+            @Override
             public ResultRow getValue(ContainerWrapper container, ResultRow row) {
                 row = row != null ? row : new ResultRow();
 
@@ -78,6 +80,7 @@ public class ContainerCapacityTest extends AbstractReportTest {
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         Collection<ContainerWrapper> filteredContainers = PredicateUtil.filter(

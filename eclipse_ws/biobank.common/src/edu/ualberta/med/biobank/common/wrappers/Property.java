@@ -1,96 +1,207 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.property.GetterInterceptor;
+import edu.ualberta.med.biobank.common.wrappers.property.PropertyLink;
 
 /**
  * 
  * @author jferland
  * 
- * @param <T> the type of the Property
- * @param <W> the type that has the Property
+ * @param <P> the type of this {@link Property}
+ * @param <M> the type of the model that has this {@link Property}
  */
-public class Property<T, W> {
+public class Property<P, M> implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private static final Pattern NAME_SPLITTER = Pattern.compile("\\."); //$NON-NLS-1$
+
     private final String name;
-    private final TypeReference<T> type;
-    private final Accessor<T, W> accessor;
+    private final List<String> splitNames;
+    private final String propertyChangeName;
+    private final Class<M> modelClass;
+    private final TypeInfo typeInfo;
+    private final Accessor<P, M> accessor;
+    private final PropertyLink<P, ?, M> link;
 
-    // TODO: include the model class as a type parameter and check this
-    // against what it's called on?
-
-    private Property(String name, TypeReference<T> type, Accessor<T, W> accessor) {
+    private Property(String name, Class<M> modelClass,
+        TypeReference<P> typeReference, Accessor<P, M> accessor) {
         this.name = name;
-        this.type = type;
+        this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
+        this.propertyChangeName = name;
+        this.modelClass = modelClass;
+        this.typeInfo = new TypeInfo(typeReference);
+        this.link = null;
         this.accessor = accessor;
+    }
+
+    private Property(String name, String propertyChangeName,
+        Class<M> modelClass, TypeInfo typeInfo, PropertyLink<P, ?, M> link) {
+        this.name = name;
+        this.splitNames = Arrays.asList(NAME_SPLITTER.split(name));
+        this.propertyChangeName = propertyChangeName;
+        this.modelClass = modelClass;
+        this.typeInfo = typeInfo;
+        this.link = link;
+        this.accessor = link;
     }
 
     public String getName() {
         return name;
     }
 
-    public Type getType() {
-        return type.getType();
+    private static <P, A, M> P get(PropertyLink<P, A, M> link, M model,
+        GetterInterceptor getter) {
+        P value = null;
+
+        Property<A, M> fromProperty = link.getFrom();
+        A from = fromProperty.get(model, getter);
+
+        if (from != null) {
+            Property<P, ? super A> toProperty = link.getTo();
+            value = toProperty.get(from, getter);
+        }
+
+        return value;
     }
 
-    public T get(W model) {
+    public P get(M model, GetterInterceptor getter) {
+        P value = null;
+
+        if (link != null) {
+            value = get(link, model, getter);
+        } else {
+            value = getter.get(this, model);
+        }
+
+        return value;
+    }
+
+    private static <P, A, M> void set(PropertyLink<P, A, M> link, M model,
+        P value, GetterInterceptor getter) {
+        Property<A, M> fromProperty = link.getFrom();
+        A from = fromProperty.get(model, getter);
+
+        Property<P, ? super A> toProperty = link.getTo();
+        toProperty.set(from, value, getter);
+    }
+
+    public void set(M model, P value, GetterInterceptor getter) {
+        if (link != null) {
+            set(link, model, value, getter);
+        } else {
+            set(model, value);
+        }
+    }
+
+    public String getPropertyChangeName() {
+        return propertyChangeName;
+    }
+
+    /**
+     * @return the {@link Class} of the elements in the {@link Collection}
+     *         returned by this class, otherwise the {@link Class} itself.
+     */
+    public Class<?> getElementClass() {
+        return typeInfo.elementClass;
+    }
+
+    public boolean isCollection() {
+        return typeInfo.isCollection;
+    }
+
+    public Class<M> getModelClass() {
+        return modelClass;
+    }
+
+    public P get(M model) {
         return accessor.get(model);
     }
 
-    public void set(W model, T value) {
+    public void set(M model, P value) {
         accessor.set(model, value);
     }
 
-    public <T2> Property<T2, W> wrap(final Property<T2, ? super T> property) {
+    /**
+     * An alias for the {@code wrap()} method. Behaves exactly the same, but
+     * with a shorter method name for use such as
+     * 
+     * <pre>
+     *      Property cThroughA = A.to(B.to(C))
+     *      C c = cThroughA.get(a);
+     * </pre>
+     * 
+     * @param <T2>
+     * @param property
+     * @returnAssociationAccessor
+     */
+    public <T2> Property<T2, M> to(final Property<T2, ? super P> property) {
+        return wrap(property.name, property);
+    }
+
+    // TODO: write an "ofEach" method that could return a PropertyCollection
+    // with get() and set() methods that return and take lists, respectively?
+    // Could also make a PropertyName object that provides methods to construct
+    // an at-compile-time checked list of properties?? COOOOOOOL! ;-) e.g.
+    // PropertyName.start(SpecimenPeer.ID).ofEach(SpecimenPeer.CHILD_SPECIMEN_COLLECTION)).get();
+
+    public <T2> Property<T2, M> wrap(final Property<T2, ? super P> property) {
         return wrap(property.name, property);
     }
 
     /**
-     * Creates a new <code>Property</code> by treating the <code>Property</code>
-     * of an association as a direct property.
+     * Creates a new {@link Property} by treating the {@link Property} of an
+     * association as a direct property.
      * 
-     * @param <T2>
-     * @param name a new name to use for the property (should correspond to the
-     *            <code>ModelWrapper</code>'s method name)
+     * @param <A>
+     * @param propertyChangeName a new name to use for the property when firing
+     *            a change event (should correspond to the {@link ModelWrapper}
+     *            's method name)
      * @param property
      * @return
      */
-    public <T2> Property<T2, W> wrap(String name,
-        final Property<T2, ? super T> property) {
-        Accessor<T2, W> accessor = new Accessor<T2, W>() {
-            @Override
-            public T2 get(W model) {
-                T association = Property.this.accessor.get(model);
-                return association == null ? null : property.get(association);
-            }
+    public <A> Property<A, M> wrap(String propertyChangeName,
+        final Property<A, ? super P> property) {
+        PropertyLink<A, ?, M> link = new PropertyLink<A, P, M>(this, property);
 
-            @Override
-            public void set(W model, T2 value) {
-                T association = Property.this.accessor.get(model);
-                if (association != null) {
-                    property.set(association, value);
-                }
-            }
-        };
-
-        return new Property<T2, W>(name, property.type, accessor);
+        return new Property<A, M>(concatNames(this, property),
+            propertyChangeName, modelClass, property.typeInfo, link);
     }
 
-    public Collection<Property<?, W>> wrap(
-        Collection<Property<?, ? super T>> properties) {
-        List<Property<?, W>> wrappedProperties = new ArrayList<Property<?, W>>();
+    public Collection<Property<?, M>> wrap(
+        Collection<Property<?, ? super P>> properties) {
+        List<Property<?, M>> wrappedProperties = new ArrayList<Property<?, M>>();
 
-        for (Property<?, ? super T> property : properties) {
-            Property<?, W> wrappedProperty = wrap(property.name, property);
+        for (Property<?, ? super P> property : properties) {
+            Property<?, M> wrappedProperty = wrap(property.name, property);
             wrappedProperties.add(wrappedProperty);
         }
 
         return wrappedProperties;
+    }
+
+    /**
+     * Returns a copy of a {@link List} of the component names that make up the
+     * name of this {@link Property}. For example, if a {@link Property} has a
+     * name of "specimen" then this method would return ("specimen"). However,
+     * if a {@link Property} has a name of "specimen.container.id" then this
+     * method would return the list ("specimen", "container", "id").
+     * 
+     * @return
+     */
+    public List<String> getNames() {
+        return new ArrayList<String>(splitNames);
     }
 
     public static String concatNames(Property<?, ?>... props) {
@@ -102,9 +213,9 @@ public class Property<T, W> {
         return StringUtils.join(propNames, '.');
     }
 
-    public static <T, W> Property<T, W> create(String name,
-        TypeReference<T> type, Accessor<T, W> accessor) {
-        return new Property<T, W>(name, type, accessor);
+    public static <P, M> Property<P, M> create(String name,
+        Class<M> modelClass, TypeReference<P> type, Accessor<P, M> accessor) {
+        return new Property<P, M>(name, modelClass, type, accessor);
     }
 
     @Override
@@ -115,6 +226,7 @@ public class Property<T, W> {
         return result;
     }
 
+    // TODO: include model class or type info for equality check?
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -134,12 +246,70 @@ public class Property<T, W> {
 
     @Override
     public String toString() {
-        return name + "(" + getType() + ")";
+        return name + "(" + typeInfo.toString + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    public interface Accessor<T, W> {
-        public T get(W model);
+    public interface Accessor<P, M> extends Serializable {
+        public P get(M model);
 
-        public void set(W model, T value);
+        public void set(M model, P value);
+    };
+
+    /**
+     * Because {@link TypeReference} is not necessarily {@link Serializable},
+     * this internal class is used to extract all the necessary information,
+     * encapsulate it, and all it to be serialized.
+     * 
+     * @author jferland
+     * 
+     */
+    private static final class TypeInfo implements Serializable {
+        // TODO: we don't need a TypeReference class to get this information, it
+        // can be generated by another file that analyzes the uml and inserted
+        // into the definitions of the peer classes
+        private static final long serialVersionUID = 1L;
+
+        private final Class<?> elementClass;
+        private final boolean isCollection;
+        private final String toString;
+
+        public TypeInfo(TypeReference<?> typeReference) {
+            Type type = typeReference.getType();
+            this.elementClass = getElementClass(type);
+            this.isCollection = isCollection(type);
+            this.toString = type.toString();
+        }
+
+        private static Class<?> getElementClass(Type type) {
+            Class<?> klazz = null;
+            if (type instanceof Class<?>) {
+                klazz = (Class<?>) type;
+            } else if (type instanceof ParameterizedType) {
+                ParameterizedType pType = (ParameterizedType) type;
+                Type[] elementTypes = pType.getActualTypeArguments();
+                if (elementTypes.length > 0) {
+                    Type elementType = elementTypes[0];
+                    klazz = getElementClass(elementType);
+                }
+            }
+            return klazz;
+        }
+
+        private static boolean isCollection(Type type) {
+            boolean isCollection = false;
+
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pType = (ParameterizedType) type;
+                Type rawType = pType.getRawType();
+                if (rawType instanceof Class) {
+                    Class<?> rawTypeClass = (Class<?>) rawType;
+                    if (rawTypeClass.isAssignableFrom(Collection.class)) {
+                        isCollection = true;
+                    }
+                }
+            }
+
+            return isCollection;
+        }
     }
 }

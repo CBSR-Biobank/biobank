@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -10,41 +9,62 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
+import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAdapter extends AdapterBase {
 
     private int nodeIdOffset = 100;
-    public static final int STUDIES_BASE_NODE_ID = 0;
-    public static final int CLINICS_BASE_ID = 1;
-    public static final int CONTAINER_TYPES_BASE_NODE_ID = 2;
-    public static final int CONTAINERS_BASE_NODE_ID = 3;
+    public static final int CONTAINER_TYPES_BASE_NODE_ID = 0;
+    public static final int CONTAINERS_BASE_NODE_ID = 1;
 
     public SiteAdapter(AdapterBase parent, SiteWrapper site) {
-        super(parent, site, false);
-
+        super(parent, site);
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
         }
-
         createNodes();
     }
 
+    @Override
+    public void init() {
+        try {
+            this.isDeletable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteDeletePermission(getModelObject().getId()));
+            this.isReadable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteReadPermission(getModelObject().getId()));
+            this.isEditable =
+                SessionManager.getAppService().isAllowed(
+                    new SiteUpdatePermission(getModelObject().getId()));
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(Messages.SiteAdapter_0,
+                Messages.SiteAdapter_1);
+        }
+    }
+
     public ContainerTypeGroup getContainerTypesGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset
+        ContainerTypeGroup adapter = (ContainerTypeGroup) getChild(nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerTypeGroup) adapter;
+        return adapter;
     }
 
     public ContainerGroup getContainersGroupNode() {
-        AdapterBase adapter = getChild(nodeIdOffset + CONTAINERS_BASE_NODE_ID);
+        ContainerGroup adapter = (ContainerGroup) getChild(nodeIdOffset
+            + CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return (ContainerGroup) adapter;
+        return adapter;
     }
 
     @Override
@@ -55,7 +75,7 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return getTooltipText(Messages.SiteAdapter_tooltip_label);
     }
 
@@ -74,15 +94,11 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    public boolean isDeletable() {
-        return internalIsDeletable();
-    }
-
-    @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof SiteWrapper)
-            return Arrays.asList((AdapterBase) this);
-        return searchChildren(searchedObject);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        if (SiteWrapper.class.isAssignableFrom(searchedClass))
+            return Arrays.asList((AbstractAdapterBase) this);
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override
@@ -91,18 +107,13 @@ public class SiteAdapter extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         return null;
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren() {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren() {
         return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() {
-        return 0;
     }
 
     @Override
@@ -128,4 +139,23 @@ public class SiteAdapter extends AdapterBase {
         createNodes();
     }
 
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        if (o instanceof SiteAdapter)
+            return internalCompareTo(o);
+        return 0;
+    }
+
+    // disable MVP for version 3.2.0
+    // @Override
+    // public IEditorPart openEntryForm(boolean hasPreviousForm) {
+    // eventBus.fireEvent(new SiteEditEvent(site.getId()));
+    // return null; // TODO: problem !?
+    // }
+
+    // disable MVP for version 3.2.0
+    // @Override
+    // public void openViewForm() {
+    // eventBus.fireEvent(new SiteViewEvent(site.getId()));
+    // }
 }

@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -8,61 +11,83 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
+import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModificationConcurrencyException;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
+    @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractDispatchEntryForm.class.getName());
 
-    protected DispatchWrapper dispatch;
+    protected DispatchWrapper dispatch = new DispatchWrapper(
+        SessionManager.getAppService());
 
-    protected BgcEntryFormWidgetListener biobankListener = new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            reloadSpecimens();
-            setDirty(true);
-        }
-    };
-
-    private boolean isTryingAgain;
+    protected BgcEntryFormWidgetListener biobankListener =
+        new BgcEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                reloadSpecimens();
+                setDirty(true);
+            }
+        };
 
     protected boolean tryAgain;
 
+    protected DispatchReadInfo dispatchInfo;
+
+    protected CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
+    protected Set<Integer> oldSpecIds;
+
     @Override
     protected void init() throws Exception {
-        Assert.isNotNull(adapter, "Adapter should be no null"); //$NON-NLS-1$
+        Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        dispatch = (DispatchWrapper) getModelObject();
-        SessionManager.logEdit(dispatch);
-        retrieveShipment();
+        setDispatchInfo(adapter.getId());
 
         setPartName(getTextForPartName());
     }
 
-    private void retrieveShipment() {
-        try {
-            dispatch.reload();
-        } catch (Exception ex) {
-            logger.error("Error while retrieving shipment " //$NON-NLS-1$
-                + dispatch.getShipmentInfo().getWaybill(), ex);
+    private void setDispatchInfo(Integer id) throws Exception {
+        if (id == null) {
+            Dispatch d = new Dispatch();
+            dispatch.setWrappedObject(d);
+        } else {
+            DispatchReadInfo read =
+                SessionManager.getAppService().doAction(
+                    new DispatchGetInfoAction(adapter.getId()));
+            read.dispatch
+                .setDispatchSpecimens(read.specimens);
+            dispatch.setWrappedObject(read.dispatch);
+            SessionManager.logLookup(read.dispatch);
         }
+        comment.setWrappedObject(new Comment());
     }
 
     protected abstract String getTextForPartName();
@@ -76,7 +101,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Composite addComposite = toolkit.createComposite(composite);
         addComposite.setLayout(new GridLayout(5, false));
         toolkit.createLabel(addComposite,
-            Messages.AbstractDispatchEntryForm_add_spec_label);
+            "Enter inventory ID to add:");
         final BgcBaseText newSpecimenText = new BgcBaseText(addComposite,
             SWT.NONE, toolkit);
         GridData gd = new GridData();
@@ -87,13 +112,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void handleEvent(Event e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText(""); //$NON-NLS-1$
+                newSpecimenText.setText("");
             }
         });
         if (setAsFirstControl) {
             setFirstControl(newSpecimenText);
         }
-        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
@@ -101,13 +126,13 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 doSpecimenTextAction(newSpecimenText.getText());
                 newSpecimenText.setFocus();
-                newSpecimenText.setText(""); //$NON-NLS-1$
+                newSpecimenText.setText("");
             }
         });
         toolkit.createLabel(addComposite,
-            Messages.AbstractDispatchEntryForm_scanDialog_label);
+            "or open scan dialog:");
         Button openScanButton = toolkit
-            .createButton(addComposite, "", SWT.PUSH); //$NON-NLS-1$
+            .createButton(addComposite, "", SWT.PUSH);
         openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
@@ -128,42 +153,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
      */
     protected abstract void doSpecimenTextAction(String text);
 
-    @Override
-    protected void saveForm() throws Exception {
-        try {
-            dispatch.persist();
-        } catch (ModificationConcurrencyException mc) {
-            if (needToTryAgainIfConcurrency()) {
-                if (isTryingAgain) {
-                    // already tried once
-                    throw mc;
-                }
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        tryAgain = BgcPlugin
-                            .openConfirm(
-                                Messages.ProcessingEventEntryForm_save_error_title,
-                                Messages.ProcessingEventEntryForm_concurrency_error_msg);
-                        setDirty(true);
-                        try {
-                            doTrySettingAgain();
-                            tryAgain = true;
-                        } catch (Exception e) {
-                            saveErrorCatch(e, null, true);
-                        }
-                    }
-                });
-            } else
-                throw mc;
-        }
-    }
-
     protected boolean needToTryAgainIfConcurrency() {
         return false;
     }
 
-    @SuppressWarnings("unused")
     protected void doTrySettingAgain() throws Exception {
         // default does nothing
     }
@@ -171,7 +164,6 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     @Override
     protected void doAfterSave() throws Exception {
         if (tryAgain) {
-            isTryingAgain = true;
             tryAgain = false;
             confirm();
         } else
@@ -181,8 +173,29 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected abstract void reloadSpecimens();
 
     @Override
-    protected void onReset() throws Exception {
-        dispatch.reset();
+    public void setValues() throws Exception {
         reloadSpecimens();
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
+
+        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        for (DispatchSpecimenWrapper ds : dispatch
+            .getDispatchSpecimenCollection(false))
+            dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
+                .getId(), ds.getState()));
+        DispatchSaveInfo dInfo =
+            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
+                .getId(), dispatch.getSenderCenter().getId(),
+                dispatch.getState(), (comment.getMessage() == null)
+                    ? "" : comment.getMessage());
+        ShipmentInfoSaveInfo ship = null;
+        if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
+            ship =
+                DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+        DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, ship);
+        dispatch.setId(SessionManager.getAppService().doAction(save).getId());
+        ((AdapterBase) adapter).setModelObject(dispatch);
     }
 }

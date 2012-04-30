@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -7,10 +8,11 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotedSpecimenInfoTable extends
     InfoTableWidget<AliquotedSpecimenWrapper> {
@@ -20,7 +22,7 @@ public class AliquotedSpecimenInfoTable extends
     protected static class TableRowData {
         public AliquotedSpecimenWrapper sampleStorage;
         public String typeName;
-        public Double volume;
+        public BigDecimal volume;
         public Integer quantity;
         public String status;
 
@@ -36,7 +38,7 @@ public class AliquotedSpecimenInfoTable extends
         Messages.AliquotedSpecimen_field_type_label,
         Messages.AliquotedSpecimen_field_volume_label,
         Messages.AliquotedSpecimen_field_quantity_label,
-        Messages.label_activity };
+        "Activity status" };
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
@@ -45,30 +47,30 @@ public class AliquotedSpecimenInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(
-        AliquotedSpecimenWrapper sampleStorage) throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.sampleStorage = sampleStorage;
-        SpecimenTypeWrapper type = sampleStorage.getSpecimenType();
+        info.sampleStorage = (AliquotedSpecimenWrapper) obj;
+        SpecimenTypeWrapper type = info.sampleStorage.getSpecimenType();
         Assert.isNotNull(type, "sample storage - sample type is null"); //$NON-NLS-1$
         info.typeName = type.getName();
-        info.volume = sampleStorage.getVolume();
-        info.quantity = sampleStorage.getQuantity();
-        ActivityStatusWrapper status = sampleStorage.getActivityStatus();
+        info.volume = info.sampleStorage.getVolume();
+        info.quantity = info.sampleStorage.getQuantity();
+        ActivityStatus status = info.sampleStorage.getActivityStatus();
         Assert.isNotNull(status, "sample storage - activity status is null"); //$NON-NLS-1$
         info.status = status.getName();
         return info;
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.AliquotedSpecimenInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -108,5 +110,23 @@ public class AliquotedSpecimenInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(AliquotedSpecimenWrapper target)
+        throws ApplicationException {
+        return true;
     }
 }

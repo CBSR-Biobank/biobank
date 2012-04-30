@@ -10,32 +10,28 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 
-import edu.ualberta.med.biobank.common.security.SecurityFeature;
-import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 
 public class PerspectiveSecurity {
 
     /**
      * perspectiveId=[View=List of features]
      */
-    private static Map<String, Map<String, List<SecurityFeature>>> featureEnablements;
+    private static Map<String, Map<String, List<String>>> rightsEnablements;
 
     private static Map<String, String> preferredViews;
 
     static {
-        featureEnablements = new HashMap<String, Map<String, List<SecurityFeature>>>();
-        ProcessingPerspective.appendFeatureEnablements(featureEnablements);
-        ReportsPerspective.appendFeatureEnablements(featureEnablements);
+        rightsEnablements = new HashMap<String, Map<String, List<String>>>();
         preferredViews = new HashMap<String, String>();
         ProcessingPerspective.appendPreferredView(preferredViews);
         ReportsPerspective.appendPreferredView(preferredViews);
     }
 
-    public static synchronized void updateVisibility(User user,
+    public static synchronized void updateVisibility(UserWrapper user,
         IWorkbenchPage page) throws PartInitException {
         String perspectiveId = page.getPerspective().getId();
-        Map<String, List<SecurityFeature>> map = featureEnablements
-            .get(perspectiveId);
+        Map<String, List<String>> map = rightsEnablements.get(perspectiveId);
         if (map != null) {
             IWorkbenchPart activePart = page.getActivePart();
             boolean usePreviousActivePart = false;
@@ -48,11 +44,9 @@ public class PerspectiveSecurity {
                 for (IViewReference ref : page.getViewReferences()) {
                     page.hideView(ref);
                 }
-                for (Entry<String, List<SecurityFeature>> entry : map
-                    .entrySet()) {
-                    boolean show = user.canPerformActions(entry.getValue());
+                for (Entry<String, List<String>> entry : map.entrySet()) {
+                    boolean show = true;
                     if (user.getCurrentWorkingCenter() == null
-                        && user.isInSuperAdminMode()
                         && ProcessingPerspective.ID.equals(perspectiveId)) {
                         show = false;
                     }

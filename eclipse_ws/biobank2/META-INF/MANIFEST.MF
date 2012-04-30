@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.7.1
 Created-By: 14.3-b01 (Sun Microsystems Inc.)
 Bundle-Name: Biobank Plug-in
-Bundle-ClassPath: .,lib/gluegen.jar,lib/SuperCSV-1.52.jar,lib/spiffy-a
- ll-0.05.jar,lib/mailapi.jar,lib/smtp.jar,lib/jdom.jar
+Bundle-ClassPath: .,lib/SuperCSV-1.52.jar,lib/spiffy-all-0.05.jar,lib/
+ mailapi.jar,lib/smtp.jar,lib/jdom.jar,lib/gluegen.jar
 Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
@@ -15,15 +15,13 @@ Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.eclipse.co
  on="1.2.1",org.eclipse.ui.forms;bundle-version="3.3.101",org.eclipse.
  ui.console;bundle-version="3.4.0",org.eclipse.ui.views.log;bundle-ver
  sion="1.0.100",org.eclipse.core.expressions;bundle-version="3.4.200",
- org.eclipse.equinox.p2.ui;bundle-version="2.0.0",org.eclipse.equinox.
- p2.operations;bundle-version="2.0.0",org.eclipse.equinox.p2.ui.sdk.sc
- heduler;bundle-version="1.0.0",biobank.gui.common;bundle-version="1.0
- .0",biobank.common,scannerConfig;bundle-version="0.9.6",sampleProcess
- ingRobot;bundle-version="1.0.0";resolution:=optional,org.eclipse.equi
- nox.p2.ui.sdk;bundle-version="1.0.200",org.eclipse.equinox.security.u
- i;bundle-version="1.1.0",org.eclipse.equinox.p2.core;bundle-version="
- 2.1.0"
-Bundle-Version: 3.1.1
+ org.eclipse.equinox.p2.operations;bundle-version="2.0.0",biobank.gui.
+ common;bundle-version="1.0.0",biobank.common;visibility:=reexport,sca
+ nnerConfig;bundle-version="0.9.6",org.eclipse.equinox.p2.ui.sdk;bundl
+ e-version="1.0.200",org.eclipse.equinox.security.ui;bundle-version="1
+ .1.0",org.eclipse.equinox.p2.core;bundle-version="2.1.0",biobank.mvp;
+ bundle-version="1.0.0"
+Bundle-Version: 3.2.0
 Bundle-Vendor: AICML
 Bundle-Localization: plugin
 Export-Package: edu.ualberta.med.biobank

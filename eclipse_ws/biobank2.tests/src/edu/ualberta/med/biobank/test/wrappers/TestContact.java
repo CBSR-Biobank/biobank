@@ -12,12 +12,14 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
+@Deprecated
 public class TestContact extends TestDatabase {
 
     @Test
@@ -52,7 +54,7 @@ public class TestContact extends TestDatabase {
 
         List<StudyWrapper> studiesSorted = contact.getStudyCollection(true);
         if (studiesSorted.size() > 1) {
-            for (int i = 0; i < studiesSorted.size() - 1; i++) {
+            for (int i = 0; i < (studiesSorted.size() - 1); i++) {
                 StudyWrapper s1 = studiesSorted.get(i);
                 StudyWrapper s2 = studiesSorted.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
@@ -92,6 +94,8 @@ public class TestContact extends TestDatabase {
         contact1.setName("stuff");
         contact2.setName("stuff1");
         Assert.assertTrue(contact1.compareTo(contact2) < 0);
+        Assert
+            .fail("should compare with something different from a ContactWraper");
     }
 
     @Test(expected = ValueNotSetException.class)
@@ -147,7 +151,7 @@ public class TestContact extends TestDatabase {
         try {
             contact.delete();
             Assert.fail("one study still linked to this contact");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankSessionException bce) {
             Assert.assertTrue(true);
         }
 
@@ -182,4 +186,15 @@ public class TestContact extends TestDatabase {
         contact.reset();
         Assert.assertEquals(null, contact.getName());
     }
+
+    @Test
+    public void testGetAllContacts() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        Assert.fail("to be implemented");
+    }
+
 }

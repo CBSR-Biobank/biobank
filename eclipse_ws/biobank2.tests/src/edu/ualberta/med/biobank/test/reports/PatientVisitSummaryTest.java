@@ -23,68 +23,77 @@ import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PatientVisitSummaryTest extends AbstractReportTest {
-    private static final Mapper<ProcessingEventWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<ProcessingEventWrapper, List<String>, PvCount>() {
-        public List<String> getKey(ProcessingEventWrapper pevent) {
-            return Arrays.asList(pevent.getCenter().getNameShort(), pevent
-                .getCenter().getNameShort(), pevent
-                .getSpecimenCollection(false).get(0).getCollectionEvent()
-                .getPatient().getPnumber());
-        }
-
-        public PvCount getValue(ProcessingEventWrapper patientVisit,
-            PvCount pvCount) {
-            if (pvCount != null) {
-                pvCount.count = new Long(pvCount.count + 1);
-            } else {
-                pvCount = new PvCount();
-                pvCount.key = getKey(patientVisit);
-                pvCount.count = new Long(1);
+    private static final Mapper<ProcessingEventWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT =
+        new Mapper<ProcessingEventWrapper, List<String>, PvCount>() {
+            @Override
+            public List<String> getKey(ProcessingEventWrapper pevent) {
+                return Arrays.asList(pevent.getCenter().getNameShort(), pevent
+                    .getCenter().getNameShort(), pevent
+                    .getSpecimenCollection(false).get(0).getCollectionEvent()
+                    .getPatient().getPnumber());
             }
-            return pvCount;
-        }
-    };
+
+            @Override
+            public PvCount getValue(ProcessingEventWrapper patientVisit,
+                PvCount pvCount) {
+                if (pvCount != null) {
+                    pvCount.count = new Long(pvCount.count + 1);
+                } else {
+                    pvCount = new PvCount();
+                    pvCount.key = getKey(patientVisit);
+                    pvCount.count = new Long(1);
+                }
+                return pvCount;
+            }
+        };
 
     private static class PvCount {
         List<String> key;
         Long count;
     }
 
-    private static final Mapper<PvCount, List<String>, List<Long>> PV_STATS_BY_STUDY_CLINIC = new Mapper<PvCount, List<String>, List<Long>>() {
-        public List<String> getKey(PvCount pvCount) {
-            return pvCount.key.subList(0, 2); // study, clinic
-        }
-
-        public List<Long> getValue(PvCount pvCount, List<Long> stats) {
-            if (stats == null) {
-                Long zero = new Long(0);
-                stats = Arrays.asList(zero, zero, zero, zero, zero, zero, zero);
+    private static final Mapper<PvCount, List<String>, List<Long>> PV_STATS_BY_STUDY_CLINIC =
+        new Mapper<PvCount, List<String>, List<Long>>() {
+            @Override
+            public List<String> getKey(PvCount pvCount) {
+                return pvCount.key.subList(0, 2); // study, clinic
             }
 
-            if ((pvCount.count >= 1) && (pvCount.count <= 4)) {
-                int index = pvCount.count.intValue() - 1;
-                stats.set(index, stats.get(index) + 1);
-            } else if (pvCount.count >= 5) {
-                stats.set(4, stats.get(4) + 1);
+            @Override
+            public List<Long> getValue(PvCount pvCount, List<Long> stats) {
+                if (stats == null) {
+                    Long zero = new Long(0);
+                    stats =
+                        Arrays.asList(zero, zero, zero, zero, zero, zero, zero);
+                }
+
+                if ((pvCount.count >= 1) && (pvCount.count <= 4)) {
+                    int index = pvCount.count.intValue() - 1;
+                    stats.set(index, stats.get(index) + 1);
+                } else if (pvCount.count >= 5) {
+                    stats.set(4, stats.get(4) + 1);
+                }
+
+                stats.set(5, stats.get(5) + pvCount.count);
+                stats.set(6, stats.get(6) + 1);
+
+                return stats;
             }
+        };
 
-            stats.set(5, stats.get(5) + pvCount.count);
-            stats.set(6, stats.get(6) + 1);
+    private static final Comparator<List<String>> ORDER_BY_STUDY_CLINIC =
+        new Comparator<List<String>>() {
+            @Override
+            public int compare(List<String> lhs, List<String> rhs) {
+                int cmp = compareStrings(lhs.get(0), rhs.get(0)); // clinic name
 
-            return stats;
-        }
-    };
+                if (cmp != 0) {
+                    return cmp;
+                }
 
-    private static final Comparator<List<String>> ORDER_BY_STUDY_CLINIC = new Comparator<List<String>>() {
-        public int compare(List<String> lhs, List<String> rhs) {
-            int cmp = compareStrings(lhs.get(0), rhs.get(0)); // clinic name
-
-            if (cmp != 0) {
-                return cmp;
+                return compareStrings(lhs.get(1), rhs.get(1)); // study name
             }
-
-            return compareStrings(lhs.get(1), rhs.get(1)); // study name
-        }
-    };
+        };
 
     @Test
     public void testResults() throws Exception {
@@ -129,8 +138,9 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
 
         Collection<ProcessingEventWrapper> patientVisits = getPatientVisits();
 
-        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
-            .filter(patientVisits, PredicateUtil.andPredicate(
+        @SuppressWarnings("unchecked")
+        Collection<ProcessingEventWrapper> filteredPatientVisits =
+            PredicateUtil.filter(patientVisits, PredicateUtil.andPredicate(
                 patientVisitProcessedBetween(after, before),
                 patientVisitSite(isInSite(), getSiteId())));
 

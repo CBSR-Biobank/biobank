@@ -8,6 +8,8 @@ public class Messages extends NLS {
     public static String ShipmentAdapter_noShipment_error_msg;
     public static String ShipmentAdapter_shipment_label;
     public static String ShipmentAdapter_tooltip_no_origin;
+    public static String ShipmentTodayNode_0;
+    public static String ShipmentTodayNode_1;
     public static String ShipmentTodayNode_add_label;
     public static String ShipmentTodayNode_today_label;
     static {

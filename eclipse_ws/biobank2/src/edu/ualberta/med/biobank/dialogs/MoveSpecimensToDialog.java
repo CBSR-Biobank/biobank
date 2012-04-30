@@ -43,7 +43,8 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     private ContainerWrapper oldContainer;
 
-    private HashMap<String, ContainerWrapper> map = new HashMap<String, ContainerWrapper>();
+    private HashMap<String, ContainerWrapper> map =
+        new HashMap<String, ContainerWrapper>();
 
     private ListViewer lv;
 
@@ -61,38 +62,30 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.MoveSpecimensToDialog_title_shell;
+        return "Move specimens from one container to another";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.MoveSpecimensToDialog_description;
+        return "Select the new container that can hold the specimens.\n It should be initialized, empty, as big as the previous one, and should accept these specimens.";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return NLS.bind(Messages.MoveSpecimensToDialog_title,
+        return NLS.bind("Move specimens from container {0} to another",
             oldContainer.getLabel());
     }
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
+        buildContainersMap();
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Label siteLabel = widgetCreator.createLabel(contents,
-            Messages.MoveSpecimensToDialog_site_label);
-        siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
-        buildContainersMap();
-        if (!SessionManager.getUser().isSuperAdministrator()) {
-            siteLabel
-                .setToolTipText(Messages.MoveSpecimensToDialog_site_tooltip);
-        }
-
         newLabelText = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.FILL,
-            Messages.MoveSpecimensToDialog_newLabel_label, null, null, null,
+            "New Container Label", null, null, null,
             null);
         newLabelText.addModifyListener(new ModifyListener() {
             @Override
@@ -114,7 +107,7 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         });
 
         Label listLabel = widgetCreator.createLabel(contents,
-            Messages.MoveSpecimensToDialog_available_containers_label);
+            "Available containers");
         lv = new ListViewer(contents);
         lv.setContentProvider(new ArrayContentProvider());
         lv.setLabelProvider(new BiobankLabelProvider());
@@ -137,14 +130,15 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
         // + "must be initialized but empty, "
         // + " and as big as the previous one.") {
 
-        String errorMessage = Messages.MoveSpecimensToDialog_newLabel_validation_msg;
+        String errorMessage =
+            "A label should be selected";
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             errorMessage);
         validator.setControlDecoration(BgcBaseWidget.createDecorator(listLabel,
             errorMessage));
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(validator);
-        selectedValue = new WritableValue("", String.class); //$NON-NLS-1$
+        selectedValue = new WritableValue("", String.class); 
         listObserveSelection = SWTObservables.observeSelection(lv.getList());
         widgetCreator.bindValue(listObserveSelection, selectedValue, uvs, uvs);
     }
@@ -155,14 +149,15 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
             .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
         try {
-            conts = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
-                SessionManager.getAppService(), SessionManager.getUser()
-                    .getCurrentWorkingSite(), typesFromOlContainer,
-                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
+            conts =
+                ContainerWrapper.getEmptyContainersHoldingSpecimenType(
+                    SessionManager.getAppService(), oldContainer.getSite(),
+                    typesFromOlContainer, oldContainer.getRowCapacity(),
+                    oldContainer.getColCapacity());
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                Messages.MoveSpecimensToDialog_getEmptyContainers_error_title,
-                Messages.MoveSpecimensToDialog_getEmptyContainers_error_msg);
+                "Error",
+                "Failed to retrieve empty containers.");
         }
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
@@ -174,15 +169,6 @@ public class MoveSpecimensToDialog extends BgcBaseDialog {
 
     public ContainerWrapper getNewContainer() {
         return map.get(selectedValue.getValue());
-    }
-
-    @Override
-    public void okPressed() {
-        boolean sure = BgcPlugin.openConfirm(
-            Messages.MoveSpecimensToDialog_move_confirm_title,
-            Messages.MoveSpecimensToDialog_move_confirm_msg);
-        if (sure)
-            super.okPressed();
     }
 
 }

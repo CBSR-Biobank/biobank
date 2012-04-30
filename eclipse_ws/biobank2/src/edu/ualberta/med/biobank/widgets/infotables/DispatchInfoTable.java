@@ -1,52 +1,67 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Dispatch;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    SpecimenWrapper a;
+    private List<DispatchWrapper> dispatches;
 
     protected static class TableRowData {
-
-        DispatchWrapper ds;
+        DispatchWrapper dispatch;
+        String sender;
         Date dispatchTime;
+        String receiver;
         Date dateReceived;
         String waybill;
         String dstatus;
-        String astatus;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { DateFormatter.formatAsDate(dispatchTime),
-                    DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
-                    astatus }, "\t"); //$NON-NLS-1$
+            return StringUtils
+                .join(
+                    new String[] { sender,
+                        DateFormatter.formatAsDate(dispatchTime), receiver,
+                        DateFormatter.formatAsDate(dateReceived), waybill,
+                        dstatus }, "\t"); //$NON-NLS-1$
         }
     }
 
     private static final String[] HEADINGS = new String[] {
+        Messages.DispatchInfoTable_sender_label,
         Messages.DispatchInfoTable_time_label,
+        Messages.DispatchInfoTable_receiver_label,
         Messages.DispatchInfoTable_received_label,
         Messages.DispatchInfoTable_waybill_label,
-        Messages.DispatchInfoTable_state_label,
-        Messages.DispatchInfoTable_spec_state_label };
+        Messages.DispatchInfoTable_state_label };
 
     private boolean editMode = false;
 
-    public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
+    public DispatchInfoTable(Composite parent,
+        List<Dispatch> dispatchesRaw) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
-        this.a = a;
-        setCollection(a.getDispatches());
+        this.dispatches = new ArrayList<DispatchWrapper>();
+        for (Dispatch dispatch : dispatchesRaw) {
+            dispatches.add(new DispatchWrapper(SessionManager.getAppService(),
+                dispatch));
+        }
+        setList(dispatches);
     }
 
     @Override
@@ -55,28 +70,31 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.DispatchInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
-                    return DateFormatter.formatAsDate(info.dispatchTime);
+                    return info.sender;
                 case 1:
-                    return DateFormatter.formatAsDate(info.dateReceived);
+                    return DateFormatter.formatAsDate(info.dispatchTime);
                 case 2:
-                    return info.waybill;
+                    return info.receiver;
                 case 3:
-                    return info.dstatus;
+                    return DateFormatter.formatAsDate(info.dateReceived);
                 case 4:
-                    return info.astatus;
+                    return info.waybill;
+                case 5:
+                    return info.dstatus;
                 default:
                     return ""; //$NON-NLS-1$
                 }
@@ -85,19 +103,21 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(DispatchWrapper ds)
-        throws Exception {
+    public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.ds = ds;
-        info.dispatchTime = ds.getShipmentInfo() == null ? null : ds
-            .getShipmentInfo().getPackedAt();
-        info.dateReceived = ds.getShipmentInfo() == null ? null : ds
-            .getShipmentInfo().getReceivedAt();
-        info.dstatus = ds.getStateDescription();
-        info.astatus = ds.getDispatchSpecimen(a.getInventoryId())
-            .getStateDescription();
-        info.waybill = ds.getShipmentInfo() == null ? null : ds
-            .getShipmentInfo().getWaybill();
+        info.dispatch = (DispatchWrapper) obj;
+        info.sender = info.dispatch.getSenderCenter().getNameShort();
+        info.dispatchTime =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getPackedAt();
+        info.receiver = info.dispatch.getReceiverCenter().getNameShort();
+        info.dateReceived =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getReceivedAt();
+        info.dstatus = info.dispatch.getStateDescription();
+        info.waybill =
+            info.dispatch.getShipmentInfo() == null ? null : info.dispatch
+                .getShipmentInfo().getWaybill();
         return info;
     }
 
@@ -114,7 +134,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             return;
         for (BiobankCollectionModel item : model) {
             TableRowData info = (TableRowData) item.o;
-            if (info.ds.equals(selected)) {
+            if (info.dispatch.equals(selected)) {
                 getTableViewer().setSelection(new StructuredSelection(item),
                     true);
             }
@@ -128,7 +148,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.ds;
+        return row.dispatch;
     }
 
     @Override
@@ -137,7 +157,28 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     public void reloadCollection() {
-        reloadCollection(a.getDispatches());
+        reloadCollection(dispatches);
+    }
+
+    @Override
+    protected Boolean canEdit(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchDeletePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canView(DispatchWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new DispatchReadPermission(target.getId()));
     }
 
 }

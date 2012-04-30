@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.widgets.infotables.LoggingInfoTable;
 
 public class LoggingForm extends BiobankViewForm {
 
-    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm"; //$NON-NLS-1$
+    public static String ID = "edu.ualberta.med.biobank.forms.LoggingForm"; 
 
     private BgcBaseText userLabel;
     private BgcBaseText typeLabel;
@@ -44,7 +44,7 @@ public class LoggingForm extends BiobankViewForm {
 
     @Override
     public void init() throws Exception {
-        setPartName(Messages.LoggingForm_title);
+        setPartName("Logging: results");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class LoggingForm extends BiobankViewForm {
 
         PlatformUI.getWorkbench().getViewRegistry().find(LoggingView.ID);
 
-        form.setText(Messages.LoggingForm_form_title);
+        form.setText("Logging: Browse through your search results");
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -78,26 +78,26 @@ public class LoggingForm extends BiobankViewForm {
 
         /* a grid might make this easier */
         centerLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            Messages.LoggingForm_center_label);
+            "Center");
         userLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            Messages.LoggingForm_user_label);
+            "User");
         typeLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            Messages.LoggingForm_type_label);
+            "Type");
         actionLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            Messages.LoggingForm_action_label);
+            "Action");
         startDateLabel = createReadOnlyLabelledField(leftClient, SWT.NONE,
-            Messages.LoggingForm_start_label);
+            "Start Date");
 
         patientNumLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            Messages.LoggingForm_pnumber_label);
+            "Patient #");
         locationLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            Messages.LoggingForm_location_label);
+            "Location");
         inventoryIDLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            Messages.LoggingForm_inventoryid_label);
+            "Inventory ID");
         detailsLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            Messages.LoggingForm_details_label);
+            "Details");
         endDateLabel = createReadOnlyLabelledField(rightClient, SWT.NONE,
-            Messages.LoggingForm_end_label);
+            "End Date");
 
         getSearchRequestFields();
 
@@ -107,10 +107,11 @@ public class LoggingForm extends BiobankViewForm {
     private void generateSearchQueryTable() {
         LogQuery.getInstance().queryDatabase();
 
-        Composite client = createSectionWithClient(Messages.LoggingForm_search_title);
+        Composite client =
+            createSectionWithClient("Search Results");
         client.setLayout(new GridLayout(1, false));
         Button button = new Button(client, SWT.PUSH);
-        button.setText(Messages.LoggingForm_1);
+        button.setText("Export CSV");
         button.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -131,16 +132,16 @@ public class LoggingForm extends BiobankViewForm {
         final Data data = new Data();
         try {
             data.setColumnNames(Arrays.asList(
-                Messages.LoggingForm_center_label,
-                Messages.LoggingForm_user_label,
-                Messages.LoggingForm_date_label,
-                Messages.LoggingForm_action_label,
-                Messages.LoggingForm_type_label,
-                Messages.LoggingForm_pnumber_label,
-                Messages.LoggingForm_inventoryid_label,
-                Messages.LoggingForm_location_label,
-                Messages.LoggingForm_details_label));
-            data.setTitle(Messages.LoggingForm_0);
+                "Center",
+                "User",
+                "Date",
+                "Action",
+                "Type",
+                "Patient #",
+                "Inventory ID",
+                "Location",
+                "Details"));
+            data.setTitle("Log Query: ");
 
             data.setRows((List<Object>) (List<?>) LogQuery.getInstance()
                 .getDatabaseResults());
@@ -150,15 +151,15 @@ public class LoggingForm extends BiobankViewForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                Messages.ReportEntryForm_export_error_title, e.getMessage());
+                "Cannot Export", e.getMessage());
             return;
         }
 
         // confirm exporting
         if (!MessageDialog.openQuestion(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            Messages.ReportEntryForm_confirm_title,
-            NLS.bind(Messages.ReportEntryForm_export_question,
+            "Confirm Report Results Export",
+            NLS.bind("Are you sure you want to {0}?",
                 exporter.getName()))) {
             return;
         }
@@ -169,7 +170,7 @@ public class LoggingForm extends BiobankViewForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                Messages.ReportEntryForm_exporting_error_title, e.getMessage());
+                "Error Exporting", e.getMessage());
             return;
         }
     }
@@ -198,8 +199,9 @@ public class LoggingForm extends BiobankViewForm {
     }
 
     @Override
-    public void reload() throws Exception {
-        //
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

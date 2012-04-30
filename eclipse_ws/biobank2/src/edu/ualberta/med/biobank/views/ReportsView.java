@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -7,12 +9,17 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.part.ViewPart;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
@@ -20,7 +27,8 @@ public class ReportsView extends ViewPart {
     public static BgcLogger logger = BgcLogger.getLogger(ReportsView.class
         .getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ReportsView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.ReportsView"; //$NON-NLS-1$
 
     public static ReportsView currentInstance;
 
@@ -42,8 +50,58 @@ public class ReportsView extends ViewPart {
 
     private CTabItem containerTab;
 
+    private Boolean allowed = false;
+
+    private AbstractReportTreeNode specimenRoot;
+
+    private AbstractReportTreeNode clinicRoot;
+
+    private AbstractReportTreeNode patientRoot;
+
+    private AbstractReportTreeNode specimenTypeRoot;
+
+    private AbstractReportTreeNode containerRoot;
+
     public ReportsView() {
         currentInstance = this;
+        try {
+            if (SessionManager.getInstance().isConnected()) allowed =
+                SessionManager.getAppService().isAllowed(
+                    new ReportsPermission());
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage(e);
+        }
+        BgcPlugin.getLoginStateSourceProvider()
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    try {
+                        if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT)) {
+                            allowed = false;
+                        }
+                        else if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
+                            allowed =
+                                SessionManager.getAppService().isAllowed(
+                                    new ReportsPermission());
+                        }
+                        reload();
+                    } catch (Exception e) {
+                        BgcPlugin.openAccessDeniedErrorMessage(e);
+                    }
+                }
+            });
     }
 
     @Override
@@ -51,7 +109,8 @@ public class ReportsView extends ViewPart {
         top = new CTabFolder(parent, SWT.BORDER);
 
         GridLayout treeLayout = new GridLayout();
-        GridData treeGd = new GridData(GridData.FILL, GridData.FILL, true, true);
+        GridData treeGd =
+            new GridData(GridData.FILL, GridData.FILL, true, true);
 
         // Specimens
         specimenTab = new CTabItem(top, SWT.NONE);
@@ -61,7 +120,7 @@ public class ReportsView extends ViewPart {
         specimenBody.setLayoutData(treeGd);
         specimenTab.setControl(specimenBody);
         specimenTree = new ReportTreeWidget(specimenBody);
-        AbstractReportTreeNode specimenRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        specimenRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
         specimenTree.setLayoutData(treeGd);
 
         top.setSelection(specimenTab);
@@ -74,7 +133,7 @@ public class ReportsView extends ViewPart {
         clinicBody.setLayoutData(treeGd);
         clinicTab.setControl(clinicBody);
         clinicTree = new ReportTreeWidget(clinicBody);
-        AbstractReportTreeNode clinicRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        clinicRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
         clinicTree.setLayoutData(treeGd);
 
         // Patients
@@ -85,7 +144,7 @@ public class ReportsView extends ViewPart {
         patientBody.setLayoutData(treeGd);
         patientTab.setControl(patientBody);
         patientTree = new ReportTreeWidget(patientBody);
-        AbstractReportTreeNode patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
         patientTree.setLayoutData(treeGd);
 
         // Specimen Types
@@ -96,7 +155,8 @@ public class ReportsView extends ViewPart {
         specimenTypeBody.setLayoutData(treeGd);
         specimenTypeTab.setControl(specimenTypeBody);
         specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
-        AbstractReportTreeNode specimenTypeRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        specimenTypeRoot =
+            new AbstractReportTreeNode(""); //$NON-NLS-1$
         specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
@@ -107,23 +167,29 @@ public class ReportsView extends ViewPart {
         containerBody.setLayoutData(treeGd);
         containerTab.setControl(containerBody);
         containerTree = new ReportTreeWidget(containerBody);
-        AbstractReportTreeNode containerRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        containerRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,
             specimenTypeRoot, containerRoot);
 
-        specimenTree.setInput(specimenRoot);
-        specimenTree.expandAll();
-        clinicTree.setInput(clinicRoot);
-        clinicTree.expandAll();
-        patientTree.setInput(patientRoot);
-        patientTree.expandAll();
-        specimenTypeTree.setInput(specimenTypeRoot);
-        specimenTypeTree.expandAll();
-        containerTree.setInput(containerRoot);
-        containerTree.expandAll();
+        setInputs();
 
+    }
+
+    public void setInputs() {
+        if (allowed) {
+            specimenTree.setInput(specimenRoot);
+            specimenTree.expandAll();
+            clinicTree.setInput(clinicRoot);
+            clinicTree.expandAll();
+            patientTree.setInput(patientRoot);
+            patientTree.expandAll();
+            specimenTypeTree.setInput(specimenTypeRoot);
+            specimenTypeTree.expandAll();
+            containerTree.setInput(containerRoot);
+            containerTree.expandAll();
+        }
     }
 
     private void initializeNewReports(AbstractReportTreeNode specimens,
@@ -172,6 +238,15 @@ public class ReportsView extends ViewPart {
             throw new Exception(NLS.bind("Unable to place report node: {0}", //$NON-NLS-1$
                 child.getLabel()));
         }
+    }
+
+    public void reload() {
+        specimenTree.setInput(null);
+        clinicTree.setInput(null);
+        patientTree.setInput(null);
+        specimenTypeTree.setInput(null);
+        containerTree.setInput(null);
+        setInputs();
     }
 
     @Override

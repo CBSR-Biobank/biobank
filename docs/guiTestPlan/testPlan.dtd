@@ -1,0 +1,60 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT ol (li)+>
+<!ELEMENT ul (li)+>
+<!ELEMENT li (#PCDATA|b|i|ref|sub|sup|p)*>
+<!ELEMENT p EMPTY>
+<!ELEMENT b (#PCDATA|i)*>
+<!ELEMENT i (#PCDATA|b)*>
+<!ELEMENT sub (#PCDATA)>
+<!ELEMENT sup (#PCDATA)>
+<!ELEMENT ref (#PCDATA)>
+
+<!ELEMENT test_suite (test_section)+>
+<!ATTLIST test_suite
+  xmlns CDATA #FIXED ''
+  xmlns:xsi CDATA #FIXED 'http://www.w3.org/2001/XMLSchema-instance'
+  name CDATA #REQUIRED
+  xsi:noNamespaceSchemaLocation NMTOKEN #REQUIRED>
+
+<!ELEMENT test_section (test_section,test_case)+>
+<!ATTLIST test_section
+  xmlns CDATA #FIXED ''
+  id CDATA #REQUIRED
+  name CDATA #REQUIRED>
+
+<!ELEMENT test_case (description,precondition,expected_result,note,
+                     dependency,steps)>
+<!ATTLIST test_case
+  xmlns CDATA #FIXED ''
+  id CDATA #REQUIRED
+  name CDATA #REQUIRED
+  variety (positive | negative) "positive">
+
+<!ELEMENT description (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
+<!ATTLIST description
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT precondition (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
+<!ATTLIST precondition
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT expected_result (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
+<!ATTLIST expected_result
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT note (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
+<!ATTLIST note
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT dependency EMPTY>
+<!ATTLIST dependency
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT steps (step)+>
+<!ATTLIST steps
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT step (#PCDATA|p|b|i|ref|ol|ul|sub|sup)*>
+<!ATTLIST step
+  xmlns CDATA #FIXED ''>

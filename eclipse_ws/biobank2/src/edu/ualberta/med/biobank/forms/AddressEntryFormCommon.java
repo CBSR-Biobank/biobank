@@ -25,23 +25,23 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     static {
         Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
         aMap.put(AddressPeer.STREET1.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_street1_label, BgcBaseText.class,
+            "Street 1", BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.STREET2.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_street2_label, BgcBaseText.class,
+            "Street 2", BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.CITY.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_city_label, BgcBaseText.class,
+            "City", BgcBaseText.class,
             SWT.NONE, null, NonEmptyStringValidator.class,
-            Messages.AddressEntryFormCommon_city_validation_msg));
+            "Enter a city"));
         aMap.put(AddressPeer.PROVINCE.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_province_label, BgcBaseText.class,
+            "Province/State", BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.POSTAL_CODE.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_postalCode_label,
+            "Postal/Zip Code",
             BgcBaseText.class, SWT.NONE, null, null, null));
         aMap.put(AddressPeer.COUNTRY.getName(), new FieldInfo(
-            Messages.AddressEntryFormCommon_country_label, BgcBaseText.class,
+            "Country", BgcBaseText.class,
             SWT.NONE, null, null, null));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };
@@ -53,7 +53,7 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     }
 
     protected void createAddressArea(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient(Messages.AddressEntryFormCommon_address_title);
+        Composite client = createSectionWithClient("Address");
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
 }

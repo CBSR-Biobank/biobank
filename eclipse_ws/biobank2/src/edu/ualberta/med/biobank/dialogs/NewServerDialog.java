@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 
 public class NewServerDialog extends BgcBaseDialog {
 
-    private static final String TITLE = Messages.NewServerDialog_title;
+    private static final String TITLE = "New Server";
 
     protected String serverAddress;
 
@@ -22,7 +22,7 @@ public class NewServerDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.NewServerDialog_description;
+        return "Enter the domain-name or IP address of the server:";
     }
 
     @Override
@@ -38,11 +38,11 @@ public class NewServerDialog extends BgcBaseDialog {
         area.setLayout(layout);
         area.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            Messages.NewServerDialog_server_validation_msg);
+            "Server field cannot be empty");
         BgcBaseText textBox = (BgcBaseText) createBoundWidgetWithLabel(area,
             BgcBaseText.class, SWT.NONE,
-            Messages.NewServerDialog_address_label, new String[0], this,
-            "serverAddress", validator); //$NON-NLS-1$
+            "Address", new String[0], this,
+            "serverAddress", validator); 
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;

@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -37,21 +36,19 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public abstract class BgcFormBase extends EditorPart implements
     ISelectionProvider {
 
     private static BgcLogger logger = BgcLogger.getLogger(BgcFormBase.class
         .getName());
-
-    protected BiobankApplicationService appService;
 
     protected ManagedForm mform;
 
@@ -71,12 +68,7 @@ public abstract class BgcFormBase extends EditorPart implements
 
     public List<BgcFormBase> linkedForms;
 
-    protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
-        @Override
-        public void doubleClick(DoubleClickEvent event) {
-            performDoubleClick(event);
-        }
-    };
+    protected boolean isEditable;
 
     public BgcFormBase() {
         widgets = new HashMap<String, Control>();
@@ -108,9 +100,13 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
+        } catch (ActionException e) {
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_action_error, e);
         } catch (Exception e) {
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_generic_error, e);
             logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
         }
+        getSite().setSelectionProvider(this);
     }
 
     /**
@@ -120,8 +116,6 @@ public abstract class BgcFormBase extends EditorPart implements
      *            view.
      */
     protected abstract void init() throws Exception;
-
-    protected abstract void performDoubleClick(DoubleClickEvent event);
 
     @Override
     public boolean isDirty() {
@@ -191,7 +185,11 @@ public abstract class BgcFormBase extends EditorPart implements
         if (title != null) {
             section.setText(title);
         }
-        section.setLayout(new GridLayout(1, false));
+        GridLayout layout = new GridLayout(1, false);
+        layout.verticalSpacing = 0;
+        layout.marginHeight = 0;
+        layout.marginWidth = 0;
+        section.setLayout(layout);
         section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         section.addExpansionListener(new ExpansionAdapter() {
             @Override
@@ -214,7 +212,11 @@ public abstract class BgcFormBase extends EditorPart implements
     protected Composite sectionAddClient(Section section) {
         Composite client = toolkit.createComposite(section);
         section.setClient(client);
-        client.setLayout(new GridLayout(2, false));
+        GridLayout layout = new GridLayout(2, false);
+        layout.verticalSpacing = 1;
+        layout.marginHeight = 1;
+        layout.marginWidth = 1;
+        client.setLayout(layout);
         toolkit.paintBordersFor(client);
         return client;
     }
@@ -284,8 +286,9 @@ public abstract class BgcFormBase extends EditorPart implements
 
     protected BgcBaseText createReadOnlyWidget(Composite parent,
         int widgetOptions, String value) {
-        BgcBaseText result = (BgcBaseText) createWidget(parent,
-            BgcBaseText.class, SWT.READ_ONLY | widgetOptions, value);
+        BgcBaseText result =
+            widgetCreator.createReadOnlyField(parent, widgetOptions, value,
+                true);
         return result;
     }
 
@@ -319,49 +322,108 @@ public abstract class BgcFormBase extends EditorPart implements
         return BeansObservables.observeValue(bean, propertyName);
     }
 
+    private IObservableValue createPojoObservable(Object bean,
+        String propertyName) {
+        if (bean == null)
+            return null;
+        Assert.isNotNull(propertyName);
+        return PojoObservables.observeValue(bean, propertyName);
+    }
+
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator) {
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, bean, propertyName, validator, true);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator, boolean createBeansObservable) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(bean, propertyName), validator);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator);
     }
 
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
         String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator, String bindingKey) {
+        return createBoundWidget(composite, widgetClass, widgetOptions, label,
+            widgetValues, bean, propertyName, validator, bindingKey, true);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(bean, propertyName), validator, bindingKey);
-
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            bindingKey);
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues, Object bean,
         String propertyName, AbstractValidator validator) {
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, bean, propertyName,
+            validator, true);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
-            createBeansObservable(bean, propertyName), validator);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator);
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues, Object bean,
         String propertyName, AbstractValidator validator, String bindingKey) {
+        return createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues, bean, propertyName,
+            validator, bindingKey, true);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
-            createBeansObservable(bean, propertyName), validator, bindingKey);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown, String bindingKey) {
+        return createDateTimeWidget(client, label, date, bean, propertyName,
+            validator, typeShown, bindingKey, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown, String bindingKey,
+        boolean createBeansObservable) {
         return widgetCreator.createDateTimeWidget(client, label, date,
-            createBeansObservable(bean, propertyName), validator, typeShown,
-            bindingKey);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            typeShown, bindingKey);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
@@ -374,9 +436,18 @@ public abstract class BgcFormBase extends EditorPart implements
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown) {
+        return createDateTimeWidget(client, nameLabel, date, bean,
+            propertyName, validator, typeShown, true);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown,
+        boolean createBeansObservable) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            createBeansObservable(bean, propertyName), validator, typeShown,
-            null);
+            createBeansObservable ? createBeansObservable(bean, propertyName)
+                : createPojoObservable(bean, propertyName), validator,
+            typeShown, null);
     }
 
     // implementation of ISelectionProvider
@@ -401,4 +472,18 @@ public abstract class BgcFormBase extends EditorPart implements
     public ISelection getSelection() {
         return null;
     }
+
+    public void reload() {
+        try {
+            init();
+            setValues();
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error,
+                Messages.BgcFormBase_message);
+            logger.error("Can't reload the form", e); //$NON-NLS-1$
+        }
+    }
+
+    public abstract void setValues() throws Exception;
+
 }

@@ -76,7 +76,13 @@ public class Messages extends NLS {
 
     public static String SpecimenEntryWidget_inventoryid_label;
 
+    public static String SpecimenEntryWidget_no;
+
+    public static String SpecimenEntryWidget_notfound;
+
     public static String SpecimenEntryWidget_retrieve_error_title;
+
+    public static String SpecimenEntryWidget_yes;
 
     public static String TopContainerListWidget_all_label;
 

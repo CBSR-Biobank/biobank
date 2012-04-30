@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,15 +12,28 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
+import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
+    private Boolean createAllowed;
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.SiteGroup_sites_node_label, true, false);
+        super(parent, id, Messages.SiteGroup_sites_node_label, true);
+        try {
+            this.createAllowed = SessionManager.getAppService().isAllowed(
+                new SiteCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+        }
     }
 
     @Override
@@ -42,7 +53,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class)) {
+        if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(Messages.SiteGroup_add_label);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -55,13 +66,14 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    public String getTooltipText() {
+    public String getTooltipTextInternal() {
         return null;
     }
 
     @Override
-    public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, SiteWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> searchedClass,
+        Integer objectId) {
+        return findChildFromClass(searchedClass, objectId, SiteWrapper.class);
     }
 
     @Override
@@ -70,23 +82,18 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
+    protected AdapterBase createChildNode(Object child) {
         Assert.isTrue(child instanceof SiteWrapper);
         return new SiteAdapter(this, (SiteWrapper) child);
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        if (SessionManager.isSuperAdminMode()) {
-            return SiteWrapper.getSites(SessionManager.getAppService());
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        List<Site> sites = SessionManager.getAppService()
+            .doAction(new SiteGetAllAction()).getList();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            sites, SiteWrapper.class);
     }
 
     @Override
@@ -95,9 +102,11 @@ public class SiteGroup extends AdapterBase {
     }
 
     public void addSite() {
-        SiteWrapper site = new SiteWrapper(getAppService());
+        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
         SiteAdapter adapter = new SiteAdapter(this, site);
         adapter.openEntryForm();
+
+        // eventBus.fireEvent(new SiteCreateEvent());
     }
 
     @Override
@@ -108,5 +117,10 @@ public class SiteGroup extends AdapterBase {
     @Override
     public String getViewFormId() {
         return null;
+    }
+
+    @Override
+    public int compareTo(AbstractAdapterBase o) {
+        return 0;
     }
 }

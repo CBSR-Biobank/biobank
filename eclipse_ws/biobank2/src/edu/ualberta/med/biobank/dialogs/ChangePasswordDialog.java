@@ -6,6 +6,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -28,6 +29,8 @@ public class ChangePasswordDialog extends BgcBaseDialog {
     private Text newPass1Text;
     private Text newPass2Text;
 
+    private Button checkBulk;
+
     public ChangePasswordDialog(Shell parentShell) {
         super(parentShell);
     }
@@ -40,7 +43,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText(Messages.ChangePasswordDialog_title);
+        shell.setText("Change Password");
     }
 
     @Override
@@ -54,20 +57,20 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         oldPassText = createPassWordText(contents,
-            Messages.ChangePasswordDialog_oldPassword_label);
+            "Old Password");
         new Label(contents, SWT.NONE);
         new Label(contents, SWT.NONE); // shhhh! don't tell anyone i did this.
         newPass1Text = createPassWordText(contents,
-            Messages.ChangePasswordDialog_password_label);
+            "Password");
         newPass2Text = createPassWordText(contents,
-            Messages.ChangePasswordDialog_password_retype_label);
+            "Re-type Password");
 
         oldPassText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().equals("")) //$NON-NLS-1$
-                    setErrorMessage(Messages.ChangePasswordDialog_oldPassword_msg);
+                if (text.getText().equals("")) 
+                    setErrorMessage("Please enter your old password");
                 else {
                     setErrorMessage(null);
                 }
@@ -78,7 +81,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (text.getText().length() < MIN_PASSWORD_LENGTH)
-                    setErrorMessage(Messages.ChangePasswordDialog_password_length_msg);
+                    setErrorMessage("Please enter your new password (at least 5 characters)");
                 else {
                     setErrorMessage(null);
                     newPass2Text.notifyListeners(SWT.Modify, new Event());
@@ -90,13 +93,22 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (!text.getText().equals(newPass1Text.getText()))
-                    setErrorMessage(Messages.ChangePasswordDialog_password_reenter_msg);
+                    setErrorMessage("Please re-enter your new password");
                 else {
                     setErrorMessage(null);
                     oldPassText.notifyListeners(SWT.Modify, new Event());
                 }
             }
         });
+
+        if (forceChange) {
+            // will ask about bulk email on the same time
+            checkBulk = new Button(contents, SWT.CHECK);
+            checkBulk
+                .setText("I want to receive emails about new versions");
+            checkBulk
+                .setSelection(SessionManager.getUser().getRecvBulkEmails());
+        }
     }
 
     private Text createPassWordText(Composite parent, String labelText) {
@@ -120,28 +132,28 @@ public class ChangePasswordDialog extends BgcBaseDialog {
     public boolean close() {
         if (!forceChange || getReturnCode() == OK)
             return super.close();
-        else
-            return false;
+        return false;
     }
 
     @Override
     protected void okPressed() {
-        if ((this.newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
+        if ((newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
             newPass1Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
-        if (!this.newPass1Text.getText().equals(this.newPass2Text.getText())) {
+        if (!newPass1Text.getText().equals(this.newPass2Text.getText())) {
             newPass2Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
         try {
-            SessionManager.getAppService().modifyPassword(
-                this.oldPassText.getText(), this.newPass2Text.getText());
+            SessionManager.getUser().modifyPassword(oldPassText.getText(),
+                newPass2Text.getText(),
+                checkBulk == null ? null : checkBulk.getSelection());
 
             SessionManager.getInstance().getSession().resetAppService();
             BgcPlugin.openInformation(
-                Messages.ChangePasswordDialog_success_title,
-                Messages.ChangePasswordDialog_success_msg);
+                "Password modified",
+                "Your password has been successfully changed. You will need to reconnect again to see your data");
 
             if (forceChange && newPass1Text.getText().isEmpty()) {
                 return;
@@ -157,7 +169,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
 
             ld.open();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.ChangePasswordDialog_error_title,
+            BgcPlugin.openAsyncError("Error changing password",
                 e);
         }
 
@@ -176,17 +188,17 @@ public class ChangePasswordDialog extends BgcBaseDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.ChangePasswordDialog_description;
+        return "Change your password to something different.";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.ChangePasswordDialog_title;
+        return "Change Password";
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.ChangePasswordDialog_title;
+        return "Change Password";
     }
 
 }

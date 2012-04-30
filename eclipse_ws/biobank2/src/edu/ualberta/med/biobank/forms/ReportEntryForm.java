@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
+import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.export.CsvDataExporter;
 import edu.ualberta.med.biobank.export.Data;
 import edu.ualberta.med.biobank.export.DataExporter;
@@ -61,6 +62,7 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
@@ -79,14 +81,16 @@ public class ReportEntryForm extends BiobankEntryForm {
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_SAVE_AS_NEW));
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ReportEntryForm"; 
 
-    private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME = new Comparator<EntityFilter>() {
-        @Override
-        public int compare(EntityFilter lhs, EntityFilter rhs) {
-            return lhs.getName().compareToIgnoreCase(rhs.getName());
-        }
-    };
+    private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME =
+        new Comparator<EntityFilter>() {
+            @Override
+            public int compare(EntityFilter lhs, EntityFilter rhs) {
+                return lhs.getName().compareToIgnoreCase(rhs.getName());
+            }
+        };
 
     private FilterSelectWidget filtersWidget;
     private ColumnSelectWidget columnsWidget;
@@ -140,19 +144,19 @@ public class ReportEntryForm extends BiobankEntryForm {
         // anything listening to the wrapper (for example, the
         // FilterSelectWidget and the ColumnSelectWidget).
         Report nakedReport = report.getWrappedObject();
-        nakedReport.setReportColumnCollection(new HashSet<ReportColumn>(
+        nakedReport.setReportColumns(new HashSet<ReportColumn>(
             columnsWidget.getReportColumns()));
-        nakedReport.setReportFilterCollection(new HashSet<ReportFilter>(
+        nakedReport.setReportFilters(new HashSet<ReportFilter>(
             filtersWidget.getReportFilters()));
     }
 
     @Override
     protected String getOkMessage() {
-        return ""; //$NON-NLS-1$
+        return ""; 
     }
 
     @Override
-    public String getNextOpenedFormID() {
+    public String getNextOpenedFormId() {
         return ReportEntryForm.ID;
     }
 
@@ -161,11 +165,12 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         String tabName;
         if (report.isNew()) {
-            tabName = NLS.bind(Messages.ReportEntryForm_title_new, entityName);
+            tabName = NLS.bind("New {0} Report", entityName);
+            report.setName(tabName);
         } else {
             String reportName = report.getName();
             if (reportName == null || reportName.isEmpty()) {
-                tabName = NLS.bind(Messages.ReportEntryForm_unamed_report,
+                tabName = NLS.bind("Unnamed {0} Report",
                     entityName);
             } else {
                 tabName = reportName;
@@ -177,7 +182,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.ReportEntryForm_report_name, report
+        form.setText(NLS.bind("{0} Report", report
             .getEntity().getName()));
         page.setLayout(new GridLayout(1, false));
 
@@ -206,13 +211,13 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(container);
 
         setFirstControl(createBoundWidgetWithLabel(container,
-            BgcBaseText.class, SWT.NONE, Messages.ReportEntryForm_name_label,
+            BgcBaseText.class, SWT.NONE, "Name",
             null, report, ReportWrapper.PROPERTY_NAME,
             new NonEmptyStringValidator(
-                Messages.ReportEntryForm_name_validation_msg)));
+                "Name is required.")));
 
         createBoundWidgetWithLabel(container, BgcBaseText.class, SWT.MULTI,
-            Messages.ReportEntryForm_description_label, null, report,
+            "Description", null, report,
             ReportWrapper.PROPERTY_DESCRIPTION, null);
     }
 
@@ -231,7 +236,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private Control createGenerateButton(Composite parent) {
         generateButton = toolkit.createButton(parent,
-            Messages.ReportEntryForm_generate_button_label, SWT.NONE);
+            "Generate", SWT.NONE);
         generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -267,23 +272,24 @@ public class ReportEntryForm extends BiobankEntryForm {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask(Messages.ReportEntryForm_generating_msg,
+                monitor.beginTask("Generating report...",
                     IProgressMonitor.UNKNOWN);
                 try {
                     results = new ArrayList<Object>();
 
                     Thread thread = new Thread(
-                        Messages.ReportEntryForm_querying) {
+                        "Querying") {
                         @SuppressWarnings("unchecked")
                         @Override
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
-                                appService, rawReport).init();
+                                SessionManager.getAppService(), rawReport)
+                                .init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
                                     .addBusyListener(new ProgressMonitorDialogBusyListener(
-                                        Messages.ReportEntryForm_loading_msg));
+                                        "Loading more results..."));
                         }
                     };
 
@@ -305,12 +311,13 @@ public class ReportEntryForm extends BiobankEntryForm {
                     generateButton.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            resultsTable = new ReportResultsTableWidget<Object>(
-                                resultsContainer, null, getHeaders());
+                            resultsTable =
+                                new ReportResultsTableWidget<Object>(
+                                    resultsContainer, null, getHeaders());
 
                             resultsTable.adaptToToolkit(toolkit, true);
 
-                            resultsTable.setCollection(results);
+                            resultsTable.setList(results);
 
                             if (!report.getIsCount()) {
                                 resultsTable
@@ -332,13 +339,14 @@ public class ReportEntryForm extends BiobankEntryForm {
                     });
 
                     Log logMessage = new Log();
-                    logMessage.action = "report"; //$NON-NLS-1$
-                    appService.logActivity(logMessage);
+                    logMessage.setType("report");
+                    logMessage.setAction(rawReport.getName());
+                    SessionManager.getAppService().logActivity(logMessage);
                     addPrintAction();
 
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.ReportEntryForm_generation_error_title, e);
+                        "Report Generation Error", e);
                 }
                 monitor.done();
             }
@@ -410,17 +418,17 @@ public class ReportEntryForm extends BiobankEntryForm {
                         Constructor<?> constructor = entityKlazz
                             .getConstructor();
                         Object instance = constructor.newInstance();
-                        Method setIdMethod = entityKlazz.getMethod("setId", //$NON-NLS-1$
+                        Method setIdMethod = entityKlazz.getMethod("setId", 
                             Integer.class);
                         setIdMethod.invoke(instance, id);
 
-                        ModelWrapper<?> wrapper = ModelWrapper.wrapObject(
-                            appService, instance);
+                        ModelWrapper<?> wrapper = WrapperUtil.wrapObject(
+                            SessionManager.getAppService(), instance);
 
                         SessionManager.openViewForm(wrapper);
                     } catch (Exception e) {
                         logger.error(
-                            Messages.ReportEntryForm_opening_error_title, e);
+                            "Error opening selection", e);
                     }
                 }
             }
@@ -430,7 +438,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     private String[] getHeaders() {
         Report nakedReport = report.getWrappedObject();
         List<ReportColumn> reportColumns = new ArrayList<ReportColumn>(
-            nakedReport.getReportColumnCollection());
+            nakedReport.getReportColumns());
 
         Collections.sort(reportColumns, new Comparator<ReportColumn>() {
             @Override
@@ -452,7 +460,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         }
 
         if (report.getIsCount()) {
-            headers[i] = NLS.bind(Messages.ReportEntryForm_report_name_count,
+            headers[i] = NLS.bind("{0} Count",
                 report.getEntity().getName());
         }
 
@@ -460,7 +468,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void createFiltersSection() {
-        filtersSection = createSection(Messages.ReportEntryForm_filters_title);
+        filtersSection = createSection("Filters");
 
         Composite container = toolkit.createComposite(filtersSection, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
@@ -520,7 +528,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         container.setLayoutData(layoutData);
 
         Label label = new Label(container, SWT.NONE);
-        label.setText(Messages.ReportEntryForm_add_filter_label);
+        label.setText("Add filter:");
 
         GridData comboLayoutData = new GridData();
         comboLayoutData.widthHint = 200;
@@ -534,7 +542,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 if (element instanceof EntityFilter) {
                     return ((EntityFilter) element).getName();
                 }
-                return ""; //$NON-NLS-1$
+                return ""; 
             }
         });
 
@@ -567,7 +575,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void createOptionsSection() {
-        Section section = createSection(Messages.ReportEntryForm_options_title);
+        Section section = createSection("Options");
         Composite options = toolkit.createComposite(section);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -576,18 +584,18 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(options);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
-            Messages.ReportEntryForm_count_option_label, null, report,
-            "isCount", //$NON-NLS-1$
+            "Show count\r\n(for displayed columns)", null, report,
+            "isCount", 
             null);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
-            Messages.ReportEntryForm_share_button_label, null, report,
-            "isPublic", null); //$NON-NLS-1$
+            "Share report", null, report,
+            "isPublic", null); 
 
         GridData layoutData = new GridData();
         layoutData.widthHint = 225;
         Label columnsLabel = new Label(options, SWT.NONE);
-        columnsLabel.setText(Messages.ReportEntryForm_columns_label);
+        columnsLabel.setText("Columns:");
         columnsLabel.setLayoutData(layoutData);
 
         columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
@@ -631,8 +639,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                 int userId = SessionManager.getUser().getId().intValue();
                 report.setUserId(userId);
 
-                ReportAdapter reportAdapter = new ReportAdapter(getAdapter()
-                    .getParent(), report);
+                ReportAdapter reportAdapter = new ReportAdapter(
+                    (AdapterBase) getAdapter().getParent(), report);
                 IEditorPart part = reportAdapter.openEntryForm();
 
                 if (part instanceof ReportEntryForm) {
@@ -649,7 +657,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         // .setActionDefinitionId("edu.ualberta.med.biobank.commands.saveAsNew");
 
         saveAsNewAction.setImageDescriptor(SAVE_AS_NEW_ACTION_IMAGE);
-        saveAsNewAction.setToolTipText(Messages.ReportEntryForm_saveAs_label);
+        saveAsNewAction.setToolTipText("Save As New Report");
 
         form.getToolBarManager().add(saveAsNewAction);
         form.updateToolBar();
@@ -668,15 +676,15 @@ public class ReportEntryForm extends BiobankEntryForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                Messages.ReportEntryForm_export_error_title, e.getMessage());
+                "Confirm Report Results Export", e.getMessage());
             return;
         }
 
         // confirm exporting
         if (!MessageDialog.openQuestion(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            Messages.ReportEntryForm_confirm_title,
-            NLS.bind(Messages.ReportEntryForm_export_question,
+            "Confirm Report Results Export",
+            NLS.bind("Are you sure you want to {0}?",
                 exporter.getName()))) {
             return;
         }
@@ -688,7 +696,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         } catch (Exception e) {
             MessageDialog.openError(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(),
-                Messages.ReportEntryForm_exporting_error_title, e.getMessage());
+                "Error exporting", e.getMessage());
             return;
         }
     }
@@ -702,7 +710,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         Report nakedReport = report.getWrappedObject();
         List<ReportFilter> reportFilters = new ArrayList<ReportFilter>(
-            nakedReport.getReportFilterCollection());
+            nakedReport.getReportFilters());
 
         Collections.sort(reportFilters, new Comparator<ReportFilter>() {
             @Override
@@ -719,24 +727,24 @@ public class ReportEntryForm extends BiobankEntryForm {
             if (opId != null) {
                 FilterOperator op = FilterOperator.getFilterOperator(opId);
                 if (op != null) {
-                    sb.append(" "); //$NON-NLS-1$
+                    sb.append(" "); 
                     sb.append(op.getDisplayString());
                 }
             }
 
             Collection<ReportFilterValue> values = filter
-                .getReportFilterValueCollection();
+                .getReportFilterValues();
             if (values != null) {
-                sb.append(": "); //$NON-NLS-1$
+                sb.append(": "); 
                 for (ReportFilterValue value : values) {
-                    sb.append("'"); //$NON-NLS-1$
-                    sb.append(value.getValue().replace("'", "\'")); //$NON-NLS-1$ //$NON-NLS-2$
+                    sb.append("'"); 
+                    sb.append(value.getValue().replace("'", "\'"));  
 
                     if (value.getSecondValue() != null) {
-                        sb.append("' and '"); //$NON-NLS-1$
-                        sb.append(value.getSecondValue().replace("'", "\'")); //$NON-NLS-1$ //$NON-NLS-2$
+                        sb.append("' and '"); 
+                        sb.append(value.getSecondValue().replace("'", "\'"));  
                     }
-                    sb.append("'; "); //$NON-NLS-1$
+                    sb.append("'; "); 
                 }
             }
 
@@ -747,7 +755,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     @Override
-    protected void onReset() throws Exception {
+    public void setValues() throws Exception {
         emptyResultsContainer();
         report.reset();
     }

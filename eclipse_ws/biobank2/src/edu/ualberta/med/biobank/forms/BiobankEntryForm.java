@@ -47,7 +47,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.forms.BgcEntryFormActions;
 import edu.ualberta.med.biobank.gui.common.forms.BgcFormBase;
@@ -71,10 +70,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
 
-    private static final String CONTEXT_ENTRY_FORM = "biobank.context.entryForm"; //$NON-NLS-1$
-
-    private static BgcLogger logger = BgcLogger
-        .getLogger(BiobankEntryForm.class.getName());
+    private static final String CONTEXT_ENTRY_FORM =
+        "biobank.context.entryForm";
 
     protected String sessionName;
 
@@ -119,10 +116,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     public void formClosed() throws Exception {
         // TODO: is this necessary if making copies?
-        if ((adapter != null) && (adapter.getModelObject() != null)) {
-            adapter.getModelObject().reload();
-        }
-        SessionManager.updateAdapterTreeNode(adapter);
+        if (adapter instanceof AdapterBase)
+            if ((adapter != null)
+                && (((AdapterBase) adapter).getModelObject() != null)) {
+                ((AdapterBase) adapter).getModelObject().reload();
+            }
+
+        // not everything is well initialized on the adapter before it is really
+        // saved. Should not do that now..
+        // SessionManager.updateAdapterTreeNode(adapter);
     }
 
     @Override
@@ -132,15 +134,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             monitor.setCanceled(true);
             setDirty(true);
             BgcPlugin.openAsyncError(
-                Messages.BiobankEntryForm_state_error_title,
-                Messages.BiobankEntryForm_state_error_msg);
+                "Form state",
+                "Form in invalid state, save failed.");
             return;
         }
         doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal(
-        @SuppressWarnings("unused") final IProgressMonitor monitor) {
+    @SuppressWarnings("unused")
+    protected void doSaveInternal(IProgressMonitor monitor) {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
@@ -151,16 +153,32 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
                     throws InvocationTargetException, InterruptedException {
 
                     try {
-                        monitor.beginTask(Messages.BiobankEntryForm_saving,
+                        monitor.beginTask("Saving...",
                             IProgressMonitor.UNKNOWN);
                         saveForm();
+                        // this needs to be done there if we want the new node
+                        // to be in the tree and to be selected and to see the
+                        // right label (needs to be done when save is finished,
+                        // not when the form close)
+                        SessionManager.updateAllSimilarNodes(adapter, true);
                         monitor.done();
+
+                        Display.getDefault().asyncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    doAfterSave();
+                                } catch (Exception e) {
+                                    setDirty(true);
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
                     } catch (Exception ex) {
                         saveErrorCatch(ex, monitor, true);
                     }
                 }
             });
-            doAfterSave();
         } catch (Exception e) {
             setDirty(true);
             throw new RuntimeException(e);
@@ -182,16 +200,16 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
      * Called before the monitor start. Can be used to get values on the GUI
      * objects.
      */
-    @SuppressWarnings("unused")
     protected void doBeforeSave() throws Exception {
         // do nothing by default
     }
 
     /**
+     * Invoked in GUI thread.
+     * 
      * Called after the monitor start. Can be used to get values on the GUI
      * objects.
      */
-    @SuppressWarnings("unused")
     protected void doAfterSave() throws Exception {
         // default does nothing
     }
@@ -201,16 +219,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         throws PartInitException {
         super.init(editorSite, input);
         setDirty(false);
-        checkEditAccess();
-    }
-
-    protected void checkEditAccess() {
-        if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
-            BgcPlugin.openAccessDeniedErrorMessage();
-            throw new RuntimeException(
-                Messages.BiobankEntryForm_access_denied_error_msg);
-        }
     }
 
     @Override
@@ -239,7 +247,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void setFocus() {
         super.setFocus();
-        Assert.isNotNull(firstControl, "first control widget is not set"); //$NON-NLS-1$
+        Assert.isNotNull(firstControl, "first control widget is not set");
         if (!firstControl.isDisposed()) {
             firstControl.setFocus();
         }
@@ -399,7 +407,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected void addResetAction() {
-        formActions.addResetAction(Actions.BIOBANK_RESET);
+        formActions.addResetAction(Actions.BIOBANK_RELOAD);
     }
 
     protected void addCancelAction() {
@@ -426,20 +434,25 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
             if (!isDirty()) {
-                closeEntryOpenView(true, true);
+                closeEntryOpenView(true, openViewAfterSaving());
             }
         } catch (Exception e) {
-            logger.error("Can't save the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't save the form", e);
         }
+    }
+
+    protected boolean openViewAfterSaving() {
+        return true;
     }
 
     protected void closeEntryOpenView(boolean saveOnClose, boolean openView) {
         int entryIndex = linkedForms.indexOf(this);
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
             .closeEditor(this, saveOnClose);
-        if (openView && getNextOpenedFormID() != null) {
-            AdapterBase.openForm(new FormInput(getAdapter()),
-                getNextOpenedFormID(), true);
+        String nextFormId = getNextOpenedFormId();
+
+        if (openView && (nextFormId != null)) {
+            AdapterBase.openForm(new FormInput(getAdapter()), nextFormId, true);
 
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0
@@ -455,30 +468,19 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     @Override
     public void cancel() {
         try {
-            boolean openView = adapter.getModelObject() != null
-                && !adapter.getModelObject().isNew();
+            boolean openView = adapter.getId() != null;
+            if (adapter instanceof AdapterBase)
+                openView &= !((AdapterBase) adapter).getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
-            logger.error("Can't cancel the form", e); //$NON-NLS-1$
+            LOGGER.error("Can't cancel the form", e);
         }
     }
-
-    @Override
-    public void reset() {
-        try {
-            onReset();
-            setDirty(false);
-        } catch (Exception e) {
-            logger.error("Can't reset the form", e); //$NON-NLS-1$
-        }
-    }
-
-    protected abstract void onReset() throws Exception;
 
     /**
      * Return the ID of the form that should be opened after the save action is
      * performed and the current form closed
      */
-    public abstract String getNextOpenedFormID();
+    public abstract String getNextOpenedFormId();
 
 }

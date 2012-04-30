@@ -1,16 +1,19 @@
 package edu.ualberta.med.biobank.handlers;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ClinicAddHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.addClinic"; //$NON-NLS-1$
+public class ClinicAddHandler extends LogoutSensitiveHandler {
+    public static final String ID =
+        "edu.ualberta.med.biobank.commands.addClinic"; //$NON-NLS-1$
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -22,8 +25,17 @@ public class ClinicAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.isSuperAdminMode()
-            && SessionManager.canCreate(ClinicWrapper.class)
-            && SessionManager.getInstance().getSession() != null;
+        try {
+            if (allowed == null)
+                allowed =
+                    SessionManager.getAppService().isAllowed(
+                        new ClinicCreatePermission());
+            return SessionManager.getInstance().getSession() != null &&
+                allowed;
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
+                Messages.HandlerPermission_message);
+            return false;
+        }
     }
 }

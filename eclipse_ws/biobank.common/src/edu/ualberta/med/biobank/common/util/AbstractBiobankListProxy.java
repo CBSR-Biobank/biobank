@@ -24,7 +24,8 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
     Serializable {
 
     private static enum Shown {
-        BUSY, DONE
+        BUSY,
+        DONE
     };
 
     private Shown lastShown = Shown.DONE;
@@ -100,8 +101,8 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
             @SuppressWarnings("unchecked")
             E tmp = (E) element;
             return getRowObject(tmp);
-        } else
-            return null;
+        }
+        return null;
     }
 
     private void swapPages() {
@@ -185,7 +186,8 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         boolean alreadyLoaded = nextPage.offset != null
             && nextPage.offset.equals(nextOffset);
         boolean afterStart = nextOffset >= 0;
-        boolean beforeEnd = (realSize == REAL_SIZE_UNKNOWN || nextOffset < realSize);
+        boolean beforeEnd =
+            (realSize == REAL_SIZE_UNKNOWN || nextOffset < realSize);
 
         if (!alreadyLoaded && afterStart && beforeEnd) {
             final int finalNextOffset = nextOffset;
@@ -265,10 +267,6 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
 
     @Override
     public int size() {
-        return -1;
-    }
-
-    public int getRealSize() {
         return realSize;
     }
 
@@ -284,6 +282,8 @@ public abstract class AbstractBiobankListProxy<E> implements List<E>,
         // for (int i = fromIndex; i < toIndex; i++) {
         // subList.add(get(i));
         // }
+        if (realSize != REAL_SIZE_UNKNOWN && toIndex > realSize)
+            toIndex = realSize;
 
         for (Object o : page.list.subList(fromIndex - page.offset,
             Math.min(page.list.size(), toIndex - page.offset))) {

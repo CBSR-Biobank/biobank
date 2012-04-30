@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -12,15 +13,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -61,19 +61,19 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         this.newAliquotedSpecimen.setActivityStatus(origAliquotedSpecimen
             .getActivityStatus());
         if (origAliquotedSpecimen.getSpecimenType() == null) {
-            currentTitle = Messages.StudyAliquotedSpecimenDialog_add_title;
+            currentTitle = "Add aliquoted specimen";
 
             try {
                 this.newAliquotedSpecimen
-                    .setActivityStatus(ActivityStatusWrapper
-                        .getActiveActivityStatus(origAliquotedSpecimen
-                            .getAppService()));
+                    .setActivityStatus(ActivityStatus.ACTIVE);
             } catch (Exception e) {
-                BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_title,
-                    Messages.StudyAliquotedSpecimenDialog_activityStatus_retrieve_error_msg);
+                BgcPlugin
+                    .openAsyncError(
+                        "Database Error",
+                        "Error while retrieving activity status");
             }
         } else {
-            currentTitle = Messages.StudyAliquotedSpecimenDialog_edit_title;
+            currentTitle = "Edit aliquoted specimen";
         }
     }
 
@@ -85,17 +85,15 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (availableSpecimenTypes.size() > 0)
-            return Messages.StudyAliquotedSpecimenDialog_msg;
-        else
-            return Messages.StudyAliquotedSpecimenDialog_available_nomore_msg;
+            return "Select the aliquoted specimen used by this study";
+        return "No more aliquoted specimen type can be derived from the study source specimen types.";
     }
 
     @Override
     protected int getTitleAreaMessageType() {
         if (availableSpecimenTypes.size() > 0)
             return IMessageProvider.NONE;
-        else
-            return IMessageProvider.INFORMATION;
+        return IMessageProvider.INFORMATION;
     }
 
     @Override
@@ -113,9 +111,9 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.StudyAliquotedSpecimenDialog_field_type_label,
+            contents, "Specimen type",
             availableSpecimenTypes, newAliquotedSpecimen.getSpecimenType(),
-            Messages.StudyAliquotedSpecimenDialog_field_type_validation_msg,
+            "A specimen type should be selected",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -130,42 +128,44 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
             }
         });
 
-        activityStatus = getWidgetCreator().createComboViewer(
-            contents,
-            Messages.StudyAliquotedSpecimenDialog_label_activity,
-            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                .getAppService()), newAliquotedSpecimen.getActivityStatus(),
-            Messages.StudyAliquotedSpecimenDialog_validation_activity,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    try {
-                        newAliquotedSpecimen
-                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                    } catch (Exception e) {
-                        BgcPlugin.openAsyncError(
-                            Messages.StudyAliquotedSpecimenDialog_activityStatus_error_title, e);
+        activityStatus =
+            getWidgetCreator().createComboViewer(
+                contents,
+                "Activity status",
+                ActivityStatus.valuesList(),
+                newAliquotedSpecimen.getActivityStatus(),
+                "An activity status should be selected",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        try {
+                            newAliquotedSpecimen
+                                .setActivityStatus((ActivityStatus) selectedObject);
+                        } catch (Exception e) {
+                            BgcPlugin
+                                .openAsyncError(
+                                    "Error setting activity status",
+                                    e);
+                        }
                     }
-                }
-            }, new BiobankLabelProvider());
+                }, new BiobankLabelProvider());
 
         volume = (BgcBaseText) createBoundWidgetWithLabel(contents,
             BgcBaseText.class, SWT.BORDER,
-            Messages.StudyAliquotedSpecimenDialog_volume_label, new String[0],
+            "Volume (ml)", new String[0],
             newAliquotedSpecimen, AliquotedSpecimenPeer.VOLUME.getName(),
             new DoubleNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_volume_validation_msg, false));
+                "Volume should be a real number",
+                false));
 
-        quantity = (BgcBaseText) createBoundWidgetWithLabel(
-            contents,
-            BgcBaseText.class,
-            SWT.BORDER,
-            Messages.StudyAliquotedSpecimenDialog_quantity_label,
-            new String[0],
-            newAliquotedSpecimen,
+        quantity = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.BORDER,
+            "Quantity",
+            new String[0], newAliquotedSpecimen,
             AliquotedSpecimenPeer.QUANTITY.getName(),
             new IntegerNumberValidator(
-                Messages.StudyAliquotedSpecimenDialog_quantity_validation_msg, false));
+                "Quantity should be a whole number",
+                false));
     }
 
     @Override
@@ -182,7 +182,7 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
     }
 
     @Override
-    protected void copy(ModelWrapper<?> newModelObject) {
+    protected void copy(Object newModelObject) {
         ((AliquotedSpecimenWrapper) newModelObject)
             .setSpecimenType(newAliquotedSpecimen.getSpecimenType());
         ((AliquotedSpecimenWrapper) newModelObject)
@@ -203,11 +203,18 @@ public class StudyAliquotedSpecimenDialog extends PagedDialog {
         try {
             newAliquotedSpecimen.reset();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.StudyAliquotedSpecimenDialog_error_title, e);
+            BgcPlugin.openAsyncError(
+                "Error", e);
         }
         specimenTypeComboViewer.getCombo().deselectAll();
-        quantity.setText(""); //$NON-NLS-1$
-        volume.setText(""); //$NON-NLS-1$
+        quantity.setText(""); 
+        volume.setText(""); 
         activityStatus.getCombo().deselectAll();
+    }
+
+    public void setSpecimenTypes(
+        Set<SpecimenTypeWrapper> availableSpecimenTypes) {
+        this.availableSpecimenTypes = availableSpecimenTypes;
+        this.specimenTypeComboViewer.setInput(availableSpecimenTypes);
     }
 }

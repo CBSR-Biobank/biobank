@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
 
@@ -12,19 +13,20 @@ import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
  */
 public class SessionsView extends AbstractViewWithAdapterTree {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.SessionsView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.SessionsView"; //$NON-NLS-1$
 
     public SessionsView() {
         SessionManager.getInstance().setSessionsView(this);
     }
 
     @Override
-    public void createPartControl(Composite parent) {
+    public void createPartControlInternal(Composite parent) {
         adaptersTree = new AdapterTreeWidget(parent, false);
-        getSite().setSelectionProvider(getTreeViewer());
+
         rootNode = SessionManager.getInstance().getRootNode();
         getTreeViewer().setInput(rootNode);
-        rootNode.setTreeViewer(getTreeViewer());
+        ((RootNode) rootNode).setTreeViewer(getTreeViewer());
         if (rootNode.hasChildren()) {
             getTreeViewer().expandToLevel(3);
         }
@@ -33,6 +35,8 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
         if (session != null && SessionManager.getInstance().isConnected())
             session.rebuild();
+
+        getSite().setSelectionProvider(adaptersTree.getTreeViewer());
     }
 
     @Override
@@ -41,7 +45,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         if (session != null) {
             session.rebuild();
         }
-        if (SessionManager.isSuperAdminMode())
+        if (SessionManager.getUser().getCurrentWorkingCenter() == null)
             setPartName(Messages.SessionsView_admin_title);
         else
             setPartName(Messages.SessionsView_center_admin_title);
@@ -51,4 +55,5 @@ public class SessionsView extends AbstractViewWithAdapterTree {
     public String getId() {
         return ID;
     }
+
 };

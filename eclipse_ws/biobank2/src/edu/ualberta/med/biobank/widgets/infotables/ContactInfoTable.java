@@ -8,7 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
 
@@ -33,22 +34,30 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         }
     }
 
-    private static final String[] HEADINGS = new String[] { Messages.ContactInfoTable_name_label,
-        Messages.ContactInfoTable_title_label, Messages.ContactInfoTable_studies_label, Messages.ContactInfoTable_email_label, Messages.ContactInfoTable_mobile_label, Messages.ContactInfoTable_pager_label, Messages.ContactInfoTable_office_label, Messages.ContactInfoTable_fax_label };
+    private static final String[] HEADINGS = new String[] {
+        Messages.ContactInfoTable_name_label,
+        Messages.ContactInfoTable_title_label,
+        Messages.ContactInfoTable_studies_label,
+        Messages.ContactInfoTable_email_label,
+        Messages.ContactInfoTable_mobile_label,
+        Messages.ContactInfoTable_pager_label,
+        Messages.ContactInfoTable_office_label,
+        Messages.ContactInfoTable_fax_label };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ContactInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -77,15 +86,14 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ContactWrapper contact)
-        throws Exception {
-        if (contact == null)
+    public TableRowData getCollectionModelObject(Object o) throws Exception {
+        if (o == null)
             return null;
         TableRowData info = new TableRowData();
-        info.contact = contact;
-        info.name = contact.getName();
-        info.title = contact.getTitle();
-        List<StudyWrapper> studies = contact.getStudyCollection(true);
+        info.contact = (ContactWrapper) o;
+        info.name = info.contact.getName();
+        info.title = info.contact.getTitle();
+        List<StudyWrapper> studies = info.contact.getStudyCollection(true);
         if (studies != null) {
             StringBuilder sb = new StringBuilder();
             int count = 0;
@@ -98,11 +106,11 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             }
             info.studies = sb.toString();
         }
-        info.emailAddress = contact.getEmailAddress();
-        info.mobileNumber = contact.getMobileNumber();
-        info.pagerNumber = contact.getPagerNumber();
-        info.officeNumber = contact.getOfficeNumber();
-        info.faxNumber = contact.getFaxNumber();
+        info.emailAddress = info.contact.getEmailAddress();
+        info.mobileNumber = info.contact.getMobileNumber();
+        info.pagerNumber = info.contact.getPagerNumber();
+        info.officeNumber = info.contact.getOfficeNumber();
+        info.faxNumber = info.contact.getFaxNumber();
         return info;
     }
 
@@ -126,6 +134,24 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canEdit(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canDelete(ContactWrapper target)
+        throws ApplicationException {
+        return true;
+    }
+
+    @Override
+    protected Boolean canView(ContactWrapper target)
+        throws ApplicationException {
+        return true;
     }
 
 }

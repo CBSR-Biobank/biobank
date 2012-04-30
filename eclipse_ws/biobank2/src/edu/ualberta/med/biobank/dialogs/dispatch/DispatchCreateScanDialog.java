@@ -3,8 +3,10 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.osgi.util.NLS;
@@ -17,8 +19,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.scanprocess.data.ProcessData;
-import edu.ualberta.med.biobank.common.scanprocess.data.ShipmentProcessData;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
+import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
+import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -43,7 +48,8 @@ public class DispatchCreateScanDialog extends
     private boolean isPalletWithPosition;
     private boolean specimensAdded = false;
     private ContainerWrapper currentPallet;
-    private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
+    private List<ContainerWrapper> removedPallets =
+        new ArrayList<ContainerWrapper>();
 
     public DispatchCreateScanDialog(Shell parentShell,
         DispatchWrapper currentShipment, CenterWrapper<?> site) {
@@ -52,7 +58,7 @@ public class DispatchCreateScanDialog extends
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.DispatchCreateScanDialog_description;
+        return "Scan specimens to dispatch. If a pallet with previous position is scan, the specimens scanned\nwill be compared to those that are supposed to be in the pallet.";
     }
 
     /**
@@ -60,14 +66,17 @@ public class DispatchCreateScanDialog extends
      */
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
         // only sites have containers
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
             palletWithoutPositionRadio
-                .setText(Messages.DispatchCreateScanDialog_without_position_radio_text);
-            final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
+                .setText("Pallet without previous position");
+            final Button palletWithPositionRadio =
+                new Button(parent, SWT.RADIO);
             palletWithPositionRadio
-                .setText(Messages.DispatchCreateScanDialog_with_position_radio_text);
+                .setText("Pallet with previous position");
 
             palletWithPositionRadio
                 .addSelectionListener(new SelectionAdapter() {
@@ -81,13 +90,14 @@ public class DispatchCreateScanDialog extends
                 });
 
             productBarcodeValidator = new NonEmptyStringValidator(
-                Messages.DispatchCreateScanDialog_productBarcode_validationMsg);
+                "Enter product barcode");
             Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-                Messages.DispatchCreateScanDialog_productBarcode_label);
-            palletproductBarcodeText = (BgcBaseText) createBoundWidget(parent,
-                BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
-                new String[0], this,
-                "currentProductBarcode", productBarcodeValidator); //$NON-NLS-1$
+                "Pallet product barcode");
+            palletproductBarcodeText =
+                (BgcBaseText) createBoundWidget(parent,
+                    BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
+                    new String[0], this,
+                    "currentProductBarcode", productBarcodeValidator); 
             palletproductBarcodeText
                 .addKeyListener(new EnterKeyToNextFieldListener());
             showProductBarcodeField(false);
@@ -99,10 +109,10 @@ public class DispatchCreateScanDialog extends
         resetScan();
         palletproductBarcodeText.setEnabled(show);
         if (show) {
-            palletproductBarcodeText.setText(""); //$NON-NLS-1$
+            palletproductBarcodeText.setText(""); 
         } else {
             palletproductBarcodeText
-                .setText(Messages.DispatchCreateScanDialog_noposision_text);
+                .setText("No previous position");
         }
     }
 
@@ -134,9 +144,9 @@ public class DispatchCreateScanDialog extends
             if (currentPallet == null) {
                 BgcPlugin
                     .openAsyncError(
-                        Messages.DispatchCreateScanDialog_pallet_search_error_title,
+                        "Pallet error",
                         NLS.bind(
-                            Messages.DispatchCreateScanDialog_pallet_search_error_msg,
+                            "Can''t find pallet with barcode ''{0}''",
                             currentProductBarcode));
                 return false;
             }
@@ -145,14 +155,31 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected ProcessData getProcessData() {
-        return new ShipmentProcessData(currentPallet, currentShipment, true,
-            false);
+    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+        CellInfo cell, Locale locale) {
+        return new DispatchCreateProcessAction(getProcessData(), centerId,
+            cell,
+            locale);
+    }
+
+    @Override
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Locale locale) {
+        return new DispatchCreateProcessAction(getProcessData(), centerId,
+            cells,
+            isRescanMode, locale);
+    }
+
+    protected ShipmentProcessInfo getProcessData() {
+        return new ShipmentProcessInfo(currentPallet == null ? null
+            : currentPallet.getWrappedObject(),
+            currentShipment, false);
     }
 
     @Override
     protected String getProceedButtonlabel() {
-        return Messages.DispatchCreateScanDialog_proceed_button_label;
+        return "Add specimens";
     }
 
     @Override
@@ -212,14 +239,14 @@ public class DispatchCreateScanDialog extends
                     SessionManager.getAppService(), (currentShipment)
                         .getSenderCenter().getId());
             return cells;
-        } else {
-            for (SpecimenWrapper specimen : currentPallet.getSpecimens()
-                .values()) {
-                PalletCell cell = new PalletCell(new ScanCell(
-                    specimen.getPosition().row, specimen.getPosition().col,
-                    specimen.getInventoryId()));
-                map.put(specimen.getPosition(), cell);
-            }
+        }
+        for (SpecimenWrapper specimen : currentPallet.getSpecimens()
+            .values()) {
+            PalletCell cell = new PalletCell(new ScanCell(
+                specimen.getPosition().getRow(), specimen.getPosition()
+                    .getCol(),
+                specimen.getInventoryId()));
+            map.put(specimen.getPosition(), cell);
         }
         return map;
     }

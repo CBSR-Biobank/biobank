@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -16,18 +17,16 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.PagedDialog.NewListener;
 import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
 /**
  * Displays the current aliquoted specimen collection and allows the user to add
@@ -37,22 +36,35 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private List<AliquotedSpecimenWrapper> selectedAliquotedSpecimen;
 
-    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimen;
+    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimens;
 
-    private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimen;
+    private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimens;
 
-    private StudyWrapper study;
+    private boolean isDeletable;
 
-    public AliquotedSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
+    private boolean isEditable;
+
+    private Set<SpecimenTypeWrapper> availableSpecimenTypes =
+        new HashSet<SpecimenTypeWrapper>();
+
+    private StudyAliquotedSpecimenDialog dlg;
+
+    public AliquotedSpecimenEntryInfoTable(Composite parent,
+        List<AliquotedSpecimenWrapper> aliquotedSpecimens, boolean isEditable,
+        boolean isDeletable) {
         super(parent, null);
-        this.study = study;
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
+        selectedAliquotedSpecimen = aliquotedSpecimens;
         if (selectedAliquotedSpecimen == null) {
-            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+            selectedAliquotedSpecimen =
+                new ArrayList<AliquotedSpecimenWrapper>();
         }
-        setCollection(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        setList(selectedAliquotedSpecimen);
+        addedOrModifiedAliquotedSpecimens =
+            new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
+
+        this.isEditable = isEditable;
+        this.isDeletable = isDeletable;
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -68,37 +80,40 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     public void addAliquotedSpecimen() {
         AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
             SessionManager.getAppService());
-        asw.setStudy(study);
+        // DO NOT set the study on asw - if it was done then it would have to be
+        // unset if the user presses the Cancel button
         addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
         final AliquotedSpecimenWrapper aliquotedSpecimen) {
-        final Collection<SpecimenTypeWrapper> availableSpecimenTypes = getAvailableSpecimenTypes();
+        List<SpecimenTypeWrapper> dialogSpecimenTypes;
         if (!add) {
-            availableSpecimenTypes.add(aliquotedSpecimen.getSpecimenType());
-        }
+            dialogSpecimenTypes =
+                Arrays.asList(aliquotedSpecimen.getSpecimenType());
+        } else
+            dialogSpecimenTypes =
+                new ArrayList<SpecimenTypeWrapper>(getAvailableSpecimenTypes());
         NewListener newListener = null;
         if (add) {
             // only add to the collection when adding and not editing
             newListener = new NewListener() {
                 @Override
-                public void newAdded(ModelWrapper<?> spec) {
-                    ((AliquotedSpecimenWrapper) spec).setStudy(study);
-                    availableSpecimenTypes.remove(aliquotedSpecimen
-                        .getSpecimenType());
-                    selectedAliquotedSpecimen
-                        .add((AliquotedSpecimenWrapper) spec);
-                    addedOrModifiedAliquotedSpecimen
-                        .add((AliquotedSpecimenWrapper) spec);
+                public void newAdded(Object spec) {
+                    AliquotedSpecimenWrapper added =
+                        ((AliquotedSpecimenWrapper) spec);
+                    availableSpecimenTypes.remove(added.getSpecimenType());
+                    selectedAliquotedSpecimen.add(added);
+                    dlg.setSpecimenTypes(availableSpecimenTypes);
+                    addedOrModifiedAliquotedSpecimens.add(added);
                     reloadCollection(selectedAliquotedSpecimen);
                     notifyListeners();
                 }
             };
         }
-        StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
+        dlg = new StudyAliquotedSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            aliquotedSpecimen, newListener, availableSpecimenTypes);
+            aliquotedSpecimen, newListener, dialogSpecimenTypes);
 
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
@@ -108,38 +123,45 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     private Collection<SpecimenTypeWrapper> getAvailableSpecimenTypes() {
-        Set<SpecimenTypeWrapper> availableSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
-        for (SourceSpecimenWrapper ssw : study
-            .getSourceSpecimenCollection(false)) {
-            availableSpecimenTypes.addAll(ssw.getSpecimenType()
-                .getChildSpecimenTypeCollection(false));
-        }
         return availableSpecimenTypes;
     }
 
+    public void setAvailableSpecimenTypes(List<SourceSpecimenWrapper> types) {
+        availableSpecimenTypes = new HashSet<SpecimenTypeWrapper>();
+        for (SourceSpecimenWrapper ssw : types) {
+            availableSpecimenTypes.addAll(ssw.getSpecimenType()
+                .getChildSpecimenTypeCollection(false));
+        }
+        for (AliquotedSpecimenWrapper ss : selectedAliquotedSpecimen)
+            availableSpecimenTypes.remove(ss.getSpecimenType());
+    }
+
     private void addEditSupport() {
-        if (SessionManager.canCreate(AliquotedSpecimenWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
+        if (isEditable) {
+            addAddItemListener(new IInfoTableAddItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void addItem(InfoTableEvent event) {
+                public void addItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     addAliquotedSpecimen();
                 }
             });
         }
-        if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
+        if (isEditable) {
+            addEditItemListener(new IInfoTableEditItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void editItem(InfoTableEvent event) {
+                public void editItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
                     if (aliquotedSpecimen != null)
                         addOrEditAliquotedSpecimen(false, aliquotedSpecimen);
                 }
             });
         }
-        if (SessionManager.canDelete(AliquotedSpecimenWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        if (isDeletable) {
+            addDeleteItemListener(new IInfoTableDeleteItemListener<AliquotedSpecimenWrapper>() {
                 @Override
-                public void deleteItem(InfoTableEvent event) {
+                public void deleteItem(
+                    InfoTableEvent<AliquotedSpecimenWrapper> event) {
                     AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
                     if (aliquotedSpecimen != null) {
                         if (!MessageDialog
@@ -153,10 +175,11 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                                         .getName()))) {
                             return;
                         }
-
+                        availableSpecimenTypes.add(aliquotedSpecimen
+                            .getSpecimenType());
                         selectedAliquotedSpecimen.remove(aliquotedSpecimen);
-                        setCollection(selectedAliquotedSpecimen);
-                        deletedAliquotedSpecimen.add(aliquotedSpecimen);
+                        setList(selectedAliquotedSpecimen);
+                        deletedAliquotedSpecimens.add(aliquotedSpecimen);
                         notifyListeners();
                     }
                 }
@@ -165,21 +188,27 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public List<AliquotedSpecimenWrapper> getAddedOrModifiedAliquotedSpecimens() {
-        return addedOrModifiedAliquotedSpecimen;
+        return addedOrModifiedAliquotedSpecimens;
     }
 
     public List<AliquotedSpecimenWrapper> getDeletedAliquotedSpecimens() {
-        return deletedAliquotedSpecimen;
+        return deletedAliquotedSpecimens;
     }
 
-    public void reload() {
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
+    public void reload(List<AliquotedSpecimenWrapper> aliquotedSpecimens,
+        boolean isEditable, boolean isDeletable) {
+        this.isEditable = isEditable;
+        this.isDeletable = isDeletable;
+
+        selectedAliquotedSpecimen = aliquotedSpecimens;
         if (selectedAliquotedSpecimen == null) {
-            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+            selectedAliquotedSpecimen =
+                new ArrayList<AliquotedSpecimenWrapper>();
         }
         reloadCollection(selectedAliquotedSpecimen);
-        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        addedOrModifiedAliquotedSpecimens =
+            new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimens = new ArrayList<AliquotedSpecimenWrapper>();
     }
 
     @Override
@@ -190,8 +219,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((AliquotedSpecimenWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((AliquotedSpecimenWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.typeName, i2.typeName);
                 } catch (Exception e) {
                     return 0;

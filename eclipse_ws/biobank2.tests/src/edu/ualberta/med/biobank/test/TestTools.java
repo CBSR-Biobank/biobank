@@ -17,12 +17,12 @@ public class TestTools {
         String backToClassName = CamelCase.toCamelCase(tableName, true, true);
         Assert.assertEquals(className, backToClassName);
 
-        String associationName = "specimenCollection";
+        String associationName = "specimens";
         String methodName = CamelCase.toCamelCase(associationName, true);
-        Assert.assertEquals("SpecimenCollection", methodName);
+        Assert.assertEquals("Specimens", methodName);
 
         String lowerCases = CamelCase.toCamelCase(associationName, false);
-        Assert.assertEquals("specimencollection", lowerCases);
+        Assert.assertEquals("specimens", lowerCases);
 
         String columnName = "NAME_SHORT";
         String attributeName = CamelCase.toCamelCase(columnName, false, true);

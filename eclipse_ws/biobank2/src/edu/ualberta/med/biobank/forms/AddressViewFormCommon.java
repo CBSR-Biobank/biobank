@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
     protected void createAddressSection(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient(Messages.AddressViewFormCommon_address_label);
+        Composite client = createSectionWithClient("Address");
         Section section = (Section) client.getParent();
         section.setExpanded(false);
         createAddressArea(client, wrapperObject);
@@ -21,8 +21,8 @@ public abstract class AddressViewFormCommon extends BiobankViewForm {
         FieldInfo field;
         for (String widgetName : AddressEntryFormCommon.ADDRESS_FIELDS.keySet()) {
             field = AddressEntryFormCommon.ADDRESS_FIELDS.get(widgetName);
-            addWidget(widgetName, createReadOnlyLabelledField(parent, SWT.NONE,
-                field.label));
+            addWidget(widgetName,
+                createReadOnlyLabelledField(parent, SWT.NONE, field.label));
         }
         setAddressValues(wrapperObject);
     }

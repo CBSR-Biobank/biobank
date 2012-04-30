@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.criterion.DetachedCriteria;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
+import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -18,8 +20,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
-    public static final String DROP_OFF_NAME = "Drop-off";
-    public static final String PICK_UP_NAME = "Pick-up";
+    public static final String DROP_OFF_NAME = "Drop-off"; //$NON-NLS-1$
+    public static final String PICK_UP_NAME = "Pick-up"; //$NON-NLS-1$
 
     public ShippingMethodWrapper(WritableApplicationService appService) {
         super(appService);
@@ -31,29 +33,11 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankDeleteException,
-        ApplicationException {
-        List<ShipmentInfoWrapper> shipments = ShipmentInfoWrapper
-            .getAllShipmentInfosByMethod(appService, this);
-        if (shipments != null && shipments.size() > 0) {
-            throw new BiobankDeleteException(
-                "Cannot delete this shipping company: shipments are still using it");
-        }
-    }
-
-    @Override
     public boolean equals(Object object) {
         if (object instanceof ShippingMethodWrapper)
             return ((ShippingMethodWrapper) object).getName().equals(
                 this.getName());
-        else
-            return false;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkUnique();
+        return false;
     }
 
     @Override
@@ -66,9 +50,10 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     public static List<ShippingMethodWrapper> getShippingMethods(
         WritableApplicationService appService) throws ApplicationException {
-        List<ShippingMethod> objects = appService.search(ShippingMethod.class,
-            new ShippingMethod());
-        List<ShippingMethodWrapper> wrappers = new ArrayList<ShippingMethodWrapper>();
+        List<ShippingMethod> objects = appService.query(DetachedCriteria
+            .forClass(ShippingMethod.class));
+        List<ShippingMethodWrapper> wrappers =
+            new ArrayList<ShippingMethodWrapper>();
         for (ShippingMethod sm : objects) {
             wrappers.add(new ShippingMethodWrapper(appService, sm));
         }
@@ -80,16 +65,20 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY = "select count(si) from "
-        + ShipmentInfo.class.getName() + " as si where si."
-        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
+    private static final String IS_USED_HQL = "select count(si) from " //$NON-NLS-1$
+        + ShipmentInfo.class.getName() + " as si where si." //$NON-NLS-1$
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?"; //$NON-NLS-1$
 
     public boolean isUsed() throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(IS_USED_QRY,
+        if (isNew())
+            return false;
+        HQLCriteria c = new HQLCriteria(IS_USED_HQL,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
     }
 
+    // TODO: is this needed anymore?
+    @Deprecated
     public static void persistShippingMethods(
         List<ShippingMethodWrapper> addedOrModifiedTypes,
         List<ShippingMethodWrapper> typesToDelete)
@@ -112,9 +101,21 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
             && !name.equals(DROP_OFF_NAME);
     }
 
-    public void checkUnique() throws BiobankException, ApplicationException {
-        checkNoDuplicates(ShippingMethod.class,
-            ShippingMethodPeer.NAME.getName(), getName(),
-            "A shipping method with name");
+    @Deprecated
+    @Override
+    protected void addPersistTasks(TaskList tasks) {
+        tasks.add(check().notNull(ShippingMethodPeer.NAME));
+        tasks.add(check().unique(ShippingMethodPeer.NAME));
+
+        super.addPersistTasks(tasks);
+    }
+
+    @Deprecated
+    @Override
+    protected void addDeleteTasks(TaskList tasks) {
+        tasks.add(check().notUsedBy(ShipmentInfo.class,
+            ShipmentInfoPeer.SHIPPING_METHOD));
+
+        super.addDeleteTasks(tasks);
     }
 }

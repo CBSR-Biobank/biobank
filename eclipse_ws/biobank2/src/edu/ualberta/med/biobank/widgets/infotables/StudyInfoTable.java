@@ -6,9 +6,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
 
@@ -40,14 +45,15 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.StudyInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -70,18 +76,18 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     @Override
-    public Object getCollectionModelObject(StudyWrapper study) throws Exception {
+    public Object getCollectionModelObject(Object study) throws Exception {
         TableRowData info = new TableRowData();
-        info.study = study;
-        info.name = study.getName();
-        info.nameShort = study.getNameShort();
-        info.status = study.getActivityStatus().getName();
+        info.study = (StudyWrapper) study;
+        info.name = info.study.getName();
+        info.nameShort = info.study.getNameShort();
+        info.status = info.study.getActivityStatus().getName();
         if (info.status == null) {
             info.status = ""; //$NON-NLS-1$
         }
-        info.patientCount = study.getPatientCount(true);
-        info.visitCount = study.getCollectionEventCount(true);
-        study.reload();
+        info.patientCount = info.study.getPatientCount(true);
+        info.visitCount = info.study.getCollectionEventCount();
+        info.study.reload();
         return info;
     }
 
@@ -105,6 +111,25 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    protected Boolean canView(StudyWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyReadPermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canEdit(StudyWrapper target) throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyUpdatePermission(target.getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(StudyWrapper target)
+        throws ApplicationException {
+        return SessionManager.getAppService().isAllowed(
+            new StudyDeletePermission(target.getId()));
     }
 
 }

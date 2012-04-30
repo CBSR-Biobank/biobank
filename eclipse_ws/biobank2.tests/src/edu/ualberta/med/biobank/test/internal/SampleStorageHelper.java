@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@SuppressWarnings({ "unused", "deprecation" })
 @Deprecated
 public class SampleStorageHelper extends DbHelper {
 

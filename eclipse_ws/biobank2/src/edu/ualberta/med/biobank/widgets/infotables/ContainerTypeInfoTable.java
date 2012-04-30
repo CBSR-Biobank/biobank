@@ -1,28 +1,32 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
+import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeInfoTable extends
-    InfoTableWidget<ContainerTypeWrapper> {
+    InfoTableWidget<SiteContainerTypeInfo> {
 
     private static class TableRowData {
-        ContainerTypeWrapper containerType;
+        SiteContainerTypeInfo containerType;
         String name;
         String nameShort;
         Integer capacity;
@@ -49,22 +53,23 @@ public class ContainerTypeInfoTable extends
 
     private SiteAdapter siteAdapter;
 
-    public ContainerTypeInfoTable(Composite parent, SiteAdapter site) {
-        super(parent, ((SiteWrapper) site.getModelObject())
-            .getContainerTypeCollection(), HEADINGS, 10,
+    public ContainerTypeInfoTable(Composite parent, SiteAdapter site,
+        List<SiteContainerTypeInfo> containerTypeInfo) {
+        super(parent, containerTypeInfo, HEADINGS, 10,
             ContainerTypeWrapper.class);
         siteAdapter = site;
     }
 
     @Override
-    protected BiobankLabelProvider getLabelProvider() {
-        return new BiobankLabelProvider() {
+    protected BgcLabelProvider getLabelProvider() {
+        return new BgcLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.ContainerTypeInfoTable_loading;
+                        return Messages.infotable_loading_msg;
                     }
                     return ""; //$NON-NLS-1$
                 }
@@ -89,21 +94,28 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(ContainerTypeWrapper type)
-        throws Exception {
+    public Object getCollectionModelObject(Object type) throws Exception {
         TableRowData info = new TableRowData();
-        Integer rowCapacity = type.getRowCapacity();
-        Integer colCapacity = type.getColCapacity();
 
-        info.containerType = type;
-        info.name = type.getName();
-        info.nameShort = type.getNameShort();
-        info.status = type.getActivityStatus().getName();
+        SiteContainerTypeInfo containerTypeInfo = (SiteContainerTypeInfo) type;
+
+        info.containerType =
+            containerTypeInfo;
+        Integer rowCapacity =
+            info.containerType.getContainerType().getRowCapacity();
+        Integer colCapacity =
+            info.containerType.getContainerType().getColCapacity();
+
+        info.name = info.containerType.getContainerType().getName();
+        info.nameShort = info.containerType.getContainerType().getNameShort();
+        info.status =
+            info.containerType.getContainerType().getActivityStatus().getName();
         if ((rowCapacity != null) && (colCapacity != null)) {
             info.capacity = rowCapacity * colCapacity;
         }
-        info.inUseCount = type.getContainersCount();
-        info.temperature = type.getDefaultTemperature();
+        info.inUseCount = containerTypeInfo.getContainerCount();
+        info.temperature =
+            info.containerType.getContainerType().getDefaultTemperature();
         return info;
     }
 
@@ -115,13 +127,11 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    public ContainerTypeWrapper getSelection() {
+    public SiteContainerTypeInfo getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.containerType;
+        return ((TableRowData) item.o).containerType;
     }
 
     @Override
@@ -130,21 +140,51 @@ public class ContainerTypeInfoTable extends
     }
 
     @Override
-    public void addClickListener(IDoubleClickListener listener) {
+    public void addClickListener(
+        IInfoTableDoubleClickItemListener<SiteContainerTypeInfo> listener) {
         doubleClickListeners.add(listener);
+        // TODO: this code makes no sense. See jon for why.
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
         mi.setText(Messages.ContainerTypeInfoTable_edit_label);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ModelWrapper<?> selection = ContainerTypeInfoTable.this
+                SiteContainerTypeInfo selection = ContainerTypeInfoTable.this
                     .getSelection();
                 if (selection != null) {
-                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
-                    adapter.setParent(siteAdapter.getContainerTypesGroupNode());
-                    adapter.openEntryForm();
+                    new ContainerTypeAdapter(siteAdapter
+                        .getContainerTypesGroupNode(),
+                        new ContainerTypeWrapper(
+                            SessionManager.getAppService(),
+                            selection.getContainerType())).openEntryForm();
                 }
             }
         });
+    }
+
+    @Override
+    protected Boolean canEdit(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeUpdatePermission(target.getContainerType()
+                    .getId()));
+    }
+
+    @Override
+    protected Boolean canDelete(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeDeletePermission(target.getContainerType()
+                    .getId()));
+    }
+
+    @Override
+    protected Boolean canView(SiteContainerTypeInfo target)
+        throws ApplicationException {
+        return SessionManager.getAppService()
+            .isAllowed(
+                new ContainerTypeReadPermission(target.getContainerType()));
     }
 }

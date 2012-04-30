@@ -9,16 +9,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.dialogs.select.ContactAddDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableAddItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
+import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
-import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 
 public class ContactEntryInfoTable extends ContactInfoTable {
 
@@ -28,69 +27,68 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     private List<ContactWrapper> deletedContacts;
 
-    private ClinicWrapper clinic;
+    private List<ContactWrapper> originalContacts;
 
-    public ContactEntryInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getContactCollection(true));
-        this.clinic = clinic;
-        selectedContacts = clinic.getContactCollection(false);
+    public ContactEntryInfoTable(Composite parent, List<ContactWrapper> contacts) {
+        super(parent, contacts);
+        originalContacts = new ArrayList<ContactWrapper>();
+        if (contacts != null) {
+            originalContacts.addAll(contacts);
+        }
+        selectedContacts = contacts;
         if (selectedContacts == null) {
             selectedContacts = new ArrayList<ContactWrapper>();
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
 
-        if (SessionManager.canCreate(ContactWrapper.class)) {
-            addAddItemListener(new IInfoTableAddItemListener() {
-                @Override
-                public void addItem(InfoTableEvent event) {
-                    addContact();
-                }
-            });
-        }
-        if (SessionManager.canUpdate(ContactWrapper.class)) {
-            addEditItemListener(new IInfoTableEditItemListener() {
-                @Override
-                public void editItem(InfoTableEvent event) {
-                    ContactWrapper contact = getSelection();
-                    if (contact != null)
-                        addOrEditContact(false, contact);
-                }
-            });
-        }
-        if (SessionManager.canDelete(ContactWrapper.class)) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
-                @Override
-                public void deleteItem(InfoTableEvent event) {
-                    ContactWrapper contact = getSelection();
-                    if (contact != null) {
-                        if (!contact.deleteAllowed()) {
-                            BgcPlugin
-                                .openError(
-                                    Messages.ContactEntryInfoTable_delete_error_title,
-                                    NLS.bind(
-                                        Messages.ContactEntryInfoTable_delete_error_msg,
-                                        contact.getName()));
-                            return;
-                        }
+        addAddItemListener(new IInfoTableAddItemListener<ContactWrapper>() {
+            @Override
+            public void addItem(InfoTableEvent<ContactWrapper> event) {
+                addContact();
+            }
+        });
 
-                        if (!BgcPlugin
-                            .openConfirm(
-                                Messages.ContactEntryInfoTable_delete_confirm_title,
+        addEditItemListener(new IInfoTableEditItemListener<ContactWrapper>() {
+            @Override
+            public void editItem(InfoTableEvent<ContactWrapper> event) {
+                ContactWrapper contact = getSelection();
+                if (contact != null)
+                    addOrEditContact(false, contact);
+            }
+        });
+
+        addDeleteItemListener(new IInfoTableDeleteItemListener<ContactWrapper>() {
+            @Override
+            public void deleteItem(InfoTableEvent<ContactWrapper> event) {
+                ContactWrapper contact = getSelection();
+                if (contact != null) {
+                    if (!contact.deleteAllowed()) {
+                        BgcPlugin
+                            .openError(
+                                Messages.ContactEntryInfoTable_delete_error_title,
                                 NLS.bind(
-                                    Messages.ContactEntryInfoTable_delete_confirm_msg,
-                                    contact.getName()))) {
-                            return;
-                        }
-
-                        deletedContacts.add(contact);
-                        selectedContacts.remove(contact);
-                        setCollection(selectedContacts);
-                        notifyListeners();
+                                    Messages.ContactEntryInfoTable_delete_error_msg,
+                                    contact.getName()));
+                        return;
                     }
+
+                    if (!BgcPlugin
+                        .openConfirm(
+                            Messages.ContactEntryInfoTable_delete_confirm_title,
+                            NLS.bind(
+                                Messages.ContactEntryInfoTable_delete_confirm_msg,
+                                contact.getName()))) {
+                        return;
+                    }
+
+                    deletedContacts.add(contact);
+                    selectedContacts.remove(contact);
+                    setList(selectedContacts);
+                    notifyListeners();
                 }
-            });
-        }
+            }
+        });
     }
 
     @Override
@@ -106,7 +104,6 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             ContactWrapper contact = dlg.getContactWrapper();
             if (add) {
                 // only add to the collection when adding and not editing
-                contact.setClinic(clinic);
                 selectedContacts.add(contact);
                 addedOrModifiedContacts.add(contact);
             }
@@ -136,11 +133,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         return deletedContacts;
     }
 
+    @Override
     public void reload() {
-        selectedContacts = clinic.getContactCollection(false);
-        if (selectedContacts == null) {
-            selectedContacts = new ArrayList<ContactWrapper>();
-        }
+        selectedContacts = new ArrayList<ContactWrapper>(originalContacts);
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
         reloadCollection(selectedContacts, null);
@@ -153,8 +148,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((ContactWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((ContactWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject(e1);
+                    TableRowData i2 = getCollectionModelObject(e2);
                     return super.compare(i1.name, i2.name);
                 } catch (Exception e) {
                     return 0;

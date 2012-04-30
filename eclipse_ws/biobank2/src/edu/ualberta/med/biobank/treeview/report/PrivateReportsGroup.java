@@ -43,4 +43,5 @@ public class PrivateReportsGroup extends AbstractReportGroup {
 
         return reports;
     }
+
 }

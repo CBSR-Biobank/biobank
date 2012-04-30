@@ -1,13 +1,18 @@
 package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchWindow;
@@ -15,22 +20,36 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Stage;
+import com.google.web.bindery.event.shared.EventBus;
+
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
+import edu.ualberta.med.biobank.mvp.event.ExceptionHandler;
+import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.rcp.Application;
+import edu.ualberta.med.biobank.sourceproviders.UserState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.NewAbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.admin.NewStudyAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupMasterGroup;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
@@ -86,6 +105,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey
             .put(ClinicAdapter.class.getName(), BgcPlugin.IMG_CLINIC);
         classToImageKey.put(StudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
+        classToImageKey.put(NewStudyAdapter.class.getName(),
+            BgcPlugin.IMG_STUDY);
         classToImageKey.put(PatientAdapter.class.getName(),
             BgcPlugin.IMG_PATIENT);
         classToImageKey.put(CollectionEventAdapter.class.getName(),
@@ -93,6 +114,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(ShipmentAdapter.class.getName(),
             BgcPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(AbstractSearchedNode.class.getName(),
+            BgcPlugin.IMG_SEARCH);
+        classToImageKey.put(NewAbstractSearchedNode.class.getName(),
             BgcPlugin.IMG_SEARCH);
         classToImageKey.put(AbstractTodayNode.class.getName(),
             BgcPlugin.IMG_TODAY);
@@ -141,11 +164,12 @@ public class BiobankPlugin extends AbstractUIPlugin {
     // The shared instance
     private static BiobankPlugin plugin;
 
+    private Injector injector;
+
     /**
      * The constructor
      */
     public BiobankPlugin() {
-        //
     }
 
     /*
@@ -160,7 +184,42 @@ public class BiobankPlugin extends AbstractUIPlugin {
         super.start(context);
         bundleContext = context;
         plugin = this;
+        injector = Guice.createInjector(Stage.PRODUCTION, new BiobankModule());
         SessionManager.getInstance();
+
+        // attach the FormManager
+        // TODO: this will have to be unbound/ destroyed on perspective changes?
+        // There will also have to be a perspective manager?
+        // TODO: FormManager is pretty specific to eclipse, take out of mvp
+        // plugin?
+        FormManagerPresenter formManagerPresenter = injector
+            .getInstance(FormManagerPresenter.class);
+        formManagerPresenter.bind();
+
+        injector.getInstance(ExceptionDisplay.class);
+    }
+
+    // TODO: move this somewhere much more appropriate
+    static class ExceptionDisplay implements ExceptionHandler {
+        @Inject
+        ExceptionDisplay(EventBus eventBus) {
+            eventBus.addHandler(ExceptionEvent.getType(), this);
+        }
+
+        @Override
+        public void onException(ExceptionEvent event) {
+            Throwable t = event.getThrowable();
+            Shell shell = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell();
+
+            IStatus status =
+                new Status(IStatus.ERROR, Application.PLUGIN_ID, IStatus.OK,
+                    "Exception found.", t.getCause());
+            ErrorDialog.openError(shell, "Error", t.getLocalizedMessage(),
+                status);
+
+            t.printStackTrace();
+        }
     }
 
     /*
@@ -174,6 +233,19 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         plugin = null;
         super.stop(context);
+    }
+
+    protected Module getCustomModule() {
+        return new AbstractModule() {
+            @Override
+            protected void configure() {
+
+            }
+        };
+    }
+
+    public static Injector getInjector() {
+        return getDefault().injector;
     }
 
     /**
@@ -207,6 +279,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public int getPlateNumber(String barcode) {
         return ScannerConfigPlugin.getDefault().getPlateNumber(barcode,
+            isRealScanEnabled());
+    }
+
+    public List<String> getPossibleBarcodes() {
+        return ScannerConfigPlugin.getDefault().getPossibleBarcodes(
             isRealScanEnabled());
     }
 
@@ -248,9 +325,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
         String imageKey = null;
         if (object == null)
             return null;
-        if (object instanceof AdapterBase) {
+        if (object instanceof AbstractAdapterBase) {
             Class<?> objectClass = object.getClass();
-            while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
+            while (imageKey == null
+                && !objectClass.equals(AbstractAdapterBase.class)) {
                 imageKey = classToImageKey.get(objectClass.getName());
                 objectClass = objectClass.getSuperclass();
             }
@@ -258,8 +336,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 && ((object instanceof ContainerAdapter) || (object instanceof ContainerTypeAdapter))) {
                 String ctName;
                 if (object instanceof ContainerAdapter) {
-                    ContainerWrapper container = (ContainerWrapper) ((ContainerAdapter) object)
-                        .getModelObject();
+                    ContainerWrapper container =
+                        (ContainerWrapper) ((ContainerAdapter) object)
+                            .getModelObject();
                     if (container == null
                         || container.getContainerType() == null)
                         return null;
@@ -319,13 +398,13 @@ public class BiobankPlugin extends AbstractUIPlugin {
         }
     }
 
-    public static SessionState getSessionStateSourceProvider() {
+    public static UserState getSessionStateSourceProvider() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
-        return (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE_SOURCE_NAME);
+        return (UserState) service
+            .getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
     }
 
 }

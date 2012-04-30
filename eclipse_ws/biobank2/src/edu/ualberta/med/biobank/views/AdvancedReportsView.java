@@ -1,21 +1,68 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISourceProviderListener;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
+import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
+import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
 import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 
 public class AdvancedReportsView extends AbstractAdministrationView {
-    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.AdvancedReportsView"; //$NON-NLS-1$
 
     private static AdvancedReportsView currentView;
+
+    private Boolean allowed = false;
 
     public AdvancedReportsView() {
         currentView = this;
         SessionManager.addView(this);
+        try {
+            if (SessionManager.getInstance().isConnected()) allowed =
+                SessionManager.getAppService().isAllowed(
+                    new ReportsPermission());
+        } catch (Exception e) {
+            BgcPlugin.openAccessDeniedErrorMessage(e);
+        }
+        BgcPlugin.getLoginStateSourceProvider()
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    try {
+                        if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT))
+                            allowed = false;
+                        else if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
+                            allowed =
+                                SessionManager.getAppService().isAllowed(
+                                    new ReportsPermission());
+                            reload();
+                        }
+                    } catch (Exception e) {
+                        BgcPlugin.openAccessDeniedErrorMessage(e);
+                    }
+                }
+            });
     }
 
     @Override
@@ -29,7 +76,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
         rootNode.removeAll();
         createNodes();
 
-        for (AdapterBase adapter : rootNode.getChildren()) {
+        for (AbstractAdapterBase adapter : rootNode.getChildren()) {
             adapter.rebuild();
         }
 
@@ -41,13 +88,14 @@ public class AdvancedReportsView extends AbstractAdministrationView {
     }
 
     private void createNodes() {
-        if (SessionManager.getInstance().isConnected()) {
-            AbstractReportGroup adapter = new PrivateReportsGroup(rootNode, 0);
+        if (allowed) {
+            AbstractReportGroup adapter = new PrivateReportsGroup(
+                (RootNode) rootNode, 0);
             adapter.setParent(rootNode);
             adapter.setModifiable(true);
             rootNode.addChild(adapter);
 
-            adapter = new SharedReportsGroup(rootNode, 1);
+            adapter = new SharedReportsGroup((RootNode) rootNode, 1);
             adapter.setParent(rootNode);
             rootNode.addChild(adapter);
         }
@@ -67,4 +115,10 @@ public class AdvancedReportsView extends AbstractAdministrationView {
     public String getId() {
         return ID;
     }
+
+    @Override
+    protected void createRootNode() {
+        createOldRootNode();
+    }
+
 }

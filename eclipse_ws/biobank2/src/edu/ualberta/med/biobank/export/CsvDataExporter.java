@@ -8,11 +8,13 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+import edu.ualberta.med.biobank.SessionManager;
+
 public class CsvDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.csv" }; //$NON-NLS-1$
+    private static final String[] VALID_EXTS = { "*.csv" }; 
 
     public CsvDataExporter() {
-        super(Messages.CsvDataExporter_name);
+        super("Export CSV");
     }
 
     @Override
@@ -38,8 +40,7 @@ public class CsvDataExporter extends GuiDataExporter {
             Object[] labels = new Object[numHeaders];
             for (Object row : data.getRows()) {
                 if (monitor.isCanceled()) {
-                    throw new DataExportException(
-                        Messages.CsvDataExporter_cancel_msg);
+                    return;
                 }
 
                 for (int i = 0; i < numHeaders; i++) {
@@ -50,11 +51,12 @@ public class CsvDataExporter extends GuiDataExporter {
             }
 
             writer.close();
+            SessionManager.log("exportCSV",
+                data.getTitle(), LOG_TYPE);
         } catch (IOException e) {
             throw new DataExportException(e.getMessage());
         } catch (Exception e) {
-            throw new DataExportException(Messages.CsvDataExporter_0);
+            return;
         }
     }
-
 }

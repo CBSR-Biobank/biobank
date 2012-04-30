@@ -1,16 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import edu.ualberta.med.biobank.common.wrappers.base.SourceSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.util.NullHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
-
-    private Set<AliquotedSpecimenWrapper> deletedAliquotedSpecimens = new HashSet<AliquotedSpecimenWrapper>();
-
     public SourceSpecimenWrapper(WritableApplicationService appService,
         SourceSpecimen wrappedObject) {
         super(appService, wrappedObject);
@@ -21,35 +17,12 @@ public class SourceSpecimenWrapper extends SourceSpecimenBaseWrapper {
     }
 
     @Override
-    public int compareTo(ModelWrapper<SourceSpecimen> o) {
-        if (o instanceof SourceSpecimenWrapper) {
-            return getSpecimenType().compareTo(
-                ((SourceSpecimenWrapper) o).getSpecimenType());
+    public int compareTo(ModelWrapper<SourceSpecimen> other) {
+        if (other instanceof SourceSpecimenWrapper) {
+            ModelWrapper<SpecimenType> otherSpecimenType = ((SourceSpecimenWrapper) other)
+                .getSpecimenType();
+            return NullHelper.safeCompareTo(getSpecimenType(), otherSpecimenType);
         }
         return 0;
     }
-
-    /**
-     * Removes the sample storage objects that are not contained in the
-     * collection.
-     */
-    private void deleteAliquotedSpecimens() throws Exception {
-        for (AliquotedSpecimenWrapper st : deletedAliquotedSpecimens) {
-            if (!st.isNew()) {
-                st.delete();
-            }
-        }
-    }
-
-    @Override
-    protected void persistDependencies(SourceSpecimen origObject)
-        throws Exception {
-        deleteAliquotedSpecimens();
-    }
-
-    @Override
-    public void resetInternalFields() {
-        deletedAliquotedSpecimens.clear();
-    }
-
 }

@@ -26,7 +26,8 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 public class DecodeImageForm extends PlateForm implements
     IBgcFileBrowserListener {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DecodeImageForm"; //$NON-NLS-1$
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DecodeImageForm"; 
 
     private ScanPalletWidget spw;
 
@@ -36,19 +37,19 @@ public class DecodeImageForm extends PlateForm implements
 
     @Override
     protected void init() throws Exception {
-        setPartName(Messages.DecodeImage_tabTitle);
+        setPartName("Decode Image");
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.DecodeImage_tabTitle);
+        form.setText("Decode Image");
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
         imageFileSelector = new BgcFileBrowser(page,
-            Messages.DecodeImage_browse_label, SWT.NONE,
-            new String[] { "*.bmp" }); //$NON-NLS-1$
+            "Image File", SWT.NONE,
+            new String[] { "*.bmp" }); 
         imageFileSelector.addFileSelectedListener(this);
         imageFileSelector.adaptToToolkit(toolkit, true);
 
@@ -64,7 +65,7 @@ public class DecodeImageForm extends PlateForm implements
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask(Messages.DecodeImageForm_decoding,
+                monitor.beginTask("Decoding...",
                     IProgressMonitor.UNKNOWN);
                 try {
                     decodeImage();
@@ -72,7 +73,7 @@ public class DecodeImageForm extends PlateForm implements
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.DecodeImage_dialog_scanError_title, e);
+                        "Decoding error", e);
                 }
                 monitor.done();
             }
@@ -100,8 +101,9 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     @Override
-    public void reload() throws Exception {
-        // do nothing
+    public void setValues() throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
 }

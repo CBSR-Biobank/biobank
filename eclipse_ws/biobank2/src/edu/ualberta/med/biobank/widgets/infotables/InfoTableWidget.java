@@ -5,34 +5,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 /**
- * Used to display tabular information for an object in the object model or
- * combined information from several objects in the object model.
+ * Used to display tabular information for a class in the object model or
+ * combined information from several classes in the object model.
  * <p>
  * The information in the table is loaded in a background thread. By loading
  * object model data in a background thread, the main UI thread is not blocked
@@ -65,7 +49,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
  * @param <T> The model object wrapper the table is based on.
  * 
  */
-public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
+public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -77,80 +61,32 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected List<BiobankCollectionModel> model;
 
-    protected ListenerList addItemListeners = new ListenerList();
-
-    protected ListenerList editItemListeners = new ListenerList();
-
-    protected ListenerList deleteItemListeners = new ListenerList();
-
-    protected ListenerList doubleClickListeners = new ListenerList();
-
-    private MenuItem editItem;
-
-    private final Class<T> wrapperClass;
-
+    @SuppressWarnings("unused")
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, Class<T> wrapperClass) {
-        super(parent, collection, headings, null, 5);
-        this.wrapperClass = wrapperClass;
-        addTableClickListener();
-    }
-
-    public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int rowsPerPage, Class<T> wrapperClass) {
+        String[] headings, int rowsPerPage, Class<?> wrapperClass) {
         super(parent, collection, headings, null, rowsPerPage);
-        this.wrapperClass = wrapperClass;
-        addTableClickListener();
     }
 
-    private void addTableClickListener() {
-        tableViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                if (doubleClickListeners.size() > 0) {
-                    InfoTableWidget.this.doubleClick();
-                }
-            }
-        });
-        menu.addMenuListener(new MenuAdapter() {
-
-            @Override
-            public void menuShown(MenuEvent e) {
-                if (editItem == null)
-                    return;
-
-                if (getSelection() instanceof ModelWrapper<?>
-                    && !(getSelection() instanceof DispatchSpecimenWrapper))
-                    editItem.setEnabled(((ModelWrapper<?>) getSelection())
-                        .canUpdate(SessionManager.getUser()));
-                else
-                    editItem.setEnabled(false);
-            }
-        });
+    public InfoTableWidget(Composite parent, List<T> list,
+        String[] headings, Class<?> wrapperClass) {
+        this(parent, list, headings, 5, wrapperClass);
     }
 
     @Override
-    protected void init(List<T> collection) {
+    protected void init(List<T> list) {
         reloadData = true;
 
         model = new ArrayList<BiobankCollectionModel>();
-        initModel(collection);
+        initModel(list);
     }
 
     @Override
     protected void setPaginationParams(List<T> collection) {
-        if (pageInfo.rowsPerPage != 0
-            && (collection.size() > pageInfo.rowsPerPage)) {
-            Double size = new Double(collection.size());
-            Double pageSize = new Double(pageInfo.rowsPerPage);
-            pageInfo.pageTotal = Double.valueOf(Math.ceil(size / pageSize))
-                .intValue();
-            paginationRequired = true;
-            if (pageInfo.page == pageInfo.pageTotal)
-                pageInfo.page--;
+        paginationRequired = paginationWidget
+            .setTableMaxRows(collection.size());
+        if (paginationRequired) {
             getTableViewer().refresh();
-        } else
-            paginationRequired = false;
+        }
     }
 
     /**
@@ -173,7 +109,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return (BiobankCollectionModel) stSelection.getFirstElement();
     }
 
-    protected void initModel(List<T> collection) {
+    protected void initModel(List<?> collection) {
         if ((collection == null) || (model.size() == collection.size()))
             return;
 
@@ -202,16 +138,15 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
      * Should be used by info tables that allow editing of data. Use this method
      * instead of setCollection().
      * 
-     * @param collection
+     * @param list
      */
-    public void reloadCollection(final List<T> collection, T selection) {
+    public void reloadCollection(final List<T> list, T selection) {
         reloadData = true;
-        setCollection(collection, selection);
+        setList(list, selection);
     }
 
-    public void reloadCollection(final List<T> collection) {
-        reloadData = true;
-        setCollection(collection, null);
+    public void reloadCollection(final List<T> list) {
+        reloadCollection(list, null);
     }
 
     @Override
@@ -223,8 +158,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         initModel(collection);
 
         if (paginationRequired) {
-            start = pageInfo.page * pageInfo.rowsPerPage;
-            end = Math.min(start + pageInfo.rowsPerPage, model.size());
+            int rowsPerPage = paginationWidget.getRowsPerPage();
+            start = paginationWidget.getCurrentPage() * rowsPerPage;
+            end = Math.min(start + rowsPerPage, model.size());
         } else {
             start = 0;
             end = model.size();
@@ -289,222 +225,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         }
     }
 
-    @SuppressWarnings("unused")
-    public Object getCollectionModelObject(T item) throws Exception {
+    public Object getCollectionModelObject(Object item) throws Exception {
         return item;
-    }
-
-    public Object getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        Object object = item.o;
-        Assert.isNotNull(object);
-        return object;
-    }
-
-    public void addClickListener(IDoubleClickListener listener) {
-        doubleClickListeners.add(listener);
-        if (SessionManager.canUpdate(wrapperClass)) {
-            editItem = new MenuItem(getMenu(), SWT.PUSH);
-            editItem.setText(Messages.InfoTableWidget_edit_label);
-            editItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
-                        .getSelection();
-                    if (selection != null) {
-                        AdapterBase adapter = AdapterFactory
-                            .getAdapter(selection);
-                        adapter.openEntryForm();
-                    }
-                }
-            });
-        }
-    }
-
-    public void doubleClick() {
-        // get selection as derived class object
-        Object selection = getSelection();
-
-        final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
-            new InfoTableSelection(selection));
-        Object[] listeners = doubleClickListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.doubleClick(event);
-                }
-            });
-        }
-    }
-
-    public void addAddItemListener(IInfoTableAddItemListener listener) {
-        addItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_add_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                addItem();
-            }
-        });
-    }
-
-    public void addEditItemListener(IInfoTableEditItemListener listener) {
-        editItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_edit_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                editItem();
-            }
-        });
-    }
-
-    public void addDeleteItemListener(IInfoTableDeleteItemListener listener) {
-        deleteItemListeners.add(listener);
-
-        Assert.isNotNull(menu);
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTableWidget_delete_label);
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                deleteItem();
-            }
-        });
-    }
-
-    protected void addItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = addItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableAddItemListener l = (IInfoTableAddItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.addItem(event);
-                }
-            });
-        }
-    }
-
-    protected void editItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = editItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableEditItemListener l = (IInfoTableEditItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.editItem(event);
-                }
-            });
-        }
-    }
-
-    protected void deleteItem() {
-        InfoTableSelection selection = new InfoTableSelection(getSelection());
-        final InfoTableEvent event = new InfoTableEvent(this, selection);
-        Object[] listeners = deleteItemListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final IInfoTableDeleteItemListener l = (IInfoTableDeleteItemListener) listeners[i];
-            SafeRunnable.run(new SafeRunnable() {
-                @Override
-                public void run() {
-                    l.deleteItem(event);
-                }
-            });
-        }
-    }
-
-    @Override
-    protected void enableWidgets(boolean enable) {
-        if (enable && (pageInfo.page > 0)) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        } else {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
-
-        if (enable && (pageInfo.page < pageInfo.pageTotal - 1)) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        } else {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
-    }
-
-    @Override
-    protected void setDefaultWidgetsEnabled() {
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
-    }
-
-    @Override
-    protected void firstPage() {
-        pageInfo.page = 0;
-        firstButton.setEnabled(false);
-        prevButton.setEnabled(false);
-        lastButton.setEnabled(true);
-        nextButton.setEnabled(true);
-    }
-
-    @Override
-    protected void lastPage() {
-        pageInfo.page = pageInfo.pageTotal - 1;
-        firstButton.setEnabled(true);
-        prevButton.setEnabled(true);
-        lastButton.setEnabled(false);
-        nextButton.setEnabled(false);
-    }
-
-    @Override
-    protected void prevPage() {
-        if (pageInfo.page == 0)
-            return;
-        pageInfo.page--;
-        if (pageInfo.page == 0) {
-            firstButton.setEnabled(false);
-            prevButton.setEnabled(false);
-        }
-        if (pageInfo.page == pageInfo.pageTotal - 2) {
-            lastButton.setEnabled(true);
-            nextButton.setEnabled(true);
-        }
-    }
-
-    @Override
-    protected void nextPage() {
-        if (pageInfo.page >= pageInfo.pageTotal)
-            return;
-        pageInfo.page++;
-        if (pageInfo.page == 1) {
-            firstButton.setEnabled(true);
-            prevButton.setEnabled(true);
-        }
-        if (pageInfo.page == pageInfo.pageTotal - 1) {
-            lastButton.setEnabled(false);
-            nextButton.setEnabled(false);
-        }
-    }
-
-    @Override
-    protected void setPageLabelText() {
-        pageLabel.setText(NLS.bind(Messages.InfoTableWidget_pages_label,
-            (pageInfo.page + 1), +pageInfo.pageTotal));
     }
 
 }
