@@ -56,7 +56,7 @@ public class SessionManager {
 
     private SessionAdapter sessionAdapter;
 
-    private RootNode rootNode;
+    private final RootNode rootNode;
 
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
@@ -102,10 +102,14 @@ public class SessionManager {
     }
 
     public void deleteSession() throws Exception {
+        deleteSession(true);
+    }
+
+    public void deleteSession(boolean logLogout) throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         sessionAdapter = null;
         updateSessionState();
-        ServiceConnection.logout(appService);
+        if (logLogout) ServiceConnection.logout(appService);
         initPerspectivesUpdateDone();
     }
 

@@ -17,10 +17,9 @@ public class ChangePasswordHandler extends AbstractHandler implements IHandler {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
-                ChangePasswordDialog dlgx = new ChangePasswordDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell());
-                dlgx.open();
-
+                ChangePasswordDialog.open(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    false);
             }
         });
         return null;
