@@ -33,7 +33,7 @@ public class PermissionCheckTreeWidget extends Composite {
         new HashMap<PermissionEnum, PermissionNode>();
     private final Set<PermissionEnum> disabled = new HashSet<PermissionEnum>();
 
-    private ContainerCheckedTreeViewer treeviewer;
+    private final ContainerCheckedTreeViewer treeviewer;
     private PermissionRootNode rootNode;
 
     public PermissionCheckTreeWidget(Composite parent, boolean title,
@@ -123,7 +123,9 @@ public class PermissionCheckTreeWidget extends Composite {
                 new ArrayList<IPermissionCheckTreeNode>();
             for (PermissionEnum permission : permissions) {
                 PermissionNode node = nodes.get(permission);
-                checkedNodes.add(node);
+                if (node != null) {
+                    checkedNodes.add(node);
+                }
             }
             treeviewer.setCheckedElements(checkedNodes.toArray());
         } finally {
