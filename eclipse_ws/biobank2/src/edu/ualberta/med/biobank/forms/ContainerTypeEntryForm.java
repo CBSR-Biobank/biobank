@@ -200,7 +200,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         for (SiteContainerTypeInfo info : containerTypeInfos) {
             if (!info.getContainerType().getTopLevel()
-                && !info.getContainerType().equals(containerType)) {
+                && !info.getContainerType().equals(
+                    containerType.getWrappedObject())) {
                 availSubContainerTypes.add(new ContainerTypeWrapper(
                     SessionManager
                         .getAppService(), info.getContainerType()));
