@@ -22,6 +22,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -56,7 +58,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         .getLogger(ContainerTypeEntryForm.class.getName());
 
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; 
+        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
     private static final String MSG_NEW_STORAGE_TYPE_OK =
         "Creating a new storage type.";
@@ -111,7 +113,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
@@ -189,11 +191,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getContainerTypesGroupNode());
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
-        for (ContainerTypeWrapper type : containerType.getSite()
-            .getContainerTypeCollection()) {
-            if (type.getTopLevel().equals(Boolean.FALSE)
-                && !type.equals(containerType)) {
-                availSubContainerTypes.add(type);
+        List<SiteContainerTypeInfo> containerTypeInfos =
+            SessionManager
+                .getAppService()
+                .doAction(
+                    new SiteGetContainerTypeInfoAction(containerType.getSite()
+                        .getId())).getList();
+
+        for (SiteContainerTypeInfo info : containerTypeInfos) {
+            if (!info.getContainerType().getTopLevel()
+                && !info.getContainerType().equals(containerType)) {
+                availSubContainerTypes.add(new ContainerTypeWrapper(
+                    SessionManager
+                        .getAppService(), info.getContainerType()));
             }
         }
 
