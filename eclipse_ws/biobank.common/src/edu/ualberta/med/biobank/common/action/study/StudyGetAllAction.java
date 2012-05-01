@@ -42,14 +42,16 @@ public class StudyGetAllAction implements Action<StudiesInfo> {
 
     @Override
     public StudiesInfo run(ActionContext context) throws ActionException {
-        ArrayList<Study> studys = new ArrayList<Study>(0);
         Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         @SuppressWarnings("unchecked")
         List<Study> results = query.list();
+        ArrayList<Study> readableStudies = new ArrayList<Study>();
         if (results != null) {
-            studys.addAll(results);
+            for (Study s : results)
+                if (new StudyReadPermission(s.getId()).isAllowed(context))
+                    readableStudies.add(s);
         }
-        return new StudiesInfo(studys);
+        return new StudiesInfo(readableStudies);
     }
 
 }

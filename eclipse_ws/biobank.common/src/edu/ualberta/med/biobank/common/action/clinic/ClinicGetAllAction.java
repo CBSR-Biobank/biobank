@@ -47,14 +47,14 @@ public class ClinicGetAllAction implements Action<ClinicsInfo> {
 
     @Override
     public ClinicsInfo run(ActionContext context) throws ActionException {
-        ArrayList<Clinic> clinics = new ArrayList<Clinic>(0);
         Query query = context.getSession().createQuery(CLINIC_INFO_HQL);
         @SuppressWarnings("unchecked")
         List<Clinic> results = query.list();
-        if (results != null) {
-            clinics.addAll(results);
-        }
-        return new ClinicsInfo(clinics);
+        ArrayList<Clinic> readableClinics = new ArrayList<Clinic>();
+        for (Clinic c : results)
+            if (new ClinicReadPermission(c).isAllowed(context))
+                readableClinics.add(c);
+        return new ClinicsInfo(readableClinics);
     }
 
 }

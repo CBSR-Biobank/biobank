@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermissio
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;

@@ -8,6 +8,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ReportsHandler extends LogoutSensitiveHandler {

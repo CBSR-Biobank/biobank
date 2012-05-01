@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
 import edu.ualberta.med.biobank.forms.LoggingForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.logs.LogQuery;
@@ -113,12 +113,12 @@ public class LoggingView extends ViewPart {
                     String sourceName, Object sourceValue) {
                     try {
                         if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_OUT))
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT))
                             allowed = false;
                         else if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
                             allowed =
                                 SessionManager.getAppService().isAllowed(
                                     new LoggingPermission());

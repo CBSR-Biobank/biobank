@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCre
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 

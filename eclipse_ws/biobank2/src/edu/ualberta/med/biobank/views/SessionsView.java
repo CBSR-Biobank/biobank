@@ -50,7 +50,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         if (session != null) {
             session.rebuild();
         }
-        if (SessionManager.isSuperAdminMode())
+        if (SessionManager.getUser().getCurrentWorkingCenter() == null)
             setPartName(
             // tab part name
             i18n.tr("Administration"));

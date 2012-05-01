@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -40,7 +41,9 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class CollectionEventSaveAction implements Action<IdResult> {
+
     private static final long serialVersionUID = 1L;
+
     private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
@@ -81,7 +84,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public ActivityStatus activityStatus;
         public Integer specimenTypeId;
         public Integer centerId;
-        public List<String> comments;
+        public List<String> comments = new ArrayList<String>();
         public BigDecimal quantity;
     }
 
@@ -178,14 +181,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private void setSourceSpecimens(ActionContext context,
         CollectionEvent ceventToSave) {
-        Set<Specimen> newSsCollection = new HashSet<Specimen>();
 
-        Set<Specimen> newAllSpecCollection = new HashSet<Specimen>();
-        newAllSpecCollection.addAll(ceventToSave.getAllSpecimens());
-
-        Collection<Specimen> originalSpecimens =
-            ceventToSave.getOriginalSpecimens();
-
+        Set<Specimen> newOriginalSpecimens = new HashSet<Specimen>();
         if (sourceSpecimenInfos != null) {
             OriginInfo oi = null;
 
@@ -198,19 +195,15 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             specInfo.centerId));
                         context.getSession().saveOrUpdate(oi);
                     }
+
                     specimen = new Specimen();
                     specimen.setCurrentCenter(oi.getCenter());
                     specimen.setOriginInfo(oi);
                     specimen.setTopSpecimen(specimen);
-                    newAllSpecCollection.add(specimen);
                 } else {
                     specimen = context.load(Specimen.class, specInfo.id);
-
-                    if (!newAllSpecCollection.contains(specimen)) {
-                        throw new ActionException(ABSENT_SPECIMEN_ERRMSG
-                            .format(specimen.getInventoryId()));
-                    }
                 }
+
                 specimen.setActivityStatus(specInfo.activityStatus);
                 specimen.setCollectionEvent(ceventToSave);
                 // cascade will save-update the specimens from this list:
@@ -221,17 +214,51 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setSpecimenType(context.load(SpecimenType.class,
                     specInfo.specimenTypeId));
-                newSsCollection.add(specimen);
+
+                newOriginalSpecimens.add(specimen);
             }
         }
 
-        SetDifference<Specimen> origSpecDiff = new SetDifference<Specimen>(
-            originalSpecimens, newSsCollection);
-        ceventToSave.getOriginalSpecimens().addAll(newSsCollection);
-        newAllSpecCollection.removeAll(origSpecDiff.getRemoveSet());
-        ceventToSave.getAllSpecimens().addAll(newAllSpecCollection);
-        for (Specimen srcSpc : origSpecDiff.getRemoveSet()) {
-            context.getSession().delete(srcSpc);
+        Set<Specimen> oldOriginalSpecimens =
+            ceventToSave.getOriginalSpecimens();
+
+        SetDifference<Specimen> originalSpecimensDiff =
+            new SetDifference<Specimen>(oldOriginalSpecimens,
+                newOriginalSpecimens);
+
+        for (Specimen specimen : originalSpecimensDiff.getRemoveSet()) {
+            removeOriginalSpecimen(context, specimen);
+        }
+
+        for (Specimen specimen : originalSpecimensDiff.getAddSet()) {
+            updateCollectionEventOfChildren(context, specimen, ceventToSave);
+        }
+    }
+
+    private void removeOriginalSpecimen(ActionContext context, Specimen specimen) {
+        if (specimen.getChildSpecimens().isEmpty()) {
+            specimen.getCollectionEvent().getAllSpecimens().remove(specimen);
+            specimen.getCollectionEvent().getOriginalSpecimens()
+                .remove(specimen);
+
+            context.getSession().delete(specimen);
+        } else {
+            throw new ActionException(
+                bundle
+                    .tr(
+                        "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
+                    .format(
+                        specimen.getInventoryId()));
+        }
+    }
+
+    private void updateCollectionEventOfChildren(ActionContext context,
+        Specimen specimen, CollectionEvent collectionEvent) {
+        specimen.setCollectionEvent(collectionEvent);
+        collectionEvent.getAllSpecimens().add(specimen);
+
+        for (Specimen child : specimen.getChildSpecimens()) {
+            updateCollectionEventOfChildren(context, child, collectionEvent);
         }
     }
 

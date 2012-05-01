@@ -105,10 +105,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private Button isSourceSpcButton;
 
-    private BgcBaseText pEventField;
-
-    private Label pEventLabel;
-
     private BgcBaseText sourceSpecimenField;
 
     private Set<AliquotedSpecimen> aliquotedSpecTypes;
@@ -118,8 +114,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private Label sourceSpecimenLabel;
 
     protected ReparentingWizard wizard;
-
-    private Label parentPEventLabel;
 
     private BgcBaseText parentPEventField;
 
@@ -302,8 +296,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         sourceSpecimenLabel.setVisible(false);
                         sourceSpecimenField.setVisible(false);
                         isSourceSpcButton.setSelection(true);
-                        pEventLabel
-                            .setText(ProcessingEvent.NAME.singular().toString());
                     } else {
                         specimen.setParentSpecimen(new SpecimenWrapper(
                             SessionManager.getAppService(),
@@ -317,7 +309,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                         sourceSpecimenField.setText(newParent.specimen
                             .getInventoryId());
                         isSourceSpcButton.setSelection(false);
-                        pEventLabel.setText(i18n.tr("Source Processing Event"));
                     }
 
                     patientField.setText(specimen.getCollectionEvent()
@@ -427,9 +418,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         ProcessingEventWrapper parentPevent =
             specimen.getParentSpecimen() == null ? null :
                 specimen.getParentSpecimen().getProcessingEvent();
-        parentPEventLabel =
-            widgetCreator.createLabel(client,
-                i18n.tr("Source Processing Event"));
+        widgetCreator.createLabel(client,
+            i18n.tr("Source Processing Event"));
         String parentPEventString;
         if (parentPevent == null)
             parentPEventString = StringUtil.EMPTY_STRING;
@@ -440,16 +430,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                     .append(
                         i18n.tr("worksheet: {0}", parentPevent.getWorksheet()))
                     .append(")").toString();
-        parentPEventField = createReadOnlyWidget(
-            client,
-            SWT.NONE,
-            parentPEventString);
+        parentPEventField =
+            createReadOnlyWidget(client, SWT.NONE, parentPEventString);
 
         // create regular pevent section
         ProcessingEventWrapper pevent = specimen.getProcessingEvent();
-        pEventLabel =
-            widgetCreator.createLabel(client,
-                ProcessingEvent.NAME.singular().toString());
+        widgetCreator.createLabel(client,
+            ProcessingEvent.NAME.singular().toString());
         String peventString;
         if (pevent == null)
             peventString = StringUtil.EMPTY_STRING;
@@ -458,10 +445,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")
                     .append(i18n.tr("worksheet: {0}",
                         pevent.getWorksheet())).append(")").toString();
-        pEventField = createReadOnlyWidget(
-            client,
-            SWT.NONE,
-            peventString);
+        createReadOnlyWidget(client, SWT.NONE, peventString);
 
     }
 

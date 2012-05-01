@@ -59,11 +59,15 @@ import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version. 
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenLinkEntryForm.class);
+
+    protected static BgcLogger log = BgcLogger
+        .getLogger(SpecimenLinkEntryForm.class.getName());
 
     @SuppressWarnings("nls")
     public static final String ID =
@@ -71,6 +75,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
+
     @SuppressWarnings("nls")
     private static final String NEW_SINGLE_POSITION_BINDING =
         "newSinglePosition-binding";
@@ -115,21 +120,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
+        log.debug("init");
         super.init();
         // TR: title
         setPartName(i18n.tr("Linking specimens"));
         setCanLaunchScan(true);
-
-        // If the current center is a site, and if this site defines containers
-        // of 8*12 size, then get the specimen types these containers can
-        // contain
-        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-            List<SpecimenTypeWrapper> res = SpecimenTypeWrapper
-                .getSpecimenTypeForPallet96(SessionManager.getAppService(),
-                    SessionManager.getUser().getCurrentWorkingSite());
-            if (res.size() != 0)
-                palletSpecimenTypes = res;
-        }
     }
 
     @SuppressWarnings("nls")
@@ -139,13 +134,17 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return i18n.tr("Linking specimens");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected boolean isSingleMode() {
+        log.debug("isSingleMode:" + mode.isSingleMode());
         return mode.isSingleMode();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setMode(Mode m) {
+        log.debug("setMode: " + mode);
         mode = m;
     }
 
@@ -232,13 +231,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         typesSelectionPerRowComposite.setLayoutData(gd);
 
-        toolkit.createLabel(typesSelectionPerRowComposite, StringUtil.EMPTY_STRING);
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            StringUtil.EMPTY_STRING);
         toolkit.createLabel(typesSelectionPerRowComposite,
             SourceSpecimen.NAME.singular().toString());
         toolkit.createLabel(typesSelectionPerRowComposite,
             // label
             i18n.tr("Aliquoted Specimen Types"));
-        toolkit.createLabel(typesSelectionPerRowComposite, StringUtil.EMPTY_STRING);
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            StringUtil.EMPTY_STRING);
 
         specimenTypesWidgets =
             new ArrayList<AliquotedSpecimenSelectionWidget>();
@@ -293,14 +294,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void defaultInitialisation() {
+        log.debug("defaultInitialisation");
         super.defaultInitialisation();
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setNeedSinglePosition(boolean position) {
+        log.debug("setNeedSinglePosition: " + position);
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, position);
         widgetCreator.showWidget(newSinglePositionLabel, position);
         widgetCreator.showWidget(newSinglePositionText, position);
@@ -366,11 +371,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionValidator = new StringLengthValidator(4,
             // validation error message
             i18n.tr("Enter a position"));
-        newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue(StringUtil.EMPTY_STRING,
-                String.class), newSinglePositionValidator,
-            NEW_SINGLE_POSITION_BINDING);
+        newSinglePositionText =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                fieldsComposite, BgcBaseText.class, SWT.NONE,
+                newSinglePositionLabel, new String[0], new WritableValue(
+                    StringUtil.EMPTY_STRING,
+                    String.class), newSinglePositionValidator,
+                NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -411,6 +418,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     private void checkInventoryId(BgcBaseText inventoryIdText) {
+        log.debug("checkInventoryId: " + inventoryIdText.getText());
         boolean ok = true;
         try {
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
@@ -445,12 +453,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
+        singleTypesWidget.removeBindings();
         if (isSingleMode) {
             singleTypesWidget.addBindings();
             singleTypesWidget.deselectAll();
-        } else {
-            singleTypesWidget.removeBindings();
         }
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void updateAvailableSpecimenTypes() {
+        log.debug("updateAvailableSpecimenTypes");
+        setTypeCombos();
     }
 
     /**
@@ -460,11 +474,44 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * @param typesRowss used only in multiple to indicate the count of each row
      *            after scan has been done.
      */
+    @SuppressWarnings("nls")
     private void setTypeCombos() {
+        log.debug("setTypeCombos");
+
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
-        if (!isSingleMode())
-            authorizedTypesInContainers = palletSpecimenTypes;
+        if (isSingleMode()) {
+            log.debug("setTypeCombos: single mode");
+
+            if ((parentContainers != null) && (parentContainers.size() >= 1)) {
+                authorizedTypesInContainers =
+                    parentContainers.get(0).getContainerType()
+                        .getSpecimenTypeCollection();
+            }
+        } else {
+            log.debug("setTypeCombos: multiple mode");
+
+            /*
+             * If the current center is a site, and if this site defines
+             * containers of 8*12 size, then get the specimen types these
+             * containers can contain
+             */
+            if (SessionManager.getUser().getCurrentWorkingSite() != null) {
+                List<SpecimenTypeWrapper> res = null;
+                try {
+                    res = SpecimenTypeWrapper.getSpecimenTypeForPallet96(
+                        SessionManager.getAppService(), SessionManager
+                            .getUser()
+                            .getCurrentWorkingSite());
+                } catch (ApplicationException e) {
+                    BgcPlugin.openAsyncError("Error",
+                        "Failed to retrieve specimen types.");
+                }
+                if (res.size() != 0)
+                    authorizedTypesInContainers = res;
+            }
+        }
+
         studiesAliquotedTypes = linkFormPatientManagement
             .getStudyAliquotedTypes(authorizedTypesInContainers);
         List<SpecimenWrapper> availableSourceSpecimens =
@@ -503,8 +550,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             && linkFormPatientManagement.fieldsValid();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void doBeforeSave() throws Exception {
+        log.debug("doBeforeSave");
         // can't access the combos in another thread, so do it now
         if (mode.isSingleMode()) {
             SpecimenHierarchyInfo selection = singleTypesWidget.getSelection();
@@ -519,6 +568,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
+        log.debug("saveForm");
         if (mode.isSingleMode())
             saveSingleSpecimen();
         else
@@ -528,7 +578,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             "SpecimenLink");
     }
 
+    @SuppressWarnings("nls")
     private void saveMultipleSpecimens() throws Exception {
+        log.debug("saveMultipleSpecimens");
+
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletCell> cells =
             (Map<RowColPos, PalletCell>) palletWidget
@@ -560,6 +613,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     protected void printSaveMultipleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
+        log.debug("printSaveMultipleLogMessage");
+
         StringBuffer sb = new StringBuffer(
             "ALIQUOTED SPECIMENS:\n");
         for (AliquotedSpecimenResInfo resInfo : resList) {
@@ -584,7 +639,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 .getCurrentWorkingCenter().getNameShort()));
     }
 
+    @SuppressWarnings("nls")
     private void saveSingleSpecimen() throws Exception {
+        log.debug("saveSingleSpecimen");
+
         AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
         asi.activityStatus = ActivityStatus.ACTIVE;
         asi.typeId = singleSpecimen.getSpecimenType().getId();
@@ -607,6 +665,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     protected void printSaveSingleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
+        log.debug("printSaveSingleLogMessage");
+
         if (resList.size() == 1) {
             AliquotedSpecimenResInfo resInfo = resList.get(0);
             String posStr = resInfo.position;
@@ -625,8 +685,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
+        log.debug("setValues");
+
         super.setValues();
         if (isSingleMode())
             singleTypesWidget.deselectAll();
@@ -634,8 +697,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         form.layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void reset(boolean resetAll) {
+        log.debug("reset: " + resetAll);
+
         linkFormPatientManagement.reset(resetAll);
         if (resetAll) {
             palletWidget.setCells(null);
@@ -646,27 +712,33 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.reset(resetAll);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean onClose() {
+        log.debug("onClose");
         linkFormPatientManagement.onClose();
         return super.onClose();
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: do this before multiple scan is made
      */
     protected void beforeScanThreadStart() {
+        log.debug("beforeScanThreadStart");
         super.beforeScanThreadStart();
         setTypeCombos();
         beforeScans(true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: do this before scan of one tube is really made
      */
     protected void beforeScanTubeAlone() {
+        log.debug("beforeScanTubeAlone");
         super.beforeScanTubeAlone();
         beforeScans(false);
     }
@@ -674,7 +746,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: do this before any scan is really launched
      */
+    @SuppressWarnings("nls")
     private void beforeScans(boolean resetTypeRows) {
+        log.debug("beforeScans: " + resetTypeRows);
         preSelections = new ArrayList<SpecimenHierarchyInfo>();
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
             preSelections.add(stw.getSelection());
@@ -702,18 +776,22 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
+        log.debug("getCellProcessAction");
         return new SpecimenLinkProcessAction(centerId,
             linkFormPatientManagement
                 .getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
+        log.debug("getPalletProcessAction");
         return new SpecimenLinkProcessAction(centerId,
             linkFormPatientManagement
                 .getCurrentPatient().getStudy().getId(), cells, isRescanMode,
@@ -727,8 +805,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void afterScanAndProcess(final Integer rowToProcess) {
         Display.getDefault().asyncExec(new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
+                log.debug("afterScanAndProcess: asyncExec");
+
                 // enabled the hierarchy combos
                 typesSelectionPerRowComposite
                     .setEnabled(currentScanState != UICellStatus.ERROR);
@@ -765,8 +846,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: Post process of only one cell after server call has
      * been made
      */
+    @SuppressWarnings("nls")
     @Override
     protected void processCellResult(final RowColPos rcp, PalletCell cell) {
+        log.debug("processCellResult");
         Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
             typesRowsCount = 0;
@@ -788,8 +871,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * @param typesRows contains a row:count map
      * @param row row of the widget we want to update.
      */
+    @SuppressWarnings("nls")
     private void setCountOnSpecimenWidget(Map<Integer, Integer> typesRows,
         int row) {
+        log.debug("setCountOnSpecimenWidget");
         AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
         Integer number = typesRows.get(row);
         if (number == null) {
@@ -802,21 +887,27 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: apply a source and type to a specific cell.
      */
+    @SuppressWarnings("nls")
     private void setHierarchyToCell(PalletCell cell,
         SpecimenHierarchyInfo selection) {
+        log.debug("setHierarchyToCell");
         cell.setSourceSpecimen(selection.getParentSpecimen());
         cell.setSpecimenType(selection.getAliquotedSpecimenType());
         if (cell.getStatus() != UICellStatus.ERROR)
             cell.setStatus(UICellStatus.TYPE);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Mode initialisationMode() {
+        log.debug("initialisationMode: " + mode);
         return mode;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void enableFields(boolean enable) {
+        log.debug("enableFields: " + enable);
         super.enableFields(enable);
         multipleOptionsFields.setEnabled(enable);
     }

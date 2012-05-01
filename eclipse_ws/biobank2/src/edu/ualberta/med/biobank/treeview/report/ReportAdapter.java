@@ -30,6 +30,9 @@ public class ReportAdapter extends AdapterBase {
 
     public ReportAdapter(AdapterBase parent, ReportWrapper report) {
         super(parent, report);
+        this.isReadable = true;
+        this.isEditable = true;
+        this.isDeletable = true;
     }
 
     @Override

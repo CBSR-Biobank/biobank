@@ -61,16 +61,13 @@ public class AliquotedSpecimenSelectionWidget {
     private Integer number;
 
     private final IObservableValue bothSelected = new WritableValue(
-        Boolean.FALSE,
-        Boolean.class);
+        Boolean.FALSE, Boolean.class);
 
     private final IObservableValue sourceSelected = new WritableValue(
-        Boolean.FALSE,
-        Boolean.class);
+        Boolean.FALSE, Boolean.class);
 
     private final IObservableValue resultSelected = new WritableValue(
-        Boolean.FALSE,
-        Boolean.class);
+        Boolean.FALSE, Boolean.class);
 
     private Binding oneRowBinding;
     private Binding sourceBinding;

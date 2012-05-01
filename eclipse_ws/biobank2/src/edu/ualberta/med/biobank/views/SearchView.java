@@ -25,7 +25,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.utils.SearchType;
 
@@ -60,8 +60,8 @@ public class SearchView extends ViewPart {
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
                 if (sourceName
-                    .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)) {
-                    loggedIn = sourceValue.equals(LoginSessionState.LOGGED_IN);
+                    .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
+                    loggedIn = sourceValue.equals(LoginPermissionSessionState.LOGGED_IN);
                     setEnabled();
                 }
             }
@@ -115,8 +115,8 @@ public class SearchView extends ViewPart {
         });
 
         loggedIn = BgcPlugin.getLoginStateSourceProvider().getCurrentState()
-            .get(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-            .equals(LoginSessionState.LOGGED_IN);
+            .get(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+            .equals(LoginPermissionSessionState.LOGGED_IN);
         setEnabled();
 
     }

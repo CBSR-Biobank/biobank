@@ -951,6 +951,11 @@ ALTER TABLE specimen_position
           REFERENCES specimen (ID, SPECIMEN_TYPE_ID)
           ON UPDATE CASCADE ON DELETE NO ACTION;
 
+--
+-- fix comment searches for advanced reports (resolves #1651)
+--
+UPDATE entity_property SET property = 'comments.message' where property = 'comment';
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

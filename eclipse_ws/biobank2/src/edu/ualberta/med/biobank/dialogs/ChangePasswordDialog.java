@@ -13,14 +13,16 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.handlers.LogoutHandler;
 
 public class ChangePasswordDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -28,19 +30,15 @@ public class ChangePasswordDialog extends BgcBaseDialog {
 
     public static final int MIN_PASSWORD_LENGTH = 5;
 
-    private boolean forceChange;
+    private final boolean forceChange;
     private Text oldPassText;
     private Text newPass1Text;
     private Text newPass2Text;
 
     private Button checkBulk;
 
-    public ChangePasswordDialog(Shell parentShell) {
+    private ChangePasswordDialog(Shell parentShell, boolean forceChange) {
         super(parentShell);
-    }
-
-    public ChangePasswordDialog(Shell parentShell, boolean forceChange) {
-        this(parentShell);
         this.forceChange = forceChange;
     }
 
@@ -166,20 +164,27 @@ public class ChangePasswordDialog extends BgcBaseDialog {
                 newPass2Text.getText(),
                 checkBulk == null ? null : checkBulk.getSelection());
 
-            SessionManager.getInstance().getSession().resetAppService();
+            try {
+                // need to delete the session so that calls are not made with
+                // the old password that will end up locking the user out.
+                // see #1697
+                SessionManager.getInstance().deleteSession(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+            // SessionManager.getInstance().getSession().resetAppService();
             BgcPlugin
                 .openInformation(
                     // TR: dialog title
                     i18n.tr("Password modified"),
                     // TR: dialog message
-                    "Your password has been successfully changed. You will need to reconnect again to see your data");
+                    i18n.tr("Your password has been successfully changed. You will need to reconnect again to see your data"));
 
             if (forceChange && newPass1Text.getText().isEmpty()) {
                 return;
             }
-
-            LogoutHandler lh = new LogoutHandler();
-            lh.execute(null);
 
             // FIXME find a way to reconnect the user automatically ?
             super.okPressed();
@@ -226,4 +231,18 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         return i18n.tr("Change Password");
     }
 
+    public static void open(Shell shell, boolean forceChange) {
+        IWorkbench workbench =
+            BiobankPlugin.getDefault().getWorkbench();
+        IWorkbenchPage activePage =
+            workbench.getActiveWorkbenchWindow()
+                .getActivePage();
+
+        // close all editors
+        activePage.closeAllEditors(true);
+
+        ChangePasswordDialog dlgx =
+            new ChangePasswordDialog(shell, forceChange);
+        dlgx.open();
+    }
 }

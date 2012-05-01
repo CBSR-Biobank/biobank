@@ -9,6 +9,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -36,8 +37,7 @@ public class ResearchGroupAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new ResearchGroupCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && allowed
+            return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(

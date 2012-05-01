@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -15,13 +14,16 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
     private static final I18n i18n = I18nFactory.getI18n(SiteGroup.class);
@@ -31,7 +33,19 @@ public class SiteGroup extends AdapterBase {
     public SiteGroup(SessionAdapter parent, int id) {
         super(parent, id, i18n.tr("All Sites"), true);
 
-        this.createAllowed = isAllowed(new SiteCreatePermission());
+        boolean allowed = false;
+        try {
+            allowed = SessionManager.getAppService().isAllowed(
+                new SiteCreatePermission());
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(
+                // TR: dialog title
+                i18n.tr("Error"),
+                // TR: dialog message
+                i18n.tr("Unable to retrieve permissions"));
+        }
+
+        this.createAllowed = allowed;
     }
 
     @SuppressWarnings("nls")
@@ -92,10 +106,10 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        if (SessionManager.isSuperAdminMode()) {
-            return SiteQuery.getSites(SessionManager.getAppService());
-        }
-        return Collections.emptyList();
+        List<Site> sites = SessionManager.getAppService()
+            .doAction(new SiteGetAllAction()).getList();
+        return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
+            sites, SiteWrapper.class);
     }
 
     @Override

@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
@@ -94,13 +94,15 @@ public class ReportsView extends ViewPart {
                     String sourceName, Object sourceValue) {
                     try {
                         if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_OUT)) {
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue
+                                .equals(LoginPermissionSessionState.LOGGED_OUT)) {
                             allowed = false;
                         }
                         else if (sourceName
-                            .equals(LoginSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginSessionState.LOGGED_IN)) {
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
+                            && sourceValue
+                                .equals(LoginPermissionSessionState.LOGGED_IN)) {
                             allowed =
                                 SessionManager.getAppService().isAllowed(
                                     new ReportsPermission());

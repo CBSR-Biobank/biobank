@@ -9,6 +9,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -36,8 +37,7 @@ public class ClinicAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new ClinicCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && SessionManager.getInstance().getSession() != null &&
+            return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(

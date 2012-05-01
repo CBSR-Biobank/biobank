@@ -63,7 +63,7 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         List<Object> objectList = new ArrayList<Object>(availableCenters);
         // TR: no center selection combo box option
         String noCenterString = i18n.tr("-- no center selection --");
-        if (user.isInSuperAdminMode())
+        if (user.isSuperAdmin())
             objectList.add(noCenterString);
         widgetCreator.createComboViewer(contents,
             // TR: select working center combo box label

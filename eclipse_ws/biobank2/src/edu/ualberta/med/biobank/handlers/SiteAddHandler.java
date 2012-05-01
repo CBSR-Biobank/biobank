@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -59,8 +60,7 @@ public class SiteAddHandler extends LogoutSensitiveHandler {
                 allowed =
                     SessionManager.getAppService().isAllowed(
                         new SiteCreatePermission());
-            return SessionManager.isSuperAdminMode()
-                && allowed
+            return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(

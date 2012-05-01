@@ -19,12 +19,13 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.LoginSessionState;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.model.IBiobankModel;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -106,10 +108,14 @@ public class SessionManager {
     }
 
     public void deleteSession() throws Exception {
+        deleteSession(true);
+    }
+
+    public void deleteSession(boolean logLogout) throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         sessionAdapter = null;
         updateSessionState();
-        ServiceConnection.logout(appService);
+        if (logLogout) ServiceConnection.logout(appService);
         initPerspectivesUpdateDone();
     }
 
@@ -139,11 +145,20 @@ public class SessionManager {
                 .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
         }
 
-        // assign logged in state
-        LoginSessionState guiCommonSessionState = BgcPlugin
+        // assign logged in state and label permissions
+        LoginPermissionSessionState guiCommonSessionState = BgcPlugin
             .getLoginStateSourceProvider();
         guiCommonSessionState.setLoggedInState(sessionAdapter != null);
-
+        try {
+            guiCommonSessionState
+                .setLabelPrintingPermissionState(sessionAdapter != null ? SessionManager
+                    .getAppService().isAllowed(
+                        new LabelPrintingPermission())
+                    : false);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError("Error",
+                "Unable to retrieve labelprinting permissions");
+        }
         BiobankPlugin.getSessionStateSourceProvider().setUser(
             sessionAdapter == null ? null : sessionAdapter.getUser());
 
@@ -332,10 +347,6 @@ public class SessionManager {
 
     public static void setCurrentAdministrationViewId(String id) {
         getInstance().currentAdministrationViewId = id;
-    }
-
-    public static boolean isSuperAdminMode() {
-        return getUser().isInSuperAdminMode();
     }
 
     public static void updateViewsVisibility(final IWorkbenchPage page,

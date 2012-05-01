@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 
@@ -44,13 +45,19 @@ public class UserDeleteAction implements Action<EmptyResult> {
             throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
 
-        try {
-            BiobankCSMSecurityUtil.deleteUser(user);
-        } catch (Exception e) {
-            throw new ActionException(CSM_USER_DELETE_FAILURE_ERRMSG);
+        // the group side is the managing side, so we must remove the user from
+        // the group and then save it
+        for (Group group : user.getGroups()) {
+            group.getUsers().remove(user);
         }
 
+        // delete and flush the user first as this is easier to revert than
+        // deleting the CSM user.
         context.getSession().delete(user);
+        context.getSession().flush();
+
+        BiobankCSMSecurityUtil.deleteUser(user);
+
         return new EmptyResult();
     }
 }

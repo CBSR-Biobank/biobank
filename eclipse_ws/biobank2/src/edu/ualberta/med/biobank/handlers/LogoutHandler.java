@@ -21,11 +21,12 @@ public class LogoutHandler extends AbstractHandler {
         IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
             .getActivePage();
         // close all editors
-        if (activePage.closeAllEditors(true))
+        if (activePage.closeAllEditors(true)) {
             try {
                 SessionManager.getInstance().deleteSession();
             } catch (Exception e) {
                 logger.error("Error while deleting the session", e); //$NON-NLS-1$
+            }
         }
         return null;
     }

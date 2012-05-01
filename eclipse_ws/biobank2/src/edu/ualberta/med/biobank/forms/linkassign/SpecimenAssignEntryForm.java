@@ -1476,4 +1476,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         return new AssignProcessInfo(
             currentMultipleContainer.getWrappedObject());
     }
+
+    @Override
+    protected void updateAvailableSpecimenTypes() {
+        // Do nothing
+    }
 }

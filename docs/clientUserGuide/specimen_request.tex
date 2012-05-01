@@ -1,0 +1,73 @@
+\chapter{Specimen Request User Manual}
+
+The \emph{Specimen Request} feature is used to facilitate a repository site's specimen requests, record the successful retrieval from the specimen's container, and manage their outgoing transportation. Please note that this feature is under construction. Details will be added as the feature is developed.
+
+\section{Submitting a Request}
+
+A list of requested specimens is usually provided as a CSV.  Currently, the required fields are as follows:
+
+\begin{itemize}
+\item Patient Number
+\item Date Drawn (YYYY-MM-DD)
+\item Specimen Type (Short Name)
+\item Number
+\end{itemize}
+
+\begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/specimen_request/csv.png} }
+      \caption{An example of a typical request.}
+      \label{Prepare CSV}
+\end{figure}
+
+The system must first try to fill the order by searching the database for specimens that match the criteria.  To submit this file, navigate to the \emph{Reports} section of the application, select the specimen tab, and open SpecimenReport3.  This report allows you to upload a formatted CSV, and returns to you a list of available specimens that satisfy the requested criteria.  
+      
+The page will be populated with following fields:
+\begin{itemize}
+\item Patient Number
+\item Inventory Id
+\item Date Drawn
+\item Specimen Type
+\item Location
+\item Activity Status
+\end{itemize}
+    
+\begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/specimen_request/report_output.png} }
+      \caption{An example of a typical request.}
+      \label{Report Output}
+\end{figure}
+      
+ In some cases, the database may not contain what has been requested.  This will result in a ``Not Found" row in the report results. Export the CSV by clicking the ``Export CSV" button, and remember the location. Currently, requests are submitted on behalf of research groups.  These entities can be found in the \emph{Administration View}.  If you are not an administrator, you will need an admin to do this for you.  Open a research group (or create one), and find the upload section.  This section allows you to upload the report we just saved on behalf of the research group.  Select the file, click upload.  If successful, you will see the message ``Request Successfully Uploaded".
+ \emph{This method of submission is temporary.  In the future, research groups will be able to submit their requests themselves via a web interface.}
+ 
+ \section{Processing a Request}
+ 
+ The \emph{SpecimenTransitView} deals with all incoming and outgoing samples.  Navigate there and find the ``Pending Requests" node under ``Incoming".  If you were able to upload the request in the previous section, and your current center has some of the requested specimens, you should see a pending request available.  Open the form.
+
+\begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/specimen_request/request_form.png} }
+      \caption{The processing form.}
+      \label{Request Form}
+\end{figure}
+      
+At the top of the form, you will see basic information detailing the requesting party, the date of submission, and other information.  The next section contains a tree, similar to the \emph{Container} tree in administration view, but with one exception. Only containers that lead to a requested specimen are listed.  The specimens are organized into their containers, and there are various actions that can be performed on multiple specimens at a time, via their parent container.  
+      
+These actions are as follows
+\begin{itemize}
+\item Flag as unavailable - if an item is unavailable, mark it as such so processing can continue
+\item Claim - The claim function allows multiple users to simultaneously process.  Only items designed as being claimed by the user can be processed.  If a user tries to process something claimed by someone else, they will receive an error. (It is possible to overwrite someone's claim by claiming them yourself).
+\end{itemize}
+ 
+There are two primary form functions:
+\begin{itemize}
+\item Pulling:  \emph{Claimed} items may be pulled by scanning the barcode (or entering manually), to flag the item as in hand, or \emph{Pulled}.  This designates that the item as been removed from the freezer (though the specimen will not be updated until the item is dispatched).  
+\item Dispatching: \emph{Pulled} items may be dispatched by selecting a dispatch created through the form menu, and then scanning a plate, or handscanning single tubes. Please note that the dispatch must be created through the request form, and not through a separate dispatch form, to record that the item was dispatched as the result of a request.  
+\end{itemize}
+ 
+Once all items have been claimed, pulled (or flagged as unavailable), and dispatched, the request will disappear from the tree.  At this time, there is no way to view previously processed requests, though the information has been recorded internally.

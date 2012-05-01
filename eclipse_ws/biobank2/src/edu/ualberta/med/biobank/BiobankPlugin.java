@@ -410,7 +410,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         return (UserState) service
-            .getSourceProvider(UserState.HAS_USER_MANAGEMENT_RIGHTS);
+            .getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
     }
 
 }

@@ -20,11 +20,9 @@ public class RequestAdapter extends AdapterBase {
 
     public RequestAdapter(AdapterBase parent, RequestWrapper ship) {
         super(parent, ship);
-    }
-
-    @Override
-    public boolean isEditable() {
-        return false;
+        this.isReadable = true;
+        this.isDeletable = false;
+        this.isEditable = false;
     }
 
     @SuppressWarnings("nls")
@@ -43,11 +41,6 @@ public class RequestAdapter extends AdapterBase {
     @Override
     public String getTooltipTextInternal() {
         return getTooltipText(Request.NAME.singular().toString());
-    }
-
-    @Override
-    public boolean isDeletable() {
-        return false;
     }
 
     @Override
