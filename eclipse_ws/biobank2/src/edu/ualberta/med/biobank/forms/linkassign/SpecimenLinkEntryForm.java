@@ -154,7 +154,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean showSinglePosition() {
-        return true;
+        return SessionManager.getUser().getCurrentWorkingSite() != null;
     }
 
     @Override

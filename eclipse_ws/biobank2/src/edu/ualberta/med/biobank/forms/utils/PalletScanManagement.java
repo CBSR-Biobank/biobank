@@ -18,11 +18,12 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -44,14 +45,20 @@ public class PalletScanManagement {
 
     public PalletScanManagement() {
         try {
-            this.type =
-                ContainerTypeWrapper.getContainerTypesPallet96(SessionManager
-                    .getAppService(), SessionManager.getUser()
-                    .getCurrentWorkingSite()).get(0).getWrappedObject();
+            this.type = getFakePallet96();
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to load pallet type 96",
                 e);
         }
+    }
+
+    private ContainerType getFakePallet96() throws ApplicationException {
+        ContainerType ct = new ContainerType();
+        ct.setCapacity(new Capacity(8, 12));
+        ct.setChildLabelingScheme(ContainerLabelingSchemeWrapper
+            .getLabelingSchemeById(SessionManager.getAppService(),
+                ContainerLabelingSchemeWrapper.SCHEME_SBS).getWrappedObject());
+        return ct;
     }
 
     public PalletScanManagement(ContainerType containerType) {
