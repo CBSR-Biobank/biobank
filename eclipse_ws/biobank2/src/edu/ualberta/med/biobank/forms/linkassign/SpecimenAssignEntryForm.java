@@ -936,7 +936,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             BgcPlugin
                 .openAsyncError(
                     "No Pallet defined?",
-                    "No child container types found with 8 rows and 12 columns");
+                    "No 8x12 container types configured with specimen types");
         }
     }
 
