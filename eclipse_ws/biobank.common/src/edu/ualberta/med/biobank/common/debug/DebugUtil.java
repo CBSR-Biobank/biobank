@@ -104,21 +104,22 @@ public class DebugUtil {
             SpecimenWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY =
-        "select spec from " //$NON-NLS-1$
+        "select spec from "
             + Site.class.getName()
-            + " as site left join site." //$NON-NLS-1$
+            + " as site left join site."
             + SitePeer.PROCESSING_EVENTS.getName()
-            + " as pe left join pe." //$NON-NLS-1$
+            + " as pe left join pe."
             + ProcessingEventPeer.SPECIMENS.getName()
-            + " as srcSpcs left join srcSpcs." //$NON-NLS-1$
+            + " as srcSpcs left join srcSpcs."
             + SpecimenPeer.CHILD_SPECIMENS.getName()
-            + " as spec left join spec." //$NON-NLS-1$
+            + " as spec left join spec."
             + SpecimenPeer.SPECIMEN_POSITION.getName()
-            + " as spcpos where spcpos is null" //$NON-NLS-1$
-            + " and site." //$NON-NLS-1$
+            + " as spcpos where spcpos is null"
+            + " and spec is not null and site."
             + SitePeer.ID.getName()
-            + "=?"; //$NON-NLS-1$
+            + "=?";
 
     // TODO: the check on activityStatus.name makes no sense;
 

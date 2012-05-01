@@ -24,19 +24,24 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventGroup extends AdapterBase {
 
-    private boolean createAllowed;
+    private final boolean createAllowed;
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
         super(parent, id, name, true);
+
+        boolean allowed = false;
         try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
+            if (SessionManager.getUser().getCurrentWorkingCenter() != null) {
+                allowed = SessionManager.getAppService().isAllowed(
                     new ProcessingEventCreatePermission(SessionManager
                         .getUser()
                         .getCurrentWorkingCenter().getId()));
+            }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
         }
+
+        this.createAllowed = allowed;
     }
 
     @Override

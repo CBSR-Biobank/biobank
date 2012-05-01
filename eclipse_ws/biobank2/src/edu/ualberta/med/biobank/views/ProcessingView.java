@@ -155,8 +155,7 @@ public class ProcessingView extends AbstractAdministrationView {
         try {
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
                 new ProcessingEventReadPermission(SessionManager
-                    .getUser()
-                    .getCurrentWorkingCenter().getId())));
+                    .getUser().getCurrentWorkingCenter().getWrappedObject())));
         } catch (ApplicationException e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
