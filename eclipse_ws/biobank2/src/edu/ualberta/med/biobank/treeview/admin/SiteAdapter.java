@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteEntryForm;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -144,6 +146,13 @@ public class SiteAdapter extends AdapterBase {
         if (o instanceof SiteAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    public void runDelete() throws Exception {
+        SiteDeleteAction delete =
+            new SiteDeleteAction((Site) getModelObject().getWrappedObject());
+        SessionManager.getAppService().doAction(delete);
     }
 
     // disable MVP for version 3.2.0
