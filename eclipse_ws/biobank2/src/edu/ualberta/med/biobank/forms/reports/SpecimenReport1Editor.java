@@ -18,18 +18,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenReport1Editor extends ReportsEditor {
 
     public static String ID =
-        "edu.ualberta.med.biobank.editors.FTAReportEditor"; 
+        "edu.ualberta.med.biobank.editors.SpecimenReport1Editor";
 
     private ComboViewer studyCombo;
     private DateTimeWidget afterDate;
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        studyCombo = createStudyComboOption(
-            "Study", parent);
-        afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Drawn)", null, null, null,
-            SWT.DATE);
+        studyCombo = createStudyComboOption("Study", parent);
+        afterDate = widgetCreator.createDateTimeWidget(
+            parent, "After Date (Drawn)", null, null, null, SWT.DATE);
     }
 
     @Override
