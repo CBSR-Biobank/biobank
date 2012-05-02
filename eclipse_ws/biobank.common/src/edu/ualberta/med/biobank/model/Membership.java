@@ -20,6 +20,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 /**
  * A {@link User} should only be able to create
  * {@link getManageablePermissionsMembership}-s on other {@link User}-s that are
@@ -43,6 +48,23 @@ import org.hibernate.annotations.Type;
 @Table(name = "MEMBERSHIP")
 public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Membership",
+        "Memberships");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString EVERY_PERMISSION = bundle.trc(
+            "model",
+            "Has Every Permission").format();
+        public static final LString USER_MANAGER = bundle.trc(
+            "model",
+            "Can Manage Users").format();
+    }
 
     private Principal principal;
     private Domain domain = new Domain();
@@ -160,7 +182,7 @@ public class Membership extends AbstractBiobankModel {
     /**
      * Get a {@link Set} of <em>all</em> {@link PermissionEnum}-s that this
      * {@link Membership} has directly, through its {@link Role}-s, and
-     * considering its {@link Rank} (if {@link Rank#ADMINISTRATOR}, then all
+     * considering its {{@link #isEveryPermission()} value (if true, then all
      * {@link PermissionEnum}-s are included).
      * 
      * @return
@@ -208,8 +230,9 @@ public class Membership extends AbstractBiobankModel {
      * 
      * @param user the manager, who is allowed to modify the returned
      *            {@link Role}-s
-     * @param defaultAdminRoles which {@link Role}-s to add to the set if the
-     *            {@link User} is an {@link Rank#ADMINISTRATOR}.
+     * @param defaultAdminRoles which {@link Role}-s to add to the set if {
+     *            {@link #isEveryPermission()} returns true
+     *
      * @return the {@link Role}-s that the manager can manipulate
      */
     @Transient

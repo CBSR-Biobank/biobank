@@ -19,6 +19,8 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -79,6 +81,8 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
  */
 @SuppressWarnings("restriction")
 public class BiobankPlugin extends AbstractUIPlugin {
+
+    private static final I18n i18n = I18nFactory.getI18n(BiobankPlugin.class);
 
     public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$
 
@@ -206,6 +210,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
             eventBus.addHandler(ExceptionEvent.getType(), this);
         }
 
+        @SuppressWarnings("nls")
         @Override
         public void onException(ExceptionEvent event) {
             Throwable t = event.getThrowable();
@@ -214,8 +219,9 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
             IStatus status =
                 new Status(IStatus.ERROR, Application.PLUGIN_ID, IStatus.OK,
-                    "Exception found.", t.getCause());
-            ErrorDialog.openError(shell, "Error", t.getLocalizedMessage(),
+                    i18n.tr("Exception found."), t.getCause());
+            ErrorDialog.openError(shell, i18n.tr("Error"),
+                t.getLocalizedMessage(),
                 status);
 
             t.printStackTrace();

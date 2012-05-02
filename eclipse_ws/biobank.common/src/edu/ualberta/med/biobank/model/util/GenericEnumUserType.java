@@ -13,10 +13,11 @@ import org.hibernate.type.TypeResolver;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
+@SuppressWarnings("nls")
 public class GenericEnumUserType implements UserType, ParameterizedType {
     private static final String DEFAULT_IDENTIFIER_METHOD_NAME = "getId";
     private static final String DEFAULT_VALUE_OF_METHOD_NAME = "fromId";
-    
+
     @SuppressWarnings("rawtypes")
     private Class<? extends Enum> enumClass;
     private Class<?> identifierType;

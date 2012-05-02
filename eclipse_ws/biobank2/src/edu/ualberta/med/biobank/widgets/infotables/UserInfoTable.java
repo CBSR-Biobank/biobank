@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -23,6 +25,7 @@ import edu.ualberta.med.biobank.common.action.security.UserDeleteInput;
 import edu.ualberta.med.biobank.common.action.security.UserGetAction;
 import edu.ualberta.med.biobank.common.action.security.UserGetInput;
 import edu.ualberta.med.biobank.common.action.security.UserGetOutput;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -33,22 +36,24 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class UserInfoTable extends
     DefaultAbstractInfoTableWidget<User> {
+    public static final I18n i18n = I18nFactory.getI18n(UserInfoTable.class);
 
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS = new String[] {
-        Messages.UserInfoTable_login_label,
-        Messages.UserInfoTable_fullname_label,
-        Messages.UserInfoTable_email_label };
+        User.PropertyName.LOGIN.toString(),
+        User.PropertyName.FULL_NAME.toString(),
+        User.PropertyName.EMAIL_ADDRESS.toString() };
 
     private final ManagerContext managerContext;
-    private MenuItem unlockMenuItem;
+    private final MenuItem unlockMenuItem;
 
+    @SuppressWarnings("nls")
     public UserInfoTable(Composite parent, List<User> users,
         ManagerContext managerContext) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
@@ -83,7 +88,9 @@ public abstract class UserInfoTable extends
         });
 
         unlockMenuItem = new MenuItem(menu, SWT.PUSH);
-        unlockMenuItem.setText(Messages.UserInfoTable_unlock_label);
+        unlockMenuItem.setText(
+            // menu item label.
+            i18n.tr("Unlock User"));
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -93,7 +100,8 @@ public abstract class UserInfoTable extends
                     SessionManager.getAppService().unlockUser(userName);
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError(MessageFormat.format(
-                        Messages.UserInfoTable_unlock_error_msg,
+                        // dialog title.
+                        i18n.tr("Cannot unlock user {0}."),
                         new Object[] { userName }), e);
                 }
             }
@@ -135,7 +143,7 @@ public abstract class UserInfoTable extends
                 case 2:
                     return user.getEmail();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -173,6 +181,7 @@ public abstract class UserInfoTable extends
         return res;
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteUser(User user) {
         try {
             String loginName = user.getLogin();
@@ -180,16 +189,20 @@ public abstract class UserInfoTable extends
 
             if (SessionManager.getUser().equals(user)) {
                 BgcPlugin.openAsyncError(
-                    Messages.UserInfoTable_delete_error_msg,
-                    Messages.UserInfoTable_confirm_delete_suicide_msg);
+                    // dialog title.
+                    i18n.tr("Unable to delete user."),
+                    // dialog message.
+                    i18n.tr("You may not delete yourself as a user"));
                 return false;
             }
-            message = MessageFormat.format(
-                Messages.UserInfoTable_confirm_delete_msg,
-                new Object[] { loginName });
+            message =
+                // dialog message.
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    loginName);
 
             if (BgcPlugin.openConfirm(
-                Messages.UserInfoTable_confirm_delete_title, message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new UserDeleteAction(new UserDeleteInput(user)));
@@ -204,7 +217,9 @@ public abstract class UserInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError(Messages.UserInfoTable_delete_error_msg, e);
+                .openAsyncError(
+                    // dialog title.
+                    i18n.tr("Unable to delete user."), e);
         }
         return false;
     }
@@ -212,7 +227,7 @@ public abstract class UserInfoTable extends
     public static class UserComparator implements Comparator<User> {
         @Override
         public int compare(User a, User b) {
-            return NullHelper.safeCompareTo(a.getLogin(), b.getLogin(),
+            return NullUtil.cmp(a.getLogin(), b.getLogin(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }

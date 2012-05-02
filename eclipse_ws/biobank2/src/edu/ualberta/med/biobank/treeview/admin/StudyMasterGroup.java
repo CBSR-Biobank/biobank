@@ -9,6 +9,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
@@ -17,11 +19,11 @@ import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyMasterGroup extends AbstractStudyGroup {
+    private static final I18n i18n = I18nFactory
+        .getI18n(StudyMasterGroup.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
@@ -29,23 +31,23 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     private StudiesInfo studiesInfo = null;
 
-    private Boolean createAllowed;
+    private final Boolean createAllowed;
 
+    @SuppressWarnings("nls")
     public StudyMasterGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.StudyMasterGroup_studies_node_label);
-        try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
-                new StudyCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+        super(parent, id, i18n.tr("All Studies"));
+
+        this.createAllowed = isAllowed(new StudyCreatePermission());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.StudyMasterGroup_add_label);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add Study"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

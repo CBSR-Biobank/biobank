@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.views;
 
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.RootNode;
@@ -12,9 +14,11 @@ import edu.ualberta.med.biobank.widgets.trees.AdapterTreeWidget;
  * ORM model objects in the database.
  */
 public class SessionsView extends AbstractViewWithAdapterTree {
+    private static final I18n i18n = I18nFactory.getI18n(SessionsView.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.SessionsView"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.views.SessionsView";
 
     public SessionsView() {
         SessionManager.getInstance().setSessionsView(this);
@@ -39,6 +43,7 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void reload() {
         SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
@@ -46,9 +51,13 @@ public class SessionsView extends AbstractViewWithAdapterTree {
             session.rebuild();
         }
         if (SessionManager.getUser().getCurrentWorkingCenter() == null)
-            setPartName(Messages.SessionsView_admin_title);
+            setPartName(
+            // tab part name
+            i18n.tr("Administration"));
         else
-            setPartName(Messages.SessionsView_center_admin_title);
+            setPartName(
+            // tab part name
+            i18n.tr("Center Administration"));
     }
 
     @Override

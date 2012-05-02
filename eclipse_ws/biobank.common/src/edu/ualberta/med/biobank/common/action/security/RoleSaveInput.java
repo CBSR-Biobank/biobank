@@ -14,6 +14,7 @@ public class RoleSaveInput implements ActionInput {
     private final String name;
     private final Set<PermissionEnum> permissions;
 
+    @SuppressWarnings("nls")
     public RoleSaveInput(Role role) {
         if (role == null)
             throw new IllegalArgumentException("null role");

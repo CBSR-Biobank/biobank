@@ -89,6 +89,7 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return 0;
     }
 
+    @SuppressWarnings("nls")
     private static final String RG_GET = "from "
         + ResearchGroup.class.getName() + " rg where rg.id=?";
 

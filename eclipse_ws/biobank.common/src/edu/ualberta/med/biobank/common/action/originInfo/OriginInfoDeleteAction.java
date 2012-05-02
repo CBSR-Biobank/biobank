@@ -1,16 +1,24 @@
 package edu.ualberta.med.biobank.common.action.originInfo;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class OriginInfoDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final LString SPECIMEN_ORIGIN_ERRMSG =
+        bundle.tr("Specimens do not come from the same place.").format();
 
     protected final Integer originInfoId;
 
@@ -46,8 +54,7 @@ public class OriginInfoDeleteAction implements Action<EmptyResult> {
             if (currentCenter == null)
                 currentCenter = spc.getCurrentCenter();
             else if (currentCenter != spc.getCurrentCenter())
-                throw new ActionException(
-                    "Specimens do not come from the same place.");
+                throw new ActionException(SPECIMEN_ORIGIN_ERRMSG);
             spc.setOriginInfo(newOriginInfo);
             spc.setCurrentCenter(wCenter);
         }

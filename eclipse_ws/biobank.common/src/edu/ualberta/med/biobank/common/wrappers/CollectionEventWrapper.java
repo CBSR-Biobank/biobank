@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -33,17 +32,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final CollectionEventLogProvider LOG_PROVIDER =
         new CollectionEventLogProvider();
-    private static final String HAS_SPECIMENS_MSG = Messages
-        .getString("CollectionEventWrapper.has_specimen_delete_msg"); //$NON-NLS-1$
-    private static final Collection<Property<?, ? super CollectionEvent>> UNIQUE_VISIT_NUMBER_PROPS;
-    static {
-        Collection<Property<?, ? super CollectionEvent>> tmp =
-            new ArrayList<Property<?, ? super CollectionEvent>>();
-        tmp.add(CollectionEventPeer.PATIENT.to(PatientPeer.ID));
-        tmp.add(CollectionEventPeer.VISIT_NUMBER);
-
-        UNIQUE_VISIT_NUMBER_PROPS = Collections.unmodifiableCollection(tmp);
-    };
 
     private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
     private Map<String, EventAttrWrapper> eventAttrMap;
@@ -467,24 +455,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(CollectionEventPeer.VISIT_NUMBER));
-
-        tasks.add(check().unique(UNIQUE_VISIT_NUMBER_PROPS));
-
         tasks.deleteRemoved(this, CollectionEventPeer.ALL_SPECIMENS);
         tasks.deleteRemoved(this,
             CollectionEventPeer.ORIGINAL_SPECIMENS);
 
         super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(CollectionEventPeer.ALL_SPECIMENS,
-            HAS_SPECIMENS_MSG));
-
-        super.addDeleteTasks(tasks);
     }
 
     @Deprecated

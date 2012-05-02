@@ -9,7 +9,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.Messages;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
@@ -81,15 +83,17 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         return studies;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
 
-        baseForm.setTitle(Messages.SiteEntryForm_main_title);
+        baseForm.setTitle("New repository site");
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        name.setValidationControl(table.addLabel("name"));
+        name.setValidationControl(table.addLabel(HasName.PropertyName.NAME
+            .toString()));
         name.setText(table.addText());
 
         nameShort.setValidationControl(table.addLabel("nameShort"));
@@ -99,10 +103,13 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         table.addLabel("activityStatus");
         activityStatusComboView.create(table);
 
-        Composite addressClient = baseForm.createSectionWithClient("Address");
+        Composite addressClient =
+            baseForm
+                .createSectionWithClient(Address.NAME.singular().toString());
         addressEntryView.create(addressClient);
 
-        Section studySection = baseForm.createSection("Studies");
+        Section studySection =
+            baseForm.createSection(Study.NAME.plural().toString());
         WritableApplicationService appService =
             SessionManager.getAppService();
         SiteWrapper siteWrapper = new SiteWrapper(appService);
@@ -112,7 +119,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         studySection.setClient(studiesTable);
         if (superAdmin) {
             BaseForm.addSectionToolbar(studySection,
-                Messages.SiteEntryForm_studies_add, new SelectionAdapter() {
+                "Add study", new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
                         studiesTable.createStudyDlg();
@@ -125,6 +132,7 @@ public class SiteEntryFormView extends AbstractEntryFormView implements
         // comment.setText(widget.comment);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getOkMessage() {
         return "Everything is A-Okay";

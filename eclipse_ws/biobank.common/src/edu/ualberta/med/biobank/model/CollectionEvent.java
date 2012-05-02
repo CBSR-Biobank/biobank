@@ -20,6 +20,10 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -33,6 +37,26 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Empty(property = "allSpecimens", groups = PreDelete.class)
 public class CollectionEvent extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Collection Event",
+        "Collection Events");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString VISIT_NUMBER = bundle.trc(
+            "model",
+            "Visit Number").format();
+        public static final LString WORKSHEET = bundle.trc(
+            "model",
+            "Worksheet").format();
+    }
 
     private Integer visitNumber;
     private Set<Specimen> allSpecimens = new HashSet<Specimen>(0);

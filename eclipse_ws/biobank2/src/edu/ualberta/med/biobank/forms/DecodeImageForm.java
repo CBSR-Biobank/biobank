@@ -12,6 +12,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
@@ -25,9 +27,12 @@ import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManage
 
 public class DecodeImageForm extends PlateForm implements
     IBgcFileBrowserListener {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DecodeImageForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.DecodeImageForm"; 
+        "edu.ualberta.med.biobank.forms.DecodeImageForm";
 
     private ScanPalletWidget spw;
 
@@ -35,21 +40,28 @@ public class DecodeImageForm extends PlateForm implements
 
     private String imageFilename;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
-        setPartName("Decode Image");
+        setPartName(
+        // tab name.
+        i18n.tr("Decode Image"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Decode Image");
+        form.setText(
+            // form title.
+            i18n.tr("Decode Image"));
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
         imageFileSelector = new BgcFileBrowser(page,
-            "Image File", SWT.NONE,
-            new String[] { "*.bmp" }); 
+            // label.
+            i18n.tr("Image File"), SWT.NONE,
+            new String[] { "*.bmp" });
         imageFileSelector.addFileSelectedListener(this);
         imageFileSelector.adaptToToolkit(toolkit, true);
 
@@ -63,9 +75,12 @@ public class DecodeImageForm extends PlateForm implements
     public void fileSelected(String filename) {
         imageFilename = filename;
         IRunnableWithProgress op = new IRunnableWithProgress() {
+            @SuppressWarnings("nls")
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Decoding...",
+                monitor.beginTask(
+                    // progress monitor message.
+                    i18n.tr("Decoding..."),
                     IProgressMonitor.UNKNOWN);
                 try {
                     decodeImage();
@@ -73,7 +88,8 @@ public class DecodeImageForm extends PlateForm implements
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        "Decoding error", e);
+                        // dialog title.
+                        i18n.tr("Decoding error"), e);
                 }
                 monitor.done();
             }

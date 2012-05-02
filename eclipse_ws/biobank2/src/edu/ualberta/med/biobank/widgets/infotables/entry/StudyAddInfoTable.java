@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -25,8 +26,10 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
  * some clinics may have more than one contact.
  */
 public class StudyAddInfoTable extends StudyInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(StudyAddInfoTable.class);
 
-    private SiteWrapper site;
+    private final SiteWrapper site;
 
     public StudyAddInfoTable(Composite parent, SiteWrapper site,
         boolean createDeleteSupport) {
@@ -41,6 +44,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
         return true;
     }
 
+    @SuppressWarnings("nls")
     public void createStudyDlg() {
         SelectStudyDialog dlg;
         try {
@@ -57,7 +61,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 notifyListeners();
                 StudyWrapper study = dlg.getSelection();
                 if (study != null) {
-                    List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
+                    List<StudyWrapper> dummyList =
+                        new ArrayList<StudyWrapper>();
                     dummyList.add(study);
                     site.addToStudyCollection(dummyList);
                     setList(site.getStudyCollection(true));
@@ -65,7 +70,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                Messages.StudyAddInfoTable_retrieve_error_title, e);
+                // dialog title.
+                i18n.tr("Unable to retrieve available studies"), e);
         }
     }
 
@@ -78,6 +84,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener<StudyWrapper>() {
+            @SuppressWarnings("nls")
             @Override
             public void deleteItem(InfoTableEvent<StudyWrapper> event) {
                 StudyWrapper study = getSelection();
@@ -85,8 +92,10 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     return;
 
                 if (!BgcPlugin.openConfirm(
-                    Messages.StudyAddInfoTable_remove_confirm_title, NLS.bind(
-                        Messages.StudyAddInfoTable_remove_confirm_msg,
+                    // dialog title.
+                    i18n.tr("Remove Study"),
+                    // dialog message.
+                    i18n.tr("Are you sure you want to remove study \"{0}\"?",
                         study.getName()))) {
                     return;
                 }
@@ -98,7 +107,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                     notifyListeners();
                 } catch (BiobankCheckException e) {
                     BgcPlugin.openAsyncError(
-                        Messages.StudyAddInfoTable_delete_error_title, e);
+                        // dialog title.
+                        i18n.tr("Delete failed"), e);
                 }
             }
         });

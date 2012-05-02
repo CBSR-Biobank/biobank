@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -11,15 +12,19 @@ import edu.ualberta.med.biobank.common.action.info.RequestReadInfo;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.permission.request.RequestReadPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Request;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
-    private Integer id;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Tr REQUEST_NOT_FOUND =
+        bundle.tr("No request found with id \"{0}\".");
+
+    private final Integer id;
     // @formatter:off
     @SuppressWarnings("nls")
     private static final String REQUEST_HQL = "select distinct request from "
@@ -59,11 +64,9 @@ public class RequestGetInfoAction implements Action<RequestReadInfo> {
             sInfo.request = (Request) row;
 
         } else {
-            throw new ActionException(
-                "No request found with id:" + id); //$NON-NLS-1$
+            throw new ActionException(REQUEST_NOT_FOUND.format(id));
         }
 
         return sInfo;
     }
-
 }

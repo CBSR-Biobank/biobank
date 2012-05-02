@@ -39,6 +39,7 @@ public class JasperTemplateGetInfoAction implements
         return new LabelPrintingPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public JasperTemplateInfo run(ActionContext context)
         throws ActionException {

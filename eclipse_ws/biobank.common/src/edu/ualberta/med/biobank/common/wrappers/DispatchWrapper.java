@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
@@ -19,26 +21,23 @@ import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.NotNullPreCheck;
-import edu.ualberta.med.biobank.common.wrappers.checks.UniqueCheck;
 import edu.ualberta.med.biobank.common.wrappers.loggers.DispatchLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchWrapper.class);
     private static final DispatchLogProvider LOG_PROVIDER =
         new DispatchLogProvider();
     private static final Property<String, Dispatch> WAYBILL_PROPERTY =
@@ -61,7 +60,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     // TODO: Not sure if it's a good idea to maintain a list like this
     // internally. It can result in unwanted changes being persisted.
-    private List<DispatchSpecimenWrapper> dispatchSpecimensToPersist =
+    private final List<DispatchSpecimenWrapper> dispatchSpecimensToPersist =
         new ArrayList<DispatchSpecimenWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
@@ -80,11 +79,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return newObject;
     }
 
+    @SuppressWarnings("nls")
     public String getStateDescription() {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
         if (state == null)
-            return ""; //$NON-NLS-1$
+            return "";
         return state.getLabel();
     }
 
@@ -157,6 +157,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return list;
     }
 
+    @SuppressWarnings("nls")
     public void addSpecimens(List<SpecimenWrapper> newSpecimens,
         DispatchSpecimenState state) throws BiobankCheckException {
         if (newSpecimens == null)
@@ -197,11 +198,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     hasNewSpecimens = true;
                 }
             } else
-                throw new BiobankCheckException(
-                    MessageFormat.format(
-                        Messages
-                            .getString("DispatchWrapper.specimen.add.sender.error.msg"), //$NON-NLS-1$
-                        specimen.getInventoryId()));
+                // {0} specimen inventory ID
+                throw new BiobankCheckException(i18n.tr(
+                    "Specimen {0} does not belong to this sender.",
+                    specimen.getInventoryId()));
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         resetMap();
@@ -303,14 +303,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         setState(ds.getId());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSenderCenter() == null ? "" : getSenderCenter() //$NON-NLS-1$
-            .getNameShort() + "/"); //$NON-NLS-1$
-        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter() //$NON-NLS-1$
-            .getNameShort() + "/"); //$NON-NLS-1$
-        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo() //$NON-NLS-1$
+        sb.append(getSenderCenter() == null ? "" : getSenderCenter()
+            .getNameShort() + "/");
+        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter()
+            .getNameShort() + "/");
+        sb.append(getShipmentInfo() == null ? "" : getShipmentInfo()
             .getFormattedDateReceived());
         return sb.toString();
     }
@@ -356,22 +357,22 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
-    @SuppressWarnings("unused")
-    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from " //$NON-NLS-1$
+    @SuppressWarnings({ "unused", "nls" })
+    private static final String FAST_DISPATCH_SPECIMEN_QRY = "select ra from "
         + DispatchSpecimen.class.getName()
-        + " ra inner join fetch ra." //$NON-NLS-1$
+        + " ra inner join fetch ra."
         + DispatchSpecimenPeer.SPECIMEN.getName()
-        + " as spec inner join fetch spec." //$NON-NLS-1$
+        + " as spec inner join fetch spec."
         + SpecimenPeer.SPECIMEN_TYPE.getName()
-        + " inner join fetch spec." //$NON-NLS-1$
+        + " inner join fetch spec."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent inner join fetch cevent." //$NON-NLS-1$
+        + " as cevent inner join fetch cevent."
         + CollectionEventPeer.PATIENT.getName()
-        + " inner join fetch spec." //$NON-NLS-1$
+        + " inner join fetch spec."
         + SpecimenPeer.ACTIVITY_STATUS.getName()
-        + " where ra." //$NON-NLS-1$
+        + " where ra."
         + Property.concatNames(DispatchSpecimenPeer.DISPATCH, DispatchPeer.ID)
-        + " = ?"; //$NON-NLS-1$
+        + " = ?";
 
     public boolean canBeClosedBy(UserWrapper user) {
         return isInReceivedState()
@@ -395,9 +396,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return LOG_PROVIDER;
     }
 
-    private static final String DISPATCH_HQL_STRING = "from " //$NON-NLS-1$
-        + Dispatch.class.getName() + " as d inner join fetch d." //$NON-NLS-1$
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s "; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String DISPATCH_HQL_STRING = "from "
+        + Dispatch.class.getName() + " as d inner join fetch d."
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
 
     /**
      * Search for shipments in the site with the given waybill
@@ -405,8 +407,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public static List<DispatchWrapper> getDispatchesByWaybill(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s." //$NON-NLS-1$
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?"); //$NON-NLS-1$
+        @SuppressWarnings("nls")
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             Arrays.asList(new Object[] { waybill }));
 
@@ -417,17 +420,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >=? and s." //$NON-NLS-1$
+            + " >=? and s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " <? and (d." //$NON-NLS-1$
+            + " <? and (d."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." //$NON-NLS-1$
+            + "= ? or d."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
     /**
      * Search for shipments in the site with the given date received. Don't use
@@ -450,17 +454,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return shipments;
     }
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHED_BY_DATE_SENT_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (d." //$NON-NLS-1$
+            + " < ? and (d."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d." //$NON-NLS-1$
+            + "= ? or d."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
     public static List<DispatchWrapper> getDispatchesByDateSent(
         WritableApplicationService appService, Date dateSent,
@@ -494,12 +499,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(DispatchPeer.SENDER_CENTER));
-        tasks.add(check().notNull(DispatchPeer.RECEIVER_CENTER));
-
-        tasks.add(new NotNullPreCheck<Dispatch>(this,
-            DispatchPeer.SENDER_CENTER));
-
         tasks.deleteRemoved(this, DispatchPeer.DISPATCH_SPECIMENS);
 
         removeSpecimensFromParents(tasks);
@@ -508,12 +507,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         super.addPersistTasks(tasks);
 
         tasks.persistAdded(this, DispatchPeer.DISPATCH_SPECIMENS);
-
-        BiobankSessionAction checkWaybill = new UniqueCheck<Dispatch>(this,
-            UNIQUE_WAYBILL_PER_SENDER_PROPERTIES);
-
-        tasks.add(new IfAction<Dispatch>(this, WAYBILL_PROPERTY, Is.NOT_NULL,
-            checkWaybill));
 
         tasks.add(new ResetInternalStateQueryTask(this));
     }

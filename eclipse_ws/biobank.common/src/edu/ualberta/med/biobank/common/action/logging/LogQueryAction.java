@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.common.permission.logging.LoggingPermission;
 import edu.ualberta.med.biobank.model.Log;
 
+@SuppressWarnings("nls")
 public class LogQueryAction implements Action<ListResult<Log>> {
     private static final long serialVersionUID = 8892328030007487709L;
 

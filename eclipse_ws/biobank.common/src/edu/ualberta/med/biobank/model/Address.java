@@ -6,10 +6,53 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "ADDRESS")
 public class Address extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Address",
+        "Addresses");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString CITY = bundle.trc(
+            "model",
+            "City").format();
+        public static final LString COUNTRY = bundle.trc(
+            "model",
+            "Country").format();
+        public static final LString EMAIL_ADDRESS = bundle.trc(
+            "model",
+            "Email Address").format();
+        public static final LString FAX_NUMBER = bundle.trc(
+            "model",
+            "Fax Number").format();
+        public static final LString PHONE_NUMBER = bundle.trc(
+            "model",
+            "Phone Number").format();
+        public static final LString POSTAL_CODE = bundle.trc(
+            "model",
+            "Postal/ Zip Code").format();
+        public static final LString PROVINCE = bundle.trc(
+            "model",
+            "Province/ State").format();
+        public static final LString STREET1 = bundle.trc(
+            "model",
+            "Street 1").format();
+        public static final LString STREET2 = bundle.trc(
+            "model",
+            "Street 2").format();
+    }
 
     private String street1;
     private String street2;

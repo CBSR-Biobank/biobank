@@ -10,15 +10,14 @@ import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.util.WrapperUtil;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -381,24 +380,6 @@ public abstract class CenterWrapper<E extends Center> extends
             return null;
         return WrapperUtil.wrapModel(appService, centers.get(0), null);
 
-    }
-
-    @Deprecated
-    @Override
-    protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(CenterPeer.NAME));
-        tasks.add(check().notNull(CenterPeer.NAME_SHORT));
-
-        tasks.add(check().unique(CenterPeer.NAME));
-        tasks.add(check().unique(CenterPeer.NAME_SHORT));
-
-        super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        super.addDeleteTasks(tasks);
     }
 
     // TODO: remove if allowing bi-direcitonal links.

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBriefInfo;
@@ -12,10 +14,17 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(PeListInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 24;
 
@@ -26,18 +35,20 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         public Long numSVs;
         public Long numAliquots;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { startDate, studyNameShort,
-                numSVs.toString(), numAliquots.toString() }, "\t"); //$NON-NLS-1$
+                numSVs.toString(), numAliquots.toString() }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.PeListInfoTable_start_label,
-        Messages.PeListInfoTable_study_label,
-        Messages.PeListInfoTable_sources_label,
-        Messages.PeListInfoTable_aliquoteds_label };
+        i18n.tr("Start date"),
+        Study.NAME.singular().toString(),
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString() };
 
     public PeListInfoTable(Composite parent, List<ProcessingEventBriefInfo> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS,
@@ -53,9 +64,9 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -67,7 +78,7 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
                 case 3:
                     return NumberFormatter.format(item.numAliquots);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

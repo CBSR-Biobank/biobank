@@ -9,35 +9,36 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("nls")
 public class AbstractReport {
 
-    protected static final String SENT_SAMPLES_FREEZER_NAME = "SS%"; //$NON-NLS-1$
+    protected static final String SENT_SAMPLES_FREEZER_NAME = "SS%";
 
     protected String queryString;
 
     protected BiobankReport report;
 
-    protected static final String SITE_OPERATOR = "$$siteOperator$$"; //$NON-NLS-1$
+    protected static final String SITE_OPERATOR = "$$siteOperator$$";
 
     protected static final String SITE_OPERATOR_SEARCH_STRING =
         replacePatternString(SITE_OPERATOR);
 
-    protected static final String SITE_ID = "$$siteId$$"; //$NON-NLS-1$
+    protected static final String SITE_ID = "$$siteId$$";
 
     protected static final String SITE_ID_SEARCH_STRING =
         replacePatternString(SITE_ID);
 
-    protected static final String GROUPBY_DATE = "$$groupBy$$"; //$NON-NLS-1$
+    protected static final String GROUPBY_DATE = "$$groupBy$$";
 
     protected static final String GROUPBY_DATE_SEARCH_STRING =
         replacePatternString(GROUPBY_DATE);
 
-    protected static final String CONTAINER_LIST = "$$containerList$$"; //$NON-NLS-1$
+    protected static final String CONTAINER_LIST = "$$containerList$$";
 
     protected static final String CONTAINER_LIST_SEARCH_STRING =
         replacePatternString(CONTAINER_LIST);
 
-    public static final String FTA_CARD_SAMPLE_TYPE_NAME = "DNA(Blood)"; //$NON-NLS-1$
+    public static final String FTA_CARD_SAMPLE_TYPE_NAME = "DNA(Blood)";
 
     protected AbstractReport(String queryString, BiobankReport report) {
         this.queryString = queryString;
@@ -87,7 +88,7 @@ public class AbstractReport {
     }
 
     private static String replacePatternString(String pattern) {
-        return pattern.replaceAll("\\$", "\\\\\\$"); //$NON-NLS-1$ //$NON-NLS-2$
+        return pattern.replaceAll("\\$", "\\\\\\$");
     }
 
 }

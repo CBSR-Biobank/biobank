@@ -15,6 +15,7 @@ public class ShippingMethodGetInfoAction implements
     Action<ListResult<ShippingMethod>> {
     private static final long serialVersionUID = -2969994320245657734L;
 
+    @SuppressWarnings("nls")
     private static final String SHIPPING_METHOD_HQL =
         "FROM " + ShippingMethod.class.getName();
 

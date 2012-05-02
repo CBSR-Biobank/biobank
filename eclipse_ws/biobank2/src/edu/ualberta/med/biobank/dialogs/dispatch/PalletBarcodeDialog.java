@@ -5,39 +5,50 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 
 public class PalletBarcodeDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PalletBarcodeDialog.class);
 
     public PalletBarcodeDialog(Shell parentShell) {
         super(parentShell);
     }
 
-    IObservableValue barcode = new WritableValue("", String.class); 
+    IObservableValue barcode = new WritableValue(StringUtil.EMPTY_STRING,
+        String.class);
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Enter pallet barcode";
+        return i18n.tr("Enter pallet barcode");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Product Barcode Required";
+        return i18n.tr("Product Barcode Required");
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return "Product Barcode";
+        return Container.PropertyName.PRODUCT_BARCODE.toString();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         widgetCreator.createBoundWidgetWithLabel(parent, BgcBaseText.class,
-            SWT.NONE, "Barcode", new String[] {}, barcode,
-            new NonEmptyStringValidator("Barcode cannot be empty"));
+            SWT.NONE, Container.PropertyName.PRODUCT_BARCODE.toString(),
+            new String[] {}, barcode,
+            new NonEmptyStringValidator(i18n.tr("Barcode cannot be empty")));
     }
 
     public String getBarcode() {

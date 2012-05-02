@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.i18n.LString;
+
 public class CellInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -14,9 +16,10 @@ public class CellInfo implements Serializable {
 
     private CellInfoStatus status;
 
-    private String information;
+    private LString information;
 
-    private String title = ""; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private String title = "";
 
     private Integer expectedSpecimenId;
 
@@ -57,11 +60,11 @@ public class CellInfo implements Serializable {
      * 
      * @return
      */
-    public String getInformation() {
+    public LString getInformation() {
         return information;
     }
 
-    public void setInformation(String information) {
+    public void setInformation(LString information) {
         this.information = information;
     }
 

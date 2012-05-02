@@ -5,22 +5,31 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
-
     private static final long serialVersionUID = 1L;
-    private Class<?> objectClass;
-    private String propertyName;
-    private String value;
-    private Integer objectId;
+    private static final Bundle bundle = new CommonBundle();
 
+    @SuppressWarnings("nls")
+    public static final Tr UNEXPECTED_RESULTS =
+        bundle.tr("Expected a single query result, but got \"{0}\".");
+
+    private final Class<?> objectClass;
+    private final String propertyName;
+    private final String value;
+    private final Integer objectId;
+
+    @SuppressWarnings("nls")
     private static final String CHECK_NO_DUPLICATES =
-        "select count(o) from {0} " //$NON-NLS-1$
-            + "as o where {1}=? {2}"; //$NON-NLS-1$
+        "select count(o) from {0} "
+            + "as o where {1}=? {2}";
 
     public CheckNoDuplicateAction(Class<?> objectClass, Integer objectId,
         String propertyName, String value) {
@@ -36,11 +45,12 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         return true;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        String equalsTest = ""; //$NON-NLS-1$
+        String equalsTest = "";
         if (objectId != null) {
-            equalsTest = " and id <> ?"; //$NON-NLS-1$
+            equalsTest = " and id <> ?";
         }
 
         final String qryString = MessageFormat.format(CHECK_NO_DUPLICATES,
@@ -54,9 +64,8 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();
         if (res.size() != 1) {
-            throw new ActionException("Problem in query result size"); //$NON-NLS-1$
+            throw new ActionException(UNEXPECTED_RESULTS.format(res.size()));
         }
         return new BooleanResult(res.get(0) == 0);
     }
-
 }

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,11 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
@@ -25,15 +20,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
-    private static final String HAS_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_SOURCE_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.source.specimens.msg"); //$NON-NLS-1$
-    private static final String HAS_ALIQUOTED_SPECIMENS_MSG = Messages
-        .getString("SpecimenTypeWrapper.has.aliquoted.specimens.msg"); //$NON-NLS-1$
-
-    private static final String UNKNOWN_IMPORT_NAME = Messages
-        .getString("SpecimenTypeWrapper.unknow.import.label"); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -79,7 +67,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
-    public static final String ALL_SAMPLE_TYPES_QRY = "from " //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String ALL_SAMPLE_TYPES_QRY = "from "
         + SpecimenType.class.getName();
 
     public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
@@ -97,10 +86,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return list;
     }
 
-    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from " //$NON-NLS-1$
-        + SpecimenType.class.getName() + " where " //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY = "from "
+        + SpecimenType.class.getName() + " where "
         + SpecimenTypePeer.PARENT_SPECIMEN_TYPES.getName()
-        + ".size = 0"; //$NON-NLS-1$
+        + ".size = 0";
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
         WritableApplicationService appService, boolean sort)
@@ -134,9 +124,11 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY_START = "select count(x) from "; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String IS_USED_QRY_START = "select count(x) from ";
+    @SuppressWarnings("nls")
     private static final String IS_USED_QRY_END =
-        " as x where x.specimenType.id=?"; //$NON-NLS-1$
+        " as x where x.specimenType.id=?";
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
@@ -156,57 +148,18 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     @Deprecated
     @Override
-    protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(SpecimenTypePeer.NAME));
-        tasks.add(check().notNull(SpecimenTypePeer.NAME_SHORT));
-
-        tasks.add(check().unique(SpecimenTypePeer.NAME));
-        tasks.add(check().unique(SpecimenTypePeer.NAME_SHORT));
-
-        super.addPersistTasks(tasks);
-    }
-
-    @Deprecated
-    @Override
     protected void addDeleteTasks(TaskList tasks) {
-        String isUsedBySpecimensMsg = MessageFormat.format(HAS_SPECIMENS_MSG,
-            getName());
-        tasks.add(check().notUsedBy(Specimen.class, SpecimenPeer.SPECIMEN_TYPE,
-            isUsedBySpecimensMsg));
-
-        String isUsedBySourceSpecimensMsg = MessageFormat.format(
-            HAS_SOURCE_SPECIMENS_MSG, getName());
-        tasks.add(check().notUsedBy(SourceSpecimen.class,
-            SourceSpecimenPeer.SPECIMEN_TYPE, isUsedBySourceSpecimensMsg));
-
-        String isUsedByAliquotedSpecimensMsg = MessageFormat.format(
-            HAS_ALIQUOTED_SPECIMENS_MSG, getName());
-        tasks
-            .add(check().notUsedBy(AliquotedSpecimen.class,
-                AliquotedSpecimenPeer.SPECIMEN_TYPE,
-                isUsedByAliquotedSpecimensMsg));
-
         removeThisTypeFromParents(tasks);
 
         super.addDeleteTasks(tasks);
     }
 
+    @SuppressWarnings("deprecation")
     public void removeThisTypeFromParents(TaskList tasks) {
         for (SpecimenTypeWrapper parent : getParentSpecimenTypeCollection(false)) {
             parent.removeFromChildSpecimenTypeCollection(Arrays.asList(this));
             parent.addPersistTasks(tasks);
         }
-    }
-
-    public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankException {
-        checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
-            getName(),
-            Messages.getString("SpecimenTypeWrapper.specimen.with.name.text")); //$NON-NLS-1$
-        checkNoDuplicates(SpecimenType.class,
-            SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
-            Messages
-                .getString("SpecimenTypeWrapper.specimen.with.name.short.text")); //$NON-NLS-1$
     }
 
     public boolean isUnknownImport() {

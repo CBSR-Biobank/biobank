@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
 import edu.ualberta.med.biobank.common.action.security.MembershipContext;
@@ -29,6 +31,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
@@ -38,12 +41,15 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class MembershipInfoTable
     extends DefaultAbstractInfoTableWidget<Membership> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(MembershipInfoTable.class);
     public static final int ROWS_PER_PAGE = 7;
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        "Centers",
-        "Studies",
-        "Manager",
-        "Roles and Permissions" };
+        Center.NAME.plural().toString(),
+        Study.NAME.plural().toString(),
+        i18n.tr("Manager"),
+        i18n.tr("Roles and Permissions") };
 
     private final ManagerContext managerContext;
 
@@ -107,9 +113,10 @@ public class MembershipInfoTable
         }
     }
 
+    @SuppressWarnings("nls")
     private static String getCentersString(Membership m) {
         if (m.getDomain().isAllCenters()) {
-            return "All Centers";
+            return Domain.PropertyName.ALL_CENTERS.toString();
         }
 
         List<String> centerNames = new ArrayList<String>();
@@ -120,9 +127,10 @@ public class MembershipInfoTable
         return StringUtil.join(centerNames, "\n");
     }
 
+    @SuppressWarnings("nls")
     private static String getStudiesString(Membership m) {
         if (m.getDomain().isAllStudies()) {
-            return "All Studies";
+            return Domain.PropertyName.ALL_STUDIES.toString();
         }
 
         List<String> studyNames = new ArrayList<String>();
@@ -133,8 +141,9 @@ public class MembershipInfoTable
         return StringUtil.join(studyNames, "\n");
     }
 
+    @SuppressWarnings("nls")
     private static String getRolesAndPermissionsSummary(Membership m) {
-        if (m.isEveryPermission()) return "All";
+        if (m.isEveryPermission()) return i18n.tr("All");
 
         List<String> rolesAndPerms = new ArrayList<String>();
         for (Role role : m.getRoles()) {
@@ -152,6 +161,7 @@ public class MembershipInfoTable
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
+            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 Membership m = (Membership) element;
@@ -161,11 +171,13 @@ public class MembershipInfoTable
                 case 1:
                     return getStudiesString(m);
                 case 2:
-                    return m.isUserManager() ? "Yes" : "No";
+                    return m.isUserManager()
+                        ? i18n.tr("Yes")
+                        : i18n.tr("No");
                 case 3:
                     return getRolesAndPermissionsSummary(m);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

@@ -15,11 +15,19 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class ComboFilterValueWidget implements FilterValueWidget {
-    private static final String DEFAULT_TEXT = Messages.ComboFilterValueWidget_select_enter_text;
+    private static final I18n i18n = I18nFactory
+        .getI18n(ComboFilterValueWidget.class);
+
+    @SuppressWarnings("nls")
+    private static final String DEFAULT_TEXT = i18n
+        .tr("<select or enter value>");
     private final ComboViewer comboViewer;
     private boolean isShowingDefaultText;
 
@@ -36,7 +44,8 @@ public class ComboFilterValueWidget implements FilterValueWidget {
 
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values =
+            new ArrayList<ReportFilterValue>();
         ISelection selection = comboViewer.getSelection();
         if (selection instanceof IStructuredSelection) {
             Iterator<?> it = ((IStructuredSelection) selection).iterator();
@@ -71,7 +80,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     public void setValues(Collection<ReportFilterValue> values) {
         Combo combo = comboViewer.getCombo();
         if (!combo.isDisposed()) {
-            combo.setText(""); //$NON-NLS-1$
+            combo.setText(StringUtil.EMPTY_STRING);
             for (ReportFilterValue value : values) {
                 if (value != null && value.getValue() != null) {
                     combo.setText(value.getValue());
@@ -119,7 +128,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
             @Override
             public void focusGained(FocusEvent e) {
                 if (combo.getText().equals(DEFAULT_TEXT)) {
-                    combo.setText(""); //$NON-NLS-1$
+                    combo.setText(StringUtil.EMPTY_STRING);
                     isShowingDefaultText = false;
                 }
             }

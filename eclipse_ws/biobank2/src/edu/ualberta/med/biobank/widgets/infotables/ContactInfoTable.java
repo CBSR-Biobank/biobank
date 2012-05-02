@@ -6,9 +6,13 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
@@ -26,23 +30,24 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String officeNumber;
         public String faxNumber;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { name, title, studies,
                 emailAddress, mobileNumber, pagerNumber, officeNumber,
-                faxNumber }, "\t"); //$NON-NLS-1$
+                faxNumber }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ContactInfoTable_name_label,
-        Messages.ContactInfoTable_title_label,
-        Messages.ContactInfoTable_studies_label,
-        Messages.ContactInfoTable_email_label,
-        Messages.ContactInfoTable_mobile_label,
-        Messages.ContactInfoTable_pager_label,
-        Messages.ContactInfoTable_office_label,
-        Messages.ContactInfoTable_fax_label };
+        Contact.PropertyName.NAME.toString(),
+        Contact.PropertyName.TITLE.toString(),
+        Study.NAME.plural().toString(),
+        Contact.PropertyName.EMAIL_ADDRESS.toString(),
+        Contact.PropertyName.MOBILE_NUMBER.toString(),
+        Contact.PropertyName.PAGER_NUMBER.toString(),
+        Contact.PropertyName.OFFICE_NUMBER.toString(),
+        Contact.PropertyName.FAX_NUMBER.toString() };
 
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
         super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS, ContactWrapper.class);
@@ -57,9 +62,9 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -79,12 +84,13 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
                 case 7:
                     return item.faxNumber;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         if (o == null)
@@ -99,7 +105,7 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
             int count = 0;
             for (StudyWrapper study : studies) {
                 if (count > 0) {
-                    sb.append(", "); //$NON-NLS-1$
+                    sb.append(", ");
                 }
                 sb.append(study.getNameShort());
                 ++count;

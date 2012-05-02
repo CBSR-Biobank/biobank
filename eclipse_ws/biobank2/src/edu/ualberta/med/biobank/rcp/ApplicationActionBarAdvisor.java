@@ -26,36 +26,48 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ApplicationActionBarAdvisor.class);
 
-    public static final String STATUS_SERVER_MSG_ID = "biobank.serverMsg"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String STATUS_SERVER_MSG_ID = "biobank.serverMsg";
 
-    public static final String SUPER_ADMIN_MSG_ID = "biobank.superAdminMsg"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String SUPER_ADMIN_MSG_ID = "biobank.superAdminMsg";
 
+    @SuppressWarnings("nls")
     private static final String SHORTCUTS_COMMAND_ID =
-        "org.eclipse.ui.window.showKeyAssist"; //$NON-NLS-1$
+        "org.eclipse.ui.window.showKeyAssist";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
+    @SuppressWarnings("nls")
     public static final String VIEW_ID_PARM =
-        "org.eclipse.ui.views.showView.viewId"; //$NON-NLS-1$
+        "org.eclipse.ui.views.showView.viewId";
 
+    @SuppressWarnings("nls")
     public static final String ERROR_LOGS_VIEW =
-        "org.eclipse.pde.runtime.LogView"; //$NON-NLS-1$
+        "org.eclipse.pde.runtime.LogView";
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
 
+    @SuppressWarnings("nls")
     public static final String SEND_ERROR_EMAIL_ID =
-        "edu.ualberta.med.biobank.commands.sendErrorMail"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.sendErrorMail";
 
+    @SuppressWarnings("nls")
     public static final String EXPORT_ERRORS_LOGS_ID =
-        "edu.ualberta.med.biobank.commands.exportErrorsLogs"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.exportErrorsLogs";
 
     private IWorkbenchAction resetPerspectiveAction;
 
@@ -63,21 +75,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         super(configurer);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void makeActions(IWorkbenchWindow window) {
         createCustomAction(window,
-            Messages.ApplicationActionBarAdvisor_shortcuts_menu_name,
-            SHORTCUTS_COMMAND_ID, "shorcuts", //$NON-NLS-1$ 
-            Messages.ApplicationActionBarAdvisor_shortcuts_menu_description);
+            i18n.tr("Keyboard Shortcuts..."),
+            SHORTCUTS_COMMAND_ID,
+            "shorcuts",
+            // tooltip.
+            i18n.tr("Show shorcuts for the current view"));
 
         createCustomAction(window,
-            Messages.ApplicationActionBarAdvisor_errormail_menu_name,
-            SEND_ERROR_EMAIL_ID, "sendErrorMail", //$NON-NLS-1$
-            Messages.ApplicationActionBarAdvisor_errormail_menu_description);
+            i18n.tr("Send Error Mail"),
+            SEND_ERROR_EMAIL_ID, "sendErrorMail",
+            // tooltip.
+            i18n.tr("Report a problem to developpers"));
         createCustomAction(window,
-            Messages.ApplicationActionBarAdvisor_exportlogs_menu_label,
-            EXPORT_ERRORS_LOGS_ID, "exportErrorsLogs", //$NON-NLS-1$
-            Messages.ApplicationActionBarAdvisor_exportlogs_menu_description);
+            i18n.tr("Export Errors Logs"),
+            EXPORT_ERRORS_LOGS_ID,
+            "exportErrorsLogs",
+            // tooltip.
+            i18n.tr("Export a zip with useful logs data for developers"));
 
         createShowErrorLogsAction(window);
 
@@ -90,6 +108,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         final IHandlerService handlerService = (IHandlerService) window
             .getService(IHandlerService.class);
         Action action = new Action(text) {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -97,7 +116,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 } catch (Exception e) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.ApplicationActionBarAdvisor_command_error_title,
+                            // dialog message.
+                            i18n.tr("Problem with command"),
                             e);
                 }
             }
@@ -108,6 +128,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         helpMenuCustomActions.add(action);
     }
 
+    @SuppressWarnings("nls")
     private void createShowErrorLogsAction(IWorkbenchWindow window) {
         // Show error logs view action
         final IHandlerService handlerService = (IHandlerService) window
@@ -124,12 +145,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                     ERROR_LOGS_VIEW) };
             }
         } catch (NotDefinedException nde) {
-            logger.debug("Problem while initializing 'Show error logs' action", //$NON-NLS-1$
+            logger.debug("Problem while initializing 'Show error logs' action",
                 nde);
         }
         final ParameterizedCommand cmd = new ParameterizedCommand(c, parms);
         Action showErrorLogsViewAction = new Action(
-            Messages.ApplicationActionBarAdvisor_applicationlogs_menu_label) {
+            i18n.tr("Show Application Error Logs")) {
             @Override
             public void run() {
                 try {
@@ -137,20 +158,23 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 } catch (Exception e) {
                     BgcPlugin
                         .openAsyncError(
-                            Messages.ApplicationActionBarAdvisor_command_error_title,
+                            // dialog title.
+                            i18n.tr("Problem with command"),
                             e);
                 }
             }
         };
-        showErrorLogsViewAction.setId("showErrorLogs"); //$NON-NLS-1$
+        showErrorLogsViewAction.setId("showErrorLogs");
         register(showErrorLogsViewAction);
         helpMenuCustomActions.add(showErrorLogsViewAction);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void fillMenuBar(IMenuManager menuBar) {
         MenuManager helpMenu = new MenuManager(
-            Messages.ApplicationActionBarAdvisor_help_menu_name,
+            // menu text.
+            i18n.tr("&Help"),
             "biobank.help");
 
         menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -159,20 +183,23 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         // this group will also show the "Key Assist" menu. We need to add an
         // activity if we don't want this menu to be displayed, but it is not
         // displayed after the product is exported
-        helpMenu.add(new Separator("group.assist")); //$NON-NLS-1$
+        helpMenu.add(new Separator("group.assist"));
         for (Action action : helpMenuCustomActions) {
             helpMenu.add(action);
         }
         helpMenu.add(resetPerspectiveAction);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void fillStatusLine(IStatusLineManager statusLine) {
         final MsgStatusItem superAdminMsgStatusItem = new MsgStatusItem(
             SUPER_ADMIN_MSG_ID);
         superAdminMsgStatusItem.setIcon(BiobankPlugin.getDefault().getImage(
             BgcPlugin.IMG_ADMIN));
-        superAdminMsgStatusItem.setText("Super Administrator Mode"); //$NON-NLS-1$
+        superAdminMsgStatusItem.setText(
+            // menu item text.
+            i18n.tr("Super Administrator Mode"));
         superAdminMsgStatusItem.setVisible(false);
 
         statusLine.add(superAdminMsgStatusItem);
@@ -181,14 +208,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             STATUS_SERVER_MSG_ID) {
             @Override
             public Color getBackgroundColor(String text) {
-                if (text != null && !text.endsWith("@biobank.cbsr.ualberta.ca")) { //$NON-NLS-1$
+                if (text != null && !text.endsWith("@cbsr.med.ualberta.ca")) {
                     return PlatformUI.getWorkbench().getDisplay()
                         .getSystemColor(SWT.COLOR_YELLOW);
                 }
                 return null;
             }
         };
-        serverMsgStatusItem.setText(""); //$NON-NLS-1$
+        serverMsgStatusItem.setText(StringUtil.EMPTY_STRING);
         statusLine.add(serverMsgStatusItem);
     }
 }

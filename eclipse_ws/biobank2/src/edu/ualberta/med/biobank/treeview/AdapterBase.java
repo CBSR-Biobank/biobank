@@ -14,6 +14,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -29,12 +31,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * the tree are adapters for classes in the ORM model.
  */
 public abstract class AdapterBase extends AbstractAdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractTodayNode.class);
 
     private static BgcLogger logger = BgcLogger.getLogger(AdapterBase.class
         .getName());
 
-    protected static final String BGR_LOADING_LABEL =
-        Messages.AdapterBase_loading;
+    @SuppressWarnings("nls")
+    protected static final String BGR_LOADING_LABEL = i18n.tr("loading...");
 
     private Object modelObject;
 
@@ -166,6 +170,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     @Override
     public void loadChildren(final boolean updateNode) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -192,7 +197,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                         text = getModelObject().toString();
                     }
                     logger.error(
-                        "Error while loading children of node " + text, e); //$NON-NLS-1$
+                        "Error while loading children of node " + text, e);
                 }
             }
         });
@@ -232,6 +237,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
         return openForm(input, id, true);
     }
 
+    @SuppressWarnings("nls")
     public static IEditorPart openForm(FormInput input, String id,
         boolean focusOnEditor) {
         closeEditor(input);
@@ -241,7 +247,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            logger.error("Can't open form with id " + id, e); //$NON-NLS-1$
+            logger.error("Can't open form with id " + id, e);
             return null;
         }
 

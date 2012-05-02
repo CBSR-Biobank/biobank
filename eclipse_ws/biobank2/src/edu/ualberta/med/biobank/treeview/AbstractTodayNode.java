@@ -6,6 +6,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -14,14 +16,17 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractTodayNode.class);
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractTodayNode.class.getName());
 
     private List<E> currentTodayElements;
 
+    @SuppressWarnings("nls")
     public AbstractTodayNode(AdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractTodayNode_today, true);
+        super(parent, id, i18n.tr("Today"), true);
     }
 
     @Override
@@ -59,6 +64,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void performExpand() {
         try {
@@ -98,7 +104,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
         } catch (final RemoteAccessException exp) {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while getting " + getLabel(), e); //$NON-NLS-1$
+            logger.error("Error while getting " + getLabel(), e);
         }
     }
 

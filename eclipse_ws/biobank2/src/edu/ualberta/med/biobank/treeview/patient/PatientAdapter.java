@@ -11,6 +11,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
@@ -22,15 +24,15 @@ import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PatientAdapter.class);
 
     private Patient patient;
     private Study study;
@@ -48,35 +50,28 @@ public class PatientAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientDeletePermission(patient.getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientReadPermission(patient.getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new PatientUpdatePermission(patient.getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.PatientAdapter_error,
-                Messages.PatientAdapter_message);
-        }
+        this.isDeletable =
+            isAllowed(new PatientDeletePermission(patient.getId()));
+        this.isReadable = isAllowed(new PatientReadPermission(patient.getId()));
+        this.isEditable =
+            isAllowed(new PatientUpdatePermission(patient.getId()));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         if (patient == null)
-            return "no patient - should not see this"; //$NON-NLS-1$
+            return "no patient - should not see this";
         return patient.getPnumber();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         if (patient != null && study != null)
             return study.getName()
-                + " - " + getTooltipText(Messages.PatientAdapter_patient_label); //$NON-NLS-1$
-        return getTooltipText(Messages.PatientAdapter_patient_label);
+                + " - " + getTooltipText(Patient.NAME.singular().toString());
+        return getTooltipText(Patient.NAME.singular().toString());
     }
 
     @Override
@@ -85,15 +80,18 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         openViewForm();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.PatientAdapter_patient_label);
-        addViewMenu(menu, Messages.PatientAdapter_patient_label);
-        addDeleteMenu(menu, Messages.PatientAdapter_patient_label);
+        addEditMenu(menu, Patient.NAME.singular().toString());
+        addViewMenu(menu, Patient.NAME.singular().toString());
+        addDeleteMenu(menu, Patient.NAME.singular().toString());
 
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.PatientAdapter_add_cevent_label);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add Collection Event"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -144,9 +142,10 @@ public class PatientAdapter extends AbstractNewAdapterBase {
         return PatientViewForm.ID;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.PatientAdapter_delete_confirm_msg;
+        return i18n.tr("Are you sure you want to delete this patient?");
     }
 
     public Patient getPatient() {

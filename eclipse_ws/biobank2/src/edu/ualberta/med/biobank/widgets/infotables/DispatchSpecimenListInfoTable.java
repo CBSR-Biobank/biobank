@@ -8,21 +8,30 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class DispatchSpecimenListInfoTable extends
     InfoTableWidget<DispatchSpecimenWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(DispatchSpecimenListInfoTable.class);
 
     protected static class TableRowData {
         DispatchSpecimenWrapper dsa;
@@ -32,19 +41,21 @@ public abstract class DispatchSpecimenListInfoTable extends
         String status;
         String comment;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, pnumber,
-                status, comment }, "\t"); //$NON-NLS-1$
+                status, comment }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.DispatchSpecimenListInfoTable_inventoryid_label,
-        Messages.DispatchSpecimenListInfoTable_type_label,
-        Messages.DispatchSpecimenListInfoTable_pnumber_label,
-        Messages.DispatchSpecimenListInfoTable_status_label,
-        Messages.DispatchSpecimenListInfoTable_comment_label };
+        Specimen.PropertyName.INVENTORY_ID.toString(),
+        i18n.tr("Type"),
+        Patient.PropertyName.PNUMBER.toString(),
+        ActivityStatus.NAME.singular().toString(),
+        Comment.NAME.singular().toString() };
 
     private boolean editMode = false;
 
@@ -56,6 +67,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         if (editMode) {
             if (shipment.isInCreationState()) {
                 addDeleteItemListener(new IInfoTableDeleteItemListener<DispatchSpecimenWrapper>() {
+                    @SuppressWarnings("nls")
                     @Override
                     public void deleteItem(
                         InfoTableEvent<DispatchSpecimenWrapper> event) {
@@ -65,18 +77,22 @@ public abstract class DispatchSpecimenListInfoTable extends
                             if (dsaList.size() == 1
                                 && !BgcPlugin
                                     .openConfirm(
-                                        Messages.DispatchSpecimenListInfoTable_remove_confirm_title,
-                                        NLS.bind(
-                                            Messages.DispatchSpecimenListInfoTable_remove_one_confirm_msg,
+                                        // dialog title.
+                                        i18n.tr("Remove Specimen"),
+                                        // dialog message.
+                                        i18n.tr(
+                                            "Are you sure you want to remove specimen \"{0}\" from this shipment ?",
                                             dsaList.get(0).getSpecimen()
                                                 .getInventoryId())))
                                 return;
                             if (dsaList.size() > 1
                                 && !BgcPlugin
                                     .openConfirm(
-                                        Messages.DispatchSpecimenListInfoTable_remove_confirm_title,
-                                        NLS.bind(
-                                            Messages.DispatchSpecimenListInfoTable_remove_multiple_confirm_msg,
+                                        // dialog title.
+                                        i18n.tr("Remove Specimen"),
+                                        // dialog message.
+                                        i18n.tr(
+                                            "Are you sure you want to remove these {0} specimens from this shipment ?",
                                             dsaList.size())))
                                 return;
                             try {
@@ -86,7 +102,8 @@ public abstract class DispatchSpecimenListInfoTable extends
                             } catch (Exception e) {
                                 BgcPlugin
                                     .openAsyncError(
-                                        Messages.DispatchSpecimenListInfoTable_delete_error_title,
+                                        // dialog title.
+                                        i18n.tr("Delete failed"),
                                         e);
                             }
                         }
@@ -112,9 +129,9 @@ public abstract class DispatchSpecimenListInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return Messages.DispatchSpecimenListInfoTable_14;
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -128,12 +145,13 @@ public abstract class DispatchSpecimenListInfoTable extends
                 case 4:
                     return info.comment;
                 default:
-                    return Messages.DispatchSpecimenListInfoTable_15;
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
@@ -142,7 +160,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         info.pnumber = info.dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
         SpecimenTypeWrapper type = info.dsa.getSpecimen().getSpecimenType();
-        Assert.isNotNull(type, Messages.DispatchSpecimenListInfoTable_16);
+        Assert.isNotNull(type, "specimen with null type");
         info.type = type.getName();
         info.status = info.dsa.getSpecimen().getActivityStatus().toString();
         info.comment =
@@ -181,9 +199,10 @@ public abstract class DispatchSpecimenListInfoTable extends
         return row.dsa;
     }
 
+    @SuppressWarnings("nls")
     public List<DispatchSpecimenWrapper> getSelectedItems() {
         Assert.isTrue(!tableViewer.getTable().isDisposed(),
-            Messages.DispatchSpecimenListInfoTable_17);
+            "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) tableViewer
             .getSelection();
         List<DispatchSpecimenWrapper> dsaList =

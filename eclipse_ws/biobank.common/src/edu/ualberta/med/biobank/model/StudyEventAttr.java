@@ -10,6 +10,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
@@ -18,6 +22,20 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
 public class StudyEventAttr extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Study Event Attribute",
+        "Study Event Attributes");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString REQUIRED = bundle.trc(
+            "model",
+            "Required").format();
+    }
 
     private String permissible;
     private boolean required = false;

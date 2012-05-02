@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 
 public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
@@ -37,7 +38,7 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
                     if (columnIndex < row.length) {
                         Object cell = row[columnIndex];
                         if (cell == null)
-                            return ""; //$NON-NLS-1$
+                            return StringUtil.EMPTY_STRING;
                         if (formatNumbers && cell instanceof Number)
                             return NumberFormatter.format((Number) cell);
                         return cell.toString();

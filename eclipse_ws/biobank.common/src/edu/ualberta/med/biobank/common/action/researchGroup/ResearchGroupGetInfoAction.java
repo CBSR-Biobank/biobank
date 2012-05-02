@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.researchGroup;
 
-import java.util.List;
-
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -48,18 +46,9 @@ public class ResearchGroupGetInfoAction implements
         Query query = context.getSession().createQuery(RESEARCH_INFO_HQL);
         query.setParameter(0, rgId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object row = rows.get(0);
-
-            sInfo.researchGroup = (ResearchGroup) row;
-
-        } else {
-            throw new ActionException("No research group found with id:" + rgId); //$NON-NLS-1$
-        }
+        sInfo.researchGroup =
+            ActionContext.singleResult(query, ResearchGroup.class, rgId);
 
         return sInfo;
     }
-
 }

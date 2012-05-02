@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchSaveAction implements Action<IdResult> {
 
@@ -79,7 +79,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!dInfo.comment.trim().equals("")) {
+        if (!dInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();

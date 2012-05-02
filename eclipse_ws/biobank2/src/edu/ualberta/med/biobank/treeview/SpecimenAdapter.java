@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
@@ -15,8 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
 import edu.ualberta.med.biobank.forms.SpecimenViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenAdapter extends AdapterBase {
 
@@ -26,42 +24,34 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            Integer id = ((SpecimenWrapper) getModelObject()).getId();
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new SpecimenDeletePermission(id));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new SpecimenReadPermission(id));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new SpecimenUpdatePermission(id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        Integer id = ((SpecimenWrapper) getModelObject()).getId();
+
+        this.isDeletable = isAllowed(new SpecimenDeletePermission(id));
+        this.isReadable = isAllowed(new SpecimenReadPermission(id));
+        this.isEditable = isAllowed(new SpecimenUpdatePermission(id));
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void addChild(AbstractAdapterBase child) {
-        Assert.isTrue(false, "Cannot add children to this adapter"); //$NON-NLS-1$
+        Assert.isTrue(false, "Cannot add children to this adapter");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
-        Assert.isNotNull(getModelObject(), "specimen is null"); //$NON-NLS-1$
+        Assert.isNotNull(getModelObject(), "specimen is null");
         return ((SpecimenWrapper) getModelObject()).getInventoryId();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.SpecimenAdapter_specimen_label);
+        return getTooltipText(Specimen.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, Messages.SpecimenAdapter_specimen_label);
+        addViewMenu(menu, Specimen.NAME.singular().toString());
     }
 
     @Override

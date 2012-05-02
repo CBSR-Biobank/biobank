@@ -13,6 +13,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 /**
  * The specimens, derived from source specimens, that are collected for a study.
  * 
@@ -24,15 +29,28 @@ import org.hibernate.annotations.Type;
 @Table(name = "ALIQUOTED_SPECIMEN")
 public class AliquotedSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Aliquoted Specimen",
+        "Aliquoted Specimens");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString QUANTITY = bundle.trc(
+            "model",
+            "Quantity").format();
+        public static final LString VOLUME = bundle.trc(
+            "model",
+            "Volume (ml)").format();
+    }
 
     private SpecimenType specimenType;
-
     private Integer quantity;
-
     private BigDecimal volume;
-
     private Study study;
-
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     /**

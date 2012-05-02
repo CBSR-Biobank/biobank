@@ -10,6 +10,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -25,6 +27,8 @@ import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 
 public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
+    public static final I18n i18n = I18nFactory
+        .getI18n(SourceSpecimenEntryInfoTable.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
@@ -90,6 +94,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener<SourceSpecimenWrapper>() {
+            @SuppressWarnings("nls")
             @Override
             public void deleteItem(
                 InfoTableEvent<SourceSpecimenWrapper> event) {
@@ -99,8 +104,10 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                         .openConfirm(
                             PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                            Messages.SourceSpecimenEntryInfoTable_delete_title,
-                            Messages.SourceSpecimenEntryInfoTable_delete_question)) {
+                            // dialog title.
+                            i18n.tr("Delete source specimen"),
+                            // dialog message.
+                            i18n.tr("Are you sure you want to delete this source specimen?"))) {
                         return;
                     }
 

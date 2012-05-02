@@ -10,6 +10,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.search.ContainerByBarcodeSearchAction;
@@ -26,12 +28,14 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.PeListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public enum SearchType {
-    INVENTORY_ID(Messages.SearchType_inventoryid_label) {
+    INVENTORY_ID(Specimen.PropertyName.INVENTORY_ID.toString()) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -44,7 +48,8 @@ public enum SearchType {
 
     },
 
-    SPECIMEN_POSITION(Messages.SearchType_position_spec_label) {
+    @SuppressWarnings("nls")
+    SPECIMEN_POSITION(Loader.i18n.tr("Specimen position")) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -59,7 +64,8 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_LABEL(Messages.SearchType_label_cont_label) {
+    @SuppressWarnings("nls")
+    CONTAINER_LABEL(Loader.i18n.tr("Container label")) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -80,7 +86,8 @@ public enum SearchType {
         }
     },
 
-    CONTAINER_PRODUCT_BARCODE(Messages.SearchType_barcode_cont_label) {
+    @SuppressWarnings("nls")
+    CONTAINER_PRODUCT_BARCODE(Loader.i18n.tr("Container product barcode")) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -101,7 +108,7 @@ public enum SearchType {
         }
     },
 
-    WORKSHEET(Messages.SearchType_worksheet_label) {
+    WORKSHEET(ProcessingEvent.PropertyName.WORKSHEET.toString()) {
         @Override
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
@@ -115,8 +122,9 @@ public enum SearchType {
         @Override
         public void processResults(List<ModelWrapper<?>> res) {
             Assert.isNotNull(res);
+            @SuppressWarnings("nls")
             FormInput input = new FormInput(res,
-                Messages.SearchType_pEvent_list_title);
+                Loader.i18n.tr("Processing Events List"));
             try {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
@@ -129,8 +137,9 @@ public enum SearchType {
         }
     };
 
+    @SuppressWarnings("nls")
     private static final String CAN_T_OPEN_FORM_WITH_ID_MSG =
-        "Can''t open form with id {0}"; //$NON-NLS-1$
+        Loader.i18n.tr("Can''t open form with id {0}");
 
     private static BgcLogger logger = BgcLogger.getLogger(SearchType.class
         .getName());
@@ -155,10 +164,16 @@ public enum SearchType {
         if (size == 1) {
             openResult(res.get(0));
         } else {
-            boolean open = MessageDialog.openQuestion(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(),
-                Messages.SearchType_question_title,
-                NLS.bind(Messages.SearchType_question_msg, size));
+            @SuppressWarnings("nls")
+            boolean open =
+                MessageDialog.openQuestion(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(),
+                    // dialog title.
+                    Loader.i18n.tr("Search Result"),
+                    // dialog message.
+                    Loader.i18n.tr(
+                        "Found {0} results. Do you want to open all of them?",
+                        size));
             if (open) {
                 for (ModelWrapper<?> wrapper : res) {
                     openResult(wrapper);
@@ -186,6 +201,10 @@ public enum SearchType {
         if (adapter != null) {
             adapter.performDoubleClick();
         }
+    }
+
+    private static class Loader {
+        private static final I18n i18n = I18nFactory.getI18n(SearchType.class);
     }
 
 }

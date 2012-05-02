@@ -10,12 +10,12 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.request.UpdateRequestPermission;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestDispatchAction implements Action<EmptyResult> {
 
@@ -23,11 +23,11 @@ public class RequestDispatchAction implements Action<EmptyResult> {
      * 
      */
     private static final long serialVersionUID = 89092566507468524L;
-    private DispatchSaveInfo dInfo;
-    private List<Integer> specs;
-    private RequestSpecimenState rsstate;
-    private Integer requestId;
-    private Set<DispatchSpecimenInfo> dspecs;
+    private final DispatchSaveInfo dInfo;
+    private final List<Integer> specs;
+    private final RequestSpecimenState rsstate;
+    private final Integer requestId;
+    private final Set<DispatchSpecimenInfo> dspecs;
 
     public RequestDispatchAction(Integer requestId, List<Integer> specs,
         RequestSpecimenState rsstate,

@@ -2,11 +2,11 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Arrays;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 @Deprecated
 public class ContainerHelper extends DbHelper {

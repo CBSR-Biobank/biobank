@@ -8,6 +8,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
@@ -20,12 +22,16 @@ import edu.ualberta.med.biobank.widgets.trees.infos.SpecimenTypeEntryInfoTree;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTypesViewForm extends BiobankFormBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTypesViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm";
 
+    @SuppressWarnings("nls")
     public static final String OK_MESSAGE =
-        Messages.SpecimenTypesViewForm_ok_msg;
+        "Add or edit a specimen type";
 
     private SpecimenTypeEntryInfoTree specimenWidget;
 
@@ -36,20 +42,22 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     private Boolean createAllowed;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
-        setPartName(Messages.SpecimenTypesViewForm_title);
+        setPartName(SpecimenType.NAME.plural().toString());
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SpecimenTypeCreatePermission());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(
+                i18n.tr("Unable to retrieve permissions"));
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.SpecimenTypesViewForm_title);
+        form.setText(SpecimenType.NAME.plural().toString());
         page.setLayout(new GridLayout(1, false));
 
         updateSpecimenTypeInfo();
@@ -65,18 +73,19 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
                 globalSpecimenTypes, SpecimenTypeWrapper.class);
     }
 
+    @SuppressWarnings("nls")
     private void createGlobalSpecimenTypeSection() {
-        Section section = createSection(Messages.SpecimenTypesViewForm_title);
+        Section section = createSection(SpecimenType.NAME.plural().toString());
         specimenWidget =
             new SpecimenTypeEntryInfoTree(section,
                 globalSpecimenTypeWrappers,
-                Messages.SpecimenTypesViewForm_add_type_label,
-                Messages.SpecimenTypesViewForm_edit_type_label);
+                i18n.tr("Add a new global specimen type"),
+                i18n.tr("Edit the global specimen type"));
         specimenWidget.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(specimenWidget);
 
         addSectionToolbar(section,
-            Messages.SpecimenTypesViewForm_add_specimen_button,
+            i18n.tr("Add a specimen type"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -86,11 +95,12 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         section.setClient(specimenWidget);
     }
 
+    @SuppressWarnings("nls")
     protected void checkEditAccess() {
         if (!createAllowed) {
             BgcPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
-                Messages.SpecimenTypesViewForm_access_denied_error_msg);
+                i18n.tr("Cannot access Specimen Type editor. Access Denied."));
         }
     }
 

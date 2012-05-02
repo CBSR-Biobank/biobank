@@ -20,16 +20,23 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class ScanPlateForm extends PlateForm implements PaintListener {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ScanPlateForm"; 
+    private static final I18n i18n = I18nFactory
+        .getI18n(ScanPlateForm.class);
 
-    public static final String PALLET_IMAGE_FILE = "plate.bmp"; 
+    @SuppressWarnings("nls")
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ScanPlateForm";
+
+    @SuppressWarnings("nls")
+    public static final String PALLET_IMAGE_FILE = "plate.bmp";
 
     private Canvas imageCanvas;
 
@@ -39,6 +46,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
 
     Integer plateToScan;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         img = null;
@@ -47,7 +55,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
             plateFile.delete();
         }
 
-        setPartName("Scan Plate");
+        setPartName(i18n.tr("Scan Plate"));
     }
 
     @Override
@@ -56,15 +64,16 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
             .removePropertyChangeListener(propertyListener);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Scan Plate");
+        form.setText(i18n.tr("Scan Plate"));
         GridLayout layout = new GridLayout(2, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
         Label label = toolkit.createLabel(page,
-            "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
+            i18n.tr("NOTE: Cell A1 is at the TOP RIGHT corner of the image."));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -78,7 +87,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         plateSelectionWidget.setLayoutData(gd);
 
         scanButton =
-            toolkit.createButton(page, "Scan Plate",
+            toolkit.createButton(page, i18n.tr("Scan Plate"),
                 SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
@@ -135,19 +144,21 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         scanButton.setFocus();
     }
 
+    @SuppressWarnings("nls")
     protected void scanPlate() {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BgcPlugin.openAsyncError("Decode Plate Error",
-                "No plate selected");
+            BgcPlugin.openAsyncError(
+                i18n.tr("Decode Plate Error"),
+                i18n.tr("No plate selected"));
             return;
         }
 
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask("Scanning...",
+                monitor.beginTask(i18n.tr("Scanning..."),
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor);
@@ -155,7 +166,8 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        "Scan result error", e);
+                        // dialog title.
+                        i18n.tr("Scan result error"), e);
                 }
                 monitor.done();
             }
@@ -168,8 +180,11 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         }
     }
 
+    @SuppressWarnings("nls")
     protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask("Launching scan");
+        monitor.subTask(
+            // progress monitor message.
+            i18n.tr("Launching scan"));
         ScannerConfigPlugin.scanPlate(plateToScan, PALLET_IMAGE_FILE);
         File plateFile = new File(PALLET_IMAGE_FILE);
         if (plateFile.exists()) {

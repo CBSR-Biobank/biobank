@@ -10,12 +10,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 public class SelectStudyDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SelectStudyDialog.class);
 
     public static final int ADD_BTN_ID = 100;
 
@@ -23,26 +27,32 @@ public class SelectStudyDialog extends BgcBaseDialog {
 
     private StudyWrapper selectedStudy;
 
-    private List<StudyWrapper> studies;
+    private final List<StudyWrapper> studies;
 
     public SelectStudyDialog(Shell parent, List<StudyWrapper> studies) {
         super(parent);
         this.studies = studies;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return "Associated Studies";
+        // TR: select study dialog title
+        return i18n.tr("Associated Studies");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a study";
+        // TR: select study dialog title area message
+        return i18n.tr("Select a study");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Add a study to this site";
+        // TR: select study dialog title area title
+        return i18n.tr("Add a study to this site");
     }
 
     @Override

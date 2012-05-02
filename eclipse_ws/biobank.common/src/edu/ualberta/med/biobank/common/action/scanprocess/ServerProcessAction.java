@@ -16,9 +16,9 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResu
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public abstract class ServerProcessAction implements Action<ProcessResult> {
     private static final long serialVersionUID = 1L;

@@ -24,6 +24,7 @@ public class ToolBarButtonManager {
     private final Map<ButtonType, ButtonImpl> actions =
         new HashMap<ButtonType, ButtonImpl>();
 
+    @SuppressWarnings("nls")
     public enum ButtonType {
         // TODO: internationalize text
         EDIT("Edit", BgcPlugin.IMG_EDIT_FORM),

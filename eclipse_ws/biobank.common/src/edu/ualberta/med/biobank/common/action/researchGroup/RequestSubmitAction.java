@@ -5,24 +5,31 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.researchGroup.SubmitRequestPermission;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestSubmitAction implements Action<IdResult> {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -448974534976230815L;
-    private Integer rgId;
-    private List<String> specs;
+    private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final LString BLANK_SPECIMEN_ID_ERRMSG =
+        bundle.tr("Blank specimen id, please check your your file for correct" +
+            " input.").format();
+
+    private final Integer rgId;
+    private final List<String> specs;
 
     public RequestSubmitAction(Integer rgId, List<String> specs) {
         this.rgId = rgId;
@@ -34,6 +41,7 @@ public class RequestSubmitAction implements Action<IdResult> {
         return new SubmitRequestPermission(rgId).isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Request request = new Request();
@@ -48,8 +56,7 @@ public class RequestSubmitAction implements Action<IdResult> {
 
         for (String id : specs) {
             if (id == null || id.equals(""))
-                throw new ActionException(
-                    "Blank specimen id, please check your your file for correct input.");
+                throw new ActionException(BLANK_SPECIMEN_ID_ERRMSG);
 
             Query q = context.getSession().createQuery("from "
                 + Specimen.class.getName() + " where inventoryId=?");

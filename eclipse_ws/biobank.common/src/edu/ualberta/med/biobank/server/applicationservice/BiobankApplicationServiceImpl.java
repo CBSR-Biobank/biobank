@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -10,6 +11,8 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
@@ -47,6 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
+    private static final Bundle bundle = new CommonBundle();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -150,15 +154,18 @@ public class BiobankApplicationServiceImpl extends
     private static final String GET_USER_QRY = "from " + User.class.getName()
         + " where " + UserPeer.CSM_USER_ID.getName() + " = ?";
 
+    @SuppressWarnings("nls")
     @Override
     public void executeModifyPassword(Long csmUserId, String oldPassword,
-        String newPassword, Boolean recvBulkEmails) throws ApplicationException {
+        String newPassword, Boolean recvBulkEmails)
+        throws ApplicationException {
         BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
             newPassword);
         List<User> users = query(new HQLCriteria(GET_USER_QRY,
             Arrays.asList(csmUserId)));
         if (users.size() != 1) {
-            throw new ApplicationException("Problem with HQL result size"); //$NON-NLS-1$
+            throw new LocalizedException(
+                bundle.tr("Problem with HQL result size").format());
         }
         User user = users.get(0);
         user.setNeedPwdChange(false);

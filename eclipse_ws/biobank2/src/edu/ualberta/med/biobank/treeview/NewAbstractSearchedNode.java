@@ -10,17 +10,19 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+
 // FIXME see code commented below. Need to know what is still needed for the new adapters
 public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
 
     public NewAbstractSearchedNode(AbstractAdapterBase parent, int id) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, null, false);
+        super(parent, id, StringUtil.EMPTY_STRING, null, false);
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AbstractSearchedNode_clear);
+        mi.setText(StringUtil.EMPTY_STRING);
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {

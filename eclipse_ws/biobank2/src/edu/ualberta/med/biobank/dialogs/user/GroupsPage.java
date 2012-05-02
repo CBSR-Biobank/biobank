@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
@@ -26,6 +27,7 @@ import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class GroupsPage extends BgcDialogPage {
+    private static final I18n i18n = I18nFactory.getI18n(GroupsPage.class);
 
     private final ManagerContext context;
 
@@ -39,7 +41,7 @@ public abstract class GroupsPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return "Groups";
+        return Group.NAME.plural().toString();
     }
 
     @Override
@@ -74,10 +76,13 @@ public abstract class GroupsPage extends BgcDialogPage {
                     return deleted;
                 }
 
+                @SuppressWarnings("nls")
                 @Override
                 protected void duplicate(Group src) {
                     Group newGroup = new Group();
-                    newGroup.setName("Copy of " + src.getName());
+                    // TR: Group name copy prefix, e.g. "Copy of Admin Group"
+                    String prefix = i18n.tr("Copy of ");
+                    newGroup.setName(prefix + src.getName());
                     newGroup.setDescription(src.getDescription());
 
                     for (Membership srcMemb : src.getMemberships()) {
@@ -109,6 +114,7 @@ public abstract class GroupsPage extends BgcDialogPage {
         setControl(content);
     }
 
+    @SuppressWarnings("nls")
     protected void addGroup(Group group) {
         MembershipContext membershipContext = null;
 
@@ -132,9 +138,10 @@ public abstract class GroupsPage extends BgcDialogPage {
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                "Group Added", MessageFormat
-                    .format("Successfully added new group {0}.",
-                        group.getName()));
+                // TR: information dialog title
+                i18n.tr("Group Added"),
+                // TR: information dialog meessage
+                i18n.tr("Successfully added new group {0}.", group.getName()));
 
             List<Group> allCurrent = getCurrentAllGroupsList();
             allCurrent.add(group);

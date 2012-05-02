@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.handlers;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -16,6 +18,8 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteAddHandler extends LogoutSensitiveHandler {
+    private static final I18n i18n = I18nFactory.getI18n(SiteAddHandler.class);
+
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger.getLogger(SiteAddHandler.class
         .getName());
@@ -48,6 +52,7 @@ public class SiteAddHandler extends LogoutSensitiveHandler {
 
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isEnabled() {
         try {
@@ -58,7 +63,8 @@ public class SiteAddHandler extends LogoutSensitiveHandler {
             return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(
+                i18n.tr("Unable to retrieve permissions"));
             return false;
         }
     }

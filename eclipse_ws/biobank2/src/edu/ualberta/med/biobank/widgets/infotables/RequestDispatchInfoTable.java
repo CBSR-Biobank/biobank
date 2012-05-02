@@ -5,24 +5,31 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(RequestDispatchInfoTable.class);
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.RequestDispatchInfoTable_sender_label,
-        Messages.RequestDispatchInfoTable_receiver_label,
-        Messages.RequestDispatchInfoTable_total_specs_label,
-        Messages.RequestDispatchInfoTable_packed_label,
-        Messages.RequestDispatchInfoTable_received_label,
-        Messages.RequestDispatchInfoTable_state_label };
+        i18n.tr("Sender"),
+        i18n.tr("Receiver"),
+        i18n.tr("Total Specimens"),
+        i18n.tr("Date Packed"),
+        i18n.tr("Date Received"),
+        i18n.tr("State") };
 
     public RequestDispatchInfoTable(Composite parent,
         List<DispatchWrapper> dispatchCollection) {
@@ -38,9 +45,9 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     (DispatchWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -57,7 +64,7 @@ public class RequestDispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return item.getStateDescription();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

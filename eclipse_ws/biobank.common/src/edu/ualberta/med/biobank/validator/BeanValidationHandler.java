@@ -177,6 +177,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
         }
     }
 
+    @SuppressWarnings("nls")
     private <T> void handleViolations(
         Set<ConstraintViolation<T>> constraintViolations, Class<?>[] groups) {
         if (constraintViolations.isEmpty()) return;

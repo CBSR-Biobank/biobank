@@ -12,6 +12,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
@@ -19,13 +21,18 @@ import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 
 public class SelectCollectionEventPage extends BgcWizardPage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SelectCollectionEventPage.class);
     public static final String PAGE_NAME = SelectCollectionEventPage.class
         .getCanonicalName();
-    private static final String CEVENT_REQUIRED = Messages.SelectCollectionEventPage_required_msg;
+    @SuppressWarnings("nls")
+    private static final String CEVENT_REQUIRED = i18n
+        .tr("Please select a collection event.");
     private CollectionEventInfoTable ceventsTable;
 
+    @SuppressWarnings("nls")
     public SelectCollectionEventPage() {
-        super(PAGE_NAME, Messages.SelectCollectionEventPage_description, null);
+        super(PAGE_NAME, i18n.tr("Select a collection event"), null);
     }
 
     public void setCollectionEventList(List<CollectionEventWrapper> cevents) {
@@ -42,7 +49,8 @@ public class SelectCollectionEventPage extends BgcWizardPage {
         content.setLayout(new GridLayout(1, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        final IObservableValue selection = new WritableValue(null, Object.class);
+        final IObservableValue selection =
+            new WritableValue(null, Object.class);
         ceventsTable = new CollectionEventInfoTable(content,
             new ArrayList<CollectionEventWrapper>()) {
             @Override

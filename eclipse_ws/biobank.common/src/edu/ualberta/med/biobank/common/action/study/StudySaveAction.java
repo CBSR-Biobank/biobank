@@ -8,17 +8,19 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
@@ -30,6 +32,16 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class StudySaveAction implements Action<IdResult> {
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Tr REMOVED_CONTACT_MISSING_STUDY =
+        bundle.tr("Study \"{0}\" not found in removed contact's studies.");
+    @SuppressWarnings("nls")
+    public static final Tr STUDY_EVEN_ATTRS_SHARE_ID =
+        bundle.tr("Cannot add multiple study event attributes with the" +
+            " same id (\"{0}\").");
+
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(StudySaveAction.class
@@ -268,11 +280,12 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new ActionException(
-                    "study not found in removed contact's collection");
+                    REMOVED_CONTACT_MISSING_STUDY.format(study.getNameShort()));
             }
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveSourceSpecimens(ActionContext context) {
         Set<SourceSpecimen> newSsCollection = new HashSet<SourceSpecimen>();
         for (SourceSpecimenSaveInfo ssSaveInfo : sourceSpecimenSaveInfos) {
@@ -304,6 +317,7 @@ public class StudySaveAction implements Action<IdResult> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void saveAliquotedSpecimens(ActionContext context) {
         Set<AliquotedSpecimen> newAsCollection =
             new HashSet<AliquotedSpecimen>();
@@ -339,9 +353,8 @@ public class StudySaveAction implements Action<IdResult> {
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
-                throw new ActionCheckException(
-                    "canot add multiple study event attributes with same global id "
-                        + eAttrSaveInfo.globalEventAttrId);
+                throw new ActionException(STUDY_EVEN_ATTRS_SHARE_ID.format(
+                    eAttrSaveInfo.globalEventAttrId));
             }
             StudyEventAttr seAttr;
             if (eAttrSaveInfo.id == null) {

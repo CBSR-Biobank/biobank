@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.shipment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.Query;
 
@@ -50,19 +49,13 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         Query query = context.getSession().createQuery(ORIGIN_INFO_HQL);
         query.setParameter(0, oiId);
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 1) {
-            Object row = rows.get(0);
+        OriginInfo oi =
+            ActionContext.singleResult(query, OriginInfo.class, oiId);
 
-            sInfo.originInfo = (OriginInfo) row;
-            sInfo.specimens = new ArrayList<SpecimenInfo>(
-                new ShipmentGetSpecimenListInfoAction(oiId).run(context)
-                    .getList());
-
-        } else {
-            throw new ActionException("No patient found with id:" + oiId); //$NON-NLS-1$
-        }
+        sInfo.originInfo = oi;
+        sInfo.specimens = new ArrayList<SpecimenInfo>(
+            new ShipmentGetSpecimenListInfoAction(oiId).run(context)
+                .getList());
 
         return sInfo;
     }

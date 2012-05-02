@@ -7,15 +7,19 @@ import org.eclipse.core.commands.IHandler;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReloadHandler extends AbstractHandler implements IHandler {
+    private static final I18n i18n = I18nFactory.getI18n(ReloadHandler.class);
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -24,8 +28,10 @@ public class ReloadHandler extends AbstractHandler implements IHandler {
                         .getActiveEditor()).reload();
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        Messages.ReloadViewFormHandler_reload_error_title,
-                        Messages.ReloadViewFormHandler_reload_error_msg);
+                        // dialog title
+                        i18n.tr("Reload error"),
+                        // dialog message
+                        i18n.tr("An error occurred while reloading the form."));
                 }
             }
         });

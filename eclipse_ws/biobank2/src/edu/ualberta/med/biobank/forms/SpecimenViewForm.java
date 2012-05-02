@@ -3,20 +3,20 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -24,9 +24,19 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.AbstractPosition;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -35,11 +45,14 @@ import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SpecimenViewForm";
 
-    private SpecimenWrapper specimenWrapper =
+    private final SpecimenWrapper specimenWrapper =
         new SpecimenWrapper(SessionManager.getAppService());
 
     private BgcBaseText centerLabel;
@@ -80,14 +93,15 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SpecimenAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         updateSpecimenInfo();
 
-        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
+        setPartName(i18n.tr("Specimen: {0}",
             specimenWrapper.getInventoryId()));
     }
 
@@ -100,9 +114,10 @@ public class SpecimenViewForm extends BiobankViewForm {
         SessionManager.logLookup(specimen);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
+        form.setText(i18n.tr("Specimen: {0}",
             specimenWrapper.getInventoryId()));
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
@@ -115,8 +130,9 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void createDispatchSection() throws ApplicationException {
+        @SuppressWarnings("nls")
         Section section =
-            createSection(Messages.SpecimenViewForm_dispatch_title);
+            createSection(i18n.tr("Dispatch History"));
         Composite client = toolkit.createComposite(section);
         section.setClient(client);
         section.setExpanded(false);
@@ -146,6 +162,7 @@ public class SpecimenViewForm extends BiobankViewForm {
             });
     }
 
+    @SuppressWarnings("nls")
     private void createInformationSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -154,49 +171,50 @@ public class SpecimenViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_type_label);
+            i18n.tr("Type"));
         createdDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_created_label);
+            i18n.tr("Created"));
         volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_volume_label);
+            AliquotedSpecimen.PropertyName.VOLUME.toString());
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_study_label);
+            Study.NAME.singular().toString());
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_patient_label);
+            Patient.NAME.singular().toString());
         originCenterLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_origin_center_label);
+            i18n.tr("Origin center"));
         centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_current_center_label);
+            i18n.tr("Current center"));
         positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_position_label);
+            AbstractPosition.NAME.singular().toString());
         isSourceSpcButton = (Button) createLabelledWidget(client, Button.class,
-            SWT.NONE, Messages.SpecimenViewForm_source_specimen_label);
+            SWT.NONE, SourceSpecimen.NAME.singular().toString());
         if (!specimenWrapper.getTopSpecimen().equals(specimenWrapper)) {
             sourceInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SpecimenViewForm_source_specimenid_label);
+                i18n.tr("Source Inventory ID"));
         }
 
         ceventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_cevent_label);
+            CollectionEvent.NAME.singular().toString());
 
         if (!specimenWrapper.getTopSpecimen().equals(specimenWrapper)) {
             sourcePeventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SpecimenViewForm_source_pevent_label);
+                i18n.tr("Source Processing Event"));
         }
 
         if (specimenWrapper.getProcessingEvent() != null) {
             peventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.SpecimenViewForm_pevent_label);
+                ProcessingEvent.NAME.singular().toString());
         }
         childrenLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_children_nber_label);
+            i18n.tr("Children #"));
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.SpecimenViewForm_status_label);
+            ActivityStatus.NAME.singular().toString());
 
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 specimenWrapper.getCommentCollection(false));
@@ -204,10 +222,11 @@ public class SpecimenViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(commentTable);
     }
 
+    @SuppressWarnings("nls")
     private void createContainersSection() {
         if (specimenWrapper.getParentContainer() != null) {
             Section section =
-                createSection(Messages.SpecimenViewForm_visualization_title);
+                createSection(i18n.tr("Container Visualization"));
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
             section.setExpanded(false);
@@ -247,11 +266,12 @@ public class SpecimenViewForm extends BiobankViewForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS.bind(Messages.SpecimenViewForm_title,
+        setPartName(i18n.tr("Specimen: {0}",
             specimenWrapper.getInventoryId()));
-        form.setText(NLS.bind(Messages.SpecimenViewForm_title,
+        form.setText(i18n.tr("Specimen: {0}",
             specimenWrapper.getInventoryId()));
         dispatchInfoTable.reloadCollection();
         setTextValue(originCenterLabel, specimenWrapper.getOriginInfo()
@@ -289,20 +309,20 @@ public class SpecimenViewForm extends BiobankViewForm {
             setTextValue(
                 sourcePeventLabel,
                 new StringBuilder(topPevent.getFormattedCreatedAt())
-                    .append(" (") //$NON-NLS-1$
+                    .append(" (")
                     .append(
-                        NLS.bind(Messages.SpecimenViewForm_worksheet_string,
-                            topPevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
+                        i18n.tr("worksheet: {0}",
+                            topPevent.getWorksheet())).append(")").toString());
         }
 
         ProcessingEventWrapper pevent = specimenWrapper.getProcessingEvent();
         if (pevent != null) {
             setTextValue(
                 peventLabel,
-                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (") //$NON-NLS-1$
+                new StringBuilder(pevent.getFormattedCreatedAt()).append(" (")
                     .append(
-                        NLS.bind(Messages.SpecimenViewForm_worksheet_string,
-                            pevent.getWorksheet())).append(")").toString()); //$NON-NLS-1$
+                        i18n.tr("worksheet: {0}",
+                            pevent.getWorksheet())).append(")").toString());
         }
 
         setTextValue(childrenLabel,

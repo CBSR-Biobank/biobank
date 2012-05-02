@@ -4,15 +4,23 @@ import java.util.List;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Dispatch;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Tr CANNOT_FIND_DISPATCH_ERRMSG =
+        bundle.tr("Cannot find a dispatch with id \"{0}\".");
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL = "SELECT distinct dispatch "
@@ -25,7 +33,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         + " LEFT JOIN fetch comments.user"
         + " WHERE dispatch.id=?";
 
-    private Integer id;
+    private final Integer id;
 
     public DispatchGetInfoAction(Integer id) {
         this.id = id;
@@ -53,10 +61,9 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException("No dispatch found for id:" + id); //$NON-NLS-1$
+            throw new ActionException(CANNOT_FIND_DISPATCH_ERRMSG.format(id));
         }
 
         return sInfo;
     }
-
 }

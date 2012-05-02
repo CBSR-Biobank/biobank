@@ -7,11 +7,15 @@ import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -22,11 +26,40 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
 import edu.ualberta.med.biobank.util.SetDiff;
 import edu.ualberta.med.biobank.util.SetDiff.Pair;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserSaveAction implements Action<UserSaveOutput> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
     private static final Permission PERMISSION = new UserManagerPermission();
+
+    @SuppressWarnings("nls")
+    public static final LString STALE_GROUPS_ERRMSG =
+        bundle.tr("It appears you are trying to add groups you were not" +
+            " aware of. Please refresh your user management, start over" +
+            ", and try again.").format();
+    @SuppressWarnings("nls")
+    public static final LString CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG =
+        bundle.tr("You cannot add this user to groups you cannot manage.")
+            .format();
+    @SuppressWarnings("nls")
+    public static final LString INADEQUATE_PERMISSIONS_ERRMSG =
+        bundle.tr("You do not have adequate permissions to modify this user.")
+            .format();
+    @SuppressWarnings("nls")
+    public static final LString STALE_ROLES_OR_PERMISSIONS_ERRMSG =
+        bundle.tr("Your roles or permissions have changed since you began" +
+            " modifying this user. Please start over and try again.").format();
+    @SuppressWarnings("nls")
+    public static final LString CSM_MODIFICATION_FAILURE_ERRMSG =
+        bundle.tr("Problem modify associated CSM user properties").format();
+    @SuppressWarnings("nls")
+    public static final LString STALE_MANAGEABLE_MEMBERSHIPS_ERRMSG =
+        bundle.tr("Your manageable memberships have changed since you began" +
+            " modifying this user. Please refresh your user management," +
+            " start over, and try again.").format();
+    @SuppressWarnings("nls")
+    public static final Tr PASSWORD_TOO_SHORT_ERRMSG =
+        bundle.tr("Passwords must be at least {0} characters long");
 
     private final UserSaveInput input;
 
@@ -88,9 +121,11 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                 Long csmUserId = BiobankCSMSecurityUtil.persistUser(user, pw);
                 user.setCsmUserId(csmUserId);
 
-                if (pw == null || pw.length() < 5) {
+                final int MIN_PW_LENGTH = 5;
+
+                if (pw == null || pw.length() < MIN_PW_LENGTH) {
                     throw new ActionException(
-                        "password for new user must be set and be at least 5 characters");
+                        PASSWORD_TOO_SHORT_ERRMSG.format(MIN_PW_LENGTH));
                 }
 
                 Transaction tx = context.getSession().getTransaction();
@@ -105,8 +140,8 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                 tx.registerSynchronization(new PersistCsmUserOnRollback(
                     oldUserData, oldPw));
             }
-        } catch (ApplicationException e) {
-            throw new ActionException(e);
+        } catch (Exception e) {
+            throw new ActionException(CSM_MODIFICATION_FAILURE_ERRMSG, e);
         }
     }
 
@@ -118,8 +153,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Membership> executorMembs = user.getManageableMemberships(executor);
 
         if (!managerMembs.containsAll(executorMembs)) {
-            throw new ActionException(
-                "No longer able to manage some submitted memberships. Please start over and try again.");
+            throw new ActionException(STALE_MANAGEABLE_MEMBERSHIPS_ERRMSG);
         }
 
         return managerMembs;
@@ -187,11 +221,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
-                // TODO: better exception
-                // TODO: there is a bug here! got it when editting a Membership
-                // on
-                // testweirdkid
-                throw new ActionException("reduced scope");
+                throw new ActionException(STALE_ROLES_OR_PERMISSIONS_ERRMSG);
             }
 
             Domain newD = newM.getDomain();
@@ -226,16 +256,14 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
+    @SuppressWarnings("unused")
     private void mergeMembershipsOnDomain(ActionContext context, User user) {
-
     }
 
     private void checkFullyManageable(ActionContext context, Membership m) {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
-            // TODO: better exception
-            throw new ActionException(
-                "you do not have permissions to make this change on this user");
+            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
     }
 
@@ -247,16 +275,14 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
         if (!contextGroupIds.containsAll(input.getGroupIds())) {
-            // TODO: better exception
-            throw new ActionException("found groups out of context");
+            throw new ActionException(STALE_GROUPS_ERRMSG);
         }
 
         // add or remove every Group in the context
         Set<Group> groups = context.load(Group.class, contextGroupIds);
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
-                // TODO: throw exception
-                throw new ActionException("modifying unmanageable group");
+                throw new ActionException(CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG);
             }
 
             if (input.getGroupIds().contains(group.getId())) {
@@ -281,7 +307,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             if (status == javax.transaction.Status.STATUS_ROLLEDBACK) {
                 try {
                     BiobankCSMSecurityUtil.deleteUser(user);
-                } catch (ApplicationException e) {
+                } catch (Exception e) {
                     // TODO: what to do?
                 }
             }
@@ -302,7 +328,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             if (status == javax.transaction.Status.STATUS_ROLLEDBACK) {
                 try {
                     BiobankCSMSecurityUtil.persistUser(user, oldPassword);
-                } catch (ApplicationException e) {
+                } catch (Exception e) {
                     // TODO: what to do?
                 }
             }

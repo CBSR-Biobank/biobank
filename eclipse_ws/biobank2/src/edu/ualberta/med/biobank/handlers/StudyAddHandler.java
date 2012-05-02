@@ -6,14 +6,16 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyAddHandler extends LogoutSensitiveHandler {
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.commands.addStudy"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.addStudy";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -34,8 +36,8 @@ public class StudyAddHandler extends LogoutSensitiveHandler {
             return allowed
                 && SessionManager.getInstance().getSession() != null;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
             return false;
         }
     }

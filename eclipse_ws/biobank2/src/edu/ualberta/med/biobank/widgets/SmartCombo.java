@@ -18,11 +18,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+
 public class SmartCombo extends Composite {
 
     List<SelectionListener> listeners;
     private String[] items;
-    private Combo combo;
+    private final Combo combo;
     boolean ignore;
     boolean traversed;
     char keyPress;
@@ -133,7 +135,7 @@ public class SmartCombo extends Composite {
     }
 
     protected void reset() {
-        refineList(""); //$NON-NLS-1$
+        refineList(StringUtil.EMPTY_STRING);
         combo.setVisibleItemCount(combo.getItemCount());
         combo.select(0);
         Event event = new Event();
@@ -162,7 +164,7 @@ public class SmartCombo extends Composite {
     protected String closestMatch() {
         if (combo.getItemCount() > 0)
             return combo.getItem(0);
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     public void setInput(String[] items) {

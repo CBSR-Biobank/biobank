@@ -8,6 +8,7 @@ public class UserGetInput implements ActionInput {
 
     private final Integer userId;
 
+    @SuppressWarnings("nls")
     public UserGetInput(User user) {
         if (user == null)
             throw new IllegalArgumentException("null user");

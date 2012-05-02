@@ -3,35 +3,44 @@ package edu.ualberta.med.biobank.server.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenReport2 extends AbstractReport {
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    private static final LString NO_DATE_PROCESSED =
+        bundle.tr("No Date Processed").format();
 
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String QUERY = 
-        "FROM " + Specimen.class.getName() + " as s" //$NON-NLS-1$ //$NON-NLS-2$
-        + "    inner join fetch s.collectionEvent ce" //$NON-NLS-1$
-        + "    inner join fetch s.specimenType st" //$NON-NLS-1$
-        + "    inner join fetch ce.patient p" //$NON-NLS-1$
-        + "    inner join fetch s.specimenPosition sp" //$NON-NLS-1$
-        + "    left join fetch s.parentSpecimen ps" //$NON-NLS-1$
-        + "    left join fetch ps.processingEvent pe" //$NON-NLS-1$
-        + " WHERE s.createdAt between ? and ?" //$NON-NLS-1$
-        + "     and s.specimenType.nameShort = ?" //$NON-NLS-1$
-        + "     and s.specimenPosition.container.id in (SELECT c1.id" //$NON-NLS-1$
-        + "        FROM " + Container.class.getName() + " as c1 " //$NON-NLS-1$ //$NON-NLS-2$
-        + "            ," + Container.class.getName() + " as c2" //$NON-NLS-1$ //$NON-NLS-2$
-        + "         WHERE c1.path LIKE if(length(c2.path),c2.path || '/','') || c2.id || '/%' "  //$NON-NLS-1$
-        + "             and c2.id in (" + CONTAINER_LIST + "))" //$NON-NLS-1$ //$NON-NLS-2$
-        + " ORDER BY RAND()"; //$NON-NLS-1$
+        "FROM " + Specimen.class.getName() + " as s"  
+        + "    inner join fetch s.collectionEvent ce" 
+        + "    inner join fetch s.specimenType st" 
+        + "    inner join fetch ce.patient p" 
+        + "    inner join fetch s.specimenPosition sp" 
+        + "    left join fetch s.parentSpecimen ps" 
+        + "    left join fetch ps.processingEvent pe" 
+        + " WHERE s.createdAt between ? and ?" 
+        + "     and s.specimenType.nameShort = ?" 
+        + "     and s.specimenPosition.container.id in (SELECT c1.id" 
+        + "        FROM " + Container.class.getName() + " as c1 "  
+        + "            ," + Container.class.getName() + " as c2"  
+        + "         WHERE c1.path LIKE if(length(c2.path),c2.path || '/','') || c2.id || '/%' "  
+        + "             and c2.id in (" + CONTAINER_LIST + "))"  
+        + " ORDER BY RAND()"; 
     // @formatter:on
 
-    private int numResults;
+    private final int numResults;
 
     public SpecimenReport2(BiobankReport report) {
         super(QUERY, report);
@@ -59,8 +68,7 @@ public class SpecimenReport2 extends AbstractReport {
             String inventoryId = specimen.getInventoryId();
             String specimenType = specimen.getSpecimenType().getNameShort();
 
-            String dateProcessed = Messages.getString(
-                "QaSpecimensImpl.nodate_processed", report.getLocale()); //$NON-NLS-1$
+            Object dateProcessed = NO_DATE_PROCESSED;
             Specimen parentSpecimen = specimen.getParentSpecimen();
             if (parentSpecimen != null) {
                 ProcessingEvent pe = parentSpecimen.getProcessingEvent();

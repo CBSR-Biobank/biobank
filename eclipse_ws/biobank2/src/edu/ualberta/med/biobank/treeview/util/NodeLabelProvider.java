@@ -17,12 +17,13 @@ public class NodeLabelProvider implements ILabelProvider {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getText(Object element) {
         if (element instanceof AbstractAdapterBase) {
             return ((AbstractAdapterBase) element).getLabel();
         }
-        return "error in getText"; //$NON-NLS-1$
+        return "error in getText";
     }
 
     @Override

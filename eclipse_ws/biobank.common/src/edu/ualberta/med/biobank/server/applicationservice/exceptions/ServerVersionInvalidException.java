@@ -1,8 +1,16 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-public class ServerVersionInvalidException extends BiobankServerException {
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 
+public class ServerVersionInvalidException extends BiobankServerException {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    private static final LString MESSAGE =
+        bundle.tr("Server version could not be determined.").format();
 
     public ServerVersionInvalidException() {
         super();
@@ -14,7 +22,6 @@ public class ServerVersionInvalidException extends BiobankServerException {
 
     @Override
     public String getMessage() {
-        return Messages
-            .getString("ServerVersionInvalidException.server.version.error.msg"); //$NON-NLS-1$
+        return MESSAGE.toString();
     }
 }

@@ -6,6 +6,8 @@ import java.net.URI;
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
 import org.springframework.remoting.RemoteAccessException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
@@ -20,6 +22,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersi
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionHelper implements Runnable {
+    private static final I18n i18n = I18nFactory.getI18n(SessionHelper.class);
 
     private static BgcLogger logger = BgcLogger.getLogger(SessionHelper.class
         .getName());
@@ -28,23 +31,30 @@ public class SessionHelper implements Runnable {
 
     private String userName;
 
-    private String password;
+    private final String password;
 
     private BiobankApplicationService appService;
 
     private UserWrapper user;
 
-    private static final String DOWNLOAD_URL = "http://aicml-med.cs.ualberta.ca/CBSR/latest.html"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String DOWNLOAD_URL =
+        "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
 
-    private static final String DEFAULT_TEST_USER = "testuser"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String DEFAULT_TEST_USER = "testuser";
 
-    private static final String DEFAULT_TEST_USER_PWD = "test"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String DEFAULT_TEST_USER_PWD = "test";
 
-    private static final String SECURE_CONNECTION_URI = "https://"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String SECURE_CONNECTION_URI = "https://";
 
-    private static final String NON_SECURE_CONNECTION_URI = "http://"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String NON_SECURE_CONNECTION_URI = "http://";
 
-    private static final String BIOBANK_URL = "/biobank"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String BIOBANK_URL = "/biobank";
 
     public SessionHelper(String server, boolean secureConnection,
         String userName, String password) {
@@ -60,6 +70,7 @@ public class SessionHelper implements Runnable {
         appService = null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void run() {
         try {
@@ -77,20 +88,27 @@ public class SessionHelper implements Runnable {
             }
             String clientVersion = Platform.getProduct().getDefiningBundle()
                 .getVersion().toString();
-            logger.debug(Messages.SessionHelper_clientVersion_debug_msg
+            logger.debug("Check client version:"
                 + clientVersion);
             appService.checkVersion(clientVersion);
             user = UserWrapper.getUser(appService, userName);
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
-                BgcPlugin.openError(
-                    Messages.SessionHelper_server_version_error_title,
-                    Messages.SessionHelper_server_noversion_error_msg, exp);
+                BgcPlugin
+                    .openError(
+                        // dialog title.
+                        i18n.tr("Server Version Error"),
+                        // dialog message.
+                        i18n.tr("The server you are connecting to does not have a version. Cannot authenticate."),
+                        exp);
             } else if (exp instanceof ServerVersionNewerException) {
                 if (BgcPlugin.openConfirm(
-                    Messages.SessionHelper_server_version_error_title,
-                    exp.getMessage()
-                        + Messages.SessionHelper_server_oldversion_error_msg)) {
+                    // dialog title.
+                    i18n.tr("Server Version Error"),
+                    // dialog message. {0} is an exception message.
+                    i18n.tr(
+                        "{0} Would you like to download the latest version?",
+                        exp.getMessage()))) {
                     try {
                         Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
                     } catch (Exception e1) {
@@ -100,24 +118,38 @@ public class SessionHelper implements Runnable {
                 }
             } else if (exp instanceof ServerVersionOlderException) {
                 BgcPlugin.openError(
-                    Messages.SessionHelper_server_version_error_title,
+                    // dialog title.
+                    i18n.tr("Server Version Error"),
                     exp.getMessage(), exp);
             } else if (exp instanceof ClientVersionInvalidException) {
-                BgcPlugin.openError(Messages.SessionHelper_client_error_title,
-                    Messages.SessionHelper_client_invalid_error_msg, exp);
+                BgcPlugin
+                    .openError(
+                        // dialog title.
+                        i18n.tr("Client Version Error"),
+                        // dialog message.
+                        i18n.tr("Cannot connect to this server because the Java Client version is invalid."),
+                        exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BgcPlugin.openAsyncError(
-                    Messages.SessionHelper_login_error_title,
-                    Messages.SessionHelper_login_error_msg, exp);
+                BgcPlugin
+                    .openAsyncError(
+                        // dialog title.
+                        i18n.tr("Login Failed"),
+                        // dialog message.
+                        i18n.tr("Bad credentials. Warning: You will be locked out after 3 failed login attempts."),
+                        exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
                 BgcPlugin.openAsyncError(
-                    Messages.SessionHelper_login_error_title,
-                    Messages.SessionHelper_login_server_error_msg, exp);
+                    // dialog title.
+                    i18n.tr("Login Failed"),
+                    // dialog message.
+                    i18n.tr("Error contacting server."), exp);
             }
         } catch (Exception exp) {
-            BgcPlugin.openAsyncError(Messages.SessionHelper_login_error_title,
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Login Failed"),
                 exp);
         }
     }

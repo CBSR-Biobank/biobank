@@ -8,6 +8,7 @@ public class GroupDeleteInput implements ActionInput {
 
     private final Integer groupId;
 
+    @SuppressWarnings("nls")
     public GroupDeleteInput(Group group) {
         if (group == null)
             throw new IllegalArgumentException("null group");

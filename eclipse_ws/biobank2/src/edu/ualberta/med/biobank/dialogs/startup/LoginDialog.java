@@ -45,9 +45,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -59,12 +62,14 @@ import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 
 public class LoginDialog extends TitleAreaDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(LoginDialog.class);
 
-    private DataBindingContext dbc;
+    private final DataBindingContext dbc;
 
-    private ArrayList<String> servers;
+    private final ArrayList<String> servers;
 
-    private ArrayList<String> userNames;
+    private final ArrayList<String> userNames;
 
     private Combo serverWidget;
 
@@ -72,16 +77,22 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Text passwordWidget;
 
+    @SuppressWarnings("nls")
     private static final String LAST_SERVER = "lastServer";
 
+    @SuppressWarnings("nls")
     private static final String SAVED_USER_NAMES = "savedUserNames";
 
+    @SuppressWarnings("nls")
     private static final String USER_NAME = "userName";
 
+    @SuppressWarnings("nls")
     private static final String LAST_USER_NAME = "lastUserName";
 
+    @SuppressWarnings("nls")
     private static final String DEFAULT_SECURE_PORT = "8443";
 
+    @SuppressWarnings("nls")
     private static final String DEFAULT_UNSECURE_PREFIX = "http://";
 
     private static final BgcLogger logger = BgcLogger
@@ -91,12 +102,13 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Button secureConnectionButton;
 
-    private Authentication authentication;
+    private final Authentication authentication;
 
     private Boolean okButtonEnabled;
 
     private boolean setupFinished = false;
 
+    @SuppressWarnings("nls")
     public LoginDialog(Shell parentShell) {
         super(parentShell);
 
@@ -124,26 +136,31 @@ public class LoginDialog extends TitleAreaDialog {
             String[] userNodeNames = prefsUserNames.childrenNames();
             for (String userNodeName : userNodeNames) {
                 Preferences node = prefsUserNames.node(userNodeName);
-                userNames.add(node.get(USER_NAME, ""));
+                userNames.add(node.get(USER_NAME, StringUtil.EMPTY_STRING));
             }
         } catch (BackingStoreException e) {
             logger.error("Could not get " + USER_NAME + " preference", e);
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("BioBank Login");
+        // login dialog title
+        shell.setText(i18n.tr("BioBank Login"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Login to a BioBank server");
+        // login dialog title
+        setTitle(i18n.tr("Login to a BioBank server"));
         setTitleImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_LOGINWIZ));
-        setMessage("Enter server name and login details.");
+        // login dialog title area message
+        setMessage(i18n.tr("Enter server name and login details."));
         return contents;
     }
 
@@ -157,6 +174,7 @@ public class LoginDialog extends TitleAreaDialog {
         return contents;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite parentComposite = (Composite) super.createDialogArea(parent);
@@ -166,11 +184,15 @@ public class LoginDialog extends TitleAreaDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        String lastServer = pluginPrefs.get(LAST_SERVER, "");
+        String lastServer =
+            pluginPrefs.get(LAST_SERVER, StringUtil.EMPTY_STRING);
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            "Server field cannot be empty");
+            // validation error when server text box is empty
+            i18n.tr("Server field cannot be empty"));
         serverWidget = createWritableCombo(contents,
-            "&Server", servers.toArray(new String[0]),
+            // server combo box label
+            i18n.tr("&Server"),
+            servers.toArray(new String[0]),
             Authentication.SERVER_PROPERTY_NAME, lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
@@ -192,21 +214,27 @@ public class LoginDialog extends TitleAreaDialog {
             });
         } else {
             userNameValidator = new NonEmptyStringValidator(
-                "Username field cannot be empty");
+                // validation error when username text box is empty
+                i18n.tr("Username field cannot be empty"));
             passwordValidator = new NonEmptyStringValidator(
-                "Password field cannot be empty");
+                // validation error when password text box is empty
+                i18n.tr("Password field cannot be empty"));
+
         }
 
-        userNameWidget = createWritableCombo(contents,
-            "&User Name", userNames.toArray(new String[0]),
-            Authentication.USERNAME_PROPERTY_NAME,
-            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
+        userNameWidget =
+            createWritableCombo(contents,
+                // TR: login dialog user name text box label
+                i18n.tr("&User Name"),
+                userNames.toArray(new String[0]),
+                Authentication.USERNAME_PROPERTY_NAME,
+                pluginPrefs.get(LAST_USER_NAME, StringUtil.EMPTY_STRING),
+                userNameValidator);
 
         passwordWidget = createPassWordText(contents,
+            // TR: login dialog password text box label
             "&Password",
             Authentication.PASSWORD_PROPERTY_NAME, passwordValidator);
-
-        new Label(contents, SWT.NONE);
 
         bindChangeListener();
 
@@ -239,6 +267,7 @@ public class LoginDialog extends TitleAreaDialog {
             uvs, null);
     }
 
+    @SuppressWarnings("nls")
     private Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
         label.setText(labelText + ":");
@@ -303,14 +332,17 @@ public class LoginDialog extends TitleAreaDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         try {
             new URL(DEFAULT_UNSECURE_PREFIX + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(),
-                "Invalid Server URL",
-                "Please enter a valid server URL.");
+                // TR: error dialog title
+                i18n.tr("Invalid Server URL"),
+                // TR: error dialog message
+                i18n.tr("Please enter a valid server URL."));
             return;
         }
 
@@ -323,10 +355,12 @@ public class LoginDialog extends TitleAreaDialog {
             // "You are not allowed to specify a port, only a hostname and path.");
             // return;
             // }
-            if (userNameWidget.getText().equals("")) {
+            if (userNameWidget.getText().isEmpty()) {
                 MessageDialog.openError(getShell(),
-                    "Invalid User Name",
-                    "Username field cannot be empty");
+                    // TR: error dialog title
+                    i18n.tr("Invalid User Name"),
+                    // TR: error dialog message
+                    i18n.tr("Username field cannot be empty"));
                 return;
             }
         }
@@ -350,6 +384,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     protected void finalizeConnection(final SessionHelper sessionHelper) {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 selectWorkingCenter(sessionHelper);
@@ -365,7 +400,9 @@ public class LoginDialog extends TitleAreaDialog {
                                 activeWindow);
                         } catch (WorkbenchException e) {
                             BgcPlugin.openAsyncError(
-                                "Error while opening main perspective", e);
+                                // error dialog title
+                                i18n.tr("Error while opening main perspective"),
+                                e);
                         }
                     }
                 }
@@ -381,6 +418,7 @@ public class LoginDialog extends TitleAreaDialog {
         });
     }
 
+    @SuppressWarnings("nls")
     private void savePreferences() {
         pluginPrefs.put(LAST_SERVER, serverWidget.getText());
         pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
@@ -415,6 +453,7 @@ public class LoginDialog extends TitleAreaDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     private void selectWorkingCenter(final SessionHelper sessionHelper) {
 
         List<CenterWrapper<?>> workingCenters = null;
@@ -422,7 +461,8 @@ public class LoginDialog extends TitleAreaDialog {
             workingCenters = sessionHelper.getUser().getWorkingCenters();
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Problem getting user working centers", e);
+                // TR: error dialog title
+                i18n.tr("Problem getting user working centers"), e);
         }
         if (workingCenters != null) {
             if (workingCenters.size() == 0) {
@@ -430,8 +470,10 @@ public class LoginDialog extends TitleAreaDialog {
                     // cannot access the application.
                     BgcPlugin
                         .openError(
-                            "Problem getting user working centers",
-                            "No working center has been found for this user. Check with your manager or application administrator for user rights.");
+                            // TR: error dialog title
+                            i18n.tr("Problem getting user working centers"),
+                            // TR: error dialog message
+                            i18n.tr("No working center has been found for this user. Check with your manager or application administrator for user rights."));
             } else if (workingCenters.size() == 1)
                 sessionHelper.getUser().setCurrentWorkingCenter(
                     workingCenters.get(0));
@@ -445,8 +487,10 @@ public class LoginDialog extends TitleAreaDialog {
                 // connect in admin mode
                 BgcPlugin
                     .openInformation(
-                        "Super administrator mode",
-                        "No working center has been found or selected for this user. You will be logged on with no working center. Only non center specific actions will be available. ");
+                        // TR: information dialog title
+                        i18n.tr("Super administrator mode"),
+                        // TR: information dialog message
+                        i18n.tr("No working center has been found or selected for this user. You are super administrator, so you will be logged on with no working center. Only non center specific actions will be available. "));
                 // open the administration perspective if another
                 // perspective is open
                 IWorkbench workbench = PlatformUI.getWorkbench();
@@ -459,17 +503,23 @@ public class LoginDialog extends TitleAreaDialog {
                             activeWindow);
                     } catch (WorkbenchException e) {
                         BgcPlugin.openAsyncError(
-                            "Error while opening main perspective", e);
+                            // TR: error dialog title
+                            i18n.tr("Error while opening main perspective"),
+                            e);
                     }
                 }
             } else {
                 // can't connect without a working center
-                BgcPlugin.openAsyncError(
-                    "Working center selection",
-                    "You need to select the center you want to work with.");
+                BgcPlugin
+                    .openAsyncError(
+                        // error dialog title
+                        i18n.tr("Working center selection"),
+                        // error dialog message
+                        i18n.tr("You need to select the center you want to work with."));
             }
     }
 
+    @SuppressWarnings("nls")
     public static class Authentication {
         public static final String SERVER_PROPERTY_NAME = "server";
         public static final String USERNAME_PROPERTY_NAME = "username";

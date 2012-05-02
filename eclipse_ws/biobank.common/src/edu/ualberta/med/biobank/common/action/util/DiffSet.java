@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.model.util.IdUtil;
  * @param <E> element type
  */
 public class DiffSet<E> implements Set<E> {
+    @SuppressWarnings("nls")
     private static final String NOT_MUTEX_MSG = "Sets not mutually exclusive."
         + " The additions and removals sets must not share any equal values.";
     private final Set<E> additions;

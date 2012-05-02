@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.wizards;
 import java.util.List;
 
 import org.eclipse.jface.wizard.IWizardPage;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
@@ -20,6 +22,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ReparentingWizard extends BgcWizard {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ReparentingWizard.class);
+
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;
     private SelectCollectionEventPage cePage;
@@ -28,7 +33,7 @@ public class ReparentingWizard extends BgcWizard {
     private CollectionEventWrapper cevent;
     private String comment;
     private SpecimenInfo specimenInfo;
-    private Specimen original;
+    private final Specimen original;
 
     public ReparentingWizard(WritableApplicationService appService,
         Specimen original) {
@@ -67,6 +72,7 @@ public class ReparentingWizard extends BgcWizard {
         return cevent != null && comment != null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean performNext(IWizardPage page) {
         if (page == pnumberPage) {
@@ -85,7 +91,9 @@ public class ReparentingWizard extends BgcWizard {
                     .getCollectionEventCollection(true));
             } else {
                 pnumberPage
-                    .setErrorMessage(Messages.SelectCollectionEventWizard_notexists_error_msg);
+                    .setErrorMessage(
+                    // validation error message.
+                    i18n.tr("Patient does not exist."));
                 return false;
             }
         }
@@ -104,8 +112,9 @@ public class ReparentingWizard extends BgcWizard {
                     }
                 parentPage.setParentSpecimenList(specs);
             } catch (ApplicationException e) {
-                BgcPlugin.openAsyncError("Error",
-                    "Unable to retrieve specimens");
+                BgcPlugin.openAsyncError(
+                    // dialog message.
+                    i18n.tr("Unable to retrieve specimens"));
                 return false;
             }
         }

@@ -5,9 +5,15 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -15,6 +21,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class SourceSpecimenInfoTable extends
     InfoTableWidget<SourceSpecimenWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(SourceSpecimenInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 5;
 
@@ -23,18 +31,19 @@ public class SourceSpecimenInfoTable extends
         public String name;
         public String needOriginalVolume;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] {
                 name,
                 (needOriginalVolume != null) ? needOriginalVolume.toString()
-                    : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
     private final static String[] HEADINGS = new String[] {
-        Messages.SourceSpecimen_field_type_label,
-        Messages.SourceSpecimen_field_originalVolume_label };
+        SpecimenType.NAME.singular().toString(),
+        SourceSpecimen.PropertyName.NEED_ORIGINAL_VOLUME.toString() };
 
     public SourceSpecimenInfoTable(Composite parent,
         List<SourceSpecimenWrapper> collection) {
@@ -51,9 +60,9 @@ public class SourceSpecimenInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -61,26 +70,27 @@ public class SourceSpecimenInfoTable extends
                 case 1:
                     return info.needOriginalVolume;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object studySourceVessel)
         throws Exception {
         TableRowData info = new TableRowData();
         info.studySourceVessel = (SourceSpecimenWrapper) studySourceVessel;
         Assert.isNotNull(info.studySourceVessel.getSpecimenType(),
-            "study specimen type is null"); //$NON-NLS-1$
+            "study specimen type is null");
         info.name = info.studySourceVessel.getSpecimenType().getName();
         info.needOriginalVolume =
             (info.studySourceVessel
                 .getNeedOriginalVolume() != null) ? (info.studySourceVessel
-                .getNeedOriginalVolume() ? Messages.SourceSpecimenInfoTable_yes_label
-                : Messages.SourceSpecimenInfoTable_no_label)
-                : Messages.SourceSpecimenInfoTable_no_label;
+                .getNeedOriginalVolume() ? i18n.tr("Yes")
+                : i18n.tr("No"))
+                : i18n.tr("No");
         return info;
     }
 

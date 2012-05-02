@@ -24,13 +24,15 @@ import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
  */
 public class ActivityLogAppender extends AppenderSkeleton {
 
-    private MessageConsole messageConsole;
-    private MessageConsoleStream consoleStream;
-    private List<LogInfo> logsList;
+    private final MessageConsole messageConsole;
+    private final MessageConsoleStream consoleStream;
+    private final List<LogInfo> logsList;
+    @SuppressWarnings("nls")
     private static final char[] SYSTEM_LINE_SEPARATOR = System.getProperty(
-        "line.separator").toCharArray(); //$NON-NLS-1$
+        "line.separator").toCharArray();
+    @SuppressWarnings("nls")
     public static final PatternLayout layout = new PatternLayout(
-        "%d{HH:mm:ss} %m%n"); //$NON-NLS-1$
+        "%d{HH:mm:ss} %m%n");
 
     public ActivityLogAppender(String name) {
         setName(name);

@@ -10,6 +10,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
@@ -27,13 +29,16 @@ import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentTodayNode.class);
 
     private Boolean readAllowed;
     private Boolean addAllowed;
 
+    @SuppressWarnings("nls")
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
-        setLabel(Messages.ShipmentTodayNode_today_label);
+        setLabel(i18n.tr("Today's shipments"));
         try {
             this.readAllowed = false;
             this.addAllowed = false;
@@ -48,8 +53,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
                             .getCurrentWorkingCenter().getId()));
             }
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.ShipmentTodayNode_0,
-                Messages.ShipmentTodayNode_1);
+            BgcPlugin.openAsyncError(i18n.tr("Unable to retrieve permissions"));
         }
     }
 
@@ -95,11 +99,14 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
         SpecimenTransitView.addToNode(this, child);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (addAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ShipmentTodayNode_add_label);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add Shipment"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

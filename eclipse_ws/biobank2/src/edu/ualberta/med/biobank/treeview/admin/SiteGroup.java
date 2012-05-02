@@ -10,6 +10,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
@@ -24,21 +26,32 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
-    private Boolean createAllowed;
+    private static final I18n i18n = I18nFactory.getI18n(SiteGroup.class);
+    private final Boolean createAllowed;
 
+    @SuppressWarnings("nls")
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, Messages.SiteGroup_sites_node_label, true);
+        super(parent, id, i18n.tr("All Sites"), true);
+
+        boolean allowed = false;
         try {
-            this.createAllowed = SessionManager.getAppService().isAllowed(
+            allowed = SessionManager.getAppService().isAllowed(
                 new SiteCreatePermission());
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
+            BgcPlugin.openAsyncError(
+                // TR: dialog title
+                i18n.tr("Error"),
+                // TR: dialog message
+                i18n.tr("Unable to retrieve permissions"));
         }
+
+        this.createAllowed = allowed;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
+        Assert.isTrue(false, "should not be called");
     }
 
     @Override
@@ -51,11 +64,14 @@ public class SiteGroup extends AdapterBase {
         performExpand();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.SiteGroup_add_label);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Add Site"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

@@ -7,16 +7,24 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 
 public class CsvDataExporter extends GuiDataExporter {
-    private static final String[] VALID_EXTS = { "*.csv" }; 
+    private static final I18n i18n = I18nFactory
+        .getI18n(GuiDataExporter.class);
 
+    @SuppressWarnings("nls")
+    private static final String[] VALID_EXTS = { "*.csv" };
+
+    @SuppressWarnings("nls")
     public CsvDataExporter() {
-        super("Export CSV");
+        super(i18n.trc("Exporter Type Name", "Export CSV"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void export(Data data, ITableLabelProvider labelProvider,
         IProgressMonitor monitor) throws DataExportException {

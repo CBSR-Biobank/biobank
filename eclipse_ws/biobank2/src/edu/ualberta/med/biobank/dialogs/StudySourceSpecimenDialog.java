@@ -10,6 +10,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -17,11 +19,14 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class StudySourceSpecimenDialog extends PagedDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(StudySourceSpecimenDialog.class);
 
-    private SourceSpecimenWrapper defaultSourceSpecimen;
+    private final SourceSpecimenWrapper defaultSourceSpecimen;
 
     private List<SpecimenTypeWrapper> specimenTypes;
 
@@ -33,8 +38,9 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     private Button volume;
 
-    private SourceSpecimenWrapper userSourceSpecimen;
+    private final SourceSpecimenWrapper userSourceSpecimen;
 
+    @SuppressWarnings("nls")
     public StudySourceSpecimenDialog(Shell parent,
         boolean defaultNeedOrigVolume, SpecimenTypeWrapper defaultSpecimenType,
         List<SpecimenTypeWrapper> specimenTypes, NewListener newListener) {
@@ -50,11 +56,15 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         userSourceSpecimen.setSpecimenType(defaultSpecimenType);
 
         if (defaultSpecimenType == null) {
-            currentTitle = "Add source specimen types";
-            message = "Add a source specimen type to this study";
+            // TR: dialog title
+            currentTitle = i18n.tr("Add source specimen types");
+            // TR: dialog title area message
+            message = i18n.tr("Add a source specimen type to this study");
         } else {
-            currentTitle = "Edit source specimen types";
-            message = "Edit a source specimen type of this study";
+            // TR: dialog title
+            currentTitle = i18n.tr("Edit source specimen types");
+            // TR: dialog title area message
+            message = i18n.tr("Edit a source specimen type of this study");
         }
         this.specimenTypes = specimenTypes;
     }
@@ -79,6 +89,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         typeName.setInput(specimenTypes);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -86,9 +97,10 @@ public class StudySourceSpecimenDialog extends PagedDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         typeName = getWidgetCreator().createComboViewer(contents,
-            "Specimen type",
+            SpecimenType.NAME.singular().toString(),
             specimenTypes, userSourceSpecimen.getSpecimenType(),
-            "A specimen type should be selected",
+            // TR: validation error message
+            i18n.tr("A specimen type should be selected"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -99,7 +111,7 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
-            "Need Original Volume",
+            SourceSpecimen.PropertyName.NEED_ORIGINAL_VOLUME.toString(),
             new String[0], userSourceSpecimen,
             SourceSpecimenPeer.NEED_ORIGINAL_VOLUME.getName(), null);
 

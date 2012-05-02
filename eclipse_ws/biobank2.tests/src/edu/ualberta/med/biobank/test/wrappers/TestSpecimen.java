@@ -14,17 +14,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -33,25 +27,24 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicatePropertySetException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.InvalidOptionException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
-import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
-import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 @Deprecated
@@ -110,43 +103,6 @@ public class TestSpecimen extends TestDatabase {
         }
         parentSpc.setActivityStatus(ActivityStatus.ACTIVE);
         parentSpc.persist();
-    }
-
-    @Test
-    public void testCheckInventoryIdUnique() throws BiobankCheckException,
-        Exception {
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
-            childSpc.getSpecimenType(),
-            ActivityStatus.ACTIVE,
-            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
-
-        duplicate.setInventoryId(parentSpc.getInventoryId());
-        try {
-            duplicate.checkInventoryIdUnique();
-            Assert.fail("The check should detect that this is the same");
-        } catch (DuplicateEntryException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testCheckInventoryIdUniqueCaseSensitive()
-        throws BiobankCheckException, Exception {
-        int i = r.nextInt();
-        parentSpc.setInventoryId("toto" + i);
-        parentSpc.persist();
-        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(parentSpc,
-            childSpc.getSpecimenType(),
-            ActivityStatus.ACTIVE,
-            childSpc.getProcessingEvent(), childSpc.getParentContainer(), 2, 2);
-
-        duplicate.setInventoryId("TOTO" + i);
-        try {
-            duplicate.checkInventoryIdUnique();
-            Assert.assertTrue(true);
-        } catch (BiobankCheckException bce) {
-            Assert.fail("InventoryId is case sensitive. Should not fail");
-        }
     }
 
     @Test
@@ -269,7 +225,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type1.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
@@ -290,7 +246,7 @@ public class TestSpecimen extends TestDatabase {
         try {
             type2.delete();
             Assert.fail("cannot delete a type in use by a specimen");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
@@ -753,25 +709,6 @@ public class TestSpecimen extends TestDatabase {
         Assert.assertEquals(2, specimenDispatches.size());
         Assert.assertTrue(specimenDispatches.contains(d));
         Assert.assertTrue(specimenDispatches.contains(d2));
-    }
-
-    @Test
-    public void testGetCenterString() throws Exception {
-        String name = "testGetCenterString" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-
-        SpecimenWrapper spc = SpecimenHelper.addParentSpecimen(clinic, study,
-            patient);
-
-        Assert.assertTrue(spc.getCenterString().equals(clinic.getNameShort()));
-
-        spc.setCurrentCenter(null);
-        spc.persist();
-        Assert.assertFalse(spc.getCenterString().equals(clinic.getNameShort()));
-        Assert.assertNotNull(spc.getCenterString());
-        Assert.assertFalse("".equals(spc.getCenterString()));
     }
 
     @Test

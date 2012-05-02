@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,13 +15,11 @@ import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePostPersistChecks;
-import edu.ualberta.med.biobank.common.wrappers.checks.ContainerTypePrePersistChecks;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -34,10 +31,6 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     public static final Property<Integer, ContainerType> COL_CAPACITY =
         ContainerTypePeer.CAPACITY
             .wrap(CapacityPeer.COL_CAPACITY);
-    private static final Collection<Property<?, ? super ContainerType>> UNIQUE_NAME_PROPS,
-        UNIQUE_NAME_SHORT_PROPS;
-    private static final String CONTAINER_TYPE_IS_USED_MSG = Messages
-        .getString("ContainerTypeWrapper.container.type.isused.msg"); //$NON-NLS-1$
 
     public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
@@ -49,15 +42,6 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         aList.add(ContainerTypePeer.CHILD_LABELING_SCHEME.wrap(
             "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME)); //$NON-NLS-1$
         PROPERTIES = Collections.unmodifiableList(aList);
-
-        UNIQUE_NAME_PROPS = new ArrayList<Property<?, ? super ContainerType>>();
-        UNIQUE_NAME_PROPS.add(ContainerTypePeer.SITE.to(SitePeer.ID));
-        UNIQUE_NAME_PROPS.add(ContainerTypePeer.NAME);
-
-        UNIQUE_NAME_SHORT_PROPS =
-            new ArrayList<Property<?, ? super ContainerType>>();
-        UNIQUE_NAME_SHORT_PROPS.add(ContainerTypePeer.SITE.to(SitePeer.ID));
-        UNIQUE_NAME_SHORT_PROPS.add(ContainerTypePeer.NAME_SHORT);
     };
 
     public ContainerTypeWrapper(WritableApplicationService appService,
@@ -304,35 +288,14 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(ContainerTypePeer.SITE));
-        tasks.add(check().notNull(ContainerTypePeer.CAPACITY));
-        tasks.add(check().notNull(ContainerTypePeer.CHILD_LABELING_SCHEME));
-
-        tasks.add(check().unique(UNIQUE_NAME_PROPS));
-        tasks.add(check().unique(UNIQUE_NAME_SHORT_PROPS));
-
-        // TODO: note that there are no locks on any tables so there are still
-        // problems where a Container could be added while the checks are being
-        // performed, so the checks would not fail.
-
-        tasks.add(new ContainerTypePrePersistChecks(this));
-
         tasks.persist(this, ContainerTypePeer.CAPACITY);
 
         super.addPersistTasks(tasks);
-
-        tasks.add(new ContainerTypePostPersistChecks(this));
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        String isUsedMsg = MessageFormat.format(CONTAINER_TYPE_IS_USED_MSG,
-            getName());
-
-        tasks.add(check().notUsedBy(Container.class,
-            ContainerPeer.CONTAINER_TYPE, isUsedMsg));
-
         // When a ContainerType is deleted, remove it from all parent
         // ContainerType-s that use it and persist them. This was chosen to be
         // done because when a parent ContainerType is deleted, it is

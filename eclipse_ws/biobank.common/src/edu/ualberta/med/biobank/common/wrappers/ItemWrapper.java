@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.util.ItemState;
+import edu.ualberta.med.biobank.model.type.ItemState;
 
 public interface ItemWrapper {
 

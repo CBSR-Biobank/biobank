@@ -1,27 +1,19 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
-import edu.ualberta.med.biobank.common.wrappers.Messages;
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 
-public class PatientMergeException extends ActionCheckException {
-
+@SuppressWarnings("nls")
+public class PatientMergeException extends ActionException {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
-    public static enum ExceptionTypeEnum {
-        DEFAULT, STUDY;
-    }
+    private static LString MESSAGE =
+        bundle.tr("Problem merging patients").format();
 
-    private ExceptionTypeEnum type;
-
-    public PatientMergeException(ExceptionTypeEnum type) {
-        super(""); //$NON-NLS-1$
-        this.type = type;
-    }
-
-    @Override
-    public String getMessage() {
-        if (type == ExceptionTypeEnum.STUDY)
-            return Messages.getString("PatientMergeException.study.error.msg"); //$NON-NLS-1$
-        return Messages.getString("PatientMergeException.default.error.msg"); //$NON-NLS-1$
+    public PatientMergeException() {
+        super(MESSAGE);
     }
 }

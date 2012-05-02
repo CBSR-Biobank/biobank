@@ -9,29 +9,36 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class SpecimenTypeDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTypeDialog.class);
 
-    private SpecimenTypeWrapper origSpecimenType;
+    private final SpecimenTypeWrapper origSpecimenType;
 
     // this is the object that is modified via the bound widgets
-    private SpecimenTypeWrapper tmpSpecimenType;
+    private final SpecimenTypeWrapper tmpSpecimenType;
 
-    private String message;
+    private final String message;
 
-    private String currentTitle;
+    private final String currentTitle;
 
     private MultiSelectWidget<SpecimenTypeWrapper> multiSelectChildren;
 
-    private List<SpecimenTypeWrapper> allOthersTypes;
+    private final List<SpecimenTypeWrapper> allOthersTypes;
 
+    @SuppressWarnings("nls")
     public SpecimenTypeDialog(Shell parent, SpecimenTypeWrapper specimenType,
         String message, List<SpecimenTypeWrapper> allTypes) {
         super(parent);
@@ -41,8 +48,11 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         simpleCopyTo(origSpecimenType, tmpSpecimenType);
         this.message = message;
 
-        currentTitle = (specimenType.getName() == null ? "Add Specimen Type "
-            : "Edit Specimen Type");
+        currentTitle = (specimenType.getName() == null
+            // TR: dialog title
+            ? i18n.tr("Add Specimen Type")
+            // TR: dialog title
+            : i18n.tr("Edit Specimen Type"));
 
         allOthersTypes = new ArrayList<SpecimenTypeWrapper>(allTypes);
         allOthersTypes.remove(specimenType);
@@ -68,6 +78,7 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite content = new Composite(parent, SWT.NONE);
@@ -75,19 +86,25 @@ public class SpecimenTypeDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Name", null, tmpSpecimenType,
+            HasName.PropertyName.NAME.toString(),
+            null, tmpSpecimenType,
             SpecimenTypePeer.NAME.getName(), new NonEmptyStringValidator(
-                "Specimen type must have a name."));
+                // TR: validation error message
+                i18n.tr("Specimen type must have a name.")));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Short Name", null, tmpSpecimenType,
+            HasNameShort.PropertyName.NAME_SHORT.toString(),
+            null, tmpSpecimenType,
             SpecimenTypePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                "Specimen type must have a short name."));
+                // TR: validation error message
+                i18n.tr("Specimen type must have a short name.")));
 
         multiSelectChildren = new MultiSelectWidget<SpecimenTypeWrapper>(
             content, SWT.NONE,
-            "Available types",
-            "Child types", 300) {
+            // TR: combo box label
+            i18n.tr("Available types"),
+            // TR: combo box label
+            i18n.tr("Child types"), 300) {
 
             @Override
             protected String getTextForObject(SpecimenTypeWrapper nodeObject) {
