@@ -23,6 +23,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
+import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
@@ -208,11 +210,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getContainerTypesGroupNode());
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
-        for (ContainerTypeWrapper type : containerType.getSite()
-            .getContainerTypeCollection()) {
-            if (type.getTopLevel().equals(Boolean.FALSE)
-                && !type.equals(containerType)) {
-                availSubContainerTypes.add(type);
+        List<SiteContainerTypeInfo> containerTypeInfos =
+            SessionManager
+                .getAppService()
+                .doAction(
+                    new SiteGetContainerTypeInfoAction(containerType.getSite()
+                        .getId())).getList();
+
+        for (SiteContainerTypeInfo info : containerTypeInfos) {
+            if (!info.getContainerType().getTopLevel()
+                && !info.getContainerType().equals(
+                    containerType.getWrappedObject())) {
+                availSubContainerTypes.add(new ContainerTypeWrapper(
+                    SessionManager
+                        .getAppService(), info.getContainerType()));
             }
         }
 

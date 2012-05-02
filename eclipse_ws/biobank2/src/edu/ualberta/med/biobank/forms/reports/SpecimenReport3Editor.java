@@ -34,7 +34,7 @@ public class SpecimenReport3Editor extends ReportsEditor implements
 
     @SuppressWarnings("nls")
     public static String ID =
-        "edu.ualberta.med.biobank.editors.AliquotRequestEditor";
+        "edu.ualberta.med.biobank.editors.SpecimenReport3Editor";
 
     private BgcFileBrowser csvSelector;
 

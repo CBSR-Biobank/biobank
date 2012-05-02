@@ -99,14 +99,16 @@ public class PalletCell extends AbstractUICell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned =
             new HashMap<RowColPos, PalletCell>();
+
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
+
         int i = 0;
-        while (i < specimens.size() && i < 30) {
+        for (SpecimenWrapper spc : specimens) {
             int row = i / 12;
             int col = i % 12;
             palletScanned.put(new RowColPos(row, col), new PalletCell(
-                new ScanCell(row, col, specimens.get(i).getInventoryId())));
+                new ScanCell(row, col, spc.getInventoryId())));
             i++;
         }
         return palletScanned;

@@ -34,7 +34,7 @@ public class SpecimenReport2Editor extends ReportsEditor {
 
     @SuppressWarnings("nls")
     public static String ID =
-        "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
+        "edu.ualberta.med.biobank.editors.SpecimenReport2Editor";
 
     private DateTimeWidget start;
     private DateTimeWidget end;

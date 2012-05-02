@@ -28,7 +28,7 @@ public class SpecimenReport1Editor extends ReportsEditor {
 
     @SuppressWarnings("nls")
     public static String ID =
-        "edu.ualberta.med.biobank.editors.FTAReportEditor";
+        "edu.ualberta.med.biobank.editors.SpecimenReport1Editor";
 
     private static final String STUDY_PARAM = Study.NAME.format(1).toString();
     @SuppressWarnings("nls")
@@ -40,12 +40,9 @@ public class SpecimenReport1Editor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        studyCombo = createStudyComboOption(
-            STUDY_PARAM,
-            parent);
+        studyCombo = createStudyComboOption(STUDY_PARAM, parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            DATE_PARAM, null, null, null,
-            SWT.DATE);
+            DATE_PARAM, null, null, null, SWT.DATE);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.common.reports;
 
 public class ReportTreeNode extends AbstractReportTreeNode {
-    private BiobankReport report;
+    private final BiobankReport report;
 
     public ReportTreeNode(BiobankReport report) {
-        super(report.getClassName());
+        super(report.getName());
         this.report = report;
     }
 

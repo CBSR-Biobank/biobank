@@ -11,6 +11,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.permission.site.SiteDeletePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteReadPermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteUpdatePermission;
@@ -140,6 +141,13 @@ public class SiteAdapter extends AdapterBase {
         if (o instanceof SiteAdapter)
             return internalCompareTo(o);
         return 0;
+    }
+
+    @Override
+    public void runDelete() throws Exception {
+        SiteDeleteAction delete =
+            new SiteDeleteAction((Site) getModelObject().getWrappedObject());
+        SessionManager.getAppService().doAction(delete);
     }
 
     // disable MVP for version 3.2.0

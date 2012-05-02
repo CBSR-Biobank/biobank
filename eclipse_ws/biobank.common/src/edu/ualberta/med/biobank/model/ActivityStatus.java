@@ -61,6 +61,11 @@ public enum ActivityStatus implements NotAProxy, Serializable {
         return name.toString();
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     public static ActivityStatus fromId(int id) {
         for (ActivityStatus item : values()) {
             if (item.id == id) {

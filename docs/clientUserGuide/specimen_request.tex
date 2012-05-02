@@ -15,7 +15,7 @@ A list of requested specimens is usually provided as a CSV.  Currently, the requ
 
 \begin{figure}[H]
       \centering
-      \scalebox{0.5}
+      \scalebox{0.7}
       { \includegraphics*{screenshots/specimen_request/csv.png} }
       \caption{An example of a typical request.}
       \label{Prepare CSV}
@@ -41,7 +41,18 @@ The page will be populated with following fields:
       \label{Report Output}
 \end{figure}
       
- In some cases, the database may not contain what has been requested.  This will result in a ``Not Found" row in the report results. Export the CSV by clicking the ``Export CSV" button, and remember the location. Currently, requests are submitted on behalf of research groups.  These entities can be found in the \emph{Administration View}.  If you are not an administrator, you will need an admin to do this for you.  Open a research group (or create one), and find the upload section.  This section allows you to upload the report we just saved on behalf of the research group.  Select the file, click upload.  If successful, you will see the message ``Request Successfully Uploaded".
+ In some cases, the database may not contain what has been requested.  This will result in a ``Not Found" row in the report results. Export the CSV by clicking the ``Export CSV" button, and remember the location. 
+
+Currently, requests are submitted on behalf of research groups.  These entities can be found in the \emph{Administration View}.  If you are not an administrator, you will need an admin to do this for you.  Open a research group (or create one), and find the upload section.  This section allows you to upload the report we just saved on behalf of the research group.  Select the file, click upload.  If successful, you will see the message ``Request Successfully Uploaded".
+
+\begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/specimen_request/submit_request.png} }
+      \caption{Uploading a request.}
+      \label{Uploading}
+\end{figure}
+
  \emph{This method of submission is temporary.  In the future, research groups will be able to submit their requests themselves via a web interface.}
  
  \section{Processing a Request}
@@ -66,7 +77,7 @@ These actions are as follows
  
 There are two primary form functions:
 \begin{itemize}
-\item Pulling:  \emph{Claimed} items may be pulled by scanning the barcode (or entering manually), to flag the item as in hand, or \emph{Pulled}.  This designates that the item as been removed from the freezer (though the specimen will not be updated until the item is dispatched).  
+\item Pulling:  \emph{Claimed} items may be pulled by scanning the barcode (or entering manually), to flag the item as in hand, or \emph{Pulled}.  This designates that the item has been removed from the freezer (though the specimen will not be updated until the item is dispatched).  
 \item Dispatching: \emph{Pulled} items may be dispatched by selecting a dispatch created through the form menu, and then scanning a plate, or handscanning single tubes. Please note that the dispatch must be created through the request form, and not through a separate dispatch form, to record that the item was dispatched as the result of a request.  
 \end{itemize}
  
