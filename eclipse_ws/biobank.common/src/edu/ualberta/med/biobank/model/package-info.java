@@ -33,13 +33,6 @@
         defaultForType = RequestSpecimenState.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
-        }),
-    @TypeDef(
-        name = "requestState",
-        typeClass = GenericEnumUserType.class,
-        defaultForType = RequestState.class,
-        parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.RequestState")
         })
 })
 package edu.ualberta.med.biobank.model;
@@ -52,7 +45,6 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.model.type.RequestState;
 
 import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
 

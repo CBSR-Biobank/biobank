@@ -53,7 +53,7 @@ public class Request extends AbstractBiobankModel {
     private Set<Dispatch> dispatches = new HashSet<Dispatch>(0);
     private Set<RequestSpecimen> requestSpecimens =
         new HashSet<RequestSpecimen>(0);
-    private Address address;
+    private Address address = new Address();
     private ResearchGroup researchGroup;
 
     @Null(groups = PreDelete.class, message = "{edu.ualberta.med.biobank.model.Request.submitted.Null}")

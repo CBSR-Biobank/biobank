@@ -38,12 +38,11 @@ public class RequestSpecimen extends AbstractBiobankModel {
             "State").format();
     }
 
-    private RequestSpecimenState state;
+    private RequestSpecimenState state = RequestSpecimenState.AVAILABLE_STATE;
     private String claimedBy;
     private Specimen specimen;
     private Request request;
 
-    // TODO: switch to enum?
     @NotNull(message = "{edu.ualberta.med.biobank.model.RequestSpecimen.state.NotNull}")
     @Column(name = "STATE", nullable = false)
     @Type(type = "requestSpecimenState")

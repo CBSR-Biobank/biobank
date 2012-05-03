@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -23,6 +25,9 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.Rank;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -66,6 +71,11 @@ public class Factory {
     private Principal defaultPrincipal;
     private Membership defaultMembership;
     private Role defaultRole;
+    private Dispatch defaultDispatch;
+    private DispatchSpecimen defaultDispatchSpecimen;
+    private Request defaultRequest;
+    private RequestSpecimen defaultRequestSpecimen;
+    private ResearchGroup defaultResearchGroup;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -75,6 +85,62 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public ResearchGroup getDefaultResearchGroup() {
+        if (defaultResearchGroup == null) {
+            defaultResearchGroup = createResearchGroup();
+        }
+        return defaultResearchGroup;
+    }
+
+    public void setDefaultResearchGroup(ResearchGroup researchGroup) {
+        this.defaultResearchGroup = researchGroup;
+    }
+
+    public Request getDefaultRequest() {
+        if (defaultRequest == null) {
+            defaultRequest = createRequest();
+        }
+        return defaultRequest;
+    }
+
+    public void setDefaultRequest(Request request) {
+        this.defaultRequest = request;
+    }
+
+    public RequestSpecimen getDefaultRequestSpecimen() {
+        if (defaultRequestSpecimen == null) {
+            defaultRequestSpecimen = createRequestSpecimen();
+        }
+        return defaultRequestSpecimen;
+    }
+
+    public void setDefaultRequestSpecimen(RequestSpecimen requiestSpecimen) {
+        this.defaultRequestSpecimen = requiestSpecimen;
+    }
+
+    public Dispatch getDefaultDispatch() {
+        if (defaultDispatch == null) {
+            defaultDispatch = createDispatch();
+        }
+        return defaultDispatch;
+    }
+
+    public void setDefaultDispatch(Dispatch defaultDispatch) {
+        this.defaultDispatch = defaultDispatch;
+    }
+
+    public DispatchSpecimen getDefaultDispatchSpecimen() {
+        if (defaultDispatchSpecimen == null) {
+            defaultDispatchSpecimen = createDispatchSpecimen();
+        }
+        return defaultDispatchSpecimen;
+    }
+
+    public void setDefaultDispatchSpecimen(
+        DispatchSpecimen defaultDispatchSpecimen) {
+        this.defaultDispatchSpecimen = defaultDispatchSpecimen;
     }
 
     public Role getDefaultRole() {
@@ -290,6 +356,70 @@ public class Factory {
 
     public void setDefaultSpecimen(Specimen defaultSpecimen) {
         this.defaultSpecimen = defaultSpecimen;
+    }
+
+    public ResearchGroup createResearchGroup() {
+        String name = nameGenerator.next(ResearchGroup.class);
+
+        ResearchGroup researchGroup = new ResearchGroup();
+        researchGroup.getAddress().setCity("testville");
+        researchGroup.setName(name);
+        researchGroup.setNameShort(name);
+        researchGroup.setStudy(getDefaultStudy());
+
+        session.save(researchGroup);
+        session.flush();
+        return researchGroup;
+    }
+
+    public Request createRequest() {
+        Request request = new Request();
+        request.getAddress().setCity("testville");
+        request.setResearchGroup(getDefaultResearchGroup());
+
+        setDefaultRequest(request);
+        session.save(request);
+        session.flush();
+        return request;
+    }
+
+    public RequestSpecimen createRequestSpecimen() {
+        RequestSpecimen requestSpecimen = new RequestSpecimen();
+        requestSpecimen.setRequest(getDefaultRequest());
+
+        Specimen specimen = createSpecimen();
+        requestSpecimen.setSpecimen(specimen);
+
+        setDefaultRequestSpecimen(requestSpecimen);
+        session.save(requestSpecimen);
+        session.flush();
+        return requestSpecimen;
+    }
+
+    public Dispatch createDispatch() {
+        Dispatch dispatch = new Dispatch();
+
+        dispatch.setSenderCenter(getDefaultCenter());
+
+        Center receiver = createSite();
+        dispatch.setReceiverCenter(receiver);
+
+        setDefaultDispatch(dispatch);
+        session.save(dispatch);
+        session.flush();
+        return dispatch;
+    }
+
+    public DispatchSpecimen createDispatchSpecimen() {
+        DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
+        dispatchSpecimen.setDispatch(getDefaultDispatch());
+
+        Specimen specimen = createSpecimen();
+        dispatchSpecimen.setSpecimen(specimen);
+
+        session.save(dispatchSpecimen);
+        session.flush();
+        return dispatchSpecimen;
     }
 
     public Site createSite() {

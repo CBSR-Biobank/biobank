@@ -61,7 +61,6 @@ public class Dispatch extends AbstractBiobankModel {
     private Center receiverCenter;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.state.NotNull}")
     @Column(name = "STATE")
     @Type(type = "dispatchState")

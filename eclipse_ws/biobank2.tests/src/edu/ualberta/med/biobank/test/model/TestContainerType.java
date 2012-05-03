@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.validation;
+package edu.ualberta.med.biobank.test.model;
 
 import javax.validation.ConstraintViolationException;
 

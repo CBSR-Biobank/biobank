@@ -41,12 +41,11 @@ public class DispatchSpecimen extends AbstractBiobankModel {
             "State").format();
     }
 
-    private DispatchSpecimenState state;
+    private DispatchSpecimenState state = DispatchSpecimenState.NONE;
     private Dispatch dispatch;
     private Specimen specimen;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
     @Type(type = "dispatchSpecimenState")
