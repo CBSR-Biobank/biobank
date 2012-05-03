@@ -26,8 +26,6 @@ public class TestDispatchSpecimen extends TestDb {
                 dispatchSpecimen.setState(state);
                 session.update(dispatchSpecimen);
                 session.flush();
-                tx.commit();
-                tx = session.beginTransaction();
 
                 int id = ((Number) query.uniqueResult()).intValue();
                 Assert.assertEquals("persisted id does not match enum's id",
