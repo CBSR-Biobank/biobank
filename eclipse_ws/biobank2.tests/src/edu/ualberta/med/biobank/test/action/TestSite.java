@@ -132,7 +132,7 @@ public class TestSite extends TestAction {
         try {
             exec(siteSaveAction);
             Assert.fail(
-                "should not be allowed to add site with a null site id");
+                "should not be allowed to add site with a null study id");
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }

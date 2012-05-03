@@ -37,7 +37,7 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
     public EmptyResult run(ActionContext context) throws ActionException {
         Dispatch ship = context.get(Dispatch.class, shipId);
 
-        if (ship.getState().equals(DispatchState.CREATION.getId())) {
+        if (DispatchState.CREATION == ship.getState()) {
             context.getSession().delete(ship);
         } else {
             throw new ActionException(CREATION_ONLY_ERRMSG);
