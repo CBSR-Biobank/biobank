@@ -152,8 +152,8 @@ public class TestRequest extends TestAction {
         specInfo = exec(specAction).getList();
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
-                .equals(RequestSpecimenState.DISPATCHED_STATE));
+            Assert.assertTrue(RequestSpecimenState.DISPATCHED_STATE == spec
+                .getState());
         }
     }
 

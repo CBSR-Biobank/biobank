@@ -73,7 +73,7 @@ public class RequestHelper extends Helper {
             RequestSpecimen r =
                 new RequestSpecimen();
             r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
+            r.setState(RequestSpecimenState.AVAILABLE_STATE);
             r.setSpecimen(spec);
             session.saveOrUpdate(r);
         }

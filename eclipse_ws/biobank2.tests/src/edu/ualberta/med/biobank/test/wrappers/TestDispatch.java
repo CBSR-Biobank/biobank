@@ -784,7 +784,7 @@ public class TestDispatch extends TestDatabase {
 
         DispatchSpecimenState[] states = DispatchSpecimenState.values();
         for (DispatchSpecimenState state : states) {
-            ds.setState(state.getId());
+            ds.setState(state);
             Assert
                 .assertTrue(ds.getStateDescription().equals(state.getLabel()));
             Assert.assertTrue(ds.getSpecimenState().equals(state));

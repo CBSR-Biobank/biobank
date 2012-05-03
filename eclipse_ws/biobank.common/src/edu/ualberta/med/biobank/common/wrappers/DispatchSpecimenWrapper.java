@@ -43,15 +43,15 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
 
     @Override
     public DispatchSpecimenState getSpecimenState() {
-        return DispatchSpecimenState.getState(getState());
+        return getState();
     }
 
-    public void setDispatchSpecimenState(DispatchSpecimenState ds) {
-        setState(ds.getId());
+    public void setDispatchSpecimenState(DispatchSpecimenState state) {
+        setState(state);
     }
 
     @Override
     public String getStateDescription() {
-        return DispatchSpecimenState.getState(getState()).getLabel();
+        return getState().getLabel();
     }
 }

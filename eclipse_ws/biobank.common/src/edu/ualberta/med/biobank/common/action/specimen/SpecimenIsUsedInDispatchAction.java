@@ -48,10 +48,8 @@ public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
                 if (!dispatch.getId().equals(excludedDispatchId)
                     && (EnumSet.of(DispatchState.CREATION,
                         DispatchState.IN_TRANSIT, DispatchState.RECEIVED)
-                        .contains(DispatchState.getState(dispatch
-                            .getState())))) {
-                    if (DispatchSpecimenState.MISSING
-                        .equals(DispatchSpecimenState.getState(dsa.getState()))) {
+                        .contains(dispatch.getState()))) {
+                    if (DispatchSpecimenState.MISSING == dsa.getState()) {
                         return new BooleanResult(false);
                     }
                     return new BooleanResult(true);
@@ -59,5 +57,4 @@ public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
             }
         return new BooleanResult(false);
     }
-
 }

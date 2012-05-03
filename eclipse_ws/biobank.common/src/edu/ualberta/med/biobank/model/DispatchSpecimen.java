@@ -14,10 +14,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
@@ -38,7 +41,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
             "State").format();
     }
 
-    private Integer state;
+    private DispatchSpecimenState state;
     private Dispatch dispatch;
     private Specimen specimen;
     private Set<Comment> comments = new HashSet<Comment>(0);
@@ -46,11 +49,12 @@ public class DispatchSpecimen extends AbstractBiobankModel {
     // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
-    public Integer getState() {
+    @Type(type = "dispatchSpecimenState")
+    public DispatchSpecimenState getState() {
         return this.state;
     }
 
-    public void setState(Integer state) {
+    public void setState(DispatchSpecimenState state) {
         this.state = state;
     }
 

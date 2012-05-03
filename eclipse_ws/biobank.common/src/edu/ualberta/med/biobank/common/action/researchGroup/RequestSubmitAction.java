@@ -68,7 +68,7 @@ public class RequestSubmitAction implements Action<IdResult> {
             RequestSpecimen r =
                 new RequestSpecimen();
             r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
+            r.setState(RequestSpecimenState.AVAILABLE_STATE);
             r.setSpecimen(spec);
             context.getSession().saveOrUpdate(r);
         }

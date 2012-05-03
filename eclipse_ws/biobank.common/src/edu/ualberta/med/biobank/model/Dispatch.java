@@ -15,10 +15,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 
 /**
  * caTissue Term - Transfer Event: Event that refers to moving specimen from one
@@ -50,7 +53,7 @@ public class Dispatch extends AbstractBiobankModel {
             "State").format();
     }
 
-    private Integer state;
+    private DispatchState state = DispatchState.CREATION;
     private Set<DispatchSpecimen> dispatchSpecimens =
         new HashSet<DispatchSpecimen>(0);
     private Center senderCenter;
@@ -61,11 +64,12 @@ public class Dispatch extends AbstractBiobankModel {
     // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.state.NotNull}")
     @Column(name = "STATE")
-    public Integer getState() {
+    @Type(type = "dispatchState")
+    public DispatchState getState() {
         return this.state;
     }
 
-    public void setState(Integer state) {
+    public void setState(DispatchState state) {
         this.state = state;
     }
 

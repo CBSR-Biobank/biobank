@@ -161,10 +161,8 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                         return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
                             .getSpecimen()).getClaimedBy();
                     else if (columnIndex == 5) {
-                        return RequestSpecimenState
-                            .getState(
-                                ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
-                                    .getSpecimen()).getState()).getLabel();
+                        return ((RequestSpecimenWrapper) ((TreeItemAdapter) element)
+                            .getSpecimen()).getState().getLabel();
                     } else
                         return StringUtil.EMPTY_STRING;
                 }
@@ -252,8 +250,7 @@ public class RequestSpecimensTreeTable extends BgcBaseWidget {
                 List<Integer> rs =
                     new ArrayList<Integer>();
                 for (RequestSpecimenWrapper spec : getSelectionWrappers()) {
-                    spec.setState(RequestSpecimenState.UNAVAILABLE_STATE
-                        .getId());
+                    spec.setState(RequestSpecimenState.UNAVAILABLE_STATE);
                     rs.add(spec.getId());
                     try {
                         SessionManager.getAppService().doAction(

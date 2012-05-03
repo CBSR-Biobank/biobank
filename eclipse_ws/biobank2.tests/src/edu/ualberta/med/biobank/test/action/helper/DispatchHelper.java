@@ -30,7 +30,7 @@ public class DispatchHelper extends Helper {
 
         for (SpecimenInfo specInfo : ceventInfo.sourceSpecimenInfos) {
             infos.add(new DispatchSpecimenInfo(null, specInfo.specimen.getId(),
-                DispatchSpecimenState.NONE.getId()));
+                DispatchSpecimenState.NONE));
         }
 
         return infos;
@@ -38,7 +38,7 @@ public class DispatchHelper extends Helper {
 
     public static DispatchSaveInfo createSaveDispatchInfoRandom(Integer siteId,
         Integer centerId,
-        Integer state, String comment) {
+        DispatchState state, String comment) {
         return new DispatchSaveInfo(null, siteId, centerId, state, comment);
     }
 
@@ -47,7 +47,7 @@ public class DispatchHelper extends Helper {
         throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(dstCenterId,
-                srcCenterId, DispatchState.CREATION.getId(),
+                srcCenterId, DispatchState.CREATION,
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,

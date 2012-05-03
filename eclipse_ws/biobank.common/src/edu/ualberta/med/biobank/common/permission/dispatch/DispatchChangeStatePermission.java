@@ -21,12 +21,10 @@ public class DispatchChangeStatePermission implements Permission {
     public boolean isAllowed(ActionContext context) {
         Dispatch dispatch = context.load(Dispatch.class, dispatchId);
         User user = context.getUser();
-        return (!DispatchState.getState(dispatch.getState()).equals(
-            DispatchState.CREATION)
+        return (!DispatchState.CREATION.equals(dispatch.getState())
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
             dispatch.getReceiverCenter()))
-            || (DispatchState.getState(dispatch.getState()).equals(
-                DispatchState.CREATION)
+            || (DispatchState.CREATION.equals(dispatch.getState())
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
                 dispatch.getSenderCenter()));
     }

@@ -85,11 +85,11 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                 int col = i % 12;
                 if (row > 7)
                     break;
-                if (!RequestSpecimenState.UNAVAILABLE_STATE.isEquals(dsa
-                    .getState()))
+                if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
+                }
                 i++;
             }
         }

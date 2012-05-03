@@ -8,10 +8,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
@@ -35,7 +38,7 @@ public class RequestSpecimen extends AbstractBiobankModel {
             "State").format();
     }
 
-    private Integer state;
+    private RequestSpecimenState state;
     private String claimedBy;
     private Specimen specimen;
     private Request request;
@@ -43,11 +46,12 @@ public class RequestSpecimen extends AbstractBiobankModel {
     // TODO: switch to enum?
     @NotNull(message = "{edu.ualberta.med.biobank.model.RequestSpecimen.state.NotNull}")
     @Column(name = "STATE", nullable = false)
-    public Integer getState() {
+    @Type(type = "requestSpecimenState")
+    public RequestSpecimenState getState() {
         return this.state;
     }
 
-    public void setState(Integer state) {
+    public void setState(RequestSpecimenState state) {
         this.state = state;
     }
 

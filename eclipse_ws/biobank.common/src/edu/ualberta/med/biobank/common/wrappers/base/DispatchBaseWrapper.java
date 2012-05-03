@@ -7,6 +7,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
@@ -47,11 +48,11 @@ public class DispatchBaseWrapper extends ModelWrapper<Dispatch> {
         return DispatchPeer.PROPERTIES;
     }
 
-    public Integer getState() {
+    public DispatchState getState() {
         return getProperty(DispatchPeer.STATE);
     }
 
-    public void setState(Integer state) {
+    public void setState(DispatchState state) {
         setProperty(DispatchPeer.STATE, state);
     }
 

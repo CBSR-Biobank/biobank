@@ -99,7 +99,7 @@ public class DispatchReceiveScanDialog extends
                     .getDispatchSpecimenCollection(false).get(i);
                 int row = i / 12;
                 int col = i % 12;
-                if (!DispatchSpecimenState.MISSING.isEquals(dsa.getState()))
+                if (DispatchSpecimenState.MISSING != dsa.getState())
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));

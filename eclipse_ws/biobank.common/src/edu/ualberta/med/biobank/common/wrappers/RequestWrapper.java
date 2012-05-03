@@ -51,7 +51,7 @@ public class RequestWrapper extends RequestBaseWrapper {
     public void flagSpecimens(List<RequestSpecimenWrapper> scanned)
         throws Exception {
         for (RequestSpecimenWrapper a : scanned) {
-            a.setState(RequestSpecimenState.PULLED_STATE.getId());
+            a.setState(RequestSpecimenState.PULLED_STATE);
             a.persist();
         }
         cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);

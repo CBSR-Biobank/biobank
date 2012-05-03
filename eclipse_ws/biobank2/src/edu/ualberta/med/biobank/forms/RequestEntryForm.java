@@ -370,7 +370,7 @@ public class RequestEntryForm extends BiobankViewForm {
         d.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCenter());
         d.setReceiverCenter(request.getResearchGroup());
-        d.setState(DispatchState.CREATION.getId());
+        d.setState(DispatchState.CREATION);
         addToDispatch(d, null);
         reload();
         SpecimenTransitView.reloadCurrent();
@@ -386,7 +386,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 if (rs.getSpecimenState().equals(
                     RequestSpecimenState.PULLED_STATE)) {
                     dsInfos.add(new DispatchSpecimenInfo(null, rs.getSpecimen()
-                        .getId(), DispatchSpecimenState.NONE.getId()));
+                        .getId(), DispatchSpecimenState.NONE));
                 } else
                     throw new Exception(
                         i18n.tr("Error Adding: Specimen has not been pulled."));
@@ -396,7 +396,7 @@ public class RequestEntryForm extends BiobankViewForm {
                 .getId(),
                 SessionManager.getUser()
                     .getCurrentWorkingCenter().getId(),
-                DispatchState.CREATION.getId(), StringUtil.EMPTY_STRING);
+                DispatchState.CREATION, StringUtil.EMPTY_STRING);
 
         List<Integer> ids =
             new ArrayList<Integer>();

@@ -41,16 +41,23 @@ public enum ActivityStatus implements NotAProxy, Serializable {
         "Activity Status",
         "Activity Statuses");
 
+    public static List<ActivityStatus> valuesList() {
+        return VALUES_LIST;
+    }
+
+    public static ActivityStatus fromId(int id) {
+        for (ActivityStatus item : values()) {
+            if (item.id == id) return item;
+        }
+        return null;
+    }
+
     private final int id;
     private final LString name;
 
     private ActivityStatus(int id, LString name) {
         this.id = id;
         this.name = name;
-    }
-
-    public static List<ActivityStatus> valuesList() {
-        return VALUES_LIST;
     }
 
     public int getId() {
@@ -64,15 +71,6 @@ public enum ActivityStatus implements NotAProxy, Serializable {
     @Override
     public String toString() {
         return getName();
-    }
-
-    public static ActivityStatus fromId(int id) {
-        for (ActivityStatus item : values()) {
-            if (item.id == id) {
-                return item;
-            }
-        }
-        return null;
     }
 
     public static class Loader {

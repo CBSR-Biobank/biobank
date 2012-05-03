@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestSpecimenPeer {
 	public static final Property<Integer, RequestSpecimen> ID = Property.create(
@@ -25,17 +26,17 @@ public class RequestSpecimenPeer {
 			}
 		});
 
-	public static final Property<Integer, RequestSpecimen> STATE = Property.create(
+	public static final Property<RequestSpecimenState, RequestSpecimen> STATE = Property.create(
 		"state" //$NON-NLS-1$
 		, RequestSpecimen.class
-		, new TypeReference<Integer>() {}
-		, new Property.Accessor<Integer, RequestSpecimen>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<RequestSpecimenState>() {}
+		, new Property.Accessor<RequestSpecimenState, RequestSpecimen>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Integer get(RequestSpecimen model) {
+			public RequestSpecimenState get(RequestSpecimen model) {
 				return model.getState();
 			}
 			@Override
-			public void set(RequestSpecimen model, Integer value) {
+			public void set(RequestSpecimen model, RequestSpecimenState value) {
 				model.setState(value);
 			}
 		});

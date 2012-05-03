@@ -21,8 +21,7 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
     public Log getLog(Dispatch dispatch) {
         Log log = new Log();
 
-        Integer state = dispatch.getState();
-        DispatchState dispatchState = DispatchState.getState(state);
+        DispatchState dispatchState = dispatch.getState();
 
         if (dispatchState != null) {
             if (dispatchState.equals(DispatchState.CREATION)

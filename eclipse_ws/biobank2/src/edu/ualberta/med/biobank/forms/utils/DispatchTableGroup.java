@@ -59,7 +59,7 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
         List<Node> adapters = new ArrayList<Node>();
 
         if (cache == null) {
-            switch (DispatchSpecimenState.getState(state.getId())) {
+            switch (DispatchSpecimenState.fromId(state.getId())) {
             case NONE:
                 cache = request.getNonProcessedDispatchSpecimenCollection();
                 break;

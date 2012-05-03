@@ -53,7 +53,7 @@ public class DispatchSaveAction implements Action<IdResult> {
         disp.setSenderCenter(context.get(Center.class, dInfo.senderId));
 
         if (dInfo.state == null)
-            dInfo.state = DispatchState.CREATION.getId();
+            dInfo.state = DispatchState.CREATION;
 
         disp.setState(dInfo.state);
 

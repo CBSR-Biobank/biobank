@@ -185,11 +185,10 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                         .addClipboardCopySupport(tv, menu, labelProvider, 5);
 
                     if (editSpecimensState) {
-                        if (
-                        DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
+                        if (dsa.getState() == DispatchSpecimenState.NONE)
                             addSetMissingMenu(menu);
                         addModifyCommentMenu(menu);
-                        if (DispatchSpecimenState.getState(dsa.getState()) != DispatchSpecimenState.NONE)
+                        if (dsa.getState() != DispatchSpecimenState.NONE)
                             addDeleteExtraMenu(menu);
                     }
                 }

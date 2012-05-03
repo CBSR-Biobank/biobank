@@ -25,8 +25,7 @@ public class DispatchDeletePermission implements Permission {
             } catch (ModelNotFoundException e) {
                 return false;
             }
-            if (DispatchState.getState(ship.getState()).equals(
-                DispatchState.CREATION))
+            if (DispatchState.CREATION.equals(ship.getState()))
                 return PermissionEnum.DISPATCH_DELETE.isAllowed(
                     context.getUser(),
                     ship.getSenderCenter());

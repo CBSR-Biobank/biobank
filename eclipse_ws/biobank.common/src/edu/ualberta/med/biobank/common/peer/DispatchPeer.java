@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import java.util.Collection;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchPeer {
 	public static final Property<Integer, Dispatch> ID = Property.create(
@@ -28,17 +29,17 @@ public class DispatchPeer {
 			}
 		});
 
-	public static final Property<Integer, Dispatch> STATE = Property.create(
+	public static final Property<DispatchState, Dispatch> STATE = Property.create(
 		"state" //$NON-NLS-1$
 		, Dispatch.class
-		, new TypeReference<Integer>() {}
-		, new Property.Accessor<Integer, Dispatch>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<DispatchState>() {}
+		, new Property.Accessor<DispatchState, Dispatch>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Integer get(Dispatch model) {
+			public DispatchState get(Dispatch model) {
 				return model.getState();
 			}
 			@Override
-			public void set(Dispatch model, Integer value) {
+			public void set(Dispatch model, DispatchState value) {
 				model.setState(value);
 			}
 		});

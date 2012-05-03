@@ -75,21 +75,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public Dispatch getNewObject() throws Exception {
         Dispatch newObject = super.getNewObject();
-        newObject.setState(DispatchState.CREATION.getId());
+        newObject.setState(DispatchState.CREATION);
         return newObject;
     }
 
     @SuppressWarnings("nls")
     public String getStateDescription() {
-        DispatchState state = DispatchState
-            .getState(getProperty(DispatchPeer.STATE));
-        if (state == null)
-            return "";
+        DispatchState state = getProperty(DispatchPeer.STATE);
+        if (state == null) return "";
         return state.getLabel();
     }
 
     public DispatchState getDispatchState() {
-        return DispatchState.getState(getState());
+        return getState();
     }
 
     public String getFormattedPackedAt() {
@@ -299,8 +297,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.LOST.equals(getDispatchState());
     }
 
-    public void setState(DispatchState ds) {
-        setState(ds.getId());
+    @Override
+    public void setState(DispatchState state) {
+        setState(state);
     }
 
     @SuppressWarnings("nls")

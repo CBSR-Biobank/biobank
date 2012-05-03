@@ -38,7 +38,7 @@ public class DispatchChangeStateAction implements Action<IdResult> {
         Dispatch disp =
             context.load(Dispatch.class, id);
 
-        disp.setState(newState.getId());
+        disp.setState(newState);
 
         if (shipInfo == null)
             disp.setShipmentInfo(null);

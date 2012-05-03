@@ -115,7 +115,7 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         } else {
             for (Object o : results) {
                 RequestSpecimen ra = (RequestSpecimen) ((Object[]) o)[0];
-                if (RequestSpecimenState.getState(ra.getState()).equals(state)) {
+                if (ra.getState() == state) {
                     tops.add(new TreeItemAdapter(null,
                         new RequestSpecimenWrapper(SessionManager
                             .getAppService(), ra)));
