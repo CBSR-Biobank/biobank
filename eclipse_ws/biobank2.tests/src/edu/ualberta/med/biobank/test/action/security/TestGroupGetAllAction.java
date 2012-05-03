@@ -126,7 +126,7 @@ public class TestGroupGetAllAction extends TestAction {
                 for (Role r : m.getRoles()) {
                     r.getName();
 
-                    AssertMore.assertInited(r.getPermissions());
+                    AssertMore.initialized(r.getPermissions());
                 }
             }
 
@@ -137,9 +137,9 @@ public class TestGroupGetAllAction extends TestAction {
                 u.getEmail();
                 u.getFullName();
 
-                AssertMore.assertNotInited(u.getGroups());
-                AssertMore.assertNotInited(u.getMemberships());
-                AssertMore.assertNotInited(u.getComments());
+                AssertMore.notInitialized(u.getGroups());
+                AssertMore.notInitialized(u.getMemberships());
+                AssertMore.notInitialized(u.getComments());
             }
         }
     }
