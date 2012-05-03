@@ -39,7 +39,7 @@
   <!-- hibernatetool is much faster and more powerful than schemaexport and
        works with jpa annotations -->
   <taskdef name="hibernatetool"
-           classname="org.hibernate.tool.ant.HibernateToolTask"
+           classname="org.hibernate.tool.ant.EnversHibernateToolTask"
            classpathref="hibernatetool.lib" />
 
 <!-- was to generate java files from hbm.xml files
