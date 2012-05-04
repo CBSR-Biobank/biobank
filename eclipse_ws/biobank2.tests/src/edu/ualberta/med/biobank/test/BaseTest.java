@@ -5,7 +5,7 @@ import java.util.Random;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
-public class TestBase {
+public class BaseTest {
     private static final Random R = new Random();
 
     @Rule
