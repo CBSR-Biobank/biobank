@@ -42,9 +42,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
-
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-
 import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
 

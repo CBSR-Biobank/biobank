@@ -61,8 +61,6 @@ public class Study extends AbstractBiobankModel
     private Set<Site> sites = new HashSet<Site>(0);
     private Set<Comment> comments = new HashSet<Comment>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<Membership> memberships =
-        new HashSet<Membership>(0);
     private Set<StudyEventAttr> studyEventAttrs =
         new HashSet<StudyEventAttr>(0);
     private Set<Contact> contacts = new HashSet<Contact>(0);
@@ -142,16 +140,6 @@ public class Study extends AbstractBiobankModel
 
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID", updatable = false)
-    public Set<Membership> getMemberships() {
-        return this.memberships;
-    }
-
-    public void setMemberships(Set<Membership> memberships) {
-        this.memberships = memberships;
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")

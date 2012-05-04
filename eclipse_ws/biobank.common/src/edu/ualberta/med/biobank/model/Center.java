@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * location, or repository site. See \ref Clinic, \ref Site and \ref
  * ResearchGroup.
  */
+
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -75,7 +76,6 @@ public class Center extends AbstractBiobankModel
     private Address address = new Address();
     private Set<ProcessingEvent> processingEvents =
         new HashSet<ProcessingEvent>(0);
-    private Set<Membership> memberships = new HashSet<Membership>(0);
     private Set<Dispatch> srcDispatches = new HashSet<Dispatch>(0);
     private Set<Dispatch> dstDispatches = new HashSet<Dispatch>(0);
     private Set<OriginInfo> originInfos =
@@ -123,16 +123,6 @@ public class Center extends AbstractBiobankModel
 
     public void setProcessingEvents(Set<ProcessingEvent> processingEvents) {
         this.processingEvents = processingEvents;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Set<Membership> getMemberships() {
-        return this.memberships;
-    }
-
-    public void setMemberships(Set<Membership> memberships) {
-        this.memberships = memberships;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "senderCenter")

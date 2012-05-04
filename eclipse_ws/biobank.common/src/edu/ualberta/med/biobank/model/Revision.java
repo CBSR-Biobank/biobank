@@ -25,13 +25,14 @@ import edu.ualberta.med.biobank.model.util.RevisionListenerImpl;
 @RevisionEntity(RevisionListenerImpl.class)
 @Entity
 @Table(name = "REVISION")
-public class Revision implements IBiobankModel {
+public class Revision implements IBiobankModel, HasCreatedAt {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private Date timestamp;
+    private Date createdAt;
     private User user;
-    private Set<RevisedEntity> revisedEntities = new HashSet<RevisedEntity>(0);
+    private Set<RevisionEntityType> entityTypes =
+        new HashSet<RevisionEntityType>(0);
 
     @Override
     @RevisionNumber
@@ -48,14 +49,15 @@ public class Revision implements IBiobankModel {
         this.id = id;
     }
 
+    @Override
     @RevisionTimestamp
-    @Column(name = "TIMESTAMP")
-    public Date getTimestamp() {
-        return timestamp;
+    @Column(name = "CREATED_AT")
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -69,12 +71,12 @@ public class Revision implements IBiobankModel {
     }
 
     @OneToMany(mappedBy = "revision", cascade = CascadeType.ALL)
-    public Set<RevisedEntity> getRevisedEntities() {
-        return revisedEntities;
+    public Set<RevisionEntityType> getEntityTypes() {
+        return entityTypes;
     }
 
-    public void setRevisedEntities(Set<RevisedEntity> revisedEntities) {
-        this.revisedEntities = revisedEntities;
+    public void setEntityTypes(Set<RevisionEntityType> entityTypes) {
+        this.entityTypes = entityTypes;
     }
 
     @Override

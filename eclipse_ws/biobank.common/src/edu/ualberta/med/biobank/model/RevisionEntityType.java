@@ -2,16 +2,18 @@ package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "REVISED_ENTITY")
-public class RevisedEntity implements IBiobankModel {
+@Table(name = "REVISION_ENTITY_TYPE")
+public class RevisionEntityType implements IBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
@@ -41,12 +43,8 @@ public class RevisedEntity implements IBiobankModel {
         this.type = type;
     }
 
-    public void setType(Class<?> klazz) {
-        this.type = klazz.getName();
-    }
-
-    @ManyToOne
-    @Column(name = "REVISION_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "REVISION_ID", nullable = false)
     public Revision getRevision() {
         return revision;
     }
@@ -68,7 +66,7 @@ public class RevisedEntity implements IBiobankModel {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        RevisedEntity other = (RevisedEntity) obj;
+        RevisionEntityType other = (RevisionEntityType) obj;
         if (revision == null) {
             if (other.revision != null) return false;
         } else if (!revision.equals(other.revision)) return false;

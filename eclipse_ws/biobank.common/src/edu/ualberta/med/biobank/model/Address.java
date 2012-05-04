@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
+
 @Entity
 @Table(name = "ADDRESS")
 public class Address extends AbstractBiobankModel {

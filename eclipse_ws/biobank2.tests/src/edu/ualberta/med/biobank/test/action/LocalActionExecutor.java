@@ -9,12 +9,15 @@ import java.io.ObjectOutputStream;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.model.Revision;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.SessionProvider;
 
@@ -52,6 +55,11 @@ public class LocalActionExecutor implements IActionExecutor {
                 .createCriteria(User.class)
                 .add(Restrictions.idEq(userId))
                 .uniqueResult();
+
+            AuditReader auditReader = AuditReaderFactory.get(session);
+            Revision revision =
+                auditReader.getCurrentRevision(Revision.class, false);
+            revision.setUser(user);
 
             ActionContext context = new ActionContext(user, session, null);
 

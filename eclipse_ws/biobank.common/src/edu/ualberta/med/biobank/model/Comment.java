@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
+
 @Entity
 @Table(name = "COMMENT")
 public class Comment extends AbstractBiobankModel {

@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.model.type.DispatchState;
  * storage location to another storage location.
  * 
  */
+
 @Entity
 @Table(name = "DISPATCH")
 public class Dispatch extends AbstractBiobankModel {

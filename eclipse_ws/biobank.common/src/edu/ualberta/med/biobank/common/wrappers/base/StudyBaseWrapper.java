@@ -265,13 +265,6 @@ public class StudyBaseWrapper extends ModelWrapper<Study> {
             commentCollection);
     }
 
-    void removeFromMembershipCollectionWithCheckInternal(
-        List<? extends MembershipBaseWrapper> membershipCollection)
-        throws BiobankCheckException {
-        removeFromWrapperCollectionWithCheck(StudyPeer.MEMBERSHIPS,
-            membershipCollection);
-    }
-
     public List<SiteWrapper> getSiteCollection(boolean sort) {
         boolean notCached = !isPropertyCached(StudyPeer.SITES);
         List<SiteWrapper> siteCollection =
