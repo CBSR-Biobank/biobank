@@ -44,7 +44,7 @@ import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestPatient extends TestAction {
+public class TestPatient extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();

@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAct
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
-public class TestSpecimenType extends TestAction {
+public class TestSpecimenType extends ActionTest {
 
     private String name;
 

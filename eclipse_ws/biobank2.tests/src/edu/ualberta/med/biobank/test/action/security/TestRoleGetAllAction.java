@@ -17,9 +17,9 @@ import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 
-public class TestRoleGetAllAction extends TestAction {
+public class TestRoleGetAllAction extends ActionTest {
     @Test
     public void superAdminAccess() {
         exec(new RoleGetAllAction(new RoleGetAllInput()));

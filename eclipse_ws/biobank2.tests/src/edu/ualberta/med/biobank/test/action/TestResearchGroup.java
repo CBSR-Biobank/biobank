@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestResearchGroup extends TestAction {
+public class TestResearchGroup extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();

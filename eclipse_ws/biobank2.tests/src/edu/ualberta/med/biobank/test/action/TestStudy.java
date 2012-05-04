@@ -58,7 +58,7 @@ import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
  * tested in the Site test class.
  * 
  */
-public class TestStudy extends TestAction {
+public class TestStudy extends ActionTest {
 
     private String name;
     private StudySaveAction studySaveAction;

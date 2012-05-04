@@ -8,10 +8,10 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.test.TestDb;
+import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.test.model.util.HibernateHelper;
 
-public class TestRequestSpecimen extends TestDb {
+public class TestRequestSpecimen extends DbTest {
     @Test
     public void stateIds() {
         Transaction tx = session.beginTransaction();

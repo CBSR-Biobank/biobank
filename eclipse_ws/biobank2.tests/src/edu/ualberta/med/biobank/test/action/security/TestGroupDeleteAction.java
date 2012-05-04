@@ -22,11 +22,11 @@ import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 import edu.ualberta.med.biobank.test.action.security.util.TestCase;
 import edu.ualberta.med.biobank.test.action.security.util.TestCase.IIterableBuilder;
 
-public class TestGroupDeleteAction extends TestAction {
+public class TestGroupDeleteAction extends ActionTest {
     TestCase<Scenario, Boolean> ADMIN = new TestCase<Scenario, Boolean>() {
         @Override
         public Boolean run(Scenario s) {

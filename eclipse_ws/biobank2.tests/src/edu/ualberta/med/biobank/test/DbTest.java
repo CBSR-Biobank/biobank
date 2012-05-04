@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.SessionProvider.Mode;
 
-public class TestDb extends TestBase {
+public class DbTest extends TestBase {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
     private static final User GLOBAL_ADMIN;
     private static final SessionProvider SESSION_PROVIDER;

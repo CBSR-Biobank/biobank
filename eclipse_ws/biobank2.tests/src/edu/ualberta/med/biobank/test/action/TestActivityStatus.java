@@ -7,7 +7,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Study;
 
-public class TestActivityStatus extends TestAction {
+public class TestActivityStatus extends ActionTest {
     @Test
     public void testPersistedId() {
         Transaction tx = session.beginTransaction();

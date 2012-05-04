@@ -4,9 +4,9 @@ import org.hibernate.Transaction;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.test.TestDb;
+import edu.ualberta.med.biobank.test.DbTest;
 
-public class TestRevision extends TestDb {
+public class TestRevision extends DbTest {
     @Test
     public void correctEntityTypes() {
         Transaction tx = session.beginTransaction();

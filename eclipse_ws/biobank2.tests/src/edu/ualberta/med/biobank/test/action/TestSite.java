@@ -62,7 +62,7 @@ import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestSite extends TestAction {
+public class TestSite extends ActionTest {
 
     private String name;
 
@@ -86,7 +86,7 @@ public class TestSite extends TestAction {
             exec(siteSaveAction);
             Assert.fail("should not be allowed to add site with no name");
         } catch (ConstraintViolationException e) {
-            Assert.assertTrue(TestAction.contains(e, NotEmpty.class,
+            Assert.assertTrue(ActionTest.contains(e, NotEmpty.class,
                 Site.class, "getName"));
             Assert.assertTrue(true);
         }

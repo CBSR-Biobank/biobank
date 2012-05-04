@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 
-public class TestGroupGetAllAction extends TestAction {
+public class TestGroupGetAllAction extends ActionTest {
     @Test
     public void superAdminAccess() {
         exec(new GroupGetAllAction(new GroupGetAllInput()));

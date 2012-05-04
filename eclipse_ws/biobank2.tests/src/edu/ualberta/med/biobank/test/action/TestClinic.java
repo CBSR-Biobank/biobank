@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestClinic extends TestAction {
+public class TestClinic extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();
