@@ -15,6 +15,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
+import org.hibernate.envers.Audited;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -26,6 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * specimen from a Repository to a Laboratory
  * 
  */
+@Audited
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractBiobankModel {

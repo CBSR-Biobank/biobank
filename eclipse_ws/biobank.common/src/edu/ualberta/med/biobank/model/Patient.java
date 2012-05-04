@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -40,6 +41,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * the purpose to receive medical care when necessary.
  * 
  */
+@Audited
 @Entity
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)

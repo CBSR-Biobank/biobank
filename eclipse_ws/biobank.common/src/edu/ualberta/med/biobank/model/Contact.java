@@ -11,6 +11,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * between groups or on behalf of a group.
  * 
  */
+@Audited
 @Entity
 @Table(name = "CONTACT")
 @Empty(property = "studies", groups = PreDelete.class)

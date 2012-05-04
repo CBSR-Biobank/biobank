@@ -23,6 +23,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -45,6 +46,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * particularly, a preparation of tissue or bodily fluid taken for examination
  * or diagnosis.
  */
+@Audited
 @Entity
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)

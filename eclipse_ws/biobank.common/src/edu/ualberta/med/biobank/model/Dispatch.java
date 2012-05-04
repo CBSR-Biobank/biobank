@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -28,7 +29,7 @@ import edu.ualberta.med.biobank.model.type.DispatchState;
  * storage location to another storage location.
  * 
  */
-
+@Audited
 @Entity
 @Table(name = "DISPATCH")
 public class Dispatch extends AbstractBiobankModel {

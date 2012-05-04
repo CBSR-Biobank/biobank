@@ -11,6 +11,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.hibernate.envers.Audited;
+
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -28,7 +30,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * NCI Term - Repository: A facility where things can be deposited for storage
  * or safekeeping.
  */
-
+@Audited
 @Entity
 @DiscriminatorValue("Site")
 @Empty.List({
