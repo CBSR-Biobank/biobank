@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -28,6 +31,7 @@ public class Revision implements IBiobankModel {
     private Integer id;
     private Date timestamp;
     private User user;
+    private Set<RevisedEntity> revisedEntities = new HashSet<RevisedEntity>(0);
 
     @Override
     @RevisionNumber
@@ -64,18 +68,23 @@ public class Revision implements IBiobankModel {
         this.user = user;
     }
 
+    @OneToMany(mappedBy = "revision", cascade = CascadeType.ALL)
+    public Set<RevisedEntity> getRevisedEntities() {
+        return revisedEntities;
+    }
+
+    public void setRevisedEntities(Set<RevisedEntity> revisedEntities) {
+        this.revisedEntities = revisedEntities;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result =
-            prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
         return result;
     }
 
-    // TODO: should equals be id only or all properties?
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -85,12 +94,6 @@ public class Revision implements IBiobankModel {
         if (id == null) {
             if (other.id != null) return false;
         } else if (!id.equals(other.id)) return false;
-        if (timestamp == null) {
-            if (other.timestamp != null) return false;
-        } else if (!timestamp.equals(other.timestamp)) return false;
-        if (user == null) {
-            if (other.user != null) return false;
-        } else if (!user.equals(other.user)) return false;
         return true;
     }
 }
