@@ -60,8 +60,14 @@ public class Revision implements IBiobankModel, HasCreatedAt {
         this.createdAt = createdAt;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID", unique = true, nullable = false)
+    /**
+     * The {@link User} responsible for this {@link Revision}. Note that this
+     * could be null, in cases such as, periodic server or maintenance actions.
+     * 
+     * @return
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
     public User getUser() {
         return user;
     }

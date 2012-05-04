@@ -24,11 +24,6 @@ public class RevisionListenerImpl
 
     @Override
     public void newRevision(Object revisionEntity) {
-        Revision revision = asRevision(revisionEntity);
-
-        // TODO: ditch the thread user idea? Use a global Identity instead?
-        User user = THREAD_USER.get();
-        revision.setUser(user);
     }
 
     @Override

@@ -4,21 +4,24 @@ import org.hibernate.Transaction;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.test.DbTest;
 
-public class TestRevision extends DbTest {
+public class TestRevision extends LoggingTest {
     @Test
-    public void correctEntityTypes() {
+    public void revisionEntityTypes() {
         Transaction tx = session.beginTransaction();
         Site site = factory.createSite();
         tx.commit();
 
         tx = session.beginTransaction();
+        String oldName = site.getName();
+        String newName = oldName + "X";
+        site.setName(newName);
+        session.update(site);
         tx.commit();
+    }
 
-        try {
-        } finally {
-            tx.rollback();
-        }
+    @Test
+    public void executingUser() {
+
     }
 }
