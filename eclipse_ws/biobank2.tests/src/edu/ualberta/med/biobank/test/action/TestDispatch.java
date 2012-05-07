@@ -154,7 +154,7 @@ public class TestDispatch extends ActionTest {
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.IN_TRANSIT.getId()));
+                .equals(DispatchState.IN_TRANSIT));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));

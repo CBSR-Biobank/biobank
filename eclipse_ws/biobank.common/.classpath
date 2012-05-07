@@ -17,7 +17,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-envers"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-core"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
