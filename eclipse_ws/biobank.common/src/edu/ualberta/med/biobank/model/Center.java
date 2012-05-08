@@ -52,7 +52,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "dstDispatches", groups = PreDelete.class)
 })
 public class Center extends AbstractBiobankModel
-    implements HasName, HasNameShort, HasActivityStatus, HasComments {
+    implements HasName, HasNameShort, HasActivityStatus, HasComments,
+    HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -108,6 +109,7 @@ public class Center extends AbstractBiobankModel
         this.nameShort = nameShort;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Center.address.NotNull}")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", unique = true, nullable = false)
@@ -115,6 +117,7 @@ public class Center extends AbstractBiobankModel
         return this.address;
     }
 
+    @Override
     public void setAddress(Address address) {
         this.address = address;
     }
