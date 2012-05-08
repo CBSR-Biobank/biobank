@@ -14,7 +14,9 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -58,6 +60,7 @@ public class Factory {
 
     private Site defaultSite;
     private Center defaultCenter;
+    private Clinic defaultClinic;
     private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
     private SpecimenType defaultSpecimenType;
@@ -84,6 +87,7 @@ public class Factory {
     private ProcessingEvent defaultProcessingEvent;
     private SourceSpecimen defaultSourceSpecimen;
     private AliquotedSpecimen defaultAliquotedSpecimen;
+    private Contact defaultContact;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -93,6 +97,28 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public Contact getDefaultContact() {
+        if (defaultContact == null) {
+            defaultContact = createContact();
+        }
+        return defaultContact;
+    }
+
+    public void setDefaultContact(Contact defaultContact) {
+        this.defaultContact = defaultContact;
+    }
+
+    public Clinic getDefaultClinic() {
+        if (defaultClinic == null) {
+            defaultClinic = createClinic();
+        }
+        return defaultClinic;
+    }
+
+    public void setDefaultClinic(Clinic defaultClinic) {
+        this.defaultClinic = defaultClinic;
     }
 
     public SourceSpecimen getDefaultSourceSpecimen() {
@@ -400,6 +426,34 @@ public class Factory {
         this.defaultSpecimen = defaultSpecimen;
     }
 
+    public Contact createContact() {
+        String name = nameGenerator.next(Contact.class);
+        Contact contact = new Contact();
+        contact.setClinic(getDefaultClinic());
+        contact.setName(name);
+
+        setDefaultContact(contact);
+        session.save(contact);
+        session.flush();
+        return contact;
+    }
+
+    public Clinic createClinic() {
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
+
+        Clinic clinic = new Clinic();
+        clinic.setName(name);
+        clinic.setNameShort(name);
+        clinic.getAddress().setCity("testville");
+
+        setDefaultCenter(clinic);
+        setDefaultClinic(clinic);
+        session.save(clinic);
+        session.flush();
+        return clinic;
+    }
+
     public SourceSpecimen createSourceSpecimen() {
         SourceSpecimen sourceSpecimen = new SourceSpecimen();
         sourceSpecimen.setStudy(getDefaultStudy());
@@ -448,6 +502,7 @@ public class Factory {
         researchGroup.setNameShort(name);
         researchGroup.setStudy(getDefaultStudy());
 
+        setDefaultCenter(researchGroup);
         setDefaultResearchGroup(researchGroup);
         session.save(researchGroup);
         session.flush();

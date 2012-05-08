@@ -36,7 +36,7 @@ public class TestContainerType extends DbTest {
         try {
             session.update(duplicate);
             session.flush();
-        } catch (ConstraintViolationException e) {
+        } catch (Exception e) {
             tx.rollback();
             Assert.fail("two container types can have the same name if they" +
                 " are at different sites");
@@ -76,7 +76,7 @@ public class TestContainerType extends DbTest {
         try {
             session.update(duplicate);
             session.flush();
-        } catch (ConstraintViolationException e) {
+        } catch (Exception e) {
             tx.rollback();
             Assert.fail("two container types can have the same nameShort if" +
                 " they are at different sites");

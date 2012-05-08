@@ -8,6 +8,8 @@ import org.hibernate.Transaction;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.test.DbTest;
@@ -16,10 +18,20 @@ import edu.ualberta.med.biobank.validator.constraint.Empty;
 
 public class TestCenter extends DbTest {
     @Test
+    public void emptyName() {
+        HasXHelper.checkEmptyName(session, new Site());
+    }
+
+    @Test
     public void duplicateName() {
         HasXHelper.checkDuplicateName(session,
             factory.createSite(),
             factory.createSite());
+    }
+
+    @Test
+    public void emptyNameShort() {
+        HasXHelper.checkEmptyNameShort(session, new Site());
     }
 
     @Test
@@ -48,9 +60,9 @@ public class TestCenter extends DbTest {
             tx.commit();
             Assert.fail("cannot delete a center with srcDispatches");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Empty.class,
-                new Attr("property", "srcDispatches"));
+            AssertConstraintViolation.onAnnotation(Empty.class)
+                .withAttribute("property", "srcDispatches")
+                .assertIn(e);
         }
     }
 

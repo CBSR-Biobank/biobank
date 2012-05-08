@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestClinic extends ActionTest {
@@ -286,67 +285,4 @@ public class TestClinic extends ActionTest {
 
         Assert.assertTrue(result.equals(0L));
     }
-
-    @Test
-    public void deleteWithStudies() {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-        ClinicInfo clinicInfo =
-            exec(new ClinicGetInfoAction(provisioning.clinicId));
-        try {
-            exec(new ClinicDeleteAction(clinicInfo.clinic));
-            Assert
-                .fail("should not be allowed to delete a clinic linked to a study");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-        ClinicInfo clinicInfo =
-            exec(new ClinicGetInfoAction(provisioning.clinicId));
-
-        DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
-            provisioning.siteId,
-            provisioning.patientIds.get(0));
-
-        try {
-            exec(new ClinicDeleteAction(clinicInfo.clinic));
-            Assert
-                .fail(
-                "should not be allowed to delete a clinic which is a source of dispatches");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-
-        // add second clinic to be the destination of the dispatch
-
-        ClinicSaveAction csa2 =
-            ClinicHelper.getSaveAction(name + "_clinic2", name,
-                ActivityStatus.ACTIVE, getR().nextBoolean());
-        Integer clinicId2 = exec(csa2).getId();
-        ClinicInfo clinic2Info =
-            exec(new ClinicGetInfoAction(clinicId2));
-
-        DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
-            clinicId2,
-            provisioning.patientIds.get(0));
-
-        try {
-            exec(new ClinicDeleteAction(clinic2Info.clinic));
-            Assert
-                .fail(
-                "should not be allowed to delete a clinic which is a destination for dispatches");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-    }
-
 }
