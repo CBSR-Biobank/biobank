@@ -3,9 +3,12 @@ package edu.ualberta.med.biobank.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import junit.framework.Assert;
 
@@ -26,6 +29,64 @@ public class AssertMore {
                 + ". Instead, it contains the message template(s): "
                 + Arrays.toString(messageTemplates.toArray()));
         }
+    }
+
+    public static void containsAnnotation(ConstraintViolationException e,
+        Class<?> annotationClass) {
+        containsAnnotation(e, annotationClass, null);
+    }
+
+    public static void containsAnnotation(ConstraintViolationException e,
+        Class<?> annotationClass, Map<String, Object> expectedAttrs) {
+        Collection<String> annotations = new ArrayList<String>();
+        for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+            ConstraintDescriptor<?> cd = violation.getConstraintDescriptor();
+
+            Object annotation = cd.getAnnotation();
+            Map<String, Object> attrs = cd.getAttributes();
+
+            annotations.add(annotation.toString());
+
+            if (!annotationClass.isAssignableFrom(annotation.getClass())) {
+                continue;
+            }
+            if (expectedAttrs != null && !attrsContains(attrs, expectedAttrs)) {
+                continue;
+            }
+
+            return;
+        }
+
+        Assert.fail(ConstraintViolationException.class.getSimpleName()
+            + " does not contain an expected "
+            + ConstraintDescriptor.class.getSimpleName()
+            + " with an annotation of type " + annotationClass.getName()
+            + " and properties: " + expectedAttrs
+            + ". Instead, it contains the"
+            + " annotation(s): " + Arrays.toString(annotations.toArray()));
+    }
+
+    /**
+     * @param a
+     * @param b
+     * @return True if the first map contains all key-value pairs in the second
+     *         map.
+     */
+    private static boolean attrsContains(Map<String, Object> a,
+        Map<String, Object> b) {
+        for (Entry<String, Object> entry : b.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if (!a.containsKey(key) || !arrayWiseEq(a.get(key), value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean arrayWiseEq(Object a, Object b) {
+        // because new String[] { "a" }.equals(new String[] { "a" }) is false.
+        return Arrays.deepEquals(new Object[] { a }, new Object[] { b });
     }
 
     public static void messageContains(Throwable t, String substring) {

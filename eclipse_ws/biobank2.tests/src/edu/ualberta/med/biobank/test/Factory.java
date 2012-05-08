@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
@@ -76,6 +77,7 @@ public class Factory {
     private Request defaultRequest;
     private RequestSpecimen defaultRequestSpecimen;
     private ResearchGroup defaultResearchGroup;
+    private ProcessingEvent defaultProcessingEvent;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -85,6 +87,17 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public ProcessingEvent getDefaultProcessingEvent() {
+        if (defaultProcessingEvent == null) {
+            defaultProcessingEvent = createProcessingEvent();
+        }
+        return defaultProcessingEvent;
+    }
+
+    public void setDefaultProcessingEvent(ProcessingEvent defaultProcessingEvent) {
+        this.defaultProcessingEvent = defaultProcessingEvent;
     }
 
     public ResearchGroup getDefaultResearchGroup() {
@@ -358,6 +371,20 @@ public class Factory {
         this.defaultSpecimen = defaultSpecimen;
     }
 
+    public ProcessingEvent createProcessingEvent() {
+        String worksheet = nameGenerator.next(ProcessingEvent.class);
+
+        ProcessingEvent processingEvent = new ProcessingEvent();
+        processingEvent.setWorksheet(worksheet);
+        processingEvent.setCenter(getDefaultCenter());
+        processingEvent.setCreatedAt(new Date());
+
+        setDefaultProcessingEvent(processingEvent);
+        session.save(processingEvent);
+        session.flush();
+        return processingEvent;
+    }
+
     public ResearchGroup createResearchGroup() {
         String name = nameGenerator.next(ResearchGroup.class);
 
@@ -367,6 +394,7 @@ public class Factory {
         researchGroup.setNameShort(name);
         researchGroup.setStudy(getDefaultStudy());
 
+        setDefaultResearchGroup(researchGroup);
         session.save(researchGroup);
         session.flush();
         return researchGroup;

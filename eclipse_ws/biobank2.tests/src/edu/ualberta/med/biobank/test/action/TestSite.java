@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,12 +17,6 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
-import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
-import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
@@ -33,22 +26,17 @@ import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
-import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Site;
@@ -431,105 +419,6 @@ public class TestSite extends ActionTest {
 
         Assert.assertEquals(1L, ctypeInfo.get(0).getContainerCount()
             .longValue());
-    }
-
-    @Test
-    public void deleteWithContainerTypes() {
-        Provisioning provisioning = createSiteWithContainerType();
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
-        try {
-            exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-                .fail(
-                "should not be allowed to delete a site with container types");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // delete container type followed by site - should work now
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(
-                provisioning.containerTypeIds.get(0)));
-        exec(new ContainerTypeDeleteAction(containerTypeInfo
-            .getContainerType()));
-        exec(new SiteDeleteAction(siteInfo.getSite()));
-    }
-
-    @Test
-    public void deleteWithContainers() {
-        Provisioning provisioning = createSiteWithContainerType();
-        Integer containerTypeId = provisioning.containerTypeIds.get(0);
-        Integer containerId =
-            provisioning.addContainer(getExecutor(), containerTypeId, "01");
-
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
-        try {
-            exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-                .fail(
-                "should not be allowed to delete a site with containers");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        List<Container> topContainers =
-            exec(new SiteGetTopContainersAction(provisioning.siteId))
-                .getList();
-        Assert.assertEquals(1, topContainers.size());
-
-        // delete container followed by site - should work now
-        ContainerInfo containerInfo =
-            exec(new ContainerGetInfoAction(containerId));
-        exec(new ContainerDeleteAction(containerInfo.container));
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(containerTypeId));
-        exec(new ContainerTypeDeleteAction(containerTypeInfo
-            .getContainerType()));
-        exec(new SiteDeleteAction(siteInfo.getSite()));
-    }
-
-    @Test
-    public void deleteWithProcessingEvents() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-
-        // create a collection event
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        CEventInfo ceventInfo =
-            exec(new CollectionEventGetInfoAction(ceventId));
-        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
-
-        // create a processing event with one of the collection event source
-        // specimens
-        Integer peventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, Utils.getRandomDate(), Utils
-                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                    new HashSet<Integer>(
-                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
-                    new HashSet<Integer>()))
-                .getId();
-
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
-        try {
-            exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-                .fail(
-                "should not be allowed to delete a site with processing events");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // delete the processing event
-        PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(peventId));
-        exec(new ProcessingEventDeleteAction(peventInfo.pevent));
-        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test

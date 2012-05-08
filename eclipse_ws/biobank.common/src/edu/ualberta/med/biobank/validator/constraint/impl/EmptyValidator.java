@@ -42,6 +42,21 @@ public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
         return empty;
     }
 
+    public static String getDefaultMessageTemplate(Class<?> klazz,
+        String property) {
+        StringBuilder template = new StringBuilder();
+
+        template.append("{");
+        template.append(klazz.getName());
+        template.append(".");
+        template.append(Empty.class.getSimpleName());
+        template.append(".");
+        template.append(property);
+        template.append("}");
+
+        return template.toString();
+    }
+
     private void overrideEmptyMessageTemplate(Object value,
         ConstraintValidatorContext context) {
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
@@ -50,18 +65,11 @@ public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
             ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
-            StringBuilder template = new StringBuilder();
-
-            template.append("{");
-            template.append(meta.getMappedClass(EntityMode.POJO).getName());
-            template.append(".");
-            template.append(Empty.class.getSimpleName());
-            template.append(".");
-            template.append(property);
-            template.append("}");
+            Class<?> klazz = meta.getMappedClass(EntityMode.POJO);
+            String template = getDefaultMessageTemplate(klazz, property);
 
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(template.toString())
+            context.buildConstraintViolationWithTemplate(template)
                 .addConstraintViolation();
         }
     }
