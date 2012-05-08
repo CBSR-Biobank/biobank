@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,14 +47,7 @@ public class TestClinic extends ActionTest {
 
     @Test
     public void saveNew() throws Exception {
-        clinicSaveAction.setName(null);
-        try {
-            exec(clinicSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
+        clinicSaveAction.setName(name);
 
         Address address = new Address();
         address.setCity(name);

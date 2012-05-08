@@ -17,6 +17,7 @@ import junit.framework.Assert;
 
 import org.hibernate.validator.engine.PathImpl;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.util.NullUtil;
 
 public class AssertConstraintViolation {
@@ -94,7 +95,7 @@ public class AssertConstraintViolation {
             Assert.fail("Cannot find a constraint violation"
                 + " with the expected properties: " + this.toString()
                 + ". Instead, found the constraint violation(s): "
-                + Arrays.toString(cvStrings.toArray()));
+                + StringUtil.join(cvStrings, "\r\n"));
         }
     }
 

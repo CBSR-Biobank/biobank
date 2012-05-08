@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.model;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import junit.framework.Assert;
 
@@ -116,20 +117,80 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void nullSite() {
-        Assert.fail();
+        ContainerType ct = factory.createContainerType();
+        ct.setSite(null);
+
+        try {
+            session.update(ct);
+            session.flush();
+            Assert.fail("null site should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(ct)
+                .withPropertyPath("site")
+                .assertIn(e);
+        }
     }
 
     @Test
     public void nullCapacities() {
-        // row
-        // col
-        // capacity
-        Assert.fail();
+        ContainerType ct = factory.createContainerType();
+        ct.getCapacity().setColCapacity(null);
+
+        try {
+            session.update(ct);
+            session.flush();
+            Assert.fail("null capacity.colCapacity should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(ct)
+                .withPropertyPath("capacity.colCapacity")
+                .assertIn(e);
+        }
+
+        ct.getCapacity().setColCapacity(1);
+        ct.getCapacity().setRowCapacity(null);
+
+        try {
+            session.update(ct);
+            session.flush();
+            Assert.fail("null capacity.rowCapacity should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(ct)
+                .withPropertyPath("capacity.rowCapacity")
+                .assertIn(e);
+        }
+
+        ct.setCapacity(null);
+
+        try {
+            session.update(ct);
+            session.flush();
+            Assert.fail("null capacity should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(ct)
+                .withPropertyPath("capacity")
+                .assertIn(e);
+        }
     }
 
     @Test
     public void nullChildLabelingScheme() {
-        Assert.fail();
+        ContainerType ct = factory.createContainerType();
+        ct.setChildLabelingScheme(null);
+
+        try {
+            session.update(ct);
+            session.flush();
+            Assert.fail("null childLabelingScheme should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(ct)
+                .withPropertyPath("childLabelingScheme")
+                .assertIn(e);
+        }
     }
 
     @Test
@@ -399,8 +460,9 @@ public class TestContainerType extends DbTest {
         ContainerType topCt = factory.createTopContainerType();
         ContainerType childCt = factory.createContainerType();
 
-        Assert.assertTrue("requires a parent-child relationship",
-            childCt.getParentContainerTypes().contains(topCt));
+        topCt.getChildContainerTypes().add(childCt);
+        session.update(topCt);
+        session.flush();
 
         try {
             session.delete(childCt);

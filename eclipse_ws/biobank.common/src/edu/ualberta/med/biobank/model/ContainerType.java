@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
@@ -207,6 +208,7 @@ public class ContainerType extends AbstractBiobankModel
         this.comments = comments;
     }
 
+    @Valid
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
     @Embedded
     public Capacity getCapacity() {
