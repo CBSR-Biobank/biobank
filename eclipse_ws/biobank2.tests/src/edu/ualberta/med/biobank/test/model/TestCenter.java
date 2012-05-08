@@ -11,48 +11,27 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
-import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class TestCenter extends DbTest {
     @Test
     public void duplicateName() {
-        Transaction tx = session.beginTransaction();
-
-        Center original = factory.createSite();
-        Center duplicate = factory.createSite();
-
-        duplicate.setName(original.getName());
-
-        try {
-            session.update(duplicate);
-            tx.commit();
-            Assert.fail("cannot have two centers with the same name");
-        } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "name" }));
-        }
+        HasXHelper.checkDuplicateName(session,
+            factory.createSite(),
+            factory.createSite());
     }
 
     @Test
     public void duplicateNameShort() {
-        Transaction tx = session.beginTransaction();
+        HasXHelper.checkDuplicateNameShort(session,
+            factory.createSite(),
+            factory.createSite());
+    }
 
-        Center original = factory.createSite();
-        Center duplicate = factory.createSite();
-
-        duplicate.setNameShort(original.getNameShort());
-
-        try {
-            session.update(duplicate);
-            tx.commit();
-            Assert.fail("cannot have two centers with the same nameShort");
-        } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "nameShort" }));
-        }
+    @Test
+    public void activityStatusIds() {
+        HasXHelper.checkActivityStatusIds(session, factory.createSite());
     }
 
     @Test
