@@ -30,10 +30,16 @@ public class DbTest extends BaseTest {
     public void setUp() throws Exception {
         session = getSessionProvider().openSession();
         factory = new Factory(session, getMethodNameR());
+        session.beginTransaction();
     }
 
     @After
     public void tearDown() throws Exception {
+        Transaction tx = session.getTransaction();
+        if (tx != null && tx.isActive()) {
+            tx.rollback();
+        }
+
         factory = null;
         session.close();
     }
