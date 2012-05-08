@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -136,28 +134,6 @@ public class TestPatient extends ActionTest {
     }
 
     @Test
-    public void saveSamePnumber() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-        final String pnumber = name;
-        final Date date = Utils.getRandomDate();
-        final Integer id = exec(new PatientSaveAction(null,
-            provisioning.studyId, pnumber, date, null)).getId();
-
-        // Check patient is in database with correct values
-        Patient p = (Patient) session.get(Patient.class, id);
-        Assert.assertNotNull(p);
-
-        // try to save with same pnumber
-        try {
-            exec(new PatientSaveAction(null, provisioning.studyId,
-                pnumber, new Date(), null));
-            Assert.fail("should not be able to use the same pnumber twice");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
     public void delete() throws Exception {
         Provisioning provisioning = new Provisioning(getExecutor(), name);
         final String pnumber = name;
@@ -172,33 +148,6 @@ public class TestPatient extends ActionTest {
 
         Patient patient = (Patient) session.get(Patient.class, id);
         Assert.assertNull(patient);
-    }
-
-    @Test
-    public void deleteWithCevents() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
-        final String pnumber = name;
-        final Date date = Utils.getRandomDate();
-        // create a new patient
-        final Integer patientId = exec(new PatientSaveAction(
-            null, provisioning.studyId, pnumber, date, null)).getId();
-        // add a cevent to the patient:
-        exec(new CollectionEventSaveAction(null, patientId, getR()
-            .nextInt(20) + 1, ActivityStatus.ACTIVE, null, null, null));
-
-        // delete the patient
-        PatientInfo patientInfo =
-            exec(new PatientGetInfoAction(patientId));
-        try {
-            exec(new PatientDeleteAction(patientInfo.patient));
-            Assert
-                .fail("should throw an exception since the patient still has on cevent");
-        } catch (ConstraintViolationException ae) {
-            Assert.assertTrue(true);
-        }
-
-        Patient patient = (Patient) session.get(Patient.class, patientId);
-        Assert.assertNotNull(patient);
     }
 
     @Test

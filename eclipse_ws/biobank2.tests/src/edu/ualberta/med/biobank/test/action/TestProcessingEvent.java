@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -179,28 +177,6 @@ public class TestProcessingEvent extends ActionTest {
                 specimenInfo.specimen.getCollectionEvent().getPatient()
                     .getStudy().getName());
 
-        }
-    }
-
-    @Test
-    public void saveSameWorksheet() throws Exception {
-        String worksheet = Utils.getRandomString(50);
-        Date date = Utils.getRandomDate();
-        exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet,
-            ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>(), new HashSet<Integer>()));
-
-        // try to save another pevent with the same worksheet
-        try {
-            exec(new ProcessingEventSaveAction(null,
-                provisioning.siteId, new Date(), worksheet,
-                ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(), new HashSet<Integer>()));
-            Assert
-                .fail("should not be able to use the same worksheet to 2 different pevents");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
         }
     }
 

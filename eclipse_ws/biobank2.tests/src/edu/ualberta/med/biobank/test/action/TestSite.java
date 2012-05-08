@@ -8,7 +8,6 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,49 +67,10 @@ public class TestSite extends ActionTest {
 
     @Test
     public void saveNew() throws Exception {
-        // null name
-        siteSaveAction.setName(null);
-        try {
-            exec(siteSaveAction);
-            Assert.fail("should not be allowed to add site with no name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(ActionTest.contains(e, NotEmpty.class,
-                Site.class, "getName"));
-            Assert.assertTrue(true);
-        }
-
-        // null short name
         siteSaveAction.setName(name);
-        siteSaveAction.setNameShort(null);
-        try {
-            exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no short name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         siteSaveAction.setNameShort(name);
-        siteSaveAction.setActivityStatus(null);
-        try {
-            exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add Site with no activity status");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         siteSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        siteSaveAction.setAddress(null);
-        try {
-            exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no address");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
 
-        // TODO: test invalid act status: 5, -1
         Address address = new Address();
         address.setCity(name);
         siteSaveAction.setAddress(address);
@@ -187,28 +147,6 @@ public class TestSite extends ActionTest {
         siteInfo.getSite().setNameShort(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         exec(siteSaveAction);
-
-        // test for duplicate name
-        SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
-            ActivityStatus.ACTIVE);
-        try {
-            exec(saveSite);
-            Assert.fail("should not be allowed to add site with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for duplicate name short
-        saveSite.setName(Utils.getRandomString(5, 10));
-        saveSite.setNameShort(name + "_2");
-
-        try {
-            exec(saveSite);
-            Assert.fail(
-                "should not be allowed to add site with same name short");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test

@@ -19,14 +19,19 @@ import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
+import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
 public class TestContainerType extends DbTest {
     @Test
-    public void duplicateNameDifferentSite() {
-        Transaction tx = session.getTransaction();
+    public void emptyName() {
+        HasXHelper.checkEmptyName(session, factory.createContainerType());
+    }
 
+    @Test
+    public void duplicateNameDifferentSite() {
         ContainerType original = factory.createContainerType();
 
         factory.createSite();
@@ -37,7 +42,6 @@ public class TestContainerType extends DbTest {
             session.update(duplicate);
             session.flush();
         } catch (Exception e) {
-            tx.rollback();
             Assert.fail("two container types can have the same name if they" +
                 " are at different sites");
         }
@@ -45,15 +49,13 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void duplicateSiteAndName() {
-        Transaction tx = session.getTransaction();
-
         ContainerType original = factory.createContainerType();
         ContainerType duplicate = factory.createContainerType();
         duplicate.setName(original.getName());
 
         try {
             session.update(duplicate);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot have two container types at the same site" +
                 " with the same name");
         } catch (ConstraintViolationException e) {
@@ -61,6 +63,11 @@ public class TestContainerType extends DbTest {
                 .withAttr("properties", new String[] { "site", "name" })
                 .assertIn(e);
         }
+    }
+
+    @Test
+    public void emptyNameShort() {
+        HasXHelper.checkEmptyNameShort(session, factory.createContainerType());
     }
 
     @Test
@@ -85,15 +92,13 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void duplicateSiteAndNameShort() {
-        Transaction tx = session.getTransaction();
-
         ContainerType original = factory.createContainerType();
         ContainerType duplicate = factory.createContainerType();
         duplicate.setNameShort(original.getNameShort());
 
         try {
             session.update(duplicate);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot have two container types at the same site" +
                 " with the same nameShort");
         } catch (ConstraintViolationException e) {
@@ -110,9 +115,25 @@ public class TestContainerType extends DbTest {
     }
 
     @Test
-    public void removeUsedChildContainerType() {
-        Transaction tx = session.beginTransaction();
+    public void nullSite() {
+        Assert.fail();
+    }
 
+    @Test
+    public void nullCapacities() {
+        // row
+        // col
+        // capacity
+        Assert.fail();
+    }
+
+    @Test
+    public void nullChildLabelingScheme() {
+        Assert.fail();
+    }
+
+    @Test
+    public void removeUsedChildContainerType() {
         Container topContainer = factory.createTopContainer();
         factory.createContainer();
 
@@ -120,7 +141,7 @@ public class TestContainerType extends DbTest {
             ContainerType topContainerType = topContainer.getContainerType();
             topContainerType.getChildContainerTypes().clear();
             session.update(topContainerType);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot remove child container types in use");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -131,8 +152,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void removeUsedSpecimenType() {
-        Transaction tx = session.beginTransaction();
-
         Specimen specimen = factory.createPositionedSpecimen();
 
         try {
@@ -140,7 +159,7 @@ public class TestContainerType extends DbTest {
                 .getContainer().getContainerType();
             parentCt.getSpecimenTypes().remove(specimen.getSpecimenType());
             session.update(parentCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot remove specimen types in use");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -151,8 +170,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void containerTypeChildSiteMismatch() {
-        Transaction tx = session.beginTransaction();
-
         ContainerType childCt = factory.createContainerType();
 
         factory.createSite();
@@ -161,7 +178,7 @@ public class TestContainerType extends DbTest {
         try {
             topCt.getChildContainerTypes().add(childCt);
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("child container types must have the same site");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
             AssertMore.assertMessageContains(e.getCause(),
@@ -171,18 +188,15 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void containerContainerTypeSiteMismatch() {
-        Transaction tx = session.beginTransaction();
-
         Container container = factory.createContainer();
         Site newSite = factory.createSite();
 
         try {
             container.getContainerType().setSite(newSite);
             session.update(container);
-            tx.commit();
+            session.flush();
             Assert.fail("site of container and its container type must match");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
-            tx.rollback();
             AssertMore.assertMessageContains(e.getCause(),
                 "FK_Container_containerType");
         }
@@ -190,8 +204,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void illegalChildContainerType() {
-        Transaction tx = session.beginTransaction();
-
         Container childContainer = factory.createContainer();
 
         factory.createTopContainerType(); // new default
@@ -207,9 +219,8 @@ public class TestContainerType extends DbTest {
 
         try {
             session.update(childContainer);
-            tx.commit();
+            session.flush();
         } catch (org.hibernate.exception.ConstraintViolationException e) {
-            tx.rollback();
             AssertMore.assertMessageContains(e.getCause(),
                 "FK_ContainerPosition_containerTypeContainerType");
         }
@@ -217,8 +228,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void illegalChildSpecimen() {
-        Transaction tx = session.beginTransaction();
-
         Specimen specimen = factory.createSpecimen();
         Container container = factory.createContainer();
 
@@ -231,10 +240,9 @@ public class TestContainerType extends DbTest {
 
         try {
             session.save(sp);
-            tx.commit();
+            session.flush();
             Assert.fail("legal child specimen types must be defined");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
-            tx.rollback();
             AssertMore.assertMessageContains(e.getCause(),
                 "FK_SpecimenPosition_containerTypeSpecimenType");
         }
@@ -242,8 +250,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void multipleChildTypes() {
-        Transaction tx = session.beginTransaction();
-
         ContainerType ct2 = factory.createContainerType();
         SpecimenType st = factory.createSpecimenType();
         ContainerType ct1 = factory.createContainerType();
@@ -252,7 +258,7 @@ public class TestContainerType extends DbTest {
             ct1.getChildContainerTypes().add(ct2);
             ct1.getSpecimenTypes().add(st);
             session.update(ct1);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot have child container types and specimen types");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -263,13 +269,11 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void overCapacity() {
-        Transaction tx = session.beginTransaction();
-
         ContainerType ct = factory.createContainerType();
         ct.setCapacity(new Capacity(100, 100));
 
         try {
-            tx.commit();
+            session.flush();
             Assert.fail("capacity cannot exceed what can be labeled");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -280,8 +284,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeTopLevelHavingContainers() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createContainer();
 
@@ -289,7 +291,7 @@ public class TestContainerType extends DbTest {
             ContainerType topCt = topContainer.getContainerType();
             topCt.setTopLevel(!topCt.getTopLevel());
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change topLevel if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -300,8 +302,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeCapacityHavingContainers() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createContainer();
 
@@ -309,7 +309,7 @@ public class TestContainerType extends DbTest {
             ContainerType topCt = topContainer.getContainerType();
             topCt.getCapacity().setRowCapacity(topCt.getRowCapacity() + 1);
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change capacity if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -320,8 +320,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeSchemeHavingContainers() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createContainer();
 
@@ -331,7 +329,7 @@ public class TestContainerType extends DbTest {
                 .get2CharAlphabetic());
 
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change labeling scheme if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -342,8 +340,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeTopLevelHavingSpecimens() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createPositionedSpecimen();
 
@@ -351,7 +347,7 @@ public class TestContainerType extends DbTest {
             ContainerType topCt = topContainer.getContainerType();
             topCt.setTopLevel(!topCt.getTopLevel());
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change topLevel if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -362,8 +358,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeCapacityHavingSpecimens() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createPositionedSpecimen();
 
@@ -371,7 +365,7 @@ public class TestContainerType extends DbTest {
             ContainerType topCt = topContainer.getContainerType();
             topCt.getCapacity().setRowCapacity(topCt.getRowCapacity() + 1);
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change capacity if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
@@ -382,8 +376,6 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void changeSchemeHavingSpecimens() {
-        Transaction tx = session.beginTransaction();
-
         Container topContainer = factory.createTopContainer();
         factory.createPositionedSpecimen();
 
@@ -393,11 +385,48 @@ public class TestContainerType extends DbTest {
                 .get2CharAlphabetic());
 
             session.update(topCt);
-            tx.commit();
+            session.flush();
             Assert.fail("cannot change labeling scheme if children exist");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
                 .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void deleteWithParent() {
+        ContainerType topCt = factory.createTopContainerType();
+        ContainerType childCt = factory.createContainerType();
+
+        Assert.assertTrue("requires a parent-child relationship",
+            childCt.getParentContainerTypes().contains(topCt));
+
+        try {
+            session.delete(childCt);
+            session.flush();
+            Assert.fail("cannot delete a container type with a parent");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation()
+                .withAnnotationClass(Empty.class)
+                .withAttr("property", "parentContainerTypes")
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void deleteWithContainer() {
+        Container container = factory.createContainer();
+
+        try {
+            session.delete(container.getContainerType());
+            session.flush();
+            Assert.fail("cannot delete a container type used by a container");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation()
+                .withAnnotationClass(NotUsed.class)
+                .withAttr("by", Container.class)
+                .withAttr("property", "containerType")
                 .assertIn(e);
         }
     }

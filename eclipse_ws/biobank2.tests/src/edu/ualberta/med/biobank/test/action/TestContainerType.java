@@ -6,24 +6,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.hibernate.Query;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
@@ -51,85 +45,6 @@ public class TestContainerType extends ActionTest {
             "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
             getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
                 .getId(), getR().nextDouble());
-    }
-
-    @Test
-    public void saveNew() throws Exception {
-        containerTypeSaveAction.setName(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with no name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setName(name);
-        containerTypeSaveAction.setNameShort(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with no name short");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setNameShort(name);
-        containerTypeSaveAction.setSiteId(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with no site");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setSiteId(siteId);
-        containerTypeSaveAction.setRowCapacity(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with null for row capacity");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setRowCapacity(3);
-        containerTypeSaveAction.setColCapacity(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with null for column capacity");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction.setColCapacity(10);
-        containerTypeSaveAction.setChildLabelingSchemeId(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with null for child labeling scheme");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        containerTypeSaveAction
-            .setChildLabelingSchemeId(getContainerLabelingSchemes().get(
-                "CBSR 2 char alphabetic")
-                .getId());
-        containerTypeSaveAction.setActivityStatus(null);
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add container type with null for activity status");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test success path
-        containerTypeSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        exec(containerTypeSaveAction);
     }
 
     @Test
@@ -181,31 +96,6 @@ public class TestContainerType extends ActionTest {
                 exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setNameShort("FR4x12");
         exec(containerTypeSaveAction);
-
-        // test for duplicate name
-
-        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
-            "FREEZER_4x12", "FR5x10", siteId, true, 3, 10,
-            getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId(), getR().nextDouble());
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add a second container type with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for duplicate name short
-        containerTypeSaveAction.setName("FREEZER_5x10");
-        containerTypeSaveAction.setNameShort("FR4x12");
-        try {
-            exec(containerTypeSaveAction);
-            Assert
-                .fail("should not be allowed to add a second container type with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test
@@ -426,23 +316,6 @@ public class TestContainerType extends ActionTest {
 
     }
 
-    private Container createTypeWithContainer() {
-        Integer containerTypeId =
-            exec(containerTypeSaveAction).getId();
-
-        ContainerSaveAction containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
-        containerSaveAction.setLabel("01");
-        containerSaveAction.setSiteId(siteId);
-        containerSaveAction.setTypeId(containerTypeId);
-        Integer containerId = exec(containerSaveAction).getId();
-        ContainerInfo containerInfo =
-            exec(new ContainerGetInfoAction(containerId));
-
-        return containerInfo.container;
-    }
-
     private ContainerTypeInfo addComment(Integer containerTypeId) {
         ContainerTypeSaveAction containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
@@ -471,53 +344,5 @@ public class TestContainerType extends ActionTest {
         Long result = HibernateUtil.getCountFromQuery(q);
 
         Assert.assertTrue(result.equals(0L));
-    }
-
-    @Test
-    public void deleteWithParent() {
-        // create a top container type with children
-        Set<Integer> childContainerTypeIds = new HashSet<Integer>();
-        for (ContainerType childContainerType : createChildContainerTypes()) {
-            childContainerTypeIds.add(childContainerType.getId());
-        }
-
-        containerTypeSaveAction.setChildContainerTypeIds(childContainerTypeIds);
-        Integer parentCtId = exec(containerTypeSaveAction).getId();
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(parentCtId));
-        Integer childCtId =
-            containerTypeInfo.getContainerType()
-                .getChildContainerTypes()
-                .iterator().next().getId();
-
-        ContainerTypeInfo childCtInfo =
-            exec(new ContainerTypeGetInfoAction(childCtId));
-        try {
-            exec(new ContainerTypeDeleteAction(childCtInfo
-                .getContainerType()));
-            Assert
-                .fail(
-                "should not be allowed to delete a child container type and linked to a parent type");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void deleteWithContainer() {
-        Container container = createTypeWithContainer();
-        Integer containerTypeId = container.getContainerType().getId();
-
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(containerTypeId));
-        try {
-            exec(new ContainerTypeDeleteAction(containerTypeInfo
-                .getContainerType()));
-            Assert
-                .fail(
-                "should not be allowed to delete a container type in use by a container");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 }

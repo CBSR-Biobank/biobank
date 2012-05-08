@@ -58,37 +58,6 @@ public class TestClinic extends ActionTest {
             Assert.assertTrue(true);
         }
 
-        // null short name
-        clinicSaveAction.setName(name);
-        clinicSaveAction.setNameShort(null);
-        try {
-            exec(clinicSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no short name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        clinicSaveAction.setNameShort(name);
-        clinicSaveAction.setActivityStatus(null);
-        try {
-            exec(clinicSaveAction);
-            Assert.fail(
-                "should not be allowed to add Clinic with no activity status");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        clinicSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        clinicSaveAction.setAddress(null);
-        try {
-            exec(clinicSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with no address");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         Address address = new Address();
         address.setCity(name);
         clinicSaveAction.setAddress(address);
@@ -126,48 +95,6 @@ public class TestClinic extends ActionTest {
         Assert.assertEquals(name + "_clinic_city", clinicInfo.clinic
             .getAddress()
             .getCity());
-    }
-
-    @Test
-    public void nameChecks() throws Exception {
-        // ensure we can change name on existing clinic
-        Integer clinicId = exec(clinicSaveAction).getId();
-        ClinicInfo clinicInfo =
-            exec(new ClinicGetInfoAction(clinicId));
-        clinicInfo.clinic.setName(name + "_2");
-        ClinicSaveAction clinicSave =
-            ClinicHelper.getSaveAction(clinicInfo);
-        exec(clinicSave);
-
-        // ensure we can change short name on existing clinic
-        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
-        clinicInfo.clinic.setNameShort(name + "_2");
-        clinicSave = ClinicHelper.getSaveAction(clinicInfo);
-        exec(clinicSave);
-
-        // test for duplicate name
-        ClinicSaveAction saveClinic2 =
-            ClinicHelper.getSaveAction(name + "_2", name,
-                ActivityStatus.ACTIVE, false);
-        try {
-            exec(saveClinic2);
-            Assert.fail("should not be allowed to add clinic with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for duplicate name short
-        saveClinic2.setName(Utils.getRandomString(5, 10));
-        saveClinic2.setNameShort(name + "_2");
-
-        try {
-            exec(saveClinic2);
-            Assert
-                .fail("should not be allowed to add clinic with same name short");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
     }
 
     @Test

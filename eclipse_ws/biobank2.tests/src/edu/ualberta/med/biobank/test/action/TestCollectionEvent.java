@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.hibernate.Query;
@@ -435,62 +433,6 @@ public class TestCollectionEvent extends ActionTest {
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
-    }
-
-    @Test
-    public void deleteWithSpecimens() throws Exception {
-        // add specimen type
-        final Integer typeId =
-            exec(new SpecimenTypeSaveAction(name, name)).getId();
-
-        final Map<String, SaveCEventSpecimenInfo> specs =
-            CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, getExecutor().getUserId(), provisioning.siteId);
-
-        // Save a new cevent
-        final Integer ceventId = exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0), getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
-            .getId();
-
-        // try to delete this cevent
-        CEventInfo info =
-            exec(new CollectionEventGetInfoAction(ceventId));
-        try {
-            exec(new CollectionEventDeleteAction(info.cevent));
-            Assert
-                .fail("should throw an exception because specimens are still in the cevent");
-        } catch (ConstraintViolationException ae) {
-            Assert.assertTrue(true);
-        }
-
-        // Check CollectionEvent is in database with correct values
-        CollectionEvent cevent =
-            (CollectionEvent) session.get(CollectionEvent.class, ceventId);
-        Assert.assertNotNull(cevent);
-    }
-
-    @Test
-    public void saveNotUniqueVisitNumber() throws Exception {
-        final Integer visitNumber = getR().nextInt(20) + 1;
-        // add
-        exec(new CollectionEventSaveAction(null,
-            provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
-            null, null,
-            null));
-
-        // try to add a second collection event with the same visit number
-        try {
-            exec(new CollectionEventSaveAction(null,
-                provisioning.patientIds.get(0), visitNumber,
-                ActivityStatus.ACTIVE, null,
-                null, null));
-            Assert
-                .fail("should throw an exception because the visit number is already used");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test

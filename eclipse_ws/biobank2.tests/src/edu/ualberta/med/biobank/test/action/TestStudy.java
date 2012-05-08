@@ -76,37 +76,10 @@ public class TestStudy extends ActionTest {
 
     @Test
     public void saveNew() throws Exception {
-        // null name
-        studySaveAction.setName(null);
-        try {
-            exec(studySaveAction);
-            Assert.fail("should not be allowed to add study with no name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // null short name
         studySaveAction.setName(name);
-        studySaveAction.setNameShort(null);
-        try {
-            exec(studySaveAction);
-            Assert
-                .fail("should not be allowed to add study with no short name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         studySaveAction.setNameShort(name);
-        studySaveAction.setActivityStatus(null);
-        try {
-            exec(studySaveAction);
-            Assert
-                .fail("should not be allowed to add study with no activity status");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         studySaveAction.setActivityStatus(ActivityStatus.ACTIVE);
+
         studySaveAction.setContactIds(null);
         try {
             exec(studySaveAction);
@@ -205,29 +178,6 @@ public class TestStudy extends ActionTest {
         studyInfo.getStudy().setNameShort(name + "_2");
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
         exec(studySaveAction);
-
-        // test for duplicate name
-        StudySaveAction saveStudy =
-            StudyHelper.getSaveAction(name + "_2", name,
-                ActivityStatus.ACTIVE);
-        try {
-            exec(saveStudy);
-            Assert.fail("should not be allowed to add study with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for duplicate name short
-        saveStudy.setName(Utils.getRandomString(5, 10));
-        saveStudy.setNameShort(name + "_2");
-
-        try {
-            exec(saveStudy);
-            Assert
-                .fail("should not be allowed to add study with same name short");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test
