@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
@@ -9,6 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -31,6 +34,7 @@ import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -78,6 +82,8 @@ public class Factory {
     private RequestSpecimen defaultRequestSpecimen;
     private ResearchGroup defaultResearchGroup;
     private ProcessingEvent defaultProcessingEvent;
+    private SourceSpecimen defaultSourceSpecimen;
+    private AliquotedSpecimen defaultAliquotedSpecimen;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -87,6 +93,29 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public SourceSpecimen getDefaultSourceSpecimen() {
+        if (defaultSourceSpecimen == null) {
+            defaultSourceSpecimen = createSourceSpecimen();
+        }
+        return defaultSourceSpecimen;
+    }
+
+    public void setDefaultSourceSpecimen(SourceSpecimen defaultSourceSpecimen) {
+        this.defaultSourceSpecimen = defaultSourceSpecimen;
+    }
+
+    public AliquotedSpecimen getDefaultAliquotedSpecimen() {
+        if (defaultAliquotedSpecimen == null) {
+            defaultAliquotedSpecimen = createAliquotedSpecimen();
+        }
+        return defaultAliquotedSpecimen;
+    }
+
+    public void setDefaultAliquotedSpecimen(
+        AliquotedSpecimen defaultAliquotedSpecimen) {
+        this.defaultAliquotedSpecimen = defaultAliquotedSpecimen;
     }
 
     public ProcessingEvent getDefaultProcessingEvent() {
@@ -371,6 +400,30 @@ public class Factory {
         this.defaultSpecimen = defaultSpecimen;
     }
 
+    public SourceSpecimen createSourceSpecimen() {
+        SourceSpecimen sourceSpecimen = new SourceSpecimen();
+        sourceSpecimen.setStudy(getDefaultStudy());
+        sourceSpecimen.setSpecimenType(getDefaultSpecimenType());
+
+        setDefaultSourceSpecimen(sourceSpecimen);
+        session.save(sourceSpecimen);
+        session.flush();
+        return sourceSpecimen;
+    }
+
+    public AliquotedSpecimen createAliquotedSpecimen() {
+        AliquotedSpecimen aliquotedSpecimen = new AliquotedSpecimen();
+        aliquotedSpecimen.setStudy(getDefaultStudy());
+        aliquotedSpecimen.setVolume(new BigDecimal("1.00"));
+        aliquotedSpecimen.setQuantity(1);
+        aliquotedSpecimen.setSpecimenType(getDefaultSpecimenType());
+
+        setDefaultAliquotedSpecimen(aliquotedSpecimen);
+        session.save(aliquotedSpecimen);
+        session.flush();
+        return aliquotedSpecimen;
+    }
+
     public ProcessingEvent createProcessingEvent() {
         String worksheet = nameGenerator.next(ProcessingEvent.class);
 
@@ -386,7 +439,8 @@ public class Factory {
     }
 
     public ResearchGroup createResearchGroup() {
-        String name = nameGenerator.next(ResearchGroup.class);
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
 
         ResearchGroup researchGroup = new ResearchGroup();
         researchGroup.getAddress().setCity("testville");
@@ -402,7 +456,13 @@ public class Factory {
 
     public Request createRequest() {
         Request request = new Request();
-        request.getAddress().setCity("testville");
+
+        Address address = request.getAddress();
+        address.setCity("testville");
+
+        session.save(address);
+
+        request.setCreatedAt(new Date());
         request.setResearchGroup(getDefaultResearchGroup());
 
         setDefaultRequest(request);
@@ -449,7 +509,8 @@ public class Factory {
     }
 
     public Site createSite() {
-        String name = nameGenerator.next(Site.class);
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
 
         Site site = new Site();
         site.setName(name);

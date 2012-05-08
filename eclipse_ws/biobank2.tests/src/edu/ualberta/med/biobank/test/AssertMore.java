@@ -18,6 +18,7 @@ public class AssertMore {
         String messageTemplate) {
         Collection<String> messageTemplates = new ArrayList<String>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+            checkTemplateFound(violation);
             messageTemplates.add(violation.getMessageTemplate());
         }
         if (!messageTemplates.contains(messageTemplate)) {
@@ -34,6 +35,8 @@ public class AssertMore {
         Class<?> annotationClass, Attr... expectedAttrs) {
         Collection<String> annotations = new ArrayList<String>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+            checkTemplateFound(violation);
+
             ConstraintDescriptor<?> cd = violation.getConstraintDescriptor();
 
             Object annotation = cd.getAnnotation();
@@ -80,6 +83,20 @@ public class AssertMore {
     private static boolean arrayWiseEq(Object a, Object b) {
         // because new String[] { "a" }.equals(new String[] { "a" }) is false.
         return Arrays.deepEquals(new Object[] { a }, new Object[] { b });
+    }
+
+    /**
+     * Asserts a failure if the given {@link ConstraintViolation} has a missing
+     * value for its message template, i.e. if its
+     * {@link ConstraintViolation#getMessage()} is equal to its
+     * {@link ConstraintViolation#getMessageTemplate()}.
+     * 
+     */
+    private static void checkTemplateFound(ConstraintViolation<?> cv) {
+        if (cv.getMessageTemplate().equals(cv.getMessage())) {
+            Assert.fail("It seems the message template for " + cv
+                + " could not be found: " + cv.getMessageTemplate());
+        }
     }
 
     public static void assertMessageContains(Throwable t, String substring) {

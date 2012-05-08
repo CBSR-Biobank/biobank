@@ -17,8 +17,8 @@ import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class HasXHelper {
-    public static void checkDuplicateName(Session session, HasName original,
-        HasName duplicate) {
+    public static <T extends HasName> void checkDuplicateName(Session session,
+        T original, T duplicate) {
         Transaction tx = session.getTransaction();
 
         duplicate.setName(original.getName());
@@ -26,7 +26,8 @@ public class HasXHelper {
         try {
             session.update(duplicate);
             tx.commit();
-            Assert.fail("cannot have two centers with the same name");
+            Assert.fail("cannot have two objects with the same name: "
+                + original.getClass().getName());
         } catch (ConstraintViolationException e) {
             tx.rollback();
             AssertMore.assertContainsAnnotation(e, Unique.class,
@@ -34,8 +35,8 @@ public class HasXHelper {
         }
     }
 
-    public static void checkDuplicateNameShort(Session session,
-        HasNameShort original, HasNameShort duplicate) {
+    public static <T extends HasNameShort> void checkDuplicateNameShort(
+        Session session, T original, T duplicate) {
         Transaction tx = session.getTransaction();
 
         duplicate.setNameShort(original.getNameShort());
@@ -43,7 +44,8 @@ public class HasXHelper {
         try {
             session.update(duplicate);
             tx.commit();
-            Assert.fail("cannot have two centers with the same nameShort");
+            Assert.fail("cannot have two objects with the same nameShort: "
+                + original.getClass().getName());
         } catch (ConstraintViolationException e) {
             tx.rollback();
             AssertMore.assertContainsAnnotation(e, Unique.class,
@@ -51,7 +53,7 @@ public class HasXHelper {
         }
     }
 
-    public static void checkActivityStatusIds(Session session,
+    public static void checkExpectedActivityStatusIds(Session session,
         HasActivityStatus hasActivityStatus) {
         Transaction tx = session.getTransaction();
 

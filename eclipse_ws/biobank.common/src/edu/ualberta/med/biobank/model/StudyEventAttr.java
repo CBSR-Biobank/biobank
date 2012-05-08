@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+// TODO: test activityStatus property
 @Audited
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")

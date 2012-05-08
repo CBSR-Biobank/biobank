@@ -30,8 +30,9 @@ public class TestCenter extends DbTest {
     }
 
     @Test
-    public void activityStatusIds() {
-        HasXHelper.checkActivityStatusIds(session, factory.createSite());
+    public void expectedActivityStatusIds() {
+        HasXHelper.checkExpectedActivityStatusIds(session,
+            factory.createSite());
     }
 
     @Test

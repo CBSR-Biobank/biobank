@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+// TODO: test name uniqueness? Rethink design regarding localization?
 @Audited
 @Entity
 @Table(name = "SHIPPING_METHOD")

@@ -16,10 +16,99 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.AssertMore;
+import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.model.util.HasXHelper;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
 public class TestContainerType extends DbTest {
+    @Test
+    public void duplicateNameDifferentSite() {
+        Transaction tx = session.getTransaction();
+
+        ContainerType original = factory.createContainerType();
+
+        factory.createSite();
+        ContainerType duplicate = factory.createContainerType();
+        duplicate.setName(original.getName());
+
+        try {
+            session.update(duplicate);
+            session.flush();
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            Assert.fail("two container types can have the same name if they" +
+                " are at different sites");
+        }
+    }
+
+    @Test
+    public void duplicateSiteAndName() {
+        Transaction tx = session.getTransaction();
+
+        ContainerType original = factory.createContainerType();
+        ContainerType duplicate = factory.createContainerType();
+        duplicate.setName(original.getName());
+
+        try {
+            session.update(duplicate);
+            tx.commit();
+            Assert.fail("cannot have two container types at the same site" +
+                " with the same name");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsAnnotation(e, Unique.class,
+                new Attr("properties", new String[] { "site", "name" }));
+        }
+    }
+
+    @Test
+    public void duplicateNameShortDifferentSite() {
+        Transaction tx = session.getTransaction();
+
+        ContainerType original = factory.createContainerType();
+
+        factory.createSite();
+        ContainerType duplicate = factory.createContainerType();
+        duplicate.setNameShort(original.getNameShort());
+
+        try {
+            session.update(duplicate);
+            session.flush();
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            Assert.fail("two container types can have the same nameShort if" +
+                " they are at different sites");
+        }
+    }
+
+    @Test
+    public void duplicateSiteAndNameShort() {
+        Transaction tx = session.getTransaction();
+
+        ContainerType original = factory.createContainerType();
+        ContainerType duplicate = factory.createContainerType();
+        duplicate.setNameShort(original.getNameShort());
+
+        try {
+            session.update(duplicate);
+            tx.commit();
+            Assert.fail("cannot have two container types at the same site" +
+                " with the same nameShort");
+        } catch (ConstraintViolationException e) {
+            tx.rollback();
+            AssertMore.assertContainsAnnotation(e, Unique.class,
+                new Attr("properties", new String[] { "site", "nameShort" }));
+        }
+    }
+
+    @Test
+    public void expectedActivityStatusIds() {
+        HasXHelper.checkExpectedActivityStatusIds(session,
+            factory.createContainerType());
+    }
+
     @Test
     public void removeUsedChildContainerType() {
         Transaction tx = session.beginTransaction();
