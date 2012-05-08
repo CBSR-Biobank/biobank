@@ -14,11 +14,14 @@ import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import junit.framework.Assert;
+
+import org.hibernate.validator.engine.PathImpl;
+
 import edu.ualberta.med.biobank.util.NullUtil;
 
 public class AssertConstraintViolation {
-    private final Class<?> annotationClass;
     private final Map<String, Object> attrs = new HashMap<String, Object>();
+    private final Option<Class<?>> annotationClass = new Option<Class<?>>();
     private final Option<Object> invalidValue = new Option<Object>();
     private final Option<Object> leafBean = new Option<Object>();
     private final Option<String> template = new Option<String>();
@@ -26,13 +29,10 @@ public class AssertConstraintViolation {
     private final Option<Object> rootBean = new Option<Object>();
     private final Option<Class<?>> rootBeanClass = new Option<Class<?>>();
 
-    private AssertConstraintViolation(Class<?> annotationClass) {
-        this.annotationClass = annotationClass;
-    }
-
-    public static AssertConstraintViolation onAnnotation(
+    public AssertConstraintViolation withAnnotationClass(
         Class<?> annotationClass) {
-        return new AssertConstraintViolation(annotationClass);
+        this.annotationClass.setValue(annotationClass);
+        return this;
     }
 
     public AssertConstraintViolation withInvalidValue(Object invalidValue) {
@@ -45,7 +45,7 @@ public class AssertConstraintViolation {
         return this;
     }
 
-    public AssertConstraintViolation withMessageTemplate(String template) {
+    public AssertConstraintViolation withTemplate(String template) {
         this.template.setValue(template);
         return this;
     }
@@ -53,6 +53,10 @@ public class AssertConstraintViolation {
     public AssertConstraintViolation withPropertyPath(Path propertyPath) {
         this.propertyPath.setValue(propertyPath);
         return this;
+    }
+
+    public AssertConstraintViolation withPropertyPath(String propertyPath) {
+        return withPropertyPath(PathImpl.createPathFromString(propertyPath));
     }
 
     public AssertConstraintViolation withRootBean(Object rootBean) {
@@ -65,7 +69,7 @@ public class AssertConstraintViolation {
         return this;
     }
 
-    public AssertConstraintViolation withAttribute(String key, Object value) {
+    public AssertConstraintViolation withAttr(String key, Object value) {
         attrs.put(key, value);
         return this;
     }
@@ -76,22 +80,21 @@ public class AssertConstraintViolation {
 
     public void assertIn(Set<ConstraintViolation<?>> cvs) {
         boolean found = false;
-        Collection<String> annotations = new ArrayList<String>();
+        Collection<String> cvStrings = new ArrayList<String>();
         for (ConstraintViolation<?> cv : cvs) {
             assertTemplateFound(cv);
             found |= in(cv);
 
             Object annotation = cv.getConstraintDescriptor().getAnnotation();
-            annotations.add(annotation.toString());
+            cvStrings.add("{ConstraintViolation=" + cv.toString()
+                + ",annotation=" + annotation + "}");
         }
 
         if (!found) {
-            Assert.fail(ConstraintViolationException.class.getSimpleName()
-                + " does not contain an expected "
-                + ConstraintDescriptor.class.getSimpleName()
-                + " with an annotation with properties: " + this.toString()
-                + ". Instead, found the annotation(s): "
-                + Arrays.toString(annotations.toArray()));
+            Assert.fail("Cannot find a constraint violation"
+                + " with the expected properties: " + this.toString()
+                + ". Instead, found the constraint violation(s): "
+                + Arrays.toString(cvStrings.toArray()));
         }
     }
 
@@ -99,10 +102,7 @@ public class AssertConstraintViolation {
     public String toString() {
         StringBuilder string = new StringBuilder();
 
-        string.append("{annotationClass=");
-        string.append(annotationClass.getName());
-
-        string.append(",attrs={");
+        string.append("attrs={");
         for (Entry<String, Object> entry : attrs.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
@@ -112,6 +112,11 @@ public class AssertConstraintViolation {
             string.append(Arrays.deepToString(new Object[] { value }));
         }
         string.append("}");
+
+        if (annotationClass.isSet()) {
+            string.append(",annotationClass=")
+                .append(annotationClass.getValue().getName());
+        }
 
         if (invalidValue.isSet()) {
             string.append(",invalidValue=").append(invalidValue);
@@ -129,7 +134,8 @@ public class AssertConstraintViolation {
             string.append(",rootBean=").append(rootBean);
         }
         if (rootBeanClass.isSet()) {
-            string.append(",rootBeanClass=").append(rootBeanClass);
+            string.append(",rootBeanClass=")
+                .append(rootBeanClass.getValue().getName());
         }
 
         string.append("}");
@@ -143,8 +149,12 @@ public class AssertConstraintViolation {
         // the annotation seems to be proxy so cannot compare the classes
         // with the equals operator
         Object annotation = cd.getAnnotation();
-        if (!annotationClass.isAssignableFrom(annotation.getClass())) {
-            return false;
+        if (annotationClass.isSet()) {
+            Class<?> expected = annotationClass.getValue();
+            Class<?> actual = annotation.getClass();
+            if (!expected.isAssignableFrom(actual)) {
+                return false;
+            }
         }
         if (!containsExpectedAttrs(cd.getAttributes())) return false;
 
@@ -197,6 +207,10 @@ public class AssertConstraintViolation {
         public void setValue(T value) {
             this.value = value;
             this.set = true;
+        }
+
+        public T getValue() {
+            return value;
         }
 
         public boolean isSet() {

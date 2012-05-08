@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -57,9 +57,9 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot have two container types at the same site" +
                 " with the same name");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "site", "name" }));
+            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+                .withAttr("properties", new String[] { "site", "name" })
+                .assertIn(e);
         }
     }
 
@@ -97,9 +97,9 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot have two container types at the same site" +
                 " with the same nameShort");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "site", "nameShort" }));
+            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+                .withAttr("properties", new String[] { "site", "nameShort" })
+                .assertIn(e);
         }
     }
 
@@ -123,9 +123,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot remove child container types in use");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHILD_CT_REMOVE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.REMOVED_CT_IN_USE)
+                .assertIn(e);
         }
     }
 
@@ -143,9 +143,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot remove specimen types in use");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_ST_REMOVE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.REMOVED_ST_IN_USE)
+                .assertIn(e);
         }
     }
 
@@ -164,7 +164,6 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("child container types must have the same site");
         } catch (org.hibernate.exception.ConstraintViolationException e) {
-            tx.rollback();
             AssertMore.assertMessageContains(e.getCause(),
                 "FK_ContainerType_parentContainerTypes");
         }
@@ -256,9 +255,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot have child container types and specimen types");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.MULTIPLE_CHILD_TYPES);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.MULTIPLE_CHILD_TYPES)
+                .assertIn(e);
         }
     }
 
@@ -273,9 +272,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("capacity cannot exceed what can be labeled");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.OVER_CAPACITY);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.OVER_CAPACITY)
+                .assertIn(e);
         }
     }
 
@@ -293,9 +292,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change topLevel if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 
@@ -313,9 +312,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change capacity if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 
@@ -335,9 +334,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change labeling scheme if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 
@@ -355,9 +354,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change topLevel if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 
@@ -375,9 +374,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change capacity if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 
@@ -397,9 +396,9 @@ public class TestContainerType extends DbTest {
             tx.commit();
             Assert.fail("cannot change labeling scheme if children exist");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsTemplate(e,
-                ValidContainerTypeValidator.ILLEGAL_CHANGE);
+            new AssertConstraintViolation()
+                .withTemplate(ValidContainerTypeValidator.ILLEGAL_CHANGE)
+                .assertIn(e);
         }
     }
 }

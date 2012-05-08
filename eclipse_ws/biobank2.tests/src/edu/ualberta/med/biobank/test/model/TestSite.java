@@ -11,11 +11,9 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.AssertMore.Attr;
+import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
-import edu.ualberta.med.biobank.validator.constraint.impl.EmptyValidator;
 
 public class TestSite extends DbTest {
     @Test
@@ -30,9 +28,9 @@ public class TestSite extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with containers");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Empty.class,
-                new Attr("property", "containers"));
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "containers")
+                .assertIn(e);
         }
     }
 
@@ -48,10 +46,9 @@ public class TestSite extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with container types");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            String template = EmptyValidator.
-                getDefaultMessageTemplate(Site.class, "containerTypes");
-            AssertMore.assertContainsTemplate(e, template);
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "containerTypes")
+                .assertIn(e);
         }
     }
 
@@ -71,10 +68,9 @@ public class TestSite extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with container types");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            String template = EmptyValidator.
-                getDefaultMessageTemplate(Site.class, "processingEvents");
-            AssertMore.assertContainsTemplate(e, template);
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "processingEvents")
+                .assertIn(e);
         }
     }
 }

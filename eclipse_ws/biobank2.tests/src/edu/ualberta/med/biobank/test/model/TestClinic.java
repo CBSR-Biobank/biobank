@@ -9,8 +9,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.AssertMore.Attr;
+import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
@@ -38,10 +37,10 @@ public class TestClinic extends DbTest {
             tx.commit();
             Assert.fail("cannot delete a clinic with contacts with a study");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, NotUsed.class,
-                new Attr("by", Study.class),
-                new Attr("property", "contacts.clinic"));
+            new AssertConstraintViolation().withAnnotationClass(NotUsed.class)
+                .withAttr("by", Study.class)
+                .withAttr("property", "contacts.clinic")
+                .assertIn(e);
         }
     }
 }

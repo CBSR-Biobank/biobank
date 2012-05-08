@@ -77,6 +77,11 @@ public class LocalizedConstraintViolation<T>
         return delegate.getConstraintDescriptor();
     }
 
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
+
     private void readObject(ObjectInputStream s) throws IOException,
         ClassNotFoundException {
         s.defaultReadObject();

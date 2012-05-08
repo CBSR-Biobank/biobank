@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.model.util;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.NotNull;
 
 import junit.framework.Assert;
 
@@ -13,8 +14,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.HasActivityStatus;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
-import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.AssertMore.Attr;
+import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class HasXHelper {
@@ -23,22 +23,24 @@ public class HasXHelper {
             named.setName(null);
             session.save(named);
             session.flush();
-            Assert.fail("name cannot be null");
+            Assert.fail("null name should not be allowed");
         } catch (ConstraintViolationException e) {
-            // TODO: make sure it's on the right object class and on the right
-            // property name
-            AssertMore.assertContainsAnnotation(e, NotEmpty.class);
+            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+                .withRootBean(named)
+                .withPropertyPath("name")
+                .assertIn(e);
         }
 
         try {
             named.setName("");
             session.save(named);
             session.flush();
-            Assert.fail("name cannot be empty");
+            Assert.fail("empty name should not be allowed");
         } catch (ConstraintViolationException e) {
-            // TODO: make sure it's on the right object class and on the right
-            // property name
-            AssertMore.assertContainsAnnotation(e, NotEmpty.class);
+            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+                .withRootBean(named)
+                .withPropertyPath("name")
+                .assertIn(e);
         }
     }
 
@@ -51,12 +53,11 @@ public class HasXHelper {
         try {
             session.update(duplicate);
             tx.commit();
-            Assert.fail("cannot have two objects with the same name: "
-                + original.getClass().getName());
+            Assert.fail("duplicate name should not be allowed");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "name" }));
+            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+                .withAttr("properties", new String[] { "name" })
+                .assertIn(e);
         }
     }
 
@@ -66,22 +67,24 @@ public class HasXHelper {
             shortNamed.setNameShort(null);
             session.save(shortNamed);
             session.flush();
-            Assert.fail("nameShort cannot be null");
+            Assert.fail("null nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            // TODO: make sure it's on the right object class and on the right
-            // property name
-            AssertMore.assertContainsAnnotation(e, NotEmpty.class);
+            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+                .withRootBean(shortNamed)
+                .withPropertyPath("nameShort")
+                .assertIn(e);
         }
 
         try {
             shortNamed.setNameShort("");
             session.save(shortNamed);
             session.flush();
-            Assert.fail("nameShort cannot be empty");
+            Assert.fail("empty nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            // TODO: make sure it's on the right object class and on the right
-            // property name
-            AssertMore.assertContainsAnnotation(e, NotEmpty.class);
+            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+                .withRootBean(shortNamed)
+                .withPropertyPath("nameShort")
+                .assertIn(e);
         }
     }
 
@@ -94,12 +97,26 @@ public class HasXHelper {
         try {
             session.update(duplicate);
             tx.commit();
-            Assert.fail("cannot have two objects with the same nameShort: "
-                + original.getClass().getName());
+            Assert.fail("duplicate nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            tx.rollback();
-            AssertMore.assertContainsAnnotation(e, Unique.class,
-                new Attr("properties", new String[] { "nameShort" }));
+            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+                .withAttr("properties", new String[] { "nameShort" })
+                .assertIn(e);
+        }
+    }
+
+    public static void checkNullActivityStatus(Session session,
+        HasActivityStatus hasActivityStatus) {
+        try {
+            hasActivityStatus.setActivityStatus(null);
+            session.save(hasActivityStatus);
+            session.flush();
+            Assert.fail("null activityStatus should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(hasActivityStatus)
+                .withPropertyPath("activityStatus")
+                .assertIn(e);
         }
     }
 
