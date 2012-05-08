@@ -47,7 +47,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "pnumber", groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
 @Empty(property = "collectionEvents", groups = PreDelete.class)
-public class Patient extends AbstractBiobankModel {
+public class Patient extends AbstractBiobankModel
+    implements HasCreatedAt, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -84,12 +85,14 @@ public class Patient extends AbstractBiobankModel {
         this.pnumber = pnumber;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -114,6 +117,7 @@ public class Patient extends AbstractBiobankModel {
         this.study = study;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
@@ -122,6 +126,7 @@ public class Patient extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

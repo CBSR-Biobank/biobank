@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Empty(property = "patients", groups = PreDelete.class)
 public class Study extends AbstractBiobankModel
-    implements HasName {
+    implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -77,6 +77,7 @@ public class Study extends AbstractBiobankModel
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -88,6 +89,7 @@ public class Study extends AbstractBiobankModel
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
@@ -121,6 +123,7 @@ public class Study extends AbstractBiobankModel
         this.sites = sites;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "STUDY_COMMENT",
         joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
@@ -129,10 +132,12 @@ public class Study extends AbstractBiobankModel
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -140,6 +145,7 @@ public class Study extends AbstractBiobankModel
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

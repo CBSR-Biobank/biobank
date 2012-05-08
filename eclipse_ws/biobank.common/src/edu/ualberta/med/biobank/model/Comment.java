@@ -22,7 +22,8 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "COMMENT")
-public class Comment extends AbstractBiobankModel {
+public class Comment extends AbstractBiobankModel
+    implements HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -56,11 +57,13 @@ public class Comment extends AbstractBiobankModel {
         this.message = message;
     }
 
+    @Override
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }

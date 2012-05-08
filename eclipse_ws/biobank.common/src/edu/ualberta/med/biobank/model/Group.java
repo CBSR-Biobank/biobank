@@ -26,7 +26,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @DiscriminatorValue("BbGroup")
 @Unique(properties = "name", groups = PrePersist.class)
-public class Group extends Principal {
+public class Group extends Principal
+    implements HasName {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
     private static final long serialVersionUID = 1L;
@@ -49,12 +50,14 @@ public class Group extends Principal {
     private String description;
     private Set<User> users = new HashSet<User>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

@@ -39,7 +39,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childSpecimenTypes", groups = PreDelete.class),
     @Empty(property = "parentSpecimenTypes", groups = PreDelete.class)
 })
-public class SpecimenType extends AbstractBiobankModel {
+public class SpecimenType extends AbstractBiobankModel
+    implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -56,22 +57,26 @@ public class SpecimenType extends AbstractBiobankModel {
         new HashSet<SpecimenType>(0);
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }

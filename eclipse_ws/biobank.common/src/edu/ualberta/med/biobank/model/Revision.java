@@ -25,7 +25,8 @@ import edu.ualberta.med.biobank.model.util.RevisionListenerImpl;
 @RevisionEntity(RevisionListenerImpl.class)
 @Entity
 @Table(name = "REVISION")
-public class Revision implements IBiobankModel, HasCreatedAt {
+public class Revision
+    implements IBiobankModel, HasCreatedAt {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
@@ -56,6 +57,7 @@ public class Revision implements IBiobankModel, HasCreatedAt {
         return createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }

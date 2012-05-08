@@ -52,7 +52,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @Empty(property = "childSpecimens", groups = PreDelete.class)
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
-public class Specimen extends AbstractBiobankModel {
+public class Specimen extends AbstractBiobankModel
+    implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -128,12 +129,14 @@ public class Specimen extends AbstractBiobankModel {
         this.quantity = quantity;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -220,6 +223,7 @@ public class Specimen extends AbstractBiobankModel {
         this.childSpecimens = childSpecimens;
     }
 
+    @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
@@ -228,6 +232,7 @@ public class Specimen extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
@@ -253,6 +258,7 @@ public class Specimen extends AbstractBiobankModel {
         this.originInfo = originInfo;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -260,6 +266,7 @@ public class Specimen extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

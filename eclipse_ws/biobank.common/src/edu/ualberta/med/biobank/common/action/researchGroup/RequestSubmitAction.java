@@ -46,7 +46,7 @@ public class RequestSubmitAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         Request request = new Request();
         request.setResearchGroup(context.get(ResearchGroup.class, rgId));
-        request.setCreated(new Date());
+        request.setCreatedAt(new Date());
         request.setSubmitted(new Date());
         request.setAddress(context.get(ResearchGroup.class,
             rgId).getAddress());

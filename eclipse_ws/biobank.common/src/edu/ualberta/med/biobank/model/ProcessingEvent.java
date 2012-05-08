@@ -38,7 +38,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
 @Unique(properties = "worksheet", groups = PrePersist.class)
-public class ProcessingEvent extends AbstractBiobankModel {
+public class ProcessingEvent extends AbstractBiobankModel
+    implements HasCreatedAt, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -75,12 +76,14 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.worksheet = worksheet;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -106,6 +109,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         this.specimens = specimens;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -113,10 +117,12 @@ public class ProcessingEvent extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @Override
     @ManyToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "PROCESSING_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false, updatable = false) },
@@ -125,6 +131,7 @@ public class ProcessingEvent extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

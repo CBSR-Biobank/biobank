@@ -26,7 +26,8 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 @Audited
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
-public class DispatchSpecimen extends AbstractBiobankModel {
+public class DispatchSpecimen extends AbstractBiobankModel
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -81,6 +82,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         this.specimen = specimen;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "DISPATCH_SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "DISPATCH_SPECIMEN_ID", nullable = false, updatable = false) },
@@ -89,6 +91,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

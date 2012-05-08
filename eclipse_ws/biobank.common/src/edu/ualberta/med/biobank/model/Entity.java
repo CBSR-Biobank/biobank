@@ -13,7 +13,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @javax.persistence.Entity
 @Table(name = "ENTITY")
-public class Entity extends AbstractBiobankModel {
+public class Entity extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
 
     private String className;
@@ -32,12 +33,14 @@ public class Entity extends AbstractBiobankModel {
         this.className = className;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Entity.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

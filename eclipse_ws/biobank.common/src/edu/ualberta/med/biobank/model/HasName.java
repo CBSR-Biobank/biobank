@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.i18n.LString;
 public interface HasName {
     public String getName();
 
-    public String getNameShort();
+    public void setName(String name);
 
     @SuppressWarnings("nls")
     public static class PropertyName {

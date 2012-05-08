@@ -64,7 +64,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType extends AbstractBiobankModel {
+public class ContainerType extends AbstractBiobankModel
+    implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -102,22 +103,26 @@ public class ContainerType extends AbstractBiobankModel {
     private Set<ContainerType> parentContainerTypes =
         new HashSet<ContainerType>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME_SHORT")
     public String getNameShort() {
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
@@ -175,6 +180,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.childContainerTypes = childContainerTypes;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -182,10 +188,12 @@ public class ContainerType extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
@@ -194,6 +202,7 @@ public class ContainerType extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

@@ -9,6 +9,8 @@ import edu.ualberta.med.biobank.i18n.LString;
 public interface HasCreatedAt {
     public Date getCreatedAt();
 
+    public void setCreatedAt(Date createdAt);
+
     @SuppressWarnings("nls")
     public static class PropertyName {
         private static final Bundle bundle = new CommonBundle();

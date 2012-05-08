@@ -59,7 +59,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childPositions", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractBiobankModel {
+public class Container extends AbstractBiobankModel
+    implements HasComments, HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -135,6 +136,7 @@ public class Container extends AbstractBiobankModel {
         this.path = path;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
@@ -143,6 +145,7 @@ public class Container extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
@@ -207,6 +210,7 @@ public class Container extends AbstractBiobankModel {
         this.site = site;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -214,6 +218,7 @@ public class Container extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

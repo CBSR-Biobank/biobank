@@ -29,7 +29,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "email", groups = PrePersist.class),
     @Unique(properties = "login", groups = PrePersist.class)
 })
-public class User extends Principal {
+public class User extends Principal
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -128,12 +129,14 @@ public class User extends Principal {
         this.needPwdChange = needPwdChange;
     }
 
+    @Override
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", updatable = false)
     public Set<Comment> getComments() {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

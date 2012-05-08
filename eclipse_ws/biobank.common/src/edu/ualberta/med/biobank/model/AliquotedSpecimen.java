@@ -29,7 +29,8 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
-public class AliquotedSpecimen extends AbstractBiobankModel {
+public class AliquotedSpecimen extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -112,6 +113,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
      * collected. If the activity status is closed then this specimen type is no
      * longer being collected for this study.
      */
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -119,6 +121,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

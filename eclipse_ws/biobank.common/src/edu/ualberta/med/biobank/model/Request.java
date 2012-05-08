@@ -31,7 +31,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Audited
 @Entity
 @Table(name = "REQUEST")
-public class Request extends AbstractBiobankModel {
+public class Request extends AbstractBiobankModel
+    implements HasCreatedAt, HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -69,13 +70,16 @@ public class Request extends AbstractBiobankModel {
         this.submitted = submitted;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Request.created.NotNull}")
     @Column(name = "CREATED", nullable = false)
-    public Date getCreated() {
+    // TODO: rename column to CREATED_AT?
+    public Date getCreatedAt() {
         return this.created;
     }
 
-    public void setCreated(Date created) {
+    @Override
+    public void setCreatedAt(Date created) {
         this.created = created;
     }
 
@@ -98,6 +102,7 @@ public class Request extends AbstractBiobankModel {
         this.requestSpecimens = requestSpecimens;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Request.address.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", nullable = false)
@@ -105,6 +110,7 @@ public class Request extends AbstractBiobankModel {
         return this.address;
     }
 
+    @Override
     public void setAddress(Address address) {
         this.address = address;
     }

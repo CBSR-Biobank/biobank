@@ -22,7 +22,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
 @NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
-public class StudyEventAttr extends AbstractBiobankModel {
+public class StudyEventAttr extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -86,6 +87,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         this.study = study;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.StudyEventAttr.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -93,6 +95,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

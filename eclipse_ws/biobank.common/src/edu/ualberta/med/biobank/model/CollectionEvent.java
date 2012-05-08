@@ -37,7 +37,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         @UniqueConstraint(columnNames = { "PATIENT_ID", "VISIT_NUMBER" }) })
 @Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
 @Empty(property = "allSpecimens", groups = PreDelete.class)
-public class CollectionEvent extends AbstractBiobankModel {
+public class CollectionEvent extends AbstractBiobankModel
+    implements HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -100,6 +101,7 @@ public class CollectionEvent extends AbstractBiobankModel {
         this.patient = patient;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -107,6 +109,7 @@ public class CollectionEvent extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
@@ -121,6 +124,7 @@ public class CollectionEvent extends AbstractBiobankModel {
         this.eventAttrs = eventAttrs;
     }
 
+    @Override
     @ManyToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "COLLECTION_EVENT_COMMENT",
         joinColumns = { @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false, updatable = false) },
@@ -129,6 +133,7 @@ public class CollectionEvent extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

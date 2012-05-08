@@ -37,7 +37,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "CONTACT")
 @Empty(property = "studies", groups = PreDelete.class)
-public class Contact extends AbstractBiobankModel {
+public class Contact extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -82,12 +83,14 @@ public class Contact extends AbstractBiobankModel {
     private Set<Study> studies = new HashSet<Study>(0);
     private Clinic clinic;
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

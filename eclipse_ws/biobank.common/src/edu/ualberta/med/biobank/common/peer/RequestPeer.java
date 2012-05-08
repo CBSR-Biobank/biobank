@@ -36,11 +36,11 @@ public class RequestPeer {
 		, new Property.Accessor<Date, Request>() { private static final long serialVersionUID = 1L;
 			@Override
 			public Date get(Request model) {
-				return model.getCreated();
+				return model.getCreatedAt();
 			}
 			@Override
 			public void set(Request model, Date value) {
-				model.setCreated(value);
+				model.setCreatedAt(value);
 			}
 		});
 

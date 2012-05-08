@@ -21,7 +21,8 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 
 @javax.persistence.Entity
 @Table(name = "REPORT")
-public class Report extends AbstractBiobankModel {
+public class Report extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -47,12 +48,14 @@ public class Report extends AbstractBiobankModel {
     private Entity entity;
     private Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Report.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

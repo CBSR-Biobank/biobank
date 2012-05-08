@@ -21,7 +21,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SHIPPING_METHOD")
 @Unique(properties = "name", groups = PrePersist.class)
 @NotUsed(by = ShipmentInfo.class, property = "shippingMethod", groups = PreDelete.class)
-public class ShippingMethod extends AbstractBiobankModel {
+public class ShippingMethod extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -38,12 +39,14 @@ public class ShippingMethod extends AbstractBiobankModel {
 
     private String name;
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ShippingMethod.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

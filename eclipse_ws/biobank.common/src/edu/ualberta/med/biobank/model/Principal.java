@@ -27,7 +27,8 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
-public class Principal extends AbstractBiobankModel {
+public class Principal extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -55,6 +56,7 @@ public class Principal extends AbstractBiobankModel {
         this.memberships = memberships;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Principal.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -62,6 +64,7 @@ public class Principal extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
