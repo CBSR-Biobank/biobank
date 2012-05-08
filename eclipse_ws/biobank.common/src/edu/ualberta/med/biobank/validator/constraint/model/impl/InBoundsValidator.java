@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 public class InBoundsValidator
     extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<InBounds, Object> {
-    private static final String OUT_OF_BOUNDS =
+    public static final String OUT_OF_BOUNDS =
         "{edu.ualberta.med.biobank.model.AbstractPosition.InBounds.outOfBounds}";
 
     @Override
@@ -46,7 +46,9 @@ public class InBoundsValidator
         Integer row = position.getRow();
         Integer col = position.getCol();
 
-        if (maxRow != null && maxCol != null
+        // extensive null checking here because nulls should be accounted for
+        // elsewhere, validation should only be done on non-null values
+        if (row != null && col != null && maxRow != null && maxCol != null
             && (row < 0 || row >= maxRow || col < 0 || col >= maxCol)) {
             context.buildConstraintViolationWithTemplate(OUT_OF_BOUNDS)
                 .addNode("row")
