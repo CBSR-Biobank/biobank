@@ -85,6 +85,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel
     /**
      * @brief The specimen type that has to be collected for the study.
      */
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -98,6 +99,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel
     /**
      * The study that this aliquoted specimen belongs to.
      */
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
