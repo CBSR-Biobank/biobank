@@ -37,7 +37,7 @@ public class TestSite extends DbTest {
             Map<String, Object> attributes = new HashMap<String, Object>();
             attributes.put("property", "containers");
 
-            AssertMore.containsAnnotation(e, Empty.class, attributes);
+            AssertMore.assertContainsAnnotation(e, Empty.class, attributes);
         }
     }
 
@@ -56,7 +56,7 @@ public class TestSite extends DbTest {
             tx.rollback();
             String template = EmptyValidator.
                 getDefaultMessageTemplate(Site.class, "containerTypes");
-            AssertMore.containsTemplate(e, template);
+            AssertMore.assertContainsTemplate(e, template);
         }
     }
 
@@ -79,7 +79,7 @@ public class TestSite extends DbTest {
             tx.rollback();
             String template = EmptyValidator.
                 getDefaultMessageTemplate(Site.class, "processingEvents");
-            AssertMore.containsTemplate(e, template);
+            AssertMore.assertContainsTemplate(e, template);
         }
     }
 }

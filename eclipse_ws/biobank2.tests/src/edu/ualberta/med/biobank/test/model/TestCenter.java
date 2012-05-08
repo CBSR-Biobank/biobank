@@ -35,7 +35,7 @@ public class TestCenter extends DbTest {
             Map<String, Object> attributes = new HashMap<String, Object>();
             attributes.put("properties", new String[] { "name" });
 
-            AssertMore.containsAnnotation(e, Unique.class, attributes);
+            AssertMore.assertContainsAnnotation(e, Unique.class, attributes);
         }
     }
 
@@ -58,7 +58,7 @@ public class TestCenter extends DbTest {
             Map<String, Object> attributes = new HashMap<String, Object>();
             attributes.put("properties", new String[] { "nameShort" });
 
-            AssertMore.containsAnnotation(e, Unique.class, attributes);
+            AssertMore.assertContainsAnnotation(e, Unique.class, attributes);
         }
     }
 

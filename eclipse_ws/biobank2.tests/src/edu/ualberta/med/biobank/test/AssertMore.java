@@ -15,7 +15,7 @@ import junit.framework.Assert;
 import org.hibernate.Hibernate;
 
 public class AssertMore {
-    public static void containsTemplate(ConstraintViolationException e,
+    public static void assertContainsTemplate(ConstraintViolationException e,
         String messageTemplate) {
         Collection<String> messageTemplates = new ArrayList<String>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
@@ -31,12 +31,12 @@ public class AssertMore {
         }
     }
 
-    public static void containsAnnotation(ConstraintViolationException e,
+    public static void assertContainsAnnotation(ConstraintViolationException e,
         Class<?> annotationClass) {
-        containsAnnotation(e, annotationClass, null);
+        assertContainsAnnotation(e, annotationClass, null);
     }
 
-    public static void containsAnnotation(ConstraintViolationException e,
+    public static void assertContainsAnnotation(ConstraintViolationException e,
         Class<?> annotationClass, Map<String, Object> expectedAttrs) {
         Collection<String> annotations = new ArrayList<String>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
@@ -89,7 +89,7 @@ public class AssertMore {
         return Arrays.deepEquals(new Object[] { a }, new Object[] { b });
     }
 
-    public static void messageContains(Throwable t, String substring) {
+    public static void assertMessageContains(Throwable t, String substring) {
         if (!t.getMessage().contains(substring)) {
             Assert.fail("Expected exception " + t.getClass().getName()
                 + "' to contain the substring '" + substring
@@ -97,28 +97,29 @@ public class AssertMore {
         }
     }
 
-    public static void initialized(Object o) {
+    public static void assertInitialized(Object o) {
         if (!Hibernate.isInitialized(o)) {
             Assert.fail("Expected initialized object " + o
                 + ", but was uninitialized.");
         }
     }
 
-    public static void notInitialized(Object o) {
+    public static void assertNotInitialized(Object o) {
         if (Hibernate.isInitialized(o)) {
             Assert.fail("Expected uninitialized object " + o
                 + ", but was initialized.");
         }
     }
 
-    public static void propertyInitialized(Object o, String propertyName) {
+    public static void assertPropertyInitialized(Object o, String propertyName) {
         if (!Hibernate.isPropertyInitialized(o, propertyName)) {
             Assert.fail("Expected initialized property named '" + propertyName
                 + "' of object " + o + ", but was uninitialized.");
         }
     }
 
-    public static void propertyNotInitialized(Object o, String propertyName) {
+    public static void assertPropertyNotInitialized(Object o,
+        String propertyName) {
         if (Hibernate.isPropertyInitialized(o, propertyName)) {
             Assert.fail("Expected uninitialized property named '"
                 + propertyName + "' of object " + o + ", but was initialized.");
