@@ -135,7 +135,7 @@ public class Factory {
 
     public Dispatch getDefaultDispatch() {
         if (defaultDispatch == null) {
-            defaultDispatch = createDispatch();
+            defaultDispatch = createDispatch(getDefaultCenter(), createSite());
         }
         return defaultDispatch;
     }
@@ -424,12 +424,10 @@ public class Factory {
         return requestSpecimen;
     }
 
-    public Dispatch createDispatch() {
+    public Dispatch createDispatch(Center sender, Center receiver) {
         Dispatch dispatch = new Dispatch();
 
-        dispatch.setSenderCenter(getDefaultCenter());
-
-        Center receiver = createSite();
+        dispatch.setSenderCenter(sender);
         dispatch.setReceiverCenter(receiver);
 
         setDefaultDispatch(dispatch);

@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.test.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.validation.ConstraintViolationException;
 
 import junit.framework.Assert;
@@ -15,6 +12,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.AssertMore;
+import edu.ualberta.med.biobank.test.AssertMore.Attr;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.impl.EmptyValidator;
@@ -33,11 +31,8 @@ public class TestSite extends DbTest {
             Assert.fail("cannot delete site with containers");
         } catch (ConstraintViolationException e) {
             tx.rollback();
-
-            Map<String, Object> attributes = new HashMap<String, Object>();
-            attributes.put("property", "containers");
-
-            AssertMore.assertContainsAnnotation(e, Empty.class, attributes);
+            AssertMore.assertContainsAnnotation(e, Empty.class,
+                new Attr("property", "containers"));
         }
     }
 

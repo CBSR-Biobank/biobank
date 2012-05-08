@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -32,12 +31,7 @@ public class AssertMore {
     }
 
     public static void assertContainsAnnotation(ConstraintViolationException e,
-        Class<?> annotationClass) {
-        assertContainsAnnotation(e, annotationClass, null);
-    }
-
-    public static void assertContainsAnnotation(ConstraintViolationException e,
-        Class<?> annotationClass, Map<String, Object> expectedAttrs) {
+        Class<?> annotationClass, Attr... expectedAttrs) {
         Collection<String> annotations = new ArrayList<String>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
             ConstraintDescriptor<?> cd = violation.getConstraintDescriptor();
@@ -67,17 +61,16 @@ public class AssertMore {
     }
 
     /**
-     * @param a
-     * @param b
-     * @return True if the first map contains all key-value pairs in the second
-     *         map.
+     * @param attrs
+     * @param expectedAttrs
+     * @return True if the first map contains all {@link Attr}-s specified,
+     *         otherwise false.
      */
-    private static boolean attrsContains(Map<String, Object> a,
-        Map<String, Object> b) {
-        for (Entry<String, Object> entry : b.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            if (!a.containsKey(key) || !arrayWiseEq(a.get(key), value)) {
+    private static boolean attrsContains(Map<String, Object> attrs,
+        Attr... expectedAttrs) {
+        for (Attr attr : expectedAttrs) {
+            if (!attrs.containsKey(attr.key) ||
+                !arrayWiseEq(attrs.get(attr.key), attr.value)) {
                 return false;
             }
         }
@@ -123,6 +116,16 @@ public class AssertMore {
         if (Hibernate.isPropertyInitialized(o, propertyName)) {
             Assert.fail("Expected uninitialized property named '"
                 + propertyName + "' of object " + o + ", but was initialized.");
+        }
+    }
+
+    public static class Attr {
+        private final String key;
+        private final Object value;
+
+        public Attr(String key, Object value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }

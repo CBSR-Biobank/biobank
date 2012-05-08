@@ -7,6 +7,7 @@ import org.hibernate.Transaction;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.test.model.util.HibernateHelper;
@@ -16,7 +17,9 @@ public class TestDispatch extends DbTest {
     public void stateIds() {
         Transaction tx = session.beginTransaction();
 
-        Dispatch dispatch = factory.createDispatch();
+        Site sender = factory.createSite();
+        Site receiver = factory.createSite();
+        Dispatch dispatch = factory.createDispatch(sender, receiver);
 
         Query query = HibernateHelper.getDehydratedPropertyQuery(
             session, dispatch, "state");
