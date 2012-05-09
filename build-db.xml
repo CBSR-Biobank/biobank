@@ -31,6 +31,8 @@
     <path location="${lib.dir}/slf4j-api-1.6.1.jar" />
     <path location="${lib.dir}/slf4j-nop-1.6.4.jar" />
     <path location="${lib.dir}/validation-api-1.0.0.GA.jar" />
+    <path location="${lib.dir}/gettext-commons-0.9.6.jar" />
+    <path location="${lib.dir}/messages.jar" />
     <path location="${lib.dir}/${jdbc.driver.jar}" />
   </path>
 
