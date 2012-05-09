@@ -12,10 +12,8 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
@@ -99,35 +97,6 @@ public class TestAliquotedSpecimen extends TestDatabase {
         int newTotal = appService.search(AliquotedSpecimen.class,
             new AliquotedSpecimen()).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
-    }
-
-    @Test
-    public void testActivityStatus() throws Exception {
-        String name = "testActivityStatus" + r.nextInt();
-        StudyWrapper study = StudyHelper.addStudy(name);
-
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false);
-        AliquotedSpecimenWrapper ss = AliquotedSpecimenHelper
-            .newAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
-        ss.setActivityStatus(null);
-
-        try {
-            ss.persist();
-            Assert.fail("Should not be allowed : no activity status");
-        } catch (ValueNotSetException e) {
-            Assert.assertTrue(true);
-        }
-
-        ss.setActivityStatus(ActivityStatus.ACTIVE);
-        ss.persist();
-        Assert.assertTrue(ActivityStatus.ACTIVE == ss.getActivityStatus());
-
-
-        ss.setActivityStatus(ActivityStatus.FLAGGED);
-        ss.persist();
-        Assert.assertTrue(ActivityStatus.FLAGGED == ss.getActivityStatus());
-        Assert.assertFalse(ActivityStatus.ACTIVE == ss.getActivityStatus());
     }
 
     @Test

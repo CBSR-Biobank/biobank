@@ -80,8 +80,7 @@ public class Center extends AbstractBiobankModel
         new HashSet<ProcessingEvent>(0);
     private Set<Dispatch> srcDispatches = new HashSet<Dispatch>(0);
     private Set<Dispatch> dstDispatches = new HashSet<Dispatch>(0);
-    private Set<OriginInfo> originInfos =
-        new HashSet<OriginInfo>(0);
+    private Set<OriginInfo> originInfos = new HashSet<OriginInfo>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -149,6 +148,7 @@ public class Center extends AbstractBiobankModel
         this.dstDispatches = dstDispatches;
     }
 
+    // TODO: why does this cascade exist?
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
     public Set<OriginInfo> getOriginInfos() {
@@ -185,5 +185,4 @@ public class Center extends AbstractBiobankModel
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
-
 }
