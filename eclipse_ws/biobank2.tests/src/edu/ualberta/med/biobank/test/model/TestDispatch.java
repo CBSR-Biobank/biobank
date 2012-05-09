@@ -13,6 +13,43 @@ import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.test.model.util.HibernateHelper;
 
 public class TestDispatch extends DbTest {
+    // TODO: Still need to check validation tests for the following classes:
+    // Dispatch.java
+    // DispatchSpecimen.java
+    // Domain.java
+    // EventAttr.java
+    // EventAttrType.java
+    // GlobalEventAttr.java
+    // Group.java
+    // JasperTemplate.java
+    // Log.java
+    // Membership.java
+    // Name.java
+    // OriginInfo.java
+    // Patient.java
+    // PermissionEnum.java
+    // Principal.java
+    // PrintedSsInvItem.java
+    // PrinterLabelTemplate.java
+    // ProcessingEvent.java
+    // Request.java
+    // RequestSpecimen.java
+    // ResearchGroup.java
+    // Revision.java
+    // RevisionActionData.java
+    // RevisionEntityType.java
+    // Role.java
+    // ShipmentInfo.java
+    // ShippingMethod.java
+    // Site.java
+    // SourceSpecimen.java
+    // Specimen.java
+    // SpecimenPosition.java
+    // SpecimenType.java
+    // Study.java
+    // StudyEventAttr.java
+    // User.java
+
     @Test
     public void stateIds() {
         Transaction tx = session.beginTransaction();
