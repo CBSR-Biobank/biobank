@@ -58,6 +58,7 @@ public class Comment extends AbstractBiobankModel
     }
 
     @Override
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Comment.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;

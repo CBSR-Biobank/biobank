@@ -10,12 +10,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -88,6 +90,7 @@ public class Factory {
     private SourceSpecimen defaultSourceSpecimen;
     private AliquotedSpecimen defaultAliquotedSpecimen;
     private Contact defaultContact;
+    private Comment defaultComment;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -97,6 +100,17 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public Comment getDefaultComment() {
+        if (defaultComment == null) {
+            defaultComment = createComment();
+        }
+        return defaultComment;
+    }
+
+    public void setDefaultComment(Comment defaultComment) {
+        this.defaultComment = defaultComment;
     }
 
     public Contact getDefaultContact() {
@@ -424,6 +438,18 @@ public class Factory {
 
     public void setDefaultSpecimen(Specimen defaultSpecimen) {
         this.defaultSpecimen = defaultSpecimen;
+    }
+
+    public Comment createComment() {
+        Comment comment = new Comment();
+        comment.setUser(getDefaultUser());
+        comment.setCreatedAt(new Date());
+        comment.setMessage("test");
+
+        setDefaultComment(comment);
+        session.save(comment);
+        session.flush();
+        return comment;
     }
 
     public Contact createContact() {
@@ -941,7 +967,7 @@ public class Factory {
             new ConcurrentHashMap<Class<?>, AtomicInteger>();
 
         private NameGenerator(String root) {
-            this.root = root;
+            this.root = formatRoot(root);
         }
 
         String next(Class<?> klazz) {
@@ -953,6 +979,14 @@ public class Factory {
             sb.append(suffixes.get(klazz).incrementAndGet());
 
             return sb.toString();
+        }
+
+        private String formatRoot(String root) {
+            String tmp = StringUtil.truncate(root, 25, "...");
+            if (tmp != root) {
+                tmp += root.substring(root.length() - 5);
+            }
+            return tmp;
         }
     }
 }

@@ -4,6 +4,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import edu.ualberta.med.biobank.model.AbstractPosition;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
@@ -39,7 +40,12 @@ public class InBoundsValidator
 
     private boolean checkBounds(AbstractPosition position,
         ConstraintValidatorContext context) {
-        ContainerType ct = position.getHoldingContainer().getContainerType();
+        // early out if no holding container, something else should handle
+        // validation if that is null
+        Container holdingContainer = position.getHoldingContainer();
+        if (holdingContainer == null) return true;
+
+        ContainerType ct = holdingContainer.getContainerType();
 
         Integer maxRow = ct.getRowCapacity();
         Integer maxCol = ct.getColCapacity();

@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.HasActivityStatus;
+import edu.ualberta.med.biobank.model.HasCreatedAt;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
@@ -101,6 +102,21 @@ public class HasXHelper {
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "nameShort" })
+                .assertIn(e);
+        }
+    }
+
+    public static void checkNullCreatedAt(Session session,
+        HasCreatedAt hasCreatedAt) {
+        try {
+            hasCreatedAt.setCreatedAt(null);
+            session.save(hasCreatedAt);
+            session.flush();
+            Assert.fail("null createdAt should not be allowed");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+                .withRootBean(hasCreatedAt)
+                .withPropertyPath("createdAt")
                 .assertIn(e);
         }
     }
