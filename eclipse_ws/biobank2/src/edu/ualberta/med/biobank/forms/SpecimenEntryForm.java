@@ -2,9 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Status;
@@ -22,12 +20,11 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetAliquotedSpecimensAction;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -36,6 +33,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -52,11 +50,9 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import edu.ualberta.med.biobank.wizards.ReparentingWizard;
@@ -99,17 +95,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     private CommentsInfoTable commentEntryTable;
 
     private SpecimenBriefInfo specimenInfo;
+
     private SpecimenInfo newParent;
-
-    private SpecimenAdapter specimenAdapter;
-
     private Button isSourceSpcButton;
 
     private BgcBaseText sourceSpecimenField;
 
-    private Set<AliquotedSpecimen> aliquotedSpecTypes;
-
-    private Set<SpecimenType> containerSpecimenTypeList;
+    private List<AliquotedSpecimen> aliquotedSpecTypes;
 
     private Label sourceSpecimenLabel;
 
@@ -120,7 +112,6 @@ public class SpecimenEntryForm extends BiobankEntryForm {
     @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
-        specimenAdapter = (SpecimenAdapter) adapter;
         updateSpecimenInfo(adapter.getId());
         setPartName(i18n.tr("Specimen Entry"));
     }
@@ -131,31 +122,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 new SpecimenGetInfoAction(id));
             aliquotedSpecTypes =
                 SessionManager.getAppService().doAction(
-                    new StudyGetAliquotedSpecimensAction(specimenInfo
-                        .getSpecimen().getCollectionEvent().
-                        getPatient().getStudy().getId())).getSet();
-            if (specimenInfo
-                .getSpecimen().getSpecimenPosition() != null)
-                containerSpecimenTypeList =
-                    SessionManager
-                        .getAppService()
-                        .doAction(
-                            new ContainerTypeGetInfoAction(specimenInfo
-                                .getSpecimen().getSpecimenPosition()
-                                .getContainer()
-                                .getContainerType().getId()))
-                        .getContainerType()
-                        .getSpecimenTypes();
-            else
-                containerSpecimenTypeList = new HashSet<SpecimenType>();
+                    new SpecimenGetPossibleTypesAction(specimenInfo
+                        .getSpecimen().getId())).getList();
             specimen.setWrappedObject(specimenInfo.getSpecimen());
-        } else {
-            specimenInfo = new SpecimenBriefInfo();
-            aliquotedSpecTypes = new HashSet<AliquotedSpecimen>();
-            containerSpecimenTypeList = new HashSet<SpecimenType>();
-            specimen.setWrappedObject((Specimen) specimenAdapter
-                .getModelObject().getWrappedObject());
         }
+        // not possible to have a specimen entry form with id=null
         comment.setWrappedObject(new Comment());
         SessionManager.logLookup(specimen.getWrappedObject());
         ((AdapterBase) adapter).setModelObject(specimen);
@@ -177,30 +148,22 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenTypeWrapper> specimenTypes =
-            new ArrayList<SpecimenTypeWrapper>();
-        for (AliquotedSpecimen ss : aliquotedSpecTypes) {
-            SpecimenType sst = ss.getSpecimenType();
-            if (containerSpecimenTypeList == null) {
-                specimenTypes.add(new SpecimenTypeWrapper(SessionManager
-                    .getAppService(), sst));
-            } else {
-                for (SpecimenType st : containerSpecimenTypeList) {
-                    if (sst.equals(st))
-                        specimenTypes.add(new SpecimenTypeWrapper(
-                            SessionManager.getAppService(), st));
-                }
-            }
-        }
-        if (specimen.getSpecimenType() != null
-            && !specimenTypes.contains(specimen.getSpecimenType())) {
+        List<SpecimenType> specimenTypes = new ArrayList<SpecimenType>();
+        for (AliquotedSpecimen a : aliquotedSpecTypes)
+            specimenTypes.add(a.getSpecimenType());
+        if (specimenInfo.getSpecimen().getSpecimenType() != null
+            && !specimenTypes.contains(specimenInfo.getSpecimen()
+                .getSpecimenType())) {
             specimenTypes
-                .add(new SpecimenTypeWrapper(SessionManager.getAppService(),
-                    specimenInfo.getSpecimen().getSpecimenType()));
+                .add(specimenInfo.getSpecimen().getSpecimenType());
         }
 
         specimenTypeComboViewer = createComboViewer(client,
-            i18n.tr("Type"), specimenTypes,
+            i18n.tr("Type"),
+            ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(),
+                specimenTypes,
+                SpecimenTypeWrapper.class),
             specimen.getSpecimenType(),
             i18n.tr("Specimen must have a type"),
             new ComboSelectionUpdate() {

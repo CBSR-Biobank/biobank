@@ -4,7 +4,7 @@ Created-By: 1.6.0_22-b04 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
 Bundle-Name: BioBank Common
 Bundle-SymbolicName: biobank.common
-Bundle-Version: 3.2.1.rc2
+Bundle-Version: 3.2.1
 Bundle-ClassPath: conf/,
  lib/client/acegi-security-1.0.4.jar,
  lib/client/antlr-2.7.6.jar,
@@ -203,7 +203,6 @@ Export-Package: antlr;
  org.springframework.remoting;uses:="org.springframework.core",
  org.xnap.commons.i18n
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: edu.ualberta.med.biobank.common,
- edu.ualberta.med.biobank.common.action.exception,
- edu.ualberta.med.biobank.model
+Import-Package: edu.ualberta.med.biobank.common,edu.ualberta.med.bioba
+ nk.model
 
