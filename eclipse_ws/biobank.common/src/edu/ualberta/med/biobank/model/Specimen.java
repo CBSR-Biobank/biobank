@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -104,7 +102,6 @@ public class Specimen extends AbstractBiobankModel
     private Set<RequestSpecimen> requestSpecimens =
         new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
-    @Enumerated(EnumType.STRING)
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
