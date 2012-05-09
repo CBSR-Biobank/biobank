@@ -492,4 +492,25 @@ public class TestContainerType extends DbTest {
                 .assertIn(e);
         }
     }
+
+    @Test
+    public void deleteWithParentContainerTypes() {
+        ContainerType topCt = factory.createTopContainerType();
+        ContainerType ct = factory.createContainerType();
+
+        topCt.getChildContainerTypes().add(ct);
+        session.update(topCt);
+
+        try {
+            session.delete(ct);
+            session.flush();
+            Assert.fail("cannot delete a container type with parent" +
+                " container types");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withRootBean(ct)
+                .withAttr("property", "parentContainerTypes")
+                .assertIn(e);
+        }
+    }
 }
