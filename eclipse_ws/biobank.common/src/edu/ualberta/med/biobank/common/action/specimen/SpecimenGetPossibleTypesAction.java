@@ -23,9 +23,10 @@ public class SpecimenGetPossibleTypesAction implements
             + " s "
             + "LEFT JOIN s.specimenPosition p "
             + "INNER JOIN s.collectionEvent.patient.study.aliquotedSpecimens test "
+            + "INNER JOIN FETCH test.specimenType st "
             + "where s.id=? " // specimen id
-            + "and (p is null or test.specimenType.id in (select cst.id from p.container.containerType.specimenTypes cst))" // containermatch
-            + "and test.specimenType.id in (select pst.id from s.parentSpecimen.specimenType.childSpecimenTypes pst)"; // parenttypematch
+            + "and (p is null or st.id in (select cst.id from p.container.containerType.specimenTypes cst))" // containermatch
+            + "and st.id in (select pst.id from s.parentSpecimen.specimenType.childSpecimenTypes pst)"; // parenttypematch
 
     public SpecimenGetPossibleTypesAction(Integer id) {
         this.id = id;
