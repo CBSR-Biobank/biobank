@@ -33,8 +33,8 @@ public class SiteAdapter extends AdapterBase {
         super(parent, site);
         if (site != null && site.getId() != null) {
             nodeIdOffset *= site.getId();
+            createNodes();
         }
-        createNodes();
     }
 
     @Override
