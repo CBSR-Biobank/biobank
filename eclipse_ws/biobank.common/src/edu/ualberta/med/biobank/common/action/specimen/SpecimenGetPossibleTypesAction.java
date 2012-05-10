@@ -18,14 +18,15 @@ public class SpecimenGetPossibleTypesAction implements
 
     @SuppressWarnings("nls")
     private static final String FILTERED_TYPES =
-        "select test from "
+        "select aspec from "
             + Specimen.class.getName()
             + " s "
             + "LEFT JOIN s.specimenPosition p "
-            + "INNER JOIN s.collectionEvent.patient.study.aliquotedSpecimens test "
+            + "INNER JOIN s.collectionEvent.patient.study.aliquotedSpecimens aspec "
+            + "INNER JOIN FETCH aspec.specimenType st "
             + "where s.id=? " // specimen id
-            + "and (p is null or test.specimenType.id in (select cst.id from p.container.containerType.specimenTypes cst))" // containermatch
-            + "and test.specimenType.id in (select pst.id from s.parentSpecimen.specimenType.childSpecimenTypes pst)"; // parenttypematch
+            + "and (p is null or st.id in (select cst.id from p.container.containerType.specimenTypes cst))" // containermatch
+            + "and st.id in (select pst.id from s.parentSpecimen.specimenType.childSpecimenTypes pst)"; // parenttypematch
 
     public SpecimenGetPossibleTypesAction(Integer id) {
         this.id = id;
