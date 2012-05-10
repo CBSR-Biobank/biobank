@@ -299,7 +299,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     @Override
     public void setState(DispatchState state) {
-        setState(state);
+        setProperty(DispatchPeer.STATE, state);
     }
 
     @SuppressWarnings("nls")
