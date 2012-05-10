@@ -16,7 +16,7 @@
   </path>
 
   <target name="clean-test-results">
-    <delete dir="${test.output}" />
+    <delete dir="${test.output}" quiet="true"/>
   </target>
 
   <target name="clean-tests" depends="clean-test-results">
@@ -64,19 +64,14 @@
 
   <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
     <exclude name="**/speed/**" />
+    <exclude name="**/wrappers/**" />
+    <exclude name="**/presenters/**" />
     <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
-    <exclude name="**/TestAction.java" />
-    <exclude name="**/TestBase.java" />
     <exclude name="**/TestCommon.java" />
-    <exclude name="**/TestDb.java" />
     <exclude name="**/TestingDispatcher.java" />
     <exclude name="**/TestHibernateLocking.java" />
     <exclude name="**/TestDatabase.java" />
-    <exclude name="**/TestFunctionalities.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
-    <exclude name="**/AllTests.java" />
-    <exclude name="**/wrappers/**" />
-    <exclude name="**/presenters/**" />
     <include name="**/Test*.java" />
   </fileset>
 

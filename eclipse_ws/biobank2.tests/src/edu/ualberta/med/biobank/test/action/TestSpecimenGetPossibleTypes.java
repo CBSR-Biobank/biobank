@@ -7,7 +7,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 
-public class TestSpecimenGetPossibleTypes extends TestAction {
+public class TestSpecimenGetPossibleTypes extends ActionTest {
 
     @Test
     public void test() {
