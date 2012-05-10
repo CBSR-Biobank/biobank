@@ -29,10 +29,8 @@ import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -883,38 +881,100 @@ public class Factory {
     }
 
     public Membership createMembership() {
-        return createMembership(Domain.CENTER_STUDY, Rank.NORMAL);
+        return buildMembership().create();
     }
 
-    public enum Domain {
-        GLOBAL,
-        CENTER,
-        STUDY,
-        CENTER_STUDY;
+    public static class MembershipBuilder {
+        private final Factory factory;
+        private boolean userManager = false;
+        private boolean everyPermission = false;
+        private Quantity centerQuantity = Quantity.ONE;
+        private Quantity studyQuantity = Quantity.ONE;
+
+        public MembershipBuilder(Factory factory) {
+            this.factory = factory;
+        }
+
+        public MembershipBuilder setCenter() {
+            centerQuantity = Quantity.ONE;
+            return this;
+        }
+
+        public MembershipBuilder setStudy() {
+            studyQuantity = Quantity.ONE;
+            return this;
+        }
+
+        public MembershipBuilder setGlobal() {
+            centerQuantity = Quantity.ALL;
+            studyQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setAllCenters() {
+            centerQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setAllStudies() {
+            studyQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setUserManager(boolean userManager) {
+            this.userManager = userManager;
+            if (userManager) setEveryPermission(true);
+            return this;
+        }
+
+        public MembershipBuilder setEveryPermission(boolean everyPermission) {
+            this.everyPermission = everyPermission;
+            if (!everyPermission) setUserManager(false);
+            return this;
+        }
+
+        public Membership create() {
+            return factory.createMembership(this);
+        }
+
+        enum Quantity {
+            NONE,
+            ONE,
+            ALL;
+        }
     }
 
-    public Membership createMembership(Domain domain, Rank rank) {
+    public MembershipBuilder buildMembership() {
+        return new MembershipBuilder(this);
+    }
+
+    public Membership createMembership(MembershipBuilder builder) {
         Membership membership = new Membership();
 
-        if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
+        switch (builder.centerQuantity) {
+        case ONE:
             membership.getDomain().getCenters().add(getDefaultCenter());
+            break;
+        case ALL:
+            membership.getDomain().setAllCenters(true);
+            break;
         }
-        if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
+
+        switch (builder.studyQuantity) {
+        case ONE:
             membership.getDomain().getStudies().add(getDefaultStudy());
+            break;
+        case ALL:
+            membership.getDomain().setAllStudies(true);
+            break;
         }
 
         Principal p = getDefaultPrincipal();
         p.getMemberships().add(membership);
         membership.setPrincipal(p);
 
-        membership.setUserManager(rank.isGe(Rank.MANAGER) ? true : false);
-        membership.setEveryPermission(rank.isGe(Rank.ADMINISTRATOR) ? true
-            : false);
-
-        if (Rank.MANAGER.equals(rank)) {
-            // needs at least one permission or role to manage
-            membership.getPermissions().add(PermissionEnum.CLINIC_READ);
-        }
+        membership.setEveryPermission(builder.everyPermission);
+        membership.setUserManager(builder.userManager);
 
         setDefaultMembership(membership);
         session.save(membership);
