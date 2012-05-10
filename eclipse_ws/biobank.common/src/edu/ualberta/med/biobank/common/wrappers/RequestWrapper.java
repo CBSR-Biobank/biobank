@@ -84,7 +84,7 @@ public class RequestWrapper extends RequestBaseWrapper {
                 for (RequestSpecimenWrapper dsa : children) {
                     boolean hasState = false;
                     for (RequestSpecimenState state : states) {
-                        if (state.getId().equals(dsa.getState())) {
+                        if (state.equals(dsa.getState())) {
                             hasState = true;
                             break;
                         }

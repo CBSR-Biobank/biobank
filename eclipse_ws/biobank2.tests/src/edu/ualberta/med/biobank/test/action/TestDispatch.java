@@ -155,27 +155,26 @@ public class TestDispatch extends ActionTest {
                 .getState()
                 .equals(DispatchState.IN_TRANSIT));
 
-        // fails
         exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.LOST.getId()));
+                .equals(DispatchState.LOST));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.CLOSED.getId()));
+                .equals(DispatchState.CLOSED));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.RECEIVED.getId()));
+                .equals(DispatchState.RECEIVED));
 
     }
 
