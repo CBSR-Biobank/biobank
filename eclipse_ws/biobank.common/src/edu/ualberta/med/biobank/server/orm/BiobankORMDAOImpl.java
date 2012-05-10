@@ -28,8 +28,11 @@ import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import gov.nih.nci.system.query.SDKQueryResult;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.acegisecurity.context.SecurityContextHolder;
@@ -38,6 +41,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.metadata.ClassMetadata;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
@@ -71,6 +75,26 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             return query((AppServiceAction<?>) obj);
         }
         return super.query(request);
+    }
+
+    @Override
+    public List<String> getAllClassNames() {
+
+        List<String> allClassNames = new ArrayList<String>();
+        Map<String, ClassMetadata> allClassMetadata =
+            getSessionFactory().getAllClassMetadata();
+
+        for (Entry<String, ClassMetadata> entry : allClassMetadata.entrySet()) {
+            String entityName = entry.getKey();
+            ClassMetadata meta = entry.getValue();
+
+            // skip envers audit objects
+            if (!entityName.endsWith("_audit")) {
+                allClassNames.add(entityName);
+            }
+        }
+
+        return allClassNames;
     }
 
     private <T extends ActionResult> Response query(
