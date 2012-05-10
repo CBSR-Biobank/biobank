@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.model.type;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
@@ -19,7 +22,7 @@ import org.xnap.commons.i18n.I18nFactory;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum DispatchState {
+public enum DispatchState implements NotAProxy, Serializable {
     CREATION(0, Loader.i18n.tr("Creation")),
     IN_TRANSIT(1, Loader.i18n.tr("In Transit")),
     RECEIVED(2, Loader.i18n.tr("Received")),
