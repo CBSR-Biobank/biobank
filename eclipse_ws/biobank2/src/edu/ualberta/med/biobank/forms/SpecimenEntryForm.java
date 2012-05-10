@@ -39,9 +39,11 @@ import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.AbstractBiobankModel;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -88,7 +90,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText sourceSpecimenField;
 
-    private List<AliquotedSpecimen> aliquotedSpecTypes;
+    private List<AbstractBiobankModel> specTypes;
 
     private Label sourceSpecimenLabel;
 
@@ -106,7 +108,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         if (id != null) {
             specimenInfo = SessionManager.getAppService().doAction(
                 new SpecimenGetInfoAction(id));
-            aliquotedSpecTypes =
+            specTypes =
                 SessionManager.getAppService().doAction(
                     new SpecimenGetPossibleTypesAction(specimenInfo
                         .getSpecimen().getId())).getList();
@@ -134,8 +136,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         List<SpecimenType> specimenTypes = new ArrayList<SpecimenType>();
-        for (AliquotedSpecimen a : aliquotedSpecTypes)
-            specimenTypes.add(a.getSpecimenType());
+        for (AbstractBiobankModel a : specTypes)
+            if (a instanceof AliquotedSpecimen)
+                specimenTypes.add(((AliquotedSpecimen) a).getSpecimenType());
+            else
+                specimenTypes.add(((SourceSpecimen) a).getSpecimenType());
         if (specimenInfo.getSpecimen().getSpecimenType() != null
             && !specimenTypes.contains(specimenInfo.getSpecimen()
                 .getSpecimenType())) {
@@ -170,10 +175,13 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
                     private BigDecimal setQuantityFromType(
                         SpecimenType specimenType) {
-                        for (AliquotedSpecimen as : aliquotedSpecTypes) {
-                            if (specimenType.equals(as.getSpecimenType())) {
-                                return as.getVolume();
-                            }
+                        for (AbstractBiobankModel as : specTypes) {
+                            if (as instanceof AliquotedSpecimen)
+                                if (specimenType
+                                    .equals(((AliquotedSpecimen) as)
+                                        .getSpecimenType())) {
+                                    return ((AliquotedSpecimen) as).getVolume();
+                                }
                         }
                         return null;
                     }
