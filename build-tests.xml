@@ -5,6 +5,7 @@
   <property name="test.output" location="testing" />
   <property name="test.output.raw" value="${test.output}/raw" />
   <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
+  <property name="coverage.output" location="coverage" />
 
   <path id="common.class.path">
     <fileset dir="${eclipse.proj.dir.common}/lib/client">
@@ -63,15 +64,14 @@
   </target>
 
   <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
-    <exclude name="**/speed/**" />
     <exclude name="**/wrappers/**" />
     <exclude name="**/presenters/**" />
-    <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
     <exclude name="**/TestCommon.java" />
+    <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestingDispatcher.java" />
     <exclude name="**/TestHibernateLocking.java" />
-    <exclude name="**/TestDatabase.java" />
     <exclude name="**/TestReportsOnExistingData.java" />
+    <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
     <include name="**/Test*.java" />
   </fileset>
 
@@ -154,7 +154,7 @@
       </classpath>
     </java>
     <echo message="test report: file://${test.output}/html/junit-noframes.html" />
-    <echo message="coverage report: file://${converage.output}/index.html" />
+    <echo message="coverage report: file://${coverage.output}/index.html" />
   </target>
 
 </project>
