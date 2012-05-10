@@ -159,6 +159,7 @@ public class TestProcessingEvent extends ActionTest {
             Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
+            // expected active but was closed
             Assert.assertEquals(
                 sourceSpecs.get(0).specimen.getActivityStatus(),
                 specimenInfo.specimen.getActivityStatus());
@@ -243,6 +244,7 @@ public class TestProcessingEvent extends ActionTest {
         session.clear();
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
+        // expected null but was x
         Assert.assertNotNull(spc);
         Assert.assertNull(spc.getProcessingEvent());
     }

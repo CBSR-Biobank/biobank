@@ -34,7 +34,7 @@ public enum RequestSpecimenState implements ItemState {
 
     public static RequestSpecimenState fromId(Integer id) {
         for (RequestSpecimenState item : values()) {
-            if (item.id == id) return item;
+            if (item.id.equals(id)) return item;
 
         }
         return null;

@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +15,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
@@ -116,7 +115,7 @@ public class TestDispatch extends ActionTest {
                 exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail("test should fail");
-        } catch (ConstraintViolationException e) {
+        } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }
 
@@ -156,6 +155,7 @@ public class TestDispatch extends ActionTest {
                 .getState()
                 .equals(DispatchState.IN_TRANSIT));
 
+        // fails
         exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert

@@ -73,7 +73,7 @@ public class ActionContext {
         throws ModelNotFoundException {
         E result = get(klazz, id);
 
-        if (id != null && result == null) {
+        if (result == null) {
             throw new ModelNotFoundException(klazz, id);
         }
 

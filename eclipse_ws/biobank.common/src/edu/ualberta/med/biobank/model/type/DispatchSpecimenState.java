@@ -34,7 +34,7 @@ public enum DispatchSpecimenState implements ItemState {
 
     public static DispatchSpecimenState fromId(Integer id) {
         for (DispatchSpecimenState item : values()) {
-            if (item.id == id) return item;
+            if (item.id.equals(id)) return item;
         }
         return null;
     }

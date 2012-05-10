@@ -45,14 +45,14 @@ public enum ActivityStatus implements NotAProxy, Serializable {
         return VALUES_LIST;
     }
 
-    public static ActivityStatus fromId(int id) {
+    public static ActivityStatus fromId(Integer id) {
         for (ActivityStatus item : values()) {
-            if (item.id == id) return item;
+            if (item.id.equals(id)) return item;
         }
         return null;
     }
 
-    private final int id;
+    private final Integer id;
     private final LString name;
 
     private ActivityStatus(int id, LString name) {
@@ -60,7 +60,7 @@ public enum ActivityStatus implements NotAProxy, Serializable {
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

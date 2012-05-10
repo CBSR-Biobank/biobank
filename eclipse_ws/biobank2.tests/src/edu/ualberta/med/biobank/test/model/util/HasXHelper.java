@@ -151,7 +151,7 @@ public class HasXHelper {
 
                 int id = ((Number) query.uniqueResult()).intValue();
                 Assert.assertEquals("persisted id does not match enum's id",
-                    activityStatus.getId(), id);
+                    activityStatus.getId(), new Integer(id));
             }
         } finally {
             tx.rollback();

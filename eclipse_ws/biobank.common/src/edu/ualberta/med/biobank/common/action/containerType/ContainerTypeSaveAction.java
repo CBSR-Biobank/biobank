@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -132,14 +131,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     }
 
     private ContainerType getContainerType(ActionContext context) {
-        ContainerType containerType =
-            context.load(ContainerType.class, containerTypeId);
-
-        if (containerType == null) {
-            containerType = new ContainerType();
-            containerType.setCapacity(new Capacity());
-            containerType.setComments(new HashSet<Comment>());
-        }
+        ContainerType containerType = context.load(ContainerType.class,
+            containerTypeId, new ContainerType());
 
         return containerType;
     }

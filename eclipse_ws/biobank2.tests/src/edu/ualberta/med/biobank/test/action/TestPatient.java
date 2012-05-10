@@ -350,7 +350,7 @@ public class TestPatient extends ActionTest {
             null, provisioning.studyId, pnumber, date, null)).getId();
 
         // add 2 cevents to this patient:
-        int vnber = getR().nextInt(20);
+        int vnber = getR().nextInt(20) + 1;
         exec(new CollectionEventSaveAction(null, patientId,
             vnber, ActivityStatus.ACTIVE, null, null, null));
         exec(new CollectionEventSaveAction(null, patientId,

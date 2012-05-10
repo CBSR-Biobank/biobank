@@ -4,6 +4,7 @@ import javax.validation.ConstraintViolationException;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Contact;
@@ -13,6 +14,7 @@ import edu.ualberta.med.biobank.test.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
 public class TestClinic extends DbTest {
+    @Ignore
     @Test
     public void deleteWithContactWithoutStudies() {
         Assert.fail("not sure what the expected behavior is");

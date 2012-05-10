@@ -104,6 +104,7 @@ public class TestCollectionEvent extends ActionTest {
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
+        // cevent is null?
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
         Assert.assertNotNull(cevent.getComments());
@@ -329,6 +330,7 @@ public class TestCollectionEvent extends ActionTest {
         session.refresh(cevent);
         Assert.assertEquals(1, cevent.getEventAttrs().size());
         eventAttr = cevent.getEventAttrs().iterator().next();
+        // wrong size
         Assert.assertEquals(value2, eventAttr.getValue());
         Assert.assertEquals(eventAttrId, eventAttr.getId());
 

@@ -36,7 +36,7 @@ public enum DispatchState {
     public static DispatchState fromId(Integer id) {
         if (id == null) return CREATION;
         for (DispatchState item : values()) {
-            if (item.id == id) return item;
+            if (item.id.equals(id)) return item;
         }
         return null;
     }

@@ -24,7 +24,7 @@ public class StudyReadPermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        if (studyId == null) {
+        if (studyId != null) {
             Study study = context.load(Study.class, studyId);
             return PermissionEnum.STUDY_READ
                 .isAllowed(context.getUser(), study);
