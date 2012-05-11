@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum DispatchState implements NotAProxy, Serializable {
+public enum DispatchState implements Serializable, NotAProxy {
     CREATION(0, Loader.i18n.tr("Creation")),
     IN_TRANSIT(1, Loader.i18n.tr("In Transit")),
     RECEIVED(2, Loader.i18n.tr("Received")),

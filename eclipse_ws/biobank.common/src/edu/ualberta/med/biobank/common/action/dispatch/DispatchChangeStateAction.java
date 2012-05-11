@@ -6,7 +6,9 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.type.DispatchState;
@@ -40,6 +42,10 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
         disp.setState(newState);
 
+        if (newState.equals(DispatchState.LOST))
+            for (DispatchSpecimen ds : disp.getDispatchSpecimens())
+                ds.getSpecimen().setActivityStatus(ActivityStatus.FLAGGED);
+
         if (shipInfo == null)
             disp.setShipmentInfo(null);
         else {
@@ -63,5 +69,4 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
         return new IdResult(disp.getId());
     }
-
 }
