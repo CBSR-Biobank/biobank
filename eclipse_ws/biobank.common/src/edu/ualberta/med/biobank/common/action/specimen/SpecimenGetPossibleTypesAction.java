@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
+import java.util.ArrayList;
+
 import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -53,6 +55,9 @@ public class SpecimenGetPossibleTypesAction implements
     public ListResult<AbstractBiobankModel> run(ActionContext context)
         throws ActionException {
         Specimen spec = context.load(Specimen.class, id);
+        if (!spec.getChildSpecimens().isEmpty())
+            return new ListResult<AbstractBiobankModel>(
+                new ArrayList<AbstractBiobankModel>());
         Query q;
         if (spec.getParentSpecimen() == null)
             q = context.getSession().createQuery(SOURCE_TYPES);
