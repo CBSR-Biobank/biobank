@@ -30,6 +30,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -501,7 +502,7 @@ public class LinkFormPatientManagement {
      * container authorized
      */
     @SuppressWarnings("nls")
-    public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
+    public List<AliquotedSpecimenWrapper> getStudyAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
         if (currentPatient == null)
             return Collections.emptyList();
@@ -517,7 +518,7 @@ public class LinkFormPatientManagement {
                 i18n.tr("Problem reloading study"), e);
         }
 
-        List<SpecimenTypeWrapper> studiesAliquotedTypes;
+        List<AliquotedSpecimenWrapper> studiesAliquotedTypes;
         try {
             studiesAliquotedTypes =
                 study
@@ -537,7 +538,7 @@ public class LinkFormPatientManagement {
                             studyNameShort));
             }
         } catch (ApplicationException e) {
-            studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
+            studiesAliquotedTypes = new ArrayList<AliquotedSpecimenWrapper>();
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Error retrieving available types"), e);

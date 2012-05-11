@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -400,27 +399,26 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY =
-        "select aspec."
-            + AliquotedSpecimenPeer.SPECIMEN_TYPE.getName()
-            + " from "
+        "select aspec from "
             + AliquotedSpecimen.class.getName()
             + " as aspec where aspec."
             + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
             + " = ? and aspec.activityStatus = "
             + ActivityStatus.ACTIVE.getId();
 
-    public List<SpecimenTypeWrapper> getAuthorizedActiveAliquotedTypes(
+    public List<AliquotedSpecimenWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
-        List<SpecimenType> raw = appService.query(new HQLCriteria(
+        List<AliquotedSpecimen> raw = appService.query(new HQLCriteria(
             ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY, Arrays
                 .asList(new Object[] { getId() })));
         if (raw == null) {
-            return new ArrayList<SpecimenTypeWrapper>();
+            return new ArrayList<AliquotedSpecimenWrapper>();
         }
-        List<SpecimenTypeWrapper> studiesAliquotedTypes =
-            new ArrayList<SpecimenTypeWrapper>();
-        for (SpecimenType st : raw) {
-            SpecimenTypeWrapper type = new SpecimenTypeWrapper(appService, st);
+        List<AliquotedSpecimenWrapper> studiesAliquotedTypes =
+            new ArrayList<AliquotedSpecimenWrapper>();
+        for (AliquotedSpecimen st : raw) {
+            AliquotedSpecimenWrapper type =
+                new AliquotedSpecimenWrapper(appService, st);
             if (authorizedTypes == null || authorizedTypes.contains(type)) {
                 studiesAliquotedTypes.add(type);
             }

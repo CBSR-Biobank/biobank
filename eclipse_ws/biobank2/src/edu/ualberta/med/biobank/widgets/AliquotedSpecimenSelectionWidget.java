@@ -38,6 +38,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -110,7 +111,7 @@ public class AliquotedSpecimenSelectionWidget {
             @Override
             public String getText(Object element) {
                 SpecimenWrapper spc = (SpecimenWrapper) element;
-                return spc.getSpecimenType().getNameShort() + "("
+                return spc.getSpecimenType().getNameShort() + " ("
                     + spc.getInventoryId() + ")";
             }
         });
@@ -144,7 +145,10 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SpecimenTypeWrapper) element).getName();
+                return ((AliquotedSpecimenWrapper) element).getSpecimenType()
+                    .getName()
+                    + "("
+                    + ((AliquotedSpecimenWrapper) element).getVolume() + ")";
             }
         });
         cvResult.addFilter(new ViewerFilter() {
@@ -153,7 +157,9 @@ public class AliquotedSpecimenSelectionWidget {
                 Object element) {
                 return (getSourceSelection() != null && getSourceSelection()
                     .hasUnknownImportType())
-                    || sourceChildTypes.contains(element);
+                    || sourceChildTypes
+                        .contains(((AliquotedSpecimenWrapper) element)
+                            .getSpecimenType());
             }
         });
         if (oneRow) {
@@ -386,8 +392,9 @@ public class AliquotedSpecimenSelectionWidget {
         this.nextWidget = nextWidget;
     }
 
-    public void setResultTypes(List<SpecimenTypeWrapper> types) {
-        cvResult.setInput(types);
+    public void setResultTypes(
+        List<AliquotedSpecimenWrapper> studiesAliquotedTypes) {
+        cvResult.setInput(studiesAliquotedTypes);
     }
 
     public void setSourceSpecimens(List<SpecimenWrapper> sourceSpecimens) {

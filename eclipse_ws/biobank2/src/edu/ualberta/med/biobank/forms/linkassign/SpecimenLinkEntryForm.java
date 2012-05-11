@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.Al
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -478,7 +479,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private void setTypeCombos() {
         log.debug("setTypeCombos");
 
-        List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
+        List<AliquotedSpecimenWrapper> studiesAliquotedTypes = null;
         List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
         if (isSingleMode()) {
             log.debug("setTypeCombos: single mode");
