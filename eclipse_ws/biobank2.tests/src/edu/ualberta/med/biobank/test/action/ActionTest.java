@@ -12,6 +12,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
+import org.hibernate.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -37,6 +38,12 @@ public class ActionTest extends DbTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
+
+        // let action tests manager their own transactions.
+        Transaction tx = session.getTransaction();
+        if (tx != null && tx.isActive()) {
+            tx.rollback();
+        }
 
         // by default, always execute as the super user
         getExecutor().setUserId(getGlobalAdmin().getId());

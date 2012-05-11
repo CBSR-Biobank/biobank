@@ -117,6 +117,9 @@ public class TestProcessingEvent extends ActionTest {
                     new HashSet<Integer>()))
                 .getId();
 
+        // sourceSpecs.get(0) will have its activity status set to closed now
+        sourceSpecs.get(0).specimen.setActivityStatus(ActivityStatus.CLOSED);
+
         // create aliquoted specimens by doing a scan link
         Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
             new HashSet<AliquotedSpecimenInfo>();
@@ -159,7 +162,6 @@ public class TestProcessingEvent extends ActionTest {
             Assert.assertEquals(sourceSpecs.get(0).specimen.getSpecimenType()
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
-            // expected active but was closed
             Assert.assertEquals(
                 sourceSpecs.get(0).specimen.getActivityStatus(),
                 specimenInfo.specimen.getActivityStatus());
@@ -244,7 +246,6 @@ public class TestProcessingEvent extends ActionTest {
         session.clear();
         spc = (Specimen) session.load(Specimen.class, spcId);
         session.refresh(spc);
-        // expected null but was x
         Assert.assertNotNull(spc);
         Assert.assertNull(spc.getProcessingEvent());
     }
