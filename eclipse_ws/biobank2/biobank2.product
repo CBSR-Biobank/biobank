@@ -27,16 +27,13 @@ AICML: http://aicml.cs.ualberta.ca
 
    <windowImages/>
 
-   <splash
-      location="biobank" />
+   <splash location="biobank"/>
    <launcher name="BioBank">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
       <win useIco="false">
-         <bmp
-            winSmallHigh="/biobank.gui.common/icons/biobank_launcher_16.bmp"
-            winMediumHigh="/biobank.gui.common/icons/biobank_launcher_32.bmp"/>
+         <bmp winSmallHigh="/biobank.gui.common/icons/biobank_launcher_16.bmp" winMediumHigh="/biobank.gui.common/icons/biobank_launcher_32.bmp"/>
       </win>
    </launcher>
 
@@ -61,7 +58,7 @@ list of conditions and the following disclaimer.
 this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE CANADIAN BIOSAMPLE REPOSITORY ``AS IS&apos;&apos; AND
+THIS SOFTWARE IS PROVIDED BY THE CANADIAN BIOSAMPLE REPOSITORY ``AS IS'' AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL THE CANADIAN BIOSAMPLE EPOSITORY OR CONTRIBUTORS
@@ -89,12 +86,13 @@ either expressed or implied, of the Canadian BioSample Repository.
    </features>
 
    <configurations>
-      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
-      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
-      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
-      <property name="org.eclipse.update.reconcile" value="false" />
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4"/>
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2"/>
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2"/>
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1"/>
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1"/>
+      <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="1"/>
+      <property name="org.eclipse.update.reconcile" value="false"/>
    </configurations>
 
 </product>
