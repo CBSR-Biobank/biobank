@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.bbpdbconsent;
+package edu.ualberta.med.biobank.tools.freezer_link;
 
 public class BbpdbSpecimenInfo {
 

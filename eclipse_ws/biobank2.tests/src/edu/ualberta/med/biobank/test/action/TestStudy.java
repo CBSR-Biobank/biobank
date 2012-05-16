@@ -30,7 +30,6 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.Patie
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
@@ -793,27 +792,27 @@ public class TestStudy extends TestAction {
     public void getAllStudiesAction() {
 
         StudyGetAllAction action = new StudyGetAllAction();
-        StudiesInfo infos = exec(action);
+        List<Study> infos = exec(action).getList();
 
-        Integer startSize = infos.getStudies().size();
+        Integer startSize = infos.size();
 
         Integer firstStudy = StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 1);
 
         StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 2);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 2);
 
         Study study = new Study();
         study.setId(firstStudy);
         exec(new StudyDeleteAction(study));
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 1);
     }
 }

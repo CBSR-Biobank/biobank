@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
-import edu.ualberta.med.biobank.tools.bbpdbconsent.BbpdbSpecimenInfo;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
@@ -36,9 +35,12 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  * @author Nelson
  * 
  */
+@SuppressWarnings("nls")
 public class FreezerLinkImport {
 
-    // @formatter:off
+    private static final Logger log = LoggerFactory
+        .getLogger(FreezerLinkImport.class.getName());
+
     private static String USAGE =
         "Usage: bbpdb_freezer_link [options]\n\n"
             + "Options\n"
@@ -47,15 +49,14 @@ public class FreezerLinkImport {
             + "  -u, --user       user name to log into BioBank server\n"
             + "  -w, --password   password to log into BioBank server\n"
             + "  -v, --verbose    shows verbose output\n"
-            + "  -h, --help       shows this text\n"; 
-    // @formatter:on
-
-    private static final Logger log = LoggerFactory
-        .getLogger(FreezerLinkImport.class.getName());
+            + "  -h, --help       shows this text\n";
 
     public static final String BBPDB_QRY =
         "SELECT stl.study_name_short,clinics.clinic_name,patient.dec_chr_nr,"
-            + "pv.date_taken,pv.date_received,pv.worksheet,fl.inventory_id,fl.link_date,sl.sample_name,"
+            + "convert_tz(pv.date_taken,'Canada/Mountain','GMT') date_taken,"
+            + "convert_tz(pv.date_received,'Canada/Mountain','GMT') date_received,"
+            + "convert_tz(fl.link_date,'Canada/Mountain','GMT') link_date,"
+            + "pv.worksheet,fl.inventory_id,sl.sample_name,"
             + "pv.phlebotomist_id,pv.consent_surveillance,pv.consent_genetics "
             + "FROM freezer_link fl "
             + "join patient on patient.patient_nr=fl.patient_nr "
@@ -71,13 +72,13 @@ public class FreezerLinkImport {
 
     private final BiobankApplicationService appService;
 
-    private Set<BbpdbSpecimenInfo> bbpdbSpecimenInfos =
+    private final Set<BbpdbSpecimenInfo> bbpdbSpecimenInfos =
         new HashSet<BbpdbSpecimenInfo>();
 
-    private Set<BbpdbSpecimenInfo> bbpdbSpecimensToAdd =
+    private final Set<BbpdbSpecimenInfo> bbpdbSpecimensToAdd =
         new HashSet<BbpdbSpecimenInfo>();
 
-    private Site cbsrSite;
+    private final Site cbsrSite;
 
     private List<Study> studies = null;
 
