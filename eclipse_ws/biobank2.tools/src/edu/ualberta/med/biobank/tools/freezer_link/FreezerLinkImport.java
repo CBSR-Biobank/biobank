@@ -5,32 +5,50 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
+import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Fixes issue #520.
  * 
  * Some aliquots in the freezer_link table of the BBPDB database were not
  * imported into BioBank.
+ * 
+ * Note: time zone conversions are not required. The BBPDB database has times
+ * stored as Canada Mountain time. Biobank is accessed via the JBoss server
+ * which converts the times to Canada Mountain time for us.
  * 
  * @author Nelson
  * 
@@ -53,9 +71,7 @@ public class FreezerLinkImport {
 
     public static final String BBPDB_QRY =
         "SELECT stl.study_name_short,clinics.clinic_name,patient.dec_chr_nr,"
-            + "convert_tz(pv.date_taken,'Canada/Mountain','GMT') date_taken,"
-            + "convert_tz(pv.date_received,'Canada/Mountain','GMT') date_received,"
-            + "convert_tz(fl.link_date,'Canada/Mountain','GMT') link_date,"
+            + "pv.date_taken,pv.date_received,fl.link_date,"
             + "pv.worksheet,fl.inventory_id,sl.sample_name,"
             + "pv.phlebotomist_id,pv.consent_surveillance,pv.consent_genetics "
             + "FROM freezer_link fl "
@@ -63,7 +79,7 @@ public class FreezerLinkImport {
             + "join patient_visit pv on pv.visit_nr=fl.visit_nr "
             + "join sample_list sl on sl.sample_nr=fl.sample_nr "
             + "join study_list stl on stl.study_nr=pv.study_nr "
-            + "join clinics on clinics.clinic_site=pv.clinic_site "
+            + "left join clinics on clinics.clinic_site=pv.clinic_site and clinics.study_nr=pv.study_nr "
             + "left join freezer on freezer.inventory_id=fl.inventory_id "
             + "where freezer.inventory_id is null "
             + "order by patient.dec_chr_nr,pv.date_taken desc";
@@ -72,7 +88,7 @@ public class FreezerLinkImport {
 
     private final BiobankApplicationService appService;
 
-    private final Set<BbpdbSpecimenInfo> bbpdbSpecimenInfos =
+    private final Set<BbpdbSpecimenInfo> bbpdbSpcInfos =
         new HashSet<BbpdbSpecimenInfo>();
 
     private final Set<BbpdbSpecimenInfo> bbpdbSpecimensToAdd =
@@ -80,9 +96,9 @@ public class FreezerLinkImport {
 
     private final Site cbsrSite;
 
-    private List<Study> studies = null;
+    private Map<String, Study> studiesMap = null;
 
-    private List<SpecimenType> specimenTypes = null;
+    private Map<String, SpecimenType> specimenTypesMap = null;
 
     public static void main(String[] argv) {
         try {
@@ -111,15 +127,14 @@ public class FreezerLinkImport {
         appService = ServiceConnection.getAppService(hostUrl, args.username,
             args.password);
 
+        cbsrSite = getCbsrSiteByNameShort("CBSR");
+
         getBbpdbUnlinkedSpecimens();
         getSpecimensToAdd();
-        cbsrSite = getCbsrSiteByNameShort("CBSR");
 
         if (bbpdbSpecimensToAdd.size() == 0) {
             log.info("no specimens to add");
         }
-
-        addSpecimens();
     }
 
     private void getBbpdbUnlinkedSpecimens() throws SQLException {
@@ -127,33 +142,33 @@ public class FreezerLinkImport {
 
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            BbpdbSpecimenInfo bbpdbSpecimenInfo =
+            BbpdbSpecimenInfo bbpdbSpcInfo =
                 getSpecimenInfoFromResultSet(rs);
-            bbpdbSpecimenInfos.add(bbpdbSpecimenInfo);
+            bbpdbSpcInfos.add(bbpdbSpcInfo);
         }
 
         log.debug("got {} specimens from the freezer link table",
-            bbpdbSpecimenInfos.size());
+            bbpdbSpcInfos.size());
     }
 
     private BbpdbSpecimenInfo getSpecimenInfoFromResultSet(ResultSet rs)
         throws SQLException {
-        BbpdbSpecimenInfo bbpdbSpecimenInfo = new BbpdbSpecimenInfo();
-        bbpdbSpecimenInfo.setStudyNameShort(rs.getString("study_name_short"));
-        bbpdbSpecimenInfo.setClinicName(rs.getString("clinic_name"));
-        bbpdbSpecimenInfo.setChrNr(rs.getString("dec_chr_nr"));
-        bbpdbSpecimenInfo.setDateTaken(rs.getString("date_taken"));
-        bbpdbSpecimenInfo.setDateReceived(rs.getString("date_received"));
-        bbpdbSpecimenInfo.setWorksheet(rs.getString("worksheet"));
-        bbpdbSpecimenInfo.setInventoryId(rs.getString("inventory_id"));
-        bbpdbSpecimenInfo.setLinkDate(rs.getString("link_date"));
-        bbpdbSpecimenInfo.setSampleName(rs.getString("sample_name"));
-        bbpdbSpecimenInfo.setPhlebotomistId(rs.getString("phlebotomist_id"));
-        bbpdbSpecimenInfo.setConsentSurveillance(rs
+        BbpdbSpecimenInfo bbpdbSpcInfo = new BbpdbSpecimenInfo();
+        bbpdbSpcInfo.setStudyNameShort(rs.getString("study_name_short"));
+        bbpdbSpcInfo.setClinicName(rs.getString("clinic_name"));
+        bbpdbSpcInfo.setChrNr(rs.getString("dec_chr_nr"));
+        bbpdbSpcInfo.setDateTaken(rs.getString("date_taken"));
+        bbpdbSpcInfo.setDateReceived(rs.getString("date_received"));
+        bbpdbSpcInfo.setWorksheet(rs.getString("worksheet"));
+        bbpdbSpcInfo.setInventoryId(rs.getString("inventory_id"));
+        bbpdbSpcInfo.setLinkDate(rs.getString("link_date"));
+        bbpdbSpcInfo.setSampleName(rs.getString("sample_name"));
+        bbpdbSpcInfo.setPhlebotomistId(rs.getString("phlebotomist_id"));
+        bbpdbSpcInfo.setConsentSurveillance(rs
             .getString("consent_surveillance"));
-        bbpdbSpecimenInfo.setConsentGenetics(rs.getString("consent_genetics"));
+        bbpdbSpcInfo.setConsentGenetics(rs.getString("consent_genetics"));
 
-        return bbpdbSpecimenInfo;
+        return bbpdbSpcInfo;
     }
 
     private Site getCbsrSiteByNameShort(String nameShort) throws Exception {
@@ -169,55 +184,79 @@ public class FreezerLinkImport {
         throw new Exception("Site " + nameShort + " not found");
     }
 
-    private Study getStudyByNameShort(String nameShort) throws Exception {
-        if (studies == null) {
-            studies = appService.doAction(new StudyGetAllAction()).getList();
-        }
+    private void getStudies() throws Exception {
+        if (studiesMap != null) return;
+
+        studiesMap = new HashMap<String, Study>();
+
+        List<Study> studies =
+            appService.doAction(new StudyGetAllAction()).getList();
 
         for (Study study : studies) {
-            if (study.getNameShort().equals(nameShort)) {
-                return study;
-            }
+            studiesMap.put(study.getNameShort(), study);
         }
-
-        throw new Exception("Study " + nameShort + " not found");
     }
 
-    private SpecimenType getSpecimenTypeByName(String name)
-        throws Exception {
-        if (specimenTypes == null) {
-            specimenTypes =
-                appService.doAction(new SpecimenTypeGetAllAction()).getList();
+    private Study getBiobankStudy(String bbpdbStudyName) throws Exception {
+        getStudies();
+        Study study = null;
+
+        if (bbpdbStudyName.equals("BBP")) {
+            study = studiesMap.get("BBPSP");
+        } else {
+            study = studiesMap.get(bbpdbStudyName);
         }
+
+        if (study == null) {
+            throw new Exception("Study " + bbpdbStudyName + " not found");
+        }
+
+        return study;
+    }
+
+    private void getSpecimenTypes() throws ApplicationException {
+        if (specimenTypesMap != null) return;
+
+        specimenTypesMap = new HashMap<String, SpecimenType>();
+
+        List<SpecimenType> specimenTypes =
+            appService.doAction(new SpecimenTypeGetAllAction()).getList();
 
         for (SpecimenType specimenType : specimenTypes) {
-            if (specimenType.getName().equals(name)) {
-                return specimenType;
-            }
+            specimenTypesMap.put(specimenType.getName(), specimenType);
+        }
+    }
+
+    private SpecimenType getBiobankSpecimenType(String bbpdbSpcTypeName)
+        throws Exception {
+        getSpecimenTypes();
+        SpecimenType spcType = specimenTypesMap.get(bbpdbSpcTypeName);
+
+        if (spcType == null) {
+            log.error("SpecimenType " + bbpdbSpcTypeName + " not found");
+            return null;
         }
 
-        throw new Exception("SpecimenType " + name + " not found");
+        return spcType;
     }
 
     /*
      * Stores specimens to add in bbpdbSpecimensToAdd.
      */
     private void getSpecimensToAdd() throws Exception {
-        for (BbpdbSpecimenInfo bbpdbSpecimenInfo : bbpdbSpecimenInfos) {
+        for (BbpdbSpecimenInfo bbpdbSpcInfo : bbpdbSpcInfos) {
             List<Integer> specimenIds = appService.doAction(
-                new SpecimenByInventorySearchAction(bbpdbSpecimenInfo
+                new SpecimenByInventorySearchAction(bbpdbSpcInfo
                     .getInventoryId(), cbsrSite.getId())).getList();
 
             if (specimenIds.size() > 1) {
-                throw new Exception("inventory id " + bbpdbSpecimenInfo
+                throw new Exception("inventory id " + bbpdbSpcInfo
                     .getInventoryId() + " is in the database multiple times");
             } else if (specimenIds.size() == 1) {
                 log.trace("inventory id {} is already in the database",
-                    bbpdbSpecimenInfo.getInventoryId());
+                    bbpdbSpcInfo.getInventoryId());
             } else {
-                log.info("inventory id {} has to be added",
-                    bbpdbSpecimenInfo.getInventoryId());
-                bbpdbSpecimensToAdd.add(bbpdbSpecimenInfo);
+                processSpecimensToAdd(bbpdbSpcInfo);
             }
         }
     }
@@ -225,19 +264,68 @@ public class FreezerLinkImport {
     /*
      * Assumes specimens to add are already in bbpdbSpecimensToAdd.
      */
-    private void addSpecimens() throws Exception {
-        Study study;
+    private void processSpecimensToAdd(BbpdbSpecimenInfo bbpdbSpcInfo)
+        throws Exception {
+        bbpdbSpecimensToAdd.add(bbpdbSpcInfo);
 
-        for (BbpdbSpecimenInfo bbpdbSpecimenInfo : bbpdbSpecimensToAdd) {
-            study = getStudyByNameShort(bbpdbSpecimenInfo.getStudyNameShort());
+        Date bbpdbDateTaken =
+            DateFormatter.parseToDateTime(bbpdbSpcInfo.getDateTaken());
 
-            AliquotedSpecimenInfo aqSpcInfo = new AliquotedSpecimenInfo();
-            aqSpcInfo.inventoryId = bbpdbSpecimenInfo.getInventoryId();
-            aqSpcInfo.typeId =
-                getSpecimenTypeByName(bbpdbSpecimenInfo.getSampleName())
-                    .getId();
-            aqSpcInfo.activityStatus = ActivityStatus.ACTIVE;
+        SearchedPatientInfo searchedPatientInfo = appService.doAction(
+            new PatientSearchAction(bbpdbSpcInfo.getChrNr()));
 
+        PatientInfo patientInfo = appService.doAction(
+            new PatientGetInfoAction(searchedPatientInfo.patient.getId()));
+
+        boolean sourceSpecimenFound = false;
+
+        for (PatientCEventInfo ceventInfo : patientInfo.ceventInfos) {
+            CEventInfo cEventInfo = appService.doAction(
+                new CollectionEventGetInfoAction(ceventInfo.cevent.getId()));
+
+            for (SpecimenInfo spcInfo : cEventInfo.sourceSpecimenInfos) {
+                if (DateFormatter.compareDatesToMinutes(bbpdbDateTaken,
+                    spcInfo.specimen.getCreatedAt())) {
+                    addSpecimens(bbpdbSpcInfo, spcInfo.specimen,
+                        patientInfo.patient.getStudy());
+                    sourceSpecimenFound = true;
+                    // break here since we do not want to add the specimen
+                    // to more than one source specimen with the same date drawn
+                    break;
+                }
+            }
+
+            if (sourceSpecimenFound) break;
         }
+
+        if (!sourceSpecimenFound) {
+            log.error(
+                "source specimen not found inventory_id={} patient={} date_taken={}",
+                new Object[] { bbpdbSpcInfo.getInventoryId(),
+                    bbpdbSpcInfo.getChrNr(), bbpdbSpcInfo.getDateTaken() });
+        }
+    }
+
+    private void addSpecimens(BbpdbSpecimenInfo bbpdbSpcInfo,
+        Specimen bbSourceSpecimen, Study study) throws Exception {
+
+        getBiobankStudy(bbpdbSpcInfo.getStudyNameShort());
+        SpecimenType bbSpecimenType =
+            getBiobankSpecimenType(bbpdbSpcInfo.getSampleName());
+
+        if (bbSpecimenType == null) return;
+
+        AliquotedSpecimenInfo aqSpcInfo = new AliquotedSpecimenInfo();
+        aqSpcInfo.inventoryId = bbpdbSpcInfo.getInventoryId();
+        aqSpcInfo.typeId = bbSpecimenType.getId();
+        aqSpcInfo.activityStatus = ActivityStatus.ACTIVE;
+        aqSpcInfo.parentSpecimenId = bbSourceSpecimen.getId();
+
+        // appService.doAction(new SpecimenLinkSaveAction(cbsrSite.getId(),
+        // study
+        // .getId(), Arrays.asList(aqSpcInfo)));
+
+        log.info("inventory id {} has to be added to source specimen {}",
+            bbpdbSpcInfo.getInventoryId(), bbSourceSpecimen.getInventoryId());
     }
 }
