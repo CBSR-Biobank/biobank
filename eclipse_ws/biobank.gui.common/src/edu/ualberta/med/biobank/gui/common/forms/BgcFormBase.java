@@ -15,6 +15,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,6 +35,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.ScrolledPageBook;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.ToggleHyperlink;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
@@ -204,6 +207,24 @@ public abstract class BgcFormBase extends EditorPart implements
         if (title != null) {
             section.setText(title);
         }
+        section.getChildren()[0].addFocusListener(new FocusListener() {
+
+            // move focus to children
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 0 = toggle 1 = label 2 = client
+                Control client =
+                    ((ToggleHyperlink) e.widget).getParent().getChildren()[2];
+                if (client != null) client.setFocus();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
         GridLayout layout = new GridLayout(1, false);
         layout.verticalSpacing = 0;
         layout.marginHeight = 0;

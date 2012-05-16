@@ -128,12 +128,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
     protected abstract String getCollectionModelObjectToString(Object o);
 
-    @Override
-    public boolean setFocus() {
-        tableViewer.getControl().setFocus();
-        return true;
-    }
-
     /**
      * Should be used by info tables that allow editing of data. Use this method
      * instead of setCollection().
