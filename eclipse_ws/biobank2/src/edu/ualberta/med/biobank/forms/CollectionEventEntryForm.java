@@ -8,17 +8,23 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.Section;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -40,16 +46,20 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -69,6 +79,7 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CommentedSpecimenInfo;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
+import edu.ualberta.med.biobank.wizards.RepatientingWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
@@ -123,6 +134,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private final CollectionEventWrapper cevent = new CollectionEventWrapper(
         SessionManager.getAppService());
+
+    protected RepatientingWizard wizard;
+
+    private BgcBaseText patientField;
 
     @SuppressWarnings("nls")
     @Override
@@ -234,9 +249,54 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             Study.NAME.format(1).toString(), cevent
                 .getPatient().getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE,
-            Patient.NAME.format(1).toString(), cevent
-                .getPatient().getPnumber());
+        widgetCreator.createLabel(client,
+            Patient.NAME.singular().toString());
+
+        Composite c = new Composite(client, SWT.NONE);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        c.setLayoutData(gd);
+        GridLayout gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        c.setLayout(gl);
+
+        patientField =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                c,
+                BgcBaseText.class,
+                SWT.READ_ONLY,
+                null,
+                BeansObservables
+                    .observeValue(cevent,
+                        Property.concatNames(CollectionEventPeer.PATIENT,
+                            PatientPeer.PNUMBER)), null);
+        patientField.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
+
+        Button editSourceButton = new Button(c, SWT.NONE);
+        editSourceButton
+            .setText(i18n.tr("Change Source"));
+
+        toolkit.adapt(c);
+
+        editSourceButton.addListener(SWT.MouseUp, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                wizard =
+                    new RepatientingWizard(
+                        SessionManager.getAppService());
+                WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
+                    wizard);
+                int res = dialog.open();
+                if (res == Status.OK) {
+                    cevent.setPatient(wizard.getPatient());
+                    comment.setMessage(wizard.getComment());
+                    setDirty(true);
+                }
+            }
+        });
 
         visitNumberText =
             (BgcBaseText) createBoundWidgetWithLabel(
