@@ -37,7 +37,7 @@ public class BgcBaseWidget extends Composite {
     }
 
     public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
-        toolkit.adapt(this, true, true);
+        toolkit.adapt(this, true, false);
         adaptAllChildren(this, toolkit);
         if (paintBorder) {
             toolkit.paintBordersFor(this);

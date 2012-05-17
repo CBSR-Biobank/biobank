@@ -1066,12 +1066,14 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  style="push">
+                  style="push"
+                  tooltip="Site Administration View">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processingAdmin"
                   icon="icons/processingPerspective.png"
-                  style="push">
+                  style="push"
+                  tooltip="Processing View">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"

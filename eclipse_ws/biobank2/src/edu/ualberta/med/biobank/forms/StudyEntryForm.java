@@ -268,6 +268,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         client.setLayout(gl);
         commentEntryTable =
             new CommentsInfoTable(client, study.getCommentCollection(false));
+        commentEntryTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;

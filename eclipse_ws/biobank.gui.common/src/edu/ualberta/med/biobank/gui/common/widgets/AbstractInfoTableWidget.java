@@ -108,7 +108,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     public AbstractInfoTableWidget(final Composite parent,
         final String[] headings,
         int[] columnWidths, int rowsPerPage) {
-        super(parent, SWT.NONE);
+        super(parent, SWT.NO_FOCUS);
 
         GridLayout gl = new GridLayout(1, false);
         gl.verticalSpacing = 1;
@@ -270,12 +270,6 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     protected abstract BgcTableSorter getTableSorter();
 
     public abstract void reload();
-
-    @Override
-    public boolean setFocus() {
-        tableViewer.getControl().setFocus();
-        return true;
-    }
 
     protected TableViewer getTableViewer() {
         return tableViewer;
