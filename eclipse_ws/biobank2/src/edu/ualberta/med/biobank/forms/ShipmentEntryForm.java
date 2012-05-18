@@ -459,7 +459,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         }
                         break;
                     case POST_DELETE:
-                        originInfo.removeFromSpecimenCollection(Arrays
+                        specimens.remove(Arrays
                             .asList(specimen));
                         break;
                     }
