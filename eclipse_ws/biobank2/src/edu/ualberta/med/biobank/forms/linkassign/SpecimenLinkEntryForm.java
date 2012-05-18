@@ -560,7 +560,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             SpecimenHierarchyInfo selection = singleTypesWidget.getSelection();
             singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
             singleSpecimen
-                .setSpecimenType(selection.getAliquotedSpecimenType());
+                .setSpecimenType(selection.getAliquotedSpecimenType()
+                    .getSpecimenType());
             singleSpecimen.setCollectionEvent(linkFormPatientManagement
                 .getSelectedCollectionEvent());
         }
@@ -893,7 +894,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         SpecimenHierarchyInfo selection) {
         log.debug("setHierarchyToCell");
         cell.setSourceSpecimen(selection.getParentSpecimen());
-        cell.setSpecimenType(selection.getAliquotedSpecimenType());
+        cell.setSpecimenType(selection.getAliquotedSpecimenType()
+            .getSpecimenType());
         if (cell.getStatus() != UICellStatus.ERROR)
             cell.setStatus(UICellStatus.TYPE);
     }

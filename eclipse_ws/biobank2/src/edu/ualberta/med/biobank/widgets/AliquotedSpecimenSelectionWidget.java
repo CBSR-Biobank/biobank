@@ -291,8 +291,8 @@ public class AliquotedSpecimenSelectionWidget {
         return number > 0;
     }
 
-    private SpecimenTypeWrapper getResultTypeSelection() {
-        return (SpecimenTypeWrapper) ((StructuredSelection) cvResult
+    private AliquotedSpecimenWrapper getResultTypeSelection() {
+        return (AliquotedSpecimenWrapper) ((StructuredSelection) cvResult
             .getSelection()).getFirstElement();
     }
 
