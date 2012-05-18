@@ -53,6 +53,9 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * stored as Canada Mountain time. Biobank is accessed via the JBoss server
  * which converts the times to Canada Mountain time for us.
  * 
+ * RUN AS: java -Dlog4j.configuration=file:///apth/log4j.properties -jar
+ * bbpdb_freezer_link.jar OPTIONS
+ *
  * @author Nelson
  * 
  */
@@ -274,7 +277,7 @@ public class FreezerLinkImport {
                 throw new Exception("inventory id " + bbpdbSpcInfo
                     .getInventoryId() + " is in the database multiple times");
             } else if (specimenIds.size() == 1) {
-                log.trace("inventory id {} is already in the database",
+                log.debug("inventory id {} is already in the database",
                     bbpdbSpcInfo.getInventoryId());
             } else {
                 processSpecimensToAdd(bbpdbSpcInfo);
@@ -347,7 +350,10 @@ public class FreezerLinkImport {
         appService.doAction(new SpecimenLinkSaveAction(cbsrSite.getId(),
             study.getId(), Arrays.asList(aqSpcInfo)));
 
-        log.info("inventory id {} was added to source specimen '{}'",
-            bbpdbSpcInfo.getInventoryId(), bbSourceSpecimen.getInventoryId());
+        log.info(
+            "inventory id {} was added to source specimen '{}' for patient {}",
+            new Object[] { bbpdbSpcInfo.getInventoryId(),
+                bbSourceSpecimen.getInventoryId(),
+                bbSourceSpecimen.getCollectionEvent().getPatient().getPnumber() });
     }
 }
