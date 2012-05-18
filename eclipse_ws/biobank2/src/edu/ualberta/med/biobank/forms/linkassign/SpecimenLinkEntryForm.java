@@ -108,8 +108,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // this row)
     private final Map<Integer, Integer> typesRows =
         new HashMap<Integer, Integer>();
-    // List of specimen types that a pallet can have.
-    private List<SpecimenTypeWrapper> palletSpecimenTypes;
+
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 

@@ -14,11 +14,11 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 
 public class StudyMasterGroup extends AbstractStudyGroup {
@@ -29,7 +29,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(StudyMasterGroup.class.getName());
 
-    private StudiesInfo studiesInfo = null;
+    private List<Study> studies = null;
 
     private final Boolean createAllowed;
 
@@ -60,11 +60,11 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        studiesInfo = SessionManager.getAppService().doAction(
-            new StudyGetAllAction());
+        studies = SessionManager.getAppService().doAction(
+            new StudyGetAllAction()).getList();
 
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-            studiesInfo.getStudies(), StudyWrapper.class);
+            studies, StudyWrapper.class);
     }
 
     public void addStudy() {
