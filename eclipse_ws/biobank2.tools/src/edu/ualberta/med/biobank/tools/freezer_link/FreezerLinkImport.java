@@ -55,7 +55,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * 
  * RUN AS: java -Dlog4j.configuration=file:///apth/log4j.properties -jar
  * bbpdb_freezer_link.jar OPTIONS
- *
+ * 
  * @author Nelson
  * 
  */
@@ -209,7 +209,7 @@ public class FreezerLinkImport {
         studiesMap = new HashMap<String, Study>();
 
         List<Study> studies =
-            appService.doAction(new StudyGetAllAction()).getList();
+            appService.doAction(new StudyGetAllAction()).getStudies();
 
         for (Study study : studies) {
             studiesMap.put(study.getNameShort(), study);

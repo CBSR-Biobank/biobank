@@ -59,7 +59,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         studies = SessionManager.getAppService().doAction(
-            new StudyGetAllAction()).getList();
+            new StudyGetAllAction()).getStudies();
 
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
             studies, StudyWrapper.class);
