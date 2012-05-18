@@ -822,6 +822,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 currentMultipleContainer.reset();
                 initWithProduct = true;
 
+                palletPositionText.setText(palletFoundWithProductBarcode
+                    .getLabel());
+
                 // display the type, which can't be modified.
                 palletTypesViewer.getCombo().setEnabled(false);
                 palletTypesViewer.setInput(Arrays
@@ -837,6 +840,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         palletFoundWithProductBarcode.getContainerType()
                             .getName()));
                 // can't modify the position if exists already
+
                 palletPositionText.setEnabled(false);
                 focusPlateToScan();
             }
