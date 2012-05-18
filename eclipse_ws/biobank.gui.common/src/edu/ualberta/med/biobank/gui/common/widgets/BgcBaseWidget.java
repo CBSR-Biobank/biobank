@@ -37,6 +37,9 @@ public class BgcBaseWidget extends Composite {
     }
 
     public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {
+        // **IMPORTANT** the 3rd argument is called "track keyboard", and if set
+        // to true will eat focus related events that we need to pass down to
+        // its children
         toolkit.adapt(this, true, false);
         adaptAllChildren(this, toolkit);
         if (paintBorder) {
