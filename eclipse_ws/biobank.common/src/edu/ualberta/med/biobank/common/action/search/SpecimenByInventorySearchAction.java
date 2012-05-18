@@ -17,7 +17,7 @@ public class SpecimenByInventorySearchAction implements
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
         "SELECT spec.id FROM " + Specimen.class.getName() + " spec"
-            + " where spec.inventoryId=? and spec.currentCenter.id=?";
+            + " WHERE spec.inventoryId=? AND spec.currentCenter.id=?";
 
     private static final long serialVersionUID = 1L;
     private String inventoryId;
