@@ -226,6 +226,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         }
     }
 
+    @SuppressWarnings("unused")
     private void mergeMembershipsOnDomain(ActionContext context, User user) {
 
     }

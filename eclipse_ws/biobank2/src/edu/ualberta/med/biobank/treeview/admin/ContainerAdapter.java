@@ -165,7 +165,6 @@ public class ContainerAdapter extends AdapterBase {
                 .getActiveWorkbenchWindow().getShell(), getContainer());
         if (msDlg.open() == Dialog.OK) {
             try {
-                final Integer toContainerId = msDlg.getNewContainer().getId();
                 final ContainerWrapper newContainer = msDlg.getNewContainer();
                 IRunnableContext context =
                     new ProgressMonitorDialog(Display.getDefault()
@@ -267,7 +266,6 @@ public class ContainerAdapter extends AdapterBase {
     public boolean setNewPositionFromLabel(final String newLabel)
         throws Exception {
         final ContainerWrapper container = getContainer();
-        final String oldLabel = container.getLabel();
         List<ContainerWrapper> newParentContainers =
             container.getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {

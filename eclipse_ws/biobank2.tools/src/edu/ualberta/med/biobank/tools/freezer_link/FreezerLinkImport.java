@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +28,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
@@ -99,6 +102,19 @@ public class FreezerLinkImport {
     private Map<String, Study> studiesMap = null;
 
     private Map<String, SpecimenType> specimenTypesMap = null;
+
+    public static final Map<String, String> NEW_SAMPLE_TYPE_NAME;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("DNA(WBC)", "DNA (WBC)");
+        aMap.put("PFP", "PF Plasma");
+        aMap.put("Plasma LH", "Lith Hep Plasma");
+        aMap.put("RNA Later", "Biopsy, RNA later");
+        aMap.put("CDPA Plas", "CDPA Plasma");
+        aMap.put("Sodium Azide Urine", "SodiumAzideUrine");
+        aMap.put("Paxgene", "Paxgene800");
+        NEW_SAMPLE_TYPE_NAME = Collections.unmodifiableMap(aMap);
+    }
 
     public static void main(String[] argv) {
         try {
@@ -233,6 +249,11 @@ public class FreezerLinkImport {
         SpecimenType spcType = specimenTypesMap.get(bbpdbSpcTypeName);
 
         if (spcType == null) {
+            spcType = specimenTypesMap
+                .get(NEW_SAMPLE_TYPE_NAME.get(bbpdbSpcTypeName));
+        }
+
+        if (spcType == null) {
             log.error("SpecimenType " + bbpdbSpcTypeName + " not found");
             return null;
         }
@@ -285,7 +306,9 @@ public class FreezerLinkImport {
 
             for (SpecimenInfo spcInfo : cEventInfo.sourceSpecimenInfos) {
                 if (DateFormatter.compareDatesToMinutes(bbpdbDateTaken,
-                    spcInfo.specimen.getCreatedAt())) {
+                    spcInfo.specimen.getCreatedAt())
+                    && spcInfo.specimen.getInventoryId().startsWith(
+                        "sw upgrade")) {
                     addSpecimens(bbpdbSpcInfo, spcInfo.specimen,
                         patientInfo.patient.getStudy());
                     sourceSpecimenFound = true;
@@ -321,11 +344,10 @@ public class FreezerLinkImport {
         aqSpcInfo.activityStatus = ActivityStatus.ACTIVE;
         aqSpcInfo.parentSpecimenId = bbSourceSpecimen.getId();
 
-        // appService.doAction(new SpecimenLinkSaveAction(cbsrSite.getId(),
-        // study
-        // .getId(), Arrays.asList(aqSpcInfo)));
+        appService.doAction(new SpecimenLinkSaveAction(cbsrSite.getId(),
+            study.getId(), Arrays.asList(aqSpcInfo)));
 
-        log.info("inventory id {} has to be added to source specimen {}",
+        log.info("inventory id {} was added to source specimen '{}'",
             bbpdbSpcInfo.getInventoryId(), bbSourceSpecimen.getInventoryId());
     }
 }
