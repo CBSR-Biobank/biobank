@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
-import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 
 public class ContainerGetSpecimenListInfoAction extends
     SpecimenListGetInfoAction {
@@ -27,7 +27,7 @@ public class ContainerGetSpecimenListInfoAction extends
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new OriginInfoReadPermission(containerId).isAllowed(context);
+        return new ContainerReadPermission(containerId).isAllowed(context);
     }
 
     @Override
