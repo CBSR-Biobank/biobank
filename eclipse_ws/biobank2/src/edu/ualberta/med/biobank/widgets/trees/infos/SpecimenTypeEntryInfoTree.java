@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.widgets.trees.infos;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 
@@ -92,6 +94,11 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
                         new SpecimenTypeSaveAction(specimenType.getName(),
                             specimenType.getNameShort());
                     save.setId(specimenType.getId());
+                    Set<Integer> ids = new HashSet<Integer>();
+                    for (SpecimenTypeWrapper child : specimenType
+                        .getChildSpecimenTypeCollection(false))
+                        ids.add(child.getId());
+                    save.setChildSpecimenTypeIds(ids);
                     specimenType.setId(SessionManager.getAppService().doAction(
                         save).getId());
                     if (add) {
