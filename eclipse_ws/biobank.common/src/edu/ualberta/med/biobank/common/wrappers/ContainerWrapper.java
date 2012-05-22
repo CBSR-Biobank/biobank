@@ -43,29 +43,23 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("nls")
 public class ContainerWrapper extends ContainerBaseWrapper {
-    @SuppressWarnings("nls")
     public static final String PATH_DELIMITER = "/";
 
     private static final I18n i18n = I18nFactory
         .getI18n(ContainerWrapper.class);
 
-    @SuppressWarnings("nls")
     private static final String CHILD_POSITION_CONFLICT_MSG =
         i18n.tr("Position {0} of container {1} already contains container {2} when trying to add container {3}.");
-    @SuppressWarnings("nls")
     private static final String OUT_OF_BOUNDS_POSITION_MSG =
         i18n.tr("Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).");
-    @SuppressWarnings("nls")
     private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG =
         i18n.tr("Container {0} does not allow inserts of type {1}.");
-    @SuppressWarnings("nls")
     private static final String SAMPLE_EXISTS_AT_POSITION_MSG =
         i18n.tr("Container {0} is already holding an specimen at position {1} {2}");
-    @SuppressWarnings("nls")
     private static final String CONTAINER_AT_POSITION_MSG =
         i18n.tr("Container {0} is already holding a container {1} at position {2}.");
-    @SuppressWarnings("nls")
     private static final String INVALID_POSITION =
         i18n.tr("Can't use position {0} in container {1} because its" +
             " maximum capacity is {2} rows and {3} columns.");
@@ -118,7 +112,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankRuntimeException if this or any parent is new (does not
      *             have an id) as the path is then undefined.
      */
-    @SuppressWarnings("nls")
     @Override
     public String getPath() {
         if (isNew()) {
@@ -200,7 +193,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return pos == null ? null : pos.getParent();
     }
 
-    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setPath(String dummy) {
@@ -235,7 +227,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         setTopContainerInternal(topContainer, true);
     }
 
-    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setTopContainer(ContainerBaseWrapper container) {
@@ -366,7 +357,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *         type
      * 
      */
-    @SuppressWarnings("nls")
     public String getFullInfoLabel() {
         if (getContainerType() == null
             || getContainerType().getNameShort() == null) {
@@ -442,7 +432,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("nls")
     public ContainerWrapper getChildByLabel(String label) throws Exception {
         ContainerTypeWrapper containerType = getContainerType();
         if (containerType == null) {
@@ -490,7 +479,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception if the sample type is null.
      */
-    @SuppressWarnings("nls")
     public boolean canHoldSpecimenType(SpecimenWrapper specimen)
         throws Exception {
         SpecimenTypeWrapper type = specimen.getSpecimenType();
@@ -523,7 +511,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             getContainerType());
     }
 
-    @SuppressWarnings("nls")
     private static final String POSSIBLE_PARENTS_BASE_QRY =
         "select distinct(c) from "
             + Container.class.getName()
@@ -543,7 +530,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param type if the child is a container, this is its type (if available)
      * @throws BiobankException
      */
-    @SuppressWarnings("nls")
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
         SiteWrapper site, ContainerTypeWrapper type)
@@ -593,7 +579,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return filteredWrappers;
     }
 
-    @SuppressWarnings("nls")
     private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY =
         "from "
             + Container.class.getName()
@@ -632,7 +617,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param minRowCapacity min row capacity
      * @param minColCapacity min col capacity
      */
-    @SuppressWarnings("nls")
     public static List<ContainerWrapper> getEmptyContainersHoldingSpecimenType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         List<SpecimenTypeWrapper> sampleTypes, Integer minRowCapacity,
@@ -652,7 +636,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    @SuppressWarnings("nls")
     private static final String CONTAINERS_IN_SITE_QRY = "from "
         + Container.class.getName() + " where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
@@ -671,7 +654,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    @SuppressWarnings("nls")
     private static final String CONTAINERS_BY_LABEL = "from "
         + Container.class.getName() + " where " + ContainerPeer.LABEL.getName()
         + "=?";
@@ -689,7 +671,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    @SuppressWarnings("nls")
     private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY =
         "from "
             + Container.class.getName() + " where "
@@ -741,7 +722,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         reload();
     }
 
-    @SuppressWarnings("nls")
     @Deprecated
     private void initPositionIfEmpty(ContainerTypeWrapper type, int i, int j)
         throws Exception {
@@ -892,7 +872,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getContainerType().isPallet96();
     }
 
-    @SuppressWarnings("nls")
     private static final String POSITION_FREE_QRY = "from "
         + Specimen.class.getName()
         + " where "
