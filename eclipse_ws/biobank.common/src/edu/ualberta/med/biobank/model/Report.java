@@ -14,10 +14,30 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @javax.persistence.Entity
 @Table(name = "REPORT")
-public class Report extends AbstractBiobankModel {
+public class Report extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Report",
+        "Reports");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString NAME = bundle.trc(
+            "model",
+            "Name").format();
+    }
 
     private String name;
     private String description;
@@ -28,12 +48,14 @@ public class Report extends AbstractBiobankModel {
     private Entity entity;
     private Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Report.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

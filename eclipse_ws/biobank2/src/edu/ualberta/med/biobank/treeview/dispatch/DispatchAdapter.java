@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
@@ -20,7 +22,7 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
-import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -29,12 +31,15 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(DispatchAdapter.class);
 
     public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
@@ -46,20 +51,12 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchDeletePermission(getModelObject().getId()));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchReadPermission(getModelObject().getId()));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new DispatchUpdatePermission(getModelObject().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable =
+            isAllowed(new DispatchDeletePermission(getModelObject().getId()));
+        this.isReadable =
+            isAllowed(new DispatchReadPermission(getModelObject().getId()));
+        this.isEditable =
+            isAllowed(new DispatchUpdatePermission(getModelObject().getId()));
     }
 
     @Override
@@ -82,92 +79,100 @@ public class DispatchAdapter extends AdapterBase {
         return editable;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         DispatchWrapper dispatch = getDispatchWrapper();
-        Assert.isNotNull(dispatch, "Dispatch is null"); //$NON-NLS-1$
-        String label = ""; //$NON-NLS-1$
+        Assert.isNotNull(dispatch, "Dispatch is null");
+        String label = StringUtil.EMPTY_STRING;
         if (dispatch.getSenderCenter() != null
             && dispatch.getReceiverCenter() != null)
-            label += dispatch.getSenderCenter().getNameShort() + " -> " //$NON-NLS-1$
+            label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
         ShipmentInfoWrapper shipInfo = dispatch.getShipmentInfo();
         if ((shipInfo != null) && (shipInfo.getPackedAt() != null))
-            label += " [" + dispatch.getFormattedPackedAt() + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+            label += " [" + dispatch.getFormattedPackedAt() + "]";
         return label;
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.DispatchAdapter_dispatch_label);
+        return getTooltipText(Dispatch.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         CenterWrapper<?> siteParent = SessionManager.getUser()
             .getCurrentWorkingCenter();
-        addViewMenu(menu, Messages.DispatchAdapter_dispatch_label);
-        try {
-            if (isDeletable()) {
-                addDeleteMenu(menu, Messages.DispatchAdapter_dispatch_label);
-            }
-            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
-                && isEditable
-                && getDispatchWrapper().hasErrors()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_close_label);
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doClose();
-                    }
-                });
-            }
-            if (siteParent.equals(getDispatchWrapper().getSenderCenter())
-                && isEditable
-                && getDispatchWrapper().isInTransitState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_move_creation_label);
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setDispatchAsCreation();
-                    }
-                });
-            }
-            if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
-                && getDispatchWrapper().isInTransitState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_receive_label);
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceive();
-                    }
-                });
-                mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_receive_process_label);
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceiveAndProcess();
-                    }
-                });
-                mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText(Messages.DispatchAdapter_lost_label);
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doSetAsLost();
-                    }
-                });
-            }
-            addEditMenu(menu, Messages.DispatchAdapter_dispatch_label);
-        } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_check_error_msg,
-                e);
+        addViewMenu(menu, Dispatch.NAME.singular().toString());
+
+        if (isDeletable()) {
+            addDeleteMenu(menu, Dispatch.NAME.singular().toString());
         }
+        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+            && isEditable
+            && getDispatchWrapper().hasErrors()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Close"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doClose();
+                }
+            });
+        }
+        if (siteParent.equals(getDispatchWrapper().getSenderCenter())
+            && isEditable
+            && getDispatchWrapper().isInTransitState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Move to Creation"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    setDispatchAsCreation();
+                }
+            });
+        }
+        if (siteParent.equals(getDispatchWrapper().getReceiverCenter())
+            && getDispatchWrapper().isInTransitState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Receive"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doReceive();
+                }
+            });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Receive and Process"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doReceiveAndProcess();
+                }
+            });
+            mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText(
+                // menu item label.
+                i18n.tr("Mark as Lost"));
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    doSetAsLost();
+                }
+            });
+        }
+        addEditMenu(menu, Dispatch.NAME.singular().toString());
     }
 
     @Override
@@ -177,9 +182,10 @@ public class DispatchAdapter extends AdapterBase {
         SessionManager.getAppService().doAction(delete);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.DispatchAdapter_delete_confirm_msg;
+        return i18n.tr("Are you sure you want to delete this dispatch?");
     }
 
     public void doReceive() {
@@ -220,12 +226,15 @@ public class DispatchAdapter extends AdapterBase {
         openViewForm();
     }
 
+    @SuppressWarnings("nls")
     public void doSetAsLost() {
         try {
             // to be sure has last database data.
             getDispatchWrapper().reload();
         } catch (Exception ex) {
-            BgcPlugin.openAsyncError(Messages.DispatchAdapter_reload_error, ex);
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Error reloading"), ex);
         }
         getDispatchWrapper().setState(DispatchState.LOST);
         persistDispatch();
@@ -238,6 +247,7 @@ public class DispatchAdapter extends AdapterBase {
         persistDispatch();
     }
 
+    @SuppressWarnings("nls")
     private void persistDispatch() {
         DispatchChangeStateAction action =
             new DispatchChangeStateAction(getDispatchWrapper().getId(),
@@ -247,7 +257,9 @@ public class DispatchAdapter extends AdapterBase {
         try {
             SessionManager.getAppService().doAction(action);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Unable to save changes", e);
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Unable to save changes"), e);
         }
         Display.getDefault().syncExec(new Runnable() {
             @Override

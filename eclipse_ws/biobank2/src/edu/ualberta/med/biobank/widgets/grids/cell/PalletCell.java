@@ -10,24 +10,25 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PalletCell extends AbstractUICell {
-
     private String information;
 
-    private String title = ""; //$NON-NLS-1$
+    private String title = StringUtil.EMPTY_STRING;
 
     private SpecimenWrapper sourceSpecimen;
 
     private SpecimenWrapper specimen;
 
-    private ScanCell scanCell;
+    private final ScanCell scanCell;
 
     private SpecimenWrapper expectedSpecimen;
 
@@ -98,14 +99,16 @@ public class PalletCell extends AbstractUICell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned =
             new HashMap<RowColPos, PalletCell>();
+
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
+
         int i = 0;
-        while (i < specimens.size() && i < 30) {
+        for (SpecimenWrapper spc : specimens) {
             int row = i / 12;
             int col = i % 12;
             palletScanned.put(new RowColPos(row, col), new PalletCell(
-                new ScanCell(row, col, specimens.get(i).getInventoryId())));
+                new ScanCell(row, col, spc.getInventoryId())));
             i++;
         }
         return palletScanned;
@@ -162,7 +165,7 @@ public class PalletCell extends AbstractUICell {
             }
             return type.getName();
         }
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     public SpecimenTypeWrapper getType() {
@@ -249,9 +252,10 @@ public class PalletCell extends AbstractUICell {
         edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());
-        setInformation(cell.getInformation());
+        if (cell.getInformation() != null)
+            setInformation(cell.getInformation().toString());
         setValue(cell.getValue());
-        setTitle(cell.getTitle());
+        setTitle(cell.getTitle().toString());
         SpecimenWrapper expectedSpecimen = null;
         if (cell.getExpectedSpecimenId() != null) {
             expectedSpecimen = new SpecimenWrapper(appService);
@@ -275,6 +279,7 @@ public class PalletCell extends AbstractUICell {
             setStatus(UICellStatus.valueOf(status.name()));
     }
 
+    @SuppressWarnings("deprecation")
     public CellInfo transformIntoServerCell() {
         CellInfo serverCell =
             new CellInfo(getRow(), getCol(), getValue(),
@@ -284,7 +289,9 @@ public class PalletCell extends AbstractUICell {
             : getExpectedSpecimen().getId());
         if (getStatus() != null)
             serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
-        serverCell.setInformation(getInformation());
+        if (getInformation() != null)
+            serverCell.setInformation(LString.lit(getInformation()
+                .toString()));
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
         serverCell.setTitle(getTitle());

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
@@ -9,22 +10,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
-import edu.ualberta.med.biobank.model.Rank;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -48,6 +60,7 @@ public class Factory {
 
     private Site defaultSite;
     private Center defaultCenter;
+    private Clinic defaultClinic;
     private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
     private SpecimenType defaultSpecimenType;
@@ -66,6 +79,16 @@ public class Factory {
     private Principal defaultPrincipal;
     private Membership defaultMembership;
     private Role defaultRole;
+    private Dispatch defaultDispatch;
+    private DispatchSpecimen defaultDispatchSpecimen;
+    private Request defaultRequest;
+    private RequestSpecimen defaultRequestSpecimen;
+    private ResearchGroup defaultResearchGroup;
+    private ProcessingEvent defaultProcessingEvent;
+    private SourceSpecimen defaultSourceSpecimen;
+    private AliquotedSpecimen defaultAliquotedSpecimen;
+    private Contact defaultContact;
+    private Comment defaultComment;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -75,6 +98,129 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    public Comment getDefaultComment() {
+        if (defaultComment == null) {
+            defaultComment = createComment();
+        }
+        return defaultComment;
+    }
+
+    public void setDefaultComment(Comment defaultComment) {
+        this.defaultComment = defaultComment;
+    }
+
+    public Contact getDefaultContact() {
+        if (defaultContact == null) {
+            defaultContact = createContact();
+        }
+        return defaultContact;
+    }
+
+    public void setDefaultContact(Contact defaultContact) {
+        this.defaultContact = defaultContact;
+    }
+
+    public Clinic getDefaultClinic() {
+        if (defaultClinic == null) {
+            defaultClinic = createClinic();
+        }
+        return defaultClinic;
+    }
+
+    public void setDefaultClinic(Clinic defaultClinic) {
+        this.defaultClinic = defaultClinic;
+    }
+
+    public SourceSpecimen getDefaultSourceSpecimen() {
+        if (defaultSourceSpecimen == null) {
+            defaultSourceSpecimen = createSourceSpecimen();
+        }
+        return defaultSourceSpecimen;
+    }
+
+    public void setDefaultSourceSpecimen(SourceSpecimen defaultSourceSpecimen) {
+        this.defaultSourceSpecimen = defaultSourceSpecimen;
+    }
+
+    public AliquotedSpecimen getDefaultAliquotedSpecimen() {
+        if (defaultAliquotedSpecimen == null) {
+            defaultAliquotedSpecimen = createAliquotedSpecimen();
+        }
+        return defaultAliquotedSpecimen;
+    }
+
+    public void setDefaultAliquotedSpecimen(
+        AliquotedSpecimen defaultAliquotedSpecimen) {
+        this.defaultAliquotedSpecimen = defaultAliquotedSpecimen;
+    }
+
+    public ProcessingEvent getDefaultProcessingEvent() {
+        if (defaultProcessingEvent == null) {
+            defaultProcessingEvent = createProcessingEvent();
+        }
+        return defaultProcessingEvent;
+    }
+
+    public void setDefaultProcessingEvent(ProcessingEvent defaultProcessingEvent) {
+        this.defaultProcessingEvent = defaultProcessingEvent;
+    }
+
+    public ResearchGroup getDefaultResearchGroup() {
+        if (defaultResearchGroup == null) {
+            defaultResearchGroup = createResearchGroup();
+        }
+        return defaultResearchGroup;
+    }
+
+    public void setDefaultResearchGroup(ResearchGroup researchGroup) {
+        this.defaultResearchGroup = researchGroup;
+    }
+
+    public Request getDefaultRequest() {
+        if (defaultRequest == null) {
+            defaultRequest = createRequest();
+        }
+        return defaultRequest;
+    }
+
+    public void setDefaultRequest(Request request) {
+        this.defaultRequest = request;
+    }
+
+    public RequestSpecimen getDefaultRequestSpecimen() {
+        if (defaultRequestSpecimen == null) {
+            defaultRequestSpecimen = createRequestSpecimen();
+        }
+        return defaultRequestSpecimen;
+    }
+
+    public void setDefaultRequestSpecimen(RequestSpecimen requiestSpecimen) {
+        this.defaultRequestSpecimen = requiestSpecimen;
+    }
+
+    public Dispatch getDefaultDispatch() {
+        if (defaultDispatch == null) {
+            defaultDispatch = createDispatch(getDefaultCenter(), createSite());
+        }
+        return defaultDispatch;
+    }
+
+    public void setDefaultDispatch(Dispatch defaultDispatch) {
+        this.defaultDispatch = defaultDispatch;
+    }
+
+    public DispatchSpecimen getDefaultDispatchSpecimen() {
+        if (defaultDispatchSpecimen == null) {
+            defaultDispatchSpecimen = createDispatchSpecimen();
+        }
+        return defaultDispatchSpecimen;
+    }
+
+    public void setDefaultDispatchSpecimen(
+        DispatchSpecimen defaultDispatchSpecimen) {
+        this.defaultDispatchSpecimen = defaultDispatchSpecimen;
     }
 
     public Role getDefaultRole() {
@@ -292,8 +438,158 @@ public class Factory {
         this.defaultSpecimen = defaultSpecimen;
     }
 
+    public Comment createComment() {
+        Comment comment = new Comment();
+        comment.setUser(getDefaultUser());
+        comment.setCreatedAt(new Date());
+        comment.setMessage("test");
+
+        setDefaultComment(comment);
+        session.save(comment);
+        session.flush();
+        return comment;
+    }
+
+    public Contact createContact() {
+        String name = nameGenerator.next(Contact.class);
+        Contact contact = new Contact();
+        contact.setClinic(getDefaultClinic());
+        contact.setName(name);
+
+        setDefaultContact(contact);
+        session.save(contact);
+        session.flush();
+        return contact;
+    }
+
+    public Clinic createClinic() {
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
+
+        Clinic clinic = new Clinic();
+        clinic.setName(name);
+        clinic.setNameShort(name);
+        clinic.getAddress().setCity("testville");
+
+        setDefaultCenter(clinic);
+        setDefaultClinic(clinic);
+        session.save(clinic);
+        session.flush();
+        return clinic;
+    }
+
+    public SourceSpecimen createSourceSpecimen() {
+        SourceSpecimen sourceSpecimen = new SourceSpecimen();
+        sourceSpecimen.setStudy(getDefaultStudy());
+        sourceSpecimen.setSpecimenType(getDefaultSpecimenType());
+
+        setDefaultSourceSpecimen(sourceSpecimen);
+        session.save(sourceSpecimen);
+        session.flush();
+        return sourceSpecimen;
+    }
+
+    public AliquotedSpecimen createAliquotedSpecimen() {
+        AliquotedSpecimen aliquotedSpecimen = new AliquotedSpecimen();
+        aliquotedSpecimen.setStudy(getDefaultStudy());
+        aliquotedSpecimen.setVolume(new BigDecimal("1.00"));
+        aliquotedSpecimen.setQuantity(1);
+        aliquotedSpecimen.setSpecimenType(getDefaultSpecimenType());
+
+        setDefaultAliquotedSpecimen(aliquotedSpecimen);
+        session.save(aliquotedSpecimen);
+        session.flush();
+        return aliquotedSpecimen;
+    }
+
+    public ProcessingEvent createProcessingEvent() {
+        String worksheet = nameGenerator.next(ProcessingEvent.class);
+
+        ProcessingEvent processingEvent = new ProcessingEvent();
+        processingEvent.setWorksheet(worksheet);
+        processingEvent.setCenter(getDefaultCenter());
+        processingEvent.setCreatedAt(new Date());
+
+        setDefaultProcessingEvent(processingEvent);
+        session.save(processingEvent);
+        session.flush();
+        return processingEvent;
+    }
+
+    public ResearchGroup createResearchGroup() {
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
+
+        ResearchGroup researchGroup = new ResearchGroup();
+        researchGroup.getAddress().setCity("testville");
+        researchGroup.setName(name);
+        researchGroup.setNameShort(name);
+        researchGroup.setStudy(getDefaultStudy());
+
+        setDefaultCenter(researchGroup);
+        setDefaultResearchGroup(researchGroup);
+        session.save(researchGroup);
+        session.flush();
+        return researchGroup;
+    }
+
+    public Request createRequest() {
+        Request request = new Request();
+
+        Address address = request.getAddress();
+        address.setCity("testville");
+
+        session.save(address);
+
+        request.setCreatedAt(new Date());
+        request.setResearchGroup(getDefaultResearchGroup());
+
+        setDefaultRequest(request);
+        session.save(request);
+        session.flush();
+        return request;
+    }
+
+    public RequestSpecimen createRequestSpecimen() {
+        RequestSpecimen requestSpecimen = new RequestSpecimen();
+        requestSpecimen.setRequest(getDefaultRequest());
+
+        Specimen specimen = createSpecimen();
+        requestSpecimen.setSpecimen(specimen);
+
+        setDefaultRequestSpecimen(requestSpecimen);
+        session.save(requestSpecimen);
+        session.flush();
+        return requestSpecimen;
+    }
+
+    public Dispatch createDispatch(Center sender, Center receiver) {
+        Dispatch dispatch = new Dispatch();
+
+        dispatch.setSenderCenter(sender);
+        dispatch.setReceiverCenter(receiver);
+
+        setDefaultDispatch(dispatch);
+        session.save(dispatch);
+        session.flush();
+        return dispatch;
+    }
+
+    public DispatchSpecimen createDispatchSpecimen() {
+        DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
+        dispatchSpecimen.setDispatch(getDefaultDispatch());
+
+        Specimen specimen = createSpecimen();
+        dispatchSpecimen.setSpecimen(specimen);
+
+        session.save(dispatchSpecimen);
+        session.flush();
+        return dispatchSpecimen;
+    }
+
     public Site createSite() {
-        String name = nameGenerator.next(Site.class);
+        // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
 
         Site site = new Site();
         site.setName(name);
@@ -585,38 +881,100 @@ public class Factory {
     }
 
     public Membership createMembership() {
-        return createMembership(Domain.CENTER_STUDY, Rank.NORMAL);
+        return buildMembership().create();
     }
 
-    public enum Domain {
-        GLOBAL,
-        CENTER,
-        STUDY,
-        CENTER_STUDY;
+    public static class MembershipBuilder {
+        private final Factory factory;
+        private boolean userManager = false;
+        private boolean everyPermission = false;
+        private Quantity centerQuantity = Quantity.ONE;
+        private Quantity studyQuantity = Quantity.ONE;
+
+        public MembershipBuilder(Factory factory) {
+            this.factory = factory;
+        }
+
+        public MembershipBuilder setCenter() {
+            centerQuantity = Quantity.ONE;
+            return this;
+        }
+
+        public MembershipBuilder setStudy() {
+            studyQuantity = Quantity.ONE;
+            return this;
+        }
+
+        public MembershipBuilder setGlobal() {
+            centerQuantity = Quantity.ALL;
+            studyQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setAllCenters() {
+            centerQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setAllStudies() {
+            studyQuantity = Quantity.ALL;
+            return this;
+        }
+
+        public MembershipBuilder setUserManager(boolean userManager) {
+            this.userManager = userManager;
+            if (userManager) setEveryPermission(true);
+            return this;
+        }
+
+        public MembershipBuilder setEveryPermission(boolean everyPermission) {
+            this.everyPermission = everyPermission;
+            if (!everyPermission) setUserManager(false);
+            return this;
+        }
+
+        public Membership create() {
+            return factory.createMembership(this);
+        }
+
+        enum Quantity {
+            NONE,
+            ONE,
+            ALL;
+        }
     }
 
-    public Membership createMembership(Domain domain, Rank rank) {
+    public MembershipBuilder buildMembership() {
+        return new MembershipBuilder(this);
+    }
+
+    public Membership createMembership(MembershipBuilder builder) {
         Membership membership = new Membership();
 
-        if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
+        switch (builder.centerQuantity) {
+        case ONE:
             membership.getDomain().getCenters().add(getDefaultCenter());
+            break;
+        case ALL:
+            membership.getDomain().setAllCenters(true);
+            break;
         }
-        if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
+
+        switch (builder.studyQuantity) {
+        case ONE:
             membership.getDomain().getStudies().add(getDefaultStudy());
+            break;
+        case ALL:
+            membership.getDomain().setAllStudies(true);
+            break;
         }
 
         Principal p = getDefaultPrincipal();
         p.getMemberships().add(membership);
         membership.setPrincipal(p);
 
-        membership.setUserManager(rank.isGe(Rank.MANAGER) ? true : false);
-        membership.setEveryPermission(rank.isGe(Rank.ADMINISTRATOR) ? true
-            : false);
-
-        if (Rank.MANAGER.equals(rank)) {
-            // needs at least one permission or role to manage
-            membership.getPermissions().add(PermissionEnum.CLINIC_READ);
-        }
+        membership.setEveryPermission(builder.everyPermission);
+        membership.setUserManager(builder.userManager);
 
         setDefaultMembership(membership);
         session.save(membership);
@@ -669,7 +1027,7 @@ public class Factory {
             new ConcurrentHashMap<Class<?>, AtomicInteger>();
 
         private NameGenerator(String root) {
-            this.root = root;
+            this.root = formatRoot(root);
         }
 
         String next(Class<?> klazz) {
@@ -681,6 +1039,14 @@ public class Factory {
             sb.append(suffixes.get(klazz).incrementAndGet());
 
             return sb.toString();
+        }
+
+        private String formatRoot(String root) {
+            String tmp = StringUtil.truncate(root, 25, "...");
+            if (tmp != root) {
+                tmp += root.substring(root.length() - 5);
+            }
+            return tmp;
         }
     }
 }

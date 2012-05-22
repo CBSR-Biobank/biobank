@@ -12,13 +12,11 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteInput;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 
-public class TestRoleDeleteAction extends TestAction {
+public class TestRoleDeleteAction extends ActionTest {
     @Test
     public void superAdminAccess() {
         Transaction tx = session.beginTransaction();
@@ -33,7 +31,7 @@ public class TestRoleDeleteAction extends TestAction {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         try {
@@ -62,7 +60,7 @@ public class TestRoleDeleteAction extends TestAction {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         try {

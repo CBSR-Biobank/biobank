@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.hibernate.Query;
@@ -45,7 +43,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestCollectionEvent extends TestAction {
+public class TestCollectionEvent extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();
@@ -67,13 +65,10 @@ public class TestCollectionEvent extends TestAction {
         final String commentText = Utils.getRandomString(20, 30);
 
         // test add
-        final Integer ceventId =
-            getExecutor()
-                .exec(
-                    new CollectionEventSaveAction(null, provisioning.patientIds
-                        .get(0),
-                        visitNumber, ActivityStatus.ACTIVE, commentText, null,
-                        null)).getId();
+        final Integer ceventId = exec(
+            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
+                visitNumber, ActivityStatus.ACTIVE, commentText, null,
+                null)).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
@@ -83,6 +78,7 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertEquals(1, cevent.getComments().size());
     }
 
+    @SuppressWarnings("nls")
     @Test
     public void saveWithSpecs() throws Exception {
         final Integer visitNumber = getR().nextInt(20) + 1;
@@ -96,16 +92,15 @@ public class TestCollectionEvent extends TestAction {
 
         // Save a new cevent
         final Integer ceventId = exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0),
+            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNumber, ActivityStatus.ACTIVE, commentText,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                null))
+                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
             .getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
+        Assert.assertNotNull(cevent);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
         Assert.assertNotNull(cevent.getComments());
@@ -190,6 +185,7 @@ public class TestCollectionEvent extends TestAction {
         }
     }
 
+    @SuppressWarnings("nls")
     @Test
     public void checkGetAction() throws Exception {
         // add specimen type
@@ -264,6 +260,7 @@ public class TestCollectionEvent extends TestAction {
         // FIXME need to add test with aliquoted specimens
     }
 
+    @SuppressWarnings("nls")
     @Test
     public void saveWithAttrs() throws Exception {
         setEventAttrs(provisioning.studyId);
@@ -297,12 +294,10 @@ public class TestCollectionEvent extends TestAction {
         attrs.add(attrInfo);
 
         // Save a new cevent
-        final Integer ceventId =
-            exec(
-                new CollectionEventSaveAction(null, provisioning.patientIds
-                    .get(0),
-                    visitNumber, ActivityStatus.ACTIVE, commentText, null,
-                    attrs)).getId();
+        final Integer ceventId = exec(
+            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
+                visitNumber, ActivityStatus.ACTIVE, commentText, null,
+                attrs)).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
@@ -315,16 +310,16 @@ public class TestCollectionEvent extends TestAction {
         EventAttr eventAttr = cevent.getEventAttrs().iterator().next();
         Assert.assertEquals(value1, eventAttr.getValue());
         Assert.assertEquals(phlebotomistStudyAttr.getId(), eventAttr
-            .getStudyEventAttr()
-            .getId());
+            .getStudyEventAttr().getId());
+
         Integer eventAttrId = eventAttr.getId();
         String value2 = name + "jklmnopqr";
         attrInfo.value = value2;
+
         // Save with a different value for attrinfo
         exec(new CollectionEventSaveAction(ceventId,
             provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
-            commentText,
-            null, attrs));
+            commentText, null, attrs));
 
         session.clear();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -336,13 +331,11 @@ public class TestCollectionEvent extends TestAction {
 
         // make sure only one value in database
         Query q = session.createQuery(
-            "select eattr from "
-                + CollectionEvent.class.getName()
-                + " as ce "
-                + "join ce.eventAttrs as eattr "
-                + "join eattr.studyEventAttr as seattr "
-                + "join seattr.globalEventAttr as geattr "
-                + "where ce.id = ? and geattr.label= ?");
+            "SELECT eattr FROM " + CollectionEvent.class.getName() + " ce "
+                + "JOIN ce.eventAttrs eattr "
+                + "JOIN eattr.studyEventAttr seattr "
+                + "JOIN seattr.globalEventAttr geattr "
+                + "WHERE ce.id = ? AND geattr.label= ?");
         q.setParameter(0, cevent.getId());
         q.setParameter(1, "Phlebotomist");
         @SuppressWarnings("unchecked")
@@ -353,6 +346,7 @@ public class TestCollectionEvent extends TestAction {
     /*
      * add Event Attr to study
      */
+    @SuppressWarnings("nls")
     private void setEventAttrs(Integer studyId)
         throws Exception {
 
@@ -437,62 +431,7 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNull(cevent);
     }
 
-    @Test
-    public void deleteWithSpecimens() throws Exception {
-        // add specimen type
-        final Integer typeId =
-            exec(new SpecimenTypeSaveAction(name, name)).getId();
-
-        final Map<String, SaveCEventSpecimenInfo> specs =
-            CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, getExecutor().getUserId(), provisioning.siteId);
-
-        // Save a new cevent
-        final Integer ceventId = exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds
-                .get(0), getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
-            .getId();
-
-        // try to delete this cevent
-        CEventInfo info =
-            exec(new CollectionEventGetInfoAction(ceventId));
-        try {
-            exec(new CollectionEventDeleteAction(info.cevent));
-            Assert
-                .fail("should throw an exception because specimens are still in the cevent");
-        } catch (ConstraintViolationException ae) {
-            Assert.assertTrue(true);
-        }
-
-        // Check CollectionEvent is in database with correct values
-        CollectionEvent cevent =
-            (CollectionEvent) session.get(CollectionEvent.class, ceventId);
-        Assert.assertNotNull(cevent);
-    }
-
-    @Test
-    public void saveNotUniqueVisitNumber() throws Exception {
-        final Integer visitNumber = getR().nextInt(20) + 1;
-        // add
-        exec(new CollectionEventSaveAction(null,
-            provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
-            null, null,
-            null));
-
-        // try to add a second collection event with the same visit number
-        try {
-            exec(new CollectionEventSaveAction(null,
-                provisioning.patientIds.get(0), visitNumber,
-                ActivityStatus.ACTIVE, null,
-                null, null));
-            Assert
-                .fail("should throw an exception because the visit number is already used");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-    }
-
+    @SuppressWarnings("nls")
     @Test
     public void gsetEventAttrInfos() throws Exception {
         // add specimen type

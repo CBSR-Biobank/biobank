@@ -22,9 +22,10 @@ public class LoginHandler extends AbstractHandler implements IHandler {
         if (loginDialog.open() == Dialog.OK)
             if (SessionManager.getInstance().getSession().getUser()
                 .needChangePassword()) {
-                ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
-                dlg.open();
+                ChangePasswordDialog
+                    .open(PlatformUI
+                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                        true);
             }
         return null;
     }

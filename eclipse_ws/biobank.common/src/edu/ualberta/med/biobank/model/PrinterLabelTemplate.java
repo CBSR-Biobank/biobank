@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PRINTER_LABEL_TEMPLATE")
 @Unique(properties = "name", groups = PrePersist.class)
-public class PrinterLabelTemplate extends AbstractBiobankModel {
+public class PrinterLabelTemplate extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
 
     private String name;
@@ -24,12 +25,14 @@ public class PrinterLabelTemplate extends AbstractBiobankModel {
     private String configData;
     private JasperTemplate jasperTemplate;
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.PrinterLabelTemplate.name.NotEmpty}")
     @Column(name = "NAME", unique = true, length = 50)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

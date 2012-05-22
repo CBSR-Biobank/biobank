@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
-import java.text.MessageFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
@@ -27,6 +26,8 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -43,11 +44,30 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer ceventId;
-    private Integer patientId;
-    private Integer visitNumber;
-    private ActivityStatus activityStatus;
-    private String commentText;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Tr ABSENT_SPECIMEN_ERRMSG =
+        bundle.tr("Specimen \"{0}\" not found in collection.");
+    @SuppressWarnings("nls")
+    public static final Tr LOCKED_LABEL_ERRMSG =
+        bundle.tr("Attribute for label \"{0}\" is locked, changes not" +
+            " permitted.");
+    @SuppressWarnings("nls")
+    public static final Tr STUDY_EVENT_ATTR_MISSING_ERRMSG =
+        bundle.tr("Cannot find Study Event Attribute with id \"{0}\".");
+    @SuppressWarnings("nls")
+    public static final Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG =
+        bundle.tr("Value \"{0}\" is invalid for label \"{2}\".");
+    @SuppressWarnings("nls")
+    public static final Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG =
+        bundle.tr("Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".");
+    @SuppressWarnings("nls")
+    public static final Tr CANNOT_PARSE_DATE_ERRMSG =
+        bundle.tr("Cannot parse date \"{0}\".");
+    @SuppressWarnings("nls")
+    public static final Tr UNKNOWN_EVENT_ATTR_TYPE_ERRMSG =
+        bundle.tr("Unknown Event Attribute Type \"{0}\".");
 
     public static class SaveCEventSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -63,17 +83,21 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     }
 
     public static class CEventAttrSaveInfo implements ActionResult {
-
         private static final long serialVersionUID = 1L;
+
         public Integer studyEventAttrId;
         public EventAttrTypeEnum type;
         public String value;
-
     }
 
+    private Integer ceventId;
+    private Integer patientId;
+    private Integer visitNumber;
+    private ActivityStatus activityStatus;
+    private String commentText;
     private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
-
-    private List<CEventAttrSaveInfo> ceAttrList;
+    private List<CEventAttrSaveInfo> ceAttrList =
+        new ArrayList<CEventAttrSaveInfo>(0);
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, ActivityStatus activityStatus, String commentText,
@@ -136,8 +160,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         } else {
             ceventToSave = context.load(CollectionEvent.class, ceventId);
         }
-
-        // FIXME Version check?
 
         Patient patient = context.load(Patient.class, patientId);
         ceventToSave.setPatient(patient);
@@ -209,6 +231,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         }
     }
 
+    @SuppressWarnings("nls")
     private void removeOriginalSpecimen(ActionContext context, Specimen specimen) {
         if (specimen.getChildSpecimens().isEmpty()) {
             specimen.getCollectionEvent().getAllSpecimens().remove(specimen);
@@ -217,10 +240,11 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
             context.getSession().delete(specimen);
         } else {
-            throw new ActionCheckException(
-                MessageFormat
+            throw new ActionException(
+                bundle
+                    .tr(
+                        "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
                     .format(
-                        "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.",
                         specimen.getInventoryId()));
         }
     }
@@ -237,105 +261,115 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     public void setEventAttrs(ActionContext context, Study study,
         CollectionEvent cevent) throws ActionException {
-        Map<Integer, StudyEventAttrInfo> studyEventList =
-            new StudyGetEventAttrInfoAction(
-                study.getId()).run(context).getMap();
+
+        if ((ceAttrList == null) || ceAttrList.isEmpty()) return;
 
         Map<Integer, EventAttrInfo> ceventAttrList =
             new CollectionEventGetEventAttrInfoAction(
                 ceventId).run(context).getMap();
-        if (ceAttrList != null)
-            for (CEventAttrSaveInfo attrInfo : ceAttrList) {
-                EventAttrInfo ceventAttrInfo = ceventAttrList
-                    .get(attrInfo.studyEventAttrId);
-                StudyEventAttrInfo studyEventAttrInfo = studyEventList
-                    .get(attrInfo.studyEventAttrId);
 
-                StudyEventAttr sAttr;
+        Map<Integer, StudyEventAttrInfo> studyEventList =
+            new StudyGetEventAttrInfoAction(
+                study.getId()).run(context).getMap();
 
-                if (ceventAttrInfo != null) {
-                    sAttr = ceventAttrInfo.attr.getStudyEventAttr();
-                } else {
-                    sAttr = studyEventAttrInfo == null ? null
-                        : studyEventAttrInfo.attr;
-                    if (sAttr == null) {
-                        throw new ActionException(
-                            "no StudyEventAttr found for id \"" //$NON-NLS-1$
-                                + attrInfo.studyEventAttrId + "\""); //$NON-NLS-1$
-                    }
-                }
+        Set<EventAttr> eventAttrs = new HashSet<EventAttr>(ceAttrList.size());
 
-                if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
+        for (CEventAttrSaveInfo attrInfo : ceAttrList) {
+            EventAttrInfo ceventAttrInfo = ceventAttrList
+                .get(attrInfo.studyEventAttrId);
+            StudyEventAttrInfo studyEventAttrInfo = studyEventList
+                .get(attrInfo.studyEventAttrId);
+
+            StudyEventAttr sAttr;
+
+            if (ceventAttrInfo != null) {
+                sAttr = ceventAttrInfo.attr.getStudyEventAttr();
+            } else {
+                sAttr = studyEventAttrInfo == null ? null
+                    : studyEventAttrInfo.attr;
+                if (sAttr == null) {
                     throw new ActionException(
-                        "Attribute for \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
-                            + "\" is locked, changes not permitted"); //$NON-NLS-1$
+                        STUDY_EVENT_ATTR_MISSING_ERRMSG
+                            .format(attrInfo.studyEventAttrId));
                 }
+            }
 
-                if (attrInfo.value != null) {
-                    // validate the value
-                    attrInfo.value = attrInfo.value.trim();
-                    if (attrInfo.value.length() > 0) {
-                        EventAttrTypeEnum type = attrInfo.type;
-                        List<String> permissibleSplit = null;
+            if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
+                String label = sAttr.getGlobalEventAttr().getLabel();
+                throw new ActionException(LOCKED_LABEL_ERRMSG.format(label));
+            }
 
-                        if (type == EventAttrTypeEnum.SELECT_SINGLE
-                            || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                            String permissible = sAttr.getPermissible();
-                            if (permissible != null) {
-                                permissibleSplit = Arrays.asList(permissible
-                                    .split(";")); //$NON-NLS-1$
-                            }
-                        }
+            if (attrInfo.value != null) {
+                // validate the value
+                attrInfo.value = attrInfo.value.trim();
+                if (attrInfo.value.length() > 0) {
+                    EventAttrTypeEnum type = attrInfo.type;
+                    List<String> permissibleSplit = null;
 
-                        if (type == EventAttrTypeEnum.SELECT_SINGLE) {
-                            if (!permissibleSplit.contains(attrInfo.value)) {
-                                throw new ActionException(
-                                    "value " + attrInfo.value //$NON-NLS-1$
-                                        + "is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-                            }
-                        } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                            for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
-                                if (!permissibleSplit.contains(singleVal)) {
-                                    throw new ActionException(
-                                        "value " + singleVal + " (" //$NON-NLS-1$ //$NON-NLS-2$
-                                            + attrInfo.value
-                                            + ") is invalid for label \"" + sAttr.getGlobalEventAttr().getLabel() //$NON-NLS-1$
-                                            + "\""); //$NON-NLS-1$
-                                }
-                            }
-                        } else if (type == EventAttrTypeEnum.NUMBER) {
-                            Double.parseDouble(attrInfo.value);
-                        } else if (type == EventAttrTypeEnum.DATE_TIME) {
-                            try {
-                                DateFormatter.dateFormatter
-                                    .parse(attrInfo.value);
-                            } catch (ParseException e) {
-                                throw new ActionException(e);
-                            }
-                        } else if (type == EventAttrTypeEnum.TEXT) {
-                            // do nothing
-                        } else {
-                            throw new ActionException(
-                                "type \"" + type + "\" not tested"); //$NON-NLS-1$ //$NON-NLS-2$
+                    if (type == EventAttrTypeEnum.SELECT_SINGLE
+                        || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                        String permissible = sAttr.getPermissible();
+                        if (permissible != null) {
+                            permissibleSplit = Arrays.asList(permissible
+                                .split(";")); //$NON-NLS-1$
                         }
                     }
-                }
 
-                EventAttr eventAttr;
-                if (ceventAttrInfo == null) {
-                    eventAttr = new EventAttr();
-                    cevent.getEventAttrs().add(eventAttr);
-                    eventAttr.setCollectionEvent(cevent);
-                    eventAttr.setStudyEventAttr(sAttr);
-                } else {
-                    eventAttr = ceventAttrInfo.attr;
+                    if (type == EventAttrTypeEnum.SELECT_SINGLE) {
+                        if (!permissibleSplit.contains(attrInfo.value)) {
+                            String label =
+                                sAttr.getGlobalEventAttr().getLabel();
+                            throw new ActionException(
+                                INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
+                                    .format(attrInfo.value, label));
+                        }
+                    } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                        for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
+                            if (!permissibleSplit.contains(singleVal)) {
+                                String label =
+                                    sAttr.getGlobalEventAttr().getLabel();
+                                throw new ActionException(
+                                    INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
+                                        .format(singleVal, attrInfo.value,
+                                            label));
+                            }
+                        }
+                    } else if (type == EventAttrTypeEnum.NUMBER) {
+                        Double.parseDouble(attrInfo.value);
+                    } else if (type == EventAttrTypeEnum.DATE_TIME) {
+                        try {
+                            DateFormatter.dateFormatter
+                                .parse(attrInfo.value);
+                        } catch (ParseException e) {
+                            throw new ActionException(
+                                CANNOT_PARSE_DATE_ERRMSG
+                                    .format(attrInfo.value));
+                        }
+                    } else if (type == EventAttrTypeEnum.TEXT) {
+                        // do nothing
+                    } else {
+                        throw new ActionException(
+                            UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
+                                .format(type.getName()));
+                    }
                 }
-                eventAttr.setValue(attrInfo.value);
-
-                // FIXME need to remove attributes ? when they don't exist
-                // anymore
-                // in study maybe ? See previous code in wrapper ?
             }
+
+            EventAttr eventAttr;
+            if (ceventAttrInfo == null) {
+                eventAttr = new EventAttr();
+                eventAttr.setCollectionEvent(cevent);
+                eventAttr.setStudyEventAttr(sAttr);
+            } else {
+                eventAttr = ceventAttrInfo.attr;
+            }
+            eventAttr.setValue(attrInfo.value);
+            eventAttrs.add(eventAttr);
+        }
+
+        // saving the collection this way will delete unused event attrs
+        cevent.getEventAttrs().clear();
+        cevent.getEventAttrs().addAll(eventAttrs);
     }
 
     private void saveComment(ActionContext context, CollectionEvent ceventToSave) {

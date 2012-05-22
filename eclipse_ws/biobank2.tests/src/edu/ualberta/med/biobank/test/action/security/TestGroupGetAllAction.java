@@ -15,16 +15,14 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 
-public class TestGroupGetAllAction extends TestAction {
+public class TestGroupGetAllAction extends ActionTest {
     @Test
     public void superAdminAccess() {
         exec(new GroupGetAllAction(new GroupGetAllInput()));
@@ -34,7 +32,7 @@ public class TestGroupGetAllAction extends TestAction {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
@@ -57,7 +55,7 @@ public class TestGroupGetAllAction extends TestAction {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
@@ -126,7 +124,7 @@ public class TestGroupGetAllAction extends TestAction {
                 for (Role r : m.getRoles()) {
                     r.getName();
 
-                    AssertMore.assertInited(r.getPermissions());
+                    AssertMore.assertInitialized(r.getPermissions());
                 }
             }
 
@@ -137,9 +135,9 @@ public class TestGroupGetAllAction extends TestAction {
                 u.getEmail();
                 u.getFullName();
 
-                AssertMore.assertNotInited(u.getGroups());
-                AssertMore.assertNotInited(u.getMemberships());
-                AssertMore.assertNotInited(u.getComments());
+                AssertMore.assertNotInitialized(u.getGroups());
+                AssertMore.assertNotInitialized(u.getMemberships());
+                AssertMore.assertNotInitialized(u.getComments());
             }
         }
     }
@@ -153,7 +151,7 @@ public class TestGroupGetAllAction extends TestAction {
         Group group1A = factory.createGroup();
         factory.createMembership();
         User man1A = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.buildMembership().setUserManager(true).create();
 
         Membership man1Amembership = man1A.getMemberships().iterator().next();
         man1Amembership.getPermissions().add(PermissionEnum.CLINIC_READ);
@@ -163,7 +161,7 @@ public class TestGroupGetAllAction extends TestAction {
         Group group2B = factory.createGroup();
         factory.createMembership();
         User man2B = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         GroupGetAllOutput actual;
@@ -173,13 +171,13 @@ public class TestGroupGetAllAction extends TestAction {
         expected.add(group1A);
         actual = execAs(man1A, new GroupGetAllAction(new GroupGetAllInput()));
 
-        Assert.assertEquals("wrong groups",
-            expected, actual.getAllManageableGroups());
+        Assert.assertTrue("wrong groups",
+            actual.getAllManageableGroups().containsAll(expected));
 
         expected.clear();
         actual = execAs(man2B, new GroupGetAllAction(new GroupGetAllInput()));
 
-        Assert.assertEquals("wrong groups",
-            expected, actual.getAllManageableGroups());
+        Assert.assertTrue("wrong groups",
+            actual.getAllManageableGroups().containsAll(expected));
     }
 }

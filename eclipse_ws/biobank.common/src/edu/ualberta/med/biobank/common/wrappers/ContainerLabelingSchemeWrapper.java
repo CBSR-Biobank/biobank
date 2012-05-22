@@ -1,21 +1,20 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.criterion.DetachedCriteria;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -35,15 +34,22 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static final int SCHEME_2_CHAR_ALPHA = 6;
 
+    @SuppressWarnings("nls")
     public static final String CBSR_2_CHAR_LABELLING_PATTERN =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ"; //$NON-NLS-1$
+        "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
+    @SuppressWarnings("nls")
     public static final String TWO_CHAR_LABELLING_PATTERN =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
-    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
+
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContainerLabelingSchemeWrapper.class);
 
     private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes =
         null;
@@ -58,6 +64,7 @@ public class ContainerLabelingSchemeWrapper extends
         super(appService);
     }
 
+    @SuppressWarnings("nls")
     public static synchronized Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws ApplicationException {
         if (allSchemes == null) {
@@ -70,51 +77,51 @@ public class ContainerLabelingSchemeWrapper extends
                     Integer id = scheme.getId();
                     switch (id.intValue()) {
                     case SCHEME_SBS:
-                        if (!scheme.getName().equals("SBS Standard")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("SBS Standard")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_CBSR_2_CHAR_ALPHA:
-                        if (!scheme.getName().equals("CBSR 2 char alphabetic")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("CBSR 2 char alphabetic")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_2_CHAR_NUMERIC:
-                        if (!scheme.getName().equals("2 char numeric")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("2 char numeric")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_DEWAR:
-                        if (!scheme.getName().equals("Dewar")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("Dewar")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_CBSR_SBS:
-                        if (!scheme.getName().equals("CBSR SBS")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("CBSR SBS")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_2_CHAR_ALPHA:
-                        if (!scheme.getName().equals("2 char alphabetic")) { //$NON-NLS-1$
+                        if (!scheme.getName().equals("2 char alphabetic")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName()); //$NON-NLS-1$
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     default:
                         throw new ApplicationException(
-                            "labeling scheme with id " + id //$NON-NLS-1$
-                                + " is not mapped correctly"); //$NON-NLS-1$
+                            "labeling scheme with id " + id
+                                + " is not mapped correctly");
                     }
                     allSchemes.put(id, new ContainerLabelingSchemeWrapper(
                         appService, scheme));
@@ -124,14 +131,15 @@ public class ContainerLabelingSchemeWrapper extends
         return allSchemes;
     }
 
+    @SuppressWarnings("nls")
     public static ContainerLabelingSchemeWrapper getLabelingSchemeById(
         WritableApplicationService appService, Integer id)
         throws ApplicationException {
         getAllLabelingSchemesMap(appService);
         ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
         if (scheme == null) {
-            throw new ApplicationException("labeling scheme with id " + id //$NON-NLS-1$
-                + " does not exist"); //$NON-NLS-1$
+            throw new ApplicationException(
+                i18n.tr("labeling scheme with id \"{0}\" does not exist", id));
         }
         return scheme;
     }
@@ -162,6 +170,7 @@ public class ContainerLabelingSchemeWrapper extends
     /**
      * Check labeling scheme limits for a given gridsize
      **/
+    @SuppressWarnings("nls")
     public static boolean checkBounds(WritableApplicationService appService,
         Integer labelingScheme, Integer totalRows, Integer totalCols) {
 
@@ -174,7 +183,7 @@ public class ContainerLabelingSchemeWrapper extends
             getAllLabelingSchemesMap(appService);
         } catch (ApplicationException e) {
             throw new RuntimeException(
-                "could not load container labeling schemes"); //$NON-NLS-1$
+                "could not load container labeling schemes");
         }
 
         ContainerLabelingSchemeWrapper schemeWrapper = allSchemes
@@ -230,8 +239,9 @@ public class ContainerLabelingSchemeWrapper extends
         return canLabel;
     }
 
+    @SuppressWarnings("nls")
     private static final String POS_LABEL_LEN_QRY =
-        "select min(minChars), max(maxChars) from " //$NON-NLS-1$
+        "select min(minChars), max(maxChars) from "
             + ContainerLabelingScheme.class.getName();
 
     public static List<Integer> getPossibleLabelLength(
@@ -249,18 +259,18 @@ public class ContainerLabelingSchemeWrapper extends
      * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
      * string position. Could be A2 or F12.
      */
+    @SuppressWarnings("nls")
     public static RowColPos sbsToRowCol(WritableApplicationService appService,
         String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
             appService, SCHEME_SBS);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.sbs.not.found.msg")); //$NON-NLS-1$
+                "SBS Standard labeling scheme not found.");
         }
         if ((pos.length() != scheme.getMinChars())
             && (pos.length() != scheme.getMaxChars())) {
-            throw new Exception("binPos has an invalid length: " + pos); //$NON-NLS-1$
+            throw new Exception("binPos has an invalid length: " + pos);
         }
         int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
@@ -272,18 +282,18 @@ public class ContainerLabelingSchemeWrapper extends
      * Get the rowColPos corresponding to the given CBSR SBS 2 char string
      * position. Could be A2 or F9. (CBSR SBS skip I and O)
      */
+    @SuppressWarnings("nls")
     public static RowColPos cbsrSbsToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
             appService, SCHEME_CBSR_SBS);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.cbsr.sbs.not.found.msg")); //$NON-NLS-1$
+                "CBSR SBS labeling scheme not found.");
         }
         if ((pos.length() != scheme.getMinChars())
             && (pos.length() != scheme.getMaxChars())) {
-            throw new Exception("binPos has an invalid length: " + pos); //$NON-NLS-1$
+            throw new Exception("binPos has an invalid length: " + pos);
         }
         int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
         if (row == -1) return null;
@@ -300,7 +310,8 @@ public class ContainerLabelingSchemeWrapper extends
         if (rcp.getRow() < 0
             || rcp.getRow() > SBS_ROW_LABELLING_PATTERN.length() - 1)
             return null;
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
+        return StringUtil.EMPTY_STRING
+            + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow())
             + (rcp.getCol() + 1);
     }
 
@@ -312,7 +323,8 @@ public class ContainerLabelingSchemeWrapper extends
         if (rcp.getRow() < 0
             || rcp.getRow() > BOX81_LABELLING_PATTERN.length() - 1)
             return null;
-        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
+        return StringUtil.EMPTY_STRING
+            + BOX81_LABELLING_PATTERN.charAt(rcp.getRow())
             + (rcp.getCol() + 1);
     }
 
@@ -320,6 +332,7 @@ public class ContainerLabelingSchemeWrapper extends
      * get the RowColPos in the given container corresponding to the given label
      * AB and will return 1:0.
      */
+    @SuppressWarnings("nls")
     public static RowColPos cbsrTwoCharToRowCol(
         WritableApplicationService appService, String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
@@ -327,15 +340,12 @@ public class ContainerLabelingSchemeWrapper extends
             appService, SCHEME_CBSR_2_CHAR_ALPHA);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.cbsr.2char.alpha.not.found.msg")); //$NON-NLS-1$
+                "CBSR 2 char alphabetic labeling scheme not found.");
         }
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(
-                MessageFormat.format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.characters.length.msg"), scheme.getMinChars())); //$NON-NLS-1$
+                i18n.tr("Label should be {0} characters.", scheme.getMinChars()));
 
         int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
             .charAt(len - 2));
@@ -343,8 +353,7 @@ public class ContainerLabelingSchemeWrapper extends
             .charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
             throw new Exception(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.invalid.charac.msg")); //$NON-NLS-1$
+                i18n.tr("Invalid characters in label. Are they in upper case?"));
         }
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
@@ -353,25 +362,17 @@ public class ContainerLabelingSchemeWrapper extends
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
             String msgStart =
-                MessageFormat
-                    .format(
-                        Messages
-                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
-                        label);
+                i18n.tr("Label {0} does not exist in this scheme.",
+                    label);
             if (containerTypeName != null)
                 msgStart =
-                    MessageFormat
-                        .format(
-                            Messages
-                                .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
-                            containerTypeName);
+                    i18n.tr("Label {0} does not exist in {1}", label,
+                        containerTypeName);
             String msgMax =
-                MessageFormat
-                    .format(
-                        Messages
-                            .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
-                        rowCap, colCap);
-            throw new BiobankCheckException(msgStart + " " + msgMax); //$NON-NLS-1$
+                i18n.tr("Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                    maxValue,
+                    rowCap, colCap);
+            throw new BiobankCheckException(msgStart + " " + msgMax);
         }
         Integer row = pos % rowCap;
         Integer col = pos / rowCap;
@@ -384,6 +385,7 @@ public class ContainerLabelingSchemeWrapper extends
      * get the RowColPos in the given container corresponding to the given label
      * AB and will return 1:0.
      */
+    @SuppressWarnings("nls")
     public static RowColPos twoCharToRowCol(
         WritableApplicationService appService, String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
@@ -391,23 +393,19 @@ public class ContainerLabelingSchemeWrapper extends
             appService, SCHEME_2_CHAR_ALPHA);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.2char.alpha.not.found.msg")); //$NON-NLS-1$
+                "2 char alphabetic labeling scheme not found.");
         }
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(
-                MessageFormat.format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.characters.length.msg"), //$NON-NLS-1$
+                i18n.tr("Label should be {0} characters.",
                     scheme.getMinChars()));
 
         int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
         int index2 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
             throw new Exception(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.invalid.charac.msg")); //$NON-NLS-1$
+                i18n.tr("Invalid characters in label. Are they in upper case?"));
         }
         int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
 
@@ -416,25 +414,16 @@ public class ContainerLabelingSchemeWrapper extends
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
             String msgStart =
-                MessageFormat
-                    .format(
-                        Messages
-                            .getString("ContainerLabelingSchemeWrapper.label.not.exists.msg"), //$NON-NLS-1$
-                        label);
+                i18n.tr("Label {0} does not exist in this scheme.", label);
             if (containerTypeName != null)
-                msgStart =
-                    MessageFormat
-                        .format(
-                            Messages
-                                .getString("ContainerLabelingSchemeWrapper.label.not.exists.in.type.msg"), label, //$NON-NLS-1$
-                            containerTypeName);
-            String msgMax =
-                MessageFormat
-                    .format(
-                        Messages
-                            .getString("ContainerLabelingSchemeWrapper.scheme.max.value.msg"), maxValue, //$NON-NLS-1$
-                        rowCap, colCap);
-            throw new BiobankCheckException(msgStart + " " + msgMax); //$NON-NLS-1$
+                msgStart = i18n.tr("Label {0} does not exist in {1}", label,
+                    containerTypeName);
+            String msgMax = i18n.tr(
+                "Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                maxValue,
+                rowCap,
+                colCap);
+            throw new BiobankCheckException(msgStart + " " + msgMax);
         }
         Integer row = pos % rowCap;
         Integer col = pos / rowCap;
@@ -447,6 +436,7 @@ public class ContainerLabelingSchemeWrapper extends
      * Get the RowColPos in the given container corresponding to the given label
      * using the 2 char numeric labelling.
      */
+    @SuppressWarnings("nls")
     public static RowColPos twoCharNumericToRowCol(
         WritableApplicationService appService, String label, int totalRows)
         throws Exception {
@@ -454,14 +444,10 @@ public class ContainerLabelingSchemeWrapper extends
             appService, SCHEME_2_CHAR_NUMERIC);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.2char.numeric.not.found.msg")); //$NON-NLS-1$
+                i18n.tr("2 char numeric labeling scheme not found"));
         }
         String errorMsg =
-            MessageFormat
-                .format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.characters.length.incorrect.msg"), label); //$NON-NLS-1$
+            i18n.tr("Label {0} is incorrect: it should be 2 characters", label);
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(errorMsg);
@@ -538,8 +524,9 @@ public class ContainerLabelingSchemeWrapper extends
     /**
      * Convert a position in row*column to two char numeric.
      */
+    @SuppressWarnings("nls")
     public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows) {
-        return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol() //$NON-NLS-1$
+        return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol()
             + 1);
     }
 
@@ -558,6 +545,7 @@ public class ContainerLabelingSchemeWrapper extends
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     public static RowColPos dewarToRowCol(
         WritableApplicationService appService, String label, int totalCol)
         throws Exception {
@@ -565,20 +553,16 @@ public class ContainerLabelingSchemeWrapper extends
             appService, SCHEME_DEWAR);
         if (scheme == null) {
             throw new BiobankCheckException(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.cbsr.2char.alpha.not.found.msg")); //$NON-NLS-1$
+                i18n.tr("CBSR 2 char alphabetic labeling scheme not found."));
         }
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(
-                MessageFormat.format(
-                    Messages
-                        .getString("ContainerLabelingSchemeWrapper.characters.length.msg"), scheme.getMinChars())); //$NON-NLS-1$
+                i18n.tr("Label should be {0} characters.", scheme.getMinChars()));
 
         if (label.charAt(0) != label.charAt(1)) {
             throw new Exception(
-                Messages
-                    .getString("ContainerLabelingSchemeWrapper.letter.double.msg")); //$NON-NLS-1$
+                i18n.tr("Label should be double letter (BB)."));
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
@@ -649,15 +633,5 @@ public class ContainerLabelingSchemeWrapper extends
                 colCapacity, null);
         }
         return null;
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-
-        tasks.add(check().notUsedBy(ContainerType.class,
-            ContainerTypePeer.CHILD_LABELING_SCHEME));
-
-        super.addDeleteTasks(tasks);
     }
 }

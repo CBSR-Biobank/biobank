@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +12,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.GroupDeleteAction;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAction;
 import edu.ualberta.med.biobank.common.action.security.GroupGetInput;
 import edu.ualberta.med.biobank.common.action.security.GroupGetOutput;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
 import edu.ualberta.med.biobank.dialogs.user.TmpUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -31,16 +33,19 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.util.NullUtil;
 
 public abstract class GroupInfoTable extends
     DefaultAbstractInfoTableWidget<Group> {
+    public static final I18n i18n = I18nFactory.getI18n(GroupInfoTable.class);
     public static final int ROWS_PER_PAGE = 12;
     private static final String[] HEADINGS =
-        new String[] { Messages.GroupInfoTable_name_label };
+        new String[] { HasName.PropertyName.NAME.toString() };
 
     private final ManagerContext context;
 
+    @SuppressWarnings("nls")
     public GroupInfoTable(Composite parent, List<Group> collection,
         ManagerContext context) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
@@ -72,7 +77,7 @@ public abstract class GroupInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.GroupInfoTable_duplicate);
+        item.setText(i18n.tr("duplicate (verb)", "Duplicate"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -93,7 +98,7 @@ public abstract class GroupInfoTable extends
                 case 0:
                     return group.getName();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -126,15 +131,18 @@ public abstract class GroupInfoTable extends
         }
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteGroup(Group group) {
         try {
             String name = group.getName();
-            String message = MessageFormat.format(
-                Messages.GroupInfoTable_delete_confirm_msg,
-                new Object[] { name });
+            // dialog message.
+            String message =
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    name);
 
             if (BgcPlugin.openConfirm(
-                Messages.GroupInfoTable_delete_confirm_title, message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new GroupDeleteAction(new GroupDeleteInput(group)));
@@ -156,7 +164,7 @@ public abstract class GroupInfoTable extends
     public static class GroupComparator implements Comparator<Group> {
         @Override
         public int compare(Group a, Group b) {
-            return NullHelper.safeCompareTo(a.getName(), b.getName(),
+            return NullUtil.cmp(a.getName(), b.getName(),
                 String.CASE_INSENSITIVE_ORDER);
         }
     }

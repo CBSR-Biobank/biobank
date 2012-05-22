@@ -11,6 +11,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -27,7 +29,10 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
     implements
     IHandler {
+    private static final I18n i18n = I18nFactory
+        .getI18n(LinkAssignCommonHandler.class);
 
+    @SuppressWarnings("nls")
     public Object openLinkAssignPerspective(String editorId, AdapterBase adapter)
         throws ExecutionException {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
@@ -44,7 +49,9 @@ public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
             }
         } catch (WorkbenchException e) {
             throw new ExecutionException(
-                Messages.LinkAssignCommonHandler_link_assign_open_error_msg, e);
+                // exception message
+                i18n.tr("Error while opening link-assign management perspective"),
+                e);
         }
         return null;
     }

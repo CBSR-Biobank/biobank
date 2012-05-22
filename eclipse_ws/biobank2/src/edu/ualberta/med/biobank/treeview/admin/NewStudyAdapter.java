@@ -5,15 +5,19 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.forms.StudyViewForm;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 
 public class NewStudyAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(NewStudyAdapter.class);
 
-    private Study study;
+    private final Study study;
 
     public NewStudyAdapter(AbstractAdapterBase parent, Study study) {
         super(parent, study.getId(), null, null, false);
@@ -22,24 +26,25 @@ public class NewStudyAdapter extends AbstractNewAdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return study == null ? "" : study.getNameShort(); //$NON-NLS-1$
+        return study == null ? StringUtil.EMPTY_STRING : study.getNameShort();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.StudyAdapter_study_label);
+        return getTooltipText(Study.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.StudyAdapter_study_label);
-        addViewMenu(menu, Messages.StudyAdapter_study_label);
-        addDeleteMenu(menu, Messages.StudyAdapter_study_label);
+        addEditMenu(menu, Study.NAME.singular().toString());
+        addViewMenu(menu, Study.NAME.singular().toString());
+        addDeleteMenu(menu, Study.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.StudyAdapter_delete_confirm_msg;
+        return i18n.tr("Are you sure you want to delete this study?");
     }
 
     @Override

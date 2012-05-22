@@ -15,6 +15,7 @@ import org.hibernate.metadata.ClassMetadata;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
+@SuppressWarnings("nls")
 public class UniqueValidator extends
     EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<Unique, Object> {
@@ -40,6 +41,26 @@ public class UniqueValidator extends
         return unique;
     }
 
+    public static String getDefaultMessageTemplate(Class<?> klazz,
+        String[] properties) {
+        StringBuilder template = new StringBuilder();
+
+        template.append("{");
+        template.append(klazz.getName());
+        template.append(".");
+        template.append(Unique.class.getSimpleName());
+        template.append("[");
+
+        for (int i = 0, n = properties.length; i < n; i++) {
+            template.append(properties[i]);
+            if (i < n - 1) template.append(",");
+        }
+
+        template.append("]}");
+
+        return template.toString();
+    }
+
     private void overrideEmptyMessageTemplate(Object value,
         ConstraintValidatorContext context) {
         String defaultTemplate = context.getDefaultConstraintMessageTemplate();
@@ -48,23 +69,11 @@ public class UniqueValidator extends
             ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
-            StringBuilder template = new StringBuilder();
-
-            template.append("{");
-            template.append(meta.getMappedClass(EntityMode.POJO).getName());
-            template.append(".");
-            template.append(Unique.class.getSimpleName());
-            template.append("[");
-
-            for (int i = 0, n = properties.length; i < n; i++) {
-                template.append(properties[i]);
-                if (i < n - 1) template.append(",");
-            }
-
-            template.append("]}");
+            Class<?> klazz = meta.getMappedClass(EntityMode.POJO);
+            String template = getDefaultMessageTemplate(klazz, properties);
 
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(template.toString())
+            context.buildConstraintViolationWithTemplate(template)
                 .addConstraintViolation();
         }
     }

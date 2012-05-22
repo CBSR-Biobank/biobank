@@ -5,18 +5,28 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventDeletePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventReadPermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(CollectionEventInfoTable.class);
 
     private static class TableRowData {
         CollectionEventWrapper collectionEvent;
@@ -25,20 +35,21 @@ public class CollectionEventInfoTable extends
         long aliquotedSpecimenCount;
         String comment;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(
                 new String[] { visitNumber.toString(),
                     String.valueOf(sourceSpecimenCount),
-                    String.valueOf(aliquotedSpecimenCount), comment }, "\t"); //$NON-NLS-1$
+                    String.valueOf(aliquotedSpecimenCount), comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.CollectionEventInfoTable_header_visitNumber,
-        Messages.CollectionEventInfoTable_header_numSourceSpecimens,
-        Messages.CollectionEventInfoTable_header_numAliquotedSpecimens,
-        Messages.CollectionEventInfoTable_header_comment };
+        CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString(),
+        Comment.NAME.singular().toString() };
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -54,9 +65,9 @@ public class CollectionEventInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -69,12 +80,13 @@ public class CollectionEventInfoTable extends
                     return info.comment;
 
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Object getCollectionModelObject(Object o) throws Exception {
         TableRowData info = new TableRowData();
@@ -85,8 +97,9 @@ public class CollectionEventInfoTable extends
         info.aliquotedSpecimenCount = info.collectionEvent
             .getAliquotedSpecimensCount(true);
         info.comment =
-            info.collectionEvent.getCommentCollection(false).size() == 0 ? Messages.SpecimenInfoTable_no_first_letter
-                : Messages.SpecimenInfoTable_yes_first_letter;
+            info.collectionEvent.getCommentCollection(false).size() == 0
+                ? i18n.trc("no abbeviation", "N")
+                : i18n.trc("yes abbeviation", "Y");
         return info;
     }
 

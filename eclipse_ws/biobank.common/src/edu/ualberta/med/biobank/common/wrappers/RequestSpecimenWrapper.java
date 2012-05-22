@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
@@ -28,16 +28,17 @@ public class RequestSpecimenWrapper extends RequestSpecimenBaseWrapper
 
     @Override
     public String getStateDescription() {
-        return RequestSpecimenState.getState(getState()).getLabel();
+        return getState().getLabel();
     }
 
     @Override
     public RequestSpecimenState getSpecimenState() {
-        return RequestSpecimenState.getState(getState());
+        return getState();
     }
 
+    @Override
     public void setState(RequestSpecimenState state) {
-        setState(state.getId());
+        setState(state);
     }
 
     @Override

@@ -11,14 +11,19 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+@Audited
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 @Unique.List({
@@ -34,8 +39,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childSpecimenTypes", groups = PreDelete.class),
     @Empty(property = "parentSpecimenTypes", groups = PreDelete.class)
 })
-public class SpecimenType extends AbstractBiobankModel {
+public class SpecimenType extends AbstractBiobankModel
+    implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Specimen Type",
+        "Specimen Types");
 
     private String name;
     private String nameShort;
@@ -44,22 +57,26 @@ public class SpecimenType extends AbstractBiobankModel {
         new HashSet<SpecimenType>(0);
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }

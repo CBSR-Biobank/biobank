@@ -14,24 +14,49 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+
+@Audited
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
-public class DispatchSpecimen extends AbstractBiobankModel {
+public class DispatchSpecimen extends AbstractBiobankModel
+    implements HasComments {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
-    private Integer state;
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Dispatched Specimen",
+        "Dispatched Specimens");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString STATE = bundle.trc(
+            "model",
+            "State").format();
+    }
+
+    private DispatchSpecimenState state = DispatchSpecimenState.NONE;
     private Dispatch dispatch;
     private Specimen specimen;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    // TODO: convert to enum
     @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
-    public Integer getState() {
+    @Type(type = "dispatchSpecimenState")
+    public DispatchSpecimenState getState() {
         return this.state;
     }
 
-    public void setState(Integer state) {
+    public void setState(DispatchSpecimenState state) {
         this.state = state;
     }
 
@@ -57,6 +82,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         this.specimen = specimen;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "DISPATCH_SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "DISPATCH_SPECIMEN_ID", nullable = false, updatable = false) },
@@ -65,6 +91,7 @@ public class DispatchSpecimen extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

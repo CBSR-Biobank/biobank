@@ -34,6 +34,7 @@ public abstract class AbstractValidation implements HasValidation {
         setValidationResult(new ValidationResultImpl());
     }
 
+    @SuppressWarnings("nls")
     protected void setValidationResult(ValidationResultImpl result) {
         if (result == null) {
             throw new NullPointerException("validationResult is null");

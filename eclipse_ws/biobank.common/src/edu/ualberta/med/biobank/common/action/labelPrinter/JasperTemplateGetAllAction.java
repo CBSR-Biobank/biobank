@@ -30,6 +30,7 @@ public class JasperTemplateGetAllAction implements
         return new LabelPrintingPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ListResult<JasperTemplate> run(ActionContext context)
         throws ActionException {

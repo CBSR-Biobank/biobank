@@ -15,11 +15,25 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
+@Audited
 @Entity
 @Table(name = "ORIGIN_INFO")
-public class OriginInfo extends AbstractBiobankModel {
+public class OriginInfo extends AbstractBiobankModel
+    implements HasComments {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Origin Information",
+        "Origin Information");
 
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
@@ -27,6 +41,7 @@ public class OriginInfo extends AbstractBiobankModel {
     private Center center;
     private Site receiverSite;
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "ORIGIN_INFO_COMMENT",
         joinColumns = { @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false, updatable = false) },
@@ -35,6 +50,7 @@ public class OriginInfo extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

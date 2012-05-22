@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 
 public class ContainerDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -29,8 +30,16 @@ public class ContainerDeleteAction implements Action<EmptyResult> {
         Container container = context.load(Container.class, containerId);
         // cascades delete all comments
 
-        context.getSession().delete(container);
+        delete(container, context);
         return new EmptyResult();
+    }
+
+    private void delete(Container container, ActionContext context)
+        throws ActionException {
+        for (ContainerPosition child : container.getChildPositions())
+            delete(child.getContainer(), context);
+        context.getSession().flush();
+        context.getSession().delete(container);
     }
 
 }

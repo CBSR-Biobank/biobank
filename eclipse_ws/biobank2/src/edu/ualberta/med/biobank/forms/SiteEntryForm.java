@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -13,6 +12,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -34,7 +35,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
@@ -44,18 +48,23 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
+    private static final I18n i18n = I18nFactory.getI18n(SiteEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String MSG_NEW_SITE_OK =
-        Messages.SiteEntryForm_creation_msg;
+        i18n.tr("Create a new Biobank site.");
+    @SuppressWarnings("nls")
     private static final String MSG_SITE_OK =
-        Messages.SiteEntryForm_edition_msg;
+        i18n.tr("Edit a Biobank site.");
 
     private SiteAdapter siteAdapter;
 
-    private SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
+    private final SiteWrapper site = new SiteWrapper(
+        SessionManager.getAppService());
 
     protected Combo session;
 
@@ -67,10 +76,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -78,10 +87,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             }
         };
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
@@ -89,11 +99,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (site.isNew()) {
-            tabName = Messages.SiteEntryForm_title_new;
+            tabName = i18n.tr("New repository site");
             site.setActivityStatus(ActivityStatus.ACTIVE);
         } else {
             tabName =
-                NLS.bind(Messages.SiteEntryForm_title_edit, site.getNameShort());
+                i18n.tr("Repository site {0}", site.getNameShort());
         }
         setPartName(tabName);
     }
@@ -113,9 +123,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         ((AdapterBase) adapter).setModelObject(site);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.SiteEntryForm_main_title);
+        form.setText(i18n.tr("Repository site information"));
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
         createCommentSection();
@@ -127,8 +138,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         // IJavaHelpContextIds.XXXXX);
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -140,12 +153,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null);
+            i18n.tr("Add a comment"), null, comment, "message", null);
     }
 
+    @SuppressWarnings("nls")
     private void createSiteSection() {
-        toolkit.createLabel(page, Messages.SiteEntryForm_main_description,
-            SWT.LEFT);
+        toolkit
+            .createLabel(
+                page,
+                "Studies, clinics, containers and container types can be added after submitting this information.",
+                SWT.LEFT);
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -155,19 +172,21 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, site, SitePeer.NAME.getName(),
+            SWT.NONE, HasName.PropertyName.NAME.toString(), null, site,
+            SitePeer.NAME.getName(),
             new NonEmptyStringValidator(
-                Messages.SiteEntryForm_field_name_validation_msg)));
+                i18n.tr("Site must have a name"))));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Name Short", null, site,
+            HasNameShort.PropertyName.NAME_SHORT.toString(), null, site,
             SitePeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
-                Messages.SiteEntryForm_field_nameShort_validation_msg));
+                i18n.tr("Site short name cannot be blank")));
 
         activityStatusComboViewer =
-            createComboViewer(client, "Activity status",
+            createComboViewer(client,
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(), site.getActivityStatus(),
-                Messages.SiteEntryForm_field_activity_validation_msg,
+                i18n.tr("Site must have an activity status"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -177,11 +196,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     }
 
+    @SuppressWarnings("nls")
     private void createStudySection() {
-        Section section = createSection(Messages.SiteEntryForm_studies_title);
+        Section section = createSection(Study.NAME.plural().toString());
         boolean superAdmin = SessionManager.getUser().isSuperAdmin();
         if (superAdmin) {
-            addSectionToolbar(section, Messages.SiteEntryForm_studies_add,
+            addSectionToolbar(section, i18n.tr("Add Study "),
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {

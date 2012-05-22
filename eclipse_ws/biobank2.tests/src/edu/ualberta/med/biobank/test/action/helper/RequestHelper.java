@@ -9,15 +9,14 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
@@ -53,7 +52,7 @@ public class RequestHelper extends Helper {
         Request request = new Request();
         request.setResearchGroup((ResearchGroup) session.get(
             ResearchGroup.class, rgId));
-        request.setCreated(new Date());
+        request.setCreatedAt(new Date());
         request.setAddress(((ResearchGroup) session.get(ResearchGroup.class,
             rgId)).getAddress());
 
@@ -61,7 +60,7 @@ public class RequestHelper extends Helper {
 
         for (String id : specs) {
             if (id == null || id.equals(""))
-                throw new ActionException(
+                throw new Exception(
                     "Blank specimen id, please check your your file for correct input.");
 
             Query q = session.createQuery("from "
@@ -74,7 +73,7 @@ public class RequestHelper extends Helper {
             RequestSpecimen r =
                 new RequestSpecimen();
             r.setRequest(request);
-            r.setState(RequestSpecimenState.AVAILABLE_STATE.getId());
+            r.setState(RequestSpecimenState.AVAILABLE_STATE);
             r.setSpecimen(spec);
             session.saveOrUpdate(r);
         }

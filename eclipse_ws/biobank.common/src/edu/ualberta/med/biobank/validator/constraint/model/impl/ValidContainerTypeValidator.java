@@ -14,15 +14,17 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
 
+@SuppressWarnings("nls")
 public class ValidContainerTypeValidator
     extends EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<ValidContainerType, Object> {
@@ -32,9 +34,9 @@ public class ValidContainerTypeValidator
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.overCapacity}";
     public static final String ILLEGAL_CHANGE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChange}";
-    public static final String ILLEGAL_CHILD_CT_REMOVE =
+    public static final String REMOVED_CT_IN_USE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChildContainerTypeRemove}";
-    public static final String ILLEGAL_ST_REMOVE =
+    public static final String REMOVED_ST_IN_USE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalSpecimenTypeRemove}";
 
     @Override
@@ -88,7 +90,14 @@ public class ValidContainerTypeValidator
     private boolean checkCapacity(ContainerType ct,
         ConstraintValidatorContext context) {
         ContainerLabelingScheme scheme = ct.getChildLabelingScheme();
-        if (scheme != null && !scheme.canLabel(ct.getCapacity())) {
+        Capacity capacity = ct.getCapacity();
+        // allow other validation to handle null issues, so do extensive null
+        // checking here
+        if (scheme != null &&
+            capacity != null &&
+            capacity.getRowCapacity() != null &&
+            capacity.getColCapacity() != null &&
+            !scheme.canLabel(capacity)) {
             context.buildConstraintViolationWithTemplate(OVER_CAPACITY)
                 .addNode("childLabelingScheme")
                 // TODO: any way to mark rowCapacity and colCapacity?
@@ -133,9 +142,9 @@ public class ValidContainerTypeValidator
         // rows, but not columns if more than one row is filled (assuming
         // labeling is done row by row)
 
-        isValid &= NullHelper.safeEquals(ct.getCapacity(), oldCt.getCapacity());
-        isValid &= NullHelper.safeEquals(ct.getTopLevel(), oldCt.getTopLevel());
-        isValid &= NullHelper.safeEquals(ct.getChildLabelingScheme(),
+        isValid &= NullUtil.eq(ct.getCapacity(), oldCt.getCapacity());
+        isValid &= NullUtil.eq(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= NullUtil.eq(ct.getChildLabelingScheme(),
             oldCt.getChildLabelingScheme());
 
         if (!isValid) {
@@ -186,7 +195,7 @@ public class ValidContainerTypeValidator
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(
-                ILLEGAL_CHILD_CT_REMOVE)
+                REMOVED_CT_IN_USE)
                 .addNode("childContainerTypes")
                 .addConstraintViolation();
         }
@@ -214,7 +223,7 @@ public class ValidContainerTypeValidator
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(
-                ILLEGAL_ST_REMOVE)
+                REMOVED_ST_IN_USE)
                 .addNode("specimenTypes")
                 .addConstraintViolation();
         }

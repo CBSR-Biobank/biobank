@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.util.LogSql;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 
+@SuppressWarnings("nls")
 public class BbpdbLogging {
 
     private static String USAGE = "Usage: bbpdblogging [options]\n\n"
@@ -53,11 +54,11 @@ public class BbpdbLogging {
         .compile("Visit #(\\d+)");
 
     @SuppressWarnings("unused")
-    private GenericAppArgs args;
+    private final GenericAppArgs args;
 
-    private Connection bbpdbCon;
+    private final Connection bbpdbCon;
 
-    private Connection biobank2Con;
+    private final Connection biobank2Con;
 
     public static void main(String[] argv) {
         try {

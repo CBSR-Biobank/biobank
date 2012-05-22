@@ -11,8 +11,13 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
@@ -28,11 +33,45 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * between groups or on behalf of a group.
  * 
  */
+@Audited
 @Entity
 @Table(name = "CONTACT")
 @Empty(property = "studies", groups = PreDelete.class)
-public class Contact extends AbstractBiobankModel {
+public class Contact extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Contact",
+        "Contacts");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString EMAIL_ADDRESS = bundle.trc(
+            "model",
+            "Email Address").format();
+        public static final LString FAX_NUMBER = bundle.trc(
+            "model",
+            "Fax Number").format();
+        public static final LString TITLE = bundle.trc(
+            "model",
+            "Title").format();
+        public static final LString MOBILE_NUMBER = bundle.trc(
+            "model",
+            "Mobile Number").format();
+        public static final LString NAME = bundle.trc(
+            "model",
+            "Contact Name").format();
+        public static final LString OFFICE_NUMBER = bundle.trc(
+            "model",
+            "Office Number").format();
+        public static final LString PAGER_NUMBER = bundle.trc(
+            "model",
+            "Pager Number").format();
+    }
 
     private String name;
     private String title;
@@ -44,12 +83,14 @@ public class Contact extends AbstractBiobankModel {
     private Set<Study> studies = new HashSet<Study>(0);
     private Clinic clinic;
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

@@ -18,13 +18,25 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
-public class Principal extends AbstractBiobankModel {
+public class Principal extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Principal",
+        "Principals");
 
     private Set<Membership> memberships = new HashSet<Membership>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
@@ -44,6 +56,7 @@ public class Principal extends AbstractBiobankModel {
         this.memberships = memberships;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Principal.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -51,6 +64,7 @@ public class Principal extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

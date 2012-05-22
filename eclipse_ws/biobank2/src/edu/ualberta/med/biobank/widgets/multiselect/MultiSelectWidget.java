@@ -23,6 +23,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -30,6 +32,8 @@ import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDragListener;
 import edu.ualberta.med.biobank.widgets.listeners.TreeViewerDropListener;
 
 public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
+    public static final I18n i18n = I18nFactory
+        .getI18n(MultiSelectWidget.class);
 
     private TreeViewer selTree;
 
@@ -39,17 +43,19 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
 
     private Button moveLeftButton;
 
-    private MultiSelectNode<T> selTreeRootNode = new MultiSelectNode<T>(null,
+    private final MultiSelectNode<T> selTreeRootNode = new MultiSelectNode<T>(
+        null,
         null);
 
-    private MultiSelectNode<T> availTreeRootNode = new MultiSelectNode<T>(null,
-        null);
+    private final MultiSelectNode<T> availTreeRootNode =
+        new MultiSelectNode<T>(null,
+            null);
 
     private int minHeight;
 
     protected boolean ctrl;
 
-    private List<T> allObjectsList = new ArrayList<T>();
+    private final List<T> allObjectsList = new ArrayList<T>();
 
     private Transfer dndTransfer;
 
@@ -63,6 +69,7 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
             MultiSelectNodeTransfer.getInstance());
     }
 
+    @SuppressWarnings("nls")
     public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight, ByteArrayTransfer dndTransfer) {
         super(parent, style);
@@ -84,12 +91,12 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
         moveRightButton = new Button(moveComposite, SWT.PUSH);
         moveRightButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_RIGHT));
-        moveRightButton.setToolTipText(Messages.MultiSelectWidget_move_tooltip);
+        moveRightButton.setToolTipText(i18n.tr("Move to selected"));
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
         moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ARROW_LEFT));
         moveLeftButton
-            .setToolTipText(Messages.MultiSelectWidget_remove_tooltip);
+            .setToolTipText(i18n.tr("Remove from selected"));
 
         selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
@@ -175,6 +182,7 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
         moveTreeViewerSelection(selTree, availTree);
     }
 
+    @SuppressWarnings("nls")
     private TreeViewer createLabelledTree(Composite parent, String label) {
         Composite selComposite = new Composite(parent, SWT.NONE);
         selComposite.setLayout(new GridLayout(1, true));
@@ -183,7 +191,7 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
 
         Label l = new Label(selComposite, SWT.NONE);
         l.setText(label);
-        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); //$NON-NLS-1$
+        l.setFont(new Font(null, "sans-serif", 8, SWT.BOLD));
         gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.CENTER;

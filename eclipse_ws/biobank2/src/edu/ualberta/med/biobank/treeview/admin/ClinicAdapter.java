@@ -6,6 +6,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
@@ -16,13 +18,12 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.ClinicEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(ClinicAdapter.class);
 
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
@@ -30,45 +31,37 @@ public class ClinicAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        try {
-            Integer id = ((ClinicWrapper) getModelObject()).getId();
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ClinicDeletePermission(id));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new ClinicReadPermission(id));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new ClinicUpdatePermission(id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        Integer id = ((ClinicWrapper) getModelObject()).getId();
+        this.isDeletable = isAllowed(new ClinicDeletePermission(id));
+        this.isReadable = isAllowed(new ClinicReadPermission(id));
+        this.isEditable = isAllowed(new ClinicUpdatePermission(id));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getLabelInternal() {
         ClinicWrapper wrapper = (ClinicWrapper) getModelObject();
-        Assert.isNotNull(wrapper, "client is null"); //$NON-NLS-1$
+        Assert.isNotNull(wrapper, "client is null");
         return wrapper.getNameShort();
     }
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.ClinicAdapter_clinic_label);
+        return getTooltipText(Clinic.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ClinicAdapter_clinic_label);
-        addViewMenu(menu, Messages.ClinicAdapter_clinic_label);
-        addDeleteMenu(menu, Messages.ClinicAdapter_clinic_label);
+        addEditMenu(menu, Clinic.NAME.singular().toString());
+        addViewMenu(menu, Clinic.NAME.singular().toString());
+        addDeleteMenu(menu, Clinic.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.ClinicAdapter_delete_confirm_msg;
+        // dialog message.
+        return i18n.tr("Are you sure you want to delete this clinic?");
     }
 
     @Override

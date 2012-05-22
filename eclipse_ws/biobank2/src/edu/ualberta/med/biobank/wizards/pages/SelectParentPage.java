@@ -15,23 +15,31 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsShown;
 
 public class SelectParentPage extends BgcWizardPage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SelectParentPage.class);
+
     public static final String PAGE_NAME = SelectParentPage.class
         .getCanonicalName();
+    @SuppressWarnings("nls")
     private static final String PARENT_REQUIRED =
-        Messages.SelectParentPage_required_msg;
+        i18n.tr("Please select its correct parent.");
     private Button isSourceSpecimen;
     private NewSpecimenInfoTable specTable;
 
+    @SuppressWarnings("nls")
     public SelectParentPage() {
-        super(PAGE_NAME, Messages.SelectParentPage_description, null);
+        super(PAGE_NAME, i18n.tr("Select a parent specimen"), null);
     }
 
     public void setParentSpecimenList(List<SpecimenInfo> specs) {
@@ -42,17 +50,20 @@ public class SelectParentPage extends BgcWizardPage {
         return specTable.getSelection();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite content = new Composite(parent, SWT.NONE);
         content.setLayout(new GridLayout(1, false));
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         isSourceSpecimen = new Button(content, SWT.CHECK);
-        isSourceSpecimen.setText("Source Specimen");
+        isSourceSpecimen.setText(SourceSpecimen.NAME.singular().toString());
         isSourceSpecimen.setSelection(true);
 
         final Label label = new Label(content, SWT.None);
-        label.setText("Select parent:");
+        label.setText(
+            // label.
+            i18n.tr("Select parent:"));
         label.setEnabled(false);
 
         final IObservableValue selection =

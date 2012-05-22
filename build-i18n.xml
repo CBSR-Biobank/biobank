@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="i18n" basedir=".">
+  <property file="build.properties" />
+
+  <property name="bundle" value="i18n.Messages" />
+  <property name="po.dir" value="po" />
+  <property name="po.output.dir" value="${po.dir}/output" />
+  <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
+
+  <target name="init.dir">
+    <mkdir dir="${po.dir}" />
+    <mkdir dir="${po.output.dir}" />
+  </target>
+
+  <target name="init.gettext" description="Loads the Ant gettext tasks">
+    <taskdef name="gettext-extract"
+             classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-merge"
+             classname="org.xnap.commons.ant.gettext.GettextMergeKeysTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-generate-default"
+             classname="org.xnap.commons.ant.gettext.GenerateDefaultBundleTask"
+             classpath="${gettexttasks.jar}"/>
+    <taskdef name="gettext-dist"
+             classname="org.xnap.commons.ant.gettext.GettextDistTask"
+             classpath="${gettexttasks.jar}"/>
+  </target>
+
+  <target name="messages-extract"
+          description="Extracts message keys from the source code"
+          depends="init.dir,init.gettext">
+    <echo message="${po.dir}" />
+    <gettext-extract keysFile="messages.pot" poDirectory="${po.dir}">
+      <!-- TODO: all projects? what about sub-projects (e.g. scannerConfig) -->
+      <fileset dir="eclipse_ws" includes="**/src/**/*.java"/>
+    </gettext-extract>
+  </target>
+
+  <target name="messages-merge"
+          description="Merges newly extracted messages into existing po files"
+          depends="init.dir,init.gettext">
+    <gettext-merge keysFile="messages.pot"
+                   poDirectory="${po.dir}" />
+  </target>
+
+  <target name="messages-bundle"
+          description="Generates a default bundle"
+          depends="init.dir,init.gettext">
+    <gettext-generate-default targetBundle="${bundle}"
+                              outputDirectory="${po.output.dir}"
+                              potfile="${po.dir}/messages.pot"/>
+  </target>
+
+  <target name="messages-jar"
+          description="Generates Java ResourceBundles and jars them up"
+          depends="init.dir,init.gettext">
+    <gettext-dist targetBundle="${bundle}"
+                  poDirectory="${po.dir}"
+                  outputDirectory="${po.output.dir}"
+                  percentage="5"/>
+      <jar destfile="jars/messages.jar"
+           basedir="${po.output.dir}"
+           includes="i18n/**"/>
+  </target>
+</project>

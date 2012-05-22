@@ -6,13 +6,14 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.center.CenterGetStudyListAction;
@@ -28,6 +29,8 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasCreatedAt;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -38,16 +41,22 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(PatientEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientEntryForm"; 
+        "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String CREATED_AT_BINDING =
-        "patient-created-at-binding"; 
+        "patient-created-at-binding";
 
+    @SuppressWarnings("nls")
     public static final String MSG_NEW_PATIENT_OK =
         "Creating a new patient record.";
 
+    @SuppressWarnings("nls")
     public static final String MSG_PATIENT_OK =
         "Editing an existing patient record.";
 
@@ -57,34 +66,36 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private NotNullValidator createdAtValidator;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator =
+    @SuppressWarnings("nls")
+    private final NonEmptyStringValidator pnumberNonEmptyValidator =
         new NonEmptyStringValidator(
-            "Patient must have a patient number");
+            // validation error message.
+            i18n.tr("Patient must have a patient number"));
 
     private PatientInfo patientInfo;
 
-    private PatientWrapper patient = new PatientWrapper(
+    private final PatientWrapper patient = new PatientWrapper(
         SessionManager.getAppService());
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         updatePatientInfo();
 
         String tabName;
         if (patientInfo == null) {
-            tabName = "New Patient";
+            tabName = i18n.tr("New Patient");
         } else {
-            tabName =
-                NLS.bind("Patient {0}",
-                    patientInfo.patient.getPnumber());
+            tabName = i18n.tr("Patient {0}",
+                patientInfo.patient.getPnumber());
         }
         setPartName(tabName);
     }
@@ -102,9 +113,10 @@ public class PatientEntryForm extends BiobankEntryForm {
         comment.setWrappedObject(new Comment());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Information");
+        form.setText(i18n.tr("Patient Information"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -115,6 +127,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void createPatientSection() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         Composite client = toolkit.createComposite(page);
@@ -140,9 +153,10 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         studiesViewer =
             createComboViewer(client,
-                "Study", studies,
+                Study.NAME.singular().toString(), studies,
                 selectedStudy,
-                "A study should be selected",
+                // validation error message.
+                i18n.tr("A study should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -160,15 +174,16 @@ public class PatientEntryForm extends BiobankEntryForm {
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Patient Number", null, patient,
+            Patient.PropertyName.PNUMBER.toString(), null, patient,
             PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
 
         createdAtLabel = widgetCreator.createLabel(client,
-            "Created At");
+            HasCreatedAt.PropertyName.CREATED_AT.toString());
         createdAtLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
         createdAtValidator = new NotNullValidator(
-            "Created At should be set");
+            // validation error message.
+            i18n.tr("Created At should be set"));
 
         createDateTimeWidget(client, createdAtLabel, patient.getCreatedAt(),
             patient, PatientPeer.CREATED_AT.getName(), createdAtValidator,
@@ -177,8 +192,10 @@ public class PatientEntryForm extends BiobankEntryForm {
         createCommentSection();
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -190,7 +207,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null);
+            i18n.tr("Add a comment"), null, comment, "message", null);
     }
 
     @Override

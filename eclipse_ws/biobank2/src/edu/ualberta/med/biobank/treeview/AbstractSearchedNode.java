@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
@@ -22,6 +24,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractSearchedNode.class);
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractSearchedNode.class.getName());
@@ -29,18 +33,20 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     protected Set<Object> searchedObjects = new HashSet<Object>();
     protected Set<Integer> searchedObjectIds = new HashSet<Integer>();
 
-    private boolean keepDirectLeafChild;
+    private final boolean keepDirectLeafChild;
 
+    @SuppressWarnings("nls")
     public AbstractSearchedNode(AdapterBase parent, int id,
         boolean keepDirectLeafChild) {
-        super(parent, id, Messages.AbstractSearchedNode_searched, true);
+        super(parent, id, i18n.tr("Searched"), true);
         this.keepDirectLeafChild = keepDirectLeafChild;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.AbstractSearchedNode_clear);
+        mi.setText(i18n.tr("Clear"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -49,6 +55,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         });
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void performExpand() {
         List<ModelWrapper<?>> alreadyHasListener =
@@ -124,7 +131,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         } catch (final RemoteAccessException exp) {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while refreshing searched elements", e); //$NON-NLS-1$
+            logger.error("Error while refreshing searched elements", e);
         }
     }
 

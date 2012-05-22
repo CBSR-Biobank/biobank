@@ -7,21 +7,43 @@ import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Embeddable
 public class Capacity implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Capacity",
+        "Capacities");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString ROW_CAPACITY = bundle.trc(
+            "model",
+            "Row Capacity").format();
+        public static final LString COLUMN_CAPACITY = bundle.trc(
+            "model",
+            "Column Capacity").format();
+    }
 
     private Integer rowCapacity;
     private Integer colCapacity;
-    
+
     public Capacity() {
     }
-    
+
     public Capacity(Integer maxRows, Integer maxCols) {
         this.rowCapacity = maxRows;
         this.colCapacity = maxCols;
     }
-    
+
     public Capacity(Capacity other) {
         this.rowCapacity = other.getRowCapacity();
         this.colCapacity = other.getColCapacity();
@@ -47,6 +69,13 @@ public class Capacity implements Serializable {
 
     public void setColCapacity(Integer colCapacity) {
         this.colCapacity = colCapacity;
+    }
+
+    @Override
+    @SuppressWarnings("nls")
+    public String toString() {
+        return "Capacity [rowCapacity=" + rowCapacity + ", colCapacity="
+            + colCapacity + "]";
     }
 
     @Override

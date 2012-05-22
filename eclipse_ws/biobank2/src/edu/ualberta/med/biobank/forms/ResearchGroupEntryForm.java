@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -29,7 +31,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.admin.ResearchGroupAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
@@ -37,31 +42,40 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 @SuppressWarnings("unused")
 public class ResearchGroupEntryForm extends AddressEntryFormCommon {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ResearchGroupEntryForm.class);
+
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ResearchGroupEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String MSG_NEW_RG_OK =
-        "New Research Group information.";
+        i18n.tr("New Research Group information.");
 
+    @SuppressWarnings("nls")
     private static final String MSG_RG_OK =
-        "Research Group information.";
+        i18n.tr("Research Group information.");
 
+    @SuppressWarnings("nls")
     private static final String MSG_NO_RG_NAME =
-        "Research Group must have a name";
+        i18n.tr("Research Group must have a name");
 
+    @SuppressWarnings("nls")
     private static final String MSG_NO_RG_NAME_SHORT =
-        "Research Group must have a short name";
+        i18n.tr("Research Group must have a short name");
 
     private ResearchGroupAdapter researchGroupAdapter;
 
-    private ResearchGroupWrapper researchGroup = new ResearchGroupWrapper(
-        SessionManager.getAppService());
+    private final ResearchGroupWrapper researchGroup =
+        new ResearchGroupWrapper(
+            SessionManager.getAppService());
 
     private BgcBaseText commentWidget;
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -75,6 +89,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     private CommentsInfoTable commentEntryTable;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ResearchGroupAdapter),
@@ -86,9 +101,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (researchGroup.isNew()) {
-            tabName = "New Research Group";
+            tabName = i18n.tr("New Research Group");
         } else
-            tabName = NLS.bind("Research Group {0}",
+            tabName = i18n.tr("Research Group {0}",
                 researchGroup.getNameShort());
         setPartName(tabName);
     }
@@ -115,14 +130,15 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         return MSG_RG_OK;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText("Research Group Information");
+        form.setText(i18n.tr("Research Group Information"));
         page.setLayout(new GridLayout(1, false));
         toolkit
             .createLabel(
                 page,
-                "Research Groups can be associated with studies after submitting this initial information.",
+                i18n.tr("Research Groups can be associated with studies after submitting this initial information."),
                 SWT.LEFT);
         createResearchGroupInfoSection();
         createAddressArea(researchGroup);
@@ -130,6 +146,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     }
 
+    @SuppressWarnings("nls")
     private void createResearchGroupInfoSection() throws ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -139,12 +156,14 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.NONE, "Name", null, researchGroup,
+            SWT.NONE, HasName.PropertyName.NAME.toString(), null,
+            researchGroup,
             ResearchGroupPeer.NAME.getName(), new NonEmptyStringValidator(
                 MSG_NO_RG_NAME)));
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Name Short", null, researchGroup,
+            HasNameShort.PropertyName.NAME_SHORT.toString(), null,
+            researchGroup,
             ResearchGroupPeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(MSG_NO_RG_NAME_SHORT));
 
@@ -156,9 +175,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             availableStudies.add(researchGroup.getStudy());
 
         studyComboViewer = createComboViewer(client,
-            "Study", availableStudies,
+            Study.NAME.singular().toString(), availableStudies,
             researchGroup.getStudy(),
-            "Select the associated study",
+            i18n.tr("Select the associated study"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -169,9 +188,9 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             SessionManager.getUser().isSuperAdmin());
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity status",
+            ActivityStatus.NAME.singular().toString(),
             ActivityStatus.valuesList(), researchGroup.getActivityStatus(),
-            "Research Group must have an activity status",
+            i18n.tr("Research Group must have an activity status"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -184,8 +203,10 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
 
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -199,7 +220,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         commentWidget =
             (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
                 SWT.MULTI,
-                "Add a comment", null, comment, "message", null);
+                i18n.tr("Add a comment"), null, comment, "message", null);
 
     }
 
@@ -228,7 +249,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
             new ResearchGroupSaveInfo(researchGroup.getId(),
                 researchGroup.getName(), researchGroup.getNameShort(),
                 researchGroup.getStudy().getId(),
-                comment.getMessage() == null ? ""
+                comment.getMessage() == null ? StringUtil.EMPTY_STRING
                     : comment.getMessage(), addressInfo, researchGroup
                     .getActivityStatus());
         ResearchGroupSaveAction save = new ResearchGroupSaveAction(info);
@@ -253,6 +274,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
         return ResearchGroupViewForm.ID;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
         try {
@@ -265,7 +287,7 @@ public class ResearchGroupEntryForm extends AddressEntryFormCommon {
                 researchGroup.getActivityStatus());
             GuiUtil.reset(studyComboViewer, researchGroup.getStudy());
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", "Unable to reload form");
+            BgcPlugin.openAsyncError(i18n.tr("Unable to reload form"));
         }
 
     }

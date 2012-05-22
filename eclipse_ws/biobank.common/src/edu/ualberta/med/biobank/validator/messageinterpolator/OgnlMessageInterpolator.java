@@ -7,7 +7,6 @@ import javax.validation.MessageInterpolator;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
-import edu.ualberta.med.biobank.i18n.OgnlMessageFormatter;
 
 /**
  * Enables the OGNL evaluation of anything of the format

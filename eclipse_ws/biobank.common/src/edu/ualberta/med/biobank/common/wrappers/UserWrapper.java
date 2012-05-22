@@ -161,7 +161,7 @@ public class UserWrapper extends UserBaseWrapper {
      * connected to the server, the method will fail
      */
     public void modifyPassword(String oldPassword, String newPassword,
-        Boolean bulkEmails) throws Exception {
+        Boolean bulkEmails) throws ApplicationException {
         ((BiobankApplicationService) appService).executeModifyPassword(
             getCsmUserId(), oldPassword, newPassword, bulkEmails);
     }

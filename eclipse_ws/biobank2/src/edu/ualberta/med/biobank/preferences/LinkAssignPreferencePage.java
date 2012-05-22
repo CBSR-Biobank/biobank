@@ -8,12 +8,16 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
 public class LinkAssignPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(LinkAssignPreferencePage.class);
 
     private DirectoryFieldEditor logPath;
 
@@ -27,26 +31,27 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
      * GUI blocks needed to manipulate various types of preferences. Each field
      * editor knows how to save and restore itself.
      */
+    @SuppressWarnings("nls")
     @Override
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CONFIRM,
-            Messages.LinkAssignPreferencePage_confirm_barcode_label,
+            i18n.tr("Confirm barcode:"),
             getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.GENERAL_CANCEL,
-            Messages.LinkAssignPreferencePage_cancel_barcode_label,
+            i18n.tr("Cancel barcode:"),
             getFieldEditorParent()));
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
-            Messages.LinkAssignPreferencePage_save_logs_label,
+            i18n.tr("Save activity logs into a file"),
             getFieldEditorParent()));
         logPath = new DirectoryFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-            Messages.LinkAssignPreferencePage_logs_path_label,
+            i18n.tr("Path for activity log files"),
             getFieldEditorParent());
         addField(logPath);
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT,
-            Messages.LinkAssignPreferencePage_ask_print_label,
+            i18n.tr("Ask to print activity log"),
             getFieldEditorParent()));
     }
 

@@ -2,27 +2,31 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.Map;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 
 public class ScanOneTubeDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ScanOneTubeDialog.class);
 
     private String scannedValue;
     private BgcBaseText valueText;
-    private RowColPos position;
-    private Map<RowColPos, PalletCell> cells;
-    private ContainerType type;
+    private final RowColPos position;
+    private final Map<RowColPos, PalletCell> cells;
+    private final ContainerType type;
 
     public ScanOneTubeDialog(Shell parentShell,
         Map<RowColPos, PalletCell> cells, RowColPos rcp,
@@ -42,26 +46,33 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
         area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         widgetCreator.createLabel(area,
-            "Barcode");
+            Container.PropertyName.PRODUCT_BARCODE.toString());
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return NLS.bind("Scan the missing tube for position {0}",
+        // TR: dialog title area message
+        return i18n.tr("Scan the missing tube for position {0}",
             type.getPositionString(position));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Pallet tube scan";
+        // TR: dialog title area title
+        return i18n.tr("Pallet tube scan");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return "Pallet tube scan";
+        // TR: dialog shell title
+        return i18n.tr("Pallet tube scan");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         this.scannedValue = valueText.getText();
@@ -69,8 +80,10 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
             if (otherCell.getValue() != null
                 && otherCell.getValue().equals(scannedValue)) {
                 BgcPlugin.openAsyncError(
-                    "Tube Scan Error", NLS.bind(
-                        "The value entered already exists in position {0}",
+                    // TR: dialog title
+                    i18n.tr("Tube Scan Error"),
+                    // TR: dialog message
+                    i18n.tr("The value entered already exists in position {0}",
                         type.getPositionString(new RowColPos(
                             otherCell.getRow(),
                             otherCell.getCol()))));

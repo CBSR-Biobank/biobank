@@ -6,13 +6,37 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 
+@Audited
 @MappedSuperclass
 @InBounds
 public abstract class AbstractPosition extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Position",
+        "Positions");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString ROW = bundle.trc(
+            "model",
+            "Row").format();
+        public static final LString COLUMN = bundle.trc(
+            "model",
+            "Column").format();
+    }
 
     private Integer row;
     private Integer col;

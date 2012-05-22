@@ -9,14 +9,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Address;
 
+@SuppressWarnings("nls")
 public abstract class AddressEntryFormCommon extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AddressEntryFormCommon.class);
 
     /*
      * Want to preserve insert order so using ListOrderedMap.
@@ -25,23 +31,27 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     static {
         Map<String, FieldInfo> aMap = new LinkedHashMap<String, FieldInfo>();
         aMap.put(AddressPeer.STREET1.getName(), new FieldInfo(
-            "Street 1", BgcBaseText.class,
+            Address.Property.STREET1.toString(),
+            BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.STREET2.getName(), new FieldInfo(
-            "Street 2", BgcBaseText.class,
+            Address.Property.STREET2.toString(),
+            BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.CITY.getName(), new FieldInfo(
-            "City", BgcBaseText.class,
+            Address.Property.CITY.toString(),
+            BgcBaseText.class,
             SWT.NONE, null, NonEmptyStringValidator.class,
-            "Enter a city"));
+            // validation error message
+            i18n.tr("Enter a city")));
         aMap.put(AddressPeer.PROVINCE.getName(), new FieldInfo(
-            "Province/State", BgcBaseText.class,
+            Address.Property.PROVINCE.toString(), BgcBaseText.class,
             SWT.NONE, null, null, null));
         aMap.put(AddressPeer.POSTAL_CODE.getName(), new FieldInfo(
-            "Postal/Zip Code",
+            Address.Property.POSTAL_CODE.toString(),
             BgcBaseText.class, SWT.NONE, null, null, null));
         aMap.put(AddressPeer.COUNTRY.getName(), new FieldInfo(
-            "Country", BgcBaseText.class,
+            Address.Property.COUNTRY.toString(), BgcBaseText.class,
             SWT.NONE, null, null, null));
         ADDRESS_FIELDS = Collections.unmodifiableMap(aMap);
     };
@@ -53,7 +63,8 @@ public abstract class AddressEntryFormCommon extends BiobankEntryForm {
     }
 
     protected void createAddressArea(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient("Address");
+        Composite client =
+            createSectionWithClient(Address.NAME.singular().toString());
         createBoundWidgetsFromMap(ADDRESS_FIELDS, wrapperObject, client);
     }
 }

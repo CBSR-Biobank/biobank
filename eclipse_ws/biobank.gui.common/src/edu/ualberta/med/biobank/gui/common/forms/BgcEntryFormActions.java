@@ -9,10 +9,26 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class BgcEntryFormActions {
+    private static final I18n i18n = I18nFactory
+        .getI18n(BgcEntryFormActions.class);
+
+    @SuppressWarnings("nls")
+    private static final String CONFIRM = i18n.tr("Confirm");
+    @SuppressWarnings("nls")
+    private static final String RESET = i18n.tr("Reset");
+    @SuppressWarnings("nls")
+    private static final String CANCEL = i18n.tr("Cancel");
+    @SuppressWarnings("nls")
+    private static final String ERROR_PRINTING = i18n.tr("Error printing.");
+    @SuppressWarnings("nls")
+    // text that appears as an option in a GUI menu to print
+    private static final String PRINT_ACTION_TEXT = i18n.tr("Print");
 
     private static ImageDescriptor printActionImage = ImageDescriptor
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
@@ -30,7 +46,7 @@ public class BgcEntryFormActions {
         .createFromImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_CONFIRM_FORM));
 
-    private IBgcEntryForm entryForm;
+    private final IBgcEntryForm entryForm;
 
     private Action confirmAction;
 
@@ -64,8 +80,7 @@ public class BgcEntryFormActions {
         };
         confirmAction.setActionDefinitionId(commandId);
         confirmAction.setImageDescriptor(confirmActionImage);
-        confirmAction
-            .setToolTipText(Messages.BgcEntryFormActions_confirm_tooltip);
+        confirmAction.setToolTipText(CONFIRM);
         entryForm.getScrolledForm().getToolBarManager().add(confirmAction);
     }
 
@@ -77,12 +92,12 @@ public class BgcEntryFormActions {
             new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(),
-                    Messages.BgcEntryFormActions_reset_label, commandId, null,
+                    RESET, commandId, null,
                     reloadActionImage, null, null,
-                    Messages.BgcEntryFormActions_reset_label,
-                    Messages.BgcEntryFormActions_reset_label,
-                    Messages.BgcEntryFormActions_reset_label,
-                    SWT.NONE, Messages.BgcEntryFormActions_reset_label, true));
+                    RESET,
+                    RESET,
+                    RESET,
+                    SWT.NONE, RESET, true));
         entryForm.getScrolledForm().getToolBarManager().add(reset);
     }
 
@@ -94,12 +109,12 @@ public class BgcEntryFormActions {
             new CommandContributionItem(
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(),
-                    Messages.BgcEntryFormActions_cancel_label, commandId, null,
+                    CANCEL, commandId, null,
                     cancelActionImage, null, null,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    Messages.BgcEntryFormActions_cancel_label,
-                    SWT.NONE, Messages.BgcEntryFormActions_cancel_label, true));
+                    CANCEL,
+                    CANCEL,
+                    CANCEL,
+                    SWT.NONE, CANCEL, true));
         entryForm.getScrolledForm().getToolBarManager().add(cancel);
     }
 
@@ -107,7 +122,7 @@ public class BgcEntryFormActions {
         if (printAction != null)
             return;
 
-        Action action = new Action(Messages.BgcEntryFormActions_print_label) {
+        Action action = new Action(PRINT_ACTION_TEXT) {
             @Override
             public void run() {
                 BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
@@ -117,7 +132,7 @@ public class BgcEntryFormActions {
                             entryForm.print();
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
-                                Messages.BgcEntryFormActions_print_error_msg,
+                                ERROR_PRINTING,
                                 ex);
                         }
                     }

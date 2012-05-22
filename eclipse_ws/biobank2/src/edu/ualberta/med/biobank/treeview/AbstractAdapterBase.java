@@ -21,12 +21,16 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -44,6 +48,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public abstract class AbstractAdapterBase implements
     Comparable<AbstractAdapterBase> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractAdapterBase.class);
+
+    @SuppressWarnings("nls")
+    // dialog title.
+    private static final String DELETE_FAILED = i18n.tr("Delete failed");
 
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(AbstractAdapterBase.class.getName());
@@ -74,6 +84,20 @@ public abstract class AbstractAdapterBase implements
     protected boolean isEditable = false;
 
     protected boolean isReadable = false;
+
+    @SuppressWarnings("nls")
+    protected static boolean isAllowed(Permission p) {
+        try {
+            return SessionManager.getAppService().isAllowed(p);
+        } catch (ApplicationException e) {
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Permission Error"),
+                // dialog message.
+                i18n.tr("Unable to retrieve user permissions"));
+        }
+        return false;
+    }
 
     public AbstractAdapterBase(AbstractAdapterBase parent, Integer id,
         String label, String tooltip, boolean hasChildren) {
@@ -139,13 +163,16 @@ public abstract class AbstractAdapterBase implements
 
     public abstract String getTooltipTextInternal();
 
+    @SuppressWarnings("nls")
     protected String getTooltipText(String string) {
         String label = getLabel();
         if (label == null) {
-            return new StringBuilder(Messages.AdapterBase_new_label).append(
-                string).toString();
+
+            String newObjectLabel = i18n.tr("New {0}", string);
+
+            return newObjectLabel;
         }
-        return new StringBuilder(string).append(" ").append(label).toString(); //$NON-NLS-1$
+        return new StringBuilder(string).append(" ").append(label).toString();
     }
 
     public List<AbstractAdapterBase> getChildren() {
@@ -183,11 +210,12 @@ public abstract class AbstractAdapterBase implements
         child.addListener(deltaListener);
     }
 
+    @SuppressWarnings("nls")
     public void insertAfter(AbstractAdapterBase existingNode,
         AbstractAdapterBase newNode) {
         int pos = children.indexOf(existingNode);
         Assert.isTrue(pos >= 0,
-            "existing node not found: " + existingNode.getLabel()); //$NON-NLS-1$
+            "existing node not found: " + existingNode.getLabel());
         newNode.setParent(this);
         children.add(pos + 1, newNode);
         newNode.addListener(deltaListener);
@@ -283,7 +311,11 @@ public abstract class AbstractAdapterBase implements
     protected void addEditMenu(Menu menu, String objectName) {
         if (isEditable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_edit_label + objectName);
+
+            @SuppressWarnings("nls")
+            String editObjectLabel = i18n.tr("Edit {0}", objectName);
+
+            mi.setText(editObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -296,7 +328,11 @@ public abstract class AbstractAdapterBase implements
     protected void addViewMenu(Menu menu, String objectName) {
         if (isReadable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_view_label + objectName);
+
+            @SuppressWarnings("nls")
+            String viewObjectLabel = i18n.tr("View {0}", objectName);
+
+            mi.setText(viewObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -309,7 +345,11 @@ public abstract class AbstractAdapterBase implements
     protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.AdapterBase_delete_label + objectName);
+
+            @SuppressWarnings("nls")
+            String deleteObjectLabel = i18n.tr("Delete {0}", objectName);
+
+            mi.setText(deleteObjectLabel);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -319,16 +359,17 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
+    @SuppressWarnings("nls")
     public void deleteWithConfirm() {
         String msg = getConfirmDeleteMessage();
         if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: " //$NON-NLS-1$
+            throw new RuntimeException("adapter has no confirm delete msg: "
                 + getClass().getName());
         }
         boolean doDelete = true;
-        doDelete =
-            BgcPlugin.openConfirm(Messages.AdapterBase_confirm_delete_title,
-                msg);
+        doDelete = BgcPlugin.openConfirm(
+            // dialog
+            i18n.tr("Confirm Delete"), msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -351,20 +392,21 @@ public abstract class AbstractAdapterBase implements
                                 .getConstraintViolationsMsgs(
                                 (ConstraintViolationException) e.getCause());
                             BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title,
-                                StringUtils.join(msgs, "\n")); //$NON-NLS-1$
+                                DELETE_FAILED,
+                                StringUtils.join(msgs, "\n"));
                         } else if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
                             BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title,
-                                "delete not allowed");
+                                DELETE_FAILED,
+                                // dialog message.
+                                i18n.tr("delete not allowed"));
                         } else {
                             BgcPlugin.openAsyncError(
-                                Messages.AdapterBase_delete_error_title,
+                                DELETE_FAILED,
                                 e.getLocalizedMessage());
                         }
                     } catch (Exception e) {
                         BgcPlugin.openAsyncError(
-                            Messages.AdapterBase_delete_error_title, e);
+                            DELETE_FAILED, e);
                         getParent().addChild(AbstractAdapterBase.this);
                         return;
                     }
@@ -377,9 +419,12 @@ public abstract class AbstractAdapterBase implements
         }
     }
 
+    @SuppressWarnings("nls")
     protected void runDelete() throws Exception {
-        BgcPlugin.openAsyncError("Programming Error",
-            "This adapter is missing its implementation for runDelete()");
+        BgcPlugin
+            .openAsyncError(
+                i18n.tr("Programming Error"),
+                i18n.tr("This adapter is missing its implementation for runDelete()"));
     }
 
     /**
@@ -424,6 +469,7 @@ public abstract class AbstractAdapterBase implements
         return openForm(input, id, true);
     }
 
+    @SuppressWarnings("nls")
     public static IEditorPart openForm(FormInput input, String id,
         boolean focusOnEditor) {
         closeEditor(input);
@@ -433,7 +479,7 @@ public abstract class AbstractAdapterBase implements
                 .openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
-            LOGGER.error("Can't open form with id " + id, e); //$NON-NLS-1$
+            LOGGER.error("Can't open form with id " + id, e);
             return null;
         }
 

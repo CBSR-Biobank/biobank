@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetContactsAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
-import edu.ualberta.med.biobank.common.action.exception.ActionCheckException;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
@@ -30,7 +30,6 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.Patie
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyDeleteAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
@@ -58,7 +57,7 @@ import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
  * tested in the Site test class.
  * 
  */
-public class TestStudy extends TestAction {
+public class TestStudy extends ActionTest {
 
     private String name;
     private StudySaveAction studySaveAction;
@@ -76,37 +75,10 @@ public class TestStudy extends TestAction {
 
     @Test
     public void saveNew() throws Exception {
-        // null name
-        studySaveAction.setName(null);
-        try {
-            exec(studySaveAction);
-            Assert.fail("should not be allowed to add study with no name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // null short name
         studySaveAction.setName(name);
-        studySaveAction.setNameShort(null);
-        try {
-            exec(studySaveAction);
-            Assert
-                .fail("should not be allowed to add study with no short name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         studySaveAction.setNameShort(name);
-        studySaveAction.setActivityStatus(null);
-        try {
-            exec(studySaveAction);
-            Assert
-                .fail("should not be allowed to add study with no activity status");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
         studySaveAction.setActivityStatus(ActivityStatus.ACTIVE);
+
         studySaveAction.setContactIds(null);
         try {
             exec(studySaveAction);
@@ -205,29 +177,6 @@ public class TestStudy extends TestAction {
         studyInfo.getStudy().setNameShort(name + "_2");
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
         exec(studySaveAction);
-
-        // test for duplicate name
-        StudySaveAction saveStudy =
-            StudyHelper.getSaveAction(name + "_2", name,
-                ActivityStatus.ACTIVE);
-        try {
-            exec(saveStudy);
-            Assert.fail("should not be allowed to add study with same name");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test for duplicate name short
-        saveStudy.setName(Utils.getRandomString(5, 10));
-        saveStudy.setNameShort(name + "_2");
-
-        try {
-            exec(saveStudy);
-            Assert
-                .fail("should not be allowed to add study with same name short");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
-        }
     }
 
     @Test
@@ -620,7 +569,7 @@ public class TestStudy extends TestAction {
         try {
             exec(studySaveAction);
             Assert.fail("should not be allowed to add more than 1 global type");
-        } catch (ActionCheckException e) {
+        } catch (ActionException e) {
             Assert.assertTrue(true);
         }
 
@@ -793,27 +742,27 @@ public class TestStudy extends TestAction {
     public void getAllStudiesAction() {
 
         StudyGetAllAction action = new StudyGetAllAction();
-        StudiesInfo infos = exec(action);
+        List<Study> infos = exec(action).getList();
 
-        Integer startSize = infos.getStudies().size();
+        Integer startSize = infos.size();
 
         Integer firstStudy = StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 1);
 
         StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 2);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 2);
 
         Study study = new Study();
         study.setId(firstStudy);
         exec(new StudyDeleteAction(study));
 
-        infos = exec(action);
-        Assert.assertTrue(infos.getStudies().size() == startSize + 1);
+        infos = exec(action).getList();
+        Assert.assertTrue(infos.size() == startSize + 1);
     }
 }

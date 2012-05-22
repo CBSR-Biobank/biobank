@@ -7,6 +7,7 @@ package edu.ualberta.med.biobank.common.wrappers.base;
 import java.util.List;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
@@ -45,11 +46,11 @@ public class DispatchSpecimenBaseWrapper extends ModelWrapper<DispatchSpecimen> 
         return DispatchSpecimenPeer.PROPERTIES;
     }
 
-    public Integer getState() {
+    public DispatchSpecimenState getState() {
         return getProperty(DispatchSpecimenPeer.STATE);
     }
 
-    public void setState(Integer state) {
+    public void setState(DispatchSpecimenState state) {
         setProperty(DispatchSpecimenPeer.STATE, state);
     }
 

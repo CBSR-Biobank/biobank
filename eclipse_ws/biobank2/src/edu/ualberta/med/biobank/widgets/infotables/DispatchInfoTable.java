@@ -8,20 +8,27 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(DispatchInfoTable.class);
 
-    private List<DispatchWrapper> dispatches;
+    private final List<DispatchWrapper> dispatches;
 
     protected static class TableRowData {
         DispatchWrapper dispatch;
@@ -32,6 +39,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         String waybill;
         String dstatus;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils
@@ -39,19 +47,20 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     new String[] { sender,
                         DateFormatter.formatAsDate(dispatchTime), receiver,
                         DateFormatter.formatAsDate(dateReceived), waybill,
-                        dstatus }, "\t"); //$NON-NLS-1$
+                        dstatus }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.DispatchInfoTable_sender_label,
-        Messages.DispatchInfoTable_time_label,
-        Messages.DispatchInfoTable_receiver_label,
-        Messages.DispatchInfoTable_received_label,
-        Messages.DispatchInfoTable_waybill_label,
-        Messages.DispatchInfoTable_state_label };
+        i18n.tr("Sender"),
+        i18n.tr("Dispatch Time"),
+        i18n.tr("Receiver"),
+        i18n.tr("Date Received"),
+        ShipmentInfo.PropertyName.WAYBILL.toString(),
+        i18n.tr("Dispatch State") };
 
-    private boolean editMode = false;
+    private final boolean editMode = false;
 
     public DispatchInfoTable(Composite parent,
         List<Dispatch> dispatchesRaw) {
@@ -78,9 +87,9 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -96,7 +105,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
                 case 5:
                     return info.dstatus;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

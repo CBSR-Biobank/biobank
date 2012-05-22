@@ -30,7 +30,6 @@ import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.printing.PrintDialog;
 import org.eclipse.swt.printing.PrinterData;
@@ -38,6 +37,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
 import ar.com.fdvs.dj.domain.AutoText;
@@ -49,26 +50,34 @@ import ar.com.fdvs.dj.domain.constants.Transparency;
 import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ReportingUtils {
+    private static final I18n i18n = I18nFactory.getI18n(ReportingUtils.class);
 
-    private static final String FILE_URI = "file://"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String FILE_URI = "file://";
 
-    private static final String CSV_EXTENSION = ".csv"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String CSV_EXTENSION = ".csv";
 
-    private static final String PDF_EXTENSION = ".pdf"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String PDF_EXTENSION = ".pdf";
 
-    public static final String SANSSERIF_TXT = "SansSerif"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String SANSSERIF_TXT = "SansSerif";
 
     public static Font sansSerif = new Font(Font.MEDIUM, SANSSERIF_TXT, false);
 
     public static Font sansSerifBold = new Font(Font.MEDIUM, SANSSERIF_TXT,
         true);
 
-    public static final String JASPER_FILE_NAME = "BasicReport.jrxml"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String JASPER_FILE_NAME = "BasicReport.jrxml";
 
-    public static final String JASPER_FILE_EXTENSION = ".jrxml"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String JASPER_FILE_EXTENSION = ".jrxml";
 
     public static PrinterData data;
 
@@ -77,6 +86,7 @@ public class ReportingUtils {
      * 'list' should be contain [{0=value}, {1=value}...] instead of
      * [{name=value}...] (see issue #1312)
      */
+    @SuppressWarnings("nls")
     public static JasperPrint createDynamicReport(String reportName,
         List<String> description, List<String> columnInfo, List<?> list,
         boolean useIntegerProperties) throws Exception {
@@ -92,22 +102,25 @@ public class ReportingUtils {
         }
 
         String infos = StringUtils.join(description,
-            System.getProperty("line.separator")); //$NON-NLS-1$
+            System.getProperty("line.separator"));
 
         Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put("title", reportName); //$NON-NLS-1$
-        fields.put("infos", infos); //$NON-NLS-1$
+        fields.put("title", reportName);
+        fields.put("infos", infos);
         URL reportURL = ReportingUtils.class.getResource(JASPER_FILE_NAME);
         if (reportURL == null) {
-            throw new Exception(NLS.bind(
-                Messages.ReportingUtils_jasperfile_error_msg,
-                JASPER_FILE_NAME.replaceAll(JASPER_FILE_EXTENSION, ""))); //$NON-NLS-1$
+            throw new Exception(
+                // exception message.
+                i18n.tr("No report available with name {0}",
+                    JASPER_FILE_NAME.replaceAll(JASPER_FILE_EXTENSION,
+                        StringUtil.EMPTY_STRING)));
         }
         drb.setTemplateFile(reportURL.getFile());
         drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
         drb.addAutoText(
-            NLS.bind(Messages.ReportingUtils_footer_print_msg,
+            // jasper report data. {0} is a date.
+            i18n.tr("Printed on {0}",
                 DateFormatter.formatAsDateTime(new Date())),
             AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
 
@@ -128,13 +141,15 @@ public class ReportingUtils {
         return jp;
     }
 
+    @SuppressWarnings("nls")
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {
         InputStream reportStream = ReportingUtils.class
             .getResourceAsStream(reportName + JASPER_FILE_EXTENSION);
         if (reportStream == null) {
-            throw new Exception(NLS.bind(
-                Messages.ReportingUtils_jasperfile_error_msg, reportName));
+            throw new Exception(
+                // exception message.
+                i18n.tr("No report available with name {0}", reportName));
         }
         JasperDesign jdesign = JRXmlLoader.load(reportStream);
         JasperReport report = JasperCompileManager.compileReport(jdesign);
@@ -142,6 +157,7 @@ public class ReportingUtils {
             new JRBeanCollectionDataSource(list));
     }
 
+    @SuppressWarnings("nls")
     public static void saveReport(JasperPrint jasperPrint, String path)
         throws Exception {
         if (path == null)
@@ -160,7 +176,9 @@ public class ReportingUtils {
                 path));
             csvExporter.exportReport();
         } else {
-            throw new Exception(Messages.ReportingUtils_extension_error_msg);
+            throw new Exception(
+                // exception message.
+                i18n.tr("Not a valid extension. Please use 'pdf' or 'csv'."));
         }
     }
 
@@ -179,6 +197,7 @@ public class ReportingUtils {
         return service;
     }
 
+    @SuppressWarnings("nls")
     private static void printViaPrinter(PrinterData data,
         JasperPrint jasperPrint) throws Exception {
         PrintService service = getPrinterService(data);
@@ -199,14 +218,19 @@ public class ReportingUtils {
                 exporter.exportReport();
             } catch (JRException e) {
                 throw new Exception(
-                    Messages.ReportingUtils_jasper_printing_error_msg);
+                    // exception message.
+                    i18n.tr("Printing Canceled. Check your printer settings and try again."));
             }
         } else {
-            throw new Exception(NLS.bind(
-                Messages.ReportingUtils_printer_error_msg, data.name));
+            throw new Exception(
+                // exception message.
+                i18n.tr(
+                    "Error with printer - No Print Service found with name {0}",
+                    data.name));
         }
     }
 
+    @SuppressWarnings("nls")
     private static void printViaFile(PrinterData data, JasperPrint jasperPrint)
         throws Exception {
         String fileName = null;
@@ -220,8 +244,10 @@ public class ReportingUtils {
             FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
             fd.setOverwrite(true);
-            fd.setText(Messages.ReportingUtils_pdf_file_msg);
-            String[] filterExt = { "*" + PDF_EXTENSION }; //$NON-NLS-1$
+            fd.setText(
+                // dialog title.
+                i18n.tr("Print document to Pdf file."));
+            String[] filterExt = { "*" + PDF_EXTENSION };
             fd.setFilterExtensions(filterExt);
             fd.setFileName(DateFormatter.formatAsDateTime(new Date()));
             final String path = fd.open();
@@ -238,8 +264,9 @@ public class ReportingUtils {
             }
             JasperExportManager.exportReportToPdfFile(jasperPrint, fileName);
         } else {
-            throw new Exception(NLS.bind(
-                Messages.ReportingUtils_file_type_error_msg, fileName));
+            throw new Exception(
+                // exception message.
+                i18n.tr("Can't save to file type {0}", fileName));
         }
     }
 
@@ -251,6 +278,7 @@ public class ReportingUtils {
         final Holder<Exception> exception = new Holder<Exception>(null);
 
         display.syncExec(new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 Shell shell = display.getActiveShell();
@@ -269,10 +297,12 @@ public class ReportingUtils {
                             } catch (Exception e) {
                                 BgcPlugin
                                     .openAsyncError(
-                                        Messages.ReportingUtils_printing_error_title,
+                                        // dialog title.
+                                        i18n.tr("Printing Error"),
                                         null,
                                         e,
-                                        Messages.ReportingUtils_printing_error_msg);
+                                        // dialog message.
+                                        i18n.tr("Select a file location to export the printed page."));
                                 printViaFile(data, jasperPrint);
                             }
                         }

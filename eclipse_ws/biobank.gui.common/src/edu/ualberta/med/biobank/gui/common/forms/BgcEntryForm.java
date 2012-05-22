@@ -91,13 +91,14 @@ public abstract class BgcEntryForm extends BgcFormBase implements IBgcEntryForm 
         return form;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void confirm() {
         try {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().saveEditor(this, false);
         } catch (Exception e) {
-            logger.error("Can't save the form", e); //$NON-NLS-1$
+            logger.error("Can't save the form", e);
         }
     }
 

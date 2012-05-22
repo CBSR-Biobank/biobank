@@ -8,26 +8,30 @@ import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(RequestReceiveScanDialog.class);
 
-    private List<SpecimenWrapper> dispatchSpecimens;
+    private final List<SpecimenWrapper> dispatchSpecimens;
 
     public RequestReceiveScanDialog(Shell parentShell,
         final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
@@ -39,23 +43,28 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
+                @SuppressWarnings("nls")
                 @Override
                 public void run() {
                     BgcPlugin.openInformation(
-                        "Extra specimens",
-                        "Some of the specimens in this pallet were not supposed to be in this shipment.");
+                        // information dialog title
+                        i18n.tr("Extra specimens"),
+                        // information dialog message
+                        i18n.tr("Some of the specimens in this pallet were not supposed to be in this shipment."));
                 }
             });
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void receiveSpecimens(List<SpecimenWrapper> specimens) {
         try {
             dispatchSpecimens.addAll(specimens);
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
-                "Error receiving request", e);
+                // error dialog title
+                i18n.tr("Error receiving request"), e);
         }
     }
 
@@ -66,7 +75,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new TreeMap<RowColPos, PalletCell>();
         if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
             int i = 0;
             for (RequestSpecimenWrapper dsa : (currentShipment)
@@ -75,11 +85,11 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                 int col = i % 12;
                 if (row > 7)
                     break;
-                if (!RequestSpecimenState.UNAVAILABLE_STATE.isEquals(dsa
-                    .getState()))
+                if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
+                }
                 i++;
             }
         }
@@ -93,7 +103,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cell,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+            cell,
             locale);
     }
 
@@ -101,7 +112,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells,
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+            cells,
             isRescanMode, locale);
     }
 

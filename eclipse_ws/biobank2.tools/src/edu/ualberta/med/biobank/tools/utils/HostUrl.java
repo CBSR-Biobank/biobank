@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.tools.utils;
 
+@SuppressWarnings("nls")
 public class HostUrl {
 
     public static String getHostUrl(String hostname, int port) {

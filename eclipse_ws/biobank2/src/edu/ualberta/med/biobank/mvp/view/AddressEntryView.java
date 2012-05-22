@@ -59,6 +59,7 @@ public class AddressEntryView extends AbstractView implements
         return country;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void onCreate(Composite parent) {
         table = new InputTable(parent);

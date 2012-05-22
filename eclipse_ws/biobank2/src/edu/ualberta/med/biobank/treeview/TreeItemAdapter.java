@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 
 public class TreeItemAdapter implements Node {
@@ -41,7 +42,7 @@ public class TreeItemAdapter implements Node {
         case 3:
             return raw.getSpecimen().getActivityStatus().getName();
         }
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     @Override

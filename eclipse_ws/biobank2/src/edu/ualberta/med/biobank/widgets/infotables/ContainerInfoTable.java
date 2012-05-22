@@ -8,22 +8,29 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerInfoTable extends InfoTableWidget<Container> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ContainerInfoTable.class);
 
     private static class TableRowData {
         Container container;
@@ -33,22 +40,28 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         String barcode;
         Double temperature;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { label, typeNameShort,
-                status, barcode,
-                (temperature != null) ? temperature.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+            return StringUtils.join(new String[] {
+                label,
+                typeNameShort,
+                status,
+                barcode,
+                (temperature != null) ? temperature.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.ContainerInfoTable_name_label,
-        Messages.ContainerInfoTable_type_label,
-        Messages.ContainerInfoTable_status_label,
-        Messages.ContainerInfoTable_barcode_label,
-        Messages.ContainerInfoTable_temperature_label };
+        HasName.PropertyName.NAME.toString(),
+        ContainerType.NAME.singular().toString(),
+        i18n.tr("Status"),
+        Container.PropertyName.PRODUCT_BARCODE.toString(),
+        Container.PropertyName.TEMPERATURE.toString() };
 
-    private SiteAdapter siteAdapter;
+    private final SiteAdapter siteAdapter;
 
     public ContainerInfoTable(Composite parent, SiteAdapter site,
         List<Container> containers) {
@@ -65,9 +78,9 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -81,7 +94,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
                 case 4:
                     NumberFormatter.format(item.temperature);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -126,12 +139,13 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void addClickListener(
         IInfoTableDoubleClickItemListener<Container> listener) {
         doubleClickListeners.add(listener);
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText(Messages.ContainerInfoTable_edit_label);
+        mi.setText(i18n.tr("Edit"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -161,7 +175,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
     @Override
     protected Boolean canView(Container target) throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ContainerReadPermission(target.getId()));
+            new ContainerReadPermission(target));
     }
 
 }

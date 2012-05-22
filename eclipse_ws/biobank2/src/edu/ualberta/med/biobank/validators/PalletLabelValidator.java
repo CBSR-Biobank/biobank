@@ -15,18 +15,20 @@ public class PalletLabelValidator extends AbstractValidator {
      * Accept combinations of 2 letters or 2 digits or one letter and one digit.
      * Need at least 3 repetitions
      */
+    @SuppressWarnings("nls")
     private static final Pattern PATTERN = Pattern
-        .compile("^(([A-Z]{2})|([A-Z][0-9])|([0-9]{2})){3,}"); //$NON-NLS-1$
+        .compile("^(([A-Z]{2})|([A-Z][0-9])|([0-9]{2})){3,}");
 
     public PalletLabelValidator(String message) {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if (value != null && !(value instanceof String)) {
             throw new RuntimeException(
-                Messages.PalletLabelValidator_nonstring_error_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         if (value != null) {

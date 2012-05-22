@@ -11,13 +11,11 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveAction;
 import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.model.PermissionEnum;
-import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.Factory.Domain;
-import edu.ualberta.med.biobank.test.action.TestAction;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 
-public class TestRoleSaveAction extends TestAction {
+public class TestRoleSaveAction extends ActionTest {
     @Test
     public void superAdminAccess() {
         Transaction tx = session.beginTransaction();
@@ -32,7 +30,7 @@ public class TestRoleSaveAction extends TestAction {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         try {
@@ -61,7 +59,7 @@ public class TestRoleSaveAction extends TestAction {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
         User manager = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.buildMembership().setUserManager(true).create();
         tx.commit();
 
         try {

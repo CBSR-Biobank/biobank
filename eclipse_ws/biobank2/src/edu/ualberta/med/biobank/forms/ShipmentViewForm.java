@@ -4,16 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -25,8 +27,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
@@ -37,11 +42,14 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShipmentViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShipmentViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.ShipmentViewForm";
 
-    private OriginInfoWrapper originInfo = new OriginInfoWrapper(
+    private final OriginInfoWrapper originInfo = new OriginInfoWrapper(
         SessionManager.getAppService());
 
     private BgcBaseText senderLabel;
@@ -62,15 +70,16 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+    private final ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
         SessionManager.getAppService());
 
     private List<SpecimenInfo> specimens;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
-            "Invalid editor input: object of type " //$NON-NLS-1$
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         setOiInfo(adapter.getId());
         setPartName();
@@ -106,7 +115,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite client =
-            createSectionWithClient(Messages.ShipmentViewForm_specimens_title);
+            createSectionWithClient(Specimen.NAME.plural().toString());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -148,6 +157,7 @@ public class ShipmentViewForm extends BiobankViewForm {
             });
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -158,27 +168,27 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         senderLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_sender_label);
+                Dispatch.PropertyName.SENDER_CENTER.toString());
         receiverLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_receiver_label);
+                Dispatch.PropertyName.RECEIVER_CENTER.toString());
         waybillLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_waybill_label);
+                ShipmentInfo.PropertyName.WAYBILL.toString());
         shippingMethodLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_shipmethod_label);
+                ShippingMethod.NAME.singular().toString());
         if (originInfo.getShipmentInfo().getShippingMethod().needDate()) {
             departedLabel =
                 createReadOnlyLabelledField(client, SWT.NONE,
-                    Messages.ShipmentViewForm_packed_label);
+                    i18n.tr("Packed"));
         }
         boxNumberLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_boxNber_label);
+                i18n.tr("Box number"));
         dateReceivedLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                Messages.ShipmentViewForm_received_label);
+                i18n.tr("Received"));
 
         createCommentSection();
 
@@ -186,7 +196,8 @@ public class ShipmentViewForm extends BiobankViewForm {
     }
 
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -208,14 +219,15 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
         SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName() : ""); //$NON-NLS-1$
+        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName()
+            : StringUtil.EMPTY_STRING);
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());
         if (departedLabel != null) {
             setTextValue(departedLabel, shipInfo.getFormattedDatePacked());
         }
         setTextValue(shippingMethodLabel,
-            shipMethod == null ? "" : shipMethod.getName()); //$NON-NLS-1$
+            shipMethod == null ? StringUtil.EMPTY_STRING : shipMethod.getName());
 
         setTextValue(boxNumberLabel, shipInfo.getBoxNumber());
         setTextValue(dateReceivedLabel, shipInfo.getFormattedDateReceived());
@@ -231,14 +243,16 @@ public class ShipmentViewForm extends BiobankViewForm {
         specimenTable.setList(specimens);
     }
 
+    @SuppressWarnings("nls")
     private void setPartName() {
-        setPartName(NLS.bind(Messages.ShipmentViewForm_title, originInfo
+        setPartName(i18n.tr("Shipment {0}", originInfo
             .getShipmentInfo().getFormattedDateReceived()));
     }
 
+    @SuppressWarnings("nls")
     private void setFormText() {
         if (!form.isDisposed()) {
-            form.setText(NLS.bind(Messages.ShipmentViewForm_form_title,
+            form.setText(i18n.tr("Shipment received on {0} from {1}",
                 originInfo.getShipmentInfo().getFormattedDateReceived(),
                 originInfo.getCenter().getNameShort()));
         }

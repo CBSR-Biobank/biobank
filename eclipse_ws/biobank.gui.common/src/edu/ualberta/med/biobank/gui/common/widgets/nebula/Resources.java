@@ -14,11 +14,8 @@ package edu.ualberta.med.biobank.gui.common.widgets.nebula;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -52,24 +49,8 @@ class Resources {
     public static final String ICON_CALENDAR = "calendar"; //$NON-NLS-1$
     public static final String ICON_BULLET = "bullet"; //$NON-NLS-1$
 
-    private static final String BUNDLE_NAME = Resources.class.getPackage()
-        .getName() + ".messages"; //$NON-NLS-1$
-
-    private static ResourceBundle defaultBundle;
-    private static final Map<Locale, ResourceBundle> bundles = new HashMap<Locale, ResourceBundle>();
-
-    private static final Map<String, Image> images = new HashMap<String, Image>();
-
-    private static String getDefaultString(String key) {
-        if (defaultBundle == null) {
-            defaultBundle = ResourceBundle.getBundle(BUNDLE_NAME);
-        }
-        try {
-            return defaultBundle.getString(key);
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
-    }
+    private static final Map<String, Image> images =
+        new HashMap<String, Image>();
 
     public static Image getIconBullet() {
         return getImage(ICON_BULLET);
@@ -90,23 +71,4 @@ class Resources {
         }
         return img;
     }
-
-    public static String getString(String key) {
-        return getString(key, Locale.US);
-    }
-
-    @SuppressWarnings("cast")
-    public static String getString(String key, Locale locale) {
-        ResourceBundle bundle = (ResourceBundle) bundles.get(locale);
-        if (bundle == null) {
-            bundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
-            bundles.put(locale, bundle);
-        }
-        try {
-            return bundle.getString(key);
-        } catch (MissingResourceException e) {
-            return getDefaultString(key);
-        }
-    }
-
 }

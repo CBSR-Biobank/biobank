@@ -10,10 +10,12 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+@Audited
 @Entity
 @Table(name = "CONTAINER_POSITION",
     uniqueConstraints = {

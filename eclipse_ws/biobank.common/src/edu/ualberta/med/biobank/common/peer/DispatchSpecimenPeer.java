@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Dispatch;
 import java.util.Collection;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 
 public class DispatchSpecimenPeer {
 	public static final Property<Integer, DispatchSpecimen> ID = Property.create(
@@ -27,17 +28,17 @@ public class DispatchSpecimenPeer {
 			}
 		});
 
-	public static final Property<Integer, DispatchSpecimen> STATE = Property.create(
+	public static final Property<DispatchSpecimenState, DispatchSpecimen> STATE = Property.create(
 		"state" //$NON-NLS-1$
 		, DispatchSpecimen.class
-		, new TypeReference<Integer>() {}
-		, new Property.Accessor<Integer, DispatchSpecimen>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<DispatchSpecimenState>() {}
+		, new Property.Accessor<DispatchSpecimenState, DispatchSpecimen>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Integer get(DispatchSpecimen model) {
+			public DispatchSpecimenState get(DispatchSpecimen model) {
 				return model.getState();
 			}
 			@Override
-			public void set(DispatchSpecimen model, Integer value) {
+			public void set(DispatchSpecimen model, DispatchSpecimenState value) {
 				model.setState(value);
 			}
 		});

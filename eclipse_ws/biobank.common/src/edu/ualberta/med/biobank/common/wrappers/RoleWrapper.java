@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.RoleBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.RolePreDeleteChecks;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -59,15 +57,8 @@ public class RoleWrapper extends RoleBaseWrapper {
         return newRole;
     }
 
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(new RolePreDeleteChecks(this));
-
-        super.addDeleteTasks(tasks);
-    }
-
-    public void addToPermissionCollection(Collection<PermissionEnum> addedPermissions) {
+    public void addToPermissionCollection(
+        Collection<PermissionEnum> addedPermissions) {
         wrappedObject.getPermissions().addAll(addedPermissions);
     }
 

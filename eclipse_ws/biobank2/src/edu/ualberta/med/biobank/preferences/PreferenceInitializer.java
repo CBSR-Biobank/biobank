@@ -4,6 +4,7 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 
 /**
  * Class used to initialise default preference values.
@@ -19,7 +20,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
 
-        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, ""); //$NON-NLS-1$
+        store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
+            StringUtil.EMPTY_STRING);
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);

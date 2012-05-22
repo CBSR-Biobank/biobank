@@ -34,7 +34,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -42,21 +45,32 @@ import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.ReportColumn;
 
 public class ColumnSelectWidget extends Composite {
-    private static final ViewerSorter DISPLAYED_COLUMNS_VIEWER_SORTER = new DisplayedColumnsViewerSorter();
-    private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER = new DisplayedColumnsLabelProvider();
-    private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER = new AvailableColumnsLabelProvider();
-    private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER = new AvailableColumnsTreeContentProvider();
-    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root"; //$NON-NLS-1$
-    private static final Comparator<ReportColumnWrapper> REPORT_COLUMN_WRAPER_COMPARTOR = new Comparator<ReportColumnWrapper>() {
-        @Override
-        public int compare(ReportColumnWrapper rcw1, ReportColumnWrapper rcw2) {
-            return rcw1.getReportColumn().getPosition()
-                .compareTo(rcw2.getReportColumn().getPosition());
-        }
-    };
+    private static final I18n i18n = I18nFactory
+        .getI18n(ColumnSelectWidget.class);
+
+    private static final ViewerSorter DISPLAYED_COLUMNS_VIEWER_SORTER =
+        new DisplayedColumnsViewerSorter();
+    private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER =
+        new DisplayedColumnsLabelProvider();
+    private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER =
+        new AvailableColumnsLabelProvider();
+    private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER =
+        new AvailableColumnsTreeContentProvider();
+    @SuppressWarnings("nls")
+    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root";
+    private static final Comparator<ReportColumnWrapper> REPORT_COLUMN_WRAPER_COMPARTOR =
+        new Comparator<ReportColumnWrapper>() {
+            @Override
+            public int compare(ReportColumnWrapper rcw1,
+                ReportColumnWrapper rcw2) {
+                return rcw1.getReportColumn().getPosition()
+                    .compareTo(rcw2.getReportColumn().getPosition());
+            }
+        };
 
     private final ReportWrapper report;
-    private final Collection<ChangeListener<ColumnChangeEvent>> listeners = new ArrayList<ChangeListener<ColumnChangeEvent>>();
+    private final Collection<ChangeListener<ColumnChangeEvent>> listeners =
+        new ArrayList<ChangeListener<ColumnChangeEvent>>();
     private Composite container;
     private TreeViewer available;
     private TableViewer displayed;
@@ -153,13 +167,14 @@ public class ColumnSelectWidget extends Composite {
         createRepositionButtons();
     }
 
+    @SuppressWarnings("nls")
     private void createAvailableTable() {
         Composite subContainer = new Composite(container, SWT.NONE);
         subContainer.setLayout(new GridLayout(1, false));
         subContainer
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createLabel(subContainer, Messages.ColumnSelectWidget_available_label);
+        createLabel(subContainer, i18n.tr("Available Columns"));
 
         available = new TreeViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
             | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -178,13 +193,14 @@ public class ColumnSelectWidget extends Composite {
         }
     }
 
+    @SuppressWarnings("nls")
     private void createDisplayedTable() {
         Composite subContainer = new Composite(container, SWT.NONE);
         subContainer.setLayout(new GridLayout(1, false));
         subContainer
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createLabel(subContainer, Messages.ColumnSelectWidget_displayed_label);
+        createLabel(subContainer, i18n.tr("Displayed Columns"));
 
         displayed = new TableViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
             | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
@@ -211,7 +227,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); //$NON-NLS-1$
+        createLabel(subContainer, StringUtil.EMPTY_STRING);
 
         rightButton = createButton(subContainer, BgcPlugin.IMG_ARROW_RIGHT);
         leftButton = createButton(subContainer, BgcPlugin.IMG_ARROW_LEFT);
@@ -237,7 +253,7 @@ public class ColumnSelectWidget extends Composite {
         subContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
 
-        createLabel(subContainer, ""); //$NON-NLS-1$
+        createLabel(subContainer, StringUtil.EMPTY_STRING);
 
         upButton = createButton(subContainer, BgcPlugin.IMG_UP);
         downButton = createButton(subContainer, BgcPlugin.IMG_DOWN);
@@ -258,11 +274,13 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private List<ReportColumnWrapper> getSelectedDisplayColumns() {
-        List<ReportColumnWrapper> selected = new ArrayList<ReportColumnWrapper>();
+        List<ReportColumnWrapper> selected =
+            new ArrayList<ReportColumnWrapper>();
 
         ISelection selection = displayed.getSelection();
         if (selection instanceof IStructuredSelection) {
-            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            IStructuredSelection structuredSelection =
+                (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
                 Object o = it.next();
@@ -278,7 +296,8 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private List<ReportColumnWrapper> getDisplayedColumns() {
-        List<ReportColumnWrapper> displayedColumns = new ArrayList<ReportColumnWrapper>();
+        List<ReportColumnWrapper> displayedColumns =
+            new ArrayList<ReportColumnWrapper>();
         int numItems = displayed.getTable().getItemCount();
         for (int i = 0; i < numItems; i++) {
             ReportColumnWrapper wrapper = (ReportColumnWrapper) displayed
@@ -321,7 +340,8 @@ public class ColumnSelectWidget extends Composite {
         }
 
         // put the remaining items in the remaining slots and set positions
-        Queue<ReportColumnWrapper> queue = new LinkedList<ReportColumnWrapper>();
+        Queue<ReportColumnWrapper> queue =
+            new LinkedList<ReportColumnWrapper>();
         queue.addAll(all);
         queue.removeAll(selected);
         for (int i = 0; i < numItems; i++) {
@@ -346,27 +366,32 @@ public class ColumnSelectWidget extends Composite {
         return button;
     }
 
+    @SuppressWarnings("nls")
     private static Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
         label.setText(labelText);
         label.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-        label.setFont(new Font(null, "sans-serif", 8, SWT.BOLD)); //$NON-NLS-1$
+        label.setFont(new Font(null, "sans-serif", 8, SWT.BOLD));
         return label;
     }
 
     private void displayColumns(ISelection selection) {
         if (selection instanceof IStructuredSelection) {
-            List<ReportColumnWrapper> toSelect = new ArrayList<ReportColumnWrapper>();
-            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            List<ReportColumnWrapper> toSelect =
+                new ArrayList<ReportColumnWrapper>();
+            IStructuredSelection structuredSelection =
+                (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
                 Object o = it.next();
                 ReportColumnWrapper wrapper = null;
                 if (o instanceof EntityColumnWrapper) {
-                    EntityColumnWrapper entityColumnWrapper = (EntityColumnWrapper) o;
+                    EntityColumnWrapper entityColumnWrapper =
+                        (EntityColumnWrapper) o;
                     wrapper = displayColumn(entityColumnWrapper);
                 } else if (o instanceof PropertyModifierWrapper) {
-                    PropertyModifierWrapper propertyModifierWrapper = (PropertyModifierWrapper) o;
+                    PropertyModifierWrapper propertyModifierWrapper =
+                        (PropertyModifierWrapper) o;
                     wrapper = displayColumn(propertyModifierWrapper);
                 }
 
@@ -384,12 +409,15 @@ public class ColumnSelectWidget extends Composite {
 
     private void removeColumns(ISelection selection) {
         if (selection instanceof IStructuredSelection) {
-            List<EntityColumnWrapper> toSelect = new ArrayList<EntityColumnWrapper>();
-            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            List<EntityColumnWrapper> toSelect =
+                new ArrayList<EntityColumnWrapper>();
+            IStructuredSelection structuredSelection =
+                (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
-                ReportColumnWrapper reportColumnWrapper = (ReportColumnWrapper) it
-                    .next();
+                ReportColumnWrapper reportColumnWrapper =
+                    (ReportColumnWrapper) it
+                        .next();
                 EntityColumnWrapper wrapper = removeColumn(reportColumnWrapper);
                 toSelect.add(wrapper);
             }
@@ -586,7 +614,8 @@ public class ColumnSelectWidget extends Composite {
 
         private Collection<PropertyModifierWrapper> getModifiers(
             EntityColumn entityColumn) {
-            List<PropertyModifierWrapper> result = new ArrayList<PropertyModifierWrapper>();
+            List<PropertyModifierWrapper> result =
+                new ArrayList<PropertyModifierWrapper>();
 
             for (PropertyModifier modifier : entityColumn.getEntityProperty()
                 .getPropertyType().getPropertyModifiers()) {
@@ -638,7 +667,7 @@ public class ColumnSelectWidget extends Composite {
                 return ((PropertyModifierWrapper) element)
                     .getPropertyModifier().getName();
             }
-            return ""; //$NON-NLS-1$
+            return StringUtil.EMPTY_STRING;
         }
     }
 
@@ -665,7 +694,8 @@ public class ColumnSelectWidget extends Composite {
         @Override
         public Object[] getChildren(Object parentElement) {
             if (parentElement instanceof EntityColumnWrapper) {
-                EntityColumnWrapper wrapper = (EntityColumnWrapper) parentElement;
+                EntityColumnWrapper wrapper =
+                    (EntityColumnWrapper) parentElement;
                 return wrapper.getPropertyModifierCollection().toArray();
             }
             return null;
@@ -674,7 +704,8 @@ public class ColumnSelectWidget extends Composite {
         @Override
         public Object getParent(Object element) {
             if (element instanceof PropertyModifierWrapper) {
-                PropertyModifierWrapper wrapper = (PropertyModifierWrapper) element;
+                PropertyModifierWrapper wrapper =
+                    (PropertyModifierWrapper) element;
                 return wrapper.getEntityColumnWrapper();
             }
             return null;
@@ -709,10 +740,11 @@ public class ColumnSelectWidget extends Composite {
         }
     }
 
+    @SuppressWarnings("nls")
     public static String getColumnName(ReportColumn reportColumn) {
         String text = reportColumn.getEntityColumn().getName();
         if (reportColumn.getPropertyModifier() != null) {
-            text += " (" + reportColumn.getPropertyModifier().getName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+            text += " (" + reportColumn.getPropertyModifier().getName() + ")";
         }
         return text;
     }

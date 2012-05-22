@@ -13,6 +13,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
@@ -23,7 +25,10 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
  */
 
 public class SelectParentContainerDialog extends BgcBaseDialog {
-    private Collection<ContainerWrapper> containers;
+    private static final I18n i18n = I18nFactory
+        .getI18n(SelectParentContainerDialog.class);
+
+    private final Collection<ContainerWrapper> containers;
     private ComboViewer comboViewer;
     protected ContainerWrapper selectedContainer;
 
@@ -34,21 +39,28 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
         this.containers = containers;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return "Select parent container";
+        // select parent container dialog title
+        return i18n.tr("Select Parent Container");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the appropriate parent container";
+        // select parent container dialog title area message
+        return i18n.tr("Select the appropriate parent container");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Multiple parent containers are possible";
+        // select parent container dialog title area title
+        return i18n.tr("Multiple parent containers are possible");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -56,9 +68,12 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         comboViewer = getWidgetCreator().createComboViewer(contents,
-            "Select parent", containers,
+            // select parent container combo box label
+            i18n.tr("Select parent"),
+            containers,
             null,
-            "A container should be selected",
+            // parent container required validation message
+            i18n.tr("A container should be selected"),
             null, new BiobankLabelProvider());
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
@@ -69,18 +84,19 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
                 if (hasParents)
-                    text.append(" (")   
+                    text.append(" (")
                         .append(
-                            "Parents")
-                        .append(": ");   
+                            i18n.trc("Select Parent Container Option Label",
+                                "Parents"))
+                        .append(": ");
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
                     if (parent != null)
-                        text.append("; "); 
+                        text.append("; ");
                 }
                 if (hasParents)
-                    text.append(")"); 
+                    text.append(")");
                 return text.toString();
             }
         });
@@ -94,8 +110,9 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
     }
 
     private void saveSelectedContainer() {
-        selectedContainer = (ContainerWrapper) ((IStructuredSelection) comboViewer
-            .getSelection()).getFirstElement();
+        selectedContainer =
+            (ContainerWrapper) ((IStructuredSelection) comboViewer
+                .getSelection()).getFirstElement();
     }
 
     public ContainerWrapper getSelectedContainer() {

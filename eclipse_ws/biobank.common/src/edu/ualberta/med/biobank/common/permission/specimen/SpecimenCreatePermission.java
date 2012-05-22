@@ -19,7 +19,8 @@ public class SpecimenCreatePermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Study study = context.load(Study.class, studyId);
+        Study study = null;
+        if (studyId != null) study = context.get(Study.class, studyId);
         Center center = context.load(Center.class, centerId);
         return PermissionEnum.SPECIMEN_CREATE.isAllowed(context.getUser(),
             center, study);

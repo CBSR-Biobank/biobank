@@ -12,8 +12,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
@@ -24,9 +27,11 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
+    private static final I18n i18n = I18nFactory.getI18n(ClinicAdapter.class);
 
+    @SuppressWarnings("nls")
     private static final String LOGOUT_COMMAND_ID =
-        "edu.ualberta.med.biobank.commands.logout"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.commands.logout";
 
     public static final int CLINICS_BASE_NODE_ID = 0;
 
@@ -38,9 +43,10 @@ public class SessionAdapter extends AdapterBase {
 
     private BiobankApplicationService appService;
 
-    private UserWrapper user;
-    private String serverName;
+    private final UserWrapper user;
+    private final String serverName;
 
+    @SuppressWarnings("nls")
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
         UserWrapper user) {
@@ -50,7 +56,7 @@ public class SessionAdapter extends AdapterBase {
         if (user.getLogin().isEmpty()) {
             setLabel(serverName);
         } else {
-            setLabel(serverName + " [" + user.getLogin() + "]"); //$NON-NLS-1$ //$NON-NLS-2$
+            setLabel(serverName + " [" + user.getLogin() + "]");
         }
         this.serverName = serverName;
         this.user = user;
@@ -89,16 +95,17 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getTooltipTextInternal() {
         if (appService != null) {
-            return Messages.SessionAdapter_current_session_label
-                + appService.getServerVersion();
+            return i18n.tr("Current server version: {0}",
+                appService.getServerVersion());
         }
-        return ""; //$NON-NLS-1$
+        return StringUtil.EMPTY_STRING;
     }
 
     private SiteGroup getSitesGroupNode() {
@@ -127,10 +134,13 @@ public class SessionAdapter extends AdapterBase {
         return adapter;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(Messages.SessionAdapter_logout_label);
+        mi.setText(
+            // menu item label.
+            i18n.tr("Logout"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -140,7 +150,7 @@ public class SessionAdapter extends AdapterBase {
                 try {
                     handlerService.executeCommand(LOGOUT_COMMAND_ID, null);
                 } catch (Exception ex) {
-                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found"); //$NON-NLS-1$
+                    throw new RuntimeException(LOGOUT_COMMAND_ID + " not found");
                 }
             }
         });
@@ -185,11 +195,14 @@ public class SessionAdapter extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     public List<ClinicWrapper> getClinicCollection() {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.SessionAdapter_load_error_title,
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Unable to load clinics from database"),
                 e);
         }
         return null;

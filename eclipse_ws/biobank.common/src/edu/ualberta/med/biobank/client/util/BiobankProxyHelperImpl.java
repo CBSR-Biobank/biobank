@@ -46,7 +46,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         return super.convertToProxy(as, obj);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "nls" })
     @Override
     protected Object convertCollectionToProxy(ApplicationService as,
         Collection collection) {
@@ -230,6 +230,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     /**
      * Copy of ProxyHelperImpl.lazyLoad
      */
+    @SuppressWarnings("nls")
     @Override
     public Object lazyLoad(ApplicationService as, MethodInvocation invocation)
         throws Throwable {
@@ -269,14 +270,14 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                     value = null;
                 else
                     throw new Exception(
-                        "Invalid data obtained from the database for the " //$NON-NLS-1$
-                            + fieldName + " attribute of the " //$NON-NLS-1$
+                        "Invalid data obtained from the database for the "
+                            + fieldName + " attribute of the "
                             + bean.getClass().getName());
             }
 
             Class<?>[] params = new Class[] { field.getType() };
             Method setter = getMethod(bean,
-                "set" + method.getName().substring(3), params); //$NON-NLS-1$
+                "set" + method.getName().substring(3), params);
             if (setter != null && params.length == 1)
                 setter.invoke(bean, new Object[] { value });
 

@@ -17,6 +17,7 @@ public class CommentWrapper extends CommentBaseWrapper {
         super(appService, comment);
     }
 
+    @SuppressWarnings("nls")
     public static String commentListToString(List<CommentWrapper> comments) {
         StringBuilder sb = new StringBuilder();
         for (CommentWrapper comment : comments) {
@@ -26,5 +27,4 @@ public class CommentWrapper extends CommentBaseWrapper {
         if (sb.length() > 0) sb.delete(sb.length() - 2, sb.length() - 1);
         return sb.toString();
     }
-
 }

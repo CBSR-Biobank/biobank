@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 /**
@@ -22,88 +25,160 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * @author Jonathan Ferland
  * 
  */
+@SuppressWarnings("nls")
 public enum PermissionEnum implements NotAProxy, Serializable {
-    SPECIMEN_CREATE(2),
-    SPECIMEN_READ(3),
-    SPECIMEN_UPDATE(4),
-    SPECIMEN_DELETE(5),
-    SPECIMEN_LINK(6),
-    SPECIMEN_ASSIGN(7),
+    SPECIMEN_CREATE(2,
+        Loader.i18n.tr("Specimen Create")),
+    SPECIMEN_READ(3,
+        Loader.i18n.tr("Specimen Read")),
+    SPECIMEN_UPDATE(4,
+        Loader.i18n.tr("Specimen Update")),
+    SPECIMEN_DELETE(5,
+        Loader.i18n.tr("Specimen Delete")),
+    SPECIMEN_LINK(6,
+        Loader.i18n.tr("Specimen Link")),
+    SPECIMEN_ASSIGN(7,
+        Loader.i18n.tr("Specimen Assign")),
 
-    SITE_CREATE(8, Require.ALL_CENTERS),
-    SITE_READ(9),
-    SITE_UPDATE(10),
-    SITE_DELETE(11),
+    SITE_CREATE(8,
+        Loader.i18n.tr("Site Create"),
+        Require.ALL_CENTERS),
+    SITE_READ(9,
+        Loader.i18n.tr("Site Read")),
+    SITE_UPDATE(10,
+        Loader.i18n.tr("Site Update")),
+    SITE_DELETE(11,
+        Loader.i18n.tr("Site Delete")),
 
-    PATIENT_CREATE(12),
-    PATIENT_READ(13),
-    PATIENT_UPDATE(14),
-    PATIENT_DELETE(15),
-    PATIENT_MERGE(16),
+    PATIENT_CREATE(12,
+        Loader.i18n.tr("Patient Create")),
+    PATIENT_READ(13,
+        Loader.i18n.tr("Patient Read")),
+    PATIENT_UPDATE(14,
+        Loader.i18n.tr("Patient Update")),
+    PATIENT_DELETE(15,
+        Loader.i18n.tr("Patient Delete")),
+    PATIENT_MERGE(16,
+        Loader.i18n.tr("Patient Merge")),
 
-    COLLECTION_EVENT_CREATE(17),
-    COLLECTION_EVENT_READ(18),
-    COLLECTION_EVENT_UPDATE(19),
-    COLLECTION_EVENT_DELETE(20),
+    COLLECTION_EVENT_CREATE(17,
+        Loader.i18n.tr("Collection Event Create")),
+    COLLECTION_EVENT_READ(18,
+        Loader.i18n.tr("Collection Event Read")),
+    COLLECTION_EVENT_UPDATE(19,
+        Loader.i18n.tr("Collection Event Update")),
+    COLLECTION_EVENT_DELETE(20,
+        Loader.i18n.tr("Collection Event Delete")),
 
-    PROCESSING_EVENT_CREATE(21),
-    PROCESSING_EVENT_READ(22),
-    PROCESSING_EVENT_UPDATE(23),
-    PROCESSING_EVENT_DELETE(24),
+    PROCESSING_EVENT_CREATE(21,
+        Loader.i18n.tr("Processing Event Create")),
+    PROCESSING_EVENT_READ(22,
+        Loader.i18n.tr("Processing Event Read")),
+    PROCESSING_EVENT_UPDATE(23,
+        Loader.i18n.tr("Processing Event Update")),
+    PROCESSING_EVENT_DELETE(24,
+        Loader.i18n.tr("Processing Event Delete")),
 
-    ORIGIN_INFO_CREATE(25),
-    ORIGIN_INFO_READ(26),
-    ORIGIN_INFO_UPDATE(27),
-    ORIGIN_INFO_DELETE(28),
+    ORIGIN_INFO_CREATE(25,
+        Loader.i18n.tr("Origin Information Create")),
+    ORIGIN_INFO_READ(26,
+        Loader.i18n.tr("Origin Information Read")),
+    ORIGIN_INFO_UPDATE(27,
+        Loader.i18n.tr("Origin Information Update")),
+    ORIGIN_INFO_DELETE(28,
+        Loader.i18n.tr("Origin Information Delete")),
 
-    DISPATCH_CREATE(29),
-    DISPATCH_READ(30),
-    DISPATCH_CHANGE_STATE(31),
-    DISPATCH_UPDATE(32),
-    DISPATCH_DELETE(33),
+    DISPATCH_CREATE(29,
+        Loader.i18n.tr("Dispatch Create")),
+    DISPATCH_READ(30,
+        Loader.i18n.tr("Dispatch Read")),
+    DISPATCH_CHANGE_STATE(31,
+        Loader.i18n.tr("Dispatch Change State")),
+    DISPATCH_UPDATE(32,
+        Loader.i18n.tr("Dispatch Update")),
+    DISPATCH_DELETE(33,
+        Loader.i18n.tr("Dispatch Delete")),
 
-    RESEARCH_GROUP_CREATE(34, Require.ALL_CENTERS),
-    RESEARCH_GROUP_READ(35),
-    RESEARCH_GROUP_UPDATE(36),
-    RESEARCH_GROUP_DELETE(37),
+    RESEARCH_GROUP_CREATE(34,
+        Loader.i18n.tr("Research Group Create"),
+        Require.ALL_CENTERS),
+    RESEARCH_GROUP_READ(35,
+        Loader.i18n.tr("Research Group Read")),
+    RESEARCH_GROUP_UPDATE(36,
+        Loader.i18n.tr("Research Group Update")),
+    RESEARCH_GROUP_DELETE(37,
+        Loader.i18n.tr("Research Group Delete")),
 
-    STUDY_CREATE(38, Require.ALL_STUDIES),
-    STUDY_READ(39),
-    STUDY_UPDATE(40),
-    STUDY_DELETE(41),
+    STUDY_CREATE(38,
+        Loader.i18n.tr("Study Create"),
+        Require.ALL_STUDIES),
+    STUDY_READ(39,
+        Loader.i18n.tr("Study Read")),
+    STUDY_UPDATE(40,
+        Loader.i18n.tr("Study Update")),
+    STUDY_DELETE(41,
+        Loader.i18n.tr("Study Delete")),
 
-    REQUEST_CREATE(42),
-    REQUEST_READ(43),
-    REQUEST_UPDATE(44),
-    REQUEST_DELETE(45),
+    REQUEST_CREATE(42,
+        Loader.i18n.tr("Request Create")),
+    REQUEST_READ(43,
+        Loader.i18n.tr("Request Read")),
+    REQUEST_UPDATE(44,
+        Loader.i18n.tr("Request Update")),
+    REQUEST_DELETE(45,
+        Loader.i18n.tr("Request Delete")),
+    REQUEST_PROCESS(46,
+        Loader.i18n.tr("Request Process")),
 
-    REQUEST_PROCESS(46),
+    CLINIC_CREATE(47,
+        Loader.i18n.tr("Clinic Create"),
+        Require.ALL_CENTERS),
+    CLINIC_READ(48,
+        Loader.i18n.tr("Clinic Read")),
+    CLINIC_UPDATE(49,
+        Loader.i18n.tr("Clinic Update")),
+    CLINIC_DELETE(50,
+        Loader.i18n.tr("Clinic Delete")),
 
-    CLINIC_CREATE(47, Require.ALL_CENTERS),
-    CLINIC_READ(48),
-    CLINIC_UPDATE(49),
-    CLINIC_DELETE(50),
+    CONTAINER_TYPE_CREATE(52,
+        Loader.i18n.tr("Container Type Create")),
+    CONTAINER_TYPE_READ(53,
+        Loader.i18n.tr("Container Type Read")),
+    CONTAINER_TYPE_UPDATE(54,
+        Loader.i18n.tr("Container Type Update")),
+    CONTAINER_TYPE_DELETE(55,
+        Loader.i18n.tr("Container Type Delete")),
 
-    CONTAINER_TYPE_CREATE(52),
-    CONTAINER_TYPE_READ(53),
-    CONTAINER_TYPE_UPDATE(54),
-    CONTAINER_TYPE_DELETE(55),
+    CONTAINER_CREATE(56,
+        Loader.i18n.tr("Container Create")),
+    CONTAINER_READ(57,
+        Loader.i18n.tr("Container Read")),
+    CONTAINER_UPDATE(58,
+        Loader.i18n.tr("Container Update")),
+    CONTAINER_DELETE(59,
+        Loader.i18n.tr("Container Delete")),
 
-    CONTAINER_CREATE(56),
-    CONTAINER_READ(57),
-    CONTAINER_UPDATE(58),
-    CONTAINER_DELETE(59),
+    SPECIMEN_TYPE_CREATE(60,
+        Loader.i18n.tr("Specimen Type Create"),
+        Require.ALL_CENTERS, Require.ALL_STUDIES),
+    SPECIMEN_TYPE_READ(61,
+        Loader.i18n.tr("Specimen Type Read")),
+    SPECIMEN_TYPE_UPDATE(62,
+        Loader.i18n.tr("Specimen Type Update"),
+        Require.ALL_CENTERS, Require.ALL_STUDIES),
+    SPECIMEN_TYPE_DELETE(63,
+        Loader.i18n.tr("Specimen Type Delete"),
+        Require.ALL_CENTERS, Require.ALL_STUDIES),
 
-    SPECIMEN_TYPE_CREATE(60, Require.ALL_CENTERS, Require.ALL_STUDIES),
-    SPECIMEN_TYPE_READ(61),
-    SPECIMEN_TYPE_UPDATE(62, Require.ALL_CENTERS, Require.ALL_STUDIES),
-    SPECIMEN_TYPE_DELETE(63, Require.ALL_CENTERS, Require.ALL_STUDIES),
+    LOGGING(64,
+        Loader.i18n.tr("Logging")),
+    REPORTS(65,
+        Loader.i18n.tr("Reports")),
 
-    LOGGING(64),
-    REPORTS(65),
-
-    SPECIMEN_LIST(66),
-    LABEL_PRINTING(67);
+    SPECIMEN_LIST(66,
+        Loader.i18n.tr("Specimen List")),
+    LABEL_PRINTING(67,
+        Loader.i18n.tr("Label Printing"));
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
@@ -116,7 +191,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         for (PermissionEnum permissionEnum : values()) {
             PermissionEnum check = map.get(permissionEnum.getId());
             if (check != null) {
-                throw new RuntimeException("permission enum value "
+                throw new IllegalStateException("permission enum value "
                     + permissionEnum.getId() + " used multiple times");
             }
 
@@ -127,10 +202,12 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     private final Integer id;
+    private final String name;
     private final EnumSet<Require> requires;
 
-    private PermissionEnum(Integer id, Require... requires) {
+    private PermissionEnum(Integer id, String name, Require... requires) {
         this.id = id;
+        this.name = name;
         this.requires = EnumSet.of(Require.DEFAULT, requires);
     }
 
@@ -151,7 +228,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     public String getName() {
-        return name(); // TODO: localized name?
+        return name;
     }
 
     public static PermissionEnum fromId(Integer id) {
@@ -268,5 +345,9 @@ public enum PermissionEnum implements NotAProxy, Serializable {
          * returns true.
          */
         ALL_STUDIES;
+    }
+
+    public static class Loader {
+        private static final I18n i18n = I18nFactory.getI18n(Loader.class);
     }
 }

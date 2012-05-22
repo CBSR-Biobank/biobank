@@ -34,6 +34,7 @@ public class ManagerContextGetAction implements Action<ManagerContextGetOutput> 
         return PERMISSION.isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ManagerContextGetOutput run(ActionContext context)
         throws ActionException {

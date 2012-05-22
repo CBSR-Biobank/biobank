@@ -8,19 +8,26 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.osgi.util.NLS;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
@@ -39,22 +46,29 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
@@ -65,16 +79,22 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.CommentedSpecimenInfo;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
+import edu.ualberta.med.biobank.wizards.RepatientingWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(CollectionEventEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.CollectionEventEntryForm";
 
+    @SuppressWarnings("nls")
     public static final String MSG_NEW_PATIENT_VISIT_OK =
         "Creating a new patient visit record.";
 
+    @SuppressWarnings("nls")
     public static final String MSG_PATIENT_VISIT_OK =
         "Editing an existing patient visit record.";
 
@@ -86,7 +106,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    private BgcEntryFormWidgetListener listener =
+    private final BgcEntryFormWidgetListener listener =
         new BgcEntryFormWidgetListener() {
             @Override
             public void selectionChanged(MultiSelectEvent event) {
@@ -107,14 +127,19 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private CommentsInfoTable commentEntryTable;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     Map<Integer, StudyEventAttrInfo> studyAttrInfos;
 
-    private CollectionEventWrapper cevent = new CollectionEventWrapper(
+    private final CollectionEventWrapper cevent = new CollectionEventWrapper(
         SessionManager.getAppService());
 
+    protected RepatientingWizard wizard;
+
+    private BgcBaseText patientField;
+
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
@@ -137,11 +162,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         copyCEvent();
         String tabName;
         if (adapter.getId() == null) {
-            tabName = "New collection event";
+            // tab name
+            tabName = i18n.tr("New collection event");
         } else {
+            // tab name
             tabName =
-                NLS.bind("Collection Event - #{0}",
-                    ceventCopy.getVisitNumber());
+                i18n.tr("Collection Event - #{0}", ceventCopy.getVisitNumber());
         }
 
         setPartName(tabName);
@@ -173,9 +199,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         comment.setWrappedObject(new Comment());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Collection Event Information");
+        form.setText(
+            // form title
+            i18n.tr("Collection Event Information"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -186,8 +215,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.format(2).toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -199,10 +230,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            "Add a comment", null, comment, "message", null);
+            // label
+            i18n.tr("Add a comment"),
+            null, comment, "message", null);
 
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -212,24 +246,70 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Study", cevent
+            Study.NAME.format(1).toString(), cevent
                 .getPatient().getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE,
-            "Patient", cevent
-                .getPatient().getPnumber());
+        widgetCreator.createLabel(client,
+            Patient.NAME.singular().toString());
+
+        Composite c = new Composite(client, SWT.NONE);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        c.setLayoutData(gd);
+        GridLayout gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        c.setLayout(gl);
+
+        patientField =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                c,
+                BgcBaseText.class,
+                SWT.READ_ONLY,
+                null,
+                BeansObservables
+                    .observeValue(cevent,
+                        Property.concatNames(CollectionEventPeer.PATIENT,
+                            PatientPeer.PNUMBER)), null);
+        patientField.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
+
+        Button editSourceButton = new Button(c, SWT.NONE);
+        editSourceButton
+            .setText(i18n.tr("Change Source"));
+
+        toolkit.adapt(c);
+
+        editSourceButton.addListener(SWT.MouseUp, new Listener() {
+
+            @Override
+            public void handleEvent(Event event) {
+                wizard =
+                    new RepatientingWizard(
+                        SessionManager.getAppService());
+                WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
+                    wizard);
+                int res = dialog.open();
+                if (res == Status.OK) {
+                    cevent.setPatient(wizard.getPatient());
+                    comment.setMessage(wizard.getComment());
+                    setDirty(true);
+                }
+            }
+        });
 
         visitNumberText =
             (BgcBaseText) createBoundWidgetWithLabel(
                 client,
                 BgcBaseText.class,
                 SWT.NONE,
-                "Visit#",
+                CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
                 null,
                 cevent,
                 CollectionEventPeer.VISIT_NUMBER.getName(),
                 new IntegerNumberValidator(
-                    "Visit must have a number",
+                    // validation error message
+                    i18n.tr("Visit must have a number"),
                     false));
 
         visitNumberText.addSelectionChangedListener(listener);
@@ -238,10 +318,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         activityStatusComboViewer =
             createComboViewer(
                 client,
-                "Activity status",
+                ActivityStatus.NAME.format(1).toString(),
                 ActivityStatus.valuesList(),
                 cevent.getActivityStatus(),
-                "Patient visit must have an activity status",
+                // validation error message
+                i18n.tr("Patient visit must have an activity status"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -254,7 +335,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 });
 
         widgetCreator.createLabel(client,
-            "Time drawn to use \non new specimens");
+            // label
+            i18n.tr("Time drawn to use \non new specimens"));
         timeDrawnWidget =
             new DateTimeWidget(client, SWT.DATE | SWT.TIME, new Date());
         toolkit.adapt(timeDrawnWidget);
@@ -278,7 +360,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             EventAttrInfo eventAttrInfo = (adapter.getId() == null)
                 ? null : ceventInfo.eventAttrs.get(entry.getKey());
             String origValue = (eventAttrInfo == null)
-                ? "" : eventAttrInfo.attr.getValue();
+                ? StringUtil.EMPTY_STRING : eventAttrInfo.attr.getValue();
             pvCustomInfo.setValue(origValue);
             pvCustomInfo.setOrigValue(origValue);
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
@@ -286,9 +368,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimensSection() {
         Section section =
-            createSection("Source specimens");
+            createSection(SourceSpecimen.NAME.format(2).toString());
         specimensTable =
             new CEventSpecimenEntryInfoTable(section, sourceSpecimens,
                 ceventCopy, ColumnsShown.CEVENT_SOURCE_SPECIMENS);
@@ -308,7 +391,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             specimensTable.addEditSupport(studySourceSpecimens,
                 allSpecimenTypes);
             addSectionToolbar(section,
-                "Add specimens",
+                // label
+                i18n.tr("Add specimens"),
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
@@ -320,11 +404,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 });
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
-                "Error retrieving source specimens", e);
+                // dialog title
+                i18n.tr("Error retrieving source specimens"), e);
         }
         section.setClient(specimensTable);
     }
 
+    @SuppressWarnings("nls")
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
@@ -333,7 +419,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 client, BgcBaseText.class, SWT.NONE, pvCustomInfo.getLabel(),
                 null, pvCustomInfo, FormPvCustomInfo.VALUE_BIND_STRING,
                 new DoubleNumberValidator(
-                    "You should select a valid number"));
+                    // validation error message
+                    i18n.tr("You should select a valid number")));
         } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
             control =
                 createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
@@ -370,6 +457,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         return control;
     }
 
+    @SuppressWarnings("nls")
     private void updateControlForLabel(FormPvCustomInfo pvCustomInfo) {
         if ((EventAttrTypeEnum.NUMBER == pvCustomInfo.getType())
             || (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()))

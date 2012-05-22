@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
@@ -43,15 +43,15 @@ public class DispatchSpecimenWrapper extends DispatchSpecimenBaseWrapper
 
     @Override
     public DispatchSpecimenState getSpecimenState() {
-        return DispatchSpecimenState.getState(getState());
+        return getState();
     }
 
-    public void setDispatchSpecimenState(DispatchSpecimenState ds) {
-        setState(ds.getId());
+    public void setDispatchSpecimenState(DispatchSpecimenState state) {
+        setState(state);
     }
 
     @Override
     public String getStateDescription() {
-        return DispatchSpecimenState.getState(getState()).getLabel();
+        return getState().getLabel();
     }
 }

@@ -17,8 +17,12 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -32,6 +36,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * describe how a biospecimen is collected.
  * 
  */
+@Audited
 @Entity
 @Table(name = "STUDY")
 @Unique.List({
@@ -40,8 +45,15 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Empty(property = "patients", groups = PreDelete.class)
 public class Study extends AbstractBiobankModel
-    implements HasName {
+    implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Study",
+        "Studies");
 
     private String name;
     private String nameShort;
@@ -51,8 +63,6 @@ public class Study extends AbstractBiobankModel
     private Set<Site> sites = new HashSet<Site>(0);
     private Set<Comment> comments = new HashSet<Comment>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
-    private Set<Membership> memberships =
-        new HashSet<Membership>(0);
     private Set<StudyEventAttr> studyEventAttrs =
         new HashSet<StudyEventAttr>(0);
     private Set<Contact> contacts = new HashSet<Contact>(0);
@@ -67,6 +77,7 @@ public class Study extends AbstractBiobankModel
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -78,6 +89,7 @@ public class Study extends AbstractBiobankModel
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
@@ -111,6 +123,7 @@ public class Study extends AbstractBiobankModel
         this.sites = sites;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "STUDY_COMMENT",
         joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
@@ -119,10 +132,12 @@ public class Study extends AbstractBiobankModel
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -130,18 +145,9 @@ public class Study extends AbstractBiobankModel
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID", updatable = false)
-    public Set<Membership> getMemberships() {
-        return this.memberships;
-    }
-
-    public void setMemberships(Set<Membership> memberships) {
-        this.memberships = memberships;
     }
 
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")

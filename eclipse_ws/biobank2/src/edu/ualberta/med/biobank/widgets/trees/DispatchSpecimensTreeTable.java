@@ -26,9 +26,11 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -38,6 +40,10 @@ import edu.ualberta.med.biobank.forms.utils.TableGroup;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
@@ -45,6 +51,8 @@ import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 public class DispatchSpecimensTreeTable extends BgcBaseWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchSpecimensTreeTable.class);
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
@@ -52,6 +60,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
     private MenuItem editItem;
     private Menu menu;
 
+    @SuppressWarnings("nls")
     public DispatchSpecimensTreeTable(Composite parent,
         final DispatchWrapper shipment,
         final boolean editSpecimensState) {
@@ -72,23 +81,23 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         tree.setLinesVisible(true);
 
         TreeColumn tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_inventoryid_label);
+        tc.setText(Specimen.PropertyName.INVENTORY_ID.toString());
         tc.setWidth(200);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_type_label);
+        tc.setText(i18n.tr("Type"));
         tc.setWidth(100);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_pnumber_label);
+        tc.setText(Patient.PropertyName.PNUMBER.toString());
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_status_label);
+        tc.setText(ActivityStatus.NAME.singular().toString());
         tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText(Messages.DispatchSpecimensTreeTable_comment_label);
+        tc.setText(i18n.tr("Dispatch comment"));
         tc.setWidth(100);
 
         menu = new Menu(parent);
@@ -138,12 +147,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                 if (element instanceof TableGroup) {
                     if (columnIndex == 0)
                         return ((TableGroup<?>) element).getTitle();
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
                         return ((RequestContainerAdapter) element)
                             .getLabelInternal();
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 } else if (element instanceof TreeItemAdapter) {
                     if (columnIndex == 4)
                         return CommentWrapper
@@ -152,7 +161,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                     return ((TreeItemAdapter) element)
                         .getColumnText(columnIndex);
                 }
-                return ""; //$NON-NLS-1$
+                return StringUtil.EMPTY_STRING;
             }
 
             @Override
@@ -161,7 +170,7 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         };
         tv.setLabelProvider(labelProvider);
-        tv.setInput("root"); //$NON-NLS-1$
+        tv.setInput("root");
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
@@ -176,11 +185,10 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
                         .addClipboardCopySupport(tv, menu, labelProvider, 5);
 
                     if (editSpecimensState) {
-                        if (
-                        DispatchSpecimenState.getState(dsa.getState()) == DispatchSpecimenState.NONE)
+                        if (dsa.getState() == DispatchSpecimenState.NONE)
                             addSetMissingMenu(menu);
                         addModifyCommentMenu(menu);
-                        if (DispatchSpecimenState.getState(dsa.getState()) != DispatchSpecimenState.NONE)
+                        if (dsa.getState() != DispatchSpecimenState.NONE)
                             addDeleteExtraMenu(menu);
                     }
                 }
@@ -199,10 +207,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         return null;
     }
 
+    @SuppressWarnings("nls")
     protected void addModifyCommentMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_modidy_comment_label);
+        item.setText(
+            // menu item label.
+            i18n.tr("Modify comment"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -212,10 +223,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    @SuppressWarnings("nls")
     private void addSetMissingMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_set_missing_label);
+        item.setText(
+            // menu item label.
+            i18n.tr("Set as missing"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -225,10 +239,13 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         });
     }
 
+    @SuppressWarnings("nls")
     private void addDeleteExtraMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.DispatchSpecimensTreeTable_delete_label);
+        item.setText(
+            // menu item label.
+            i18n.tr("Delete"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -281,10 +298,12 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
         }
     }
 
+    @SuppressWarnings("nls")
     public void refresh() {
-        tv.setInput("refresh"); //$NON-NLS-1$
+        tv.setInput(i18n.tr("refresh"));
     }
 
+    @SuppressWarnings("nls")
     public void addClickListener() {
         tv.addDoubleClickListener(new IDoubleClickListener() {
             @Override
@@ -296,7 +315,9 @@ public class DispatchSpecimensTreeTable extends BgcBaseWidget {
             }
         });
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText(Messages.DispatchSpecimensTreeTable_edit_label);
+        editItem.setText(
+            // menu item label.
+            i18n.tr("Edit"));
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

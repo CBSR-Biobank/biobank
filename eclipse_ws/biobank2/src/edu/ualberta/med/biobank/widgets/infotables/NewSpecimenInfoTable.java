@@ -5,6 +5,8 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
@@ -13,28 +15,40 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenDeletePermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.HasCreatedAt;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(NewSpecimenInfoTable.class);
 
     public static enum ColumnsShown {
+        @SuppressWarnings("nls")
         PEVENT_SOURCE_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.SpecimenInfoTable_quantity_ml_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_study_label,
-            Messages.SpecimenInfoTable_pnumber_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            Specimen.PropertyName.INVENTORY_ID.toString(),
+            i18n.tr("Type"),
+            AbstractPosition.NAME.singular().toString(),
+            i18n.tr("Time drawn"),
+            i18n.tr("Quantity (ml)"),
+            ActivityStatus.NAME.singular().toString(),
+            Study.NAME.singular().toString(),
+            Patient.PropertyName.PNUMBER.toString(),
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
+            Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -59,13 +73,14 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                         .getPnumber();
                 case 8:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
+                    return oi == null ? StringUtil.EMPTY_STRING : oi
+                        .getCenter().getNameShort();
                 case 9:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 10:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -79,17 +94,18 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 return null;
             }
         },
+        @SuppressWarnings("nls")
         CEVENT_SOURCE_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.SpecimenInfoTable_time_drawn_label,
-            Messages.NewSpecimenInfoTable_quantity_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_worksheet_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            Specimen.PropertyName.INVENTORY_ID.toString(),
+            i18n.tr("Type"),
+            AbstractPosition.NAME.singular().toString(),
+            i18n.tr("Time drawn"),
+            AliquotedSpecimen.PropertyName.QUANTITY.toString(),
+            ActivityStatus.NAME.singular().toString(),
+            ProcessingEvent.PropertyName.WORKSHEET.toString(),
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
+            Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -108,16 +124,18 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     return row.specimen.getActivityStatus().getName();
                 case 6:
                     ProcessingEvent pe = row.specimen.getProcessingEvent();
-                    return pe == null ? "" : pe.getWorksheet(); //$NON-NLS-1$
+                    return pe == null ? StringUtil.EMPTY_STRING : pe
+                        .getWorksheet();
                 case 7:
                     OriginInfo oi = row.specimen.getOriginInfo();
-                    return oi == null ? "" : oi.getCenter().getNameShort(); //$NON-NLS-1$
+                    return oi == null ? StringUtil.EMPTY_STRING : oi
+                        .getCenter().getNameShort();
                 case 8:
                     return row.specimen.getCurrentCenter().getNameShort();
                 case 9:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -133,17 +151,18 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
             }
         },
 
+        @SuppressWarnings("nls")
         CEVENT_ALIQUOTED_SPECIMENS(new String[] {
-            Messages.SpecimenInfoTable_inventoryid_label,
-            Messages.SpecimenInfoTable_type_label,
-            Messages.SpecimenInfoTable_position_label,
-            Messages.NewSpecimenInfoTable_source_worksheet_label,
-            Messages.SpecimenInfoTable_created_label,
-            Messages.SpecimenInfoTable_quantity_ml_label,
-            Messages.SpecimenInfoTable_status_label,
-            Messages.SpecimenInfoTable_origin_center_label,
-            Messages.SpecimenInfoTable_current_center_label,
-            Messages.SpecimenInfoTable_comments_label }) {
+            Specimen.PropertyName.INVENTORY_ID.toString(),
+            i18n.tr("Type"),
+            AbstractPosition.NAME.singular().toString(),
+            i18n.tr("Source worksheet"),
+            HasCreatedAt.PropertyName.CREATED_AT.toString(),
+            i18n.tr("Quantity (ml)"),
+            ActivityStatus.NAME.singular().toString(),
+            i18n.tr("Origin Center"),
+            i18n.tr("Current Center"),
+            Comment.NAME.plural().toString() }) {
             @Override
             public String getColumnValue(SpecimenInfo row, int columnIndex) {
                 switch (columnIndex) {
@@ -171,7 +190,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 9:
                     return row.comment;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
 
@@ -202,7 +221,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
         public abstract Image getColumnImage(SpecimenInfo row, int columnIndex);
     }
 
-    private ColumnsShown currentColumnsShowns;
+    private final ColumnsShown currentColumnsShowns;
 
     public NewSpecimenInfoTable(Composite parent,
         List<SpecimenInfo> specimenCollection, ColumnsShown columnsShown,
@@ -231,9 +250,9 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     (SpecimenInfo) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 return currentColumnsShowns.getColumnValue(info, columnIndex);
             }

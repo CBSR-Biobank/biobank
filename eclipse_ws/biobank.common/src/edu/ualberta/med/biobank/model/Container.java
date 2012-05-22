@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,9 +20,14 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
@@ -35,6 +39,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * contained in a parent container.
  * 
  */
+@Audited
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
@@ -54,8 +59,29 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childPositions", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractBiobankModel {
+public class Container extends AbstractBiobankModel
+    implements HasComments, HasActivityStatus {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Container",
+        "Containers");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString LABEL = bundle.trc(
+            "model",
+            "Label").format();
+        public static final LString PRODUCT_BARCODE = bundle.trc(
+            "model",
+            "Product Barcode").format();
+        public static final LString TEMPERATURE = bundle.trc(
+            "model",
+            "Temperature").format();
+    }
 
     private String productBarcode;
     private String label;
@@ -72,6 +98,11 @@ public class Container extends AbstractBiobankModel {
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ContainerType containerType;
 
+    /**
+     * Optional.
+     * 
+     * @return
+     */
     @Column(name = "PRODUCT_BARCODE")
     public String getProductBarcode() {
         return this.productBarcode;
@@ -110,6 +141,7 @@ public class Container extends AbstractBiobankModel {
         this.path = path;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
@@ -118,6 +150,7 @@ public class Container extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
@@ -182,6 +215,7 @@ public class Container extends AbstractBiobankModel {
         this.site = site;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -189,6 +223,7 @@ public class Container extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
@@ -238,11 +273,7 @@ public class Container extends AbstractBiobankModel {
 
     @Transient
     public Container getChild(RowColPos requestedPosition) throws Exception {
-        if (getChildPositions().size() == 0) {
-            throw new Exception("container does not have children");
-        }
-
-        for (ContainerPosition pos : childPositions) {
+        for (ContainerPosition pos : getChildPositions()) {
             RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
             if (requestedPosition.equals(rcp)) {
                 return pos.getContainer();
@@ -260,11 +291,6 @@ public class Container extends AbstractBiobankModel {
      */
     @Transient
     public Container getChildByLabel(String childLabel) throws Exception {
-        ContainerType containerType = getContainerType();
-        if (containerType == null) {
-            throw new Exception("container type is null");
-        }
-
         // remove parent label from child label
         if (childLabel.startsWith(getLabel())) {
             childLabel = childLabel.substring(getLabel().length());
@@ -280,48 +306,28 @@ public class Container extends AbstractBiobankModel {
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     @Transient
     public RowColPos getPositionFromLabelingScheme(String position)
         throws Exception {
         ContainerType containerType = getContainerType();
+
+        if (containerType == null)
+            throw new IllegalStateException("container type cannot be null");
+
         RowColPos rcp = containerType.getRowColFromPositionString(position);
         if (rcp != null) {
             if (rcp.getRow() >= containerType.getRowCapacity()
                 || rcp.getCol() >= containerType.getColCapacity()) {
-                throw new Exception(
-                    MessageFormat
-                        .format(
-                            "Can''t use position {0} in container {1}. Reason: capacity = {2}*{3}",
-                            position, getFullInfoLabel(),
-                            containerType.getRowCapacity(),
-                            containerType.getColCapacity()));
-            }
-            if (rcp.getRow() < 0 || rcp.getCol() < 0) {
-                throw new Exception(
-                    MessageFormat.format(
-                        "Position ''{0}'' is invalid for this container {1}",
-                        position, getFullInfoLabel()));
+                throw new IllegalArgumentException("position " + position
+                    + " (" + rcp + ") is out of bounds of "
+                    + containerType.getCapacity());
             }
         }
         return rcp;
     }
 
-    /**
-     * @return a string with the label of this container + the short name of its
-     *         type
-     * 
-     */
-    @Transient
-    public String getFullInfoLabel() {
-        ContainerType containerType = getContainerType();
-        if ((containerType == null) || (containerType.getNameShort() == null)) {
-            return getLabel();
-        }
-        return getLabel() + " (" + containerType.getNameShort() + ")";
-    }
-
     public boolean hasSpecimens() {
         return (getSpecimenPositions().size() > 0);
     }
-
 }

@@ -4,6 +4,7 @@ import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.OptionException;
 
+@SuppressWarnings("nls")
 public class GenericAppArgs {
     public boolean help = false;
     public boolean verbose = false;

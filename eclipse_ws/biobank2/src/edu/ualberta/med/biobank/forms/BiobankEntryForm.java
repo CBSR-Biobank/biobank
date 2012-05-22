@@ -44,6 +44,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.services.ISourceProviderService;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -69,7 +71,10 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
  */
 public abstract class BiobankEntryForm extends BiobankFormBase implements
     IBgcEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(BiobankEntryForm.class);
 
+    @SuppressWarnings("nls")
     private static final String CONTEXT_ENTRY_FORM =
         "biobank.context.entryForm";
 
@@ -127,6 +132,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         // SessionManager.updateAdapterTreeNode(adapter);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
@@ -134,8 +140,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
             monitor.setCanceled(true);
             setDirty(true);
             BgcPlugin.openAsyncError(
-                "Form state",
-                "Form in invalid state, save failed.");
+                // dialog title
+                i18n.tr("Form state"),
+                // dialog message
+                i18n.tr("Form in invalid state, save failed."));
             return;
         }
         doSaveInternal(monitor);
@@ -148,12 +156,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         try {
             doBeforeSave();
             context.run(true, false, new IRunnableWithProgress() {
+                @SuppressWarnings("nls")
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
 
                     try {
-                        monitor.beginTask("Saving...",
+                        monitor.beginTask(
+                            // progress monitor message
+                            i18n.tr("Saving..."),
                             IProgressMonitor.UNKNOWN);
                         saveForm();
                         // this needs to be done there if we want the new node
@@ -244,6 +255,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
 
     abstract protected void saveForm() throws Exception;
 
+    @SuppressWarnings("nls")
     @Override
     public void setFocus() {
         super.setFocus();
@@ -428,6 +440,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         return false;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void confirm() {
         try {
@@ -465,6 +478,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void cancel() {
         try {

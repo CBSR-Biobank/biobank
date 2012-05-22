@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test_suite name="BioBank GUI Test Plan" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="testPlan.xsd">
+<test_suite
+    name="BioBank GUI Test Plan"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="testPlan.xsd">
   <test_section id="1" name="General">
     <test_section id="1" name="Server Menu">
     <test_case id="1" name="Server submenu contents" variety="positive">
       <description>
-        Validates the "Server" sub-menu contents.
+        Menu contents validation.
       </description>
       <precondition>
         Using latest client software, computer connected to network, server
         reachable, initialized database, user account exists.
       </precondition>
       <expected_result>
-        The following items in the submenu: Login, Logout, Quit.
+        The following items in the menu:
+        <ul>
+          <li>Server: Login, Logout, Quit.</li>
+          <li>Administration: Add Site, Add Clinic, Add Research Group, Add Study, Add Container Type, Add Container,
+          Edit Specimen Types, Edit Shipping Methods, User Management, Change Password</li>
+        </ul>
       </expected_result>
       <note>
         None.
@@ -21,7 +29,6 @@
       </dependency>
       <steps>
         <step>Start client software.</step>
-        <step>Select "Server" from main menu.</step>
       </steps>
     </test_case>
     <test_case id="" name="" variety="positive">

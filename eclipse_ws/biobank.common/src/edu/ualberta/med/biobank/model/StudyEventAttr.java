@@ -9,15 +9,37 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
+// TODO: test activityStatus property
+@Audited
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
 @NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
-public class StudyEventAttr extends AbstractBiobankModel {
+public class StudyEventAttr extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Study Event Attribute",
+        "Study Event Attributes");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString REQUIRED = bundle.trc(
+            "model",
+            "Required").format();
+    }
 
     private String permissible;
     private boolean required = false;
@@ -66,6 +88,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         this.study = study;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.StudyEventAttr.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -73,6 +96,7 @@ public class StudyEventAttr extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

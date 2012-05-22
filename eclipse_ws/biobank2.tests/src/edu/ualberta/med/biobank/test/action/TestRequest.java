@@ -24,17 +24,17 @@ import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestRequest extends TestAction {
+public class TestRequest extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();
@@ -152,8 +152,8 @@ public class TestRequest extends TestAction {
         specInfo = exec(specAction).getList();
         for (int i = 0; i < specInfo.size(); i++) {
             RequestSpecimen spec = (RequestSpecimen) specInfo.get(i)[0];
-            Assert.assertTrue(RequestSpecimenState.getState(spec.getState())
-                .equals(RequestSpecimenState.DISPATCHED_STATE));
+            Assert.assertTrue(RequestSpecimenState.DISPATCHED_STATE == spec
+                .getState());
         }
     }
 

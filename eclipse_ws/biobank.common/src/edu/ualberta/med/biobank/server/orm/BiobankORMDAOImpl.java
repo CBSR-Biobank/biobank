@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.orm;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
@@ -12,6 +13,7 @@ import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
 import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServiceImpl.AppServiceAction;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
@@ -26,8 +28,11 @@ import gov.nih.nci.system.dao.orm.WritableORMDAOImpl;
 import gov.nih.nci.system.query.SDKQueryResult;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.acegisecurity.context.SecurityContextHolder;
@@ -36,6 +41,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.metadata.ClassMetadata;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
@@ -49,7 +55,8 @@ import org.springframework.orm.hibernate3.HibernateCallback;
  */
 @SuppressWarnings("unused")
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
-    private static AtomicInteger nextHandleId = new AtomicInteger(0);
+    private static final Bundle bundle = new CommonBundle();
+    private static final AtomicInteger nextHandleId = new AtomicInteger(0);
     private static final HashMap<QueryHandle, QueryProcess> queryMap =
         new HashMap<QueryHandle, QueryProcess>();
 
@@ -68,6 +75,27 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             return query((AppServiceAction<?>) obj);
         }
         return super.query(request);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public List<String> getAllClassNames() {
+
+        List<String> allClassNames = new ArrayList<String>();
+        Map<String, ClassMetadata> allClassMetadata =
+            getSessionFactory().getAllClassMetadata();
+
+        for (Entry<String, ClassMetadata> entry : allClassMetadata.entrySet()) {
+            String entityName = entry.getKey();
+            ClassMetadata meta = entry.getValue();
+
+            // skip envers audit objects
+            if (!entityName.endsWith("_audit")) {
+                allClassNames.add(entityName);
+            }
+        }
+
+        return allClassNames;
     }
 
     private <T extends ActionResult> Response query(
@@ -94,6 +122,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return response;
     }
 
+    @SuppressWarnings("nls")
     protected User getCurrentUser(Session session) {
         String currentLogin = SecurityContextHolder.getContext()
             .getAuthentication().getName();
@@ -102,7 +131,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         @SuppressWarnings("unchecked")
         List<User> res = criteria.list();
         if (res.size() != 1)
-            throw new ActionException("Problem getting current user"); //$NON-NLS-1$
+            throw new ActionException(
+                bundle.tr("Unable to get the current user.").format());
         return res.get(0);
     }
 

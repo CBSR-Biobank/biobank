@@ -9,7 +9,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyEvent;
@@ -26,6 +25,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.common.action.security.UserSaveInput;
 import edu.ualberta.med.biobank.common.action.security.UserSaveOutput;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -56,10 +58,13 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserEditDialog extends AbstractSecurityEditDialog {
+    private static final I18n i18n = I18nFactory.getI18n(UserEditDialog.class);
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private static final int PASSWORD_LENGTH_MIN = 5;
 
-    private static final String MSG_PASSWORD_REQUIRED = NLS.bind(
+    @SuppressWarnings("nls")
+    // TR: password minimum length validation message
+    private static final String MSG_PASSWORD_REQUIRED = i18n.tr(
         "Passwords must be at least {0} characters long.", PASSWORD_LENGTH_MIN);
 
     private final UserWrapper userWrapper;
@@ -89,28 +94,35 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         super.createButtonsForButtonBar(parent);
 
         Button okButton = getButton(IDialogConstants.OK_ID);
-        okButton.setText("Save");
+        okButton.setText(i18n.trc("Button", "Save"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
         if (user.isNew()) {
-            return "Add User";
+            // TR: add user dialog title
+            return i18n.tr("Add User");
         }
-        return "Edit User";
+        // TR: edit user dialog title
+        return i18n.tr("Edit User");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
         if (user.isNew()) {
-            return "Add a new user";
+            // TR: add user dialog title area message
+            return i18n.tr("Add a new user");
         }
-        return "Modify an existing user's information";
+        // TR: edit user dialog title area message
+        return i18n.tr("Modify an existing user's information");
     }
 
     @Override
@@ -118,6 +130,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         return getDialogShellTitle();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
@@ -129,13 +142,12 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         tb.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createUserFields(createTabItem(tb,
-            "General", 2));
+            i18n.trc("User Edit Dialog Tab Name", "General"), 2));
 
         createMembershipsSection(createTabItem(tb,
-            "Roles and Permissions", 1));
+            i18n.trc("User Edit Dialog Tab Name", "Roles and Permissions"), 1));
 
-        createGroupsSection(createTabItem(tb,
-            "Groups", 1));
+        createGroupsSection(createTabItem(tb, Group.NAME.plural().toString(), 1));
     }
 
     private Composite createTabItem(TabFolder tb, String title, int columns) {
@@ -147,6 +159,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         return contents;
     }
 
+    @SuppressWarnings("nls")
     private void createUserFields(Composite contents) {
         int readOnly = 0;
 
@@ -158,25 +171,32 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            "Login", null, userWrapper,
+            User.PropertyName.LOGIN.toString(),
+            null, userWrapper,
             UserPeer.LOGIN.getName(), new NonEmptyStringValidator(
-                "A valid login name is required.")));
+                // TR: validation error message if login name not entered
+                i18n.tr("A valid login name is required."))));
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            "Full Name", null, userWrapper,
+            User.PropertyName.FULL_NAME.toString(),
+            null, userWrapper,
             UserPeer.FULL_NAME.getName(), new NonEmptyStringValidator(
-                "Full name of this user is required")));
+                // TR: validation error message if full name not entered
+                i18n.tr("Full name of this user is required"))));
 
         controls.add(createBoundWidgetWithLabel(contents, BgcBaseText.class,
             SWT.BORDER | readOnly,
-            "Email", null, userWrapper,
+            User.PropertyName.EMAIL_ADDRESS.toString(),
+            null, userWrapper,
             UserPeer.EMAIL.getName(), new EmailValidator(
-                "A valid email is required")));
+                // TR: validation error message if email not entered
+                i18n.tr("A valid email is required"))));
 
         Control checkbox = createBoundWidgetWithLabel(contents, Button.class,
             SWT.CHECK | readOnly,
-            "Receive bulk emails", null, userWrapper,
+            User.PropertyName.RECEIVE_BULK_EMAILS.toString(),
+            null, userWrapper,
             UserPeer.RECV_BULK_EMAILS.getName(), null);
         controls.add(checkbox);
 
@@ -211,10 +231,14 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 managerContext);
     }
 
+    @SuppressWarnings("nls")
     private void createGroupsSection(Composite contents) {
         groupsWidget = new MultiSelectWidget<Group>(contents, SWT.NONE,
-            "Available groups",
-            "Selected groups", 200) {
+            // TR: label for list of available groups to choose from combo box
+            i18n.tr("Available groups"),
+            // TR: label for list of groups chosen to choose from combo box
+            i18n.tr("Selected groups"),
+            200) {
             @Override
             protected String getTextForObject(Group node) {
                 return node.getName();
@@ -256,6 +280,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         });
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         // try saving or updating the user inside this dialog so that if there
@@ -280,8 +305,10 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 // if the User is making changes to himself, logout
                 BgcPlugin
                     .openInformation(
-                        "User Information Saved",
-                        "Your information has been successfully updated. You will be logged out and have to reconnect.");
+                        // TR: information dialog title
+                        i18n.tr("User Information Saved"),
+                        // TR: information dialog message
+                        i18n.tr("Your information has been successfully updated. You will be logged out and have to reconnect."));
 
                 LogoutHandler lh = new LogoutHandler();
                 try {
@@ -298,6 +325,7 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         }
     }
 
+    @SuppressWarnings("nls")
     private void createPasswordWidgets(Composite parent) {
         AbstractValidator passwordValidator;
         passwordValidator = new StringLengthValidator(PASSWORD_LENGTH_MIN,
@@ -306,14 +334,18 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
         if (!user.isNew()) {
             // existing users can have their password field left blank
             passwordValidator = new OrValidator(Arrays.asList(
-                new EmptyStringValidator(""), passwordValidator),
+                new EmptyStringValidator(StringUtil.EMPTY_STRING), passwordValidator),
                 MSG_PASSWORD_REQUIRED);
         }
 
         password = (BgcBaseText) createBoundWidgetWithLabel(parent,
             BgcBaseText.class, SWT.BORDER | SWT.PASSWORD,
-            (user.isNew() ? "New Password"
-                : "Password"), new String[0],
+            (user.isNew()
+                // TR: user password text box label
+                ? i18n.tr("New Password")
+                // TR: user password text box label
+                : i18n.tr("Password")),
+            new String[0],
             userWrapper, "password", passwordValidator);
 
         password.addModifyListener(new ModifyListener() {
@@ -328,12 +360,18 @@ public class UserEditDialog extends AbstractSecurityEditDialog {
                 parent,
                 BgcBaseText.class,
                 SWT.BORDER | SWT.PASSWORD,
-                (user.isNew() ? "Re-Type New Password"
-                    : "Re-Type Password"),
+                (user.isNew()
+                    // TR: confirm user password text box label
+                    ? i18n.tr("Re-Type New Password")
+                    // TR: confirm user password text box label
+                    : i18n.tr("Re-Type Password")),
                 new String[0],
                 userWrapper,
                 "password", new MatchingTextValidator(
-                    "The passwords entered do not match.", password));
+                    // TR: validaton error message if two entered passwords do
+                    // not match
+                    i18n.tr("The passwords entered do not match."),
+                    password));
 
         MatchingTextValidator.addListener(password, passwordRetyped);
     }

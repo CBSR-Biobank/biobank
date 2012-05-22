@@ -49,11 +49,11 @@ public class RequestBaseWrapper extends ModelWrapper<Request> {
     }
 
     public Date getCreated() {
-        return getProperty(RequestPeer.CREATED);
+        return getProperty(RequestPeer.CREATED_AT);
     }
 
     public void setCreated(Date created) {
-        setProperty(RequestPeer.CREATED, created);
+        setProperty(RequestPeer.CREATED_AT, created);
     }
 
     public Date getSubmitted() {

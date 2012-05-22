@@ -12,6 +12,12 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 
 /**
  * The specimens, derived from source specimens, that are collected for a study.
@@ -20,19 +26,34 @@ import org.hibernate.annotations.Type;
  * required. The aliquoted specimen states the specimen types collected by a
  * study, the number of tubes and the required volume in each tube.
  */
+@Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
-public class AliquotedSpecimen extends AbstractBiobankModel {
+public class AliquotedSpecimen extends AbstractBiobankModel
+    implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Aliquoted Specimen",
+        "Aliquoted Specimens");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString QUANTITY = bundle.trc(
+            "model",
+            "Quantity").format();
+        public static final LString VOLUME = bundle.trc(
+            "model",
+            "Volume (ml)").format();
+    }
 
     private SpecimenType specimenType;
-
     private Integer quantity;
-
     private BigDecimal volume;
-
     private Study study;
-
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
 
     /**
@@ -64,6 +85,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     /**
      * @brief The specimen type that has to be collected for the study.
      */
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -77,6 +99,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
     /**
      * The study that this aliquoted specimen belongs to.
      */
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
@@ -92,6 +115,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
      * collected. If the activity status is closed then this specimen type is no
      * longer being collected for this study.
      */
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -99,6 +123,7 @@ public class AliquotedSpecimen extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

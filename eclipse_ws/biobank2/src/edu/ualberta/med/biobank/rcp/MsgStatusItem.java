@@ -13,11 +13,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+
 public class MsgStatusItem extends ContributionItem {
 
     private CLabel label;
 
-    private String text = ""; //$NON-NLS-1$
+    private String text = StringUtil.EMPTY_STRING;
 
     private int widthHint = -1;
 

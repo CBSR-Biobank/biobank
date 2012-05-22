@@ -18,7 +18,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class MultiSelectNodeTransfer extends ByteArrayTransfer {
-    private static final MultiSelectNodeTransfer INSTANCE = new MultiSelectNodeTransfer();
+    private static final MultiSelectNodeTransfer INSTANCE =
+        new MultiSelectNodeTransfer();
 
     public static MultiSelectNodeTransfer getInstance() {
         return INSTANCE;
@@ -28,8 +29,9 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
         super();
     }
 
-    private static final String TYPE_NAME = "favorites-transfer-format:" //$NON-NLS-1$ 
-        + System.currentTimeMillis() + ":" + INSTANCE.hashCode(); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String TYPE_NAME = "favorites-transfer-format:"
+        + System.currentTimeMillis() + ":" + INSTANCE.hashCode();
 
     private static final int TYPEID = registerType(TYPE_NAME);
 
@@ -117,8 +119,9 @@ public class MultiSelectNodeTransfer extends ByteArrayTransfer {
             clazz = (Class<ModelWrapper<?>>) clazz.getSuperclass();
         }
         if (clazz != null) {
+            @SuppressWarnings("nls")
             Method setIdMethod = clazz
-                .getDeclaredMethod("setId", Integer.class); //$NON-NLS-1$
+                .getDeclaredMethod("setId", Integer.class);
             setIdMethod.setAccessible(true);
             setIdMethod.invoke(wrapper, id);
             wrapper.reload();

@@ -1,16 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.peer.SitePeer;
-import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.model.Site;
@@ -19,12 +13,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class SiteWrapper extends SiteBaseWrapper {
     private static final String TOP_CONTAINER_COLLECTION_CACHE_KEY =
         "topContainerCollection"; //$NON-NLS-1$
-    private static final String EXISTING_CHILDREN_MSG = Messages
-        .getString("SiteWrapper.existing.children.msg"); //$NON-NLS-1$
-
-    @SuppressWarnings("unused")
-    private Map<RequestState, List<RequestWrapper>> requestCollectionMap =
-        new HashMap<RequestState, List<RequestWrapper>>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -79,16 +67,5 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(true);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-        String errMsg = MessageFormat.format(EXISTING_CHILDREN_MSG, getName());
-        tasks.add(check().empty(SitePeer.CONTAINERS, errMsg));
-        tasks.add(check().empty(SitePeer.CONTAINER_TYPES, errMsg));
-        tasks.add(check().empty(SitePeer.PROCESSING_EVENTS, errMsg));
-
-        super.addDeleteTasks(tasks);
     }
 }

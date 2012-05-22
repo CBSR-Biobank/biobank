@@ -1062,16 +1062,18 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.views">
+               id="edu.ualberta.med.biobank.tfoolbar.views">
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  style="push">
+                  style="push"
+                  tooltip="Site Administration View">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processingAdmin"
                   icon="icons/processingPerspective.png"
-                  style="push">
+                  style="push"
+                  tooltip="Processing View">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
@@ -1246,21 +1248,6 @@
                   style="push"
                   tooltip="Delete Selected Item">
             </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.search"
-                  icon="icons/search.png"
-                  style="push"
-                  tooltip="Search">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
-                  icon="icons/reload.png"
-                  style="push"
-                  tooltip="Reload tree">
-            </command>
-         </toolbar>
-         <toolbar
-               id="edu.ualberta.med.biobank.views.RequestAdminView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"

@@ -7,13 +7,12 @@ import org.hibernate.Query;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction.StudiesInfo;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.model.Study;
 
-public class StudyGetAllAction implements Action<StudiesInfo> {
+public class StudyGetAllAction implements Action<ListResult<Study>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
@@ -25,23 +24,8 @@ public class StudyGetAllAction implements Action<StudiesInfo> {
         return new StudyReadPermission().isAllowed(context);
     }
 
-    public static class StudiesInfo implements ActionResult {
-        private static final long serialVersionUID = 1L;
-
-        private final ArrayList<Study> studies;
-
-        public StudiesInfo(ArrayList<Study> studys) {
-            this.studies = studys;
-        }
-
-        public ArrayList<Study> getStudies() {
-            return studies;
-        }
-
-    }
-
     @Override
-    public StudiesInfo run(ActionContext context) throws ActionException {
+    public ListResult<Study> run(ActionContext context) throws ActionException {
         Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         @SuppressWarnings("unchecked")
         List<Study> results = query.list();
@@ -51,7 +35,7 @@ public class StudyGetAllAction implements Action<StudiesInfo> {
                 if (new StudyReadPermission(s.getId()).isAllowed(context))
                     readableStudies.add(s);
         }
-        return new StudiesInfo(readableStudies);
+        return new ListResult<Study>(readableStudies);
     }
 
 }

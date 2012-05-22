@@ -14,14 +14,21 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -38,6 +45,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * types are used to build a container.
  * 
  */
+@Audited
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
@@ -57,8 +65,29 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType extends AbstractBiobankModel {
+public class ContainerType extends AbstractBiobankModel
+    implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Container Type",
+        "Container Types");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString CHILD_LABELING_SCHEME = bundle.trc(
+            "model",
+            "Child Labeling Scheme").format();
+        public static final LString DEFAULT_TEMPERATURE = bundle.trc(
+            "model",
+            "Default Temperature").format();
+        public static final LString TOP_LEVEL = bundle.trc(
+            "model",
+            "Top Level").format();
+    }
 
     private String name;
     private String nameShort;
@@ -75,22 +104,26 @@ public class ContainerType extends AbstractBiobankModel {
     private Set<ContainerType> parentContainerTypes =
         new HashSet<ContainerType>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
     @Column(name = "NAME_SHORT")
     public String getNameShort() {
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
@@ -148,6 +181,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.childContainerTypes = childContainerTypes;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -155,10 +189,12 @@ public class ContainerType extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
@@ -167,10 +203,12 @@ public class ContainerType extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
+    @Valid
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
     @Embedded
     public Capacity getCapacity() {
@@ -192,6 +230,7 @@ public class ContainerType extends AbstractBiobankModel {
         this.site = site;
     }
 
+    @NotAudited
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.childLabelingScheme.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHILD_LABELING_SCHEME_ID", nullable = false)

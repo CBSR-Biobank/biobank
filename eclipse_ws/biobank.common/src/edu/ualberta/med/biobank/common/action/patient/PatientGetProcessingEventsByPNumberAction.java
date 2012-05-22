@@ -21,8 +21,10 @@ public class PatientGetProcessingEventsByPNumberAction implements
     Action<PatientGetProcessingEventsByPNumberResult> {
     private static final long serialVersionUID = 1L;
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String PATIENT_EXISTS_HQL = 
         "SELECT 1 FROM " + Patient.class.getName() + "WHERE pnumber = ?";
+    @SuppressWarnings("nls")
     private static final String PROCESSING_EVENTS_GET_HQL =
         "SELECT distinct(processingEvent)" +
         " FROM " + Patient.class.getName() + " AS patient" +

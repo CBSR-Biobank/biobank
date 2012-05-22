@@ -11,8 +11,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -32,6 +30,8 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankSessionException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -784,7 +784,7 @@ public class TestDispatch extends TestDatabase {
 
         DispatchSpecimenState[] states = DispatchSpecimenState.values();
         for (DispatchSpecimenState state : states) {
-            ds.setState(state.getId());
+            ds.setState(state);
             Assert
                 .assertTrue(ds.getStateDescription().equals(state.getLabel()));
             Assert.assertTrue(ds.getSpecimenState().equals(state));

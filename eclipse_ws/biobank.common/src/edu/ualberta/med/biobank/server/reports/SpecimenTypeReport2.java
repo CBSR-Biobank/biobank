@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.server.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -11,20 +14,29 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeReport2 extends AbstractReport {
+    private static final Bundle bundle = new CommonBundle();
 
-    private final static String USED_SPECIMEN_TYPES_QUERY = "SELECT alqs.specimenType.nameShort," //$NON-NLS-1$
-        + "     alqs.study.nameShort" //$NON-NLS-1$
-        + (" FROM " + AliquotedSpecimen.class.getName() + " alqs ") //$NON-NLS-1$ //$NON-NLS-2$
-        + " ORDER BY alqs.specimenType.nameShort, alqs.study.nameShort"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final LString UNUSED =
+        bundle.tr("Unused").format();
 
-    private final static String NOT_USED_QUERY = "SELECT st.nameShort " //$NON-NLS-1$
-        + (" FROM " + SpecimenType.class.getName() + " st ") //$NON-NLS-1$ //$NON-NLS-2$
-        + " WHERE st not in (SELECT ss.specimenType " //$NON-NLS-1$
-        + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        + "ORDER BY st.nameShort"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private final static String USED_SPECIMEN_TYPES_QUERY =
+        "SELECT alqs.specimenType.nameShort,"
+            + "     alqs.study.nameShort"
+            + (" FROM " + AliquotedSpecimen.class.getName() + " alqs ")
+            + " ORDER BY alqs.specimenType.nameShort, alqs.study.nameShort";
 
+    @SuppressWarnings("nls")
+    private final static String NOT_USED_QUERY = "SELECT st.nameShort "
+        + (" FROM " + SpecimenType.class.getName() + " st ")
+        + " WHERE st not in (SELECT ss.specimenType "
+        + ("    FROM " + AliquotedSpecimen.class.getName() + " ss") + ")"
+        + "ORDER BY st.nameShort";
+
+    @SuppressWarnings("nls")
     public SpecimenTypeReport2(BiobankReport report) {
-        super("", report); //$NON-NLS-1$
+        super("", report);
     }
 
     @Override
@@ -48,9 +60,7 @@ public class SpecimenTypeReport2 extends AbstractReport {
             expandedResults
                 .add(new Object[] {
                     ob,
-                    Messages
-                        .getString(
-                            "SpecimenTypeSUsageImpl.unused.label", report.getLocale()) }); //$NON-NLS-1$
+                    UNUSED });
         }
         return expandedResults;
     }

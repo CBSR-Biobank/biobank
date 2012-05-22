@@ -15,27 +15,49 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.util.NullHelper;
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
 @DiscriminatorValue("BbGroup")
 @Unique(properties = "name", groups = PrePersist.class)
-public class Group extends Principal {
+public class Group extends Principal
+    implements HasName {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
+
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Group",
+        "Groups");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString DESCRIPTION = bundle.trc(
+            "model",
+            "Description").format();
+    }
 
     private String name;
     private String description;
     private Set<User> users = new HashSet<User>(0);
 
+    @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -72,7 +94,7 @@ public class Group extends Principal {
         public int compare(Group a, Group b) {
             if (a == null && b == null) return 0;
             if (a == null ^ b == null) return (a == null) ? -1 : 1;
-            return NullHelper.safeCompareTo(a.getName(), b.getName());
+            return NullUtil.cmp(a.getName(), b.getName());
         }
     }
 }

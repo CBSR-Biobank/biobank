@@ -7,6 +7,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
@@ -16,22 +18,30 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SendDispatchDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SendDispatchDialog.class);
 
-    private static final String TITLE = "Dispatching specimens";
-    private DispatchWrapper shipment;
+    @SuppressWarnings("nls")
+    // send dispatch dialog title
+    private static final String TITLE = i18n.tr("Dispatching specimens");
+
+    private final DispatchWrapper shipment;
 
     public SendDispatchDialog(Shell parentShell, DispatchWrapper shipment) {
         super(parentShell);
         this.shipment = shipment;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Fill the following fields to complete the shipment";
+        // send dispatch dialog title area message
+        return i18n.tr("Fill the following fields to complete the shipment");
     }
 
     @Override
@@ -44,6 +54,7 @@ public class SendDispatchDialog extends BgcBaseDialog {
         return TITLE;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -56,7 +67,8 @@ public class SendDispatchDialog extends BgcBaseDialog {
 
         ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
-        widgetCreator.createComboViewer(contents, "Shipping Method",
+        widgetCreator.createComboViewer(contents,
+            ShipmentInfo.PropertyName.SHIPPING_METHOD.toString(),
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
@@ -68,13 +80,17 @@ public class SendDispatchDialog extends BgcBaseDialog {
             }, new BiobankLabelProvider());
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
-            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
+            // shipping waybill text box label
+            ShipmentInfo.PropertyName.WAYBILL.toString(),
+            null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.getShipmentInfo().setPackedAt(date);
-        createDateTimeWidget(contents, "Time Packed", date, shipInfo,
+        createDateTimeWidget(contents,
+            ShipmentInfo.PropertyName.PACKED_AT.toString(),
+            date, shipInfo,
             ShipmentInfoPeer.PACKED_AT.getName(), new NotNullValidator(
-                "Packed should be set"));
+                // time packed required validation message
+                i18n.tr("Time packed must be set")));
     }
-
 }

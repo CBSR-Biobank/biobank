@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
@@ -30,7 +30,7 @@ public class DispatchHelper extends Helper {
 
         for (SpecimenInfo specInfo : ceventInfo.sourceSpecimenInfos) {
             infos.add(new DispatchSpecimenInfo(null, specInfo.specimen.getId(),
-                DispatchSpecimenState.NONE.getId()));
+                DispatchSpecimenState.NONE));
         }
 
         return infos;
@@ -38,7 +38,7 @@ public class DispatchHelper extends Helper {
 
     public static DispatchSaveInfo createSaveDispatchInfoRandom(Integer siteId,
         Integer centerId,
-        Integer state, String comment) {
+        DispatchState state, String comment) {
         return new DispatchSaveInfo(null, siteId, centerId, state, comment);
     }
 
@@ -47,7 +47,7 @@ public class DispatchHelper extends Helper {
         throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(dstCenterId,
-                srcCenterId, DispatchState.CREATION.getId(),
+                srcCenterId, DispatchState.CREATION,
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,

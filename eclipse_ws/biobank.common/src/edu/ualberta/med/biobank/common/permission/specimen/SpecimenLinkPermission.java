@@ -20,7 +20,8 @@ public class SpecimenLinkPermission implements Permission {
     @Override
     public boolean isAllowed(ActionContext context) {
         Center center = context.load(Center.class, centerId);
-        Study study = context.load(Study.class, studyId);
+        // get is intended
+        Study study = context.get(Study.class, studyId);
         return PermissionEnum.SPECIMEN_LINK.isAllowed(context.getUser(),
             center, study)
             && new SpecimenCreatePermission(centerId, studyId)

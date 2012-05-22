@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  * The email has a CSV file attached.
  */
 @Deprecated
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "nls" })
 public class Cells500Absent {
 
     private static String USAGE =

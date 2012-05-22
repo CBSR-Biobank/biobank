@@ -20,8 +20,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -32,6 +37,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * location, or repository site. See \ref Clinic, \ref Site and \ref
  * ResearchGroup.
  */
+@Audited
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -46,19 +52,35 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "dstDispatches", groups = PreDelete.class)
 })
 public class Center extends AbstractBiobankModel
-    implements HasName {
+    implements HasName, HasNameShort, HasActivityStatus, HasComments,
+    HasAddress {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Center",
+        "Centers");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString DST_DISPATCHES = bundle.trc(
+            "model",
+            "Destination Dispatches").format();
+        public static final LString SRC_DISPATCHES = bundle.trc(
+            "model",
+            "Source Dispatches").format();
+    }
 
     private String name;
     private String nameShort;
     private Address address = new Address();
     private Set<ProcessingEvent> processingEvents =
         new HashSet<ProcessingEvent>(0);
-    private Set<Membership> memberships = new HashSet<Membership>(0);
     private Set<Dispatch> srcDispatches = new HashSet<Dispatch>(0);
     private Set<Dispatch> dstDispatches = new HashSet<Dispatch>(0);
-    private Set<OriginInfo> originInfos =
-        new HashSet<OriginInfo>(0);
+    private Set<OriginInfo> originInfos = new HashSet<OriginInfo>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -69,6 +91,7 @@ public class Center extends AbstractBiobankModel
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -80,10 +103,12 @@ public class Center extends AbstractBiobankModel
         return this.nameShort;
     }
 
+    @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Center.address.NotNull}")
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "ADDRESS_ID", unique = true, nullable = false)
@@ -91,6 +116,7 @@ public class Center extends AbstractBiobankModel
         return this.address;
     }
 
+    @Override
     public void setAddress(Address address) {
         this.address = address;
     }
@@ -102,16 +128,6 @@ public class Center extends AbstractBiobankModel
 
     public void setProcessingEvents(Set<ProcessingEvent> processingEvents) {
         this.processingEvents = processingEvents;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CENTER_ID", updatable = false)
-    public Set<Membership> getMemberships() {
-        return this.memberships;
-    }
-
-    public void setMemberships(Set<Membership> memberships) {
-        this.memberships = memberships;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "senderCenter")
@@ -132,6 +148,7 @@ public class Center extends AbstractBiobankModel
         this.dstDispatches = dstDispatches;
     }
 
+    // TODO: why does this cascade exist?
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", updatable = false)
     public Set<OriginInfo> getOriginInfos() {
@@ -142,6 +159,7 @@ public class Center extends AbstractBiobankModel
         this.originInfos = originInfos;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Center.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -149,10 +167,12 @@ public class Center extends AbstractBiobankModel
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "CENTER_COMMENT",
         joinColumns = { @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) },
@@ -161,8 +181,8 @@ public class Center extends AbstractBiobankModel
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
-
 }

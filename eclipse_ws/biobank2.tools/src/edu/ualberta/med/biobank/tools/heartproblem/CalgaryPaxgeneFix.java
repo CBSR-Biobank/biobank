@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.tools.utils.HostUrl;
  * Taylor on Dec 2, 2011.
  * 
  */
+@SuppressWarnings("nls")
 @Deprecated
 public class CalgaryPaxgeneFix {
 
@@ -60,7 +61,7 @@ public class CalgaryPaxgeneFix {
         "JLLXS4WMFG0A", "AO6WKF2REFKJ", "QTJL93Q2MCWG", "HIO4ONH4ZI97",
         "98R5BYN6GM8M", "PC7T0QV8TQGA" };
 
-    private BiobankApplicationService appService;
+    private final BiobankApplicationService appService;
 
     public CalgaryPaxgeneFix(GenericAppArgs appArgs) throws Exception {
         LOGGER.debug("username: " + appArgs.username);

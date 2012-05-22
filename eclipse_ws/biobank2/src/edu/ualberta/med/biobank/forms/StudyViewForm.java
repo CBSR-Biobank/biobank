@@ -6,12 +6,13 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
@@ -27,7 +28,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.EventAttrCustom;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -42,14 +48,17 @@ import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable.ClinicContacts;
 
 public class StudyViewForm extends BiobankViewForm {
+    public static final I18n i18n = I18nFactory.getI18n(StudyViewForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.forms.StudyViewForm";
 
+    @SuppressWarnings("nls")
     private static final String DATE_PROCESSED_INFO_FIELD_NAME =
-        Messages.study_visit_info_dateProcessed;
+        i18n.tr(":Date Processed");
 
-    private StudyWrapper study =
+    private final StudyWrapper study =
         new StudyWrapper(SessionManager.getAppService());
 
     private BgcBaseText nameLabel;
@@ -72,17 +81,17 @@ public class StudyViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
+    @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         Assert
             .isTrue(
                 (adapter instanceof StudyAdapter || adapter instanceof StudyWithPatientAdapter),
-                "Invalid editor input: object of type " //$NON-NLS-1$
+                "Invalid editor input: object of type {0}"
                     + adapter.getClass().getName());
 
         updateStudyInfo();
-        setPartName(NLS
-            .bind(Messages.StudyViewForm_title, study.getNameShort()));
+        setPartName(i18n.tr("Study {0}", study.getNameShort()));
         pvCustomInfoList = new ArrayList<StudyEventAttrCustomInfo>();
     }
 
@@ -100,10 +109,11 @@ public class StudyViewForm extends BiobankViewForm {
         study.setWrappedObject(s);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
         if (study.getName() != null) {
-            form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
+            form.setText(i18n.tr("Study {0}", study.getName()));
         }
 
         GridLayout layout = new GridLayout(1, false);
@@ -116,15 +126,15 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Name");
+            HasName.PropertyName.NAME.toString());
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Name Short");
+            HasNameShort.PropertyName.NAME_SHORT.toString());
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity status");
+            ActivityStatus.NAME.singular().toString());
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_patients);
+            i18n.tr("Total {0}", Patient.NAME.plural().toString()));
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.StudyViewForm_field_label_total_cEvents);
+            i18n.tr("Total {0}", CollectionEvent.NAME.plural().toString()));
 
         createCommentsSection();
         createClinicSection();
@@ -136,7 +146,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         commentTable =
             new CommentsInfoTable(client,
                 study.getCommentCollection(false));
@@ -145,8 +156,9 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createClinicSection() {
+        @SuppressWarnings("nls")
         Composite client =
-            createSectionWithClient(Messages.StudyViewForm_clinic_title);
+            createSectionWithClient(i18n.tr("Clinic Information"));
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable
@@ -191,8 +203,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createAliquotedSpecimenSection() {
-        Section section =
-            createSection(Messages.StudyViewForm_aliquoted_specimen_title);
+        @SuppressWarnings("nls")
+        Section section = createSection(i18n.tr("Aliquoted specimen types"));
 
         aliquotedSpecimenTable =
             new AliquotedSpecimenInfoTable(section,
@@ -203,8 +215,8 @@ public class StudyViewForm extends BiobankViewForm {
     }
 
     private void createSourceSpecimenSection() {
-        Section section =
-            createSection(Messages.StudyViewForm_source_specimen_title);
+        @SuppressWarnings("nls")
+        Section section = createSection(i18n.tr("Source specimen types"));
 
         sourceSpecimenTable =
             new SourceSpecimenInfoTable(section,
@@ -214,9 +226,11 @@ public class StudyViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
+    @SuppressWarnings("nls")
     private void createStudyEventAttrSection() throws Exception {
         Composite client =
-            createSectionWithClient(Messages.StudyViewForm_visit_info_attributes_title);
+            createSectionWithClient(i18n
+                .tr("Patient Visit Information Collected"));
         client.setLayout(new GridLayout(1, false));
 
         StudyEventAttrCustomInfo combinedStudyEventAttrInfo;
@@ -241,7 +255,10 @@ public class StudyViewForm extends BiobankViewForm {
         }
 
         if (pvCustomInfoList.size() == 0) {
-            toolkit.createLabel(client, Messages.StudyViewForm_visit_info_msg);
+            toolkit
+                .createLabel(
+                    client,
+                    i18n.tr("Study does not collect additional patient visit information"));
             return;
         }
 
@@ -263,6 +280,7 @@ public class StudyViewForm extends BiobankViewForm {
         }
     }
 
+    @SuppressWarnings("nls")
     private void setStudyEventAttrValues() throws Exception {
         for (StudyEventAttrCustomInfo pvCustomInfo : pvCustomInfoList) {
             String label = pvCustomInfo.getLabel();
@@ -271,15 +289,15 @@ public class StudyViewForm extends BiobankViewForm {
                 continue;
             }
             setTextValue(pvCustomInfo.widget, StringUtils.join(
-                study.getStudyEventAttrPermissible(label), ";")); //$NON-NLS-1$
+                study.getStudyEventAttrPermissible(label), ";"));
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        setPartName(NLS
-            .bind(Messages.StudyViewForm_title, study.getNameShort()));
-        form.setText(NLS.bind(Messages.StudyViewForm_title, study.getName()));
+        setPartName(i18n.tr("Study {0}", study.getNameShort()));
+        form.setText(i18n.tr("Study {0}", study.getName()));
         setStudySectionValues();
         setStudyEventAttrValues();
         aliquotedSpecimenTable.setList(study

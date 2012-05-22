@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -23,8 +21,13 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -41,13 +44,47 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * particularly, a preparation of tissue or bodily fluid taken for examination
  * or diagnosis.
  */
+@Audited
 @Entity
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @Empty(property = "childSpecimens", groups = PreDelete.class)
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
-public class Specimen extends AbstractBiobankModel {
+public class Specimen extends AbstractBiobankModel
+    implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Specimen",
+        "Specimens");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString INVENTORY_ID = bundle.trc(
+            "model",
+            "Inventory Id").format();
+        public static final LString CHILD_SPECIMENS = bundle.trc(
+            "model",
+            "Child Specimens").format();
+        public static final LString CURRENT_CENTER = bundle.trc(
+            "model",
+            "Current Center").format();
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString PARENT_SPECIMEN = bundle.trc(
+            "model",
+            "Parent Specimen").format();
+        public static final LString QUANTITY = bundle.trc(
+            "model",
+            "Quantity").format();
+        public static final LString TOP_SPECIMEN = bundle.trc(
+            "model",
+            "Top Specimen").format();
+    }
 
     private String inventoryId;
     private BigDecimal quantity;
@@ -65,7 +102,6 @@ public class Specimen extends AbstractBiobankModel {
     private Set<RequestSpecimen> requestSpecimens =
         new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
-    @Enumerated(EnumType.STRING)
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
@@ -90,12 +126,14 @@ public class Specimen extends AbstractBiobankModel {
         this.quantity = quantity;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -182,6 +220,7 @@ public class Specimen extends AbstractBiobankModel {
         this.childSpecimens = childSpecimens;
     }
 
+    @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
@@ -190,6 +229,7 @@ public class Specimen extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
@@ -215,6 +255,7 @@ public class Specimen extends AbstractBiobankModel {
         this.originInfo = originInfo;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.activityStatus.NotNull}")
     @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
     @Type(type = "activityStatus")
@@ -222,6 +263,7 @@ public class Specimen extends AbstractBiobankModel {
         return this.activityStatus;
     }
 
+    @Override
     public void setActivityStatus(ActivityStatus activityStatus) {
         this.activityStatus = activityStatus;
     }

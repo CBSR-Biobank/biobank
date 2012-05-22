@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
 
+@SuppressWarnings("nls")
 public class TestUpgradeV131V140 {
 
     private static final String QUERY_PROPERTIES_FILE_NAME = "query.properties";

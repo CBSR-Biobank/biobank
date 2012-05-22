@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.forms.utils;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.treeview.Node;
 
 public abstract class TableGroup<T extends ModelWrapper<?>> implements Node {

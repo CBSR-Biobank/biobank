@@ -60,7 +60,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!rgInfo.comment.trim().equals("")) {
+        if (!rgInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = rg.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();

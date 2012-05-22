@@ -7,19 +7,20 @@ import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerReport1 extends AbstractReport {
 
-    private CapacityPostProcess rowPostProcess;
+    private final CapacityPostProcess rowPostProcess;
 
     // @formatter:off
+    @SuppressWarnings("nls")
     private static final String QUERY = 
-        "select (select c.label || '(' || c.containerType.nameShort || ')' from " //$NON-NLS-1$
+        "select (select c.label || '(' || c.containerType.nameShort || ')' from " 
         + Container.class.getName()
-        + " c where c.id=substr(c2.path, 1, locate('/', c2.path)-1)), " //$NON-NLS-1$
-        + "sum(c2.containerType.capacity.rowCapacity " //$NON-NLS-1$
-        + "* c2.containerType.capacity.colCapacity), " //$NON-NLS-1$
-        + "sum(c2.specimenPositions.size) from " //$NON-NLS-1$
+        + " c where c.id=substr(c2.path, 1, locate('/', c2.path)-1)), " 
+        + "sum(c2.containerType.capacity.rowCapacity " 
+        + "* c2.containerType.capacity.colCapacity), " 
+        + "sum(c2.specimenPositions.size) from " 
         + Container.class.getName()
-        + " c2 where c2.containerType.specimenTypes.size > 0 " //$NON-NLS-1$
-        + " group by substr(c2.path, 1, locate('/', c2.path)-1)"; //$NON-NLS-1$
+        + " c2 where c2.containerType.specimenTypes.size > 0 " 
+        + " group by substr(c2.path, 1, locate('/', c2.path)-1)"; 
     // @formatter:on
 
     public ContainerReport1(BiobankReport report) {

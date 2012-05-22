@@ -11,17 +11,13 @@
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
 		<property name="c3p0.timeout">5000</property>
-		
-		<!-- ZERO because when hibernate calls `result = conn.prepareStatement( sql );` (in 
-		AbstractBatcher) a PreparedStatement is returned by c3p0 that already has batches in
-		it, so, if it was executed immediately, it would already insert rows, even
-		though we never told it to add any, see this bug:
-		http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=25357&atid=383690
-		
-		Possible fixes are for us to call clearBatch() on the ps, or to use another 
-		connection pooler -->
+		<!-- ZERO because when hibernate calls `result = conn.prepareStatement( 
+			sql );` (in AbstractBatcher) a PreparedStatement is returned by c3p0 that 
+			already has batches in it, so, if it was executed immediately, it would already 
+			insert rows, even though we never told it to add any, see this bug: http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=25357&atid=383690 
+			Possible fixes are for us to call clearBatch() on the ps, or to use another 
+			connection pooler -->
 		<property name="c3p0.max_statements">0</property>
-		
 		<property name="c3p0.idle_test_period">3000</property>
 		<property name="c3p0.acquire_increment">2</property>
 		<property name="c3p0.validate">false</property>
@@ -33,15 +29,23 @@
 		<property name="jdbc.use_streams_for_binary">true</property>
 		<property name="cache.use_query_cache">false</property>
 		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
-
+		<!-- Envers properties -->
+		<property name="org.hibernate.envers.audit_table_suffix">_audit</property>
+		<property name="org.hibernate.envers.revision_field_name">REVISION</property>
+		<property name="org.hibernate.envers.revision_type_field_name">REVISION_TYPE</property>
+		<!-- Note that as of 3.6.10 the following configuration options were added 
+			and should be regarded as experimental only... -->
+		<property name="org.hibernate.envers.audit_strategy">org.hibernate.envers.strategy.ValidityAuditStrategy</property>
+		<property
+			name="org.hibernate.envers.audit_strategy_validity_end_rev_field_name">END_REVISION</property>
+		<property
+			name="org.hibernate.envers.audit_strategy_validity_revend_timestamp_field_name">END_REVISION_TIME</property>
 		<!-- Turn off default Hibernate Bean Validator, only apply constraints 
 			to the database schema when generated with Hibernate -->
 		<property name="javax.persistence.validation.mode">ddl</property>
-
-		<!-- Mapped package loads package-info.java, which contains package-wide
-		information, such as, @TypeDefs -->
+		<!-- Mapped package loads package-info.java, which contains package-wide 
+			information, such as, @TypeDefs -->
 		<mapping package="edu.ualberta.med.biobank.model" />
-
 		<!-- Mapped classes -->
 		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.Address" />
@@ -85,6 +89,8 @@
 		<mapping class="edu.ualberta.med.biobank.model.Request" />
 		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.ResearchGroup" />
+		<mapping class="edu.ualberta.med.biobank.model.Revision" />
+		<mapping class="edu.ualberta.med.biobank.model.RevisionEntityType" />
 		<mapping class="edu.ualberta.med.biobank.model.Role" />
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentInfo" />
 		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" />
@@ -108,14 +114,27 @@
 		</event>
 		<event type="pre-collection-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
 		</event>
 		<event type="pre-collection-recreate">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 		</event>
 		<event type="pre-collection-remove">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+		</event>
+		<event type="post-insert">
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+		</event>
+		<event type="post-update">
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+		</event>
+		<event type="post-delete">
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+		</event>
+		<event type="post-collection-recreate">
+			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
 		</event>
 	</session-factory>
 </hibernate-configuration>
 
-        

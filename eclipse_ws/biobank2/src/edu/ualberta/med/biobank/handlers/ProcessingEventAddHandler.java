@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
@@ -39,8 +40,8 @@ public class ProcessingEventAddHandler extends LogoutSensitiveHandler {
                         new ProcessingEventCreatePermission(SessionManager
                             .getUser().getCurrentWorkingCenter().getId()));
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
         }
         return allowed;
     }

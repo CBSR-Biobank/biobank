@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -51,7 +51,7 @@ public class RequestWrapper extends RequestBaseWrapper {
     public void flagSpecimens(List<RequestSpecimenWrapper> scanned)
         throws Exception {
         for (RequestSpecimenWrapper a : scanned) {
-            a.setState(RequestSpecimenState.PULLED_STATE.getId());
+            a.setState(RequestSpecimenState.PULLED_STATE);
             a.persist();
         }
         cache.put(NON_PROCESSED_SPECIMENS_CACHE_KEY, null);
@@ -84,7 +84,7 @@ public class RequestWrapper extends RequestBaseWrapper {
                 for (RequestSpecimenWrapper dsa : children) {
                     boolean hasState = false;
                     for (RequestSpecimenState state : states) {
-                        if (state.getId().equals(dsa.getState())) {
+                        if (state.equals(dsa.getState())) {
                             hasState = true;
                             break;
                         }

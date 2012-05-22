@@ -8,24 +8,29 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
-public class ContainerLabelingScheme extends AbstractBiobankModel {
+public class ContainerLabelingScheme extends AbstractBiobankModel
+    implements HasName {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("nls")
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
+    @SuppressWarnings("nls")
     public static final String CBSR_2_CHAR_LABELLING_PATTERN =
         "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
+    @SuppressWarnings("nls")
     public static final String TWO_CHAR_LABELLING_PATTERN =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; //$NON-NLS-1$
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     private String name;
     private Integer minChars;
@@ -34,11 +39,13 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
     private Integer maxCols;
     private Integer maxCapacity;
 
+    @Override
     @Column(name = "NAME", length = 50, unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -228,11 +235,13 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
      * get the RowColPos in the given container corresponding to the given label
      * AB and will return 1:0.
      */
+    @SuppressWarnings("nls")
     public RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
-        int colCap, String containerTypeName) throws Exception {
+        int colCap, String containerTypeName)
+        throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new Exception(
+            throw new IllegalArgumentException(
                 MessageFormat.format("Label should be {0} characters.",
                     getMinChars()));
         }
@@ -242,7 +251,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
         int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
             .charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
-            throw new Exception(
+            throw new IllegalArgumentException(
                 "Invalid characters in label. Are they in upper case?");
         }
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
@@ -262,7 +271,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
             String msgMax = MessageFormat.format(
                 "Max value is {0}. (Max row: {1}. Max col: {2}.)", maxValue,
                 rowCap, colCap);
-            throw new BiobankCheckException(msgStart + " " + msgMax);
+            throw new IllegalArgumentException(msgStart + " " + msgMax);
         }
         Integer row = pos % rowCap;
         Integer col = pos / rowCap;
@@ -274,8 +283,9 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
      * Get the RowColPos in the given container corresponding to the given label
      * using the 2 char numeric labelling.
      */
+    @SuppressWarnings("nls")
     public RowColPos twoCharNumericToRowCol(String label, int totalRows)
-        throws Exception {
+        throws IllegalArgumentException {
         String errorMsg =
             MessageFormat
                 .format("Label {0} is incorrect: it should be 2 characters",
@@ -283,7 +293,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
         int len = label.length();
 
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new Exception(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
 
         try {
@@ -294,7 +304,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
             RowColPos rowColPos = new RowColPos(row, col);
             return rowColPos;
         } catch (NumberFormatException nbe) {
-            throw new Exception(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
     }
 
@@ -304,17 +314,19 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     public RowColPos dewarToRowCol(String label, int totalCol)
-        throws Exception {
+        throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new Exception(
+            throw new IllegalArgumentException(
                 MessageFormat.format("Label should be {0} characters.",
                     getMinChars()));
         }
 
         if (label.charAt(0) != label.charAt(1)) {
-            throw new Exception("Label should be double letter (BB).");
+            throw new IllegalArgumentException(
+                "Label should be double letter (BB).");
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
@@ -328,9 +340,12 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
      * Get the rowColPos corresponding to the given CBSR SBS 2 char string
      * position. Could be A2 or F9. (CBSR SBS skip I and O)
      */
-    public RowColPos cbsrSbsToRowCol(String pos) throws Exception {
+    @SuppressWarnings("nls")
+    public RowColPos cbsrSbsToRowCol(String pos)
+        throws IllegalArgumentException {
         if ((pos.length() != getMinChars()) && (pos.length() != getMaxChars())) {
-            throw new Exception("binPos has an invalid length: " + pos);
+            throw new IllegalArgumentException("binPos has an invalid length: "
+                + pos);
         }
         int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
@@ -341,11 +356,13 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
      * get the RowColPos in the given container corresponding to the given label
      * AB and will return 1:0.
      */
+    @SuppressWarnings("nls")
     public RowColPos twoCharToRowCol(String label, int rowCap, int colCap,
-        String containerTypeName) throws Exception {
+        String containerTypeName)
+        throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new Exception(
+            throw new IllegalArgumentException(
                 MessageFormat.format("Label should be {0} characters.",
                     getMinChars()));
         }
@@ -353,7 +370,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
         int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
         int index2 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
-            throw new Exception(
+            throw new IllegalArgumentException(
                 "Invalid characters in label. Are they in upper case?");
         }
         int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
@@ -373,7 +390,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel {
             String msgMax = MessageFormat.format(
                 "Max value is {0}. (Max row: {1}. Max col: {2}.)", maxValue,
                 rowCap, colCap);
-            throw new BiobankCheckException(msgStart + " " + msgMax); //$NON-NLS-1$
+            throw new IllegalArgumentException(msgStart + " " + msgMax); //$NON-NLS-1$
         }
         Integer row = pos % rowCap;
         Integer col = pos / rowCap;

@@ -7,13 +7,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportFactory {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     public static AbstractReport createReport(BiobankReport report)
         throws ApplicationException {
         try {
             String reportClass = BiobankReport.EDITOR_PATH.concat(report
-                .getClassName().concat("Impl")); //$NON-NLS-1$
-            reportClass = reportClass.replace(".editors", ".server.reports"); //$NON-NLS-1$ //$NON-NLS-2$
+                .getClassName().concat("Impl"));
+            reportClass = reportClass.replace(".editors", ".server.reports");
             Class<AbstractReport> clazz = (Class<AbstractReport>) Class
                 .forName(reportClass);
             Constructor<AbstractReport> constructor = clazz

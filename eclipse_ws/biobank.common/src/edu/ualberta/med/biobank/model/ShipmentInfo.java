@@ -10,10 +10,44 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
+@Audited
 @Entity
 @Table(name = "SHIPMENT_INFO")
 public class ShipmentInfo extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Shipment Information",
+        "Shipment Information");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString BOX_NUMBER = bundle.trc(
+            "model",
+            "Box Number").format();
+        public static final LString PACKED_AT = bundle.trc(
+            "model",
+            "Time Packed").format();
+        public static final LString RECEIVED_AT = bundle.trc(
+            "model",
+            "Received At").format();
+        public static final LString SHIPPING_METHOD = bundle.trc(
+            "model",
+            "Shipping Method").format();
+        public static final LString WAYBILL = bundle.trc(
+            "model",
+            "Waybill").format();
+    }
 
     private Date receivedAt;
     private Date packedAt;

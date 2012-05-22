@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import junit.framework.Assert;
 
 import org.junit.Before;
@@ -39,12 +37,11 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.Al
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ModelIsUsedException;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestProcessingEvent extends TestAction {
+public class TestProcessingEvent extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();
@@ -120,6 +117,9 @@ public class TestProcessingEvent extends TestAction {
                     new HashSet<Integer>()))
                 .getId();
 
+        // sourceSpecs.get(0) will have its activity status set to closed now
+        sourceSpecs.get(0).specimen.setActivityStatus(ActivityStatus.CLOSED);
+
         // create aliquoted specimens by doing a scan link
         Set<AliquotedSpecimenInfo> aliquotedSpecimenInfos =
             new HashSet<AliquotedSpecimenInfo>();
@@ -180,28 +180,6 @@ public class TestProcessingEvent extends TestAction {
                 specimenInfo.specimen.getCollectionEvent().getPatient()
                     .getStudy().getName());
 
-        }
-    }
-
-    @Test
-    public void saveSameWorksheet() throws Exception {
-        String worksheet = Utils.getRandomString(50);
-        Date date = Utils.getRandomDate();
-        exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, date, worksheet,
-            ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>(), new HashSet<Integer>()));
-
-        // try to save another pevent with the same worksheet
-        try {
-            exec(new ProcessingEventSaveAction(null,
-                provisioning.siteId, new Date(), worksheet,
-                ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(), new HashSet<Integer>()));
-            Assert
-                .fail("should not be able to use the same worksheet to 2 different pevents");
-        } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
         }
     }
 
@@ -313,7 +291,7 @@ public class TestProcessingEvent extends TestAction {
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");
-        } catch (ModelIsUsedException e) {
+        } catch (Exception e) {
             Assert.assertTrue(true);
         }
 

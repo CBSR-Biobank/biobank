@@ -1,14 +1,17 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.mvp.presenter.impl.StudyEntryPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ListField;
@@ -24,6 +27,8 @@ import edu.ualberta.med.biobank.mvp.view.util.InputTable;
 
 public class StudyEntryFormView extends AbstractEntryFormView implements
     StudyEntryPresenter.View {
+    private static final I18n i18n = I18nFactory
+        .getI18n(StudyEntryFormView.class);
 
     private final TextBox name = new TextBox();
     private final TextBox nameShort = new TextBox();
@@ -133,24 +138,25 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         return aqSpcsTranslator;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
         this.baseForm = baseForm;
-        baseForm.setTitle(Messages.StudyEntryForm_main_title);
-        editor.setPartName(NLS.bind(Messages.StudyEntryForm_title_edit,
-            nameShort.getValue()));
+        baseForm.setTitle(i18n.tr("Study information"));
+        editor.setPartName(i18n.tr("Study {0}", nameShort.getValue()));
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        name.setValidationControl(table.addLabel("name"));
+        name.setValidationControl(table.addLabel(HasName.PropertyName.NAME
+            .toString()));
         name.setText(table.addText());
 
         nameShort.setValidationControl(table.addLabel("nameShort"));
         nameShort.setText(table.addText());
 
         // TODO: what about ValidationControl?
-        table.addLabel("activityStatus");
+        table.addLabel(ActivityStatus.NAME.singular().toString());
         activityStatusComboView.create(table);
 
         // appService = SessionManager.getAppService();
@@ -224,9 +230,10 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         // aqSpcWrappers.setTable(aliquotedSpecimenTable);
     }
 
+    @SuppressWarnings("nls")
     private void createStudyEventAttrSection() {
         Composite client = baseForm.createSectionWithClient(
-            Messages.StudyEntryForm_visit_info_title);
+            "Patient Visit Information Collected");
         baseForm.getToolkit().createLabel(client,
             "Select the information that is collected from a patient during a "
                 + "collection event.");
@@ -234,6 +241,7 @@ public class StudyEntryFormView extends AbstractEntryFormView implements
         // TODO this needs implementation
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String getOkMessage() {
         return "Everything is A-Okay";

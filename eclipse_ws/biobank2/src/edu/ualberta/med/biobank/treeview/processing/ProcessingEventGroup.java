@@ -11,32 +11,30 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ProcessingEventGroup extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ProcessingEventGroup.class);
 
-    private boolean createAllowed;
+    private final boolean createAllowed;
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
         super(parent, id, name, true);
-        try {
-            this.createAllowed =
-                SessionManager.getAppService().isAllowed(
-                    new ProcessingEventCreatePermission(SessionManager
-                        .getUser()
-                        .getCurrentWorkingCenter().getId()));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error", "Unable to retrieve permissions");
-        }
+
+        this.createAllowed = isAllowed(
+            new ProcessingEventCreatePermission(SessionManager
+                .getUser()
+                .getCurrentWorkingCenter().getId()));
     }
 
     @Override
@@ -44,11 +42,12 @@ public class ProcessingEventGroup extends AdapterBase {
         performExpand();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (createAllowed) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(Messages.ProcessingEventGroup_pevent_add_label);
+            mi.setText(i18n.tr("Add processing event"));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

@@ -9,20 +9,20 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     private static final long serialVersionUID = 1L;
 
-    private DispatchState state;
-    private Integer centerId;
-    private Boolean isSender;
-    private Boolean noErrors;
+    private final DispatchState state;
+    private final Integer centerId;
+    private final Boolean isSender;
+    private final Boolean noErrors;
 
     private static String DISPATCH_HQL_STATE_SELECT =
         "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d" //$NON-NLS-1$ //$NON-NLS-2$
@@ -76,13 +76,13 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
         qryBuf.append(NO_ERRORS_HQL);
 
         Query q = context.getSession().createQuery(qryBuf.toString());
-        q.setParameter(0, state.getId());
+        q.setParameter(0, state);
         q.setParameter(1, centerId);
 
         ArrayList<Dispatch> dispatches = new ArrayList<Dispatch>();
 
         Query query = context.getSession().createQuery(qryBuf.toString());
-        query.setParameter(0, state.getId());
+        query.setParameter(0, state);
         query.setParameter(1, centerId);
 
         @SuppressWarnings("unchecked")

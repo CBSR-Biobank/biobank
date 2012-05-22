@@ -8,28 +8,41 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenReport1Editor extends ReportsEditor {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenReport1Editor.class);
 
+    @SuppressWarnings("nls")
     public static String ID =
-        "edu.ualberta.med.biobank.editors.FTAReportEditor"; 
+        "edu.ualberta.med.biobank.editors.SpecimenReport1Editor";
+
+    private static final String STUDY_PARAM = Study.NAME.format(1).toString();
+    @SuppressWarnings("nls")
+    // label
+    private static final String DATE_PARAM = i18n.tr("After Date (Drawn)");
 
     private ComboViewer studyCombo;
     private DateTimeWidget afterDate;
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        studyCombo = createStudyComboOption(
-            "Study", parent);
+        studyCombo = createStudyComboOption(STUDY_PARAM, parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
-            "After Date (Drawn)", null, null, null,
-            SWT.DATE);
+            DATE_PARAM, null, null, null, SWT.DATE);
     }
 
     @Override
@@ -58,21 +71,25 @@ public class SpecimenReport1Editor extends ReportsEditor {
         return combo;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number",
-            "Date Drawn",
-            "Inventory Id",
-            "Specimen Type",
-            "Site",
-            "Location" };
+        return new String[] {
+            Patient.PropertyName.PNUMBER.toString(),
+            // table column name
+            i18n.tr("Date Drawn"),
+            Specimen.PropertyName.INVENTORY_ID.toString(),
+            SpecimenType.NAME.format(1).toString(),
+            Site.NAME.format(1).toString(),
+            // table column name
+            i18n.tr("Location") };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> names = new ArrayList<String>();
-        names.add("Study");
-        names.add("After Date (Drawn)");
+        names.add(STUDY_PARAM);
+        names.add(DATE_PARAM);
         return names;
     }
 

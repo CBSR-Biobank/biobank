@@ -16,8 +16,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -36,13 +41,32 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * the purpose to receive medical care when necessary.
  * 
  */
+@Audited
 @Entity
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
 @Empty(property = "collectionEvents", groups = PreDelete.class)
-public class Patient extends AbstractBiobankModel {
+public class Patient extends AbstractBiobankModel
+    implements HasCreatedAt, HasComments {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Patient",
+        "Patients");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString PNUMBER = bundle.trc(
+            "model",
+            "Patient Number").format();
+    }
 
     private String pnumber;
     private Date createdAt;
@@ -61,12 +85,14 @@ public class Patient extends AbstractBiobankModel {
         this.pnumber = pnumber;
     }
 
+    @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
     }
 
+    @Override
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
@@ -91,6 +117,7 @@ public class Patient extends AbstractBiobankModel {
         this.study = study;
     }
 
+    @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
@@ -99,6 +126,7 @@ public class Patient extends AbstractBiobankModel {
         return this.comments;
     }
 
+    @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }

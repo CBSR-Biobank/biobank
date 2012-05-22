@@ -44,6 +44,7 @@ public class AddressEntryPresenter extends AbstractPresenter<View>
         super(view, eventBus);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void onBind() {
         state.add(view);

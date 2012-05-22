@@ -6,9 +6,9 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestStateChangeAction implements Action<EmptyResult> {
 
@@ -34,7 +34,7 @@ public class RequestStateChangeAction implements Action<EmptyResult> {
     public EmptyResult run(ActionContext context) throws ActionException {
         for (Integer id : rSpecIds) {
             RequestSpecimen rs = context.get(RequestSpecimen.class, id);
-            rs.setState(state.getId());
+            rs.setState(state);
             context.getSession().saveOrUpdate(rs);
         }
         return new EmptyResult();

@@ -11,18 +11,21 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 
 public class PostalCodeValidator extends AbstractValidator {
 
-    private static final Pattern pattern = Pattern
-        .compile("^[abceghjklmnprstvxyABCEGHJKLMNPRSTVXY]\\d[a-zA-Z]-?\\d[a-zA-Z]\\d$"); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final Pattern pattern =
+        Pattern
+            .compile("^[abceghjklmnprstvxyABCEGHJKLMNPRSTVXY]\\d[a-zA-Z]-?\\d[a-zA-Z]\\d$");
 
     public PostalCodeValidator(String message) {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                Messages.PostalCodeValidator_nonstring_error_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         String v = (String) value;

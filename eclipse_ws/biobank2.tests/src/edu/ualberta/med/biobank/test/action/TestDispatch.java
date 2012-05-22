@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.validation.ConstraintViolationException;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,21 +15,22 @@ import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestDispatch extends TestAction {
+public class TestDispatch extends ActionTest {
 
     @Rule
     public TestName testname = new TestName();
@@ -66,7 +65,7 @@ public class TestDispatch extends TestAction {
 
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.CREATION.getId(),
+                DispatchState.CREATION,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -116,7 +115,7 @@ public class TestDispatch extends TestAction {
                 exec(new DispatchSaveAction(d, specs, shipsave))
                     .getId();
             Assert.fail("test should fail");
-        } catch (ConstraintViolationException e) {
+        } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
         }
 
@@ -138,7 +137,7 @@ public class TestDispatch extends TestAction {
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.CREATION.getId(),
+                DispatchState.CREATION,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -154,28 +153,28 @@ public class TestDispatch extends TestAction {
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.IN_TRANSIT.getId()));
+                .equals(DispatchState.IN_TRANSIT));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.LOST, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.LOST.getId()));
+                .equals(DispatchState.LOST));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.CLOSED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.CLOSED.getId()));
+                .equals(DispatchState.CLOSED));
 
         exec(new DispatchChangeStateAction(id,
             DispatchState.RECEIVED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.RECEIVED.getId()));
+                .equals(DispatchState.RECEIVED));
 
     }
 
@@ -183,7 +182,7 @@ public class TestDispatch extends TestAction {
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.IN_TRANSIT.getId(),
+                DispatchState.IN_TRANSIT,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -213,7 +212,7 @@ public class TestDispatch extends TestAction {
 
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.IN_TRANSIT.getId(),
+                DispatchState.IN_TRANSIT,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),

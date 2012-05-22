@@ -1,25 +1,41 @@
 package edu.ualberta.med.biobank.common.action.scanprocess;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenIsUsedInDispatchAction;
-import edu.ualberta.med.biobank.common.util.ItemState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.ItemState;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class DispatchCreateProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
 
-    private ShipmentProcessInfo data;
+    @SuppressWarnings("nls")
+    public static final Tr SPECIMEN_MISSING =
+        bundle.tr("Specimen {0} missing");
+    @SuppressWarnings("nls")
+    public static final LString SPECIMEN_NOT_FOUND =
+        bundle.tr("Specimen does not exist.").format();
+    @SuppressWarnings("nls")
+    public static final LString NO_INFORMATION = bundle.tr("").format();
+    @SuppressWarnings("nls")
+    public static final Tr SPECIMEN_IN_NON_CLOSED_DISPATCH =
+        bundle.tr("{0} is already in a not closed dispatch.");
+
+    private final ShipmentProcessInfo data;
 
     public DispatchCreateProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
@@ -123,6 +139,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * only be 'already added' (this status is used while scanning: the color
      * will be different)
      */
+    @SuppressWarnings("nls")
     private CellInfoStatus processCellDipatchCreateStatus(CellInfo scanCell,
         Center sender, boolean checkAlreadyAdded) {
         Specimen expectedSpecimen = null;
@@ -133,27 +150,24 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
         String value = scanCell.getValue();
         if (value == null) { // no specimen scanned
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(MessageFormat.format(Messages.getString(
-                "ScanAssign.scanStatus.specimen.missing", locale), //$NON-NLS-1$
+            scanCell.setInformation(SPECIMEN_MISSING.format(
                 expectedSpecimen.getInventoryId()));
-            scanCell.setTitle("?"); //$NON-NLS-1$
+            scanCell.setTitle("?");
         } else {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 // not in database
                 scanCell.setStatus(CellInfoStatus.ERROR);
-                scanCell.setInformation(Messages.getString(
-                    "DispatchProcess.scanStatus.specimen.notfound", locale)); //$NON-NLS-1$
+                scanCell.setInformation(SPECIMEN_NOT_FOUND);
             } else {
                 if (expectedSpecimen != null
                     && !foundSpecimen.equals(expectedSpecimen)) {
                     // Position taken
                     scanCell.setStatus(CellInfoStatus.ERROR);
-                    scanCell
-                        .setInformation(Messages
-                            .getString(
-                                "ScanAssign.scanStatus.specimen.positionTakenError", locale)); //$NON-NLS-1$
-                    scanCell.setTitle("!"); //$NON-NLS-1$
+                    scanCell.setInformation(bundle.tr(
+                        "Specimen different from the one registered" +
+                            " at this position").format());
+                    scanCell.setTitle("!");
                 } else {
                     scanCell.setSpecimenId(foundSpecimen.getId());
                     if (expectedSpecimen != null
@@ -163,12 +177,11 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                     } else {
                         // should not be there
                         scanCell.setStatus(CellInfoStatus.ERROR);
-                        scanCell.setTitle(foundSpecimen.getCollectionEvent()
-                            .getPatient().getPnumber());
-                        scanCell
-                            .setInformation(Messages
-                                .getString(
-                                    "DispatchProcess.create.specimen.anotherPallet", locale)); //$NON-NLS-1$
+                        scanCell.setTitle(foundSpecimen
+                            .getCollectionEvent().getPatient().getPnumber());
+                        scanCell.setInformation(bundle.tr(
+                            "This specimen should be on another pallet")
+                            .format());
                     }
                 }
             }
@@ -185,21 +198,24 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * @param checkAlreadyAdded
      * @throws Exception
      */
+    @SuppressWarnings("nls")
     private void checkCanAddSpecimen(CellInfo cell, Specimen specimen,
         Center sender, boolean checkAlreadyAdded) {
         if (specimen.getId() == null) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(""); //$NON-NLS-1$
+            cell.setInformation(NO_INFORMATION);
         } else if (specimen.getActivityStatus() != ActivityStatus.ACTIVE) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages.getString(
-                "DispatchProcess.create.specimen.status", locale), //$NON-NLS-1$
-                specimen.getInventoryId()));
+            cell.setInformation(bundle.tr(
+                "Activity status of {0} is not ''Active''. Check" +
+                    " comments on this specimen for more information.")
+                .format(specimen.getInventoryId()));
         } else if (!specimen.getCurrentCenter().equals(sender)) {
             cell.setStatus(CellInfoStatus.ERROR);
-            cell.setInformation(MessageFormat.format(Messages.getString(
-                "DispatchProcess.create.specimen.currentCenter", locale), //$NON-NLS-1$
-                specimen.getInventoryId(), specimen.getCurrentCenter()
+            cell.setInformation(bundle.tr(
+                "Specimen {0} is currently assigned to center" +
+                    " {1}. It should first be sent to center {2}.")
+                .format(specimen.getInventoryId(), specimen.getCurrentCenter()
                     .getNameShort(), sender.getNameShort()));
         } else {
             Map<Integer, ItemState> currentSpecimenIds = data
@@ -208,24 +224,21 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                 && currentSpecimenIds.get(specimen.getId()) != null;
             if (checkAlreadyAdded && alreadyInShipment) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format(Messages.getString(
-                    "DispatchProcess.create.specimen.alreadyAdded", locale), //$NON-NLS-1$
-                    specimen.getInventoryId()));
+                cell.setInformation(bundle.tr(
+                    "{0} is already in this dispatch.")
+                    .format(specimen.getInventoryId()));
             } else if (new SpecimenIsUsedInDispatchAction(specimen.getId())
                 .run(actionContext).isTrue()) {
                 cell.setStatus(CellInfoStatus.ERROR);
-                cell.setInformation(MessageFormat.format(
-                    Messages
-                        .getString(
-                            "DispatchProcess.create.specimen.inNotClosedDispatch", locale), //$NON-NLS-1$
+                cell.setInformation(SPECIMEN_IN_NON_CLOSED_DISPATCH.format(
                     specimen.getInventoryId()));
             } else {
                 if (alreadyInShipment)
                     cell.setStatus(CellInfoStatus.IN_SHIPMENT_ADDED);
                 else
                     cell.setStatus(CellInfoStatus.FILLED);
-                cell.setTitle(specimen.getCollectionEvent().getPatient()
-                    .getPnumber());
+                cell.setTitle(specimen.getCollectionEvent()
+                    .getPatient().getPnumber());
                 cell.setSpecimenId(specimen.getId());
             }
         }

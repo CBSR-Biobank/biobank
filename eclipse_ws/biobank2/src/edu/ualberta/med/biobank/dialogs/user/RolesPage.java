@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.user;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.core.runtime.Status;
@@ -8,6 +7,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcDialogPage;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.widgets.infotables.RoleInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class RolesPage extends BgcDialogPage {
+    private static final I18n i18n = I18nFactory.getI18n(RolesPage.class);
 
     private RoleInfoTable roleInfoTable;
 
@@ -27,7 +29,7 @@ public abstract class RolesPage extends BgcDialogPage {
 
     @Override
     public String getTitle() {
-        return "Roles";
+        return Role.NAME.plural().toString();
     }
 
     @Override
@@ -60,10 +62,15 @@ public abstract class RolesPage extends BgcDialogPage {
                 return deleted;
             }
 
+            @SuppressWarnings("nls")
             @Override
             protected void duplicate(Role src) {
                 Role newRole = new Role();
-                newRole.setName("Copy of " + src.getName());
+
+                // TR: prefix of a role name when copying another role.
+                String prefix = i18n.tr("Copy of ");
+
+                newRole.setName(prefix + src.getName());
                 newRole.getPermissions().addAll(src.getPermissions());
                 addRole(newRole);
             }
@@ -95,15 +102,17 @@ public abstract class RolesPage extends BgcDialogPage {
         addRole(new Role());
     }
 
+    @SuppressWarnings("nls")
     protected void addRole(Role role) {
         RoleEditDialog dlg = new RoleEditDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), role);
         int res = dlg.open();
         if (res == Status.OK) {
             BgcPlugin.openAsyncInformation(
-                "Role added",
-                MessageFormat.format("Successfully added new role {0}",
-                    role.getName()));
+                // TR: information dialog title
+                i18n.tr("Role added"),
+                // TR: information dialog message
+                i18n.tr("Successfully added new role {0}", role.getName()));
 
             getCurrentAllRolesList().add(role);
 

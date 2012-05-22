@@ -4,9 +4,11 @@ package edu.ualberta.med.biobank.common.security;
  * Match the centers features protection group of the security. The name should
  * match exactly the protection group name.
  */
+@SuppressWarnings("nls")
 @Deprecated
 public enum SecurityFeature {
-    ASSIGN("Center Feature: Assign positions"), CLINIC_SHIPMENT( //$NON-NLS-1$
+    ASSIGN("Center Feature: Assign positions"),
+    CLINIC_SHIPMENT( //$NON-NLS-1$
         "Center Feature: Clinic Shipments"),
     COLLECTION_EVENT( //$NON-NLS-1$
         "Center Feature: Collection Event"),

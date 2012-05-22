@@ -6,6 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
@@ -18,6 +19,7 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
     private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
 
+    @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
@@ -26,7 +28,7 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
             PatientAdapter adapter = new PatientAdapter(null, spi);
             adapter.openEntryForm();
         } catch (Exception exp) {
-            logger.error(Messages.PatientAddHandler_patient_open_error, exp);
+            logger.error("Error while opening the patient entry form", exp);
         }
         return null;
     }
@@ -41,8 +43,8 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
             return SessionManager.getInstance().getSession() != null &&
                 allowed;
         } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(Messages.HandlerPermission_error,
-                Messages.HandlerPermission_message);
+            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
+                StringUtil.EMPTY_STRING);
             return false;
         }
     }

@@ -6,13 +6,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.WorkbenchMessages;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 
-@SuppressWarnings("restriction")
 public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(GeneralPreferencePage.class);
 
     private BooleanFieldEditor showVersionFieldEditor;
 
@@ -28,21 +31,23 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         //
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFieldEditors() {
         showVersionFieldEditor = new BooleanFieldEditor(
             PreferenceConstants.GENERAL_SHOW_VERSION,
-            Messages.GeneralPreferencePage_version_label,
+            // field editor label
+            i18n.tr("Show software version in main window title"),
             getFieldEditorParent());
         addField(showVersionFieldEditor);
 
         showHeapFieldEditor = new BooleanFieldEditor(
             IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR,
-            WorkbenchMessages.WorkbenchPreference_HeapStatusButton,
+            StringUtil.EMPTY_STRING,
             getFieldEditorParent());
         showHeapFieldEditor.getDescriptionControl(getFieldEditorParent())
             .setToolTipText(
-                WorkbenchMessages.WorkbenchPreference_HeapStatusButtonToolTip);
+                StringUtil.EMPTY_STRING);
         addField(showHeapFieldEditor);
     }
 

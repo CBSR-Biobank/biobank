@@ -15,6 +15,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -33,10 +35,14 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.ScrolledPageBook;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.ToggleHyperlink;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -47,8 +53,22 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 public abstract class BgcFormBase extends EditorPart implements
     ISelectionProvider {
 
+    private static final I18n i18n = I18nFactory.getI18n(BgcFormBase.class);
     private static BgcLogger logger = BgcLogger.getLogger(BgcFormBase.class
         .getName());
+
+    @SuppressWarnings("nls")
+    private static final String ACTION_FAILED_TITLE = i18n.tr("Action Failed");
+    @SuppressWarnings("nls")
+    private static final String INIT_FAILED_TITLE = i18n
+        .tr("Exception in form initialization");
+    @SuppressWarnings("nls")
+    private static final String PART_CONTROL_PAGE = "page";
+    @SuppressWarnings("nls")
+    private static final String RELOAD_ERROR_TITLE = i18n.tr("Error");
+    @SuppressWarnings("nls")
+    private static final String RELOAD_ERROR_MESSAGE = i18n
+        .tr("Unable to reload form.");
 
     protected ManagedForm mform;
 
@@ -91,6 +111,7 @@ public abstract class BgcFormBase extends EditorPart implements
     public void doSaveAs() {
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void init(IEditorSite editorSite, IEditorInput input)
         throws PartInitException {
@@ -101,10 +122,10 @@ public abstract class BgcFormBase extends EditorPart implements
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ActionException e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_action_error, e);
+            BgcPlugin.openAsyncError(ACTION_FAILED_TITLE, e);
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_generic_error, e);
-            logger.error("BgcFormBase.createPartControl Error", e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError(INIT_FAILED_TITLE, e);
+            logger.error("BgcFormBase.createPartControl Error", e);
         }
         getSite().setSelectionProvider(this);
     }
@@ -151,12 +172,13 @@ public abstract class BgcFormBase extends EditorPart implements
         book.setLayout(new GridLayout());
         book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             true));
-        page = book.createPage("page"); //$NON-NLS-1$
-        book.showPage("page"); //$NON-NLS-1$
+        page = book.createPage(PART_CONTROL_PAGE);
+        book.showPage(PART_CONTROL_PAGE);
 
         // start a new runnable so that database objects are populated in a
         // separate thread.
         BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -167,7 +189,7 @@ public abstract class BgcFormBase extends EditorPart implements
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
                     BgcPlugin.openError(
-                        "BioBankFormBase.createPartControl Error", e); //$NON-NLS-1$
+                        "BioBankFormBase.createPartControl Error", e);
                 }
             }
         });
@@ -185,6 +207,24 @@ public abstract class BgcFormBase extends EditorPart implements
         if (title != null) {
             section.setText(title);
         }
+        section.getChildren()[0].addFocusListener(new FocusListener() {
+
+            // move focus to children
+            @Override
+            public void focusGained(FocusEvent e) {
+                // 0 = toggle 1 = label 2 = client
+                Control client =
+                    ((ToggleHyperlink) e.widget).getParent().getChildren()[2];
+                if (client != null) client.setFocus();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
         GridLayout layout = new GridLayout(1, false);
         layout.verticalSpacing = 0;
         layout.marginHeight = 0;
@@ -279,7 +319,7 @@ public abstract class BgcFormBase extends EditorPart implements
     public static void setTextValue(BgcBaseText label, String value) {
         if ((label != null) && !label.isDisposed()) {
             if (value == null)
-                value = ""; //$NON-NLS-1$
+                value = StringUtil.EMPTY_STRING;
             label.setText(value);
         }
     }
@@ -473,14 +513,15 @@ public abstract class BgcFormBase extends EditorPart implements
         return null;
     }
 
+    @SuppressWarnings("nls")
     public void reload() {
         try {
             init();
             setValues();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.BgcFormBase_reload_error,
-                Messages.BgcFormBase_message);
-            logger.error("Can't reload the form", e); //$NON-NLS-1$
+            BgcPlugin.openAsyncError(RELOAD_ERROR_TITLE,
+                RELOAD_ERROR_MESSAGE);
+            logger.error("Can't reload the form", e);
         }
     }
 

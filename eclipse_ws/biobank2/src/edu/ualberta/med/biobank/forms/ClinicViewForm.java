@@ -3,12 +3,13 @@ package edu.ualberta.med.biobank.forms;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
@@ -25,6 +26,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemList
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -34,10 +41,14 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
 
 public class ClinicViewForm extends AddressViewFormCommon {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ClinicViewForm"; 
+    private static final I18n i18n = I18nFactory
+        .getI18n(ClinicViewForm.class);
 
-    private ClinicWrapper clinic =
+    @SuppressWarnings("nls")
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicViewForm";
+
+    private final ClinicWrapper clinic =
         new ClinicWrapper(SessionManager.getAppService());
 
     private ContactInfoTable contactsTable;
@@ -62,16 +73,18 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private List<StudyCountInfo> studyCountInfo;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
-            "Invalid editor input: object of type " 
+            "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
         Assert.isNotNull(adapter.getId());
         updateClinicInfo();
-        setPartName(NLS.bind("Clinic {0}",
-            clinic.getNameShort()));
+        setPartName(
+        // tab name
+        i18n.tr("Clinic {0}", clinic.getNameShort()));
     }
 
     private void updateClinicInfo() throws Exception {
@@ -86,9 +99,12 @@ public class ClinicViewForm extends AddressViewFormCommon {
                 new ClinicGetStudyInfoAction(adapter.getId())).getList();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(NLS.bind("Clinic {0}", clinic.getName()));
+        form.setText(
+            // form title
+            i18n.tr("Clinic {0}", clinic.getName()));
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -99,6 +115,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createStudiesSection();
     }
 
+    @SuppressWarnings("nls")
     private void createClinicSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));
@@ -106,21 +123,25 @@ public class ClinicViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(client);
 
         nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Name");
+            createReadOnlyLabelledField(client, SWT.NONE,
+                HasName.PropertyName.NAME.toString());
         nameShortLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Short Name");
+            createReadOnlyLabelledField(client, SWT.NONE,
+                HasNameShort.PropertyName.NAME_SHORT.toString());
         hasShipmentsButton =
             (Button) createLabelledWidget(client, Button.class, SWT.NONE,
-                "Sends shipments");
+                Clinic.Property.SENDS_SHIPMENTS.toString());
         activityStatusLabel =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Activity status");
+                ActivityStatus.NAME.format(1).toString());
         patientTotal =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total Patients");
+                // label
+                i18n.tr("Total Patients"));
         ceventTotal =
             createReadOnlyLabelledField(client, SWT.NONE,
-                "Total Collection Events");
+                // label
+                i18n.tr("Total Collection Events"));
 
         setClinicValues();
     }
@@ -136,7 +157,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private void createContactsSection() {
         Composite client =
-            createSectionWithClient("Contacts");
+            createSectionWithClient(Contact.NAME.format(2).toString());
         List<ContactWrapper> contacts =
             ModelWrapper.wrapModelCollection(
                 SessionManager.getAppService(), clinicInfo.contacts,
@@ -149,7 +170,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createCommentsSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.format(2).toString());
         commentTable =
             new CommentsInfoTable(client,
                 clinic.getCommentCollection(false));
@@ -159,7 +181,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     protected void createStudiesSection() {
         Composite client =
-            createSectionWithClient("Studies");
+            createSectionWithClient(Study.NAME.format(2).toString());
 
         studiesTable = new ClinicStudyInfoTable(client, studyCountInfo);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -198,9 +220,12 @@ public class ClinicViewForm extends AddressViewFormCommon {
             });
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
-        form.setText(NLS.bind("Clinic {0}", clinic.getName()));
+        form.setText(
+            // form title
+            i18n.tr("Clinic {0}", clinic.getName()));
         setClinicValues();
         setAddressValues(clinic);
         contactsTable.setList(clinic.getContactCollection(true));

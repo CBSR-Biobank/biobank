@@ -12,8 +12,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
@@ -24,6 +27,13 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 
 public class MembershipDomainPage extends BgcWizardPage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(MembershipDomainPage.class);
+
+    @SuppressWarnings("nls")
+    // TR: membership domain page title
+    private static final String TITLE = i18n.tr("Centers and Studies");
+
     private final StudiesSelectionHandler studiesSelectionHandler =
         new StudiesSelectionHandler();
     private final CentersSelectionHandler centersSelectionHandler =
@@ -42,10 +52,12 @@ public class MembershipDomainPage extends BgcWizardPage {
     private final WritableValue validStudies = new WritableValue(Boolean.FALSE,
         Boolean.class);
 
+    @SuppressWarnings("nls")
     MembershipDomainPage(Membership membership, ManagerContext context) {
-        super("", "Centers and Studies", null);
+        super(StringUtil.EMPTY_STRING, TITLE, null);
 
-        setMessage("Where the user (or group) is allowed access");
+        // TR: membership domain page title area message
+        setMessage(i18n.tr("Where the user (or group) is allowed access"));
 
         this.membership = membership;
         this.domain = membership.getDomain();
@@ -60,21 +72,28 @@ public class MembershipDomainPage extends BgcWizardPage {
         updatePageComplete();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite container = new Composite(parent, SWT.NONE);
         container.setLayout(new GridLayout(1, false));
         container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Group centersGroup = createGroup(container, "Centers");
+        Group centersGroup = createGroup(container,
+            Center.NAME.plural().toString());
         createAllCentersButton(centersGroup);
         createCentersWidget(centersGroup);
-        createCentersValidation("Select at least one center");
+        createCentersValidation(
+        // TR: validation message if no center is selected
+        i18n.tr("Select at least one center"));
 
-        Group studiesGroup = createGroup(container, "Studies");
+        Group studiesGroup =
+            createGroup(container, Study.NAME.plural().toString());
         createAllStudiesButton(studiesGroup);
         createStudiesWidget(studiesGroup);
-        createStudiesValidation("Select at least one study");
+        createStudiesValidation(
+        // TR: validation message if no study is selected
+        i18n.tr("Select at least one study"));
 
         centersWidget.addSelectionChangedListener(centersSelectionHandler);
         studiesWidget.addSelectionChangedListener(studiesSelectionHandler);
@@ -103,11 +122,14 @@ public class MembershipDomainPage extends BgcWizardPage {
         return group;
     }
 
+    @SuppressWarnings("nls")
     private void createAllCentersButton(Composite parent) {
         allCentersButton = new Button(parent, SWT.CHECK);
-        allCentersButton.setText("All Centers");
-        allCentersButton
-            .setToolTipText("Allow access to all current and future centers");
+        allCentersButton.setText(
+            Domain.PropertyName.ALL_CENTERS.toString());
+        allCentersButton.setToolTipText(
+            // TR: all centers checkbox tooltip
+            i18n.tr("Allow access to all current and future centers"));
         allCentersButton.setSelection(domain.isAllCenters());
 
         GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
@@ -126,10 +148,14 @@ public class MembershipDomainPage extends BgcWizardPage {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createCentersWidget(Composite parent) {
         centersWidget = new MultiSelectWidget<Center>(parent, SWT.NONE,
-            "Available Centers",
-            "Selected Centers", 100) {
+            // label for centers that can be selected from a multi-combo box
+            i18n.tr("Available Centers"),
+            // label for centers that have be selected from a multi-combo box
+            i18n.tr("Selected Centers"),
+            100) {
             @Override
             protected String getTextForObject(Center center) {
                 return center.getNameShort();
@@ -140,11 +166,13 @@ public class MembershipDomainPage extends BgcWizardPage {
         centersWidget.setEnabled(!domain.isAllCenters());
     }
 
+    @SuppressWarnings("nls")
     private void createAllStudiesButton(Composite parent) {
         allStudiesButton = new Button(parent, SWT.CHECK);
-        allStudiesButton.setText("All Studies");
-        allStudiesButton
-            .setToolTipText("Allow access to all current and future studies");
+        allStudiesButton.setText(Domain.PropertyName.ALL_STUDIES.toString());
+        allStudiesButton.setToolTipText(
+            // TR: all studies checkbox tooltip
+            i18n.tr("Allow access to all current and future studies"));
         allStudiesButton.setSelection(domain.isAllStudies());
 
         GridData gd = new GridData(SWT.FILL, SWT.TOP, true, true);
@@ -163,10 +191,14 @@ public class MembershipDomainPage extends BgcWizardPage {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createStudiesWidget(Composite parent) {
         studiesWidget = new MultiSelectWidget<Study>(parent, SWT.NONE,
-            "Available Studies",
-            "Selected Studies", 100) {
+            // label for Studies that can be selected from a multi-combo box
+            i18n.tr("Available Studies"),
+            // label for Studies that have be selected from a multi-combo box
+            i18n.tr("Selected Studies"),
+            100) {
             @Override
             protected String getTextForObject(Study study) {
                 return study.getNameShort();
