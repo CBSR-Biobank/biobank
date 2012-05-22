@@ -6,21 +6,27 @@ import java.util.Map;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
 
+import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction.UserCreatePermissions;
+
 public class LoginPermissionSessionState extends AbstractSourceProvider {
 
+    @SuppressWarnings("nls")
     public final static String LOGIN_STATE_SOURCE_NAME =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState";
 
+    @SuppressWarnings("nls")
     public static final String LABEL_PRINTING_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission";
 
-    public final static String LOGGED_IN = "loggedIn"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public final static String LOGGED_IN = "loggedIn";
 
-    public final static String LOGGED_OUT = "loggedOut"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public final static String LOGGED_OUT = "loggedOut";
 
     private boolean loggedIn;
 
-    private boolean labelPrintingPermission;
+    private UserCreatePermissions userCreatePermissions;
 
     @Override
     public String[] getProvidedSourceNames() {
@@ -40,21 +46,17 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
         return currentStateMap;
     }
 
-    public void setLoggedInState(boolean loggedIn) {
+    public void setLoggedInState(boolean loggedIn,
+        UserCreatePermissions userCreatePermissions) {
         if (this.loggedIn == loggedIn)
             return; // no change
         this.loggedIn = loggedIn;
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
+
+        this.userCreatePermissions = userCreatePermissions;
+
         fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
             currentState);
-    }
-
-    public void setLabelPrintingPermissionState(boolean labelPrintingPermission) {
-        if (this.labelPrintingPermission == labelPrintingPermission)
-            return; // no change
-        this.labelPrintingPermission = labelPrintingPermission;
-        fireSourceChanged(ISources.WORKBENCH, LABEL_PRINTING_PERMISSION,
-            labelPrintingPermission);
     }
 
 }
