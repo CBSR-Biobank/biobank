@@ -36,6 +36,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * be copied over.
  * 
  */
+@SuppressWarnings("nls")
 @Deprecated
 public class ProblemFixer {
 
@@ -65,17 +66,17 @@ public class ProblemFixer {
         + " inner join fetch spcs.specimenType "
         + " where spcs.createdAt > '2011-06-18' and patients.pnumber=?";
 
-    private Map<String, SpecimenTypeWrapper> specimenTypes;
+    private final Map<String, SpecimenTypeWrapper> specimenTypes;
 
-    private BiobankApplicationService tsAppService;
+    private final BiobankApplicationService tsAppService;
 
-    private BiobankApplicationService appService;
+    private final BiobankApplicationService appService;
 
     private StudyWrapper heartStudy;
 
     private SiteWrapper calgarySiteOnProduction;
 
-    private String heartEventAttrLabel;
+    private final String heartEventAttrLabel;
 
     public ProblemFixer(AppArgs appArgs) throws Exception {
         LOGGER.debug("username: " + appArgs.username);

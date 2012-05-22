@@ -29,7 +29,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * 
  */
 @Deprecated
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "nls" })
 public class ClinicCopy {
 
     // @formatter:off
@@ -60,9 +60,9 @@ public class ClinicCopy {
         + " inner join contacts.studies studies"
         + " where clinics.nameShort = ?";
 
-    private BiobankApplicationService tsAppService;
+    private final BiobankApplicationService tsAppService;
 
-    private BiobankApplicationService appService;
+    private final BiobankApplicationService appService;
 
     private Map<String, ClinicWrapper> clinicsOnTest;
 

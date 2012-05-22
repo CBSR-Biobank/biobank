@@ -131,6 +131,7 @@ public class SessionManager {
         sessionAdapter.performExpand();
     }
 
+    @SuppressWarnings("nls")
     private void updateSessionState() {
         // for key binding contexts:
         if (sessionAdapter == null) {

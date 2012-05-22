@@ -316,6 +316,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Show either single or multiple selection fields
      */
+    @SuppressWarnings("nls")
     protected void showModeComposite(Mode mode) {
         log.debug("showModeComposite: " + mode);
 
@@ -419,6 +420,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Multiple assign
      */
+    @SuppressWarnings("nls")
     protected void manageDoubleClick(MouseEvent e) {
         log.debug("manageDoubleClick");
 
@@ -576,6 +578,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * single assign. Display containers
      */
+    @SuppressWarnings("nls")
     protected void displaySinglePositions(boolean show) {
         log.debug("displaySinglePositions: " + show);
 
@@ -712,12 +715,12 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Single assign. Check can really add to the position
      */
+    @SuppressWarnings("nls")
     protected void checkPositionAndSpecimen(final BgcBaseText inventoryIdField,
         final BgcBaseText positionField) {
         log.debug("checkPositionAndSpecimen");
 
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -784,6 +787,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * assign multiple
      */
+    @SuppressWarnings("nls")
     protected void showOnlyPallet(boolean onlyPallet) {
         log.debug("showOnlyPallet: " + onlyPallet);
 
@@ -806,6 +810,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * assign multiple
      */
+    @SuppressWarnings("nls")
     protected void showOnlyPallet(final boolean show, boolean async) {
         log.debug("showOnlyPallet: show=" + show + " async=" + async);
 

@@ -31,9 +31,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * This class fixes this problem in the current BioBank database.
  * 
  */
+@SuppressWarnings("nls")
 public class BbpdbConsent {
 
-    // @formatter:off
     private static String USAGE =
         "Usage: bbpdbconsent [options]\n\n"
             + "Used to fix the consent given by a patient on the BBPSP study.\n"
@@ -49,7 +49,6 @@ public class BbpdbConsent {
             + "  -w, --password   password to log into BioBank server\n"
             + "  -v, --verbose    shows verbose output\n"
             + "  -h, --help       shows this text\n"; //$NON-NLS-1$
-    // @formatter:on
 
     private static final Logger LOGGER = Logger.getLogger(BbpdbConsent.class
         .getName());

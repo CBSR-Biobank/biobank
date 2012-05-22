@@ -44,6 +44,7 @@ public class UserManagementHandler extends LogoutSensitiveHandler
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean isEnabled() {
         if (allowed == null)

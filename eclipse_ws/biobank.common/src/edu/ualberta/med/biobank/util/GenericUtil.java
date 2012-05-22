@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.util;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+@SuppressWarnings("nls")
 public abstract class GenericUtil {
     public static Class<?> getFirstTypeParameterDeclaredOnSuperclass(
         Class<?> klazz) {

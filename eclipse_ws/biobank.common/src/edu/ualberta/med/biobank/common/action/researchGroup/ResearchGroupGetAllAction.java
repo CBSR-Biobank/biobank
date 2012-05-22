@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 public class ResearchGroupGetAllAction implements
     Action<MapResult<Integer, ResearchGroupAdapterInfo>> {
 
+    @SuppressWarnings("nls")
     public static final String ALL_RG = "from "
         + ResearchGroup.class.getName();
 

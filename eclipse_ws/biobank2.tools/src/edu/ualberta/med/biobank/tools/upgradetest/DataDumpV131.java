@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@SuppressWarnings("nls")
 public class DataDumpV131 extends DataDump {
 
     public DataDumpV131(Connection dbconnection, Properties queryProps,

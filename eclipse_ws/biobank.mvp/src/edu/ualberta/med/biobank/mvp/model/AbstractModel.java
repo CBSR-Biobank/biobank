@@ -157,6 +157,7 @@ public abstract class AbstractModel<T> extends FormModel {
      * @param model bound to the field.
      * @param binder used to bind the model and field.
      */
+    @SuppressWarnings("nls")
     public <E> void bind(FieldModel<E> field, AbstractModel<E> model) {
         if (!field.getFormModel().equals(this)) {
             throw new IllegalArgumentException("field is not from this model");

@@ -77,6 +77,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return super.query(request);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public List<String> getAllClassNames() {
 

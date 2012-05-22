@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("nls")
 public class PnumberProb {
 
-    private static String USAGE = "Usage: pnumberprob PNUMBER1 PNUMBER2 ... PNUMBERn";
+    private static String USAGE =
+        "Usage: pnumberprob PNUMBER1 PNUMBER2 ... PNUMBERn";
 
     @SuppressWarnings("unused")
     private boolean verbose = false;
