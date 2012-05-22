@@ -175,7 +175,7 @@ public class ContainerInfoTable extends InfoTableWidget<Container> {
     @Override
     protected Boolean canView(Container target) throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ContainerReadPermission(target.getId()));
+            new ContainerReadPermission(target));
     }
 
 }

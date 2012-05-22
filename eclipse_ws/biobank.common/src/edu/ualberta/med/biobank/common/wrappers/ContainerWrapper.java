@@ -448,9 +448,6 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (containerType == null) {
             throw new Exception("container type is null");
         }
-        if (label.startsWith(getLabel())) {
-            label = label.substring(getLabel().length());
-        }
         RowColPos pos = getPositionFromLabelingScheme(label);
         return getChild(pos);
     }
@@ -844,29 +841,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      *            used
      * @throws BiobankException
      */
-    @SuppressWarnings("nls")
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, SiteWrapper site,
-        String positionText, boolean isContainerPosition,
-        ContainerTypeWrapper contType)
+        String positionText, ContainerTypeWrapper contType)
         throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
             positionText, site, contType);
-        if (isContainerPosition)
-            foundContainers = possibles;
-        else {
-            foundContainers = new ArrayList<ContainerWrapper>();
-            // need to know if can contain specimen if this is a specimen
-            // position
-            for (ContainerWrapper cont : possibles) {
-                if (cont.getContainerType().getSpecimenTypeCollection() != null
-                    && cont.getContainerType().getSpecimenTypeCollection()
-                        .size() > 0) {
-                    foundContainers.add(cont);
-                }
-            }
-        }
+        foundContainers = possibles;
         if (foundContainers.size() == 0) {
             List<Integer> validLengths = ContainerLabelingSchemeWrapper
                 .getPossibleLabelLength(appService);
@@ -890,16 +872,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
             String errorMsg;
             if (contType == null) {
-                if (isContainerPosition) {
-                    // {0} possible labels
-                    errorMsg = i18n.tr("Can''t find container that will" +
-                        " match these possible labels: {0}", res.toString());
-                } else {
-                    // {0} possible labels
-                    errorMsg = i18n.tr("Can''t find container that can hold" +
-                        " specimens and that will match these possible" +
-                        " labels: {0}", res.toString());
-                }
+                // {0} possible labels
+                errorMsg = i18n.tr("Can''t find container that will" +
+                    " match these possible labels: {0}", res.toString());
             } else {
                 // {0} container type short name
                 // {1} possible labels

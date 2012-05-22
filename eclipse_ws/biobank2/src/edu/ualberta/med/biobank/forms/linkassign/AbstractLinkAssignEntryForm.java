@@ -27,6 +27,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -37,6 +38,7 @@ import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -645,25 +647,33 @@ public abstract class AbstractLinkAssignEntryForm extends
             + " isContainerPosition=" + isContainerPosition + " containerType="
             + ((type == null) ? "null" : type.getName()));
 
-        parentContainers = null;
+        parentContainers = new ArrayList<ContainerWrapper>();
+
         try {
-            parentContainers = null;
-            List<ContainerWrapper> foundContainers =
-                ContainerWrapper.getPossibleContainersFromPosition(
-                    SessionManager.getAppService(), SessionManager.getUser()
-                        .getCurrentWorkingSite(), positionText.getText(),
-                    isContainerPosition, type);
+            List<Container> foundContainers =
+                SessionManager.getAppService().doAction(
+                    new ContainerGetInfoByLabelAction(positionText.getText(),
+                        SessionManager.getUser().getCurrentWorkingSite()
+                            .getId())).getList();
+
             if (foundContainers.size() == 1) {
-                initParentContainers(foundContainers.get(0));
-            } else if (foundContainers.size() > 1) {
+                parentContainers.add(new ContainerWrapper(SessionManager
+                    .getAppService(), foundContainers.get(0)));
+            } else {
+                List<ContainerWrapper> parents =
+                    ContainerWrapper.getPossibleContainersFromPosition(
+                        SessionManager.getAppService(), SessionManager
+                            .getUser()
+                            .getCurrentWorkingSite(), positionText.getText(),
+                        type);
                 SelectParentContainerDialog dlg =
                     new SelectParentContainerDialog(
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), foundContainers);
+                            .getShell(), parents);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
-                    for (ContainerWrapper cont : foundContainers) {
+                    for (ContainerWrapper cont : parentContainers) {
                         sb.append(cont.getFullInfoLabel());
                     }
                     BgcPlugin.openError(
@@ -673,9 +683,16 @@ public abstract class AbstractLinkAssignEntryForm extends
                         i18n.tr("More than one container found matching {0}",
                             sb.toString()));
                     focusControl(positionText);
-                } else
-                    initParentContainers(dlg.getSelectedContainer());
+                } else {
+                    for (Container c : foundContainers) {
+                        if (c.getParentContainer().getId().equals(
+                            dlg.getSelectedContainer().getId()))
+                            parentContainers.add(new ContainerWrapper(
+                                SessionManager.getAppService(), c));
+                    }
+                }
             }
+            updateAvailableSpecimenTypes();
         } catch (BiobankException be) {
             BgcPlugin.openError(
                 // TR: dialog title
@@ -688,34 +705,6 @@ public abstract class AbstractLinkAssignEntryForm extends
                 i18n.tr("Init container from position"), ex);
             focusControl(positionText);
         }
-    }
-
-    /**
-     * Initialise parents
-     */
-    @SuppressWarnings("nls")
-    private void initParentContainers(ContainerWrapper bottomContainer) {
-        log.debug("initParentContainers: " + bottomContainer.getLabel());
-
-        parentContainers = new ArrayList<ContainerWrapper>();
-        ContainerWrapper parent = bottomContainer;
-        while (parent != null) {
-            parentContainers.add(parent);
-            parent = parent.getParentContainer();
-        }
-        StringBuffer parentMsg = new StringBuffer();
-        for (int i = parentContainers.size() - 1; i >= 0; i--) {
-            parent = parentContainers.get(i);
-            String label = parent.getPositionString();
-            if (label == null)
-                label = parent.getLabel();
-            parentMsg.append(label);
-            if (i != 0)
-                parentMsg.append("|");
-        }
-        appendLog(NLS.bind("Parent containers found: {0}",
-            parentMsg.toString()));
-        updateAvailableSpecimenTypes();
     }
 
     protected abstract void updateAvailableSpecimenTypes();

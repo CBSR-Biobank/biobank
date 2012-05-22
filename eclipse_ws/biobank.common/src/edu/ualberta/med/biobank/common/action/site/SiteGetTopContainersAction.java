@@ -30,7 +30,7 @@ public class SiteGetTopContainersAction implements
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType containerType"
-            + " INNER JOIN FETCH containerType.childContainerTypes"
+            + " LEFT JOIN FETCH containerType.childContainerTypes"
             + " INNER JOIN FETCH container.site site"
             + " LEFT JOIN FETCH container.specimenPositions"
             + " WHERE site.id = ?"
