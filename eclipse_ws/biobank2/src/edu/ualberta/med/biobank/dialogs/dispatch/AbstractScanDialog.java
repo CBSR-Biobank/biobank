@@ -113,7 +113,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
-                setScanHasBeenLaunched(true);
                 AbstractScanDialog.this.processScanResult(monitor,
                     AbstractScanDialog.this.currentSite);
                 setHasValues();
@@ -131,7 +130,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     @Override
                     public void run() {
                         spw.setCells(getCells());
-                        setRescanMode(true);
+                        setScanHasBeenLaunched(true);
                     }
                 });
             }
@@ -357,6 +356,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             public void run() {
                 scanHasBeenLaunchedValue.setValue(launched);
+                setRescanMode(launched);
+                plateToScanText.setEnabled(!launched);
             }
         });
     }
@@ -377,7 +378,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.CANCEL_ID,
-            i18n.tr("Cancel current pallet"), false);
+            i18n.tr("Cancel"), false);
         createButton(parent, IDialogConstants.PROCEED_ID,
             getProceedButtonlabel(), false);
         createButton(parent, IDialogConstants.NEXT_ID,
@@ -525,6 +526,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected void resetScan() {
         if (spw != null)
             spw.setCells(null);
+        setScanHasBeenLaunched(false);
         palletScanManagement.onReset();
     }
 }

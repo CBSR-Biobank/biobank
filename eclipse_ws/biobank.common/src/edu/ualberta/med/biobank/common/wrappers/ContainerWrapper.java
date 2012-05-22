@@ -711,7 +711,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 Arrays.asList(new Object[] { siteWrapper.getId(),
                     productBarcode }));
         List<Container> containers = appService.query(criteria);
-        return new ContainerWrapper(appService, containers.get(0));
+        if (containers.size() > 0)
+            return new ContainerWrapper(appService, containers.get(0));
+        return null;
     }
 
     /**

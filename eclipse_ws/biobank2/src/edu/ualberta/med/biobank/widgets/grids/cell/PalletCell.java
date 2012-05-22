@@ -252,7 +252,8 @@ public class PalletCell extends AbstractUICell {
         edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());
-        setInformation(cell.getInformation().toString());
+        if (cell.getInformation() != null)
+            setInformation(cell.getInformation().toString());
         setValue(cell.getValue());
         setTitle(cell.getTitle().toString());
         SpecimenWrapper expectedSpecimen = null;
@@ -288,8 +289,9 @@ public class PalletCell extends AbstractUICell {
             : getExpectedSpecimen().getId());
         if (getStatus() != null)
             serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
-        serverCell.setInformation(LString.lit(getInformation()
-            .toString()));
+        if (getInformation() != null)
+            serverCell.setInformation(LString.lit(getInformation()
+                .toString()));
         serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
             .getId());
         serverCell.setTitle(getTitle());
