@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.views;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,6 +16,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.search.SpecimenTransitSearchAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
@@ -28,6 +28,10 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -207,7 +211,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     @Override
     protected void internalSearch() {
         try {
-            List<? extends ModelWrapper<?>> searchedObject = search();
+            List<IBiobankModel> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
                 String msg;
                 if (radioWaybill.getSelection()) {
@@ -227,7 +231,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     // dialog title.
                     i18n.tr("Dispatch not found"), msg);
             } else {
-                showSearchedObjectsInTree(searchedObject, true);
+                showSearchedObjectsInTree(searchedObject);
                 getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
@@ -238,46 +242,24 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         }
     }
 
-    protected List<ModelWrapper<?>> search() throws Exception {
-        List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
+    protected List<IBiobankModel> search() throws Exception {
+        SpecimenTransitSearchAction search =
+            new SpecimenTransitSearchAction(SessionManager.getUser()
+                .getCurrentWorkingCenter().getId());
         if (radioWaybill.getSelection()) {
-            wrappers.addAll(OriginInfoWrapper.getShipmentsByWaybill(
-                SessionManager.getAppService(), treeText.getText().trim()));
-            wrappers.addAll(DispatchWrapper.getDispatchesByWaybill(
-                SessionManager.getAppService(), treeText.getText().trim()));
-            return wrappers;
-
+            search.setWaybill(treeText.getText().trim());
         } else if (radioDateReceived.getSelection()) {
-            Date date = dateWidget.getDate();
-            if (date != null) {
-                wrappers.addAll(OriginInfoWrapper.getShipmentsByDateReceived(
-                    SessionManager.getAppService(), date, SessionManager
-                        .getUser().getCurrentWorkingCenter()));
-                wrappers.addAll(DispatchWrapper.getDispatchesByDateReceived(
-                    SessionManager.getAppService(), date, SessionManager
-                        .getUser().getCurrentWorkingCenter()));
-                return wrappers;
-            }
+            search.setDateReceived(dateWidget.getDate());
         } else {
-            Date date = dateWidget.getDate();
-            if (date != null) {
-                wrappers.addAll(OriginInfoWrapper.getShipmentsByDateSent(
-                    SessionManager.getAppService(), date, SessionManager
-                        .getUser().getCurrentWorkingCenter()));
-                wrappers.addAll(DispatchWrapper.getDispatchesByDateSent(
-                    SessionManager.getAppService(), date, SessionManager
-                        .getUser().getCurrentWorkingCenter()));
-                return wrappers;
-            }
+            search.setDatePacked(dateWidget.getDate());
         }
-        return null;
+        return SessionManager.getAppService().doAction(search).getList();
     }
 
     @SuppressWarnings("nls")
-    @Override
     protected void showSearchedObjectsInTree(
-        List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
-        for (ModelWrapper<?> searchedObject : searchedObjects) {
+        List<IBiobankModel> searchedObject2) {
+        for (IBiobankModel searchedObject : searchedObject2) {
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedObject.getClass(), searchedObject.getId());
             if (nodeRes.size() == 0) {
@@ -286,8 +268,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 SpecimenTransitView.addToNode(searchedNode, searchedObject);
             }
         }
-        if (searchedObjects.size() == 1) {
-            ModelWrapper<?> searchedWrap = searchedObjects.get(0);
+        if (searchedObject2.size() == 1) {
+            IBiobankModel searchedWrap = searchedObject2.get(0);
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedWrap.getClass(), searchedWrap.getId());
             if (nodeRes.size() > 0)
@@ -298,15 +280,15 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 // dialog title.
                 i18n.tr("Shipments"),
                 // dialog message.
-                i18n.tr("{0} found.", searchedObjects.size()));
+                i18n.tr("{0} found.", searchedObject2.size()));
         }
     }
 
     @SuppressWarnings("nls")
     public static AbstractAdapterBase addToNode(AdapterBase parentNode,
         Object obj) {
-        if (currentInstance != null && obj instanceof OriginInfoWrapper) {
-            OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
+        if (currentInstance != null && obj instanceof OriginInfo) {
+            OriginInfo originInfo = (OriginInfo) obj;
             String text = StringUtil.EMPTY_STRING;
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
@@ -345,15 +327,17 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             }
 
             List<AbstractAdapterBase> centerAdapterList = topNode.search(
-                originInfo.getCenter().getClass(), originInfo.getCenter()
+                ClinicWrapper.class, originInfo.getCenter()
                     .getId());
             AdapterBase centerAdapter = null;
 
             if (centerAdapterList.size() > 0)
                 centerAdapter = (AdapterBase) centerAdapterList.get(0);
-            else if (originInfo.getCenter() instanceof ClinicWrapper) {
-                centerAdapter = new ClinicWithShipmentAdapter(topNode,
-                    (ClinicWrapper) originInfo.getCenter());
+            else if (originInfo.getCenter() instanceof Clinic) {
+                centerAdapter =
+                    new ClinicWithShipmentAdapter(topNode,
+                        new ClinicWrapper(SessionManager.getAppService(),
+                            (Clinic) originInfo.getCenter()));
                 topNode.addChild(centerAdapter);
             }
 
@@ -365,18 +349,22 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
                         .get(0);
                 else {
-                    shipmentAdapter = new ShipmentAdapter(centerAdapter,
-                        originInfo);
+                    shipmentAdapter =
+                        new ShipmentAdapter(centerAdapter,
+                            new OriginInfoWrapper(
+                                SessionManager.getAppService(), originInfo));
                     centerAdapter.addChild(shipmentAdapter);
                 }
                 return shipmentAdapter;
             }
-        } else if (currentInstance != null && obj instanceof DispatchWrapper) {
+        } else if (currentInstance != null && obj instanceof Dispatch) {
             List<AbstractAdapterBase> res = parentNode.search(
-                DispatchWrapper.class, ((DispatchWrapper) obj).getId());
+                Dispatch.class, ((Dispatch) obj).getId());
             if (res.size() == 0) {
-                DispatchAdapter dispatch = new DispatchAdapter(parentNode,
-                    (DispatchWrapper) obj);
+                DispatchAdapter dispatch =
+                    new DispatchAdapter(parentNode, new DispatchWrapper(
+                        SessionManager.getAppService(),
+                        (Dispatch) obj));
                 parentNode.addChild(dispatch);
             }
         }
@@ -458,6 +446,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     @Override
     protected void createRootNode() {
         createOldRootNode();
+    }
+
+    @Override
+    protected void showSearchedObjectsInTree(
+        List<? extends ModelWrapper<?>> searchedObject, boolean b) {
     }
 
 }

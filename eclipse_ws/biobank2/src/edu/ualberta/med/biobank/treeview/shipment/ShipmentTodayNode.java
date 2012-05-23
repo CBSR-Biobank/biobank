@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -14,6 +15,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.search.SpecimenTransitSearchAction;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -21,6 +23,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.IBiobankModel;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -28,7 +32,7 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
+public class ShipmentTodayNode extends AbstractTodayNode<OriginInfo> {
     private static final I18n i18n = I18nFactory
         .getI18n(ShipmentTodayNode.class);
 
@@ -69,14 +73,17 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     }
 
     @Override
-    protected List<OriginInfoWrapper> getTodayElements()
+    protected List<IBiobankModel> getTodayElements()
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected()
             && SessionManager.getUser().getCurrentWorkingCenter() != null
-            && readAllowed)
-            return OriginInfoWrapper.getTodayShipments(SessionManager
-                .getAppService(), SessionManager.getUser()
-                .getCurrentWorkingCenter());
+            && readAllowed) {
+            SpecimenTransitSearchAction search =
+                new SpecimenTransitSearchAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getId());
+            search.setDateReceived(new Date());
+            return SessionManager.getAppService().doAction(search).getList();
+        }
         return null;
     }
 
@@ -95,7 +102,7 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
     }
 
     @Override
-    protected void addChild(OriginInfoWrapper child) {
+    protected void addChild(OriginInfo child) {
         SpecimenTransitView.addToNode(this, child);
     }
 

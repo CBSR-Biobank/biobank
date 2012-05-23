@@ -12,9 +12,10 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.IBiobankModel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
+public abstract class AbstractTodayNode<E extends IBiobankModel> extends
     AdapterBase {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractTodayNode.class);
@@ -40,7 +41,8 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     }
 
     @Override
-    protected List<E> getWrapperChildren() throws Exception {
+    protected List<? extends ModelWrapper<?>> getWrapperChildren()
+        throws Exception {
         return null;
     }
 
@@ -68,7 +70,7 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     @Override
     public void performExpand() {
         try {
-            currentTodayElements = getTodayElements();
+            currentTodayElements = (List<E>) getTodayElements();
 
             // remove elements that are not in today list
             for (AbstractAdapterBase child : getChildren()) {
@@ -111,7 +113,8 @@ public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
     protected abstract boolean isParentTo(ModelWrapper<?> parent,
         ModelWrapper<?> child);
 
-    protected abstract List<E> getTodayElements() throws ApplicationException;
+    protected abstract List<IBiobankModel> getTodayElements()
+        throws ApplicationException;
 
     protected abstract void addChild(E child);
 
