@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.trees.infos.SpecimenTypeEntryInfoTree;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SpecimenTypesViewForm extends BiobankFormBase {
+public class SpecimenTypesViewForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenTypesViewForm.class);
 
@@ -46,6 +46,7 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
     @Override
     public void init() throws Exception {
         setPartName(SpecimenType.NAME.plural().toString());
+        updateSpecimenTypeInfo();
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SpecimenTypeCreatePermission());
@@ -60,7 +61,6 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
         form.setText(SpecimenType.NAME.plural().toString());
         page.setLayout(new GridLayout(1, false));
 
-        updateSpecimenTypeInfo();
         createGlobalSpecimenTypeSection();
     }
 
@@ -106,8 +106,6 @@ public class SpecimenTypesViewForm extends BiobankFormBase {
 
     @Override
     public void setValues() throws Exception {
-        // TODO Auto-generated method stub
-
+        specimenWidget.setLists(globalSpecimenTypeWrappers);
     }
-
 }

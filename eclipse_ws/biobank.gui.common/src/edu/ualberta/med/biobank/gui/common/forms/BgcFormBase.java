@@ -161,8 +161,6 @@ public abstract class BgcFormBase extends EditorPart implements
         toolkit.decorateFormHeading(form.getForm());
 
         form.getBody().setLayout(new GridLayout());
-        // horrible obscure way to prevent form scrolling using arrows
-
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.grabExcessVerticalSpace = true;

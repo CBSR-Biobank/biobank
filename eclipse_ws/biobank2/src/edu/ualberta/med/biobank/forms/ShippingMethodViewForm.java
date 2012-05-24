@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ShippingMethodEntryInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ShippingMethodViewForm extends BiobankFormBase {
+public class ShippingMethodViewForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory
         .getI18n(ShippingMethodViewForm.class);
 
@@ -82,8 +82,7 @@ public class ShippingMethodViewForm extends BiobankFormBase {
 
     @Override
     public void setValues() throws Exception {
-        // TODO Auto-generated method stub
-
+        statusWidget.setCollection(globalShippingMethods);
     }
 
 }
