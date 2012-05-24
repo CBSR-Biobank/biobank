@@ -50,10 +50,13 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction;
+import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction.UserCreatePermissions;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
@@ -464,6 +467,7 @@ public class LoginDialog extends TitleAreaDialog {
                 // TR: error dialog title
                 i18n.tr("Problem getting user working centers"), e);
         }
+
         if (workingCenters != null) {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdmin())
@@ -481,8 +485,9 @@ public class LoginDialog extends TitleAreaDialog {
                 new WorkingCenterSelectDialog(getShell(),
                     sessionHelper.getUser(), workingCenters).open();
         }
+
         if (sessionHelper.getUser().getCurrentWorkingCenter() == null
-            && !sessionHelper.getUser().isSuperAdmin())
+            && !sessionHelper.getUser().isSuperAdmin()) {
             if (sessionHelper.getUser().isSuperAdmin()) {
                 // connect in admin mode
                 BgcPlugin
@@ -517,6 +522,30 @@ public class LoginDialog extends TitleAreaDialog {
                         // error dialog message
                         i18n.tr("You need to select the center you want to work with."));
             }
+        }
+
+        // get create permissions - note working center can be null
+        try {
+            Integer centerId = null;
+
+            if (sessionHelper.getUser().getCurrentWorkingCenter() != null) {
+                centerId =
+                    sessionHelper.getUser().getCurrentWorkingCenter().getId();
+            }
+
+            UserCreatePermissions userCreatePermissions = sessionHelper
+                .getAppService().doAction(
+                    new UserPermissionsGetAction(centerId));
+
+            LoginPermissionSessionState loginPermissionSessionState = BgcPlugin
+                .getLoginStateSourceProvider();
+            loginPermissionSessionState
+                .setUserCreatePermissions(userCreatePermissions);
+        } catch (Exception e) {
+            BgcPlugin.openAsyncError(
+                // TR: error dialog title
+                i18n.tr("Problem getting user create permissions"), e);
+        }
     }
 
     @SuppressWarnings("nls")

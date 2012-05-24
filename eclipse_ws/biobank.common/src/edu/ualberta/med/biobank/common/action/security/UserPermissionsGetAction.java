@@ -24,6 +24,13 @@ import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermissio
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 
+/**
+ * Note: center ID can be null and the permissions that require a working center
+ * will be left as false.
+ *
+ * @author loyola
+ *
+ */
 public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
     private static final long serialVersionUID = 1L;
 
@@ -45,31 +52,11 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
 
         p.clinicCreatePermission =
             new ClinicCreatePermission().isAllowed(context);
-        p.collectionEventCreatePermission =
-            new CollectionEventCreatePermission(centerId).isAllowed(context);
-        p.containerCreatePermission =
-            new ContainerCreatePermission(centerId).isAllowed(context);
-        p.containerTypeCreatePermission =
-            new ContainerTypeCreatePermission(centerId).isAllowed(context);
-        p.dispatchCreatePermission =
-            new DispatchCreatePermission(centerId).isAllowed(context);
         p.globalAdminPermission =
             new GlobalAdminPermission().isAllowed(context);
-        p.originInfoUpdatePermission =
-            new OriginInfoUpdatePermission(centerId).isAllowed(context);
-        p.patientCreatePermission =
-            new PatientCreatePermission(centerId).isAllowed(context);
-        p.patientMergePermission =
-            new PatientMergePermission(centerId, null).isAllowed(context);
-        p.processingEventCreatePermission =
-            new ProcessingEventCreatePermission(centerId).isAllowed(context);
         p.researchGroupCreatePermission =
             new ResearchGroupCreatePermission().isAllowed(context);
         p.siteCreatePermission = new SiteCreatePermission().isAllowed(context);
-        p.specimenAssignPermission =
-            new SpecimenAssignPermission(centerId).isAllowed(context);
-        p.specimenLinkPermission =
-            new SpecimenLinkPermission(centerId, null).isAllowed(context);
         p.specimenTypeCreatePermission =
             new SpecimenTypeCreatePermission().isAllowed(context);
         p.studyCreatePermission =
@@ -78,6 +65,31 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             new UserManagerPermission().isAllowed(context);
         p.labelPrintingPermission = new LabelPrintingPermission()
             .isAllowed(context);
+
+        if (centerId != null) {
+            p.collectionEventCreatePermission =
+                new CollectionEventCreatePermission(centerId)
+                    .isAllowed(context);
+            p.containerCreatePermission =
+                new ContainerCreatePermission(centerId).isAllowed(context);
+            p.containerTypeCreatePermission =
+                new ContainerTypeCreatePermission(centerId).isAllowed(context);
+            p.dispatchCreatePermission =
+                new DispatchCreatePermission(centerId).isAllowed(context);
+            p.originInfoUpdatePermission =
+                new OriginInfoUpdatePermission(centerId).isAllowed(context);
+            p.patientCreatePermission =
+                new PatientCreatePermission(centerId).isAllowed(context);
+            p.patientMergePermission =
+                new PatientMergePermission(centerId, null).isAllowed(context);
+            p.processingEventCreatePermission =
+                new ProcessingEventCreatePermission(centerId)
+                    .isAllowed(context);
+            p.specimenAssignPermission =
+                new SpecimenAssignPermission(centerId).isAllowed(context);
+            p.specimenLinkPermission =
+                new SpecimenLinkPermission(centerId, null).isAllowed(context);
+        }
 
         return p;
     }

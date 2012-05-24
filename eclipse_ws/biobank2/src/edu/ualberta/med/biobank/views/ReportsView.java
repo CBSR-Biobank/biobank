@@ -94,18 +94,15 @@ public class ReportsView extends ViewPart {
                     String sourceName, Object sourceValue) {
                     try {
                         if (sourceName
-                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue
-                                .equals(LoginPermissionSessionState.LOGGED_OUT)) {
-                            allowed = false;
-                        }
-                        else if (sourceName
-                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue
-                                .equals(LoginPermissionSessionState.LOGGED_IN)) {
-                            allowed =
-                                SessionManager.getAppService().isAllowed(
-                                    new ReportsPermission());
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
+                            if (sourceValue.equals(false)) {
+                                allowed = false;
+                            }
+                            else {
+                                allowed =
+                                    SessionManager.getAppService().isAllowed(
+                                        new ReportsPermission());
+                            }
                         }
                         reload();
                     } catch (Exception e) {

@@ -139,20 +139,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                         MsgStatusItem superAdminItem =
                             (MsgStatusItem) statusline
                                 .find(ApplicationActionBarAdvisor.SUPER_ADMIN_MSG_ID);
-                        if (sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
-                            mainWindowUpdateTitle(SessionManager.getUser());
-                            serverItem.setText(new StringBuffer(
-                                SessionManager.getUser().getLogin())
-                                .append("@")
-                                .append(SessionManager.getServer())
-                                .toString());
-                            superAdminItem.setVisible(SessionManager
-                                .getUser().isSuperAdmin());
-                        } else if (sourceValue
-                            .equals(LoginPermissionSessionState.LOGGED_OUT)) {
-                            mainWindowResetTitle();
-                            serverItem.setText(StringUtil.EMPTY_STRING);
-                            superAdminItem.setVisible(false);
+
+                        if (sourceName
+                            .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
+                            if (sourceValue.equals(true)) {
+                                mainWindowUpdateTitle(SessionManager.getUser());
+                                serverItem.setText(new StringBuffer(
+                                    SessionManager.getUser().getLogin())
+                                    .append("@")
+                                    .append(SessionManager.getServer())
+                                    .toString());
+                                superAdminItem.setVisible(SessionManager
+                                    .getUser()
+                                    .isSuperAdmin());
+                            } else if (sourceValue.equals(false)) {
+                                mainWindowResetTitle();
+                                serverItem.setText(StringUtil.EMPTY_STRING);
+                                superAdminItem.setVisible(false);
+                            }
                         }
                     }
                 }

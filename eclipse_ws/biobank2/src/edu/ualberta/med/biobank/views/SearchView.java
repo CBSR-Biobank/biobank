@@ -61,7 +61,7 @@ public class SearchView extends ViewPart {
                 Object sourceValue) {
                 if (sourceName
                     .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
-                    loggedIn = sourceValue.equals(LoginPermissionSessionState.LOGGED_IN);
+                    loggedIn = sourceValue.equals(true);
                     setEnabled();
                 }
             }
@@ -116,7 +116,7 @@ public class SearchView extends ViewPart {
 
         loggedIn = BgcPlugin.getLoginStateSourceProvider().getCurrentState()
             .get(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-            .equals(LoginPermissionSessionState.LOGGED_IN);
+            .equals(true);
         setEnabled();
 
     }

@@ -41,10 +41,9 @@ public abstract class AbstractViewWithAdapterTree extends
                 if (sourceName
                     .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)) {
                     if (sourceValue != null) {
-                        if (sourceValue.equals(LoginPermissionSessionState.LOGGED_IN))
+                        if (sourceValue.equals(true))
                             reload();
-                        else if (sourceValue
-                            .equals(LoginPermissionSessionState.LOGGED_OUT))
+                        else
                             clear();
                     }
                 }
