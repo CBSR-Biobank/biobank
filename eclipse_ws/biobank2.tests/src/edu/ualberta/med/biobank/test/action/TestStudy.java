@@ -792,27 +792,27 @@ public class TestStudy extends TestAction {
     public void getAllStudiesAction() {
 
         StudyGetAllAction action = new StudyGetAllAction();
-        List<Study> infos = exec(action).getList();
+        List<Study> infos = exec(action).getStudies();
 
         Integer startSize = infos.size();
 
         Integer firstStudy = StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action).getList();
+        infos = exec(action).getStudies();
         Assert.assertTrue(infos.size() == startSize + 1);
 
         StudyHelper.createStudy(getExecutor(),
             name + Utils.getRandomNumericString(15), ActivityStatus.ACTIVE);
 
-        infos = exec(action).getList();
+        infos = exec(action).getStudies();
         Assert.assertTrue(infos.size() == startSize + 2);
 
         Study study = new Study();
         study.setId(firstStudy);
         exec(new StudyDeleteAction(study));
 
-        infos = exec(action).getList();
+        infos = exec(action).getStudies();
         Assert.assertTrue(infos.size() == startSize + 1);
     }
 }
