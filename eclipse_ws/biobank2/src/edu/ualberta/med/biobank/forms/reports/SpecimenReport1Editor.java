@@ -94,7 +94,7 @@ public class SpecimenReport1Editor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getPrintParams() throws Exception {
+    protected List<Object> getPrintParams() {
         List<Object> params = new ArrayList<Object>();
         params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
             .getSelection()).getFirstElement()).getNameShort());
