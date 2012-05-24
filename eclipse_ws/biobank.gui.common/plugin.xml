@@ -22,7 +22,7 @@
          <with
                variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
             <equals
-                  value="loggedIn">
+                  value="true">
             </equals>
          </with>
       </definition>
@@ -31,7 +31,7 @@
          <with
                variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
             <equals
-                  value="loggedOut">
+                  value="false">
             </equals>
          </with>
       </definition>

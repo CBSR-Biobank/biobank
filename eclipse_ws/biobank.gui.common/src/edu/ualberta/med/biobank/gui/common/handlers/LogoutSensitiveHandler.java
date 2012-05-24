@@ -27,7 +27,7 @@ public abstract class LogoutSensitiveHandler extends AbstractHandler {
                     String sourceName, Object sourceValue) {
                     if (sourceName
                         .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-                        && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT))
+                        && sourceValue.equals(false))
                         allowed = null;
                 }
             });

@@ -19,7 +19,6 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.WrapperLogProvider;
@@ -40,7 +39,6 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -131,7 +129,6 @@ public class SessionManager {
         sessionAdapter.performExpand();
     }
 
-    @SuppressWarnings("nls")
     private void updateSessionState() {
         // for key binding contexts:
         if (sessionAdapter == null) {
@@ -147,19 +144,10 @@ public class SessionManager {
         }
 
         // assign logged in state and label permissions
-        LoginPermissionSessionState guiCommonSessionState = BgcPlugin
+        LoginPermissionSessionState loginPermissionSessionState = BgcPlugin
             .getLoginStateSourceProvider();
-        guiCommonSessionState.setLoggedInState(sessionAdapter != null);
-        try {
-            guiCommonSessionState
-                .setLabelPrintingPermissionState(sessionAdapter != null ? SessionManager
-                    .getAppService().isAllowed(
-                        new LabelPrintingPermission())
-                    : false);
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Error",
-                "Unable to retrieve labelprinting permissions");
-        }
+        loginPermissionSessionState.setLoggedInState(sessionAdapter != null);
+
         BiobankPlugin.getSessionStateSourceProvider().setUser(
             sessionAdapter == null ? null : sessionAdapter.getUser());
 
