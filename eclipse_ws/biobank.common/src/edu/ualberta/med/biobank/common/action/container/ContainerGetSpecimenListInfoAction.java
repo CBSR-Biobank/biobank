@@ -20,20 +20,21 @@ public class ContainerGetSpecimenListInfoAction extends
             + SpecimenListGetInfoAction.SPEC_BASE_END;
 
     private static final long serialVersionUID = 1L;
-    private Container container;
+    private final Integer containerId;
 
-    public ContainerGetSpecimenListInfoAction(Container container) {
-        this.container = container;
+    public ContainerGetSpecimenListInfoAction(Integer containerId) {
+        this.containerId = containerId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerReadPermission(container).isAllowed(context);
+        Container c = context.load(Container.class, containerId);
+        return new ContainerReadPermission(c).isAllowed(context);
     }
 
     @Override
     public ListResult<SpecimenInfo> run(ActionContext context)
         throws ActionException {
-        return run(context, SPEC_QRY, container.getId());
+        return run(context, SPEC_QRY, containerId);
     }
 }
