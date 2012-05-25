@@ -85,7 +85,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     // The widget that is to get the focus when the form is created
     private Control firstControl;
 
-    protected BgcEntryFormActions formActions;
+    protected BgcEntryFormActions formActions = new BgcEntryFormActions(this);
 
     protected KeyListener keyListener = new KeyAdapter() {
         @Override
@@ -407,7 +407,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected void addToolbarButtons() {
-        formActions = new BgcEntryFormActions(this);
         addResetAction();
         addCancelAction();
         addConfirmAction();
