@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
+import edu.ualberta.med.biobank.model.Container;
 
 public class ContainerGetSpecimenListInfoAction extends
     SpecimenListGetInfoAction {
@@ -19,7 +20,7 @@ public class ContainerGetSpecimenListInfoAction extends
             + SpecimenListGetInfoAction.SPEC_BASE_END;
 
     private static final long serialVersionUID = 1L;
-    private Integer containerId;
+    private final Integer containerId;
 
     public ContainerGetSpecimenListInfoAction(Integer containerId) {
         this.containerId = containerId;
@@ -27,7 +28,8 @@ public class ContainerGetSpecimenListInfoAction extends
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ContainerReadPermission(containerId).isAllowed(context);
+        Container c = context.load(Container.class, containerId);
+        return new ContainerReadPermission(c).isAllowed(context);
     }
 
     @Override
