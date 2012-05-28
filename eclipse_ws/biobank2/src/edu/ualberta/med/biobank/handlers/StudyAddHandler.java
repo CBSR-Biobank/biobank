@@ -1,18 +1,14 @@
 package edu.ualberta.med.biobank.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
-import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class StudyAddHandler extends LogoutSensitiveHandler {
+public class StudyAddHandler extends AbstractHandler {
     @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.commands.addStudy";
@@ -24,21 +20,5 @@ public class StudyAddHandler extends LogoutSensitiveHandler {
         Assert.isNotNull(sessionAdapter);
         sessionAdapter.addStudy();
         return null;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        try {
-            if (allowed == null)
-                allowed =
-                    SessionManager.getAppService().isAllowed(
-                        new StudyCreatePermission());
-            return allowed
-                && SessionManager.getInstance().getSession() != null;
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
-                StringUtil.EMPTY_STRING);
-            return false;
-        }
     }
 }

@@ -15,6 +15,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAllAction;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -33,33 +34,45 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     private final Boolean createAllowed;
 
+    private final boolean readAllowed;
+
     @SuppressWarnings("nls")
     public StudyMasterGroup(SessionAdapter parent, int id) {
         super(parent, id, i18n.tr("All Studies"));
 
         this.createAllowed = isAllowed(new StudyCreatePermission());
+        this.readAllowed = isAllowed(new StudyReadPermission());
+        this.hasChildren = this.readAllowed;
+    }
+
+    @Override
+    public void performExpand() {
+        if (!readAllowed) return;
+        super.performExpand();
     }
 
     @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (createAllowed) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(
-                // menu item label.
-                i18n.tr("Add Study"));
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    addStudy();
-                }
-            });
-        }
+        if (!createAllowed) return;
+
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText(
+            // menu item label.
+            i18n.tr("Add Study"));
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                addStudy();
+            }
+        });
     }
 
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
+        if (!readAllowed) return null;
+
         studies = SessionManager.getAppService().doAction(
             new StudyGetAllAction()).getList();
 

@@ -115,6 +115,59 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
     public void setUserCreatePermissions(
         UserCreatePermissions userCreatePermissions) {
 
+        fireSourceChanged(ISources.WORKBENCH, CLINIC_CREATE_PERMISSION,
+            userCreatePermissions.isClinicCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH,
+            COLLECTION_EVENT_CREATE_PERMISSION,
+            userCreatePermissions.isCollectionEventCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, CONTAINER_CREATE_PERMISSION,
+            userCreatePermissions.isContainerCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, CONTAINER_TYPE_CREATE_PERMISSION,
+            userCreatePermissions.isContainerTypeCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, DISPATCH_CREATE_PERMISSION,
+            userCreatePermissions.isDispatchCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, GLOBAL_ADMIN_PERMISSION,
+            userCreatePermissions.isGlobalAdminPermission());
+
+        fireSourceChanged(ISources.WORKBENCH, ORIGIN_INFO_UPDATE_PERMISSION,
+            userCreatePermissions.isOriginInfoUpdatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, PATIENT_CREATE_PERMISSION,
+            userCreatePermissions.isPatientCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, PATIENT_MERGE_PERMISSION,
+            userCreatePermissions.isPatientMergePermission());
+
+        fireSourceChanged(ISources.WORKBENCH,
+            PROCESSING_EVENT_CREATE_PERMISSION,
+            userCreatePermissions.isProcessingEventCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, RESEARCH_GROUP_CREATE_PERMISSION,
+            userCreatePermissions.isResearchGroupCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, SITE_CREATE_PERMISSION,
+            userCreatePermissions.isSiteCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, SPECIMEN_ASSIGN_PERMISSION,
+            userCreatePermissions.isSpecimenAssignPermission());
+
+        fireSourceChanged(ISources.WORKBENCH, SPECIMEN_LINK_PERMISSION,
+            userCreatePermissions.isSpecimenLinkPermission());
+
+        fireSourceChanged(ISources.WORKBENCH, SPECIMEN_TYPE_CREATE_PERMISSION,
+            userCreatePermissions.isSpecimenTypeCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, STUDY_CREATE_PERMISSION,
+            userCreatePermissions.isStudyCreatePermission());
+
+        fireSourceChanged(ISources.WORKBENCH, USER_MANAGER_PERMISSION,
+            userCreatePermissions.isUserManagerPermission());
+
         fireSourceChanged(ISources.WORKBENCH, LABEL_PRINTING_PERMISSION,
             userCreatePermissions.isLabelPrintingPermission());
 

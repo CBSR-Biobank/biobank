@@ -8,15 +8,12 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.forms.SpecimenTypesViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
+import org.eclipse.core.commands.AbstractHandler;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
+public class EditSpecimenTypesHandler extends AbstractHandler {
     private static final I18n i18n = I18nFactory
         .getI18n(EditSpecimenTypesHandler.class);
 
@@ -31,11 +28,8 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
             .getSession();
         Assert.isNotNull(sessionAdapter);
         try {
-            PlatformUI
-                .getWorkbench()
-                .getActiveWorkbenchWindow()
-                .getActivePage()
-                .openEditor(new FormInput(sessionAdapter),
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().openEditor(new FormInput(sessionAdapter),
                     SpecimenTypesViewForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException(
@@ -44,25 +38,5 @@ public class EditSpecimenTypesHandler extends LogoutSensitiveHandler {
         }
 
         return null;
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    public boolean isEnabled() {
-        try {
-            if (allowed == null)
-                allowed = SessionManager.getAppService().isAllowed(
-                    new SpecimenTypeCreatePermission());
-            return SessionManager.getUser().isSuperAdmin()
-                && allowed
-                && (SessionManager.getInstance().getSession() != null);
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                // dialog title
-                i18n.tr("Error"),
-                // dialog message
-                i18n.tr("Unable to retrieve permissions"));
-            return false;
-        }
     }
 }

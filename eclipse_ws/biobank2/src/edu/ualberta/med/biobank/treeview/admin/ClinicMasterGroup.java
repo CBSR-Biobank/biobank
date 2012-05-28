@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction.ClinicsInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
+import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
@@ -34,6 +35,8 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
 
     private final boolean createAllowed;
 
+    private final boolean readAllowed;
+
     @SuppressWarnings("nls")
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
         super(sessionAdapter, id,
@@ -41,28 +44,38 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
             i18n.tr("All Clinics"));
 
         this.createAllowed = isAllowed(new ClinicCreatePermission());
+        this.readAllowed = isAllowed(new ClinicReadPermission());
+        this.hasChildren = this.readAllowed;
+    }
+
+    @Override
+    public void performExpand() {
+        if (!readAllowed) return;
+        super.performExpand();
     }
 
     @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (createAllowed) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(
-                // menu item label.
-                i18n.tr("Add Clinic"));
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    addClinic();
-                }
-            });
-        }
+        if (!createAllowed) return;
+
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText(
+            // menu item label.
+            i18n.tr("Add Clinic"));
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                addClinic();
+            }
+        });
     }
 
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
+        if (!readAllowed) return null;
+
         clinicsInfo = SessionManager.getAppService().doAction(
             new ClinicGetAllAction());
 

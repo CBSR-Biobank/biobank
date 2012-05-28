@@ -17,10 +17,4 @@ public class DeleteSelectionHandler extends AbstractHandler {
         adapter.deleteWithConfirm();
         return null;
     }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
 }

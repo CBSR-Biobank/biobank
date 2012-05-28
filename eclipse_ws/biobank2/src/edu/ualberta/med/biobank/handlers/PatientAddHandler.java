@@ -1,20 +1,15 @@
 package edu.ualberta.med.biobank.handlers;
 
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
-import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientAddHandler extends LogoutSensitiveHandler {
+public class PatientAddHandler extends AbstractHandler {
 
     private static BgcLogger logger = BgcLogger
         .getLogger(PatientAddHandler.class.getName());
@@ -31,21 +26,5 @@ public class PatientAddHandler extends LogoutSensitiveHandler {
             logger.error("Error while opening the patient entry form", exp);
         }
         return null;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        try {
-            if (allowed == null)
-                allowed =
-                    SessionManager.getAppService().isAllowed(
-                        new PatientCreatePermission(null));
-            return SessionManager.getInstance().getSession() != null &&
-                allowed;
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(StringUtil.EMPTY_STRING,
-                StringUtil.EMPTY_STRING);
-            return false;
-        }
     }
 }
