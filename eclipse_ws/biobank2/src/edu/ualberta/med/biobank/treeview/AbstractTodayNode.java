@@ -10,6 +10,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.IBiobankModel;
@@ -93,7 +94,8 @@ public abstract class AbstractTodayNode<E extends IBiobankModel> extends
             // add today elements is not yet there
             if (currentTodayElements != null) {
                 for (E wrapper : currentTodayElements) {
-                    addChild(wrapper);
+                    if (wrapper instanceof OriginInfoWrapper)
+                        addChild(wrapper);
                 }
             }
 

@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessIn
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
@@ -99,10 +100,9 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         BgcBaseText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, ShipmentInfo.PropertyName.WAYBILL.toString());
         setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
-        BgcBaseText dateReceivedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, i18n.tr("Date received"));
-        setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
-            .getFormattedDateReceived());
+        createDateTimeWidget(client, i18n.tr("Date received"), null,
+            dispatch.getShipmentInfo(),
+            ShipmentInfoPeer.RECEIVED_AT.getName(), null);
 
         createCommentSection();
 

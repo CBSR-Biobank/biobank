@@ -21,6 +21,8 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction.ClinicsInfo;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
@@ -32,12 +34,12 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.helpers.SiteQuery;
 import edu.ualberta.med.biobank.dialogs.SpecimenOriginSelectDialog;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -201,10 +203,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        ClinicsInfo clinics = SessionManager
+            .getAppService().doAction(
+                new ClinicGetAllAction());
+
         senderComboViewer =
-            createComboViewer(client,
+            createComboViewer(
+                client,
                 Dispatch.PropertyName.SENDER_CENTER.toString(),
-                ClinicWrapper.getAllClinics(SessionManager.getAppService()),
+                ModelWrapper.wrapModelCollection(
+                    SessionManager.getAppService(), clinics.getClinics(),
+                    ClinicWrapper.class),
                 (ClinicWrapper) originInfo.getCenter(),
                 // validation error message.
                 i18n.tr("A sender center should be selected"),
@@ -221,7 +230,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         receiverComboViewer =
             createComboViewer(client,
                 Dispatch.PropertyName.RECEIVER_CENTER.toString(),
-                SiteQuery.getSites(SessionManager.getAppService()),
+                Arrays.asList(SessionManager.getUser()
+                    .getCurrentWorkingSite()),
                 originInfo.getReceiverSite(),
                 // validation error message.
                 i18n.tr("A receiving site should be selected"),
