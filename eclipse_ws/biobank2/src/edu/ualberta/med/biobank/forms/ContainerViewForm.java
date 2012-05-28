@@ -162,7 +162,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getAppService()
                 .doAction(
                     new ContainerGetSpecimenListInfoAction(
-                        containerInfo.container)).getList();
+                        containerInfo.container.getId())).getList();
         Assert.isNotNull(containerInfo);
         Assert.isNotNull(containerInfo.container);
     }
@@ -318,7 +318,8 @@ public class ContainerViewForm extends BiobankViewForm {
             @SuppressWarnings("nls")
             Label label =
                 toolkit
-                    .createLabel(client,
+                    .createLabel(
+                        client,
                         i18n.tr("Error in container children : can't display those initialized"));
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));

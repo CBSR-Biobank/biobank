@@ -27,77 +27,85 @@ public class SpecimenTransitSearchAction implements
     private String waybill;
     private Date received;
     private Date packed;
-    private Integer currentSite;
+    private final Integer currentSite;
 
     public SpecimenTransitSearchAction(Integer currentSite) {
         this.currentSite = currentSite;
     }
 
-    private static final String SHIPMENT_HQL_STRING = "from " //$NON-NLS-1$
-        + OriginInfo.class.getName() + " as o inner join fetch o." //$NON-NLS-1$
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s " //$NON-NLS-1$
-        + " inner join fetch o.center inner join fetch o.receiverSite"; //$NON-NLS-1$
-
-    private static final String DISPATCH_HQL_STRING = "from " //$NON-NLS-1$
-        + Dispatch.class.getName() + " as o inner join fetch o." //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String SHIPMENT_HQL_STRING = "from "
+        + OriginInfo.class.getName() + " as o inner join fetch o."
         + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "
-        + " inner join fetch o.senderCenter inner join fetch o.receiverCenter"; //$NON-NLS-1$
+        + " inner join fetch o.center inner join fetch o.receiverSite";
 
+    @SuppressWarnings("nls")
+    private static final String DISPATCH_HQL_STRING = "from "
+        + Dispatch.class.getName() + " as o inner join fetch o."
+        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "
+        + " inner join fetch o.senderCenter inner join fetch o.receiverCenter";
+
+    @SuppressWarnings("nls")
     private static final String SHIPMENTS_BY_WAYBILL_QRY = SHIPMENT_HQL_STRING
-        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
+        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?";
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHES_BY_WAYBILL_QRY = DISPATCH_HQL_STRING
-        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
+        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?";
 
+    @SuppressWarnings("nls")
     private static final String SHIPMENTS_BY_DATE_PACKED_QRY =
         SHIPMENT_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
+            + " < ? and (o."
             + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
+            + "= ? or o."
             + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHES_BY_DATE_PACKED_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s."
             + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
+            + " < ? and (o."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
+            + "= ? or o."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER,
                 CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
+    @SuppressWarnings("nls")
     private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY =
         SHIPMENT_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
+            + " < ? and (o."
             + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
+            + "= ? or o."
             + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
+    @SuppressWarnings("nls")
     private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
         DISPATCH_HQL_STRING
-            + " where s." //$NON-NLS-1$
+            + " where s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
+            + " >= ? and s."
             + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
+            + " < ? and (o."
             + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
+            + "= ? or o."
             + Property.concatNames(DispatchPeer.RECEIVER_CENTER,
                 CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
+            + " = ?)";
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
