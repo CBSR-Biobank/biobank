@@ -10,9 +10,6 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
-import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.dialogs.startup.ActivityLogLocationDialog;
 import edu.ualberta.med.biobank.forms.linkassign.SpecimenLinkEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -62,22 +59,5 @@ public class SpecimenLinkHandler extends LinkAssignCommonHandler {
             .getString(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH));
 
         return (!logSave || (dir.isDirectory() && dir.canWrite()));
-    }
-
-    @Override
-    protected boolean canUserPerformAction(UserWrapper user) {
-        if (allowed == null)
-            try {
-                if (!SessionManager.getInstance().isConnected()
-                    || user.getCurrentWorkingCenter() == null)
-                    return false;
-                allowed =
-                    SessionManager.getAppService().isAllowed(
-                        new SpecimenLinkPermission(user
-                            .getCurrentWorkingCenter().getId(), null));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        return allowed;
     }
 }

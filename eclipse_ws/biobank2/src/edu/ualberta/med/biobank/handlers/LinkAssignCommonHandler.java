@@ -15,10 +15,8 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.gui.common.handlers.LogoutSensitiveHandler;
+import org.eclipse.core.commands.AbstractHandler;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
@@ -26,7 +24,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
  * Open a form in patient administration like scan link, scan assign or cabinet
  * like/assign
  */
-public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
+public abstract class LinkAssignCommonHandler extends AbstractHandler
     implements
     IHandler {
     private static final I18n i18n = I18nFactory
@@ -55,13 +53,6 @@ public abstract class LinkAssignCommonHandler extends LogoutSensitiveHandler
         }
         return null;
     }
-
-    @Override
-    public boolean isEnabled() {
-        return canUserPerformAction(SessionManager.getUser());
-    }
-
-    protected abstract boolean canUserPerformAction(UserWrapper user);
 
     private void hideConsoleViewIcons(IWorkbenchPage activePage) {
         // Remove buttons in the console view toolbar

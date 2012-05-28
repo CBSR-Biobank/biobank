@@ -17,30 +17,123 @@
    </extension>
    <extension
          point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="edu.ualberta.med.biobank.gui.common.loggedIn">
-         <with
-               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
-            <equals
-                  value="true">
+      <definition id="edu.ualberta.med.biobank.gui.common.loggedIn">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
+            <equals value="true">
             </equals>
          </with>
       </definition>
-      <definition
-            id="edu.ualberta.med.biobank.gui.common.loggedOut">
-         <with
-               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
-            <equals
-                  value="false">
+      <definition id="edu.ualberta.med.biobank.gui.common.loggedOut">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.loginState">
+            <equals value="false">
             </equals>
          </with>
       </definition>
-      <definition
-            id="edu.ualberta.med.biobank.gui.common.labelPrintingPermission">
-         <with
-               variable="edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission">
-            <equals
-                  value="true">
+      <definition id="edu.ualberta.med.biobank.gui.common.clinicCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.clinicCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.collectionEventCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.collectionEventCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.containerCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.containerCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.containerTypeCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.containerTypeCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.dispatchCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.dispatchCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.globalAdminPermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.patientMergePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.patientMergePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.researchGroupCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.researchGroupCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.originInfoUpdatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.originInfoUpdatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.processingEventCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.processingEventCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.patientCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.patientCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.siteCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.siteCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.studyCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.studyCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.specimenAssignPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.specimenAssignPermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.specimenLinkPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.specimenLinkPermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.specimenTypeCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.specimenTypeCreatePermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.userManagerPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.userManagerPermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.labelPrintingPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission">
+            <equals value="true">
             </equals>
          </with>
       </definition>

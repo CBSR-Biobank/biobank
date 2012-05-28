@@ -55,7 +55,7 @@ public class ContainerGetInfoByLabelAction implements
 
     private final String label;
 
-    private Integer siteId;
+    private final Integer siteId;
 
     @SuppressWarnings("nls")
     public ContainerGetInfoByLabelAction(String label, Integer siteId) {
@@ -76,7 +76,7 @@ public class ContainerGetInfoByLabelAction implements
         return result;
     }
 
-    @SuppressWarnings("nls")
+    @SuppressWarnings({ "nls", "unchecked" })
     @Override
     public ListResult<Container> run(ActionContext context)
         throws ActionException {

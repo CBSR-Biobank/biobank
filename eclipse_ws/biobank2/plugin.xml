@@ -346,7 +346,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.siteCreatePermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -360,8 +360,8 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
+                     definitionId="edu.ualberta.med.biobank.gui.common.studyCreatePermission">
+               </reference> 
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
@@ -373,11 +373,9 @@
             commandId="edu.ualberta.med.biobank.commands.clinicAdd">
          <activeWhen>
             <and>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               <reference definitionId="edu.ualberta.med.biobank.gui.common.clinicCreatePermission">
                </reference>
-               <reference
-                     definitionId="biobank.mainPerspectiveSelected">
+               <reference definitionId="biobank.mainPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -388,7 +386,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.containerTypeCreatePermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -402,7 +400,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.containerCreatePermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -416,7 +414,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.specimenTypeCreatePermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -430,8 +428,8 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
-               </reference>
+                     definitionId="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
+               </reference> 
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
@@ -489,7 +487,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.originInfoUpdatePermission">
               </reference>
             </and>
          </activeWhen>
@@ -508,7 +506,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.patientCreatePermission">
               </reference>
             </and>
          </activeWhen>
@@ -522,9 +520,14 @@
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
          <activeWhen>
+            <and>
               <reference
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
+              <reference
+                    definitionId="edu.ualberta.med.biobank.gui.common.patientMergePermission">
+              </reference>
+            </and>
          </activeWhen>
           <enabledWhen>
             <and>
@@ -571,18 +574,17 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
+         <activeWhen>
+              <reference definitionId="edu.ualberta.med.biobank.gui.common.collectionEventCreatePermission">
+               </reference>
+         </activeWhen>
          <enabledWhen>
             <and>
-               <reference
-                     definitionId="biobank.oneElementSelected">
+               <reference definitionId="biobank.oneElementSelected">
                </reference>
-			   <with
-                  variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+			   <with variable="selection">
+                  <iterate ifEmpty="false" operator="or">
+                     <instanceof value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -593,8 +595,7 @@
             class="edu.ualberta.med.biobank.handlers.ReloadViewWithTreeHandler"
             commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree">
          <activeWhen>
-               <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               <reference definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
                </reference>
          </activeWhen>
       </handler>
@@ -688,7 +689,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.userManagerPermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
@@ -705,7 +706,7 @@
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                    definitionId="edu.ualberta.med.biobank.gui.common.dispatchCreatePermission">
               </reference>
             </and>
          </activeWhen>
@@ -724,7 +725,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.processingEventCreatePermission">
                </reference>
             </and>
          </activeWhen>
@@ -743,7 +744,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.specimenAssignPermission">
                </reference>
             </and>
          </activeWhen>
@@ -762,7 +763,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.specimenLinkPermission">
                </reference>
             </and>
          </activeWhen>
@@ -778,7 +779,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+                     definitionId="edu.ualberta.med.biobank.gui.common.researchGroupCreatePermission">
                </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">

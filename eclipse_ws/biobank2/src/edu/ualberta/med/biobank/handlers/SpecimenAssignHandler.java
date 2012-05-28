@@ -5,9 +5,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
-import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.treeview.processing.SpecimenAssignAdapter;
@@ -32,22 +29,5 @@ public class SpecimenAssignHandler extends LinkAssignCommonHandler {
                 i18n.tr("Specimen Assign"),
                 false));
         return null;
-    }
-
-    @Override
-    protected boolean canUserPerformAction(UserWrapper user) {
-        if (allowed == null)
-            try {
-                if (!SessionManager.getInstance().isConnected()
-                    || user.getCurrentWorkingSite() == null)
-                    return false;
-                allowed =
-                    SessionManager.getAppService().isAllowed(
-                        new SpecimenAssignPermission(user
-                            .getCurrentWorkingSite().getId()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        return allowed;
     }
 }

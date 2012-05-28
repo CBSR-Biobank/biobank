@@ -18,12 +18,10 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetAllAction;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteGroup extends AdapterBase {
     private static final I18n i18n = I18nFactory.getI18n(SiteGroup.class);
@@ -31,21 +29,11 @@ public class SiteGroup extends AdapterBase {
 
     @SuppressWarnings("nls")
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, i18n.tr("All Sites"), true);
+        super(parent, id,
+            // tree node label.
+            i18n.tr("All Sites"), true);
 
-        boolean allowed = false;
-        try {
-            allowed = SessionManager.getAppService().isAllowed(
-                new SiteCreatePermission());
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("Error"),
-                // TR: dialog message
-                i18n.tr("Unable to retrieve permissions"));
-        }
-
-        this.createAllowed = allowed;
+        this.createAllowed = isAllowed(new SiteCreatePermission());
     }
 
     @SuppressWarnings("nls")
