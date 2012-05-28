@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -195,12 +196,18 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             }
         }
         try {
-            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new DispatchReadPermission(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getWrappedObject()))
-                || SessionManager.getAppService().isAllowed(
-                    new OriginInfoReadPermission(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getWrappedObject())));
+            CenterWrapper<?> center = SessionManager.getUser()
+                .getCurrentWorkingCenter();
+            if (center == null)
+                setSearchFieldsEnablement(false);
+            else
+                setSearchFieldsEnablement(SessionManager.getAppService()
+                    .isAllowed(
+                        new DispatchReadPermission(center
+                            .getWrappedObject()))
+                    || SessionManager.getAppService().isAllowed(
+                        new OriginInfoReadPermission(SessionManager.getUser()
+                            .getCurrentWorkingCenter().getWrappedObject())));
         } catch (ApplicationException e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
