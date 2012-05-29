@@ -129,7 +129,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.NONE,
             // TR: label
-            i18n.tr("email", "Title"),
+            i18n.trc("email", "Title"),
             new String[0], email,
             "title",
             new NonEmptyStringValidator(
@@ -139,7 +139,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         BgcBaseText descText = (BgcBaseText) createBoundWidgetWithLabel(
             contents, BgcBaseText.class, SWT.MULTI,
             // TR: label
-            i18n.tr("email", "Description"),
+            i18n.trc("email", "Description"),
             new String[0],
             email, "description", new NonEmptyStringValidator(
                 // TR: validation error message
@@ -149,7 +149,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         descText.setLayoutData(gd);
 
         Label attLabel = widgetCreator.createLabel(contents,
-            i18n.tr("email", "Attachments"));
+            i18n.trc("email", "Attachments"));
         attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
         final Composite attachmentsComposite =
@@ -167,7 +167,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
         addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_ADD));
         // TR: button tooltip
-        addButton.setToolTipText(i18n.tr("email", "Add attachment"));
+        addButton.setToolTipText(i18n.trc("email", "Add attachment"));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -406,7 +406,7 @@ public class SendErrorMessageDialog extends BgcBaseDialog {
                 BgcBaseText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
             // TR: button
-            browseButton.setText(i18n.tr("file", "Browse"));
+            browseButton.setText(i18n.trc("file", "Browse"));
             browseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
