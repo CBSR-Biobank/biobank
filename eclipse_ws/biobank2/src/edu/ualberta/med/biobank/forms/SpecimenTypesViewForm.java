@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,9 +8,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -35,18 +29,12 @@ public class SpecimenTypesViewForm extends BiobankViewForm {
 
     private SpecimenTypeEntryInfoTree specimenWidget;
 
-    private List<SpecimenTypeWrapper> globalSpecimenTypeWrappers =
-        new ArrayList<SpecimenTypeWrapper>();
-
-    private List<SpecimenType> globalSpecimenTypes;
-
     private Boolean createAllowed;
 
     @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
         setPartName(SpecimenType.NAME.plural().toString());
-        updateSpecimenTypeInfo();
         try {
             this.createAllowed = SessionManager.getAppService().isAllowed(
                 new SpecimenTypeCreatePermission());
@@ -64,21 +52,11 @@ public class SpecimenTypesViewForm extends BiobankViewForm {
         createGlobalSpecimenTypeSection();
     }
 
-    private void updateSpecimenTypeInfo() throws Exception {
-        globalSpecimenTypes = SessionManager.getAppService().doAction(
-            new SpecimenTypeGetAllAction()).getList();
-        Assert.isNotNull(globalSpecimenTypes);
-        globalSpecimenTypeWrappers =
-            ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-                globalSpecimenTypes, SpecimenTypeWrapper.class);
-    }
-
     @SuppressWarnings("nls")
     private void createGlobalSpecimenTypeSection() {
         Section section = createSection(SpecimenType.NAME.plural().toString());
         specimenWidget =
             new SpecimenTypeEntryInfoTree(section,
-                globalSpecimenTypeWrappers,
                 i18n.tr("Add a new global specimen type"),
                 i18n.tr("Edit the global specimen type"));
         specimenWidget.adaptToToolkit(toolkit, true);
@@ -106,6 +84,6 @@ public class SpecimenTypesViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
-        specimenWidget.setLists(globalSpecimenTypeWrappers);
+        specimenWidget.reload();
     }
 }
