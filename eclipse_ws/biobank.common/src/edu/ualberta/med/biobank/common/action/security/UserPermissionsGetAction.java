@@ -7,7 +7,6 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction.UserCreatePermissions;
 import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
-import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
@@ -67,9 +66,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             .isAllowed(context);
 
         if (centerId != null) {
-            p.collectionEventCreatePermission =
-                new CollectionEventCreatePermission(centerId)
-                    .isAllowed(context);
             p.containerCreatePermission =
                 new ContainerCreatePermission(centerId).isAllowed(context);
             p.containerTypeCreatePermission =
@@ -98,7 +94,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         private static final long serialVersionUID = 1L;
 
         private boolean clinicCreatePermission;
-        private boolean collectionEventCreatePermission;
         private boolean containerCreatePermission;
         private boolean containerTypeCreatePermission;
         private boolean dispatchCreatePermission;
@@ -122,10 +117,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
 
         public boolean isClinicCreatePermission() {
             return clinicCreatePermission;
-        }
-
-        public boolean isCollectionEventCreatePermission() {
-            return collectionEventCreatePermission;
         }
 
         public boolean isContainerCreatePermission() {

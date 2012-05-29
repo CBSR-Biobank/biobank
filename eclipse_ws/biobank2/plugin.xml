@@ -574,10 +574,6 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
-         <activeWhen>
-              <reference definitionId="edu.ualberta.med.biobank.gui.common.collectionEventCreatePermission">
-               </reference>
-         </activeWhen>
          <enabledWhen>
             <and>
                <reference definitionId="biobank.oneElementSelected">

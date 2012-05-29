@@ -19,10 +19,6 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
         "edu.ualberta.med.biobank.gui.common.sourceprovider.clinicCreatePermission";
 
     @SuppressWarnings("nls")
-    public static final String COLLECTION_EVENT_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.collectionEventCreatePermission";
-
-    @SuppressWarnings("nls")
     public static final String CONTAINER_CREATE_PERMISSION =
         "edu.ualberta.med.biobank.gui.common.sourceprovider.containerCreatePermission";
 
@@ -117,10 +113,6 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
 
         fireSourceChanged(ISources.WORKBENCH, CLINIC_CREATE_PERMISSION,
             userCreatePermissions.isClinicCreatePermission());
-
-        fireSourceChanged(ISources.WORKBENCH,
-            COLLECTION_EVENT_CREATE_PERMISSION,
-            userCreatePermissions.isCollectionEventCreatePermission());
 
         fireSourceChanged(ISources.WORKBENCH, CONTAINER_CREATE_PERMISSION,
             userCreatePermissions.isContainerCreatePermission());

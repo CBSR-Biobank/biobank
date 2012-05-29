@@ -35,12 +35,6 @@
             </equals>
          </with>
       </definition>
-      <definition id="edu.ualberta.med.biobank.gui.common.collectionEventCreatePermission">
-         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.collectionEventCreatePermission">
-            <equals value="true">
-            </equals>
-         </with>
-      </definition>
       <definition id="edu.ualberta.med.biobank.gui.common.containerCreatePermission">
          <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.containerCreatePermission">
             <equals value="true">
