@@ -8,8 +8,10 @@ import java.util.ListIterator;
 
 public class DelegatingList<E> extends AbstractListChangeSource<E>
     implements List<E> {
-    private final ModifierChangeHandler modifierChangeHandler = new ModifierChangeHandler();
-    private final List<ListChangeSource<E>> modifiers = new ArrayList<ListChangeSource<E>>();
+    private final ModifierChangeHandler modifierChangeHandler =
+        new ModifierChangeHandler();
+    private final List<ListChangeSource<E>> modifiers =
+        new ArrayList<ListChangeSource<E>>();
     private List<E> delegate;
 
     public DelegatingList() {
@@ -25,10 +27,11 @@ public class DelegatingList<E> extends AbstractListChangeSource<E>
             throw new IllegalArgumentException("delegate is required"); //$NON-NLS-1$
         }
 
-        // no need to delegate to ourselves or reset the delegate
-        if (this == delegate || this.delegate == delegate) {
-            return;
-        }
+        // removed this code: you cannot be certain your collection hasn't
+        // changed, even if it is the same collection
+        // if (this == delegate || this.delegate == delegate) {
+        // return;
+        // }
 
         clearModifiers();
         this.delegate = delegate;
@@ -109,8 +112,9 @@ public class DelegatingList<E> extends AbstractListChangeSource<E>
 
     @Override
     public ListIterator<E> listIterator() {
-        ListChangeSourceListIterator<E> iterator = new ListChangeSourceListIterator<E>(
-            delegate.listIterator());
+        ListChangeSourceListIterator<E> iterator =
+            new ListChangeSourceListIterator<E>(
+                delegate.listIterator());
         iterator.addListChangeHandler(modifierChangeHandler);
         modifiers.add(iterator);
         return iterator;
@@ -118,8 +122,9 @@ public class DelegatingList<E> extends AbstractListChangeSource<E>
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        ListChangeSourceListIterator<E> iterator = new ListChangeSourceListIterator<E>(
-            delegate.listIterator(index));
+        ListChangeSourceListIterator<E> iterator =
+            new ListChangeSourceListIterator<E>(
+                delegate.listIterator(index));
         iterator.addListChangeHandler(modifierChangeHandler);
         modifiers.add(iterator);
         return iterator;
