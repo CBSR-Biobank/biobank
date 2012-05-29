@@ -28,10 +28,12 @@ import edu.ualberta.med.biobank.common.action.patient.PatientMergeAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -76,6 +78,9 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private PatientInfo p;
 
+    private CommentWrapper comment = new CommentWrapper(
+        SessionManager.getAppService());
+
     @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
@@ -89,6 +94,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1 =
             new PatientWrapper(SessionManager.getAppService());
         patient1.setWrappedObject(p.patient);
+
+        comment.setWrappedObject(new Comment());
 
         // tab name.
         String tabName = i18n.tr("Merging Patient {0}",
@@ -117,6 +124,22 @@ public class PatientMergeForm extends BiobankEntryForm {
                     patient1.getPnumber()), SWT.LEFT);
 
         createPatientSection();
+        createCommentSection();
+
+    }
+
+    @SuppressWarnings("nls")
+    private void createCommentSection() {
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
+        GridLayout gl = new GridLayout(1, false);
+        client.setLayout(gl);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.MULTI, i18n.tr("Add a comment"), null, comment, "message", null);
+
     }
 
     private void createPatientSection() {
@@ -293,7 +316,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                         .getAppService()
                         .doAction(
                             new PatientMergeAction(patient1.getId(), patient2
-                                .getId())).isTrue();
+                                .getId(), comment.getMessage())).isTrue();
             } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     // dialog title.
@@ -337,6 +360,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient2VisitsTable
             .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;
+        comment.setWrappedObject(new Comment());
     }
 
     @SuppressWarnings("nls")
