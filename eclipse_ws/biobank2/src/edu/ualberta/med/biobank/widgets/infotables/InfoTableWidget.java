@@ -147,6 +147,9 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     protected void tableLoader(final List<T> collection, final T selection) {
         final TableViewer viewer = getTableViewer();
         final Table table = viewer.getTable();
+
+        if (table.isDisposed()) return;
+
         Display display = viewer.getTable().getDisplay();
 
         initModel(collection);
