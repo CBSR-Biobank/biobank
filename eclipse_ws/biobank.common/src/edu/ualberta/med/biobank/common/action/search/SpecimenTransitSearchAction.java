@@ -112,6 +112,7 @@ public class SpecimenTransitSearchAction implements
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<IBiobankModel> run(ActionContext context)
         throws ActionException {
