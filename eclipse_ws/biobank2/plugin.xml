@@ -566,7 +566,7 @@
                   </or>
                </not>
                <reference
-                     definitionId="biobank.hasWorkingCenter">
+                     definitionId="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
                </reference>
             </and>
          </enabledWhen>
@@ -2171,12 +2171,9 @@
             </equals>
          </with>
       </definition>
-       <definition
-             id="biobank.hasWorkingCenter">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
-             <equals
-                   value="true">
+       <definition id="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+          <with variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+             <equals value="true">
              </equals>
           </with>
        </definition>
