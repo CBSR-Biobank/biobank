@@ -175,7 +175,7 @@ public class TestPatient extends ActionTest {
         createCEventWithSpecimens(provisioning, patientId2, 3, typeId, 7);
 
         // merge patient1 into patient2
-        exec(new PatientMergeAction(patientId1, patientId2));
+        exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
 
         Patient p1 = (Patient) session.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
@@ -227,7 +227,7 @@ public class TestPatient extends ActionTest {
 
         // merge patient1 into patient2
         try {
-            exec(new PatientMergeAction(patientId1, patientId2));
+            exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
             Assert
                 .fail("Should not be able to merge when patients are from different studies");
         } catch (PatientMergeException pme) {
