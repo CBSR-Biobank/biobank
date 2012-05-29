@@ -239,7 +239,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     i18n.tr("Dispatch not found"), msg);
             } else {
                 showSearchedObjectsInTree(searchedObject);
-                getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
             BgcPlugin.openError(
@@ -265,8 +264,8 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @SuppressWarnings("nls")
     protected void showSearchedObjectsInTree(
-        List<IBiobankModel> searchedObject2) {
-        for (IBiobankModel searchedObject : searchedObject2) {
+        List<IBiobankModel> searchedObjects) {
+        for (IBiobankModel searchedObject : searchedObjects) {
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedObject.getClass(), searchedObject.getId());
             if (nodeRes.size() == 0) {
@@ -275,19 +274,21 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 SpecimenTransitView.addToNode(searchedNode, searchedObject);
             }
         }
-        if (searchedObject2.size() == 1) {
-            IBiobankModel searchedWrap = searchedObject2.get(0);
+        if (searchedObjects.size() == 1) {
+            IBiobankModel searchedWrap = searchedObjects.get(0);
             List<AbstractAdapterBase> nodeRes = rootNode.search(
                 searchedWrap.getClass(), searchedWrap.getId());
-            if (nodeRes.size() > 0)
+            if (nodeRes.size() > 0) {
                 nodeRes.get(0).performDoubleClick();
+                getTreeViewer().expandToLevel(nodeRes.get(0), 1);
+            }
         } else {
             searchedNode.performExpand();
             BgcPlugin.openMessage(
                 // dialog title.
                 i18n.tr("Shipments"),
                 // dialog message.
-                i18n.tr("{0} found.", searchedObject2.size()));
+                i18n.tr("{0} found.", searchedObjects.size()));
         }
     }
 
@@ -351,7 +352,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             if (centerAdapter != null) {
                 ShipmentAdapter shipmentAdapter = null;
                 List<AbstractAdapterBase> shipmentAdapterList = centerAdapter
-                    .search(OriginInfoWrapper.class, originInfo.getId());
+                    .search(OriginInfo.class, originInfo.getId());
                 if (shipmentAdapterList.size() > 0)
                     shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
                         .get(0);

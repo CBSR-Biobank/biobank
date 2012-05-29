@@ -138,6 +138,7 @@ public class CollectionView extends AbstractAdministrationView {
                 setSelectedNode(nodeRes.get(0));
                 nodeRes.get(0).performDoubleClick();
             }
+            getTreeViewer().expandToLevel(nodeRes.get(0), 1);
         }
     }
 
@@ -164,7 +165,6 @@ public class CollectionView extends AbstractAdministrationView {
                 searchedNode.addPatient(pinfo);
                 showSearchedObjectsInTree(pinfo.patient.getId(),
                     pinfo.patient.getPnumber(), false, true);
-                getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
