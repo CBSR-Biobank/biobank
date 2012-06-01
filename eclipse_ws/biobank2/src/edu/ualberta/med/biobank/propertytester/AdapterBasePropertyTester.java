@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.expressions;
+package edu.ualberta.med.biobank.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
 
@@ -7,11 +7,13 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 
 public class AdapterBasePropertyTester extends PropertyTester {
 
-    public static final String CAN_DELETE = "canDelete"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final String CAN_DELETE = "canDelete";
 
-    private static BgcLogger logger = BgcLogger
+    private static BgcLogger log = BgcLogger
         .getLogger(AdapterBasePropertyTester.class.getName());
 
+    @SuppressWarnings("nls")
     @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
@@ -22,7 +24,7 @@ public class AdapterBasePropertyTester extends PropertyTester {
                 if (CAN_DELETE.equals(property))
                     return adapter.isDeletable();
             } catch (Exception ex) {
-                logger.error("Problem testing menus enablement", ex); //$NON-NLS-1$
+                log.error("Problem testing menus enablement", ex);
             }
         }
         return false;

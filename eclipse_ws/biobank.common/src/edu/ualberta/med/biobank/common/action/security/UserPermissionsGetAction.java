@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCre
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
 import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
-import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCreatePermission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
@@ -26,9 +25,9 @@ import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 /**
  * Note: center ID can be null and the permissions that require a working center
  * will be left as false.
- *
+ * 
  * @author loyola
- *
+ * 
  */
 public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
     private static final long serialVersionUID = 1L;
@@ -64,6 +63,8 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             new UserManagerPermission().isAllowed(context);
         p.labelPrintingPermission = new LabelPrintingPermission()
             .isAllowed(context);
+        p.patientCreatePermission =
+            new PatientCreatePermission(null).isAllowed(context);
 
         if (centerId != null) {
             p.containerCreatePermission =
@@ -74,10 +75,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
                 new DispatchCreatePermission(centerId).isAllowed(context);
             p.originInfoUpdatePermission =
                 new OriginInfoUpdatePermission(centerId).isAllowed(context);
-            p.patientCreatePermission =
-                new PatientCreatePermission(centerId).isAllowed(context);
-            p.patientMergePermission =
-                new PatientMergePermission(centerId, null).isAllowed(context);
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(centerId)
                     .isAllowed(context);
