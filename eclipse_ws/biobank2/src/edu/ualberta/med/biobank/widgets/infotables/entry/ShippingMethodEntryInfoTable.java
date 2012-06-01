@@ -38,8 +38,6 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
     private static BgcLogger logger = BgcLogger
         .getLogger(ShippingMethodEntryInfoTable.class.getName());
 
-    List<ShippingMethodWrapper> selectedShippingMethod;
-
     private final String addMessage;
 
     private final String editMessage;
@@ -55,7 +53,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         List<ShippingMethodWrapper> globalShippingMethod, String addMessage,
         String editMessage) {
         super(parent, null);
-        setLists(globalShippingMethod);
+        setList(globalShippingMethod);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
         addEditSupport();
@@ -86,7 +84,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             if (addEditOk(shippingMethod)) {
                 if (add) {
                     // only add to the collection when adding and not editing
-                    selectedShippingMethod.add(shippingMethod);
+                    getList().add(shippingMethod);
                 }
                 try {
                     SessionManager.getAppService().doAction(
@@ -97,18 +95,8 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         i18n.tr("Save Failed"),
                         e);
                 }
-                reloadCollection(selectedShippingMethod);
                 return true;
             }
-            try {
-                shippingMethod.reload();
-            } catch (Exception e) {
-                BgcPlugin
-                    .openAsyncError(
-                        i18n.tr("Refresh Failed"),
-                        e);
-            }
-            reloadCollection(selectedShippingMethod);
         }
         return false;
     }
@@ -164,11 +152,10 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
 
                         // equals method now compare toString() results if both
                         // ids are null.
-                        selectedShippingMethod.remove(type);
+                        getList().remove(type);
                         SessionManager.getAppService().doAction(
                             new ShippingMethodDeleteAction(
                                 type.getId()));
-                        setList(selectedShippingMethod);
                     } catch (final RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
@@ -183,8 +170,8 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
     @SuppressWarnings("nls")
     private boolean addEditOk(ShippingMethodWrapper type) {
         try {
-            for (ShippingMethodWrapper sv : selectedShippingMethod)
-                if (!sv.getId().equals(type.getId())
+            for (ShippingMethodWrapper sv : getList())
+                if ((sv.getId() == null || !sv.getId().equals(type.getId()))
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
                         // exception message.
@@ -198,16 +185,11 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         return true;
     }
 
-    public void setLists(List<ShippingMethodWrapper> shippingMethodCollection) {
-        selectedShippingMethod = shippingMethodCollection;
-        reloadCollection(shippingMethodCollection);
-    }
-
     @SuppressWarnings("nls")
     @Override
     public void reload() {
         try {
-            setLists(ShippingMethodWrapper.getShippingMethods(SessionManager
+            setList(ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(

@@ -78,6 +78,7 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
 
         model = new ArrayList<BiobankCollectionModel>();
         initModel(list);
+        tableViewer.refresh();
     }
 
     @Override
@@ -127,21 +128,6 @@ public abstract class InfoTableWidget<T> extends InfoTableBgrLoader<T> {
     protected abstract BiobankTableSorter getComparator();
 
     protected abstract String getCollectionModelObjectToString(Object o);
-
-    /**
-     * Should be used by info tables that allow editing of data. Use this method
-     * instead of setCollection().
-     * 
-     * @param list
-     */
-    public void reloadCollection(final List<T> list, T selection) {
-        reloadData = true;
-        setList(list, selection);
-    }
-
-    public void reloadCollection(final List<T> list) {
-        reloadCollection(list, null);
-    }
 
     @Override
     protected void tableLoader(final List<T> collection, final T selection) {

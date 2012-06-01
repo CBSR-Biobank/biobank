@@ -24,8 +24,6 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     public static final I18n i18n = I18nFactory
         .getI18n(ContactEntryInfoTable.class);
 
-    private List<ContactWrapper> selectedContacts;
-
     private List<ContactWrapper> addedOrModifiedContacts;
 
     private List<ContactWrapper> deletedContacts;
@@ -38,9 +36,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
         if (contacts != null) {
             originalContacts.addAll(contacts);
         }
-        selectedContacts = contacts;
-        if (selectedContacts == null) {
-            selectedContacts = new ArrayList<ContactWrapper>();
+        if (contacts == null) {
+            contacts = new ArrayList<ContactWrapper>();
         }
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
@@ -87,8 +84,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     }
 
                     deletedContacts.add(contact);
-                    selectedContacts.remove(contact);
-                    setList(selectedContacts);
+                    getList().remove(contact);
                     notifyListeners();
                 }
             }
@@ -109,10 +105,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             ContactWrapper contact = dlg.getContactWrapper();
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedContacts.add(contact);
+                getList().add(contact);
                 addedOrModifiedContacts.add(contact);
             }
-            reloadCollection(selectedContacts, contact);
             notifyListeners();
         } else if (!add && res == Dialog.CANCEL) {
             try {
@@ -122,7 +117,6 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     // error dialog
                     i18n.tr("Cancel error"), e);
             }
-            reloadCollection(selectedContacts, null);
         }
     }
 
@@ -141,10 +135,9 @@ public class ContactEntryInfoTable extends ContactInfoTable {
 
     @Override
     public void reload() {
-        selectedContacts = new ArrayList<ContactWrapper>(originalContacts);
         addedOrModifiedContacts = new ArrayList<ContactWrapper>();
         deletedContacts = new ArrayList<ContactWrapper>();
-        reloadCollection(selectedContacts, null);
+        setList(new ArrayList<ContactWrapper>(originalContacts), null);
     }
 
     @SuppressWarnings("serial")

@@ -222,8 +222,6 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         vetoListenerSupport.notifyListeners(preAdd);
 
         specimens.add(specimen);
-        // FIXME: sorting? Collections.sort(specimens);
-        specTable.setList(specimens);
         addedSpecimens.add(specimen);
         removedSpecimens.remove(specimen);
 
@@ -286,7 +284,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         if (preDelete.doit) {
             specimens.remove(specimen);
             // FIXME: sorting? Collections.sort(specimens);
-            specTable.setList(specimens);
+            specTable.getList().remove(specimen);
             removedSpecimens.add(specimen);
             addedSpecimens.remove(specimen);
 

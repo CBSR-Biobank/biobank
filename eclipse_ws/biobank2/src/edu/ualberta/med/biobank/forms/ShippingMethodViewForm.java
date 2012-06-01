@@ -82,7 +82,7 @@ public class ShippingMethodViewForm extends BiobankViewForm {
 
     @Override
     public void setValues() throws Exception {
-        statusWidget.setCollection(globalShippingMethods);
+        statusWidget.setList(globalShippingMethods);
     }
 
 }

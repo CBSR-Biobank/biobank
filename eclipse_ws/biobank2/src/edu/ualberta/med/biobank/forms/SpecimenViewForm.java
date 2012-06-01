@@ -93,6 +93,8 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private CommentsInfoTable commentTable;
 
+    private SpecimenDispatchesInfo dispatchesInfo;
+
     @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
@@ -141,18 +143,18 @@ public class SpecimenViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        SpecimenDispatchesInfo specimenDispatchesInfo =
+        dispatchesInfo =
             SessionManager.getAppService().doAction(
                 new SpecimenGetDispatchesAction(specimenWrapper.getId()));
 
         dispatchInfoTable =
             new DispatchInfoTable(client,
-                specimenDispatchesInfo.getDispatches());
+                dispatchesInfo.getDispatches());
         dispatchInfoTable
-            .addEditItemListener(new IInfoTableEditItemListener<DispatchWrapper>() {
+            .addEditItemListener(new IInfoTableEditItemListener<Dispatch>() {
 
                 @Override
-                public void editItem(InfoTableEvent<DispatchWrapper> event) {
+                public void editItem(InfoTableEvent<Dispatch> event) {
                     Dispatch d =
                         ((Dispatch) ((InfoTableSelection) event
                             .getSelection()).getObject());
@@ -273,7 +275,7 @@ public class SpecimenViewForm extends BiobankViewForm {
             specimenWrapper.getInventoryId()));
         form.setText(i18n.tr("Specimen: {0}",
             specimenWrapper.getInventoryId()));
-        dispatchInfoTable.reloadCollection();
+        dispatchInfoTable.setList(dispatchesInfo.getDispatches());
         setTextValue(originCenterLabel, specimenWrapper.getOriginInfo()
             .getCenter()
             .getNameShort());

@@ -27,11 +27,9 @@ public class DelegatingList<E> extends AbstractListChangeSource<E>
             throw new IllegalArgumentException("delegate is required"); //$NON-NLS-1$
         }
 
-        // removed this code: you cannot be certain your collection hasn't
-        // changed, even if it is the same collection
-        // if (this == delegate || this.delegate == delegate) {
-        // return;
-        // }
+        if (this == delegate || this.delegate == delegate) {
+            return;
+        }
 
         clearModifiers();
         this.delegate = delegate;

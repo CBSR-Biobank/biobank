@@ -720,7 +720,7 @@ public class ContainerViewForm extends BiobankViewForm {
         }
 
         if (specimensWidget != null) {
-            specimensWidget.reloadCollection(specInfo);
+            specimensWidget.setList(specInfo);
         }
         commentTable.setList(
             ModelWrapper.wrapModelCollection(

@@ -84,7 +84,6 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                         return;
                     }
                     getList().remove(contact);
-                    setList(getList());
                     notifyListeners();
                 }
             }

@@ -12,9 +12,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
 
-    // list of what is displayed into the table
-    protected List<SpecimenInfo> currentSpecimens;
-
     public NewSpecimenEntryInfoTable(Composite parent,
         List<SpecimenInfo> specInfos, ColumnsShown columnsShowns) {
         super(parent, specInfos, columnsShowns, 10);
@@ -48,14 +45,13 @@ public class NewSpecimenEntryInfoTable extends NewSpecimenInfoTable {
 
     public void reload(List<SpecimenInfo> specimens) {
         setCurrentSpecimens(specimens);
-        reloadCollection(currentSpecimens);
     }
 
     private void setCurrentSpecimens(List<SpecimenInfo> specInfos) {
-        currentSpecimens = new ArrayList<SpecimenInfo>();
-        if (specInfos != null) {
-            currentSpecimens.addAll(specInfos);
+        if (specInfos == null) {
+            specInfos = new ArrayList<SpecimenInfo>();
         }
+        setList(specInfos);
     }
 
     @Override

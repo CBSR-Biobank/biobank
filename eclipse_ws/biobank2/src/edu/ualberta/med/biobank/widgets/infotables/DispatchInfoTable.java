@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,14 +23,12 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
+public class DispatchInfoTable extends InfoTableWidget<Dispatch> {
     public static final I18n i18n = I18nFactory
         .getI18n(DispatchInfoTable.class);
 
-    private final List<DispatchWrapper> dispatches;
-
     protected static class TableRowData {
-        DispatchWrapper dispatch;
+        Dispatch dispatch;
         String sender;
         Date dispatchTime;
         String receiver;
@@ -65,12 +62,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     public DispatchInfoTable(Composite parent,
         List<Dispatch> dispatchesRaw) {
         super(parent, null, HEADINGS, 15, DispatchWrapper.class);
-        this.dispatches = new ArrayList<DispatchWrapper>();
-        for (Dispatch dispatch : dispatchesRaw) {
-            dispatches.add(new DispatchWrapper(SessionManager.getAppService(),
-                dispatch));
-        }
-        setList(dispatches);
+        setList(dispatchesRaw);
     }
 
     @Override
@@ -114,7 +106,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     @Override
     public TableRowData getCollectionModelObject(Object obj) throws Exception {
         TableRowData info = new TableRowData();
-        info.dispatch = (DispatchWrapper) obj;
+        info.dispatch = (Dispatch) obj;
         info.sender = info.dispatch.getSenderCenter().getNameShort();
         info.dispatchTime =
             info.dispatch.getShipmentInfo() == null ? null : info.dispatch
@@ -123,7 +115,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         info.dateReceived =
             info.dispatch.getShipmentInfo() == null ? null : info.dispatch
                 .getShipmentInfo().getReceivedAt();
-        info.dstatus = info.dispatch.getStateDescription();
+        info.dstatus = info.dispatch.getState().getLabel();
         info.waybill =
             info.dispatch.getShipmentInfo() == null ? null : info.dispatch
                 .getShipmentInfo().getWaybill();
@@ -151,7 +143,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
     }
 
     @Override
-    public DispatchWrapper getSelection() {
+    public Dispatch getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
@@ -165,26 +157,22 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         return null;
     }
 
-    public void reloadCollection() {
-        reloadCollection(dispatches);
-    }
-
     @Override
-    protected Boolean canEdit(DispatchWrapper target)
+    protected Boolean canEdit(Dispatch target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new DispatchUpdatePermission(target.getId()));
     }
 
     @Override
-    protected Boolean canDelete(DispatchWrapper target)
+    protected Boolean canDelete(Dispatch target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new DispatchDeletePermission(target.getId()));
     }
 
     @Override
-    protected Boolean canView(DispatchWrapper target)
+    protected Boolean canView(Dispatch target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
             new DispatchReadPermission(target.getId()));

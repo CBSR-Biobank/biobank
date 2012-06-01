@@ -13,8 +13,8 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 
@@ -46,7 +46,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
         area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         widgetCreator.createLabel(area,
-            Container.PropertyName.PRODUCT_BARCODE.toString());
+            Specimen.PropertyName.INVENTORY_ID.toString());
         valueText = widgetCreator.createText(area, SWT.NONE, null, null);
     }
 
