@@ -25,8 +25,8 @@ public class CollectionEventCanCreatePropertyTester extends PropertyTester {
             || (CollectionView.getCurrent() == null)
             || (CollectionView.getCurrentPatient() == null)) return false;
 
-        System.out.println("CollectionEventCanCreatePropertyTester: "
-            + property);
+        // System.out.println("CollectionEventCanCreatePropertyTester: "
+        // + property);
 
         boolean allowed = false;
         try {

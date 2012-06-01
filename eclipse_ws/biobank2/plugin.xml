@@ -528,12 +528,8 @@
                <reference definitionId="biobank.oneElementSelected">
                </reference>
 			   <with variable="selection">
-                  <iterate ifEmpty="false" operator="and">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
-                     </instanceof>
-                     <test property="edu.ualberta.med.biobank.propertyTester.patientmerge.canMerge">
-                     </test>
+                  <iterate ifEmpty="false" operator="or">
+                      <test property="edu.ualberta.med.biobank.propertyTester.patientmerge.canMerge" />
                   </iterate>
           	  </with>
             </and>
@@ -563,8 +559,7 @@
             </and>
          </enabledWhen>
       </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
+      <handler class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
          <activeWhen>
               <reference definitionId="biobank.processingPerspectiveSelected">
@@ -575,9 +570,7 @@
                <reference definitionId="biobank.oneElementSelected">
                </reference>
 			   <with variable="selection">
-			      <count value="1"/>
-                  <iterate ifEmpty="false" operator="and">
-                     <instanceof value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter" />
+                  <iterate ifEmpty="false" operator="or">
                      <test property="edu.ualberta.med.biobank.propertyTester.collectionevent.canCreate" />
                   </iterate>
           	  </with>
@@ -2134,33 +2127,19 @@
             </equals>
          </with>
       </definition>
-      <definition
-            id="biobank.oneElementSelected">
-         <with
-               variable="selection">
-            <count
-                  value="1">
-            </count>
+      <definition id="biobank.oneElementSelected">
+         <with variable="selection">
+            <count value="1" />
          </with>
       </definition>
-      <definition
-            id="biobank.editorDirty">
-         <with
-               variable="activeEditorId">
-            <test
-                  forcePluginActivation="true"
-                  property="dirty"
-                  value="true">
-            </test>
+      <definition id="biobank.editorDirty">
+         <with variable="activeEditorId">
+            <test forcePluginActivation="true" property="dirty" value="true" />
          </with>
       </definition>
-      <definition
-            id="biobank.confirmEnabled">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
-            <equals
-                  value="confirmEnabled">
-            </equals>
+      <definition id="biobank.confirmEnabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
+            <equals value="confirmEnabled" />
          </with>
       </definition>
        <definition id="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
@@ -2257,14 +2236,14 @@
             id="edu.ualberta.med.biobank.propertytester.CollectionEventCanCreatePropertyTester"
             namespace="edu.ualberta.med.biobank.propertyTester.collectionevent"
             properties="canCreate"
-            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
+            type="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
       </propertyTester>
       <propertyTester
             class="edu.ualberta.med.biobank.propertytester.PatientMergeAllowedPropertyTester"
             id="edu.ualberta.med.biobank.propertytester.PatientMergeAllowedPropertyTester"
             namespace="edu.ualberta.med.biobank.propertyTester.patientmerge"
             properties="canMerge"
-            type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
+            type="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
       </propertyTester>
    </extension>
 </plugin>
