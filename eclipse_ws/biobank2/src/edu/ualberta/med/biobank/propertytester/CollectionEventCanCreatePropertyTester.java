@@ -22,7 +22,11 @@ public class CollectionEventCanCreatePropertyTester extends PropertyTester {
         Object expectedValue) {
 
         if (!SessionManager.getInstance().isConnected()
+            || (CollectionView.getCurrent() == null)
             || (CollectionView.getCurrentPatient() == null)) return false;
+
+        System.out.println("CollectionEventCanCreatePropertyTester: "
+            + property);
 
         boolean allowed = false;
         try {

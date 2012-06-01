@@ -519,12 +519,19 @@
         <handler
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
+         <activeWhen>
+              <reference definitionId="biobank.processingPerspectiveSelected">
+              </reference>
+         </activeWhen>
           <enabledWhen>
             <and>
                <reference definitionId="biobank.oneElementSelected">
                </reference>
 			   <with variable="selection">
-                  <iterate ifEmpty="false" operator="or">
+                  <iterate ifEmpty="false" operator="and">
+                     <instanceof
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+                     </instanceof>
                      <test property="edu.ualberta.med.biobank.propertyTester.patientmerge.canMerge">
                      </test>
                   </iterate>
@@ -559,14 +566,19 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
+         <activeWhen>
+              <reference definitionId="biobank.processingPerspectiveSelected">
+              </reference>
+         </activeWhen>
          <enabledWhen>
             <and>
                <reference definitionId="biobank.oneElementSelected">
                </reference>
 			   <with variable="selection">
-                  <iterate ifEmpty="false" operator="or">
-                     <test property="edu.ualberta.med.biobank.propertyTester.collectionevent.canCreate">
-                     </test>
+			      <count value="1"/>
+                  <iterate ifEmpty="false" operator="and">
+                     <instanceof value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter" />
+                     <test property="edu.ualberta.med.biobank.propertyTester.collectionevent.canCreate" />
                   </iterate>
           	  </with>
             </and>

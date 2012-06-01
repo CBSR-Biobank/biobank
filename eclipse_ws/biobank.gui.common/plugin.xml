@@ -59,8 +59,8 @@
             </equals>
          </with>
       </definition>
-      <definition id="edu.ualberta.med.biobank.gui.common.patientMergePermission">
-         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.patientMergePermission">
+      <definition id="edu.ualberta.med.biobank.gui.common.patientCreatePermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.patientCreatePermission">
             <equals value="true">
             </equals>
          </with>

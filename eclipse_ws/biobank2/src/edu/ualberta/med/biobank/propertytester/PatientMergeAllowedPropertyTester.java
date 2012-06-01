@@ -22,6 +22,7 @@ public class PatientMergeAllowedPropertyTester extends PropertyTester {
         Object expectedValue) {
 
         if (!SessionManager.getInstance().isConnected()
+            || (CollectionView.getCurrent() == null)
             || (CollectionView.getCurrentPatient() == null)) return false;
 
         boolean allowed = false;
