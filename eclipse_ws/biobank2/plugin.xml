@@ -519,10 +519,9 @@
         <handler
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
-         <activeWhen>
-              <reference definitionId="biobank.processingPerspectiveSelected">
-              </reference>
-         </activeWhen>
+          <activeWhen>
+              <reference definitionId="biobank.processingPerspectiveSelected" />
+          </activeWhen>
           <enabledWhen>
             <and>
                <reference definitionId="biobank.oneElementSelected">
