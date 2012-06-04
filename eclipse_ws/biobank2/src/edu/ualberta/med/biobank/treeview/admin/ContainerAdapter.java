@@ -24,6 +24,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
 import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
@@ -275,8 +276,11 @@ public class ContainerAdapter extends AdapterBase {
         final ContainerWrapper container = getContainer();
         @SuppressWarnings("unused")
         final String oldLabel = container.getLabel();
-        List<ContainerWrapper> newParentContainers =
-            container.getPossibleParents(newLabel);
+        List<Container> newParentContainers =
+            SessionManager.getAppService().doAction(
+                new ContainerGetInfoByLabelAction(newLabel,
+                    SessionManager.getUser().getCurrentWorkingSite()
+                        .getId())).getList();
         if (newParentContainers.size() == 0) {
             BgcPlugin
                 .openError(
@@ -289,7 +293,7 @@ public class ContainerAdapter extends AdapterBase {
             return false;
         }
 
-        ContainerWrapper newParent;
+        Container newParent;
         if (newParentContainers.size() > 1) {
             SelectParentContainerDialog dlg =
                 new SelectParentContainerDialog(PlatformUI.getWorkbench()
@@ -304,7 +308,7 @@ public class ContainerAdapter extends AdapterBase {
 
         SessionManager.getAppService().doAction(new ContainerMoveAction(
             getContainer().getWrappedObject(),
-            newParent.getWrappedObject(), newLabel));
+            newParent, newLabel));
         return true;
     }
 

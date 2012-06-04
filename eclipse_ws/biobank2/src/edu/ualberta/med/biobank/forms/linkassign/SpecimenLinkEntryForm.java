@@ -389,7 +389,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                             @Override
                             public void run() {
                                 initContainersFromPosition(
-                                    newSinglePositionText, false, null);
+                                    newSinglePositionText, null);
                                 checkPositionAndSpecimen(inventoryIdText,
                                     newSinglePositionText);
                             }

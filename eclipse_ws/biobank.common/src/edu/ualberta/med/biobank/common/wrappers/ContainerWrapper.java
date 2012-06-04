@@ -365,6 +365,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return getLabel() + " (" + getContainerType().getNameShort() + ")";
     }
 
+    public static String getFullInfoLabel(Container c) {
+        if (c.getContainerType() == null
+            || c.getContainerType().getNameShort() == null) {
+            return c.getLabel();
+        }
+        return c.getLabel() + " (" + c.getContainerType().getNameShort() + ")";
+    }
+
     public long getChildCount(boolean fast) throws BiobankException,
         ApplicationException {
         return getPropertyCount(ContainerPeer.CHILD_POSITIONS, fast);
