@@ -34,7 +34,7 @@ public class ContainerGroup extends AdapterBase {
     private static final I18n i18n = I18nFactory
         .getI18n(ContainerGroup.class);
 
-    private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerGroup.class
+    private static BgcLogger log = BgcLogger.getLogger(ContainerGroup.class
         .getName());
 
     private List<Container> topContainers = null;
@@ -65,22 +65,18 @@ public class ContainerGroup extends AdapterBase {
             @Override
             public void run() {
                 try {
-                    topContainers =
-                        SessionManager
-                            .getAppService()
-                            .doAction(
-                                new SiteGetTopContainersAction(siteAdapter
-                                    .getId())).getList();
+                    topContainers = SessionManager.getAppService().doAction(
+                        new SiteGetTopContainersAction(
+                            siteAdapter.getId())).getList();
                     ContainerGroup.super.performExpand();
                 } catch (Exception e) {
                     String text = getClass().getName();
                     if (getModelObject() != null) {
                         text = getModelObject().toString();
                     }
-                    LOGGER.error(
+                    log.error(
                         "Error while loading children of node " + text, e);
                 }
-
             }
         });
     }
@@ -166,7 +162,7 @@ public class ContainerGroup extends AdapterBase {
         } catch (final RemoteConnectFailureException exp) {
             BgcPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
-            LOGGER.error("BioBankFormBase.createPartControl Error", e);
+            log.error("BioBankFormBase.createPartControl Error", e);
         }
     }
 
