@@ -23,13 +23,12 @@ import edu.ualberta.med.biobank.model.Specimen;
  * 
  */
 public class PatientMergeAction implements Action<BooleanResult> {
-
     private static final long serialVersionUID = 1L;
 
     private final Integer patient1Id;
     private final Integer patient2Id;
 
-    private String comment;
+    private final String comment;
 
     public PatientMergeAction(Integer patient1Id, Integer patient2Id,
         String comment) {
