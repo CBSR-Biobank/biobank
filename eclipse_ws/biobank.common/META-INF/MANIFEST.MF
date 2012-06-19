@@ -44,6 +44,7 @@ Bundle-ClassPath: conf/,
  lib/client/ognl-2.6.7.jar,
  lib/client/jta-1.1.jar,
  lib/client/gettext-commons-0.9.6.jar,
+ lib/server/spiffy-all-0.05.jar,
  lib/server/SuperCSV-1.52.jar,
  .
 Bundle-Vendor: AICML
@@ -338,7 +339,12 @@ Export-Package: antlr;
  org.supercsv.io;uses:="org.supercsv.cellprocessor.ift,org.supercsv.util,org.supercsv.prefs",
  org.supercsv.prefs,
  org.supercsv.util;uses:="org.supercsv.cellprocessor.ift,spiffy.core.util",
- org.xnap.commons.i18n
+ org.xnap.commons.i18n,
+ spiffy.core.lang,
+ spiffy.core.util,
+ spiffy.junit,
+ spiffy.log4j,
+ spiffy.struts1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: edu.ualberta.med.biobank.common,edu.ualberta.med.bioba
  nk.model

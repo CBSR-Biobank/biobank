@@ -1,9 +1,16 @@
 package edu.ualberta.med.biobank.common.action.csvimport;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
@@ -31,7 +38,7 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
  * @author loyola
  * 
  */
-public class SpecimenCsvImport implements Action<BooleanResult> {
+public class SpecimenCsvImportActtion implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -39,11 +46,21 @@ public class SpecimenCsvImport implements Action<BooleanResult> {
     public static final LString CSV_PARSE_ERROR =
         bundle.tr("Parse error at line {0}\n{1}").format();
 
-    public static class SpecimenCsvInfo {
+    @SuppressWarnings("nls")
+    public static final LString CSV_FILE_ERROR =
+        bundle.tr("CVS file not loaded").format();
+
+    @SuppressWarnings("nls")
+    public static final LString CSV_UNCOMPRESS_ERROR =
+        bundle.tr("CVS file could not be uncompressed").format();
+
+    public static class SpecimenCsvInfo implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         String inventoryId;
         String parentInventoryID;
         String specimenType;
-        Date createAt;
+        Date createdAt;
         String patientNumber;
         Integer visitNumber;
         String currentCenter;
@@ -78,12 +95,12 @@ public class SpecimenCsvImport implements Action<BooleanResult> {
             this.specimenType = specimenType;
         }
 
-        public Date getCreateAt() {
-            return createAt;
+        public Date getCreatedAt() {
+            return createdAt;
         }
 
-        public void setCreateAt(Date createAt) {
-            this.createAt = createAt;
+        public void setCreatedAt(Date createAt) {
+            this.createdAt = createAt;
         }
 
         public String getPatientNumber() {
@@ -159,44 +176,73 @@ public class SpecimenCsvImport implements Action<BooleanResult> {
         }
     }
 
-    private boolean actionValid = false;
+    @SuppressWarnings("nls")
+    private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
+        new Unique(),
+        null,
+        null,
+        new ParseDate("yyyy-MM-dd HH:mm"),
+        null,
+        new ParseInt(),
+        null,
+        null,
+        new ParseBool(),
+        null,
+        null,
+        null,
+        null
+    };
 
+    private byte[] compressedBuffer = null;
+
+    @SuppressWarnings("nls")
     public boolean setCsvFile(String filename) throws IOException {
         ICsvBeanReader reader = new CsvBeanReader(
             new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
 
-        final CellProcessor[] processors = new CellProcessor[] {
-            new Unique(),
-            null,
-            null,
-            new ParseDate("yyyy-MM-dd HH:mm"),
-            null,
-            new ParseInt(),
-            null,
-            null,
-            new ParseBool(),
-            null,
-            null,
-            null,
-            null
+        final String[] header = new String[] {
+            "inventoryId",
+            "parentInventoryID",
+            "specimenType",
+            "createdAt",
+            "patientNumber",
+            "visitNumber",
+            "currentCenter",
+            "originCenter",
+            "sourceSpecimen",
+            "worksheet",
+            "rootContainerType",
+            "palletLabel",
+            "palletPosition"
         };
 
         try {
             ArrayList<SpecimenCsvInfo> specimenCsvInfos =
                 new ArrayList<SpecimenCsvInfo>(0);
 
-            final String[] header = reader.getCSVHeader(true);
             SpecimenCsvInfo specimenCsvInfo;
+            reader.getCSVHeader(true);
             while ((specimenCsvInfo =
-                reader.read(SpecimenCsvInfo.class, header, processors)) != null) {
+                reader.read(SpecimenCsvInfo.class, header, PROCESSORS)) != null) {
                 specimenCsvInfos.add(specimenCsvInfo);
             }
 
             // zip the info into the buffer
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            GZIPOutputStream zos = new GZIPOutputStream(bos);
+            ObjectOutputStream ous = new ObjectOutputStream(zos);
 
-            actionValid = true;
+            ous.writeObject(specimenCsvInfos);
+
+            zos.finish();
+            bos.flush();
+            compressedBuffer = bos.toByteArray();
+            bos.close();
 
         } catch (SuperCSVException e) {
+            System.out.println("message: " + e.getMessage());
+            System.out.println("context: " + e.getCsvContext());
+            // TODO: what exception should be thrown here
             throw new ActionException(CSV_PARSE_ERROR);
             // TODO: add parameters reader.getLineNumber() and
             // e.getCsvContext())) to this exception
@@ -204,7 +250,7 @@ public class SpecimenCsvImport implements Action<BooleanResult> {
             reader.close();
         }
 
-        return actionValid;
+        return (compressedBuffer != null);
     }
 
     @Override
@@ -214,8 +260,31 @@ public class SpecimenCsvImport implements Action<BooleanResult> {
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        // TODO Auto-generated method stub
-        return null;
+        if (compressedBuffer == null) {
+            throw new ActionException(CSV_FILE_ERROR);
+        }
+
+        boolean result = false;
+
+        try {
+            ByteArrayInputStream bis =
+                new ByteArrayInputStream(compressedBuffer);
+            GZIPInputStream zis = new GZIPInputStream(bis);
+            ObjectInputStream ois = new ObjectInputStream(zis);
+
+            @SuppressWarnings("unchecked")
+            ArrayList<SpecimenCsvInfo> specimenCsvInfos =
+                (ArrayList<SpecimenCsvInfo>) ois.readObject();
+
+            ois.close();
+            result = true;
+        } catch (IOException e) {
+            throw new ActionException(CSV_UNCOMPRESS_ERROR);
+        } catch (ClassNotFoundException e) {
+            throw new ActionException(CSV_UNCOMPRESS_ERROR);
+        }
+
+        return new BooleanResult(result);
     }
 
 }
