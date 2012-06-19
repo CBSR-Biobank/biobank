@@ -1,16 +1,10 @@
 package edu.ualberta.med.biobank.common.action.csvimport;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
@@ -30,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
  * This action takes a CSV file as input and import the specimens contained in
@@ -193,7 +188,8 @@ public class SpecimenCsvImportActtion implements Action<BooleanResult> {
         null
     };
 
-    private byte[] compressedBuffer = null;
+    private CompressedReference<ArrayList<SpecimenCsvInfo>> compressedList =
+        null;
 
     @SuppressWarnings("nls")
     public boolean setCsvFile(String filename) throws IOException {
@@ -227,17 +223,9 @@ public class SpecimenCsvImportActtion implements Action<BooleanResult> {
                 specimenCsvInfos.add(specimenCsvInfo);
             }
 
-            // zip the info into the buffer
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            GZIPOutputStream zos = new GZIPOutputStream(bos);
-            ObjectOutputStream ous = new ObjectOutputStream(zos);
-
-            ous.writeObject(specimenCsvInfos);
-
-            zos.finish();
-            bos.flush();
-            compressedBuffer = bos.toByteArray();
-            bos.close();
+            compressedList =
+                new CompressedReference<ArrayList<SpecimenCsvInfo>>(
+                    specimenCsvInfos);
 
         } catch (SuperCSVException e) {
             System.out.println("message: " + e.getMessage());
@@ -250,7 +238,7 @@ public class SpecimenCsvImportActtion implements Action<BooleanResult> {
             reader.close();
         }
 
-        return (compressedBuffer != null);
+        return (compressedList != null);
     }
 
     @Override
@@ -260,29 +248,14 @@ public class SpecimenCsvImportActtion implements Action<BooleanResult> {
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        if (compressedBuffer == null) {
+        if (compressedList == null) {
             throw new ActionException(CSV_FILE_ERROR);
         }
 
         boolean result = false;
 
-        try {
-            ByteArrayInputStream bis =
-                new ByteArrayInputStream(compressedBuffer);
-            GZIPInputStream zis = new GZIPInputStream(bis);
-            ObjectInputStream ois = new ObjectInputStream(zis);
-
-            @SuppressWarnings("unchecked")
-            ArrayList<SpecimenCsvInfo> specimenCsvInfos =
-                (ArrayList<SpecimenCsvInfo>) ois.readObject();
-
-            ois.close();
-            result = true;
-        } catch (IOException e) {
-            throw new ActionException(CSV_UNCOMPRESS_ERROR);
-        } catch (ClassNotFoundException e) {
-            throw new ActionException(CSV_UNCOMPRESS_ERROR);
-        }
+        ArrayList<SpecimenCsvInfo> specimenCsvInfos = compressedList.get();
+        result = true;
 
         return new BooleanResult(result);
     }
