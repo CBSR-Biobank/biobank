@@ -109,14 +109,14 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private CompressedReference<ArrayList<SpecimenCsvInfo>> compressedList =
         null;
 
+    private ActionContext context = null;
+
     public SpecimenCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);
     }
 
-    private ActionContext context = null;
-
     @SuppressWarnings("nls")
-    private boolean setCsvFile(String filename) throws IOException {
+    private void setCsvFile(String filename) throws IOException {
         ICsvBeanReader reader = new CsvBeanReader(
             new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
 
@@ -179,13 +179,11 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         } finally {
             reader.close();
         }
-
-        return (compressedList != null);
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.SPECIMEN_CSV_IMPORT.isAllowed(context.getUser());
+        return PermissionEnum.LEGACY_IMPORT_CSV.isAllowed(context.getUser());
     }
 
     @Override
@@ -195,7 +193,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         this.context = context;
-
         boolean result = false;
 
         ArrayList<SpecimenCsvInfo> specimenCsvInfos = compressedList.get();
@@ -218,8 +215,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 "should only be called once the context is initialized");
         }
 
-        Patient p =
-            loadPatient(csvInfo.getPatientNumber(), csvInfo.getStudyName());
+        Patient p = loadPatient(csvInfo.getPatientNumber());
 
         CollectionEvent cevent = null;
         Integer id = null;
@@ -279,8 +275,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         // make sure patient exists
-        Patient p = loadPatient(csvInfo.getPatientNumber(),
-            csvInfo.getStudyName());
+        Patient p = loadPatient(csvInfo.getPatientNumber());
         Specimen parentSpecimen = loadSpecimen(csvInfo.getParentInventoryID());
         Center currentCenter = loadCenter(csvInfo.getCurrentCenter());
         SpecimenType specimenType = loadSpecimenType(csvInfo.getSpecimenType());
@@ -315,32 +310,30 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     }
 
     @SuppressWarnings("nls")
-    private Patient getPatient(String pnumber, String studyNameShort) {
+    private Patient getPatient(String pnumber) {
         Criteria c = context.getSession()
             .createCriteria(Patient.class, "p")
             .createAlias("p.study", "s", Criteria.LEFT_JOIN)
-            .add(Restrictions.eq("pnumber", pnumber))
-            .add(Restrictions.eq("s.nameShort", studyNameShort));
+            .add(Restrictions.eq("pnumber", pnumber));
 
         return (Patient) c.uniqueResult();
     }
 
-    /**
+    /*
      * Generates an action exception if patient does not exist.
-     * 
-     * @param pnumber
-     * @param studyNameShort
-     * @return
      */
-    private Patient loadPatient(String pnumber, String studyNameShort) {
+    private Patient loadPatient(String pnumber) {
         // make sure patient exists
-        Patient p = getPatient(pnumber, studyNameShort);
+        Patient p = getPatient(pnumber);
         if (p == null) {
             throw new ActionException(CSV_PATIENT_ERROR);
         }
         return p;
     }
 
+    /*
+     * Generates an action exception if specimen type does not exist.
+     */
     @SuppressWarnings("nls")
     private SpecimenType loadSpecimenType(String name) {
         Criteria c = context.getSession()
@@ -354,6 +347,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         return specimenType;
     }
 
+    /*
+     * Generates an action exception if centre with name does not exist.
+     */
     @SuppressWarnings("nls")
     private Center loadCenter(String name) {
         Criteria c = context.getSession()
@@ -368,6 +364,10 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         return center;
     }
 
+    /*
+     * Generates an action exception if specimen with inventory ID does not
+     * exist.
+     */
     @SuppressWarnings("nls")
     private Specimen loadSpecimen(String inventoryId) {
         Criteria c = context.getSession()
@@ -383,6 +383,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         return specimen;
     }
 
+    /*
+     * Generates an action exception if container label does not exist.
+     */
     @SuppressWarnings("nls")
     private Container loadContainer(String label) {
         Criteria c = context.getSession()

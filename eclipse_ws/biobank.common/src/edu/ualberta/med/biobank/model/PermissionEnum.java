@@ -180,7 +180,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     LABEL_PRINTING(67,
         Loader.i18n.tr("Label Printing")),
 
-    SPECIMEN_CSV_IMPORT(68,
+    LEGACY_IMPORT_CSV(68,
         Loader.i18n.tr("Specimen CSV Import"));
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
