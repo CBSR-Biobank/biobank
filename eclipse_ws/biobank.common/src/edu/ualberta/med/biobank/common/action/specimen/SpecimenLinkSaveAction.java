@@ -23,12 +23,16 @@ public class SpecimenLinkSaveAction implements
 
     private static final long serialVersionUID = 1L;
 
-    private Integer centerId;
+    private final Integer centerId;
 
-    private Collection<AliquotedSpecimenInfo> aliquotedSpecInfoList;
+    private final Collection<AliquotedSpecimenInfo> aliquotedSpecInfoList;
 
-    private Integer studyId;
+    private final Integer studyId;
 
+    /**
+     * The fields containerId and position can be null.
+     * 
+     */
     public static class AliquotedSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
         public String inventoryId;
@@ -96,8 +100,7 @@ public class SpecimenLinkSaveAction implements
             SpecimenActionHelper.setParent(context, specimen,
                 asi.parentSpecimenId);
             SpecimenActionHelper.setQuantityFromType(specimen);
-            SpecimenActionHelper.setPosition(context, specimen,
-                asi.position,
+            SpecimenActionHelper.setPosition(context, specimen, asi.position,
                 asi.containerId);
 
             context.getSession().save(specimen);

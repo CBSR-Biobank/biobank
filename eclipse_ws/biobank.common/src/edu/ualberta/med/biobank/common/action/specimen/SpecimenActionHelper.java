@@ -51,11 +51,10 @@ public class SpecimenActionHelper {
 
     @SuppressWarnings("nls")
     public static void setPosition(ActionContext actionContext,
-        Specimen specimen,
-        RowColPos rcp, Integer containerId) {
+        Specimen specimen, RowColPos rcp, Integer containerId) {
         // FIXME check if a position exists?
         SpecimenPosition pos = specimen.getSpecimenPosition();
-        if (pos != null && rcp == null && containerId == null) {
+        if ((pos != null) && (rcp == null) && (containerId == null)) {
             specimen.setSpecimenPosition(null);
             // FIXME not sure this will work. Needs to be tested.
             actionContext.getSession().delete(pos);

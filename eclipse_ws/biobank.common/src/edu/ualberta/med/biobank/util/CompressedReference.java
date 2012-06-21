@@ -9,6 +9,14 @@ import java.io.Serializable;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * Taken from
+ * http://theplateisbad.blogspot.ca/2011/04/java-in-memory-compression.html.
+ * 
+ * @author loyola
+ * 
+ * @param <T>
+ */
 public class CompressedReference<T extends Serializable> implements
     Serializable {
     private static final long serialVersionUID = 7967994340450625830L;
@@ -42,7 +50,6 @@ public class CompressedReference<T extends Serializable> implements
     }
 
     private void compress(T referent) throws IOException {
-
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GZIPOutputStream zos = new GZIPOutputStream(bos);
         ObjectOutputStream ous = new ObjectOutputStream(zos);
