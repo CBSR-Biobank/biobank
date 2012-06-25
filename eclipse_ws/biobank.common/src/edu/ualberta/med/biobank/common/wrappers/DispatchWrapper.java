@@ -134,16 +134,18 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {
+
+        // if there is no shipment info, then there is no waybill
+        if (getShipmentInfo() == null)
+            return true;
+
         List<Object> params = new ArrayList<Object>();
         CenterWrapper<?> sender = getSenderCenter();
         if (sender == null) {
             throw new BiobankCheckException("sender site cannot be null");
         }
         params.add(sender.getId());
-        if (getShipmentInfo() == null)
-            params.add("");
-        else
-            params.add(getShipmentInfo().getWaybill());
+        params.add(getShipmentInfo().getWaybill());
 
         StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
         if (!isNew()) {
@@ -462,7 +464,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if ((state != null)
             && ((state.equals(DispatchState.CREATION)
                 || state.equals(DispatchState.IN_TRANSIT) || state
-                .equals(DispatchState.LOST)))) {
+                    .equals(DispatchState.LOST)))) {
             String packedAt = getFormattedPackedAt();
             if ((packedAt != null) && (packedAt.length() > 0)) {
                 detailsList.add(new StringBuilder("packed at: ").append(
