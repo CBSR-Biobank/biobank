@@ -13,6 +13,8 @@ import org.supercsv.exception.SuperCSVException;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -22,25 +24,30 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
-public class PatientCsvImport implements Action<BooleanResult> {
+public class PatientCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
+
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenCsvImportAction.class);
+
     private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LString CSV_PARSE_ERROR =
-        bundle.tr("Parse error at line {0}\n{1}").format();
+    public static final String CSV_PARSE_ERROR =
+        "Parse error at line {0}\n{1}";
 
     @SuppressWarnings("nls")
     public static final LString CSV_FILE_ERROR =
         bundle.tr("CVS file not loaded").format();
 
     @SuppressWarnings("nls")
-    public static final LString CSV_STUDY_ERROR =
-        bundle.tr("CSV study does not exist").format();
+    public static final Tr CSV_STUDY_ERROR =
+        bundle.tr("CSV study {0} does not exist");
 
     @SuppressWarnings("nls")
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
@@ -54,7 +61,7 @@ public class PatientCsvImport implements Action<BooleanResult> {
 
     private ActionContext context = null;
 
-    public PatientCsvImport(String filename) throws IOException {
+    public PatientCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);
     }
 
@@ -87,12 +94,8 @@ public class PatientCsvImport implements Action<BooleanResult> {
                     patientCsvInfos);
 
         } catch (SuperCSVException e) {
-            // System.out.println("message: " + e.getMessage());
-            // System.out.println("context: " + e.getCsvContext());
-            // TODO: what exception should be thrown here
-            throw new ActionException(CSV_PARSE_ERROR);
-            // TODO: add parameters reader.getLineNumber() and
-            // e.getCsvContext())) to this exception
+            throw new IllegalStateException(
+                i18n.tr(CSV_PARSE_ERROR, e.getMessage(), e.getCsvContext()));
         } finally {
             reader.close();
         }
@@ -140,7 +143,7 @@ public class PatientCsvImport implements Action<BooleanResult> {
 
         Study study = (Study) c.uniqueResult();
         if (study == null) {
-            throw new ActionException(CSV_STUDY_ERROR);
+            throw new ActionException(CSV_STUDY_ERROR.format(nameShort));
         }
         return study;
     }

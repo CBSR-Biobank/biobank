@@ -23,6 +23,7 @@ public class SpecimenCsvInfo implements Serializable {
     private String originCenter;
     private Boolean sourceSpecimen;
     private String worksheet;
+    private String palletProductBarcode;
     private String rootContainerType;
     private String palletLabel;
     private String palletPosition;
@@ -105,6 +106,14 @@ public class SpecimenCsvInfo implements Serializable {
 
     public void setWorksheet(String worksheet) {
         this.worksheet = worksheet;
+    }
+
+    public String getPalletProductBarcode() {
+        return palletProductBarcode;
+    }
+
+    public void setPalletProductBarcode(String palletProductBarcode) {
+        this.palletProductBarcode = palletProductBarcode;
     }
 
     public String getRootContainerType() {

@@ -19,6 +19,8 @@ import org.supercsv.exception.SuperCSVException;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
 import org.supercsv.prefs.CsvPreference;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -31,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -50,11 +53,15 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  */
 public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
+
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenCsvImportAction.class);
+
     private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final LString CSV_PARSE_ERROR =
-        bundle.tr("Parse error at line {0}\n{1}").format();
+    public static final String CSV_PARSE_ERROR =
+        "Parse error at line {0}\n{1}";
 
     @SuppressWarnings("nls")
     public static final LString CSV_FILE_ERROR =
@@ -65,28 +72,29 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         bundle.tr("CVS file could not be uncompressed").format();
 
     @SuppressWarnings("nls")
-    public static final LString CSV_PATIENT_ERROR =
-        bundle.tr("CVS patient does not exist").format();
+    public static final Tr CSV_PATIENT_ERROR =
+        bundle.tr("patient in CSV file with number {0} not exist");
 
     @SuppressWarnings("nls")
-    public static final LString CSV_PARENT_SPECIMEN_ERROR =
-        bundle.tr("CVS parent specimen does not exist").format();
+    public static final Tr CSV_PARENT_SPECIMEN_ERROR =
+        bundle
+            .tr("parent specimen in CSV file with inventory id {0} does not exist");
 
     @SuppressWarnings("nls")
-    public static final LString CSV_CURRENT_CENTER_ERROR =
-        bundle.tr("CVS current center does not exist").format();
+    public static final Tr CSV_CURRENT_CENTER_ERROR =
+        bundle.tr("current center in CSV file with name {0} does not exist");
 
     @SuppressWarnings("nls")
-    public static final LString CSV_SPECIMEN_TYPE_ERROR =
-        bundle.tr("CVS specimen type does not exist").format();
+    public static final Tr CSV_SPECIMEN_TYPE_ERROR =
+        bundle.tr("specimen type in CSV file with name {0} does not exist");
 
     @SuppressWarnings("nls")
-    public static final LString CSV_CONTAINER_LABEL_ERROR =
-        bundle.tr("CVS container does not exist").format();
+    public static final Tr CSV_CONTAINER_LABEL_ERROR =
+        bundle.tr("container in CSV file with label {0} does not exist");
 
     @SuppressWarnings("nls")
-    public static final LString CSV_SPECIMEN_LABEL_ERROR =
-        bundle.tr("CVS specimen position is invalid").format();
+    public static final Tr CSV_SPECIMEN_LABEL_ERROR =
+        bundle.tr("specimen position in CSV file with label {0} is invalid");
 
     @SuppressWarnings("nls")
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
@@ -94,7 +102,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         null,
         null,
         new ParseDate("yyyy-MM-dd HH:mm"),
-        null,
         null,
         new ParseInt(),
         null,
@@ -125,7 +132,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             "parentInventoryID",
             "specimenType",
             "createdAt",
-            "studyName",
             "patientNumber",
             "visitNumber",
             "currentCenter",
@@ -148,16 +154,18 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
                 if ((specimenCsvInfo.getPalletLabel() != null)
                     && (specimenCsvInfo.getPalletPosition() == null)) {
-                    // if pallet label defined then position has to be defined
-                    // System.out.println("line: " + reader.getLineNumber());
-                    throw new ActionException(CSV_PARSE_ERROR);
+                    throw new IllegalStateException(
+                        i18n.tr(
+                            "line {0}: pallet label defined but not position",
+                            reader.getLineNumber()));
                 }
 
                 if ((specimenCsvInfo.getPalletLabel() == null)
                     && (specimenCsvInfo.getPalletPosition() != null)) {
-                    // if pallet position defined then label has to be defined
-                    // System.out.println("line: " + reader.getLineNumber());
-                    throw new ActionException(CSV_PARSE_ERROR);
+                    throw new IllegalStateException(
+                        i18n.tr(
+                            "line {0}: pallet position defined but not label",
+                            reader.getLineNumber()));
                 }
 
                 specimenCsvInfos.add(specimenCsvInfo);
@@ -170,12 +178,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                     specimenCsvInfos);
 
         } catch (SuperCSVException e) {
-            // System.out.println("message: " + e.getMessage());
-            // System.out.println("context: " + e.getCsvContext());
-            // TODO: what exception should be thrown here
-            throw new ActionException(CSV_PARSE_ERROR);
-            // TODO: add parameters reader.getLineNumber() and
-            // e.getCsvContext())) to this exception
+            throw new IllegalStateException(
+                i18n.tr(CSV_PARSE_ERROR, e.getMessage(), e.getCsvContext()));
         } finally {
             reader.close();
         }
@@ -295,7 +299,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             try {
                 container.getChildByLabel(csvInfo.getPalletPosition());
             } catch (Exception e) {
-                throw new ActionException(CSV_SPECIMEN_LABEL_ERROR);
+                throw new ActionException(
+                    CSV_SPECIMEN_LABEL_ERROR.format(csvInfo.getPalletLabel()));
             }
         } else {
             throw new IllegalStateException(
@@ -326,42 +331,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         // make sure patient exists
         Patient p = getPatient(pnumber);
         if (p == null) {
-            throw new ActionException(CSV_PATIENT_ERROR);
+            throw new ActionException(CSV_PATIENT_ERROR.format(pnumber));
         }
         return p;
-    }
-
-    /*
-     * Generates an action exception if specimen type does not exist.
-     */
-    @SuppressWarnings("nls")
-    private SpecimenType loadSpecimenType(String name) {
-        Criteria c = context.getSession()
-            .createCriteria(SpecimenType.class, "st")
-            .add(Restrictions.eq("name", name));
-
-        SpecimenType specimenType = (SpecimenType) c.uniqueResult();
-        if (specimenType == null) {
-            throw new ActionException(CSV_SPECIMEN_TYPE_ERROR);
-        }
-        return specimenType;
-    }
-
-    /*
-     * Generates an action exception if centre with name does not exist.
-     */
-    @SuppressWarnings("nls")
-    private Center loadCenter(String name) {
-        Criteria c = context.getSession()
-            .createCriteria(Center.class, "c")
-            .add(Restrictions.eq("pnumber", name));
-
-        Center center = (Center) c.uniqueResult();
-        if (center == null) {
-            throw new ActionException(CSV_CURRENT_CENTER_ERROR);
-        }
-
-        return center;
     }
 
     /*
@@ -377,10 +349,44 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         Specimen specimen = (Specimen) c.uniqueResult();
         if (specimen == null) {
-            throw new ActionException(CSV_PARENT_SPECIMEN_ERROR);
+            throw new ActionException(
+                CSV_PARENT_SPECIMEN_ERROR.format(inventoryId));
         }
 
         return specimen;
+    }
+
+    /*
+     * Generates an action exception if specimen type does not exist.
+     */
+    @SuppressWarnings("nls")
+    private SpecimenType loadSpecimenType(String name) {
+        Criteria c = context.getSession()
+            .createCriteria(SpecimenType.class, "st")
+            .add(Restrictions.eq("name", name));
+
+        SpecimenType specimenType = (SpecimenType) c.uniqueResult();
+        if (specimenType == null) {
+            throw new ActionException(CSV_SPECIMEN_TYPE_ERROR.format(name));
+        }
+        return specimenType;
+    }
+
+    /*
+     * Generates an action exception if centre with name does not exist.
+     */
+    @SuppressWarnings("nls")
+    private Center loadCenter(String name) {
+        Criteria c = context.getSession()
+            .createCriteria(Center.class, "c")
+            .add(Restrictions.eq("pnumber", name));
+
+        Center center = (Center) c.uniqueResult();
+        if (center == null) {
+            throw new ActionException(CSV_CURRENT_CENTER_ERROR.format(name));
+        }
+
+        return center;
     }
 
     /*
@@ -394,7 +400,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         Container container = (Container) c.uniqueResult();
         if (container == null) {
-            throw new ActionException(CSV_CONTAINER_LABEL_ERROR);
+            throw new ActionException(CSV_CONTAINER_LABEL_ERROR.format(label));
         }
         return container;
     }

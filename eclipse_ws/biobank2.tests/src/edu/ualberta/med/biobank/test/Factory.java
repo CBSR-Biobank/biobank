@@ -587,8 +587,9 @@ public class Factory {
         return dispatchSpecimen;
     }
 
-    public Site createSite(String name) {
+    public Site createSite() {
         // Use Center.class because the name must be unique on Center
+        String name = nameGenerator.next(Center.class);
         Site site = new Site();
         site.setName(name);
         site.setNameShort(name);
@@ -599,10 +600,6 @@ public class Factory {
         session.save(site);
         session.flush();
         return site;
-    }
-
-    public Site createSite() {
-        return createSite(nameGenerator.next(Center.class));
     }
 
     public ContainerType createContainerType() {
