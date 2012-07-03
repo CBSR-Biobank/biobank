@@ -9,6 +9,8 @@ import javax.persistence.Version;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 @MappedSuperclass
@@ -19,9 +21,14 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     private Integer id;
 
     @Override
-    @GenericGenerator(name = "generator", strategy = "increment")
     @Id
-    @GeneratedValue(generator = "generator")
+    @GeneratedValue(generator = "id-generator")
+    @GenericGenerator(name = "id-generator",
+        strategy = "edu.ualberta.med.biobank.model.type.SmartTableGenerator",
+        parameters = {
+            @Parameter(name = TableGenerator.CONFIG_PREFER_SEGMENT_PER_ENTITY, value = "true"),
+            @Parameter(name = TableGenerator.INCREMENT_PARAM, value = "50")
+        })
     @Column(name = "ID", nullable = false)
     public Integer getId() {
         return this.id;

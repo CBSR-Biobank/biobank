@@ -2,6 +2,10 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
+		<!-- Interpret the sequence as the starting (low) value, not the high range 
+			(where low would be high - increment) -->
+		<property name="hibernate.id.optimizer.pooled.prefer_lo">true</property>
+
 		<!-- Properties for the session factory -->
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
@@ -115,31 +119,25 @@
 		<event type="pre-collection-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 			<listener class="org.hibernate.envers.event.AuditEventListener" />
-            <!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
 		</event>
 		<event type="pre-collection-recreate">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 		</event>
 		<event type="pre-collection-remove">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
-            <listener class="org.hibernate.envers.event.AuditEventListener" />
-			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 		<event type="post-insert">
-            <listener class="org.hibernate.envers.event.AuditEventListener" />
-			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 		<event type="post-update">
-            <listener class="org.hibernate.envers.event.AuditEventListener" />
-			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 		<event type="post-delete">
-            <listener class="org.hibernate.envers.event.AuditEventListener" />
-			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 		<event type="post-collection-recreate">
-            <listener class="org.hibernate.envers.event.AuditEventListener" />
-			<!--  <listener class="org.hibernate.envers.event.AuditEventListener" />-->
+			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 	</session-factory>
 </hibernate-configuration>
