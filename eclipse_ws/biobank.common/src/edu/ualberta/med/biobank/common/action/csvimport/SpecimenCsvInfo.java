@@ -21,7 +21,7 @@ public class SpecimenCsvInfo implements Serializable {
     private Integer visitNumber;
     private String currentCenter;
     private String originCenter;
-    private Boolean sourceSpecimen;
+    private Boolean sourceSpecimen = false;
     private String worksheet;
     private String palletProductBarcode;
     private String rootContainerType;

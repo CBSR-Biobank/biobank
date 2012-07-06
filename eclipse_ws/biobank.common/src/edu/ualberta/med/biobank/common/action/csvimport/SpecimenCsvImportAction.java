@@ -97,21 +97,24 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         bundle.tr("specimen position in CSV file with label {0} is invalid");
 
     @SuppressWarnings("nls")
+    // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        new Unique(),
-        null,
-        null,
-        new ParseDate("yyyy-MM-dd HH:mm"),
-        null,
-        new ParseInt(),
-        null,
-        null,
-        new ParseBool(),
-        null,
-        null,
-        new Optional(),
-        new Optional()
-    };
+        new Unique(),                       // "inventoryId",
+        null,                               // "parentInventoryID",
+        null,                               // "specimenType",
+        new ParseDate("yyyy-MM-dd HH:mm"),  // "createdAt",
+        null,                               // "patientNumber",
+        new ParseInt(),                     // "visitNumber",
+        null,                               // "currentCenter",
+        null,                               // "originCenter",
+        new ParseBool(),                    // "sourceSpecimen",
+        null,                               // "worksheet",
+        new Optional(),                     // "palletProductBarcode",
+        new Optional(),                     // "rootContainerType",
+        new Optional(),                     // "palletLabel",
+        new Optional()                      // "palletPosition"
+    }; 
+    // @formatter:on    
 
     private CompressedReference<ArrayList<SpecimenCsvInfo>> compressedList =
         null;
@@ -138,6 +141,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             "originCenter",
             "sourceSpecimen",
             "worksheet",
+            "palletProductBarcode",
             "rootContainerType",
             "palletLabel",
             "palletPosition"

@@ -38,7 +38,6 @@ public class SpecimenCsvWriter {
             "parentInventoryID",
             "specimenType",
             "createdAt",
-            "studyName",
             "patientNumber",
             "visitNumber",
             "currentCenter",
@@ -57,19 +56,19 @@ public class SpecimenCsvWriter {
 
         final CellProcessor[] processing = new CellProcessor[] {
             null,
-            new ConvertNullTo("\"\""),
+            new ConvertNullTo(""),
             null,
             null,
             null,
             null,
             null,
+            new ConvertNullTo(""),
             null,
-            null,
-            new ConvertNullTo("\"\""),
-            new ConvertNullTo("\"\""),
-            new ConvertNullTo("\"\""),
-            new ConvertNullTo("\"\""),
-            new ConvertNullTo("\"\"")
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo("")
         };
 
         try {
