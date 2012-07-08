@@ -55,15 +55,15 @@ public class SpecimenCsvWriter {
                 CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processing = new CellProcessor[] {
-            null,
             new ConvertNullTo(""),
-            null,
-            null,
-            null,
-            null,
-            null,
             new ConvertNullTo(""),
-            null,
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
+            new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),

@@ -100,7 +100,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
         new Unique(),                       // "inventoryId",
-        null,                               // "parentInventoryID",
+        new Optional(),                     // "parentInventoryID",
         null,                               // "specimenType",
         new ParseDate("yyyy-MM-dd HH:mm"),  // "createdAt",
         null,                               // "patientNumber",
@@ -108,7 +108,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         null,                               // "currentCenter",
         null,                               // "originCenter",
         new ParseBool(),                    // "sourceSpecimen",
-        null,                               // "worksheet",
+        new Optional(),                     // "worksheet",
         new Optional(),                     // "palletProductBarcode",
         new Optional(),                     // "rootContainerType",
         new Optional(),                     // "palletLabel",

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -76,11 +77,11 @@ public class TestSpecimenCsvImport extends ActionTest {
         throws IOException {
         final String CSV_NAME = "import_specimens.csv";
 
+        Set<SpecimenCsvInfo> specimenInfos = new LinkedHashSet<>();
         Map<SourceSpecimen, SpecimenCsvInfo> parentSpecimenInfos =
             new HashMap<>();
 
         // add parent specimens first
-        Set<SpecimenCsvInfo> specimenInfos = new HashSet<>();
         for (SourceSpecimen ss : sourceSpecimens) {
             for (Patient p : patients) {
                 SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
