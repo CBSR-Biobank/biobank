@@ -205,7 +205,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         ArrayList<SpecimenCsvInfo> specimenCsvInfos = compressedList.get();
         for (SpecimenCsvInfo csvInfo : specimenCsvInfos) {
-            if (csvInfo.getParentInventoryID().isEmpty()) {
+            if ((csvInfo.getParentInventoryID() == null)
+                || csvInfo.getParentInventoryID().isEmpty()) {
                 addSourceSpecimen(csvInfo);
             } else {
                 addAliquotedSpecimen(csvInfo);
@@ -383,7 +384,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private Center loadCenter(String name) {
         Criteria c = context.getSession()
             .createCriteria(Center.class, "c")
-            .add(Restrictions.eq("pnumber", name));
+            .add(Restrictions.eq("nameShort", name));
 
         Center center = (Center) c.uniqueResult();
         if (center == null) {

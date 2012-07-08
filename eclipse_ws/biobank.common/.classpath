@@ -42,7 +42,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/messages.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/ognl-2.6.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12-1.6.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/SuperCSV-1.52.jar" sourcepath="/home/loyola/proj/cbsr/supercsv/trunk/src/main/java"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/SuperCSV-1.52.jar" sourcepath="/home/nelson/proj/cbsr/SuperCSV"/>
 	<classpathentry kind="lib" path="lib/server/spiffy-all-0.05.jar"/>
 	<classpathentry kind="con" path="com.soyatec.uml.CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
