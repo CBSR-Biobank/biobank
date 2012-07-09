@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
-import javax.persistence.Version;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,11 +11,9 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-@MappedSuperclass
-public abstract class AbstractBiobankModel implements IBiobankModel {
+public class AbstractModel implements IBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Integer version;
     private Integer id;
 
     @Override
@@ -37,23 +33,6 @@ public abstract class AbstractBiobankModel implements IBiobankModel {
     @Override
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    @Version
-    @Column(name = "VERSION", nullable = false)
-    public Integer getVersion() {
-        return this.version;
-    }
-
-    /**
-     * DO NOT CALL this method unless, maybe, for tests. Hibernate manages
-     * setting this value.
-     * 
-     * @param version
-     */
-    @Deprecated
-    public void setVersion(Integer version) {
-        this.version = version;
     }
 
     @Override

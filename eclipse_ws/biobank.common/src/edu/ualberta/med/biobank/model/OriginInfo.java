@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "ORIGIN_INFO")
-public class OriginInfo extends AbstractBiobankModel
+public class OriginInfo extends AbstractVersionedModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

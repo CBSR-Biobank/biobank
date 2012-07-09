@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childSpecimenTypes", groups = PreDelete.class),
     @Empty(property = "parentSpecimenTypes", groups = PreDelete.class)
 })
-public class SpecimenType extends AbstractBiobankModel
+public class SpecimenType extends AbstractVersionedModel
     implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
  */
 @Entity
 @Table(name = "MEMBERSHIP")
-public class Membership extends AbstractBiobankModel {
+public class Membership extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

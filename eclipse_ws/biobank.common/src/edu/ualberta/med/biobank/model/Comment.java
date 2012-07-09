@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "COMMENT")
-public class Comment extends AbstractBiobankModel
+public class Comment extends AbstractVersionedModel
     implements HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
-public class AliquotedSpecimen extends AbstractBiobankModel
+public class AliquotedSpecimen extends AbstractVersionedModel
     implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

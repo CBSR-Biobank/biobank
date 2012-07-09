@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 @Audited
 @MappedSuperclass
 @InBounds
-public abstract class AbstractPosition extends AbstractBiobankModel {
+public abstract class AbstractPosition extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

@@ -65,7 +65,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType extends AbstractBiobankModel
+public class ContainerType extends AbstractVersionedModel
     implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

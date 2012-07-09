@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
-public class ContainerLabelingScheme extends AbstractBiobankModel
+public class ContainerLabelingScheme extends AbstractVersionedModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 

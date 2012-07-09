@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Audited
 @Entity
 @Table(name = "REQUEST")
-public class Request extends AbstractBiobankModel
+public class Request extends AbstractVersionedModel
     implements HasCreatedAt, HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -9,11 +9,11 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
-import edu.ualberta.med.biobank.model.AbstractBiobankModel;
+import edu.ualberta.med.biobank.model.AbstractVersionedModel;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenGetPossibleTypesAction implements
-    Action<ListResult<AbstractBiobankModel>> {
+    Action<ListResult<AbstractVersionedModel>> {
 
     private static final long serialVersionUID = 1L;
     private Integer id;
@@ -52,18 +52,18 @@ public class SpecimenGetPossibleTypesAction implements
 
     @SuppressWarnings("unchecked")
     @Override
-    public ListResult<AbstractBiobankModel> run(ActionContext context)
+    public ListResult<AbstractVersionedModel> run(ActionContext context)
         throws ActionException {
         Specimen spec = context.load(Specimen.class, id);
         if (!spec.getChildSpecimens().isEmpty())
-            return new ListResult<AbstractBiobankModel>(
-                new ArrayList<AbstractBiobankModel>());
+            return new ListResult<AbstractVersionedModel>(
+                new ArrayList<AbstractVersionedModel>());
         Query q;
         if (spec.getParentSpecimen() == null)
             q = context.getSession().createQuery(SOURCE_TYPES);
         else
             q = context.getSession().createQuery(ALIQUOTED_TYPES);
         q.setParameter(0, id);
-        return new ListResult<AbstractBiobankModel>(q.list());
+        return new ListResult<AbstractVersionedModel>(q.list());
     }
 }

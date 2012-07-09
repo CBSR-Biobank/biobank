@@ -47,7 +47,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "pnumber", groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
 @Empty(property = "collectionEvents", groups = PreDelete.class)
-public class Patient extends AbstractBiobankModel
+public class Patient extends AbstractVersionedModel
     implements HasCreatedAt, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

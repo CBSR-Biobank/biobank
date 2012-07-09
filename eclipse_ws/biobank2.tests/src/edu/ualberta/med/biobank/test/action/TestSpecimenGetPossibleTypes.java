@@ -5,7 +5,7 @@ import java.util.List;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
-import edu.ualberta.med.biobank.model.AbstractBiobankModel;
+import edu.ualberta.med.biobank.model.AbstractVersionedModel;
 
 public class TestSpecimenGetPossibleTypes extends ActionTest {
 
@@ -13,6 +13,6 @@ public class TestSpecimenGetPossibleTypes extends ActionTest {
     public void test() {
         SpecimenGetPossibleTypesAction action =
             new SpecimenGetPossibleTypesAction(4);
-        List<AbstractBiobankModel> list = exec(action).getList();
+        List<AbstractVersionedModel> list = exec(action).getList();
     }
 }

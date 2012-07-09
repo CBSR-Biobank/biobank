@@ -3,36 +3,18 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
+// TODO: make this an enum?
 @Entity
 @Table(name = "REVISION_ENTITY_TYPE")
-public class RevisionEntityType implements IBiobankModel {
+public class RevisionEntityType extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
     private String type;
     private Revision revision;
-
-    @Override
-    @GenericGenerator(name = "generator", strategy = "increment")
-    @Id
-    @GeneratedValue(generator = "generator")
-    @Column(name = "ID", nullable = false)
-    public Integer getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     @Column(name = "TYPE", nullable = false)
     public String getType() {

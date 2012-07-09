@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 @Audited
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
-public class DispatchSpecimen extends AbstractBiobankModel
+public class DispatchSpecimen extends AbstractVersionedModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

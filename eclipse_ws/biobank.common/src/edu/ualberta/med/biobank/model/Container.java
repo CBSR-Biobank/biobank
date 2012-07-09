@@ -59,7 +59,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childPositions", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractBiobankModel
+public class Container extends AbstractVersionedModel
     implements HasComments, HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

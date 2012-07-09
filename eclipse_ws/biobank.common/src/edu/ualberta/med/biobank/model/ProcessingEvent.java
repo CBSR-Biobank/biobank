@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
 @Unique(properties = "worksheet", groups = PrePersist.class)
-public class ProcessingEvent extends AbstractBiobankModel
+public class ProcessingEvent extends AbstractVersionedModel
     implements HasCreatedAt, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

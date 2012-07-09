@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "ROLE")
 @Unique(properties = "name", groups = PrePersist.class)
 // TODO: check that no Membership uses this role before deleting
-public class Role extends AbstractBiobankModel {
+public class Role extends AbstractVersionedModel {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
     private static final long serialVersionUID = 1L;

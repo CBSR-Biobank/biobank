@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "GLOBAL_EVENT_ATTR")
 @Unique(properties = "label", groups = PrePersist.class)
-public class GlobalEventAttr extends AbstractBiobankModel {
+public class GlobalEventAttr extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

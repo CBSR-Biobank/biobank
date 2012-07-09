@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "CONTACT")
 @Empty(property = "studies", groups = PreDelete.class)
-public class Contact extends AbstractBiobankModel
+public class Contact extends AbstractVersionedModel
     implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
