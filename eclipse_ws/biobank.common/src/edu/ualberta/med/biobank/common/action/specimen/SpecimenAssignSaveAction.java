@@ -87,8 +87,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
             Specimen specimen =
                 context.load(Specimen.class, si.specimenId);
             SpecimenActionHelper.setPosition(context, specimen,
-                si.position,
-                containerId);
+                si.position, containerId);
             context.getSession().saveOrUpdate(specimen);
 
             SpecimenResInfo rInfo = new SpecimenResInfo();

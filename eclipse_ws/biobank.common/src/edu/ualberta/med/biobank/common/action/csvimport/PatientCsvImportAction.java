@@ -87,8 +87,6 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
                 patientCsvInfos.add(patientCsvInfo);
             }
 
-            System.out.println("rows read: " + patientCsvInfos.size());
-
             compressedList =
                 new CompressedReference<ArrayList<PatientCsvInfo>>(
                     patientCsvInfos);

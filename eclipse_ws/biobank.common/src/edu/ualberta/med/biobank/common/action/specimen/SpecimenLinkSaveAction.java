@@ -97,8 +97,10 @@ public class SpecimenLinkSaveAction implements
             specimen.setCurrentCenter(currentCenter);
             specimen.setOriginInfo(originInfo);
 
-            SpecimenActionHelper.setParent(context, specimen,
-                asi.parentSpecimenId);
+            Specimen parentSpc =
+                context.load(Specimen.class, asi.parentSpecimenId);
+
+            SpecimenActionHelper.setParent(specimen, parentSpc);
             SpecimenActionHelper.setQuantityFromType(specimen);
             SpecimenActionHelper.setPosition(context, specimen, asi.position,
                 asi.containerId);

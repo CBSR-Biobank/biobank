@@ -12,6 +12,7 @@ import java.util.Date;
 public class SpecimenCsvInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private int lineNumber;
     private String inventoryId;
     private String parentInventoryID;
     private String specimenType;
@@ -27,6 +28,14 @@ public class SpecimenCsvInfo implements Serializable {
     private String rootContainerType;
     private String palletLabel;
     private String palletPosition;
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
     public String getInventoryId() {
         return inventoryId;

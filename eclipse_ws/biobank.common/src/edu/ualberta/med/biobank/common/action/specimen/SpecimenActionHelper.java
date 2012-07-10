@@ -18,20 +18,15 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 public class SpecimenActionHelper {
     private static final Bundle bundle = new CommonBundle();
 
-    public static void setParent(ActionContext actionContext,
-        Specimen specimen,
-        Integer parentSpecimenId) {
-        Specimen parent = null;
-        if (parentSpecimenId != null) {
-            parent = actionContext.load(Specimen.class,
-                parentSpecimenId);
-            specimen.setCollectionEvent(parent.getCollectionEvent());
-            specimen.setParentSpecimen(parent);
+    public static void setParent(Specimen specimen, Specimen parentSpecimen) {
+        if (parentSpecimen != null) {
+            specimen.setCollectionEvent(parentSpecimen.getCollectionEvent());
+            specimen.setParentSpecimen(parentSpecimen);
         }
-        Specimen topSpecimen = parent == null ? specimen : parent
-            .getTopSpecimen();
+        Specimen topSpecimen = (parentSpecimen == null)
+            ? specimen : parentSpecimen.getTopSpecimen();
         specimen.setTopSpecimen(topSpecimen);
-        if (specimen.equals(parent)) { // parent to itself
+        if (specimen.equals(parentSpecimen)) { // parent to itself
             specimen.setOriginalCollectionEvent(specimen.getCollectionEvent());
         }
     }
@@ -50,6 +45,35 @@ public class SpecimenActionHelper {
     }
 
     @SuppressWarnings("nls")
+    public static void createOrChangePosition(Specimen specimen,
+        Container container, RowColPos rcp) {
+        if (container == null) {
+            throw new NullPointerException("container is null");
+        }
+        if (rcp == null) {
+            throw new NullPointerException("rcp is null");
+        }
+
+        SpecimenPosition pos = specimen.getSpecimenPosition();
+        if (pos == null) {
+            pos = new SpecimenPosition();
+            pos.setSpecimen(specimen);
+            specimen.setSpecimenPosition(pos);
+        }
+
+        pos.setRow(rcp.getRow());
+        pos.setCol(rcp.getCol());
+
+        pos.setContainer(container);
+        ContainerType type = container.getContainerType();
+        String positionString = ContainerLabelingSchemeWrapper
+            .getPositionString(rcp, type.getChildLabelingScheme().getId(),
+                type.getCapacity().getRowCapacity(), type.getCapacity()
+                    .getColCapacity());
+        pos.setPositionString(positionString);
+    }
+
+    @SuppressWarnings("nls")
     public static void setPosition(ActionContext actionContext,
         Specimen specimen, RowColPos rcp, Integer containerId) {
         // FIXME check if a position exists?
@@ -59,24 +83,11 @@ public class SpecimenActionHelper {
             // FIXME not sure this will work. Needs to be tested.
             actionContext.getSession().delete(pos);
         }
-        if (rcp != null && containerId != null) {
-            if (pos == null) {
-                pos = new SpecimenPosition();
-                pos.setSpecimen(specimen);
-                specimen.setSpecimenPosition(pos);
-            }
-            pos.setRow(rcp.getRow());
-            pos.setCol(rcp.getCol());
 
+        if (rcp != null && containerId != null) {
             Container container = actionContext.load(Container.class,
                 containerId);
-            pos.setContainer(container);
-            ContainerType type = container.getContainerType();
-            String positionString = ContainerLabelingSchemeWrapper
-                .getPositionString(rcp, type.getChildLabelingScheme().getId(),
-                    type.getCapacity().getRowCapacity(), type.getCapacity()
-                        .getColCapacity());
-            pos.setPositionString(positionString);
+            createOrChangePosition(specimen, container, rcp);
         } else if ((rcp == null && containerId != null)
             || (rcp != null && containerId == null)) {
             throw new ActionException(
