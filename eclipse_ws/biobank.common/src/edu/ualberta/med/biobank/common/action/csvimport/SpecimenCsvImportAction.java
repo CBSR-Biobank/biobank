@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
@@ -77,26 +78,28 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         bundle.tr("CVS file could not be uncompressed").format();
 
     public static final Tr CSV_PATIENT_ERROR =
-        bundle.tr("patient in CSV file with number {0} not exist");
+        bundle.tr("patient in CSV file with number \"{0}\" not exist");
 
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
         bundle
-            .tr("parent specimen in CSV file with inventory id {0} does not exist");
+            .tr("parent specimen in CSV file with inventory id \"{0}\" does not exist");
 
     public static final Tr CSV_ORIGIN_CENTER_ERROR =
-        bundle.tr("origin center in CSV file with name {0} does not exist");
+        bundle.tr("origin center in CSV file with name \"{0}\" does not exist");
 
     public static final Tr CSV_CURRENT_CENTER_ERROR =
-        bundle.tr("current center in CSV file with name {0} does not exist");
+        bundle
+            .tr("current center in CSV file with name \"{0}\" does not exist");
 
     public static final Tr CSV_SPECIMEN_TYPE_ERROR =
-        bundle.tr("specimen type in CSV file with name {0} does not exist");
+        bundle.tr("specimen type in CSV file with name \"{0}\" does not exist");
 
     public static final Tr CSV_CONTAINER_LABEL_ERROR =
-        bundle.tr("container in CSV file with label {0} does not exist");
+        bundle.tr("container in CSV file with label \"{0}\" does not exist");
 
     public static final Tr CSV_SPECIMEN_LABEL_ERROR =
-        bundle.tr("specimen position in CSV file with label {0} is invalid");
+        bundle
+            .tr("specimen position in CSV file with label \"{0}\" is invalid");
 
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
@@ -131,7 +134,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private final Map<String, Specimen> sourceSpecimens =
         new HashMap<>(0);
 
-    private final Set<ImportError> errors = new HashSet<>(0);
+    private final Set<ImportError> errors = new TreeSet<>();
 
     public SpecimenCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);
@@ -274,11 +277,12 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         Patient patient = loadPatient(csvInfo.getPatientNumber());
         info.setPatient(patient);
 
-        log.debug("finding collection event: pt={} numCevents={}",
-            csvInfo.getPatientNumber(), patient.getCollectionEvents().size());
-
         if (!info.isAliquotedSpecimen()) {
             // find the collection event for this specimen
+            log.debug("finding collection event: pt={} numCevents={}",
+                csvInfo.getPatientNumber(), patient.getCollectionEvents()
+                    .size());
+
             for (CollectionEvent ce : patient.getCollectionEvents()) {
                 if (ce.getVisitNumber().equals(csvInfo.getVisitNumber())) {
                     info.setCevent(ce);
@@ -316,21 +320,24 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             info.setSpecimenType(spcType);
         }
 
-        Container container = getContainer(csvInfo.getPalletLabel());
-        if (container == null) {
-            addError(csvInfo.getLineNumber(),
-                CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
-        } else {
-            info.setContainer(container);
-        }
+        // only get container information if defined for this row
+        if (info.hasPosition()) {
+            Container container = getContainer(csvInfo.getPalletLabel());
+            if (container == null) {
+                addError(csvInfo.getLineNumber(),
+                    CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
+            } else {
+                info.setContainer(container);
+            }
 
-        try {
-            RowColPos pos = container.getPositionFromLabelingScheme(csvInfo
-                .getPalletPosition());
-            info.setSpecimenPos(pos);
-        } catch (Exception e) {
-            addError(csvInfo.getLineNumber(),
-                CSV_SPECIMEN_LABEL_ERROR.format(csvInfo.getPalletLabel()));
+            try {
+                RowColPos pos = container.getPositionFromLabelingScheme(csvInfo
+                    .getPalletPosition());
+                info.setSpecimenPos(pos);
+            } catch (Exception e) {
+                addError(csvInfo.getLineNumber(),
+                    CSV_SPECIMEN_LABEL_ERROR.format(csvInfo.getPalletLabel()));
+            }
         }
 
         return info;
@@ -343,26 +350,15 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         CollectionEvent cevent = info.getCevent();
-        boolean ceventCreated = false;
 
         if (cevent == null) {
             cevent = info.createCollectionEvent();
-            ceventCreated = true;
-        }
-
-        Specimen spc = info.getSpecimen();
-        context.getSession().save(spc);
-
-        if (ceventCreated) {
             context.getSession().saveOrUpdate(cevent);
         }
 
-        log.debug("added collection event: pt={} v#={} invId={}",
-            new Object[] {
-                info.getCsvInfo().getPatientNumber(),
-                info.getCsvInfo().getVisitNumber(),
-                info.getCsvInfo().getInventoryId()
-            });
+        Specimen spc = info.getSpecimen();
+        context.getSession().save(spc.getOriginInfo());
+        context.getSession().save(spc);
 
         return spc;
     }

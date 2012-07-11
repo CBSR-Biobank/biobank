@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.common.action.csvimport;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -12,6 +15,10 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenImportInfo {
+
+    private static Logger log = LoggerFactory
+        .getLogger(SpecimenImportInfo.class.getName());
+
     private SpecimenCsvInfo csvInfo;
     private SpecimenImportInfo parentInfo;
     private Patient patient;
@@ -120,12 +127,29 @@ public class SpecimenImportInfo {
             && !csvInfo.getParentInventoryID().isEmpty();
     }
 
+    public boolean hasPosition() {
+        return (csvInfo.getPalletLabel() != null)
+            && !csvInfo.getPalletLabel().isEmpty()
+            && (csvInfo.getPalletPosition() != null)
+            && !csvInfo.getPalletPosition().isEmpty();
+
+    }
+
+    @SuppressWarnings("nls")
     public CollectionEvent createCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
         cevent.setVisitNumber(csvInfo.getVisitNumber());
         cevent.setActivityStatus(ActivityStatus.ACTIVE);
         patient.getCollectionEvents().add(cevent);
+
+        log.debug("created collection event: pt={} v#={} invId={}",
+            new Object[] {
+                csvInfo.getPatientNumber(),
+                csvInfo.getVisitNumber(),
+                csvInfo.getInventoryId()
+            });
+
         return cevent;
     }
 
@@ -139,15 +163,29 @@ public class SpecimenImportInfo {
         spc.setOriginInfo(oi);
         spc.setCurrentCenter(currentCenter);
         spc.setActivityStatus(ActivityStatus.ACTIVE);
-        spc.setCollectionEvent(cevent);
         spc.setOriginalCollectionEvent(cevent);
         spc.setCreatedAt(csvInfo.getCreatedAt());
         spc.setInventoryId(csvInfo.getInventoryId());
         spc.setSpecimenType(specimenType);
 
-        if (parentSpecimen == null) {
+        if (cevent == null) {
             throw new IllegalStateException(
-                "parent specimen has not be created yet");
+                "specimen does not have a collection event");
+        }
+
+        spc.setCollectionEvent(cevent);
+
+        if (!isAliquotedSpecimen()) {
+            cevent.getOriginalSpecimens().add(spc);
+        }
+        cevent.getAllSpecimens().add(spc);
+
+        if ((csvInfo.getParentInventoryID() != null)
+            && !csvInfo.getParentInventoryID().isEmpty()
+            && (parentSpecimen == null)) {
+            throw new IllegalStateException(
+                "parent specimen for specimen with " + csvInfo.getInventoryId()
+                    + " has not be created yet");
         }
 
         SpecimenActionHelper.setParent(spc, parentSpecimen);
@@ -158,10 +196,14 @@ public class SpecimenImportInfo {
                 specimenPos);
         }
 
-        if (!isAliquotedSpecimen()) {
-            cevent.getOriginalSpecimens().add(spc);
-        }
-        cevent.getAllSpecimens().add(spc);
+        log.debug("creating specimen: pt={} v#={} invId={} cevent={}",
+            new Object[] {
+                csvInfo.getPatientNumber(),
+                csvInfo.getVisitNumber(),
+                csvInfo.getInventoryId(),
+                cevent
+            });
+
         return spc;
     }
 }

@@ -22,7 +22,7 @@ public class CsvImportException extends ActionException {
         return errors;
     }
 
-    public static class ImportError {
+    public static class ImportError implements Comparable<ImportError> {
         private final int lineNumber;
         private final LString message;
 
@@ -37,6 +37,11 @@ public class CsvImportException extends ActionException {
 
         public LString getMessage() {
             return message;
+        }
+
+        @Override
+        public int compareTo(ImportError ie) {
+            return lineNumber - ie.lineNumber;
         }
     }
 
