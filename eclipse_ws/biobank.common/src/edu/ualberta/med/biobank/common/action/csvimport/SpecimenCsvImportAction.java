@@ -31,6 +31,8 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -65,6 +67,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         .getI18n(SpecimenCsvImportAction.class);
 
     private static final Bundle bundle = new CommonBundle();
+
+    public static final int MAX_ERRORS_TO_REPORT = 50;
 
     public static final String CSV_PARSE_ERROR =
         "Parse error at line {0}\n{1}";
@@ -130,7 +134,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private final Map<String, Specimen> sourceSpecimens =
         new HashMap<>(0);
 
-    private final Set<LString> errors = new HashSet<>(0);
+    private final Set<ImportError> errors = new HashSet<>(0);
 
     public SpecimenCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);
@@ -234,19 +238,16 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             SpecimenImportInfo parentInfo =
                 sourceSpcInvIds.get(info.getParentInventoryID());
             if ((info.getPatient() == null) && (parentInfo == null)) {
-                errors.add(CSV_PARENT_SPECIMEN_ERROR.format(info
-                    .getParentInventoryID()));
+                addError(info.getLineNumber(),
+                    CSV_PARENT_SPECIMEN_ERROR.format(info
+                        .getParentInventoryID()));
             } else {
                 info.setParentInfo(parentInfo);
             }
         }
 
         if (!errors.isEmpty()) {
-            StringBuffer sb = new StringBuffer();
-            for (LString msg : errors) {
-                sb.append(msg).append("\n");
-            }
-            throw new ActionException();
+            throw new CsvImportException(errors);
         }
 
         for (SpecimenImportInfo info : specimenImportInfos) {
@@ -295,32 +296,32 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         Center originCenter = getCenter(csvInfo.getOriginCenter());
         if (originCenter == null) {
-            errors.add(CSV_ORIGIN_CENTER_ERROR.format(csvInfo
-                .getOriginCenter()));
+            addError(csvInfo.getLineNumber(),
+                CSV_ORIGIN_CENTER_ERROR.format(csvInfo.getOriginCenter()));
         } else {
             info.setOriginCenter(originCenter);
         }
 
         Center currentCenter = getCenter(csvInfo.getCurrentCenter());
         if (originCenter == null) {
-            errors.add(CSV_CURRENT_CENTER_ERROR.format(
-                csvInfo.getCurrentCenter()));
+            addError(csvInfo.getLineNumber(),
+                CSV_CURRENT_CENTER_ERROR.format(csvInfo.getCurrentCenter()));
         } else {
             info.setCurrentCenter(currentCenter);
         }
 
         SpecimenType spcType = getSpecimenType(csvInfo.getSpecimenType());
         if (spcType == null) {
-            errors.add(CSV_SPECIMEN_TYPE_ERROR.format(
-                csvInfo.getSpecimenType()));
+            addError(csvInfo.getLineNumber(),
+                CSV_SPECIMEN_TYPE_ERROR.format(csvInfo.getSpecimenType()));
         } else {
             info.setSpecimenType(spcType);
         }
 
         Container container = getContainer(csvInfo.getPalletLabel());
         if (container == null) {
-            errors.add(CSV_CONTAINER_LABEL_ERROR.format(
-                csvInfo.getPalletLabel()));
+            addError(csvInfo.getLineNumber(),
+                CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
         } else {
             info.setContainer(container);
         }
@@ -330,8 +331,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 .getPalletPosition());
             info.setSpecimenPos(pos);
         } catch (Exception e) {
-            errors.add(CSV_SPECIMEN_LABEL_ERROR.format(
-                csvInfo.getPalletLabel()));
+            addError(csvInfo.getLineNumber(),
+                CSV_SPECIMEN_LABEL_ERROR.format(csvInfo.getPalletLabel()));
         }
 
         return info;
@@ -366,6 +367,16 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             });
 
         return spc;
+    }
+
+    private void addError(int lineNumber, LString message)
+        throws CsvImportException {
+        ImportError importError = new ImportError(lineNumber, message);
+        errors.add(importError);
+        if (errors.size() > MAX_ERRORS_TO_REPORT) {
+            throw new CsvImportException(errors);
+        }
+
     }
 
     private Patient getPatient(String pnumber) {
@@ -454,6 +465,10 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
             this.setCsvInfo(csvInfo);
+        }
+
+        public int getLineNumber() {
+            return csvInfo.getLineNumber();
         }
 
         public SpecimenCsvInfo getCsvInfo() {

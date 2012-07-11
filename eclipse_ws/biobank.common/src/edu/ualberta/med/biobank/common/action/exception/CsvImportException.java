@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.i18n.LString;
@@ -8,23 +7,37 @@ import edu.ualberta.med.biobank.i18n.LString;
 public class CsvImportException extends ActionException {
     private static final long serialVersionUID = 1L;
 
-    private final Set<ImportError> errors = new HashSet<>(0);
+    private Set<ImportError> errors;
 
-    public CsvImportException() {
+    public CsvImportException(Set<ImportError> errors) {
         super(null);
+        addErrors(errors);
     }
 
-    public void addError(int lineNumber, LString message) {
-        ImportError importError = new ImportError();
-        importError.lineNumber = lineNumber;
-        importError.message = message;
-        errors.add(importError);
-
+    public void addErrors(Set<ImportError> errors) {
+        this.errors = errors;
     }
 
-    private static class ImportError {
-        int lineNumber;
-        LString message;
+    public Set<ImportError> getErrors() {
+        return errors;
+    }
+
+    public static class ImportError {
+        private final int lineNumber;
+        private final LString message;
+
+        public ImportError(int lineNumber, LString message) {
+            this.lineNumber = lineNumber;
+            this.message = message;
+        }
+
+        public int getLineNumber() {
+            return lineNumber;
+        }
+
+        public LString getMessage() {
+            return message;
+        }
     }
 
 }
