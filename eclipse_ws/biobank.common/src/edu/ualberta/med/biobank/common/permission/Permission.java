@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.permission;
 
 import java.io.Serializable;
 
-
 import edu.ualberta.med.biobank.common.action.ActionContext;
 
 /**

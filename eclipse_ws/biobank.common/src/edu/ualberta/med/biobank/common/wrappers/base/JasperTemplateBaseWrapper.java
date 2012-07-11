@@ -5,11 +5,12 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.JasperTemplate;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.JasperTemplatePeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.JasperTemplate;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class JasperTemplateBaseWrapper extends ModelWrapper<JasperTemplate> {
 

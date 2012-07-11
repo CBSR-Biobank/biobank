@@ -1,13 +1,14 @@
 package edu.ualberta.med.biobank.common.peer;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import java.util.Collections;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.List;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.model.Contact;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Contact;
 
 public class ClinicPeer  extends CenterPeer {
 	public static final Property<Boolean, Clinic> SENDS_SHIPMENTS = Property.create(

@@ -29,19 +29,16 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -61,7 +58,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory
-        .getLogger(ContainerGetInfoAction.class.getName());
+        .getLogger(SpecimenCsvImportAction.class.getName());
 
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenCsvImportAction.class);
@@ -210,7 +207,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new ActionException(CSV_FILE_ERROR);
+            throw new LocalizedException(CSV_FILE_ERROR);
         }
 
         this.context = context;
@@ -280,8 +277,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         log.debug("finding collection event: pt={} numCevents={}",
             csvInfo.getPatientNumber(), patient.getCollectionEvents().size());
 
-        if ((csvInfo.getParentInventoryID() == null)
-            || csvInfo.getParentInventoryID().isEmpty()) {
+        if (!info.isAliquotedSpecimen()) {
             // find the collection event for this specimen
             for (CollectionEvent ce : patient.getCollectionEvents()) {
                 if (ce.getVisitNumber().equals(csvInfo.getVisitNumber())) {
@@ -290,8 +286,10 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 }
             }
         } else {
-            info.setParentSpecimen(
-                loadSpecimen(csvInfo.getParentInventoryID()));
+            Specimen parentSpecimen =
+                getSpecimen(csvInfo.getParentInventoryID());
+            if (parentSpecimen != null)
+                info.setParentSpecimen(parentSpecimen);
         }
 
         Center originCenter = getCenter(csvInfo.getOriginCenter());
@@ -394,7 +392,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         // make sure patient exists
         Patient p = getPatient(pnumber);
         if (p == null) {
-            throw new ActionException(CSV_PATIENT_ERROR.format(pnumber));
+            throw new LocalizedException(CSV_PATIENT_ERROR.format(pnumber));
         }
         return p;
     }
@@ -403,19 +401,13 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
      * Generates an action exception if specimen with inventory ID does not
      * exist.
      */
-    private Specimen loadSpecimen(String inventoryId) {
+    private Specimen getSpecimen(String inventoryId) {
         Criteria c = context.getSession()
             .createCriteria(Specimen.class, "s")
             .add(Restrictions.eq("inventoryId",
                 inventoryId));
 
-        Specimen specimen = (Specimen) c.uniqueResult();
-        if (specimen == null) {
-            throw new ActionException(
-                CSV_PARENT_SPECIMEN_ERROR.format(inventoryId));
-        }
-
-        return specimen;
+        return (Specimen) c.uniqueResult();
     }
 
     /*
@@ -449,160 +441,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             .add(Restrictions.eq("label", label));
 
         return (Container) c.uniqueResult();
-    }
-
-    private static class SpecimenImportInfo {
-        private SpecimenCsvInfo csvInfo;
-        private SpecimenImportInfo parentInfo;
-        private Patient patient;
-        private CollectionEvent cevent;
-        private Specimen parentSpecimen;
-        private Center originCenter;
-        private Center currentCenter;
-        private SpecimenType specimenType;
-        private Container container;
-        private RowColPos specimenPos;
-
-        SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
-            this.setCsvInfo(csvInfo);
-        }
-
-        public int getLineNumber() {
-            return csvInfo.getLineNumber();
-        }
-
-        public SpecimenCsvInfo getCsvInfo() {
-            return csvInfo;
-        }
-
-        public SpecimenImportInfo getParentInfo() {
-            return parentInfo;
-        }
-
-        public void setParentInfo(SpecimenImportInfo parentInfo) {
-            this.parentInfo = parentInfo;
-        }
-
-        public void setCsvInfo(SpecimenCsvInfo csvInfo) {
-            this.csvInfo = csvInfo;
-        }
-
-        public Patient getPatient() {
-            return patient;
-        }
-
-        public void setPatient(Patient patient) {
-            this.patient = patient;
-        }
-
-        public CollectionEvent getCevent() {
-            return cevent;
-        }
-
-        public void setCevent(CollectionEvent cevent) {
-            this.cevent = cevent;
-        }
-
-        public Specimen getParentSpecimen() {
-            return parentSpecimen;
-        }
-
-        public void setParentSpecimen(Specimen parentSpecimen) {
-            this.parentSpecimen = parentSpecimen;
-        }
-
-        public String getParentInventoryID() {
-            return csvInfo.getParentInventoryID();
-        }
-
-        public Center getOriginCenter() {
-            return originCenter;
-        }
-
-        public void setOriginCenter(Center originCenter) {
-            this.originCenter = originCenter;
-        }
-
-        public Center getCurrentCenter() {
-            return currentCenter;
-        }
-
-        public void setCurrentCenter(Center currentCenter) {
-            this.currentCenter = currentCenter;
-        }
-
-        public SpecimenType getSpecimenType() {
-            return specimenType;
-        }
-
-        public void setSpecimenType(SpecimenType specimenType) {
-            this.specimenType = specimenType;
-        }
-
-        public Container getContainer() {
-            return container;
-        }
-
-        public void setContainer(Container container) {
-            this.container = container;
-        }
-
-        public RowColPos getSpecimenPos() {
-            return specimenPos;
-        }
-
-        public void setSpecimenPos(RowColPos specimenPos) {
-            this.specimenPos = specimenPos;
-        }
-
-        public boolean isAliquotedSpecimen() {
-            return (csvInfo.getParentInventoryID() != null)
-                && !csvInfo.getParentInventoryID().isEmpty();
-        }
-
-        public CollectionEvent createCollectionEvent() {
-            cevent = new CollectionEvent();
-            cevent.setPatient(patient);
-            cevent.setVisitNumber(csvInfo.getVisitNumber());
-            cevent.setActivityStatus(ActivityStatus.ACTIVE);
-            patient.getCollectionEvents().add(cevent);
-            return cevent;
-        }
-
-        public Specimen getSpecimen() {
-            // add the specimen to the collection event
-            OriginInfo oi = new OriginInfo();
-            oi.setCenter(originCenter);
-
-            Specimen spc = new Specimen();
-            spc.setOriginInfo(oi);
-            spc.setCurrentCenter(currentCenter);
-            spc.setActivityStatus(ActivityStatus.ACTIVE);
-            spc.setCollectionEvent(cevent);
-            spc.setOriginalCollectionEvent(cevent);
-            spc.setCreatedAt(csvInfo.getCreatedAt());
-            spc.setInventoryId(csvInfo.getInventoryId());
-            spc.setSpecimenType(specimenType);
-
-            if (parentSpecimen == null) {
-                throw new IllegalStateException(
-                    "parent specimen has not be created yet");
-            }
-
-            SpecimenActionHelper.setParent(spc, parentSpecimen);
-            SpecimenActionHelper.setQuantityFromType(spc);
-
-            if (container != null) {
-                SpecimenActionHelper.createOrChangePosition(spc, container,
-                    specimenPos);
-            }
-
-            if (!isAliquotedSpecimen()) {
-                cevent.getOriginalSpecimens().add(spc);
-            }
-            cevent.getAllSpecimens().add(spc);
-            return spc;
-        }
     }
 
 }

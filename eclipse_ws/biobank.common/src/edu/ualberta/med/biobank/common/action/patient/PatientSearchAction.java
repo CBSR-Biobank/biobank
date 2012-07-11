@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.Search
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
@@ -87,6 +88,6 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             pinfo.ceventsCount = (Long) row[2];
             return pinfo;
         }
-        throw new ActionException(MULTIPLE_PATIENTS_FOUND.format(pnumber));
+        throw new LocalizedException(MULTIPLE_PATIENTS_FOUND.format(pnumber));
     }
 }

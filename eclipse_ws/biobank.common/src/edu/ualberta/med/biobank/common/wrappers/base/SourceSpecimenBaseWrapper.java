@@ -4,17 +4,16 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SourceSpecimenBaseWrapper extends ModelWrapper<SourceSpecimen> {
 

@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Dispatch;
 
@@ -61,7 +62,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {
-            throw new ActionException(CANNOT_FIND_DISPATCH_ERRMSG.format(id));
+            throw new LocalizedException(CANNOT_FIND_DISPATCH_ERRMSG.format(id));
         }
 
         return sInfo;

@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
@@ -107,7 +108,7 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new ActionException(CSV_FILE_ERROR);
+            throw new LocalizedException(CSV_FILE_ERROR);
         }
 
         this.context = context;
@@ -141,7 +142,7 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
 
         Study study = (Study) c.uniqueResult();
         if (study == null) {
-            throw new ActionException(CSV_STUDY_ERROR.format(nameShort));
+            throw new LocalizedException(CSV_STUDY_ERROR.format(nameShort));
         }
         return study;
     }

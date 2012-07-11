@@ -4,20 +4,19 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.ArrayList;
-import edu.ualberta.med.biobank.common.peer.UserPeer;
-import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.GroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.GroupBaseWrapper;
-import java.util.Arrays;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class UserBaseWrapper extends PrincipalWrapper<User> {
 

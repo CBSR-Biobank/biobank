@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 
 public class CheckNoDuplicateAction implements Action<BooleanResult> {
@@ -64,7 +65,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
         @SuppressWarnings("unchecked")
         List<Long> res = query.list();
         if (res.size() != 1) {
-            throw new ActionException(UNEXPECTED_RESULTS.format(res.size()));
+            throw new LocalizedException(UNEXPECTED_RESULTS.format(res.size()));
         }
         return new BooleanResult(res.get(0) == 0);
     }

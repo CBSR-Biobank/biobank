@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.server.orm;
 
+import gov.nih.nci.system.dao.orm.SessionFactoryBean;
+
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
-
-import gov.nih.nci.system.dao.orm.SessionFactoryBean;
 
 public class BiobankSessionFactoryBean extends SessionFactoryBean {
     @Override

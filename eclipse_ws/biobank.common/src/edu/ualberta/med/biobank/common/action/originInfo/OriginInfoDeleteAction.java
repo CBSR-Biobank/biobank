@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.shipment.ShipmentDeletePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -54,7 +55,7 @@ public class OriginInfoDeleteAction implements Action<EmptyResult> {
             if (currentCenter == null)
                 currentCenter = spc.getCurrentCenter();
             else if (currentCenter != spc.getCurrentCenter())
-                throw new ActionException(SPECIMEN_ORIGIN_ERRMSG);
+                throw new LocalizedException(SPECIMEN_ORIGIN_ERRMSG);
             spc.setOriginInfo(newOriginInfo);
             spc.setCurrentCenter(wCenter);
         }

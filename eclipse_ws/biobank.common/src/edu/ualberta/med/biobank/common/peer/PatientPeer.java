@@ -1,16 +1,17 @@
 package edu.ualberta.med.biobank.common.peer;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import java.util.Collections;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Study;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 
 public class PatientPeer {
 	public static final Property<Integer, Patient> ID = Property.create(

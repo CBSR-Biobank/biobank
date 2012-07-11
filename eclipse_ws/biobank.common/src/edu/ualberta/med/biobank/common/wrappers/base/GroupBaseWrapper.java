@@ -4,17 +4,17 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.GroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.PrincipalWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.UserBaseWrapper;
-import java.util.Arrays;
+import edu.ualberta.med.biobank.model.Group;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class GroupBaseWrapper extends PrincipalWrapper<Group> {
 

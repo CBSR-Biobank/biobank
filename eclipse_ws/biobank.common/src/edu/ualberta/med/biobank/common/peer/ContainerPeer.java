@@ -1,18 +1,19 @@
 package edu.ualberta.med.biobank.common.peer;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import java.util.Collections;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.List;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.model.Site;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.ActivityStatus;
-import java.util.Collection;
 
 public class ContainerPeer {
 	public static final Property<Integer, Container> ID = Property.create(

@@ -5,13 +5,13 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.PrinterLabelTemplate;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.PrinterLabelTemplatePeer;
 import edu.ualberta.med.biobank.common.wrappers.JasperTemplateWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.JasperTemplateBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.PrinterLabelTemplate;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PrinterLabelTemplateBaseWrapper extends ModelWrapper<PrinterLabelTemplate> {
 

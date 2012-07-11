@@ -4,15 +4,15 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.util.Arrays;
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Report;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.ReportPeer;
 import edu.ualberta.med.biobank.common.wrappers.EntityWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.EntityBaseWrapper;
-import java.util.Arrays;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Report;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ReportBaseWrapper extends ModelWrapper<Report> {
 

@@ -4,16 +4,16 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Principal;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.PrincipalPeer;
 import edu.ualberta.med.biobank.common.wrappers.MembershipWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.MembershipBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Principal;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class PrincipalBaseWrapper<E extends Principal> extends ModelWrapper<E> {
 

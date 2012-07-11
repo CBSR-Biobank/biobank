@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.common.action.container;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -40,7 +40,7 @@ public class ContainerActionHelper {
                 context.getSession().delete(pos);
             }
         } else {
-            throw new ActionException(PARENT_REQUIRES_POSITION_ERRMSG);
+            throw new LocalizedException(PARENT_REQUIRES_POSITION_ERRMSG);
         }
         container.setTopContainer(parent == null ? container : parent
             .getTopContainer());

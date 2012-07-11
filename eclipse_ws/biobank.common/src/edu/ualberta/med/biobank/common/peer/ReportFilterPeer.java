@@ -1,14 +1,15 @@
 package edu.ualberta.med.biobank.common.peer;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import java.util.Collections;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.List;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.model.EntityFilter;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class ReportFilterPeer {
 	public static final Property<Integer, ReportFilter> POSITION = Property.create(

@@ -5,13 +5,13 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.GlobalEventAttr;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.GlobalEventAttrPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.EventAttrTypeBaseWrapper;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class GlobalEventAttrBaseWrapper extends ModelWrapper<GlobalEventAttr> {
 

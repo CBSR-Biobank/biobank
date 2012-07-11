@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class ReportAction implements Action<ProxiedListResult<Object>> {
@@ -48,7 +49,7 @@ public class ReportAction implements Action<ProxiedListResult<Object>> {
                 runReport.generate(context
                     .getAppService()));
         } catch (Exception e) {
-            throw new ActionException(UNKNOWN_PROBLEM_ERRMSG, e);
+            throw new LocalizedException(UNKNOWN_PROBLEM_ERRMSG, e);
         }
     }
 }

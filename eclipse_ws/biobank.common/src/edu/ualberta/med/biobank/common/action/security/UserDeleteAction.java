@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
@@ -42,7 +43,7 @@ public class UserDeleteAction implements Action<EmptyResult> {
         User user = context.load(User.class, input.getUserId());
 
         if (!user.isFullyManageable(context.getUser())) {
-            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
+            throw new LocalizedException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
 
         // the group side is the managing side, so we must remove the user from

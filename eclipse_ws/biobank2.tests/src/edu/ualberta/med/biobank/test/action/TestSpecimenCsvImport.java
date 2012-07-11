@@ -11,9 +11,13 @@ import java.util.Set;
 import org.hibernate.Transaction;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
@@ -24,6 +28,9 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
 public class TestSpecimenCsvImport extends ActionTest {
+
+    private static Logger log = LoggerFactory
+        .getLogger(TestSpecimenCsvImport.class.getName());
 
     private final NameGenerator nameGenerator;
 
@@ -65,8 +72,15 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
-        specimensCreateAndImportCsv(study, clinic, center, patients,
-            sourceSpecimens, aliquotedSpecimens);
+        try {
+            specimensCreateAndImportCsv(study, clinic, center, patients,
+                sourceSpecimens, aliquotedSpecimens);
+        } catch (CsvImportException e) {
+            for (ImportError ie : e.getErrors()) {
+                log.error("ERROR: line no {}: {}", ie.getLineNumber(),
+                    ie.getMessage());
+            }
+        }
     }
 
     @SuppressWarnings("nls")

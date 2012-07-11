@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
@@ -124,7 +125,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                 final int MIN_PW_LENGTH = 5;
 
                 if (pw == null || pw.length() < MIN_PW_LENGTH) {
-                    throw new ActionException(
+                    throw new LocalizedException(
                         PASSWORD_TOO_SHORT_ERRMSG.format(MIN_PW_LENGTH));
                 }
 
@@ -141,7 +142,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                     oldUserData, oldPw));
             }
         } catch (Exception e) {
-            throw new ActionException(CSM_MODIFICATION_FAILURE_ERRMSG, e);
+            throw new LocalizedException(CSM_MODIFICATION_FAILURE_ERRMSG, e);
         }
     }
 
@@ -153,7 +154,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Membership> executorMembs = user.getManageableMemberships(executor);
 
         if (!managerMembs.containsAll(executorMembs)) {
-            throw new ActionException(STALE_MANAGEABLE_MEMBERSHIPS_ERRMSG);
+            throw new LocalizedException(STALE_MANAGEABLE_MEMBERSHIPS_ERRMSG);
         }
 
         return managerMembs;
@@ -221,7 +222,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             // (server?) scope
             if (!newPermissionScope.containsAll(oldPermissionScope)
                 || !newRoleScope.containsAll(oldRoleScope)) {
-                throw new ActionException(STALE_ROLES_OR_PERMISSIONS_ERRMSG);
+                throw new LocalizedException(STALE_ROLES_OR_PERMISSIONS_ERRMSG);
             }
 
             Domain newD = newM.getDomain();
@@ -263,7 +264,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
     private void checkFullyManageable(ActionContext context, Membership m) {
         User executingUser = context.getUser();
         if (!m.isFullyManageable(executingUser)) {
-            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
+            throw new LocalizedException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
     }
 
@@ -275,14 +276,14 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Integer> contextGroupIds = IdUtil.getIds(contextGroups);
 
         if (!contextGroupIds.containsAll(input.getGroupIds())) {
-            throw new ActionException(STALE_GROUPS_ERRMSG);
+            throw new LocalizedException(STALE_GROUPS_ERRMSG);
         }
 
         // add or remove every Group in the context
         Set<Group> groups = context.load(Group.class, contextGroupIds);
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
-                throw new ActionException(CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG);
+                throw new LocalizedException(CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG);
             }
 
             if (input.getGroupIds().contains(group.getId())) {

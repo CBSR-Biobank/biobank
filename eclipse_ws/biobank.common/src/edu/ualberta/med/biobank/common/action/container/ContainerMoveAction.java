@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -87,7 +88,7 @@ public class ContainerMoveAction implements Action<IdResult> {
             log.debug("container " + containerToMoveId + " moved under parent "
                 + newParentContainerId);
         } catch (Exception e) {
-            throw new ActionException(bundle.tr("Unable to move container.")
+            throw new LocalizedException(bundle.tr("Unable to move container.")
                 .format(), e);
         }
 

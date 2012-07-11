@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Group;
 
 public class GroupDeleteAction implements Action<EmptyResult> {
@@ -35,7 +36,7 @@ public class GroupDeleteAction implements Action<EmptyResult> {
         Group group = context.load(Group.class, input.getGroupId());
 
         if (!group.isFullyManageable(context.getUser()))
-            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
+            throw new LocalizedException(INADEQUATE_PERMISSIONS_ERRMSG);
 
         context.getSession().delete(group);
         return new EmptyResult();

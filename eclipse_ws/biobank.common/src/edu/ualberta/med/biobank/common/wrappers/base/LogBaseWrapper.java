@@ -4,13 +4,14 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.LogPeer;
 import java.util.Date;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Log;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class LogBaseWrapper extends ModelWrapper<Log> {
 

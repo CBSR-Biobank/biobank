@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEven
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -240,7 +241,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
             context.getSession().delete(specimen);
         } else {
-            throw new ActionException(
+            throw new LocalizedException(
                 bundle
                     .tr(
                         "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
@@ -288,7 +289,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 sAttr = studyEventAttrInfo == null ? null
                     : studyEventAttrInfo.attr;
                 if (sAttr == null) {
-                    throw new ActionException(
+                    throw new LocalizedException(
                         STUDY_EVENT_ATTR_MISSING_ERRMSG
                             .format(attrInfo.studyEventAttrId));
                 }
@@ -296,7 +297,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
             if (ActivityStatus.ACTIVE != sAttr.getActivityStatus()) {
                 String label = sAttr.getGlobalEventAttr().getLabel();
-                throw new ActionException(LOCKED_LABEL_ERRMSG.format(label));
+                throw new LocalizedException(LOCKED_LABEL_ERRMSG.format(label));
             }
 
             if (attrInfo.value != null) {
@@ -319,7 +320,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                         if (!permissibleSplit.contains(attrInfo.value)) {
                             String label =
                                 sAttr.getGlobalEventAttr().getLabel();
-                            throw new ActionException(
+                            throw new LocalizedException(
                                 INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
                                     .format(attrInfo.value, label));
                         }
@@ -328,7 +329,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             if (!permissibleSplit.contains(singleVal)) {
                                 String label =
                                     sAttr.getGlobalEventAttr().getLabel();
-                                throw new ActionException(
+                                throw new LocalizedException(
                                     INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
                                         .format(singleVal, attrInfo.value,
                                             label));
@@ -341,14 +342,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                             DateFormatter.dateFormatter
                                 .parse(attrInfo.value);
                         } catch (ParseException e) {
-                            throw new ActionException(
+                            throw new LocalizedException(
                                 CANNOT_PARSE_DATE_ERRMSG
                                     .format(attrInfo.value));
                         }
                     } else if (type == EventAttrTypeEnum.TEXT) {
                         // do nothing
                     } else {
-                        throw new ActionException(
+                        throw new LocalizedException(
                             UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
                                 .format(type.getName()));
                     }

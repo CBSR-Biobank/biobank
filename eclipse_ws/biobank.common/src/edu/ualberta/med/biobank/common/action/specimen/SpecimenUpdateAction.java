@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenUpdatePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -110,7 +111,7 @@ public class SpecimenUpdateAction implements Action<EmptyResult> {
             specimen.setOriginalCollectionEvent(null);
             if (specimen.getParentSpecimen()
                 .getProcessingEvent() == null)
-                throw new ActionException(
+                throw new LocalizedException(
                     bundle
                         .tr("You must select a parent with a processing event")
                         .format());

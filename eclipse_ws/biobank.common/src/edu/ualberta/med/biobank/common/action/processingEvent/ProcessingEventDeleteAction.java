@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventDeletePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -44,7 +45,7 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
         for (Specimen sp : pevent.getSpecimens()) {
             if (sp.getChildSpecimens().size() != 0)
-                throw new ActionException(HAS_CHILD_SPECIMENS_ERRMSG);
+                throw new LocalizedException(HAS_CHILD_SPECIMENS_ERRMSG);
             sp.setActivityStatus(ActivityStatus.ACTIVE);
             sp.setProcessingEvent(null);
             context.getSession().saveOrUpdate(sp);

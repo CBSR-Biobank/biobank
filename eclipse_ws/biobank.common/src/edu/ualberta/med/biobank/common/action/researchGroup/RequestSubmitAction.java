@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.researchGroup.SubmitRequestPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -56,7 +57,7 @@ public class RequestSubmitAction implements Action<IdResult> {
 
         for (String id : specs) {
             if (id == null || id.equals(""))
-                throw new ActionException(BLANK_SPECIMEN_ID_ERRMSG);
+                throw new LocalizedException(BLANK_SPECIMEN_ID_ERRMSG);
 
             Query q = context.getSession().createQuery("from "
                 + Specimen.class.getName() + " where inventoryId=?");

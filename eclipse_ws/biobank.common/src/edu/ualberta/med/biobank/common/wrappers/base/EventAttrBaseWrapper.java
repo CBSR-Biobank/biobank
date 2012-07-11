@@ -4,17 +4,16 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.EventAttr;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyEventAttrWrapper;
-import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
-import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.model.EventAttr;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class EventAttrBaseWrapper extends ModelWrapper<EventAttr> {
 
