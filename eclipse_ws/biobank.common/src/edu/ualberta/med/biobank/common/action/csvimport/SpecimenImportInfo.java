@@ -196,12 +196,11 @@ public class SpecimenImportInfo {
                 specimenPos);
         }
 
-        log.debug("creating specimen: pt={} v#={} invId={} cevent={}",
+        log.debug("creating specimen: pt={} v#={} invId={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
-                csvInfo.getInventoryId(),
-                cevent
+                csvInfo.getInventoryId()
             });
 
         return spc;
