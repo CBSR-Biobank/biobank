@@ -18,10 +18,12 @@ public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractSearchedNode.class);
 
+    @SuppressWarnings("nls")
     public NewAbstractSearchedNode(AbstractAdapterBase parent, int id) {
         super(parent, id, i18n.tr("Searched"), null, false);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);

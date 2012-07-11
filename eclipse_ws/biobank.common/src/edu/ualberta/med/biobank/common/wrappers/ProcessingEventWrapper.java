@@ -34,7 +34,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     private static final ProcessingEventLogProvider LOG_PROVIDER =
         new ProcessingEventLogProvider();
-    private Set<SpecimenWrapper> removedSpecimens =
+    private final Set<SpecimenWrapper> removedSpecimens =
         new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
@@ -168,7 +168,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Deprecated
-    @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         if (getCenter() != null)

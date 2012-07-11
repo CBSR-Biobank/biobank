@@ -19,6 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class NewCollectionEventInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
         i18n.tr("Visit"),
         i18n.tr("Sources"),

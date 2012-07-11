@@ -360,7 +360,6 @@ public abstract class CenterWrapper<E extends Center> extends
         return getCountResult(appService, criteria);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         return Arrays.asList(this);

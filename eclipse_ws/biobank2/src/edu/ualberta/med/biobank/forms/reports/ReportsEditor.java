@@ -73,9 +73,6 @@ public abstract class ReportsEditor extends BiobankEntryForm {
     protected Button exportPDFButton;
     protected Button exportCSVButton;
 
-    // Mostly for visibility reasons
-    private String path;
-
     // Global status
     private IObservableValue statusObservable;
 

@@ -129,6 +129,7 @@ public class SpecimenImportInfo {
         return cevent;
     }
 
+    @SuppressWarnings("nls")
     public Specimen getSpecimen() {
         // add the specimen to the collection event
         OriginInfo oi = new OriginInfo();
