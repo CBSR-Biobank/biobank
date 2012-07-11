@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
@@ -48,7 +46,7 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @Test
-    public void testCompression() throws Exception {
+    public void testNoErrors() throws Exception {
         Transaction tx = session.beginTransaction();
         // the site name comes from the CSV file
         Center center = factory.createSite();
@@ -72,15 +70,8 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
-        try {
-            specimensCreateAndImportCsv(study, clinic, center, patients,
-                sourceSpecimens, aliquotedSpecimens);
-        } catch (CsvImportException e) {
-            for (ImportError ie : e.getErrors()) {
-                log.error("ERROR: line no {}: {}", ie.getLineNumber(),
-                    ie.getMessage());
-            }
-        }
+        specimensCreateAndImportCsv(study, clinic, center, patients,
+            sourceSpecimens, aliquotedSpecimens);
     }
 
     @SuppressWarnings("nls")

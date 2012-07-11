@@ -352,8 +352,29 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         CollectionEvent cevent = info.getCevent();
 
         if (cevent == null) {
-            cevent = info.createCollectionEvent();
-            context.getSession().saveOrUpdate(cevent);
+            // see if this collection event was created for a previous specimen
+            for (CollectionEvent patientCevent : info.getPatient()
+                .getCollectionEvents()) {
+                if (patientCevent.getVisitNumber().equals(
+                    info.getCsvInfo().getVisitNumber())) {
+                    cevent = patientCevent;
+
+                    log.debug("collection event found: pt={} v#={} invId={}",
+                        new Object[] {
+                            info.getCsvInfo().getPatientNumber(),
+                            info.getCsvInfo().getVisitNumber(),
+                            info.getCsvInfo().getInventoryId()
+                        });
+
+                    info.setCevent(cevent);
+                }
+            }
+
+            // if still not found create one
+            if (cevent == null) {
+                cevent = info.createCollectionEvent();
+                context.getSession().saveOrUpdate(cevent);
+            }
         }
 
         Specimen spc = info.getSpecimen();
