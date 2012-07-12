@@ -33,6 +33,8 @@ public class TestSpecimenCsvImport extends ActionTest {
     private static Logger log = LoggerFactory
         .getLogger(TestSpecimenCsvImport.class.getName());
 
+    private static final String CSV_NAME = "import_specimens.csv";
+
     private final NameGenerator nameGenerator;
 
     public TestSpecimenCsvImport() {
@@ -74,14 +76,56 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            specimensCreateAndImportCsv(study, clinic, center, patients,
+            specimensCreateCsv(study, clinic, center, patients,
                 sourceSpecimens, aliquotedSpecimens);
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(CSV_NAME);
+            exec(importAction);
         } catch (CsvImportException e) {
             Assert.fail("errors in CVS data");
             showErrorsInLog(e);
         } catch (Exception e) {
             Assert.fail("could not import data");
         }
+    }
+
+    public void testMissingPatient() {
+        Transaction tx = session.beginTransaction();
+        // the site name comes from the CSV file
+        Center center = factory.createSite();
+        Center clinic = factory.createClinic();
+        Study study = factory.createStudy();
+
+        Set<Patient> patients = new HashSet<>();
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<>();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        sourceSpecimens.add(factory.createSourceSpecimen());
+
+        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        try {
+            specimensCreateCsv(study, clinic, center, patients,
+                sourceSpecimens, aliquotedSpecimens);
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(CSV_NAME);
+            exec(importAction);
+        } catch (CsvImportException e) {
+            Assert.fail("errors in CVS data");
+            showErrorsInLog(e);
+        } catch (Exception e) {
+            Assert.fail("could not import data");
+        }
+
     }
 
     private void showErrorsInLog(CsvImportException e) {
@@ -93,12 +137,11 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @SuppressWarnings("nls")
-    private void specimensCreateAndImportCsv(Study study, Center originCenter,
+    private void specimensCreateCsv(Study study, Center originCenter,
         Center currentCenter, Set<Patient> patients,
         Set<SourceSpecimen> sourceSpecimens,
         Set<AliquotedSpecimen> aliquotedSpecimens)
         throws IOException {
-        final String CSV_NAME = "import_specimens.csv";
 
         Set<SpecimenCsvInfo> specimenInfos = new LinkedHashSet<>();
         Map<SourceSpecimen, SpecimenCsvInfo> parentSpecimenInfos =
@@ -147,8 +190,5 @@ public class TestSpecimenCsvImport extends ActionTest {
         }
 
         SpecimenCsvWriter.write(CSV_NAME, specimenInfos);
-        SpecimenCsvImportAction importAction =
-            new SpecimenCsvImportAction(CSV_NAME);
-        exec(importAction);
     }
 }
