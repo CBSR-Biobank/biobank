@@ -22,7 +22,7 @@ public class AbstractModel implements IBiobankModel {
     @Id
     @GeneratedValue(generator = "id-generator")
     @GenericGenerator(name = "id-generator",
-        strategy = "edu.ualberta.med.biobank.model.id.SmartTableGenerator",
+        strategy = "edu.ualberta.med.biobank.model.id.CustomTableGenerator",
         parameters = @Parameter(name = TableGenerator.INCREMENT_PARAM, value = "50"))
     @Column(name = "ID", nullable = false)
     public Integer getId() {

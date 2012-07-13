@@ -13,7 +13,7 @@ import org.hibernate.type.Type;
 import edu.ualberta.med.biobank.model.Revision;
 
 public class RevisionNumberGenerator
-    extends SmartTableGenerator {
+    extends CustomTableGenerator {
 
     /**
      * {@inheritDoc}
