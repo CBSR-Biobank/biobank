@@ -28,7 +28,8 @@ public class Revision
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private Long idGeneratedAt;
+    private Long timestamp;
+    private Long generatedAt;
     private Long committedAt;
     private User user;
     private Set<RevisionEntityType> entityTypes =
@@ -51,19 +52,33 @@ public class Revision
     }
 
     /**
+     * Milliseconds since epoch when this object is created by Envers.
+     * 
+     * @return
+     */
+    @RevisionTimestamp
+    @Column(name = "REVISION_TIMESTAMP")
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
      * Milliseconds since epoch right after the {@link @RevisionNumber} was
      * generated.
      * 
      * @return
      */
-    @RevisionTimestamp
-    @Column(name = "ID_GENERATED_AT")
-    public Long getIdGeneratedAt() {
-        return idGeneratedAt;
+    @Column(name = "GENERATED_AT")
+    public Long getGeneratedAt() {
+        return generatedAt;
     }
 
-    public void setIdGeneratedAt(Long idGeneratedAt) {
-        this.idGeneratedAt = idGeneratedAt;
+    public void setGeneratedAt(Long generatedAt) {
+        this.generatedAt = generatedAt;
     }
 
     /**
@@ -71,6 +86,7 @@ public class Revision
      * 
      * @return
      */
+    @Column(name = "COMMITTED_AT")
     public Long getCommittedAt() {
         return committedAt;
     }

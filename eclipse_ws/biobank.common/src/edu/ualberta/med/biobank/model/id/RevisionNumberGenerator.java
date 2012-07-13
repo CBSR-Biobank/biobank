@@ -12,8 +12,7 @@ import org.hibernate.type.Type;
 
 import edu.ualberta.med.biobank.model.Revision;
 
-public class RevisionNumberGenerator
-    extends CustomTableGenerator {
+public class RevisionNumberGenerator extends CustomTableGenerator {
 
     /**
      * {@inheritDoc}
@@ -37,15 +36,11 @@ public class RevisionNumberGenerator
             Revision revision = (Revision) object;
 
             Serializable id = super.generate(session, object);
-
-            long time = System.currentTimeMillis();
-            revision.setIdGeneratedAt(time);
-
+            revision.setGeneratedAt(System.currentTimeMillis());
             return id;
         }
 
         throw new RuntimeException("This persistent identifier generator " +
-            "is intended to only work with the class "
-            + Revision.class.getName());
+            "is intended to only work with " + Revision.class.getName());
     }
 }
