@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,46 +20,63 @@ import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
 
-import edu.ualberta.med.biobank.model.util.RevisionListenerImpl;
-
 @RevisionEntity(RevisionListenerImpl.class)
 @Entity
 @Table(name = "REVISION")
 public class Revision
-    implements IBiobankModel, HasCreatedAt {
+    implements Serializable, HasId<Long> {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
-    private Date createdAt;
+    private Long id;
+    private Long idGeneratedAt;
+    private Long committedAt;
     private User user;
     private Set<RevisionEntityType> entityTypes =
         new HashSet<RevisionEntityType>(0);
 
     @Override
     @RevisionNumber
-    @GenericGenerator(name = "generator", strategy = "increment")
     @Id
-    @GeneratedValue(generator = "generator")
+    @GeneratedValue(generator = "revision-number-generator")
+    @GenericGenerator(name = "revision-number-generator",
+        strategy = "edu.ualberta.med.biobank.model.id.RevisionNumberGenerator")
     @Column(name = "ID", nullable = false)
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     @Override
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
+    /**
+     * Milliseconds since epoch right after the {@link @RevisionNumber} was
+     * generated.
+     * 
+     * @return
+     */
     @RevisionTimestamp
-    @Column(name = "CREATED_AT")
-    public Date getCreatedAt() {
-        return createdAt;
+    @Column(name = "ID_GENERATED_AT")
+    public Long getIdGeneratedAt() {
+        return idGeneratedAt;
     }
 
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setIdGeneratedAt(Long idGeneratedAt) {
+        this.idGeneratedAt = idGeneratedAt;
+    }
+
+    /**
+     * Milliseconds since epoch just before the transaction was committed.
+     * 
+     * @return
+     */
+    public Long getCommittedAt() {
+        return committedAt;
+    }
+
+    public void setCommittedAt(Long committedAt) {
+        this.committedAt = committedAt;
     }
 
     /**

@@ -31,15 +31,13 @@
 		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 		<!-- Envers properties -->
 		<property name="org.hibernate.envers.audit_table_suffix">_audit</property>
-		<property name="org.hibernate.envers.revision_field_name">REVISION</property>
+		<property name="org.hibernate.envers.revision_field_name">REVISION_ID</property>
 		<property name="org.hibernate.envers.revision_type_field_name">REVISION_TYPE</property>
 		<!-- Note that as of 3.6.10 the following configuration options were added 
 			and should be regarded as experimental only... -->
 		<property name="org.hibernate.envers.audit_strategy">org.hibernate.envers.strategy.ValidityAuditStrategy</property>
-		<property
-			name="org.hibernate.envers.audit_strategy_validity_end_rev_field_name">END_REVISION</property>
-		<property
-			name="org.hibernate.envers.audit_strategy_validity_revend_timestamp_field_name">END_REVISION_TIME</property>
+		<property name="org.hibernate.envers.audit_strategy_validity_end_rev_field_name">END_REVISION_ID</property>
+		<property name="org.hibernate.envers.audit_strategy_validity_revend_timestamp_field_name">END_REVISION_TIME</property>
 		<!-- Turn off default Hibernate Bean Validator, only apply constraints 
 			to the database schema when generated with Hibernate -->
 		<property name="javax.persistence.validation.mode">ddl</property>
@@ -55,10 +53,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.Center" />
 		<mapping class="edu.ualberta.med.biobank.model.Clinic" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" />
-		<mapping class="edu.ualberta.med.biobank.model.CollectionEventAttribute" />
-		<mapping
-			class="edu.ualberta.med.biobank.model.CollectionEventAttributeOption" />
-		<mapping class="edu.ualberta.med.biobank.model.CollectionEventAttributeType" />
 		<mapping class="edu.ualberta.med.biobank.model.Comment" />
 		<mapping class="edu.ualberta.med.biobank.model.Contact" />
 		<mapping class="edu.ualberta.med.biobank.model.Container" />
@@ -80,9 +74,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.Membership" />
 		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" />
 		<mapping class="edu.ualberta.med.biobank.model.Patient" />
-		<mapping class="edu.ualberta.med.biobank.model.PatientAttribute" />
-		<mapping class="edu.ualberta.med.biobank.model.PatientAttributeOption" />
-		<mapping class="edu.ualberta.med.biobank.model.PatientAttributeType" />
 		<mapping class="edu.ualberta.med.biobank.model.Principal" />
 		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" />
 		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" />
@@ -104,9 +95,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.Site" />
 		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenAttribute" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenAttributeOption" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenAttributeType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model.type;
+package edu.ualberta.med.biobank.model.id;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -12,14 +12,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionImplementor;
+import org.hibernate.id.enhanced.OptimizerFactory;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.type.Type;
-import org.hibernate.util.PropertiesHelper;
 
+/**
+ * 
+ * 
+ * @author Jonathan Ferland
+ */
 @SuppressWarnings("nls")
 public class SmartTableGenerator extends TableGenerator {
-    private static final int SELECT_INITIAL_VALUE = 0;
-
     private String targetTable;
     private String targetColumn;
 
@@ -34,6 +37,13 @@ public class SmartTableGenerator extends TableGenerator {
 
         targetTable = params.getProperty("target_table");
         targetColumn = params.getProperty("target_column");
+
+        // let the 'next_val' column mean the next free value, NOT the next
+        // free value minus the increment
+        params.put(TableGenerator.OPT_PARAM, OptimizerFactory.POOL);
+
+        // use the 'target_table' property as the segment name
+        params.put(TableGenerator.CONFIG_PREFER_SEGMENT_PER_ENTITY, "true");
 
         super.configure(type, params, dialect);
     }
@@ -50,12 +60,6 @@ public class SmartTableGenerator extends TableGenerator {
         }
         Serializable id = super.generate(session, obj);
         return id;
-    }
-
-    @Override
-    protected int determineInitialValue(Properties params) {
-        return PropertiesHelper.getInt(INITIAL_PARAM, params,
-            SELECT_INITIAL_VALUE);
     }
 
     private void initialize(final SessionImplementor session) {

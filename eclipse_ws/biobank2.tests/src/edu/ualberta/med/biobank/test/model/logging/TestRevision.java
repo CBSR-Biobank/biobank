@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.model.logging;
 
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
@@ -18,10 +19,20 @@ public class TestRevision extends LoggingTest {
         site.setName(newName);
         session.update(site);
         tx.commit();
+
+        System.out.println(System.currentTimeMillis());
     }
 
     @Test
-    public void executingUser() {
+    public void twoSessions() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        session.getTransaction().commit();
+
+        Session s1 = openSession();
+        Session s2 = openSession();
+
+        s1.beginTransaction();
 
     }
 }
