@@ -39,7 +39,7 @@ public class CustomTableGenerator extends TableGenerator {
 
         // make sure the 'next_val' column means the next free value, NOT the
         // next free value minus the increment
-        params.put(TableGenerator.OPT_PARAM, OptimizerFactory.POOL);
+        params.put(TableGenerator.OPT_PARAM, OptimizerFactory.POOL_LO);
 
         // make sure to use the 'target_table' property as the segment name
         params.put(TableGenerator.CONFIG_PREFER_SEGMENT_PER_ENTITY, "true");
