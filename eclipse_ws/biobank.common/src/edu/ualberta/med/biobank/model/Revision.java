@@ -118,7 +118,7 @@ public class Revision
      * @return
      */
     @ElementCollection
-    @CollectionTable(name = "REVISION_CHANGED_TYPES",
+    @CollectionTable(name = "REVISION_MODIFIED_TYPE",
         joinColumns = @JoinColumn(name = "REVISION_ID"))
     @Column(name = "MODIFIED_TYPE", nullable = false)
     public Set<String> getModifiedTypes() {
