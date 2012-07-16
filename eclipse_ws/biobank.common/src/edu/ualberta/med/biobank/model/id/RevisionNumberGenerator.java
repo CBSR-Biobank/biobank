@@ -12,6 +12,15 @@ import org.hibernate.type.Type;
 
 import edu.ualberta.med.biobank.model.Revision;
 
+/**
+ * Intended only to work with the {@link Revision} ({@link @RevisionEntity}) to
+ * generate its {@link Revision#getId()} ({@link @RevisionNumber}). After the id
+ * (revision number) is set, the time is also recorded. Note that it would be
+ * better to record the time from the database or somewhere else, but MySQL does
+ * not have millisecond precision (without a custom UDF).
+ * 
+ * @author Jonathan Ferland
+ */
 public class RevisionNumberGenerator extends CustomTableGenerator {
 
     /**
