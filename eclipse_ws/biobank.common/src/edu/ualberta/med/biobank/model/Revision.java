@@ -4,15 +4,15 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -32,8 +32,7 @@ public class Revision
     private Long generatedAt;
     private Long committedAt;
     private User user;
-    private Set<RevisionEntityType> entityTypes =
-        new HashSet<RevisionEntityType>(0);
+    private Set<String> modifiedTypes = new HashSet<String>(0);
 
     @Override
     @RevisionNumber
@@ -111,13 +110,23 @@ public class Revision
         this.user = user;
     }
 
-    @OneToMany(mappedBy = "revision", cascade = CascadeType.ALL)
-    public Set<RevisionEntityType> getEntityTypes() {
-        return entityTypes;
+    /**
+     * A list of entity names that were modified in this revision so that
+     * finding all entities modified in a given {@link Revision} can be faster
+     * (avoid scanning all tables).
+     * 
+     * @return
+     */
+    @ElementCollection
+    @CollectionTable(name = "REVISION_CHANGED_TYPES",
+        joinColumns = @JoinColumn(name = "REVISION_ID"))
+    @Column(name = "MODIFIED_TYPE", nullable = false)
+    public Set<String> getModifiedTypes() {
+        return modifiedTypes;
     }
 
-    public void setEntityTypes(Set<RevisionEntityType> entityTypes) {
-        this.entityTypes = entityTypes;
+    public void setModifiedTypes(Set<String> modifiedTypes) {
+        this.modifiedTypes = modifiedTypes;
     }
 
     @Override

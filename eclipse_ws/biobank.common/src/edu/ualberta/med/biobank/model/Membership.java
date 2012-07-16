@@ -232,7 +232,7 @@ public class Membership extends AbstractVersionedModel {
      *            {@link Role}-s
      * @param defaultAdminRoles which {@link Role}-s to add to the set if {
      *            {@link #isEveryPermission()} returns true
-     *
+     * 
      * @return the {@link Role}-s that the manager can manipulate
      */
     @Transient
