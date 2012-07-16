@@ -4,6 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.model.Revision;
 import edu.ualberta.med.biobank.model.Site;
 
 public class TestRevision extends LoggingTest {
@@ -34,5 +35,13 @@ public class TestRevision extends LoggingTest {
 
         s1.beginTransaction();
 
+    }
+
+    @Test
+    public void nonAuditedCommit() {
+        session.beginTransaction();
+        Revision tmp = new Revision();
+        session.save(tmp);
+        session.getTransaction().commit();
     }
 }
