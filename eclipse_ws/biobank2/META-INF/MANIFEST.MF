@@ -9,7 +9,7 @@ Bundle-ClassPath: .,
  lib/gluegen.jar,
  lib/messages.jar
 Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: biobank;singleton:=true
 Bundle-ActivationPolicy: lazy

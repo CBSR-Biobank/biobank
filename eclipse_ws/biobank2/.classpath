@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mailapi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smtp.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jdom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/messages.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/biobank.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

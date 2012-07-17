@@ -126,15 +126,15 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private ActionContext context = null;
 
     private final Set<SpecimenImportInfo> specimenImportInfos =
-        new HashSet<>(0);
+        new HashSet<SpecimenImportInfo>(0);
 
     private final Map<String, SpecimenImportInfo> sourceSpcInvIds =
-        new HashMap<>(0);
+        new HashMap<String, SpecimenImportInfo>(0);
 
     private final Map<String, Specimen> sourceSpecimens =
-        new HashMap<>(0);
+        new HashMap<String, Specimen>(0);
 
-    private final Set<ImportError> errors = new TreeSet<>();
+    private final Set<ImportError> errors = new TreeSet<ImportError>();
 
     public SpecimenCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);

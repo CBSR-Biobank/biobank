@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasperreports-4.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/DynamicJasper-3.0.14.jar" sourcepath="/home/delphine/projects/sources/dynamicjasper/DynamicJasper-3.0.14-sources.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/biobank.common"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.7.jar"/>
@@ -14,5 +13,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -345,7 +345,7 @@ Export-Package: antlr;
  spiffy.junit,
  spiffy.log4j,
  spiffy.struts1
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: edu.ualberta.med.biobank.common,edu.ualberta.med.bioba
  nk.model
 
