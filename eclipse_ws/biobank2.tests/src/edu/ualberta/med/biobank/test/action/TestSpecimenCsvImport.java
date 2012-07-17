@@ -51,24 +51,25 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @Test
-    public void testNoErrors() {
+    public void testNoErrorsNoContainers() {
         Transaction tx = session.beginTransaction();
         // the site name comes from the CSV file
         Center center = factory.createSite();
         Center clinic = factory.createClinic();
         Study study = factory.createStudy();
 
-        Set<Patient> patients = new HashSet<>();
+        Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
 
-        Set<SourceSpecimen> sourceSpecimens = new HashSet<>();
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
         sourceSpecimens.add(factory.createSourceSpecimen());
         sourceSpecimens.add(factory.createSourceSpecimen());
         sourceSpecimens.add(factory.createSourceSpecimen());
 
-        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<>();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
@@ -96,17 +97,18 @@ public class TestSpecimenCsvImport extends ActionTest {
         Center clinic = factory.createClinic();
         Study study = factory.createStudy();
 
-        Set<Patient> patients = new HashSet<>();
+        Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
 
-        Set<SourceSpecimen> sourceSpecimens = new HashSet<>();
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
         sourceSpecimens.add(factory.createSourceSpecimen());
         sourceSpecimens.add(factory.createSourceSpecimen());
         sourceSpecimens.add(factory.createSourceSpecimen());
 
-        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<>();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
@@ -143,9 +145,10 @@ public class TestSpecimenCsvImport extends ActionTest {
         Set<AliquotedSpecimen> aliquotedSpecimens)
         throws IOException {
 
-        Set<SpecimenCsvInfo> specimenInfos = new LinkedHashSet<>();
+        Set<SpecimenCsvInfo> specimenInfos =
+            new LinkedHashSet<SpecimenCsvInfo>();
         Map<SourceSpecimen, SpecimenCsvInfo> parentSpecimenInfos =
-            new HashMap<>();
+            new HashMap<SourceSpecimen, SpecimenCsvInfo>();
 
         // add parent specimens first
         for (SourceSpecimen ss : sourceSpecimens) {
