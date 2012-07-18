@@ -1,11 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.Transaction;
@@ -16,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvImportAction;
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -24,9 +18,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.test.NameGenerator;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
+import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
 
 public class TestSpecimenCsvImport extends ActionTest {
 
@@ -35,13 +27,11 @@ public class TestSpecimenCsvImport extends ActionTest {
 
     private static final String CSV_NAME = "import_specimens.csv";
 
-    private final NameGenerator nameGenerator;
+    private final SpecimenCsvHelper csvHelper;
 
     public TestSpecimenCsvImport() {
         super();
-        this.nameGenerator =
-            new NameGenerator(TestSpecimenCsvImport.class.getSimpleName()
-                + getR());
+        this.csvHelper = new SpecimenCsvHelper();
     }
 
     @Override
@@ -51,7 +41,7 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @Test
-    public void testNoErrorsNoContainers() throws Exception {
+    public void noErrorsNoContainers() throws Exception {
         Transaction tx = session.beginTransaction();
         // the site name comes from the CSV file
         Center center = factory.createSite();
@@ -81,8 +71,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            specimensCreateCsv(study, clinic, center, patients,
-                sourceSpecimens, aliquotedSpecimens);
+            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
+                patients, sourceSpecimens, aliquotedSpecimens);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
@@ -92,7 +82,48 @@ public class TestSpecimenCsvImport extends ActionTest {
         }
     }
 
-    public void testMissingPatient() {
+    @Test
+    public void noSourceSpecimensInCsv() throws Exception {
+        Transaction tx = session.beginTransaction();
+        // the site name comes from the CSV file
+        Center center = factory.createSite();
+        Center clinic = factory.createClinic();
+        Study study = factory.createStudy();
+
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+
+        Set<SourceSpecimen> sourceSpecimensEmpty =
+            new HashSet<SourceSpecimen>();
+        factory.createSpecimenType();
+        factory.createSpecimenType();
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        try {
+            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
+                patients, sourceSpecimensEmpty, aliquotedSpecimens);
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(CSV_NAME);
+            exec(importAction);
+        } catch (CsvImportException e) {
+            showErrorsInLog(e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void missingPatient() {
         Transaction tx = session.beginTransaction();
         // the site name comes from the CSV file
         Center center = factory.createSite();
@@ -118,8 +149,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            specimensCreateCsv(study, clinic, center, patients,
-                sourceSpecimens, aliquotedSpecimens);
+            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
+                patients, sourceSpecimens, aliquotedSpecimens);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
@@ -138,61 +169,5 @@ public class TestSpecimenCsvImport extends ActionTest {
                 ie.getMessage());
         }
 
-    }
-
-    @SuppressWarnings("nls")
-    private void specimensCreateCsv(Study study, Center originCenter,
-        Center currentCenter, Set<Patient> patients,
-        Set<SourceSpecimen> sourceSpecimens,
-        Set<AliquotedSpecimen> aliquotedSpecimens)
-        throws IOException {
-
-        Set<SpecimenCsvInfo> specimenInfos =
-            new LinkedHashSet<SpecimenCsvInfo>();
-        Map<SpecimenCsvInfo, SourceSpecimen> parentSpecimenInfos =
-            new HashMap<SpecimenCsvInfo, SourceSpecimen>();
-
-        // add parent specimens first
-        for (SourceSpecimen ss : sourceSpecimens) {
-            for (Patient p : patients) {
-                SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-                specimenInfo.setInventoryId(nameGenerator.next(String.class));
-                specimenInfo.setSpecimenType(ss.getSpecimenType().getName());
-                specimenInfo.setCreatedAt(Utils.getRandomDate());
-                specimenInfo.setStudyName(study.getNameShort());
-                specimenInfo.setPatientNumber(p.getPnumber());
-                specimenInfo.setVisitNumber(1);
-                specimenInfo.setCurrentCenter(currentCenter.getNameShort());
-                specimenInfo.setOriginCenter(originCenter.getNameShort());
-                specimenInfo.setWorksheet(nameGenerator.next(String.class));
-                specimenInfo.setSourceSpecimen(true);
-                specimenInfos.add(specimenInfo);
-                parentSpecimenInfos.put(specimenInfo, ss);
-            }
-        }
-
-        // add aliquoted specimens
-        for (Entry<SpecimenCsvInfo, SourceSpecimen> entry : parentSpecimenInfos
-            .entrySet()) {
-            for (AliquotedSpecimen as : aliquotedSpecimens) {
-                SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-                specimenInfo.setInventoryId(nameGenerator
-                    .next(String.class));
-                specimenInfo.setParentInventoryID(entry.getKey()
-                    .getInventoryId());
-                specimenInfo
-                    .setSpecimenType(as.getSpecimenType().getName());
-                specimenInfo.setCreatedAt(Utils.getRandomDate());
-                specimenInfo.setStudyName(study.getNameShort());
-                specimenInfo
-                    .setPatientNumber(entry.getKey().getPatientNumber());
-                specimenInfo.setVisitNumber(1);
-                specimenInfo.setCurrentCenter(currentCenter.getNameShort());
-                specimenInfo.setOriginCenter(originCenter.getNameShort());
-                specimenInfos.add(specimenInfo);
-            }
-        }
-
-        SpecimenCsvWriter.write(CSV_NAME, specimenInfos);
     }
 }

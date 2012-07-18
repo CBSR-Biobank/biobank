@@ -7,10 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.Optional;
@@ -27,12 +24,10 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -56,7 +51,7 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenCsvImportAction implements Action<BooleanResult> {
+public class SpecimenCsvImportAction extends CsvImportAction {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory
@@ -66,8 +61,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         .getI18n(SpecimenCsvImportAction.class);
 
     private static final Bundle bundle = new CommonBundle();
-
-    public static final int MAX_ERRORS_TO_REPORT = 50;
 
     public static final String CSV_PARSE_ERROR =
         "Parse error at line {0}\n{1}";
@@ -146,8 +139,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private CompressedReference<ArrayList<SpecimenCsvInfo>> compressedList =
         null;
 
-    private ActionContext context = null;
-
     private final Set<SpecimenImportInfo> specimenImportInfos =
         new HashSet<SpecimenImportInfo>(0);
 
@@ -156,8 +147,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
     private final Map<String, Specimen> sourceSpecimens =
         new HashMap<String, Specimen>(0);
-
-    private final Set<ImportError> errors = new TreeSet<ImportError>();
 
     public SpecimenCsvImportAction(String filename) throws IOException {
         setCsvFile(filename);
@@ -349,6 +338,12 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                     break;
                 }
             }
+        } else {
+            Specimen parentSpecimen =
+                getSpecimen(csvInfo.getParentInventoryId());
+            if (parentSpecimen != null) {
+                info.setParentSpecimen(parentSpecimen);
+            }
         }
 
         Center originCenter = getCenter(csvInfo.getOriginCenter());
@@ -438,24 +433,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         return spc;
     }
 
-    private void addError(int lineNumber, LString message)
-        throws CsvImportException {
-        ImportError importError = new ImportError(lineNumber, message);
-        errors.add(importError);
-        if (errors.size() > MAX_ERRORS_TO_REPORT) {
-            throw new CsvImportException(errors);
-        }
-
-    }
-
-    private Patient getPatient(String pnumber) {
-        Criteria c = context.getSession()
-            .createCriteria(Patient.class, "p")
-            .add(Restrictions.eq("pnumber", pnumber));
-
-        return (Patient) c.uniqueResult();
-    }
-
     /*
      * Generates an action exception if patient does not exist.
      */
@@ -466,52 +443,6 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             throw new LocalizedException(CSV_PATIENT_ERROR.format(pnumber));
         }
         return p;
-    }
-
-    /*
-     * Generates an action exception if specimen with inventory ID does not
-     * exist.
-     */
-    private Specimen getSpecimen(String inventoryId) {
-        Criteria c = context.getSession()
-            .createCriteria(Specimen.class, "s")
-            .add(Restrictions.eq("inventoryId",
-                inventoryId));
-
-        return (Specimen) c.uniqueResult();
-    }
-
-    /*
-     * Generates an action exception if specimen type does not exist.
-     */
-    private SpecimenType getSpecimenType(String name) {
-        Criteria c = context.getSession()
-            .createCriteria(SpecimenType.class, "st")
-            .add(Restrictions.eq("name", name));
-
-        return (SpecimenType) c.uniqueResult();
-    }
-
-    /*
-     * Generates an action exception if centre with name does not exist.
-     */
-    private Center getCenter(String name) {
-        Criteria c = context.getSession()
-            .createCriteria(Center.class, "c")
-            .add(Restrictions.eq("nameShort", name));
-
-        return (Center) c.uniqueResult();
-    }
-
-    /*
-     * Generates an action exception if container label does not exist.
-     */
-    private Container getContainer(String label) {
-        Criteria c = context.getSession()
-            .createCriteria(Container.class, "c")
-            .add(Restrictions.eq("label", label));
-
-        return (Container) c.uniqueResult();
     }
 
 }
