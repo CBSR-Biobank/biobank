@@ -45,7 +45,7 @@ public class SpecimenCsvInfo implements Serializable {
         this.inventoryId = inventoryId;
     }
 
-    public String getParentInventoryID() {
+    public String getParentInventoryId() {
         return parentInventoryID;
     }
 

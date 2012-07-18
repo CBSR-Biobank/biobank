@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.csvimport;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +12,12 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
+@SuppressWarnings("nls")
 public class SpecimenImportInfo {
 
     private static Logger log = LoggerFactory
@@ -23,12 +27,14 @@ public class SpecimenImportInfo {
     private SpecimenImportInfo parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
+    private ProcessingEvent pevent;
     private Specimen parentSpecimen;
     private Center originCenter;
     private Center currentCenter;
     private SpecimenType specimenType;
     private Container container;
     private RowColPos specimenPos;
+    private Specimen specimen;
 
     SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
         this.setCsvInfo(csvInfo);
@@ -47,7 +53,12 @@ public class SpecimenImportInfo {
     }
 
     public void setParentInfo(SpecimenImportInfo parentInfo) {
+        if (parentInfo == null) {
+            throw new IllegalStateException("parentInfo is null");
+        }
         this.parentInfo = parentInfo;
+        log.debug("setting parent info for specimen {} to {}",
+            csvInfo.getInventoryId(), parentInfo.csvInfo.getInventoryId());
     }
 
     public void setCsvInfo(SpecimenCsvInfo csvInfo) {
@@ -70,16 +81,25 @@ public class SpecimenImportInfo {
         this.cevent = cevent;
     }
 
+    public ProcessingEvent getPevent() {
+        return pevent;
+    }
+
+    public void setPevent(ProcessingEvent pevent) {
+        this.pevent = pevent;
+    }
+
     public Specimen getParentSpecimen() {
         return parentSpecimen;
     }
 
     public void setParentSpecimen(Specimen parentSpecimen) {
         this.parentSpecimen = parentSpecimen;
+        this.pevent = parentSpecimen.getProcessingEvent();
     }
 
-    public String getParentInventoryID() {
-        return csvInfo.getParentInventoryID();
+    public String getParentInventoryId() {
+        return csvInfo.getParentInventoryId();
     }
 
     public Center getOriginCenter() {
@@ -122,9 +142,17 @@ public class SpecimenImportInfo {
         this.specimenPos = specimenPos;
     }
 
+    public boolean isSourceSpecimen() {
+        return csvInfo.getSourceSpecimen();
+    }
+
     public boolean isAliquotedSpecimen() {
-        return (csvInfo.getParentInventoryID() != null)
-            && !csvInfo.getParentInventoryID().isEmpty();
+        return !csvInfo.getSourceSpecimen();
+    }
+
+    public boolean hasWorksheet() {
+        return (csvInfo.getWorksheet() != null)
+            && !csvInfo.getWorksheet().isEmpty();
     }
 
     public boolean hasPosition() {
@@ -135,7 +163,6 @@ public class SpecimenImportInfo {
 
     }
 
-    @SuppressWarnings("nls")
     public CollectionEvent createCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
@@ -143,7 +170,7 @@ public class SpecimenImportInfo {
         cevent.setActivityStatus(ActivityStatus.ACTIVE);
         patient.getCollectionEvents().add(cevent);
 
-        log.debug("created collection event: pt={} v#={} invId={}",
+        log.trace("created collection event: pt={} v#={} invId={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
@@ -153,56 +180,78 @@ public class SpecimenImportInfo {
         return cevent;
     }
 
-    @SuppressWarnings("nls")
+    public ProcessingEvent createProcessingEvent() {
+        if (parentSpecimen != null) {
+            throw new IllegalStateException(
+                "this specimen has a parent specimen and cannot have a processing event");
+        }
+        pevent = new ProcessingEvent();
+        pevent.setWorksheet(csvInfo.getWorksheet());
+        pevent.setCreatedAt(new Date());
+        pevent.setCenter(currentCenter);
+        pevent.setActivityStatus(ActivityStatus.ACTIVE);
+        specimen.setProcessingEvent(pevent);
+
+        log.debug("created processing event: worksheet={} parentSpc={}",
+            csvInfo.getWorksheet(), csvInfo.getInventoryId());
+
+        return getPevent();
+    }
+
     public Specimen getSpecimen() {
         // add the specimen to the collection event
         OriginInfo oi = new OriginInfo();
         oi.setCenter(originCenter);
 
-        Specimen spc = new Specimen();
-        spc.setOriginInfo(oi);
-        spc.setCurrentCenter(currentCenter);
-        spc.setActivityStatus(ActivityStatus.ACTIVE);
-        spc.setOriginalCollectionEvent(cevent);
-        spc.setCreatedAt(csvInfo.getCreatedAt());
-        spc.setInventoryId(csvInfo.getInventoryId());
-        spc.setSpecimenType(specimenType);
+        specimen = new Specimen();
+        specimen.setOriginInfo(oi);
+        specimen.setCurrentCenter(currentCenter);
+        specimen.setActivityStatus(ActivityStatus.ACTIVE);
+        specimen.setCreatedAt(csvInfo.getCreatedAt());
+        specimen.setInventoryId(csvInfo.getInventoryId());
+        specimen.setSpecimenType(specimenType);
 
         if (cevent == null) {
             throw new IllegalStateException(
                 "specimen does not have a collection event");
         }
 
-        spc.setCollectionEvent(cevent);
-
-        if (!isAliquotedSpecimen()) {
-            cevent.getOriginalSpecimens().add(spc);
+        specimen.setCollectionEvent(cevent);
+        if (isSourceSpecimen()) {
+            specimen.setOriginalCollectionEvent(cevent);
+            cevent.getOriginalSpecimens().add(specimen);
+        } else {
+            if (parentInfo.pevent == null) {
+                throw new IllegalStateException(
+                    "parent specimen pevent is null");
+            }
+            parentInfo.pevent.getSpecimens().add(specimen);
+            SpecimenActionHelper.setParent(specimen, parentSpecimen);
         }
-        cevent.getAllSpecimens().add(spc);
+        cevent.getAllSpecimens().add(specimen);
 
-        if ((csvInfo.getParentInventoryID() != null)
-            && !csvInfo.getParentInventoryID().isEmpty()
+        if ((csvInfo.getParentInventoryId() != null)
+            && !csvInfo.getParentInventoryId().isEmpty()
             && (parentSpecimen == null)) {
             throw new IllegalStateException(
                 "parent specimen for specimen with " + csvInfo.getInventoryId()
                     + " has not be created yet");
         }
 
-        SpecimenActionHelper.setParent(spc, parentSpecimen);
-        SpecimenActionHelper.setQuantityFromType(spc);
+        SpecimenActionHelper.setQuantityFromType(specimen);
 
         if (container != null) {
-            SpecimenActionHelper.createOrChangePosition(spc, container,
+            SpecimenActionHelper.createOrChangePosition(specimen, container,
                 specimenPos);
         }
 
-        log.debug("creating specimen: pt={} v#={} invId={}",
+        log.trace("creating specimen: pt={} v#={} invId={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
                 csvInfo.getInventoryId()
             });
 
-        return spc;
+        return specimen;
     }
 }

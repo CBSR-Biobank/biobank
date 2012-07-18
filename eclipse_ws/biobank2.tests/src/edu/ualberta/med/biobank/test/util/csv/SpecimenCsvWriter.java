@@ -78,7 +78,7 @@ public class SpecimenCsvWriter {
                 final HashMap<String, ? super Object> data =
                     new HashMap<String, Object>();
                 data.put(header[0], info.getInventoryId());
-                data.put(header[1], info.getParentInventoryID());
+                data.put(header[1], info.getParentInventoryId());
                 data.put(header[2], info.getSpecimenType());
                 data.put(header[3],
                     DateFormatter.formatAsDateTime(info.getCreatedAt()));
