@@ -72,6 +72,12 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     public static final String CSV_PARSE_ERROR =
         "Parse error at line {0}\n{1}";
 
+    public static final LString CSV_SPC_PATIENT_ERROR =
+        bundle
+            .tr(
+                "parent specimen and child specimen do not have the same patient number")
+            .format();
+
     public static final LString CSV_SOURCE_SPC_ERROR =
         bundle.tr(
             "specimen is a source specimen but parent inventory ID present")
@@ -182,6 +188,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             ArrayList<SpecimenCsvInfo> specimenCsvInfos =
                 new ArrayList<SpecimenCsvInfo>(0);
 
+            Map<String, SpecimenCsvInfo> sourceSpcMap =
+                new HashMap<String, SpecimenCsvInfo>();
+
             SpecimenCsvInfo csvInfo;
             reader.getCSVHeader(true);
             while ((csvInfo =
@@ -190,27 +199,37 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 if (csvInfo.getSourceSpecimen()) {
                     if ((csvInfo.getParentInventoryId() != null)
                         && !csvInfo.getParentInventoryId().isEmpty()) {
-                        addError(
-                            reader.getLineNumber(), CSV_ALIQUOTED_SPC_ERROR);
+                        addError(reader.getLineNumber(),
+                            CSV_ALIQUOTED_SPC_ERROR);
                     }
+                    sourceSpcMap.put(csvInfo.getInventoryId(), csvInfo);
                 } else {
                     if ((csvInfo.getParentInventoryId() == null)
                         || csvInfo.getParentInventoryId().isEmpty()) {
-                        addError(
-                            reader.getLineNumber(), CSV_ALIQUOTED_SPC_ERROR);
+                        addError(reader.getLineNumber(),
+                            CSV_ALIQUOTED_SPC_ERROR);
+                    }
+
+                    // check that parent and child specimens have the same
+                    // patient number
+                    SpecimenCsvInfo parentCsvInfo =
+                        sourceSpcMap.get(csvInfo.getParentInventoryId());
+
+                    if ((parentCsvInfo != null)
+                        && !csvInfo.getPatientNumber().equals(
+                            parentCsvInfo.getPatientNumber())) {
+                        addError(reader.getLineNumber(), CSV_SPC_PATIENT_ERROR);
                     }
                 }
 
                 if ((csvInfo.getPalletLabel() != null)
                     && (csvInfo.getPalletPosition() == null)) {
-                    addError(
-                        reader.getLineNumber(), CSV_PALLET_POS_ERROR);
+                    addError(reader.getLineNumber(), CSV_PALLET_POS_ERROR);
                 }
 
                 if ((csvInfo.getPalletLabel() == null)
                     && (csvInfo.getPalletPosition() != null)) {
-                    addError(
-                        reader.getLineNumber(), CSV_PALLET_LABEL_ERROR);
+                    addError(reader.getLineNumber(), CSV_PALLET_LABEL_ERROR);
                 }
 
                 csvInfo.setLineNumber(reader.getLineNumber());

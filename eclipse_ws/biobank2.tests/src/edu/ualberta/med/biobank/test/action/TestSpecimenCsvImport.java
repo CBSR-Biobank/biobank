@@ -87,8 +87,8 @@ public class TestSpecimenCsvImport extends ActionTest {
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            Assert.fail("errors in CVS data");
             showErrorsInLog(e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
         }
     }
 
@@ -175,22 +175,21 @@ public class TestSpecimenCsvImport extends ActionTest {
         for (Entry<SpecimenCsvInfo, SourceSpecimen> entry : parentSpecimenInfos
             .entrySet()) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
-                for (Patient p : patients) {
-                    SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-                    specimenInfo.setInventoryId(nameGenerator
-                        .next(String.class));
-                    specimenInfo.setParentInventoryID(entry.getKey()
-                        .getInventoryId());
-                    specimenInfo
-                        .setSpecimenType(as.getSpecimenType().getName());
-                    specimenInfo.setCreatedAt(Utils.getRandomDate());
-                    specimenInfo.setStudyName(study.getNameShort());
-                    specimenInfo.setPatientNumber(p.getPnumber());
-                    specimenInfo.setVisitNumber(1);
-                    specimenInfo.setCurrentCenter(currentCenter.getNameShort());
-                    specimenInfo.setOriginCenter(originCenter.getNameShort());
-                    specimenInfos.add(specimenInfo);
-                }
+                SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
+                specimenInfo.setInventoryId(nameGenerator
+                    .next(String.class));
+                specimenInfo.setParentInventoryID(entry.getKey()
+                    .getInventoryId());
+                specimenInfo
+                    .setSpecimenType(as.getSpecimenType().getName());
+                specimenInfo.setCreatedAt(Utils.getRandomDate());
+                specimenInfo.setStudyName(study.getNameShort());
+                specimenInfo
+                    .setPatientNumber(entry.getKey().getPatientNumber());
+                specimenInfo.setVisitNumber(1);
+                specimenInfo.setCurrentCenter(currentCenter.getNameShort());
+                specimenInfo.setOriginCenter(originCenter.getNameShort());
+                specimenInfos.add(specimenInfo);
             }
         }
 
