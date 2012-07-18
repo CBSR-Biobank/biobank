@@ -60,6 +60,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         factory.createSpecimenType();
         sourceSpecimens.add(factory.createSourceSpecimen());
 
+        study.getSourceSpecimens().addAll(sourceSpecimens);
+
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
         Set<AliquotedSpecimen> aliquotedSpecimens =
@@ -68,11 +70,13 @@ public class TestSpecimenCsvImport extends ActionTest {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
+        study.getAliquotedSpecimens().addAll(aliquotedSpecimens);
+
         tx.commit();
 
         try {
-            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
-                patients, sourceSpecimens, aliquotedSpecimens);
+            csvHelper.createAllSpecimensCsv(CSV_NAME, study, clinic, center,
+                patients);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
@@ -111,8 +115,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
-                patients, sourceSpecimensEmpty, aliquotedSpecimens);
+            csvHelper.createAllSpecimensCsv(CSV_NAME, study, clinic, center,
+                patients);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
@@ -149,8 +153,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            csvHelper.specimensCreateCsv(CSV_NAME, study, clinic, center,
-                patients, sourceSpecimens, aliquotedSpecimens);
+            csvHelper.createAllSpecimensCsv(CSV_NAME, study, clinic, center,
+                patients);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);

@@ -17,7 +17,6 @@ public class SpecimenCsvInfo implements Serializable {
     private String parentInventoryID;
     private String specimenType;
     private Date createdAt;
-    private String studyName;
     private String patientNumber;
     private Integer visitNumber;
     private String currentCenter;
@@ -49,7 +48,7 @@ public class SpecimenCsvInfo implements Serializable {
         return parentInventoryID;
     }
 
-    public void setParentInventoryID(String parentInventoryID) {
+    public void setParentInventoryId(String parentInventoryID) {
         this.parentInventoryID = parentInventoryID;
     }
 
@@ -147,14 +146,6 @@ public class SpecimenCsvInfo implements Serializable {
 
     public void setPalletPosition(String palletPosition) {
         this.palletPosition = palletPosition;
-    }
-
-    public String getStudyName() {
-        return studyName;
-    }
-
-    public void setStudyName(String studyName) {
-        this.studyName = studyName;
     }
 
 }
