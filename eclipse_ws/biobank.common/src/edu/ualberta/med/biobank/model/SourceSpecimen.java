@@ -8,8 +8,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
-
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
@@ -30,7 +28,6 @@ import edu.ualberta.med.biobank.i18n.Trnc;
  * products.
  * 
  */
-@Audited
 @Entity
 @Table(name = "SOURCE_SPECIMEN")
 public class SourceSpecimen extends AbstractVersionedModel {

@@ -12,6 +12,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -66,6 +67,7 @@ public class Site extends Center {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "site")
+    @NotAudited
     public Set<ContainerType> getContainerTypes() {
         return this.containerTypes;
     }

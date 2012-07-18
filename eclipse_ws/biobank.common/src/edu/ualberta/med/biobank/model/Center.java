@@ -51,7 +51,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "srcDispatches", groups = PreDelete.class),
     @Empty(property = "dstDispatches", groups = PreDelete.class)
 })
-public class Center extends AbstractVersionedModel
+public abstract class Center extends AbstractVersionedModel
     implements HasName, HasNameShort, HasActivityStatus, HasComments,
     HasAddress {
     private static final long serialVersionUID = 1L;

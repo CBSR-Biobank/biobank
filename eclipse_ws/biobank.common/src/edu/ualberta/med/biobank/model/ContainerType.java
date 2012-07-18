@@ -148,6 +148,7 @@ public class ContainerType extends AbstractVersionedModel
         this.defaultTemperature = defaultTemperature;
     }
 
+    @NotAudited
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -94,6 +95,7 @@ public class Study extends AbstractVersionedModel
         this.nameShort = nameShort;
     }
 
+    @NotAudited
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
     public Set<AliquotedSpecimen> getAliquotedSpecimens() {
@@ -181,6 +183,7 @@ public class Study extends AbstractVersionedModel
         this.researchGroup = researchGroup;
     }
 
+    @NotAudited
     @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "study")
     @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
     public Set<SourceSpecimen> getSourceSpecimens() {

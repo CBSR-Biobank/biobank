@@ -12,7 +12,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -33,6 +35,7 @@ public class Revision
     private Long committedAt;
     private User user;
     private Set<String> modifiedTypes = new HashSet<String>(0);
+    private Set<Activity> activities = new HashSet<Activity>(0);
 
     @Override
     @RevisionNumber
@@ -127,6 +130,18 @@ public class Revision
 
     public void setModifiedTypes(Set<String> modifiedTypes) {
         this.modifiedTypes = modifiedTypes;
+    }
+
+    @OneToMany
+    @JoinTable(name = "REVISION_ACTIVITY",
+        joinColumns = @JoinColumn(name = "REVISION_ID", unique = true),
+        inverseJoinColumns = @JoinColumn(name = "ACTIVITY_ID"))
+    public Set<Activity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(Set<Activity> activities) {
+        this.activities = activities;
     }
 
     @Override

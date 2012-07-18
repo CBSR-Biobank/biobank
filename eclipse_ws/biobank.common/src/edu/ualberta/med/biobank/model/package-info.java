@@ -6,6 +6,14 @@
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus")
         }),
+    // TODO: can we just make one "enum" type that is used by all enums that makes sure they implement some "getId()" interface and are enums and then just build an internal map?
+    @TypeDef(
+        name = "activityType",
+        typeClass = GenericEnumUserType.class,
+        defaultForType = ActivityType.class,
+        parameters = {
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.ActivityType")
+        }),
     @TypeDef(
         name = "dispatchSpecimenState",
         typeClass = GenericEnumUserType.class,
@@ -41,6 +49,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
+import edu.ualberta.med.biobank.model.type.ActivityType;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;

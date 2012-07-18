@@ -12,7 +12,6 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -26,7 +25,6 @@ import edu.ualberta.med.biobank.i18n.Trnc;
  * required. The aliquoted specimen states the specimen types collected by a
  * study, the number of tubes and the required volume in each tube.
  */
-@Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
 public class AliquotedSpecimen extends AbstractVersionedModel

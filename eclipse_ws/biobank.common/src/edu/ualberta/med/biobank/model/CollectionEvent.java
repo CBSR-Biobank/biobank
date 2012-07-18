@@ -20,6 +20,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -114,6 +115,7 @@ public class CollectionEvent extends AbstractVersionedModel
         this.activityStatus = activityStatus;
     }
 
+    @NotAudited
     @OneToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
     public Set<EventAttr> getEventAttrs() {
