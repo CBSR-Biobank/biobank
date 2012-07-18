@@ -22,20 +22,29 @@ public class SpecimenCsvHelper {
         this.nameGenerator =
             new NameGenerator(SpecimenCsvHelper.class.getSimpleName()
                 + new Random());
-
     }
 
     @SuppressWarnings("nls")
     public void specimensCreateCsv(String csvname, Study study,
-        Center originCenter,
-        Center currentCenter, Set<Patient> patients,
+        Center originCenter, Center currentCenter, Set<Patient> patients,
         Set<SourceSpecimen> sourceSpecimens,
         Set<AliquotedSpecimen> aliquotedSpecimens)
         throws IOException {
 
         Set<SpecimenCsvInfo> specimenInfos =
-            new LinkedHashSet<SpecimenCsvInfo>();
-        Set<SpecimenCsvInfo> parentSpecimenInfos =
+            sourceSpecimensCreate(study, originCenter, currentCenter, patients,
+                sourceSpecimens);
+
+        specimenInfos.addAll(aliquotedSpecimensCreate(study, originCenter,
+            currentCenter, specimenInfos, aliquotedSpecimens));
+
+        SpecimenCsvWriter.write(csvname, specimenInfos);
+    }
+
+    public Set<SpecimenCsvInfo> sourceSpecimensCreate(Study study,
+        Center originCenter, Center currentCenter, Set<Patient> patients,
+        Set<SourceSpecimen> sourceSpecimens) {
+        Set<SpecimenCsvInfo> specimenInfos =
             new LinkedHashSet<SpecimenCsvInfo>();
 
         // add parent specimens first
@@ -53,14 +62,10 @@ public class SpecimenCsvHelper {
                 specimenInfo.setWorksheet(nameGenerator.next(String.class));
                 specimenInfo.setSourceSpecimen(true);
                 specimenInfos.add(specimenInfo);
-                parentSpecimenInfos.add(specimenInfo);
             }
         }
 
-        specimenInfos.addAll(aliquotedSpecimensCreate(study, originCenter,
-            currentCenter, parentSpecimenInfos, aliquotedSpecimens));
-
-        SpecimenCsvWriter.write(csvname, specimenInfos);
+        return specimenInfos;
     }
 
     public Set<SpecimenCsvInfo> aliquotedSpecimensCreate(Study study,
@@ -70,7 +75,6 @@ public class SpecimenCsvHelper {
         Set<SpecimenCsvInfo> specimenInfos =
             new LinkedHashSet<SpecimenCsvInfo>();
 
-        // add aliquoted specimens
         for (SpecimenCsvInfo parentSpecimenInfo : parentSpecimenInfos) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
                 SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
