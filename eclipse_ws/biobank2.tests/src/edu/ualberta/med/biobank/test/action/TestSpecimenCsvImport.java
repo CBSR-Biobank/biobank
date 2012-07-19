@@ -86,6 +86,11 @@ public class TestSpecimenCsvImport extends ActionTest {
         }
     }
 
+    /*
+     * Test if we can import aliquoted specimens only.
+     * 
+     * The CSV file has no positions here.
+     */
     @Test
     public void noSourceSpecimensInCsv() throws Exception {
         Transaction tx = session.beginTransaction();
@@ -99,10 +104,13 @@ public class TestSpecimenCsvImport extends ActionTest {
         patients.add(factory.createPatient());
         patients.add(factory.createPatient());
 
-        Set<SourceSpecimen> sourceSpecimensEmpty =
-            new HashSet<SourceSpecimen>();
+        // create 2 source specimens
+        factory.createSourceSpecimen();
         factory.createSpecimenType();
+        factory.createSourceSpecimen();
         factory.createSpecimenType();
+
+        factory.createSpecimen();
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
@@ -115,8 +123,8 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         try {
-            csvHelper.createAllSpecimensCsv(CSV_NAME, study, clinic, center,
-                patients);
+            csvHelper.createAliquotedSpecimensCsv(CSV_NAME, study, clinic,
+                center, null);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);

@@ -730,6 +730,16 @@ public class Factory {
         return specimen;
     }
 
+    /*
+     * public Specimen createParentSpecimen() {
+     * 
+     * }
+     * 
+     * public Specimen createChildSpecimen() {
+     * 
+     * }
+     */
+
     public Specimen createPositionedSpecimen() {
         Specimen assignedSpecimen = createSpecimen();
 
