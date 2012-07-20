@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +13,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchSpecimenPeer;
@@ -30,10 +27,8 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
     private static final I18n i18n = I18nFactory
@@ -393,92 +388,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public DispatchLogProvider getLogProvider() {
         return LOG_PROVIDER;
-    }
-
-    @SuppressWarnings("nls")
-    private static final String DISPATCH_HQL_STRING = "from "
-        + Dispatch.class.getName() + " as d inner join fetch d."
-        + DispatchPeer.SHIPMENT_INFO.getName() + " as s ";
-
-    /**
-     * Search for shipments in the site with the given waybill
-     */
-    public static List<DispatchWrapper> getDispatchesByWaybill(
-        WritableApplicationService appService, String waybill)
-        throws ApplicationException {
-        @SuppressWarnings("nls")
-        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " where s."
-            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            Arrays.asList(new Object[] { waybill }));
-
-        List<Dispatch> origins = appService.query(criteria);
-        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, DispatchWrapper.class);
-
-        return shipments;
-    }
-
-    @SuppressWarnings("nls")
-    private static final String DISPATCHES_BY_DATE_RECEIVED_QRY =
-        DISPATCH_HQL_STRING
-            + " where s."
-            + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >=? and s."
-            + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " <? and (d."
-            + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d."
-            + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)";
-
-    /**
-     * Search for shipments in the site with the given date received. Don't use
-     * hour and minute.
-     */
-    public static List<DispatchWrapper> getDispatchesByDateReceived(
-        WritableApplicationService appService, Date dateReceived,
-        CenterWrapper<?> center) throws ApplicationException {
-
-        Integer centerId = center.getId();
-        HQLCriteria criteria = new HQLCriteria(
-            DISPATCHES_BY_DATE_RECEIVED_QRY.toString(),
-            Arrays.asList(new Object[] { startOfDay(dateReceived),
-                endOfDay(dateReceived), centerId, centerId }));
-
-        List<Dispatch> origins = appService.query(criteria);
-        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, DispatchWrapper.class);
-
-        return shipments;
-    }
-
-    @SuppressWarnings("nls")
-    private static final String DISPATCHED_BY_DATE_SENT_QRY =
-        DISPATCH_HQL_STRING
-            + " where s."
-            + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s."
-            + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (d."
-            + Property.concatNames(DispatchPeer.RECEIVER_CENTER, CenterPeer.ID)
-            + "= ? or d."
-            + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-            + " = ?)";
-
-    public static List<DispatchWrapper> getDispatchesByDateSent(
-        WritableApplicationService appService, Date dateSent,
-        CenterWrapper<?> center) throws ApplicationException {
-        Integer centerId = center.getId();
-        HQLCriteria criteria = new HQLCriteria(DISPATCHED_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { startOfDay(dateSent),
-                endOfDay(dateSent), centerId, centerId }));
-
-        List<Dispatch> origins = appService.query(criteria);
-        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, DispatchWrapper.class);
-
-        return shipments;
     }
 
     @Override

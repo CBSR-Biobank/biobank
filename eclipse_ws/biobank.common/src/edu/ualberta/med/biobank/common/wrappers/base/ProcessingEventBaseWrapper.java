@@ -4,22 +4,20 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import java.util.Date;
-import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.CommentBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import java.util.Arrays;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ProcessingEventBaseWrapper extends ModelWrapper<ProcessingEvent> {
 

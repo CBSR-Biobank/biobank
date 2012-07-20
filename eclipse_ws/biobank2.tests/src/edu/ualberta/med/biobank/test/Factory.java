@@ -4,13 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -590,7 +587,6 @@ public class Factory {
     public Site createSite() {
         // Use Center.class because the name must be unique on Center
         String name = nameGenerator.next(Center.class);
-
         Site site = new Site();
         site.setName(name);
         site.setNameShort(name);
@@ -733,6 +729,16 @@ public class Factory {
         session.flush();
         return specimen;
     }
+
+    /*
+     * public Specimen createParentSpecimen() {
+     * 
+     * }
+     * 
+     * public Specimen createChildSpecimen() {
+     * 
+     * }
+     */
 
     public Specimen createPositionedSpecimen() {
         Specimen assignedSpecimen = createSpecimen();
@@ -1017,36 +1023,5 @@ public class Factory {
 
     public String getName(Class<?> klazz) {
         return nameGenerator.next(klazz);
-    }
-
-    public class NameGenerator {
-        private static final String DELIMITER = "_";
-
-        private final String root;
-        private final ConcurrentHashMap<Class<?>, AtomicInteger> suffixes =
-            new ConcurrentHashMap<Class<?>, AtomicInteger>();
-
-        private NameGenerator(String root) {
-            this.root = formatRoot(root);
-        }
-
-        String next(Class<?> klazz) {
-            suffixes.putIfAbsent(klazz, new AtomicInteger(1));
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(root);
-            sb.append(DELIMITER);
-            sb.append(suffixes.get(klazz).incrementAndGet());
-
-            return sb.toString();
-        }
-
-        private String formatRoot(String root) {
-            String tmp = StringUtil.truncate(root, 25, "...");
-            if (tmp != root) {
-                tmp += root.substring(root.length() - 5);
-            }
-            return tmp;
-        }
     }
 }

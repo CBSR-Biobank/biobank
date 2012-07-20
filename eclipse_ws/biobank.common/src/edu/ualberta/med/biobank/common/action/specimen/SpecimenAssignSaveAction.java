@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -70,7 +71,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         throws ActionException {
         SpecimenAssignResInfo res = new SpecimenAssignResInfo();
         if (containerId == null && containerId == null)
-            throw new ActionException(
+            throw new LocalizedException(
                 bundle.tr("Problem with sent data. Container id is null")
                     .format());
         res.parentContainerId = containerId;
@@ -87,8 +88,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
             Specimen specimen =
                 context.load(Specimen.class, si.specimenId);
             SpecimenActionHelper.setPosition(context, specimen,
-                si.position,
-                containerId);
+                si.position, containerId);
             context.getSession().saveOrUpdate(specimen);
 
             SpecimenResInfo rInfo = new SpecimenResInfo();

@@ -4,15 +4,15 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import java.util.Date;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ShipmentInfoBaseWrapper extends ModelWrapper<ShipmentInfo> {
 

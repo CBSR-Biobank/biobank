@@ -1,27 +1,17 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.OriginInfoLogProvider;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     private static final OriginInfoLogProvider LOG_PROVIDER =
         new OriginInfoLogProvider();
-    private static final String SHIPMENT_HQL_STRING = "from " //$NON-NLS-1$
-        + OriginInfo.class.getName() + " as o inner join fetch o." //$NON-NLS-1$
-        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "; //$NON-NLS-1$
 
     public OriginInfoWrapper(WritableApplicationService appService) {
         super(appService);
@@ -49,95 +39,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         }
 
         return patients;
-    }
-
-    public static List<OriginInfoWrapper> getTodayShipments(
-        BiobankApplicationService appService, CenterWrapper<?> center)
-        throws ApplicationException {
-        return getShipmentsByDateReceived(appService, new Date(), center);
-    }
-
-    private static final String SHIPMENTS_BY_WAYBILL_QRY = SHIPMENT_HQL_STRING
-        + " where s." + ShipmentInfoPeer.WAYBILL.getName() + " = ?"; //$NON-NLS-1$ //$NON-NLS-2$
-
-    /**
-     * Search for shipments in the site with the given waybill
-     */
-    public static List<OriginInfoWrapper> getShipmentsByWaybill(
-        WritableApplicationService appService, String waybill)
-        throws ApplicationException {
-
-        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_WAYBILL_QRY,
-            Arrays.asList(new Object[] { waybill }));
-
-        List<OriginInfo> origins = appService.query(criteria);
-        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, OriginInfoWrapper.class);
-
-        return shipments;
-    }
-
-    // Don't run this on the server unless you take into account timezones in
-    // your inputs
-    private static final String SHIPMENTS_BY_DATE_RECEIVED_QRY =
-        SHIPMENT_HQL_STRING
-            + " where s." //$NON-NLS-1$
-            + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
-            + ShipmentInfoPeer.RECEIVED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
-            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
-            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
-
-    /**
-     * Search for shipments in the site with the given date received. Don't use
-     * hour and minute. Will check the given center is either the sender or the
-     * receiver.
-     */
-    public static List<OriginInfoWrapper> getShipmentsByDateReceived(
-        WritableApplicationService appService, Date dateReceived,
-        CenterWrapper<?> center) throws ApplicationException {
-
-        Integer centerId = center.getId();
-        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_RECEIVED_QRY,
-            Arrays.asList(new Object[] { startOfDay(dateReceived),
-                endOfDay(dateReceived), centerId, centerId }));
-
-        List<OriginInfo> origins = appService.query(criteria);
-        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, OriginInfoWrapper.class);
-
-        return shipments;
-    }
-
-    // Don't run this on the server unless you take into account timezones in
-    // your inputs
-    private static final String SHIPMENTS_BY_DATE_SENT_QRY =
-        SHIPMENT_HQL_STRING
-            + " where s." //$NON-NLS-1$
-            + ShipmentInfoPeer.PACKED_AT.getName()
-            + " >= ? and s." //$NON-NLS-1$
-            + ShipmentInfoPeer.PACKED_AT.getName()
-            + " < ? and (o." //$NON-NLS-1$
-            + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
-            + "= ? or o." //$NON-NLS-1$
-            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
-            + " = ?)"; //$NON-NLS-1$
-
-    public static List<OriginInfoWrapper> getShipmentsByDateSent(
-        WritableApplicationService appService, Date dateSent,
-        CenterWrapper<?> center) throws ApplicationException {
-        Integer centerId = center.getId();
-        HQLCriteria criteria = new HQLCriteria(SHIPMENTS_BY_DATE_SENT_QRY,
-            Arrays.asList(new Object[] { startOfDay(dateSent),
-                endOfDay(dateSent), centerId, centerId }));
-        List<OriginInfo> origins = appService.query(criteria);
-        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, OriginInfoWrapper.class);
-
-        return shipments;
     }
 
     /**

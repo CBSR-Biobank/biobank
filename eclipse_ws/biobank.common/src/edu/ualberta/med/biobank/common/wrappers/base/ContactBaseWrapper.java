@@ -4,18 +4,17 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.util.Arrays;
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import java.util.Arrays;
+import edu.ualberta.med.biobank.model.Contact;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContactBaseWrapper extends ModelWrapper<Contact> {
 

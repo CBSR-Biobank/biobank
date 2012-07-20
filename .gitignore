@@ -1,4 +1,6 @@
 po/output
+*sublime*
+.settings
 .options
 *.jasper
 backup/

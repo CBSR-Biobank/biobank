@@ -36,8 +36,6 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private List<SpecimenTypeWrapper> availableSpecimenTypes;
 
-    private List<SourceSpecimenWrapper> selectedSourceSpecimens;
-
     private List<SourceSpecimenWrapper> addedOrModifiedSourceSpecimens;
 
     private List<SourceSpecimenWrapper> deletedSourceSpecimen;
@@ -59,14 +57,15 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         List<SourceSpecimenWrapper> sourceSpecimens,
         List<SpecimenTypeWrapper> specimenTypes) {
         super(parent, null);
-        selectedSourceSpecimens = sourceSpecimens;
+
         availableSpecimenTypes = specimenTypes;
-        for (SourceSpecimenWrapper ss : selectedSourceSpecimens)
-            availableSpecimenTypes.remove(ss.getSpecimenType());
-        if (selectedSourceSpecimens == null) {
-            selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
+        if (sourceSpecimens == null) {
+            sourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
-        setList(selectedSourceSpecimens);
+        for (SourceSpecimenWrapper ss : sourceSpecimens)
+            availableSpecimenTypes.remove(ss.getSpecimenType());
+
+        setList(sourceSpecimens);
         addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
 
@@ -111,8 +110,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                         return;
                     }
 
-                    selectedSourceSpecimens.remove(sourceSpecimen);
-                    setList(selectedSourceSpecimens);
+                    getList().remove(sourceSpecimen);
                     deletedSourceSpecimen.add(sourceSpecimen);
                     availableSpecimenTypes.add(sourceSpecimen
                         .getSpecimenType());
@@ -153,9 +151,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                     SourceSpecimenWrapper ss = (SourceSpecimenWrapper) spec;
                     availableSpecimenTypes.remove(ss.getSpecimenType());
                     dlg.setSpecimenTypes(availableSpecimenTypes);
-                    selectedSourceSpecimens.add(ss);
+                    getList().add(ss);
                     addedOrModifiedSourceSpecimens.add(ss);
-                    reloadCollection(selectedSourceSpecimens);
                     notifyListeners();
                 }
             };
@@ -172,7 +169,6 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             sourceSpecimen.setSpecimenType(dlg.getSpecimenType());
 
             if (!add) {
-                reloadCollection(selectedSourceSpecimens);
                 notifyListeners();
             }
         }
@@ -187,11 +183,10 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     }
 
     public void reload(List<SourceSpecimenWrapper> sourceSpecimens) {
-        selectedSourceSpecimens = sourceSpecimens;
-        if (selectedSourceSpecimens == null) {
-            selectedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
+        if (sourceSpecimens == null) {
+            sourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         }
-        reloadCollection(selectedSourceSpecimens);
+        setList(sourceSpecimens);
         addedOrModifiedSourceSpecimens = new ArrayList<SourceSpecimenWrapper>();
         deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
     }

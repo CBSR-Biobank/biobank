@@ -162,7 +162,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 .getAppService()
                 .doAction(
                     new ContainerGetSpecimenListInfoAction(
-                        containerInfo.container)).getList();
+                        containerInfo.container.getId())).getList();
         Assert.isNotNull(containerInfo);
         Assert.isNotNull(containerInfo.container);
     }
@@ -720,7 +720,7 @@ public class ContainerViewForm extends BiobankViewForm {
         }
 
         if (specimensWidget != null) {
-            specimensWidget.reloadCollection(specInfo);
+            specimensWidget.setList(specInfo);
         }
         commentTable.setList(
             ModelWrapper.wrapModelCollection(

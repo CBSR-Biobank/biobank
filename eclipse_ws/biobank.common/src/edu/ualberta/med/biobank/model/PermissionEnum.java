@@ -178,7 +178,10 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     SPECIMEN_LIST(66,
         Loader.i18n.tr("Specimen List")),
     LABEL_PRINTING(67,
-        Loader.i18n.tr("Label Printing"));
+        Loader.i18n.tr("Label Printing")),
+
+    LEGACY_IMPORT_CSV(68,
+        Loader.i18n.tr("Specimen CSV Import"));
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));

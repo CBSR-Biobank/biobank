@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -314,4 +315,11 @@ public class DispatchAdapter extends AdapterBase {
         return 0;
     }
 
+    @Override
+    public List<AbstractAdapterBase> search(Class<?> klazz, Integer id) {
+        List<AbstractAdapterBase> list = new ArrayList<AbstractAdapterBase>();
+        if (klazz.equals(Dispatch.class) && id.equals(getId()))
+            list.add(this);
+        return list;
+    }
 }

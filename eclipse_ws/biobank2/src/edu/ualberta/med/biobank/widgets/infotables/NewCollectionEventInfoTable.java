@@ -19,11 +19,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class NewCollectionEventInfoTable extends
     InfoTableWidget<PatientCEventInfo> {
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING,
-        StringUtil.EMPTY_STRING };
+        i18n.tr("Visit"),
+        i18n.tr("Sources"),
+        i18n.tr("Aliquots"),
+        i18n.tr("Comment") };
 
     public NewCollectionEventInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -41,7 +42,7 @@ public class NewCollectionEventInfoTable extends
                     if (columnIndex == 0) {
                         return AbstractInfoTableWidget.LOADING;
                     }
-                    return StringUtil.EMPTY_STRING; 
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -55,7 +56,7 @@ public class NewCollectionEventInfoTable extends
                         : StringUtil.EMPTY_STRING;
 
                 default:
-                    return StringUtil.EMPTY_STRING; 
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

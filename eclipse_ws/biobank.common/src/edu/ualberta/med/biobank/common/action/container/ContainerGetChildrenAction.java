@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.action.container;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
-import org.hibernate.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -11,32 +12,16 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerGetChildrenAction implements
     Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
-    // This query has to initialise specimenPositionCollection due to the
-    // tree adapter needing to know this to display additional menu selections
-    // when a right click is done on a container node.
-    //
-    // Also has to initialize containerType.childContainerTypes to support
-    // container drag and drop.
-    @SuppressWarnings("nls")
-    private static final String SELECT_CHILD_CONTAINERS_HQL =
-        "SELECT container"
-            + " FROM " + Container.class.getName() + " container"
-            + " INNER JOIN FETCH container.containerType containerType"
-            + " LEFT JOIN FETCH containerType.childContainerTypes"
-            + " INNER JOIN FETCH container.position position"
-            + " INNER JOIN FETCH position.parentContainer parentContainer"
-            + " INNER JOIN FETCH parentContainer.containerType parentCType"
-            + " INNER JOIN FETCH parentCType.childLabelingScheme"
-            + " INNER JOIN FETCH containerType.capacity"
-            + " LEFT JOIN FETCH containerType.specimenTypes"
-            + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN FETCH container.specimenPositions"
-            + " WHERE container.position.parentContainer.id = ?";
+    private static Logger log = LoggerFactory
+        .getLogger(ContainerGetInfoAction.class.getName());
 
     private final Integer parentContainerId;
 
@@ -51,22 +36,60 @@ public class ContainerGetChildrenAction implements
             .isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public ListResult<Container> run(ActionContext context)
         throws ActionException {
-        ArrayList<Container> childContainers = new ArrayList<Container>(0);
+        log.info("run: parentContainerId={}", parentContainerId);
 
-        Query query =
-            context.getSession().createQuery(SELECT_CHILD_CONTAINERS_HQL);
-        query.setParameter(0, parentContainerId);
+        Container parentContainer =
+            context.load(Container.class, parentContainerId);
+        ArrayList<Container> childContainers =
+            new ArrayList<Container>(parentContainer.getChildPositions().size());
 
-        @SuppressWarnings("unchecked")
-        List<Container> results = query.list();
-        if (results != null) {
-            childContainers.addAll(results);
+        parentContainer.getContainerType().getChildLabelingScheme().getName();
+
+        // used to NOT iterate over the same child container types
+        HashSet<ContainerType> ctSet = new HashSet<ContainerType>();
+
+        for (ContainerPosition pos : parentContainer.getChildPositions()) {
+            Container child = pos.getContainer();
+            childContainers.add(child);
+
+            child.getSite().getName();
+
+            log.debug("run: parentContainerId={} getting container types");
+
+            // need to initialize containerType.childContainerTypes to
+            // support container drag and drop.
+            for (ContainerType ct : child.getContainerType()
+                .getChildContainerTypes()) {
+                ct.getName();
+
+                if (!ctSet.contains(ct)) {
+                    ctSet.add(ct);
+
+                    log.info("run: parentContainerId={} childCtype={}",
+                        parentContainerId, ct.getNameShort());
+
+                    ct.getCapacity().getRowCapacity();
+
+                    for (SpecimenType st : ct.getSpecimenTypes()) {
+                        st.getName();
+                    }
+                }
+            }
+
+            log.debug("run: parentContainerId={} getting specimen positions");
+
+            // specimenPosition set has to be initialized due to the
+            // tree adapter needing to know this to display additional menu
+            // selections when a right click is done on a container node.
+            child.getSpecimenPositions().size();
         }
+
+        log.debug("run: parentContainerId={} exit", parentContainerId);
 
         return new ListResult<Container>(childContainers);
     }
-
 }

@@ -49,7 +49,8 @@ public class LocalActionExecutor implements IActionExecutor {
         // time. The User object should also be loaded fresh from the database.
         Session session = sessionProvider.openSession();
 
-        Transaction tx = session.beginTransaction();
+        session.beginTransaction();
+
         try {
             User user = (User) session
                 .createCriteria(User.class)
@@ -69,11 +70,17 @@ public class LocalActionExecutor implements IActionExecutor {
 
             result = simulateWire(result);
 
-            tx.commit();
+            Transaction tx = session.getTransaction();
+            if (tx.isActive()) {
+                tx.commit();
+            }
 
             return result;
         } catch (RuntimeException e) {
-            tx.rollback();
+            Transaction tx = session.getTransaction();
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             throw e;
         } finally {
             session.clear();

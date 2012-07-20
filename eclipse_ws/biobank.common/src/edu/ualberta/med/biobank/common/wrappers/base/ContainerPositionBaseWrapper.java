@@ -4,16 +4,16 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.ArrayList;
-import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
-import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class ContainerPositionBaseWrapper extends AbstractPositionWrapper<ContainerPosition> {
 

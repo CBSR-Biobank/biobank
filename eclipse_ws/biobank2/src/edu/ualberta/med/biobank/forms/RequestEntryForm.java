@@ -216,7 +216,7 @@ public class RequestEntryForm extends BiobankViewForm {
             public void widgetSelected(SelectionEvent e) {
                 openScanDialog();
                 specimensTree.refresh();
-                dispatchTable.reloadCollection(
+                dispatchTable.setList(
                     request.getDispatchCollection(false),
                     getDispatchSelection());
             }

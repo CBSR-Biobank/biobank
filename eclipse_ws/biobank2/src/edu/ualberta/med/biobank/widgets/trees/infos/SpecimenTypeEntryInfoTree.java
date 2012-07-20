@@ -57,13 +57,13 @@ public class SpecimenTypeEntryInfoTree extends SpecimenTypeInfoTree {
      *            displayed in the table viewer (can be null).
      */
     public SpecimenTypeEntryInfoTree(Composite parent,
-        List<SpecimenTypeWrapper> globalSpecimenTypes, String addMessage,
+        String addMessage,
         String editMessage) {
         super(parent, null);
-        setLists(globalSpecimenTypes);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
         addEditSupport();
+        reload();
     }
 
     @Override

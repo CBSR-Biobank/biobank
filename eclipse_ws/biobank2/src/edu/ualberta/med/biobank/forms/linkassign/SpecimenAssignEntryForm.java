@@ -526,7 +526,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                             @Override
                             public void run() {
                                 initContainersFromPosition(
-                                    newSinglePositionText, false, null);
+                                    newSinglePositionText, null);
                                 checkPositionAndSpecimen(inventoryIdText,
                                     newSinglePositionText);
                             }
@@ -704,7 +704,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     private boolean checkMultipleContainerPosition() {
         checkingMultipleContainerPosition = true;
-        initContainersFromPosition(palletPositionText, true, null);
+        initContainersFromPosition(palletPositionText, null);
         if (parentContainers.size() == 0)
             return false;
         try {

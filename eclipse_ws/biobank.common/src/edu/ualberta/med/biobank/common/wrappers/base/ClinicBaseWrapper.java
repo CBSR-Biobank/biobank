@@ -4,16 +4,16 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.ArrayList;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Clinic;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class ClinicBaseWrapper extends CenterWrapper<Clinic> {
 

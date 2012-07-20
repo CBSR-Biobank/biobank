@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -64,7 +65,7 @@ public class GroupSaveAction implements Action<IdResult> {
 
     private void checkFullyManageable(Group group, User executingUser) {
         if (!group.isFullyManageable(executingUser)) {
-            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
+            throw new LocalizedException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
     }
 

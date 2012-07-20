@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.InBoundsValidator;
 
 /**

@@ -18,6 +18,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
@@ -28,12 +29,12 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(SelectParentContainerDialog.class);
 
-    private final Collection<ContainerWrapper> containers;
+    private final Collection<Container> containers;
     private ComboViewer comboViewer;
-    protected ContainerWrapper selectedContainer;
+    protected Container selectedContainer;
 
     public SelectParentContainerDialog(Shell parent,
-        Collection<ContainerWrapper> containers) {
+        Collection<Container> containers) {
         super(parent);
         Assert.isNotNull(containers);
         this.containers = containers;
@@ -111,11 +112,11 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
 
     private void saveSelectedContainer() {
         selectedContainer =
-            (ContainerWrapper) ((IStructuredSelection) comboViewer
+            (Container) ((IStructuredSelection) comboViewer
                 .getSelection()).getFirstElement();
     }
 
-    public ContainerWrapper getSelectedContainer() {
+    public Container getSelectedContainer() {
         return selectedContainer;
     }
 

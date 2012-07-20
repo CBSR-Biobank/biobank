@@ -4,23 +4,20 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.RequestPeer;
-import java.util.Date;
-import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ResearchGroupBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.AddressBaseWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.RequestSpecimenBaseWrapper;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.RequestPeer;
+import edu.ualberta.med.biobank.common.wrappers.AddressWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ResearchGroupWrapper;
+import edu.ualberta.med.biobank.model.Request;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RequestBaseWrapper extends ModelWrapper<Request> {
 

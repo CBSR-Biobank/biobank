@@ -1,14 +1,15 @@
 package edu.ualberta.med.biobank.common.peer;
 
-import edu.ualberta.med.biobank.common.util.TypeReference;
-import java.util.Collections;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityProperty;
 import edu.ualberta.med.biobank.model.Report;
-import java.util.Collection;
-import edu.ualberta.med.biobank.model.Entity;
 
 public class EntityPeer {
 	public static final Property<Integer, Entity> ID = Property.create(

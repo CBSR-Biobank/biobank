@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermi
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
@@ -102,7 +103,7 @@ public class ContainerSaveAction implements Action<IdResult> {
 
         if (parentId != null) {
             if (label != null) {
-                throw new ActionException(CANNOT_SET_LABEL_ERRMSG);
+                throw new LocalizedException(CANNOT_SET_LABEL_ERRMSG);
             }
             ContainerActionHelper.setPosition(context, container, position,
                 parentId);

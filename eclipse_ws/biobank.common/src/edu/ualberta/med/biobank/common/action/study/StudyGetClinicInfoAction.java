@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -100,7 +101,7 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
             Clinic clinic = (Clinic) row[0];
             List<Contact> contactList = contactsByClinic.get(clinic);
             if (contactList == null) {
-                throw new ActionException(CLINIC_REQUIRES_CONTACTS
+                throw new LocalizedException(CLINIC_REQUIRES_CONTACTS
                     .format(clinic.getNameShort()));
             }
             ClinicInfo info = new ClinicInfo(clinic, (Long) row[1],

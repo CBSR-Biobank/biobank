@@ -9,9 +9,11 @@ import org.hibernate.Session;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -21,15 +23,18 @@ import edu.ualberta.med.biobank.model.Specimen;
  * 
  */
 public class PatientMergeAction implements Action<BooleanResult> {
-
     private static final long serialVersionUID = 1L;
 
     private final Integer patient1Id;
     private final Integer patient2Id;
 
-    public PatientMergeAction(Integer patient1Id, Integer patient2Id) {
+    private final String comment;
+
+    public PatientMergeAction(Integer patient1Id, Integer patient2Id,
+        String comment) {
         this.patient1Id = patient1Id;
         this.patient2Id = patient2Id;
+        this.comment = comment;
     }
 
     @Override
@@ -72,32 +77,33 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 }
                 merged = false;
             }
-
-            context.getSession().saveOrUpdate(patient1);
-
-            // flush so deleting the patient realizes its collection events have
-            // been removed.
-            context.getSession().flush();
-
-            context.getSession().delete(patient2);
-
-            // FIXME see how logs should be done properly...
-            Log logP2 = new Log();
-            logP2.setAction("merge"); //$NON-NLS-1$
-            logP2.setPatientNumber(patient2.getPnumber());
-            logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
-                + patient1.getPnumber());
-            logP2.setType("Patient"); //$NON-NLS-1$
-            context.getSession().save(logP2);
-
-            Log logP1 = new Log();
-            logP1.setAction("merge"); //$NON-NLS-1$
-            logP1.setPatientNumber(patient1.getPnumber());
-            logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
-                + patient2.getPnumber());
-            logP1.setType("Patient"); //$NON-NLS-1$
-            context.getSession().save(logP1);
         }
+        Comment c = CommentUtil.create(context.getUser(), comment);
+        patient1.getComments().add(c);
+        context.getSession().saveOrUpdate(patient1);
+
+        // flush so deleting the patient realizes its collection events have
+        // been removed.
+        context.getSession().flush();
+
+        context.getSession().delete(patient2);
+
+        // FIXME see how logs should be done properly...
+        Log logP2 = new Log();
+        logP2.setAction("merge"); //$NON-NLS-1$
+        logP2.setPatientNumber(patient2.getPnumber());
+        logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
+            + patient1.getPnumber());
+        logP2.setType("Patient"); //$NON-NLS-1$
+        context.getSession().save(logP2);
+
+        Log logP1 = new Log();
+        logP1.setAction("merge"); //$NON-NLS-1$
+        logP1.setPatientNumber(patient1.getPnumber());
+        logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
+            + patient2.getPnumber());
+        logP1.setType("Patient"); //$NON-NLS-1$
+        context.getSession().save(logP1);
 
         return new BooleanResult(true);
     }

@@ -34,7 +34,7 @@ public class SpecimenTypeReport2Editor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getPrintParams() throws Exception {
+    protected List<Object> getPrintParams() {
         return new ArrayList<Object>();
     }
 }

@@ -25,10 +25,8 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -932,30 +930,4 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return cascader;
     }
 
-    /**
-     * Will consider the date and not the time.
-     */
-    // TODO: why is this in ModelWrapper? It's a DateUtil function.
-    public static Date endOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        return c.getTime();
-    }
-
-    /**
-     * Remove time on this date to get time set to 00:00
-     */
-    // TODO: why is this in ModelWrapper? It's a DateUtil function.
-    public static Date startOfDay(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
-    }
 }

@@ -1,18 +1,19 @@
 package edu.ualberta.med.biobank.validator.constraint;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
-import edu.ualberta.med.biobank.validator.constraint.impl.NotUsedValidator;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+
+import edu.ualberta.med.biobank.validator.constraint.impl.NotUsedValidator;
 
 /**
  * Asserts that the annotated bean is not used by the given class through the

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -17,12 +18,12 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -107,10 +108,11 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Class<?> searchedClass,
-        Integer objectId) {
-        return findChildFromClass(searchedClass, objectId,
-            ProcessingEventWrapper.class);
+    public List<AbstractAdapterBase> search(Class<?> klazz, Integer id) {
+        List<AbstractAdapterBase> list = new ArrayList<AbstractAdapterBase>();
+        if (klazz.equals(Dispatch.class) && id.equals(getId()))
+            list.add(this);
+        return list;
     }
 
     @Override

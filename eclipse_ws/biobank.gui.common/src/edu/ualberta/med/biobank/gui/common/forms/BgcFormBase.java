@@ -172,6 +172,7 @@ public abstract class BgcFormBase extends EditorPart implements
         book.setLayout(new GridLayout());
         book.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
             true));
+        //book.setData("novarrows", true); //$NON-NLS-1$
         page = book.createPage(PART_CONTROL_PAGE);
         book.showPage(PART_CONTROL_PAGE);
 

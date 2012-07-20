@@ -11,32 +11,20 @@ import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
 public class SiteGetTopContainersAction implements
     Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
-    // This query has to initialise specimenPositions due to the
-    // tree adapter needing to know this to display additional menu selections
-    // when a right click is done on a container node.
-    //
-    // Also has to initialize containerType.childContainerTypes to support
-    // container drag and drop.
-    //
-    // @formatter:off
+    // only select top-level/ Container-s
     @SuppressWarnings("nls")
-    private static final String SELECT_TOP_CONTAINERS_HQL = 
+    private static final String SELECT_TOP_CONTAINERS_HQL =
         "SELECT container"
             + " FROM " + Container.class.getName() + " container"
-            + " INNER JOIN FETCH container.containerType containerType"
-            + " LEFT JOIN FETCH containerType.childContainerTypes"
-            + " INNER JOIN FETCH container.site site"
-            + " LEFT JOIN FETCH container.specimenPositions"
             + " WHERE site.id = ?"
-            + " AND containerType.topLevel IS TRUE"; // only select top-level
-                                                     // Container-s
-    // @formatter:on
+            + " AND containerType.topLevel IS TRUE";
 
     private final Integer siteId;
 
@@ -66,6 +54,22 @@ public class SiteGetTopContainersAction implements
         List<Container> results = query.list();
         if (results != null) {
             topContainers.addAll(results);
+
+            for (Container c : results) {
+                c.getSite().getName();
+
+                // need to initialize containerType.childContainerTypes to
+                // support container drag and drop.
+                for (ContainerType ct : c.getContainerType()
+                    .getChildContainerTypes()) {
+                    ct.getName();
+                }
+
+                // specimenPositions have to be initialized due to the
+                // tree adapter needing to know this to display additional menu
+                // selections when a right click is done on a container node.
+                c.getSpecimenPositions().size();
+            }
         }
 
         return new ListResult<Container>(topContainers);

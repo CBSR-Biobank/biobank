@@ -277,7 +277,7 @@ public class FreezerLinkImport {
                 throw new Exception("inventory id " + bbpdbSpcInfo
                     .getInventoryId() + " is in the database multiple times");
             } else if (specimenIds.size() == 1) {
-                log.debug("inventory id {} is already in the database",
+                log.trace("inventory id {} is already in the database",
                     bbpdbSpcInfo.getInventoryId());
             } else {
                 processSpecimensToAdd(bbpdbSpcInfo);
@@ -351,9 +351,10 @@ public class FreezerLinkImport {
             study.getId(), Arrays.asList(aqSpcInfo)));
 
         log.info(
-            "inventory id {} was added to source specimen '{}' for patient {}",
+            "inventory_id={} spc_type=\"{}\" source_specimen=\"{}\" date_taken={} patient={}",
             new Object[] { bbpdbSpcInfo.getInventoryId(),
-                bbSourceSpecimen.getInventoryId(),
+                bbSpecimenType.getName(), bbSourceSpecimen.getInventoryId(),
+                bbSourceSpecimen.getCreatedAt(),
                 bbSourceSpecimen.getCollectionEvent().getPatient().getPnumber() });
     }
 }

@@ -199,6 +199,8 @@ End:
         <include name="jta-1.1.jar" />
         <include name="sdk-core.jar" />
         <include name="sdk-writable-core.jar" />
+        <include name="SuperCSV-1.52.jar" />
+        <include name="spiffy-all-0.05.jar" />
       </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
@@ -233,8 +235,6 @@ End:
         <include name="mailapi.jar" />
         <include name="messages.jar" />
         <include name="smtp.jar" />
-        <include name="spiffy-all-0.05.jar" />
-        <include name="SuperCSV-1.52.jar" />
       </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
@@ -242,8 +242,6 @@ End:
         <include name="commons-io-1.4.jar" />
         <include name="jargs.jar" />
         <include name="mysql-connector-java-5.1.15-bin.jar" />
-        <include name="spiffy-all-0.05.jar" />
-        <include name="SuperCSV-1.52.jar" />
       </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">

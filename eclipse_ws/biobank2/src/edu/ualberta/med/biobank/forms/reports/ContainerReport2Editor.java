@@ -148,7 +148,7 @@ public class ContainerReport2Editor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getPrintParams() throws Exception {
+    protected List<Object> getPrintParams() {
         List<Object> params = new ArrayList<Object>();
         params.add(containerLabel.getText());
         params.add(topContainers.getSelectedContainerNames());

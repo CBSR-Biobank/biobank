@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.i18n;
 
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+
 /**
  * 
  * @author Jonathan Ferland
  */
-public class LocalizedException extends RuntimeException
+public class LocalizedException extends ActionException
     implements HasLocalizedString {
     private static final long serialVersionUID = 1L;
 

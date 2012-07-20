@@ -50,7 +50,7 @@ public class BgcBaseWidget extends Composite {
     private void adaptAllChildren(Composite container, FormToolkit toolkit) {
         Control[] children = container.getChildren();
         for (Control aChild : children) {
-            toolkit.adapt(aChild, true, true);
+            toolkit.adapt(aChild, true, false);
             if (aChild instanceof Composite) {
                 adaptAllChildren((Composite) aChild, toolkit);
             }

@@ -5,11 +5,12 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.EventAttrType;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.EventAttrType;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class EventAttrTypeBaseWrapper extends ModelWrapper<EventAttrType> {
 

@@ -65,7 +65,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
     @Override
     public void reload(List<SpecimenInfo> specimens) {
         super.reload(specimens);
-        specimensAdded.setValue(currentSpecimens.size() > 0);
+        specimensAdded.setValue(getList().size() > 0);
     }
 
     public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo si,
@@ -74,7 +74,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         final Date defaultTimeDrawn) {
         NewListener newListener = null;
         List<String> inventoryIdExcludeList = new ArrayList<String>();
-        for (SpecimenInfo sp : currentSpecimens) {
+        for (SpecimenInfo sp : getList()) {
             inventoryIdExcludeList.add(sp.specimen.getInventoryId());
         }
         if (add) {
@@ -86,9 +86,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                     spec.specimen.setOriginalCollectionEvent(cEvent);
                     spec.specimen.setCurrentCenter(SessionManager.getUser()
                         .getCurrentWorkingCenter().getWrappedObject());
-                    currentSpecimens.add(spec);
+                    getList().add(spec);
                     specimensAdded.setValue(true);
-                    reloadCollection(currentSpecimens);
                     notifyListeners();
                 }
             };
@@ -103,8 +102,6 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
-
-            reloadCollection(currentSpecimens);
             notifyListeners();
         }
     }
@@ -142,9 +139,8 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                                     si.specimen.getInventoryId()))) {
                             return;
                         }
-                        currentSpecimens.remove(si);
-                        setList(currentSpecimens);
-                        if (currentSpecimens.size() == 0) {
+                        getList().remove(si);
+                        if (getList().size() == 0) {
                             specimensAdded.setValue(false);
                         }
                         notifyListeners();

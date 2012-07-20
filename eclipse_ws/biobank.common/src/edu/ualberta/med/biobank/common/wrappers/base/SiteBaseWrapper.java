@@ -4,21 +4,19 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
-import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import java.util.Arrays;
+import edu.ualberta.med.biobank.model.Site;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class SiteBaseWrapper extends CenterWrapper<Site> {
 

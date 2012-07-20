@@ -229,7 +229,7 @@ public abstract class DispatchSpecimenListInfoTable extends
         if (dsaList == null) {
             dsaList = new ArrayList<DispatchSpecimenWrapper>();
         }
-        reloadCollection(dsaList);
+        setList(dsaList);
     }
 
     @Override

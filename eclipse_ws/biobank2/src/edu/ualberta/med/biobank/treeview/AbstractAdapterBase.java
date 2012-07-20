@@ -537,13 +537,7 @@ public abstract class AbstractAdapterBase implements
             if (clazz.isAssignableFrom(searchedClass)) {
                 List<AbstractAdapterBase> res =
                     new ArrayList<AbstractAdapterBase>();
-                AbstractAdapterBase child = null;
-                // if (Date.class.isAssignableFrom(clazz))
-                // child = getChild((int) ((Date) searchedObject).getTime());
-                // else if (Integer.class.isAssignableFrom(clazz))
-                // child = getChild(((Integer) searchedObject).intValue());
-                // else
-                child = getChild(objectId, true);
+                AbstractAdapterBase child = getChild(objectId, true);
                 if (child != null) {
                     res.add(child);
                 }

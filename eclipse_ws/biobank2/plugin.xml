@@ -361,7 +361,7 @@
             <and>
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.studyCreatePermission">
-               </reference> 
+               </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
@@ -429,7 +429,7 @@
             <and>
                <reference
                      definitionId="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
-               </reference> 
+               </reference>
                <reference
                      definitionId="biobank.mainPerspectiveSelected">
                </reference>
@@ -519,29 +519,16 @@
         <handler
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
-         <activeWhen>
-            <and>
-              <reference
-                    definitionId="biobank.processingPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="edu.ualberta.med.biobank.gui.common.patientMergePermission">
-              </reference>
-            </and>
-         </activeWhen>
+          <activeWhen>
+              <reference definitionId="biobank.processingPerspectiveSelected" />
+          </activeWhen>
           <enabledWhen>
             <and>
-               <reference
-                     definitionId="biobank.oneElementSelected">
+               <reference definitionId="biobank.oneElementSelected">
                </reference>
-			   <with
-                  variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
-                     </instanceof>
+			   <with variable="selection">
+                  <iterate ifEmpty="false" operator="or">
+                      <test property="edu.ualberta.med.biobank.propertyTester.patientmerge.canMerge" />
                   </iterate>
           	  </with>
             </and>
@@ -566,17 +553,16 @@
                   </or>
                </not>
                <reference
-                     definitionId="biobank.hasWorkingCenter">
+                     definitionId="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
                </reference>
             </and>
          </enabledWhen>
       </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
+      <handler class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
          <activeWhen>
-              <reference definitionId="edu.ualberta.med.biobank.gui.common.collectionEventCreatePermission">
-               </reference>
+              <reference definitionId="biobank.processingPerspectiveSelected">
+              </reference>
          </activeWhen>
          <enabledWhen>
             <and>
@@ -584,8 +570,7 @@
                </reference>
 			   <with variable="selection">
                   <iterate ifEmpty="false" operator="or">
-                     <instanceof value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
-                     </instanceof>
+                     <test property="edu.ualberta.med.biobank.propertyTester.collectionevent.canCreate" />
                   </iterate>
           	  </with>
             </and>
@@ -604,16 +589,11 @@
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
          <enabledWhen>
             <and>
-               <reference
-                     definitionId="biobank.oneElementSelected">
+               <reference definitionId="biobank.oneElementSelected">
                </reference>
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <test
-                           property="edu.ualberta.med.biobank.treeview.canDelete">
+               <with variable="selection">
+                  <iterate ifEmpty="false" operator="or">
+                     <test property="edu.ualberta.med.biobank.treeview.canDelete">
                      </test>
                   </iterate>
                </with>
@@ -2146,41 +2126,24 @@
             </equals>
          </with>
       </definition>
-      <definition
-            id="biobank.oneElementSelected">
-         <with
-               variable="selection">
-            <count
-                  value="1">
-            </count>
+      <definition id="biobank.oneElementSelected">
+         <with variable="selection">
+            <count value="1" />
          </with>
       </definition>
-      <definition
-            id="biobank.editorDirty">
-         <with
-               variable="activeEditorId">
-            <test
-                  forcePluginActivation="true"
-                  property="dirty"
-                  value="true">
-            </test>
+      <definition id="biobank.editorDirty">
+         <with variable="activeEditorId">
+            <test forcePluginActivation="true" property="dirty" value="true" />
          </with>
       </definition>
-      <definition
-            id="biobank.confirmEnabled">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
-            <equals
-                  value="confirmEnabled">
-            </equals>
+      <definition id="biobank.confirmEnabled">
+         <with variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
+            <equals value="confirmEnabled" />
          </with>
       </definition>
-       <definition
-             id="biobank.hasWorkingCenter">
-          <with
-                variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
-             <equals
-                   value="true">
+       <definition id="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+          <with variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+             <equals value="true">
              </equals>
           </with>
        </definition>
@@ -2261,11 +2224,25 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
-            id="edu.ualberta.med.biobank.expressions.AdapterBasePropertyTester"
+            class="edu.ualberta.med.biobank.propertytester.AdapterBasePropertyTester"
+            id="edu.ualberta.med.biobank.propertyTester.AdapterBasePropertyTester"
             namespace="edu.ualberta.med.biobank.treeview"
             properties="canDelete"
             type="edu.ualberta.med.biobank.treeview.AbstractAdapterBase">
+      </propertyTester>
+      <propertyTester
+            class="edu.ualberta.med.biobank.propertytester.CollectionEventCanCreatePropertyTester"
+            id="edu.ualberta.med.biobank.propertytester.CollectionEventCanCreatePropertyTester"
+            namespace="edu.ualberta.med.biobank.propertyTester.collectionevent"
+            properties="canCreate"
+            type="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+      </propertyTester>
+      <propertyTester
+            class="edu.ualberta.med.biobank.propertytester.PatientMergeAllowedPropertyTester"
+            id="edu.ualberta.med.biobank.propertytester.PatientMergeAllowedPropertyTester"
+            namespace="edu.ualberta.med.biobank.propertyTester.patientmerge"
+            properties="canMerge"
+            type="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
       </propertyTester>
    </extension>
 </plugin>

@@ -13,6 +13,13 @@ import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 
+/**
+ * Used to allow the user to switch to the processing view. The processing view
+ * is only selectable if the user has selected a working center.
+ *
+ * @author Aaron.
+ *
+ */
 public class UserState extends AbstractSourceProvider {
 
     private static BgcLogger logger = BgcLogger.getLogger(UserState.class

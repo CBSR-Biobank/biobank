@@ -5,11 +5,12 @@
 package edu.ualberta.med.biobank.common.wrappers.base;
 
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+
 import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerLabelingSchemeBaseWrapper extends ModelWrapper<ContainerLabelingScheme> {
 

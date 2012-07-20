@@ -417,10 +417,11 @@ public class StudyWrapper extends StudyBaseWrapper {
         List<AliquotedSpecimenWrapper> studiesAliquotedTypes =
             new ArrayList<AliquotedSpecimenWrapper>();
         for (AliquotedSpecimen st : raw) {
-            AliquotedSpecimenWrapper type =
+            AliquotedSpecimenWrapper atype =
                 new AliquotedSpecimenWrapper(appService, st);
+            SpecimenTypeWrapper type = atype.getSpecimenType();
             if (authorizedTypes == null || authorizedTypes.contains(type)) {
-                studiesAliquotedTypes.add(type);
+                studiesAliquotedTypes.add(atype);
             }
         }
         return studiesAliquotedTypes;

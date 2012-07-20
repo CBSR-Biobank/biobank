@@ -4,18 +4,17 @@
 
 package edu.ualberta.med.biobank.common.wrappers.base;
 
+import java.util.Arrays;
 import java.util.List;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
-import java.util.Arrays;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RequestSpecimenBaseWrapper extends ModelWrapper<RequestSpecimen> {
 

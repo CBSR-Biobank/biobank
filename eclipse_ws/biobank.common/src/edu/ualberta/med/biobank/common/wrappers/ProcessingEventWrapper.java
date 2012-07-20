@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.DateUtil;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.ProcessingEventLogProvider;
@@ -33,7 +34,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     private static final ProcessingEventLogProvider LOG_PROVIDER =
         new ProcessingEventLogProvider();
-    private Set<SpecimenWrapper> removedSpecimens =
+    private final Set<SpecimenWrapper> removedSpecimens =
         new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
@@ -108,9 +109,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     public static List<ProcessingEventWrapper> getProcessingEventsWithDateForCenter(
         WritableApplicationService appService, Date date,
         CenterWrapper<?> center) throws Exception {
-        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
-            Arrays.asList(new Object[] { startOfDay(date), endOfDay(date),
-                center.getId() }));
+        HQLCriteria c =
+            new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
+                Arrays.asList(new Object[] { DateUtil.startOfDay(date),
+                    DateUtil.endOfDay(date),
+                    center.getId() }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws =
             new ArrayList<ProcessingEventWrapper>();
@@ -165,7 +168,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Deprecated
-    @SuppressWarnings("unchecked")
     @Override
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {
         if (getCenter() != null)

@@ -315,7 +315,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public boolean hasSpecimens() {
-        return !getSpecimens().isEmpty();
+        return !getContainerType().getSpecimenTypeCollection().isEmpty()
+            && !getSpecimens().isEmpty();
     }
 
     public SpecimenWrapper getSpecimen(Integer row, Integer col)
@@ -363,6 +364,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             return getLabel();
         }
         return getLabel() + " (" + getContainerType().getNameShort() + ")";
+    }
+
+    public static String getFullInfoLabel(Container c) {
+        if (c.getContainerType() == null
+            || c.getContainerType().getNameShort() == null) {
+            return c.getLabel();
+        }
+        return c.getLabel() + " (" + c.getContainerType().getNameShort() + ")";
     }
 
     public long getChildCount(boolean fast) throws BiobankException,

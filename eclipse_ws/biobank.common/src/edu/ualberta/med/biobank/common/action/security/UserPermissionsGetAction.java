@@ -7,13 +7,11 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction.UserCreatePermissions;
 import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
-import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchCreatePermission;
 import edu.ualberta.med.biobank.common.permission.labelPrinting.LabelPrintingPermission;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
-import edu.ualberta.med.biobank.common.permission.patient.PatientMergePermission;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCreatePermission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
@@ -65,11 +63,10 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             new UserManagerPermission().isAllowed(context);
         p.labelPrintingPermission = new LabelPrintingPermission()
             .isAllowed(context);
+        p.patientCreatePermission =
+            new PatientCreatePermission(null).isAllowed(context);
 
         if (centerId != null) {
-            p.collectionEventCreatePermission =
-                new CollectionEventCreatePermission(centerId)
-                    .isAllowed(context);
             p.containerCreatePermission =
                 new ContainerCreatePermission(centerId).isAllowed(context);
             p.containerTypeCreatePermission =
@@ -78,10 +75,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
                 new DispatchCreatePermission(centerId).isAllowed(context);
             p.originInfoUpdatePermission =
                 new OriginInfoUpdatePermission(centerId).isAllowed(context);
-            p.patientCreatePermission =
-                new PatientCreatePermission(centerId).isAllowed(context);
-            p.patientMergePermission =
-                new PatientMergePermission(centerId, null).isAllowed(context);
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(centerId)
                     .isAllowed(context);
@@ -98,7 +91,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         private static final long serialVersionUID = 1L;
 
         private boolean clinicCreatePermission;
-        private boolean collectionEventCreatePermission;
         private boolean containerCreatePermission;
         private boolean containerTypeCreatePermission;
         private boolean dispatchCreatePermission;
@@ -122,10 +114,6 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
 
         public boolean isClinicCreatePermission() {
             return clinicCreatePermission;
-        }
-
-        public boolean isCollectionEventCreatePermission() {
-            return collectionEventCreatePermission;
         }
 
         public boolean isContainerCreatePermission() {

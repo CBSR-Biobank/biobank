@@ -9,20 +9,25 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-
-import edu.ualberta.med.biobank.common.util.StringUtil;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 // FIXME see code commented below. Need to know what is still needed for the new adapters
 public abstract class NewAbstractSearchedNode extends AbstractNewAdapterBase {
 
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractSearchedNode.class);
+
+    @SuppressWarnings("nls")
     public NewAbstractSearchedNode(AbstractAdapterBase parent, int id) {
-        super(parent, id, StringUtil.EMPTY_STRING, null, false);
+        super(parent, id, i18n.tr("Searched"), null, false);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         MenuItem mi = new MenuItem(menu, SWT.PUSH);
-        mi.setText(StringUtil.EMPTY_STRING);
+        mi.setText(i18n.tr("Clear"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {

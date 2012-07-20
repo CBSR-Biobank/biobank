@@ -26,7 +26,10 @@ public class DateNode extends AdapterBase {
     @Override
     public List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId) {
-        return findChildFromClass(searchedClass, objectId, ClinicWrapper.class);
+        if (searchedClass.equals(ClinicWrapper.class))
+            return findChildFromClass(searchedClass, objectId,
+                ClinicWrapper.class);
+        return searchChildren(searchedClass, objectId);
     }
 
     @Override

@@ -4,6 +4,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 
 public class ShippingMethodSaveAction implements Action<IdResult> {
@@ -22,14 +23,15 @@ public class ShippingMethodSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return true;
+        return new GlobalAdminPermission().isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        ShippingMethod sm = new ShippingMethod();
-        sm.setId(id);
+        ShippingMethod sm =
+            context.load(ShippingMethod.class, id, new ShippingMethod());
         sm.setName(name);
-        return new IdResult((Integer) context.getSession().save(sm));
+        context.getSession().saveOrUpdate(sm);
+        return new IdResult(sm.getId());
     }
 }

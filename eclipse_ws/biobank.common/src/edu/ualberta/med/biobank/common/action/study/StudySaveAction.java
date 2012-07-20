@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -279,7 +280,7 @@ public class StudySaveAction implements Action<IdResult> {
             if (contactStudies.remove(study)) {
                 contact.setStudies(contactStudies);
             } else {
-                throw new ActionException(
+                throw new LocalizedException(
                     REMOVED_CONTACT_MISSING_STUDY.format(study.getNameShort()));
             }
         }
@@ -353,7 +354,7 @@ public class StudySaveAction implements Action<IdResult> {
         Set<StudyEventAttr> newEAttrCollection = new HashSet<StudyEventAttr>();
         for (StudyEventAttrSaveInfo eAttrSaveInfo : studyEventAttrSaveInfos) {
             if (geAttrIdsUsed.contains(eAttrSaveInfo.globalEventAttrId)) {
-                throw new ActionException(STUDY_EVEN_ATTRS_SHARE_ID.format(
+                throw new LocalizedException(STUDY_EVEN_ATTRS_SHARE_ID.format(
                     eAttrSaveInfo.globalEventAttrId));
             }
             StudyEventAttr seAttr;

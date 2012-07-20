@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 
@@ -40,7 +41,7 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
         if (DispatchState.CREATION == ship.getState()) {
             context.getSession().delete(ship);
         } else {
-            throw new ActionException(CREATION_ONLY_ERRMSG);
+            throw new LocalizedException(CREATION_ONLY_ERRMSG);
         }
 
         return new EmptyResult();

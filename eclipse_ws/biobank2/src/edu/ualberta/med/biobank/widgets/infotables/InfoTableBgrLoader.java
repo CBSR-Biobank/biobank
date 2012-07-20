@@ -51,12 +51,16 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
     public synchronized void setList(final List<T> list, final T selection) {
         if (list == null) return;
 
-        final ListUpdater updater = new ListUpdater(list, selection);
-        final Thread previousThread = this.previousThread;
-
         // set the list here, which sets the delegate, so events fired by the
         // delegate can be properly paid attention to or ignored.
         super.setList(list);
+        updateList(list, selection);
+    }
+
+    private void updateList(List<T> list, T selection) {
+
+        final ListUpdater updater = new ListUpdater(list, selection);
+        final Thread previousThread = this.previousThread;
 
         resizeTable();
 
@@ -107,7 +111,8 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                             showPaginationWidget();
                             paginationWidget.setPageLabelText();
                             enablePaginationWidget(false);
-                        } else if (paginationWidget != null) {
+                        } else if (paginationWidget != null
+                            && !paginationWidget.isDisposed()) {
                             paginationWidget.setVisible(false);
                         }
 
@@ -175,6 +180,7 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
                     List<T> list = getList();
                     init(list);
                     setPaginationParams(list);
+                    updateList(list, null);
                 } finally {
                     ignoreEvents = false;
                 }
