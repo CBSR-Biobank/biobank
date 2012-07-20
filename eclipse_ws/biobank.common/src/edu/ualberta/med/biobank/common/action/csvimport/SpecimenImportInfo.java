@@ -57,7 +57,7 @@ public class SpecimenImportInfo {
             throw new IllegalStateException("parentInfo is null");
         }
         this.parentInfo = parentInfo;
-        log.debug("setting parent info for specimen {} to {}",
+        log.trace("setting parent info for specimen {} to {}",
             csvInfo.getInventoryId(), parentInfo.csvInfo.getInventoryId());
     }
 
@@ -192,7 +192,7 @@ public class SpecimenImportInfo {
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
 
-        log.debug("created processing event: worksheet={} parentSpc={}",
+        log.trace("created processing event: worksheet={} parentSpc={}",
             csvInfo.getWorksheet(), csvInfo.getInventoryId());
 
         return getPevent();
@@ -251,7 +251,7 @@ public class SpecimenImportInfo {
                 specimenPos);
         }
 
-        log.debug("creating specimen: pt={} v#={} invId={} isParent={}",
+        log.trace("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
