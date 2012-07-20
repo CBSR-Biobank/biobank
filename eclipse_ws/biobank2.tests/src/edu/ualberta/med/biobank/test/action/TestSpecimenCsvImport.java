@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +16,7 @@ import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
+import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
@@ -66,12 +69,13 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
+        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+
         try {
-            Set<SpecimenCsvInfo> csvInfo =
-                SpecimenCsvHelper.createAllSpecimens(
-                    factory.getDefaultStudy(), factory.getDefaultClinic(),
-                    factory.getDefaultSite(), patients);
-            SpecimenCsvWriter.write(CSV_NAME, csvInfo);
+            csvInfos = SpecimenCsvHelper.createAllSpecimens(
+                factory.getDefaultStudy(), factory.getDefaultClinic(),
+                factory.getDefaultSite(), patients);
+            SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
@@ -80,6 +84,8 @@ public class TestSpecimenCsvImport extends ActionTest {
             showErrorsInLog(e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     @Test
@@ -98,12 +104,13 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
+        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+
         try {
             // make sure you can add parent specimens without a worksheet #
-            Set<SpecimenCsvInfo> csvInfos =
-                SpecimenCsvHelper.sourceSpecimensCreate(factory
-                    .getDefaultClinic(), factory.getDefaultSite(), patients,
-                    factory.getDefaultStudy().getSourceSpecimens());
+            csvInfos = SpecimenCsvHelper.sourceSpecimensCreate(factory
+                .getDefaultClinic(), factory.getDefaultSite(), patients,
+                factory.getDefaultStudy().getSourceSpecimens());
 
             // remove the worksheet # for the last half
             int half = csvInfos.size() / 2;
@@ -124,6 +131,8 @@ public class TestSpecimenCsvImport extends ActionTest {
             showErrorsInLog(e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     /*
@@ -161,12 +170,13 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
+        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+
         try {
-            Set<SpecimenCsvInfo> csvInfo =
-                SpecimenCsvHelper.createAliquotedSpecimens(
-                    factory.getDefaultStudy(), factory.getDefaultClinic(),
-                    factory.getDefaultSite(), parentSpecimens);
-            SpecimenCsvWriter.write(CSV_NAME, csvInfo);
+            csvInfos = SpecimenCsvHelper.createAliquotedSpecimens(
+                factory.getDefaultStudy(), factory.getDefaultClinic(),
+                factory.getDefaultSite(), parentSpecimens);
+            SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
@@ -175,6 +185,8 @@ public class TestSpecimenCsvImport extends ActionTest {
             showErrorsInLog(e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     @Test
@@ -213,7 +225,47 @@ public class TestSpecimenCsvImport extends ActionTest {
         } catch (Exception e) {
             Assert.fail("could not import data");
         }
+    }
 
+    private void checkCsvInfoAgainstDb(Set<SpecimenCsvInfo> csvInfos) {
+        for (SpecimenCsvInfo csvInfo : csvInfos) {
+            Criteria c = session.createCriteria(Specimen.class, "p")
+                .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()));
+
+            Specimen specimen = (Specimen) c.uniqueResult();
+            Assert.assertEquals(csvInfo.getSpecimenType(),
+                specimen.getSpecimenType().getName());
+            Assert.assertEquals(0, DateCompare.compare(csvInfo.getCreatedAt(),
+                specimen.getCreatedAt()));
+            Assert.assertEquals(csvInfo.getPatientNumber(), specimen
+                .getCollectionEvent().getPatient().getPnumber());
+
+            Assert.assertNotNull(specimen.getCollectionEvent());
+            Assert.assertEquals(csvInfo.getVisitNumber(), specimen
+                .getCollectionEvent().getVisitNumber());
+
+            Assert.assertEquals(csvInfo.getCurrentCenter(), specimen
+                .getCurrentCenter().getName());
+            Assert.assertEquals(csvInfo.getOriginCenter(), specimen
+                .getOriginInfo().getCenter().getName());
+
+            if (csvInfo.getSourceSpecimen()) {
+                Assert.assertNotNull(specimen.getOriginalCollectionEvent());
+
+                if ((csvInfo.getWorksheet() != null)
+                    && !csvInfo.getWorksheet().isEmpty()) {
+                    Assert.assertNotNull(specimen.getProcessingEvent());
+                    Assert.assertEquals(csvInfo.getWorksheet(), specimen
+                        .getProcessingEvent().getWorksheet());
+                }
+            } else {
+                Assert.assertEquals(csvInfo.getParentInventoryId(),
+                    specimen.getParentSpecimen().getInventoryId());
+                Assert.assertNull(specimen.getOriginalCollectionEvent());
+                Assert.assertNotNull(specimen.getParentSpecimen()
+                    .getProcessingEvent());
+            }
+        }
     }
 
     private void showErrorsInLog(CsvImportException e) {
