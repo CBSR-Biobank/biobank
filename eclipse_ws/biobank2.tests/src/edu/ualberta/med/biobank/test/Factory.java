@@ -508,6 +508,7 @@ public class Factory {
         sourceSpecimen.setStudy(getDefaultStudy());
         sourceSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
+        getDefaultStudy().getSourceSpecimens().add(sourceSpecimen);
         setDefaultSourceSpecimen(sourceSpecimen);
         session.save(sourceSpecimen);
         session.flush();
@@ -521,6 +522,7 @@ public class Factory {
         aliquotedSpecimen.setQuantity(1);
         aliquotedSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
+        getDefaultStudy().getAliquotedSpecimens().add(aliquotedSpecimen);
         setDefaultAliquotedSpecimen(aliquotedSpecimen);
         session.save(aliquotedSpecimen);
         session.flush();
@@ -757,6 +759,7 @@ public class Factory {
     public Specimen createParentSpecimen() {
         Specimen parentSpecimen = createSpecimen();
         parentSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
+
         CollectionEvent cevent = getDefaultCollectionEvent();
         parentSpecimen.setOriginalCollectionEvent(cevent);
         cevent.getOriginalSpecimens().add(parentSpecimen);
@@ -850,10 +853,10 @@ public class Factory {
         // set to generate a sensible default visit number.
         Patient patient = getDefaultPatient();
         collectionEvent.setPatient(patient);
-        patient.getCollectionEvents().add(collectionEvent);
 
         int numCEs = patient.getCollectionEvents().size();
         collectionEvent.setVisitNumber(numCEs + 1);
+        patient.getCollectionEvents().add(collectionEvent);
 
         setDefaultCollectionEvent(collectionEvent);
         session.save(collectionEvent);

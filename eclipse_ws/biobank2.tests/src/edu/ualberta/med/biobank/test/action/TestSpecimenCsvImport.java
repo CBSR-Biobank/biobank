@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
 
@@ -87,13 +88,18 @@ public class TestSpecimenCsvImport extends ActionTest {
         }
     }
 
+    @Test
+    public void onlyParentSpecimensInCsv() throws Exception {
+        // make sure you can add parent specimens without a worksheet #
+    }
+
     /*
      * Test if we can import aliquoted specimens only.
      * 
      * The CSV file has no positions here.
      */
     @Test
-    public void noSourceSpecimensInCsv() throws Exception {
+    public void onlyChildSpecimensInCsv() throws Exception {
         Transaction tx = session.beginTransaction();
         // the site name comes from the CSV file
         Center center = factory.createSite();
@@ -101,17 +107,22 @@ public class TestSpecimenCsvImport extends ActionTest {
         Study study = factory.createStudy();
 
         Set<Patient> patients = new HashSet<Patient>();
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
-        // create 2 source specimens
-        factory.createSourceSpecimen();
-        factory.createSpecimenType();
-        factory.createSourceSpecimen();
-        factory.createSpecimenType();
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
 
-        factory.createParentSpecimen();
+            // create 3 source specimens and parent specimens
+            for (int j = 0; j < 3; j++) {
+                factory.createSourceSpecimen();
+                Specimen parentSpecimen = factory.createParentSpecimen();
+                parentSpecimen.setProcessingEvent(factory
+                    .createProcessingEvent());
+                parentSpecimens.add(parentSpecimen);
+            }
+        }
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
@@ -125,7 +136,7 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         try {
             csvHelper.createAliquotedSpecimensCsv(CSV_NAME, study, clinic,
-                center, null);
+                center, parentSpecimens);
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);

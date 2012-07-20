@@ -229,11 +229,18 @@ public class SpecimenImportInfo {
             specimen.setOriginalCollectionEvent(cevent);
             cevent.getOriginalSpecimens().add(specimen);
         } else {
-            if (parentInfo.pevent == null) {
-                throw new IllegalStateException(
-                    "parent specimen pevent is null");
+            ProcessingEvent pevent;
+
+            if (parentSpecimen != null) {
+                pevent = parentSpecimen.getProcessingEvent();
+            } else {
+                if (parentInfo.pevent == null) {
+                    throw new IllegalStateException(
+                        "parent specimen pevent is null");
+                }
+                pevent = parentInfo.pevent;
             }
-            parentInfo.pevent.getSpecimens().add(specimen);
+            pevent.getSpecimens().add(specimen);
             SpecimenActionHelper.setParent(specimen, parentSpecimen);
             SpecimenActionHelper.setQuantityFromType(specimen);
         }
@@ -244,11 +251,12 @@ public class SpecimenImportInfo {
                 specimenPos);
         }
 
-        log.trace("creating specimen: pt={} v#={} invId={}",
+        log.debug("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
-                csvInfo.getInventoryId()
+                csvInfo.getInventoryId(),
+                specimen.getOriginalCollectionEvent() != null
             });
 
         return specimen;
