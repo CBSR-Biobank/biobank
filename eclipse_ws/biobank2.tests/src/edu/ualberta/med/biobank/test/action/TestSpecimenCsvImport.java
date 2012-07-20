@@ -21,9 +21,11 @@ import edu.ualberta.med.biobank.common.action.exception.CsvImportException.Impor
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
@@ -244,7 +246,7 @@ public class TestSpecimenCsvImport extends ActionTest {
         sourceSpecimens.add(factory.createSourceSpecimen());
 
         // create a new specimen type for the aliquoted specimens
-        factory.createSpecimenType();
+        SpecimenType aqSpecimenType = factory.createSpecimenType();
         Set<AliquotedSpecimen> aliquotedSpecimens =
             new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
@@ -253,6 +255,14 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         factory.createTopContainer();
         factory.createParentContainer();
+
+        // need to add the aliquoted specimen type to the valid specimen types
+        // for these containers' container types
+        ContainerType ctype = factory.createContainerType();
+        ctype.getChildContainerTypes().clear();
+        ctype.getSpecimenTypes().clear();
+        ctype.getSpecimenTypes().add(aqSpecimenType);
+
         Container[] childL2Containers = new Container[] {
             factory.createContainer(),
             factory.createContainer(),
@@ -266,12 +276,20 @@ public class TestSpecimenCsvImport extends ActionTest {
             factory.getDefaultStudy(), factory.getDefaultClinic(),
             factory.getDefaultSite(), patients);
 
-        List<SpecimenCsvInfo> csvInfosList =
-            new ArrayList<SpecimenCsvInfo>(csvInfos);
+        // only the aliquoted specimens will have a position
+        List<SpecimenCsvInfo> aliquotedSpecimensCsvInfos =
+            new ArrayList<SpecimenCsvInfo>();
+
+        for (SpecimenCsvInfo csvInfo : csvInfos) {
+            if (csvInfo.getSourceSpecimen()) continue;
+            aliquotedSpecimensCsvInfos.add(csvInfo);
+        }
 
         // fill as many containers as space will allow
         int count = 0;
         for (Container container : childL2Containers) {
+            ctype = container.getContainerType();
+
             int maxRows =
                 container.getContainerType().getCapacity().getRowCapacity();
             int maxCols =
@@ -279,17 +297,16 @@ public class TestSpecimenCsvImport extends ActionTest {
 
             for (int r = 0; r < maxRows; ++r) {
                 for (int c = 0; c < maxCols; ++c) {
-                    if (count >= csvInfosList.size()) break;
+                    if (count >= aliquotedSpecimensCsvInfos.size()) break;
 
-                    SpecimenCsvInfo csvInfo = csvInfosList.get(count);
+                    SpecimenCsvInfo csvInfo =
+                        aliquotedSpecimensCsvInfos.get(count);
                     RowColPos pos = new RowColPos(r, c);
-                    csvInfo.setPalletPosition(container.getContainerType()
-                        .getPositionString(pos));
+                    csvInfo.setPalletPosition(ctype.getPositionString(pos));
                     csvInfo.setPalletLabel(container.getLabel());
                     csvInfo.setPalletProductBarcode(container
                         .getProductBarcode());
-                    csvInfo.setRootContainerType(container.getContainerType()
-                        .getNameShort());
+                    csvInfo.setRootContainerType(ctype.getNameShort());
 
                     count++;
                 }
@@ -347,6 +364,15 @@ public class TestSpecimenCsvImport extends ActionTest {
                 Assert.assertNull(specimen.getOriginalCollectionEvent());
                 Assert.assertNotNull(specimen.getParentSpecimen()
                     .getProcessingEvent());
+            }
+
+            if ((csvInfo.getPalletPosition() != null)
+                && !csvInfo.getPalletPosition().isEmpty()) {
+                Assert.assertEquals(csvInfo.getPalletPosition(),
+                    specimen.getSpecimenPosition().getPositionString());
+                Assert.assertEquals(csvInfo.getPalletLabel(),
+                    specimen.getSpecimenPosition().getContainer().getLabel());
+
             }
         }
     }
