@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
 
+@SuppressWarnings("nls")
 public class TestSpecimenCsvImport extends ActionTest {
 
     private static Logger log = LoggerFactory

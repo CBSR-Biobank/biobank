@@ -60,11 +60,13 @@ public class Factory {
     private Clinic defaultClinic;
     private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
-    private SpecimenType defaultSpecimenType;
+    private SpecimenType defaultSourceSpecimenType;
+    private SpecimenType defaultAliquotedSpecimenType;
     private Container defaultTopContainer;
     private Container defaultParentContainer;
     private Container defaultContainer;
-    private Specimen defaultSpecimen;
+    private Specimen defaultParentSpecimen;
+    private Specimen defaultChildSpecimen;
     private ContainerLabelingScheme defaultContainerLabelingScheme;
     private Capacity defaultCapacity = new Capacity(5, 5);
     private Study defaultStudy;
@@ -139,12 +141,16 @@ public class Factory {
 
     public void setDefaultSourceSpecimen(SourceSpecimen defaultSourceSpecimen) {
         this.defaultSourceSpecimen = defaultSourceSpecimen;
+        this.defaultSourceSpecimenType =
+            defaultSourceSpecimen.getSpecimenType();
     }
 
     public AliquotedSpecimen getDefaultAliquotedSpecimen() {
         if (defaultAliquotedSpecimen == null) {
             defaultAliquotedSpecimen = createAliquotedSpecimen();
         }
+        this.defaultAliquotedSpecimenType =
+            defaultAliquotedSpecimen.getSpecimenType();
         return defaultAliquotedSpecimen;
     }
 
@@ -413,26 +419,48 @@ public class Factory {
         this.defaultCapacity = defaultCapacity;
     }
 
-    public SpecimenType getDefaultSpecimenType() {
-        if (defaultSpecimenType == null) {
-            defaultSpecimenType = createSpecimenType();
+    public SpecimenType getDefaultSourceSpecimenType() {
+        if (defaultSourceSpecimenType == null) {
+            defaultSourceSpecimenType = createSpecimenType();
         }
-        return defaultSpecimenType;
+        return defaultSourceSpecimenType;
     }
 
-    public void setDefaultSpecimenType(SpecimenType defaultSpecimenType) {
-        this.defaultSpecimenType = defaultSpecimenType;
+    public void setDefaultSourceSpecimenType(SpecimenType defaultSpecimenType) {
+        this.defaultSourceSpecimenType = defaultSpecimenType;
     }
 
-    public Specimen getDefaultSpecimen() {
-        if (defaultSpecimen == null) {
-            defaultSpecimen = createSpecimen();
+    public SpecimenType getDefaultAliquotedSpecimenType() {
+        if (defaultAliquotedSpecimenType == null) {
+            defaultAliquotedSpecimenType = createSpecimenType();
         }
-        return defaultSpecimen;
+        return defaultAliquotedSpecimenType;
     }
 
-    public void setDefaultSpecimen(Specimen defaultSpecimen) {
-        this.defaultSpecimen = defaultSpecimen;
+    public void setDefaultAliquotedSpecimenType(SpecimenType defaultSpecimenType) {
+        this.defaultAliquotedSpecimenType = defaultSpecimenType;
+    }
+
+    public Specimen getDefaultParentSpecimen() {
+        if (defaultParentSpecimen == null) {
+            defaultParentSpecimen = createSpecimen();
+        }
+        return defaultParentSpecimen;
+    }
+
+    public void setDefaultParentSpecimen(Specimen defaultSpecimen) {
+        this.defaultParentSpecimen = defaultSpecimen;
+    }
+
+    public Specimen getDefaultChildSpecimen() {
+        if (defaultChildSpecimen == null) {
+            defaultChildSpecimen = createSpecimen();
+        }
+        return defaultChildSpecimen;
+    }
+
+    public void setDefaultChildSpecimen(Specimen defaultSpecimen) {
+        this.defaultChildSpecimen = defaultSpecimen;
     }
 
     public Comment createComment() {
@@ -478,7 +506,7 @@ public class Factory {
     public SourceSpecimen createSourceSpecimen() {
         SourceSpecimen sourceSpecimen = new SourceSpecimen();
         sourceSpecimen.setStudy(getDefaultStudy());
-        sourceSpecimen.setSpecimenType(getDefaultSpecimenType());
+        sourceSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
         setDefaultSourceSpecimen(sourceSpecimen);
         session.save(sourceSpecimen);
@@ -491,7 +519,7 @@ public class Factory {
         aliquotedSpecimen.setStudy(getDefaultStudy());
         aliquotedSpecimen.setVolume(new BigDecimal("1.00"));
         aliquotedSpecimen.setQuantity(1);
-        aliquotedSpecimen.setSpecimenType(getDefaultSpecimenType());
+        aliquotedSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
         setDefaultAliquotedSpecimen(aliquotedSpecimen);
         session.save(aliquotedSpecimen);
@@ -707,7 +735,7 @@ public class Factory {
         specimenType.setName(name);
         specimenType.setNameShort(name);
 
-        setDefaultSpecimenType(specimenType);
+        setDefaultSourceSpecimenType(specimenType);
         session.save(specimenType);
         session.flush();
         return specimenType;
@@ -718,27 +746,58 @@ public class Factory {
 
         Specimen specimen = new Specimen();
         specimen.setInventoryId(name);
-        specimen.setSpecimenType(getDefaultSpecimenType());
         specimen.setCurrentCenter(getDefaultSite());
         specimen.setCollectionEvent(getDefaultCollectionEvent());
         specimen.setOriginInfo(getDefaultOriginInfo());
         specimen.setCreatedAt(new Date());
 
-        setDefaultSpecimen(specimen);
-        session.save(specimen);
-        session.flush();
         return specimen;
     }
 
-    /*
-     * public Specimen createParentSpecimen() {
-     * 
-     * }
-     * 
-     * public Specimen createChildSpecimen() {
-     * 
-     * }
-     */
+    public Specimen createParentSpecimen() {
+        Specimen parentSpecimen = createSpecimen();
+        parentSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
+        CollectionEvent cevent = getDefaultCollectionEvent();
+        parentSpecimen.setOriginalCollectionEvent(cevent);
+        cevent.getOriginalSpecimens().add(parentSpecimen);
+        cevent.getAllSpecimens().add(parentSpecimen);
+
+        session.save(parentSpecimen);
+        session.flush();
+
+        setDefaultParentSpecimen(parentSpecimen);
+        return parentSpecimen;
+    }
+
+    public Specimen createChildSpecimen() {
+        Specimen childSpecimen = createSpecimen();
+        childSpecimen.setSpecimenType(getDefaultAliquotedSpecimenType());
+
+        Specimen parentSpecimen = getDefaultParentSpecimen();
+        childSpecimen.setParentSpecimen(parentSpecimen);
+        childSpecimen.setCollectionEvent(parentSpecimen.getCollectionEvent());
+
+        Specimen topSpecimen = parentSpecimen.getTopSpecimen();
+        if (topSpecimen != null) {
+            childSpecimen.setTopSpecimen(topSpecimen);
+        } else {
+            childSpecimen.setTopSpecimen(parentSpecimen);
+        }
+
+        ProcessingEvent pevent = getDefaultProcessingEvent();
+        parentSpecimen.setProcessingEvent(pevent);
+        pevent.getSpecimens().add(childSpecimen);
+
+        childSpecimen.setQuantity(getDefaultAliquotedSpecimen().getVolume());
+        parentSpecimen.getCollectionEvent().getAllSpecimens()
+            .add(childSpecimen);
+
+        session.save(childSpecimen);
+        session.flush();
+
+        setDefaultChildSpecimen(childSpecimen);
+        return childSpecimen;
+    }
 
     public Specimen createPositionedSpecimen() {
         Specimen assignedSpecimen = createSpecimen();

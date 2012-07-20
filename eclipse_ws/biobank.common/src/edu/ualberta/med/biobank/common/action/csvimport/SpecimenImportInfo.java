@@ -199,24 +199,32 @@ public class SpecimenImportInfo {
     }
 
     public Specimen getSpecimen() {
-        // add the specimen to the collection event
-        OriginInfo oi = new OriginInfo();
-        oi.setCenter(originCenter);
-
-        specimen = new Specimen();
-        specimen.setOriginInfo(oi);
-        specimen.setCurrentCenter(currentCenter);
-        specimen.setActivityStatus(ActivityStatus.ACTIVE);
-        specimen.setCreatedAt(csvInfo.getCreatedAt());
-        specimen.setInventoryId(csvInfo.getInventoryId());
-        specimen.setSpecimenType(specimenType);
-
         if (cevent == null) {
             throw new IllegalStateException(
                 "specimen does not have a collection event");
         }
 
+        if ((csvInfo.getParentInventoryId() != null)
+            && !csvInfo.getParentInventoryId().isEmpty()
+            && (parentSpecimen == null)) {
+            throw new IllegalStateException(
+                "parent specimen for specimen with " + csvInfo.getInventoryId()
+                    + " has not be created yet");
+        }
+
+        // add the specimen to the collection event
+        OriginInfo oi = new OriginInfo();
+        oi.setCenter(originCenter);
+
+        specimen = new Specimen();
+        specimen.setInventoryId(csvInfo.getInventoryId());
+        specimen.setSpecimenType(specimenType);
+        specimen.setCurrentCenter(currentCenter);
         specimen.setCollectionEvent(cevent);
+        specimen.setOriginInfo(oi);
+        specimen.setCreatedAt(csvInfo.getCreatedAt());
+        specimen.setActivityStatus(ActivityStatus.ACTIVE);
+
         if (isSourceSpecimen()) {
             specimen.setOriginalCollectionEvent(cevent);
             cevent.getOriginalSpecimens().add(specimen);
@@ -227,18 +235,9 @@ public class SpecimenImportInfo {
             }
             parentInfo.pevent.getSpecimens().add(specimen);
             SpecimenActionHelper.setParent(specimen, parentSpecimen);
+            SpecimenActionHelper.setQuantityFromType(specimen);
         }
         cevent.getAllSpecimens().add(specimen);
-
-        if ((csvInfo.getParentInventoryId() != null)
-            && !csvInfo.getParentInventoryId().isEmpty()
-            && (parentSpecimen == null)) {
-            throw new IllegalStateException(
-                "parent specimen for specimen with " + csvInfo.getInventoryId()
-                    + " has not be created yet");
-        }
-
-        SpecimenActionHelper.setQuantityFromType(specimen);
 
         if (container != null) {
             SpecimenActionHelper.createOrChangePosition(specimen, container,
