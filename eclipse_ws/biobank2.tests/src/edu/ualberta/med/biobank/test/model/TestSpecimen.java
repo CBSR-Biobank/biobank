@@ -9,6 +9,6 @@ public class TestSpecimen extends DbTest {
     @Test
     public void expectedActivityStatusIds() {
         HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createSpecimen());
+            factory.createParentSpecimen());
     }
 }

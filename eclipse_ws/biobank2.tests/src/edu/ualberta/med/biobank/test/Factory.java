@@ -443,7 +443,7 @@ public class Factory {
 
     public Specimen getDefaultParentSpecimen() {
         if (defaultParentSpecimen == null) {
-            defaultParentSpecimen = createSpecimen();
+            defaultParentSpecimen = createParentSpecimen();
         }
         return defaultParentSpecimen;
     }
@@ -454,7 +454,7 @@ public class Factory {
 
     public Specimen getDefaultChildSpecimen() {
         if (defaultChildSpecimen == null) {
-            defaultChildSpecimen = createSpecimen();
+            defaultChildSpecimen = createChildSpecimen();
         }
         return defaultChildSpecimen;
     }
@@ -579,7 +579,7 @@ public class Factory {
         RequestSpecimen requestSpecimen = new RequestSpecimen();
         requestSpecimen.setRequest(getDefaultRequest());
 
-        Specimen specimen = createSpecimen();
+        Specimen specimen = createChildSpecimen();
         requestSpecimen.setSpecimen(specimen);
 
         setDefaultRequestSpecimen(requestSpecimen);
@@ -604,7 +604,7 @@ public class Factory {
         DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
         dispatchSpecimen.setDispatch(getDefaultDispatch());
 
-        Specimen specimen = createSpecimen();
+        Specimen specimen = createParentSpecimen();
         dispatchSpecimen.setSpecimen(specimen);
 
         session.save(dispatchSpecimen);
@@ -800,7 +800,7 @@ public class Factory {
     }
 
     public Specimen createPositionedSpecimen() {
-        Specimen assignedSpecimen = createSpecimen();
+        Specimen assignedSpecimen = createChildSpecimen();
 
         Container parentContainer = getDefaultContainer();
         ContainerType parentCt = parentContainer.getContainerType();

@@ -111,7 +111,7 @@ public class TestSpecimenCsvImport extends ActionTest {
         factory.createSourceSpecimen();
         factory.createSpecimenType();
 
-        factory.createSpecimen();
+        factory.createParentSpecimen();
 
         // create a new specimen type for the aliquoted specimens
         factory.createSpecimenType();
