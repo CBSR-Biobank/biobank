@@ -1,19 +1,25 @@
 package edu.ualberta.med.biobank.model.event;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 
 import edu.ualberta.med.biobank.model.Center;
 
-@Entity
-@DiscriminatorValue("1")
-public abstract class CenterEvent extends Event {
+@MappedSuperclass
+public abstract class CenterEvent<T extends Enum<T> & EventType>
+    extends Event<T> {
     private static final long serialVersionUID = 1L;
 
     private Center center;
 
-    @Column(name = "CENTER_ID")
+    public CenterEvent() {
+    }
+
+    public CenterEvent(Center center) {
+        setCenter(center);
+    }
+
+    @Column(name = CENTER_COLUMN_NAME)
     public Center getCenter() {
         return center;
     }

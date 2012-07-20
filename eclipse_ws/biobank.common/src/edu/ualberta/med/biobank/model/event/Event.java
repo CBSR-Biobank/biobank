@@ -19,12 +19,21 @@ import edu.ualberta.med.biobank.model.User;
 @Table(name = "EVENT")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.INTEGER)
-public abstract class Event<T extends Enum<T>> extends AbstractModel {
+@SuppressWarnings("nls")
+public abstract class Event<T extends Enum<T> & EventType>
+    extends AbstractModel
+    implements HasEventType<T> {
     private static final long serialVersionUID = 1L;
+
+    protected static final String CENTER_COLUMN_NAME = "CENTER_ID";
+    protected static final String STUDY_COLUMN_NAME = "STUDY_ID";
+    protected static final String EVENT_TYPE_COLUMN_NAME = "EVENT_TYPE_ID";
+    protected static final String EVENT_TYPE_NOT_NULL_MESSAGE =
+        "{edu.ualberta.med.biobank.model.Event.type.NotNull";
 
     private User user;
     private Long createdAt = System.currentTimeMillis();
-    private T type;
+    protected T eventType;
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Event.user.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,16 +46,6 @@ public abstract class Event<T extends Enum<T>> extends AbstractModel {
         this.user = user;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Event.type.NotNull")
-    @Column(name = "EVENT_TYPE")
-    public T getType() {
-        return type;
-    }
-
-    public void setType(T type) {
-        this.type = type;
-    }
-
     @NotNull(message = "{edu.ualberta.med.biobank.model.Event.createdAt.NotNull")
     @Column(name = "CREATED_AT")
     public Long getCreatedAt() {
@@ -55,5 +54,22 @@ public abstract class Event<T extends Enum<T>> extends AbstractModel {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public static class SpecimenTypeReadEvent extends Event {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Enum getEventType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setEventType(Enum eventType) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 }

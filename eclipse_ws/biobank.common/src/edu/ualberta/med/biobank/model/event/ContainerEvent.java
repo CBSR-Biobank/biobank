@@ -6,33 +6,51 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.event.ContainerEvent.ContainerEventType;
+import edu.ualberta.med.biobank.model.util.EnumUserType;
 
 @Entity
 @DiscriminatorValue("2")
-public class ContainerEvent extends CenterEvent {
+public class ContainerEvent
+    extends CenterEvent<ContainerEventType> {
     private static final long serialVersionUID = 1L;
 
-    private EventObject container;
+    private EntityId container;
 
     public ContainerEvent(Container container) {
         setCenter(container.getSite());
-        setContainer(new EventObject());
+        setContainer(new EntityId(container.getLabel(), container));
+    }
+
+    @Type(type = "edu.ualberta.med.biobank.model.util.EnumUserType",
+        parameters = @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            value = "edu.ualberta.med.biobank.model.event.ContainerEvent$ContainerEventType"))
+    @Override
+    public ContainerEventType getEventType() {
+        return eventType;
+    }
+
+    @Override
+    public void setEventType(ContainerEventType eventType) {
+        this.eventType = eventType;
     }
 
     @OneToOne
-    @JoinTable(name = "CONTAINER_EVENT",
-        joinColumns = @JoinColumn(name = "CONTAINER_EVENT_ID", unique = true))
-    public EventObject getContainer() {
+    @JoinTable(name = "EVENT_CONTAINER",
+        joinColumns = @JoinColumn(name = "EVENT_ID", unique = true))
+    public EntityId getContainer() {
         return container;
     }
 
-    public void setContainer(EventObject container) {
+    public void setContainer(EntityId container) {
         this.container = container;
     }
 
-    // TODO: implement interface for really easy usertype?
-    public enum ContainerEventType {
+    public enum ContainerEventType implements EventType {
         CREATE(1),
         READ(2),
         UPDATE(3),
@@ -49,6 +67,7 @@ public class ContainerEvent extends CenterEvent {
             this.id = id;
         }
 
+        @Override
         public Integer getId() {
             return id;
         }

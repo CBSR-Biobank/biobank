@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.hibernate.HibernateException;
@@ -13,61 +15,99 @@ import org.hibernate.type.TypeResolver;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
+/**
+ * An {@link Enum} {@link UserType} that maintains its own internal map of
+ * identifier to enum. An exception will be thrown if the same identifier is
+ * used more than once. The identifier method is determined by an optional
+ * configuration parameter {@link #ID_METHOD_NAME_PARAM}.
+ * <p>
+ * The enum class <em>must</em> be specified via the configuration parameter
+ * {@link #ENUM_CLASS_NAME_PARAM}.
+ * 
+ * @author Jonathan Ferland
+ * 
+ * @param <T> the enum type
+ */
 @SuppressWarnings("nls")
-public class EnumUserType implements UserType, ParameterizedType {
-    private static final String DEFAULT_IDENTIFIER_METHOD_NAME = "getId";
-    private static final String DEFAULT_VALUE_OF_METHOD_NAME = "fromId";
+public class EnumUserType<T extends Enum<T>>
+    implements UserType, ParameterizedType {
 
-    @SuppressWarnings("rawtypes")
-    private Class<? extends Enum> enumClass;
-    private Class<?> identifierType;
-    private Method identifierMethod;
-    private Method valueOfMethod;
+    public static final String ID_METHOD_NAME_PARAM = "identifierMethod";
+    public static final String DEF_ID_METHOD_NAME = "getId";
+
+    public static final String ENUM_CLASS_NAME_PARAM = "enumClass";
+
+    private Class<T> enumClass;
+    private Class<?> idType;
+    private Method idMethod;
     private AbstractSingleColumnStandardBasicType<?> type;
     private int[] sqlTypes;
+    private Map<Object, T> values;
+
+    private Map<Object, T> getValuesMap() throws HibernateException {
+        if (values == null) {
+            Map<Object, T> tmp = new HashMap<Object, T>();
+
+            for (T value : enumClass.getEnumConstants()) {
+                Object id = getId(value);
+                T oldValue = tmp.put(id, value);
+
+                if (oldValue != null) {
+                    throw new HibernateException("Duplicate id " + id
+                        + " in enum " + enumClass);
+                }
+            }
+
+            values = tmp;
+        }
+        return values;
+    }
+
+    private Object getId(Object value) {
+        try {
+            Object id = value != null
+                ? idMethod.invoke(value, new Object[0])
+                : null;
+            return id;
+        } catch (Exception exception) {
+            throw new HibernateException(
+                "Exception while invoking identifierMethod of enum" + enumClass,
+                exception);
+        }
+    }
 
     @Override
     public void setParameterValues(Properties parameters) {
-        String enumClassName = parameters.getProperty("enumClass");
+        String enumClassName = parameters.getProperty(ENUM_CLASS_NAME_PARAM);
         try {
-            enumClass = Class.forName(enumClassName).asSubclass(Enum.class);
+            @SuppressWarnings("unchecked")
+            Class<T> tmp = (Class<T>) Class.forName(enumClassName)
+                .asSubclass(Enum.class);
+            enumClass = tmp;
         } catch (ClassNotFoundException exception) {
-            throw new HibernateException("Enum class not found", exception);
+            throw new HibernateException("Enum not found: " + enumClassName,
+                exception);
         }
 
-        String identifierMethodName =
-            parameters.getProperty("identifierMethod",
-                DEFAULT_IDENTIFIER_METHOD_NAME);
+        String idMethodName = parameters.getProperty(ID_METHOD_NAME_PARAM,
+            DEF_ID_METHOD_NAME);
 
         try {
-            identifierMethod = enumClass.getMethod(identifierMethodName,
-                new Class[0]);
-            identifierType = identifierMethod.getReturnType();
+            idMethod = enumClass.getMethod(idMethodName, new Class[0]);
+            idType = idMethod.getReturnType();
         } catch (Exception exception) {
-            throw new HibernateException("Failed to optain identifier method",
+            throw new HibernateException("Failed to obtain identifier method",
                 exception);
         }
 
         TypeResolver tr = new TypeResolver();
-        type =
-            (AbstractSingleColumnStandardBasicType<?>) tr.basic(identifierType
-                .getName());
+        type = (AbstractSingleColumnStandardBasicType<?>) tr
+            .basic(idType.getName());
         if (type == null) {
             throw new HibernateException("Unsupported identifier type "
-                + identifierType.getName());
+                + idType.getName());
         }
         sqlTypes = new int[] { type.sqlType() };
-
-        String valueOfMethodName = parameters.getProperty("valueOfMethod",
-            DEFAULT_VALUE_OF_METHOD_NAME);
-
-        try {
-            valueOfMethod = enumClass.getMethod(valueOfMethodName,
-                new Class[] { identifierType });
-        } catch (Exception exception) {
-            throw new HibernateException("Failed to optain valueOf method",
-                exception);
-        }
     }
 
     @Override
@@ -81,30 +121,16 @@ public class EnumUserType implements UserType, ParameterizedType {
         // TODO: hibernate4 adds SessionImplementor to the parameters, so we can
         // call the correct (non-deprecated) type method.
         @SuppressWarnings("deprecation")
-        Object identifier = type.get(rs, names[0]);
-        try {
-            return valueOfMethod.invoke(enumClass, new Object[] { identifier });
-        } catch (Exception exception) {
-            throw new HibernateException(
-                "Exception while invoking valueOfMethod of enumeration class: ",
-                exception);
-        }
+        Object id = type.get(rs, names[0]);
+        T value = getValuesMap().get(id);
+        return value;
     }
 
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index)
         throws HibernateException, SQLException {
-        try {
-            Object identifier =
-                value != null ? identifierMethod.invoke(value, new Object[0])
-                    : null;
-            st.setObject(index, identifier);
-        } catch (Exception exception) {
-            throw new HibernateException(
-                "Exception while invoking identifierMethod of enumeration class: ",
-                exception);
-
-        }
+        Object id = getId(value);
+        st.setObject(index, id);
     }
 
     @Override
