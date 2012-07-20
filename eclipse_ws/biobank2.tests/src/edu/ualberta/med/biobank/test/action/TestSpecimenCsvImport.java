@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
@@ -18,9 +20,11 @@ import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
@@ -69,13 +73,12 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
-        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+        Set<SpecimenCsvInfo> csvInfos = SpecimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), factory.getDefaultClinic(),
+            factory.getDefaultSite(), patients);
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            csvInfos = SpecimenCsvHelper.createAllSpecimens(
-                factory.getDefaultStudy(), factory.getDefaultClinic(),
-                factory.getDefaultSite(), patients);
-            SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
@@ -104,25 +107,25 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
-        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
-
-        try {
-            // make sure you can add parent specimens without a worksheet #
-            csvInfos = SpecimenCsvHelper.sourceSpecimensCreate(factory
+        // make sure you can add parent specimens without a worksheet #
+        Set<SpecimenCsvInfo> csvInfos =
+            SpecimenCsvHelper.sourceSpecimensCreate(factory
                 .getDefaultClinic(), factory.getDefaultSite(), patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
-            // remove the worksheet # for the last half
-            int half = csvInfos.size() / 2;
-            int count = 0;
-            for (SpecimenCsvInfo csvInfo : csvInfos) {
-                if (count > half) {
-                    csvInfo.setWorksheet(null);
-                }
-                ++count;
+        // remove the worksheet # for the last half
+        int half = csvInfos.size() / 2;
+        int count = 0;
+        for (SpecimenCsvInfo csvInfo : csvInfos) {
+            if (count > half) {
+                csvInfo.setWorksheet(null);
             }
+            ++count;
+        }
 
-            SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
 
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
@@ -170,14 +173,13 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         tx.commit();
 
-        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
-
-        try {
-            csvInfos = SpecimenCsvHelper.createAliquotedSpecimens(
+        Set<SpecimenCsvInfo> csvInfos =
+            SpecimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), factory.getDefaultClinic(),
                 factory.getDefaultSite(), parentSpecimens);
-            SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
+        try {
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
@@ -225,6 +227,87 @@ public class TestSpecimenCsvImport extends ActionTest {
         } catch (Exception e) {
             Assert.fail("could not import data");
         }
+    }
+
+    @Test
+    public void noErrorsWithContainers() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSpecimenType();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSpecimenType();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        factory.createTopContainer();
+        factory.createParentContainer();
+        Container[] childL2Containers = new Container[] {
+            factory.createContainer(),
+            factory.createContainer(),
+            factory.createContainer(),
+        };
+
+        tx.commit();
+
+        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+        csvInfos = SpecimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), factory.getDefaultClinic(),
+            factory.getDefaultSite(), patients);
+
+        List<SpecimenCsvInfo> csvInfosList =
+            new ArrayList<SpecimenCsvInfo>(csvInfos);
+
+        // fill as many containers as space will allow
+        int count = 0;
+        for (Container container : childL2Containers) {
+            int maxRows =
+                container.getContainerType().getCapacity().getRowCapacity();
+            int maxCols =
+                container.getContainerType().getCapacity().getColCapacity();
+
+            for (int r = 0; r < maxRows; ++r) {
+                for (int c = 0; c < maxCols; ++c) {
+                    if (count >= csvInfosList.size()) break;
+
+                    SpecimenCsvInfo csvInfo = csvInfosList.get(count);
+                    RowColPos pos = new RowColPos(r, c);
+                    csvInfo.setPalletPosition(container.getContainerType()
+                        .getPositionString(pos));
+                    csvInfo.setPalletLabel(container.getLabel());
+                    csvInfo.setPalletProductBarcode(container
+                        .getProductBarcode());
+                    csvInfo.setRootContainerType(container.getContainerType()
+                        .getNameShort());
+
+                    count++;
+                }
+            }
+        }
+
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(CSV_NAME);
+            exec(importAction);
+        } catch (CsvImportException e) {
+            showErrorsInLog(e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     private void checkCsvInfoAgainstDb(Set<SpecimenCsvInfo> csvInfos) {

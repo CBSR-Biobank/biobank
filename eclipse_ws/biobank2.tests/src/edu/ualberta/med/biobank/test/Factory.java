@@ -669,6 +669,8 @@ public class Factory {
             // make sure sites match
             createTopContainerType();
         }
+
+        // FIXME: why assign to a top container type here?
         container.setContainerType(getDefaultTopContainerType());
         container.setLabel(label);
         container.setTopContainer(container);
