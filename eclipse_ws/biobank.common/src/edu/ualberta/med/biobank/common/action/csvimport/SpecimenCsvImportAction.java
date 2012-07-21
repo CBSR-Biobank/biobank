@@ -71,7 +71,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
                 "parent specimen and child specimen do not have the same patient number")
             .format();
 
-    public static final LString CSV_SOURCE_SPC_ERROR =
+    public static final LString CSV_PARENT_SPC_ERROR =
         bundle.tr(
             "specimen is a source specimen but parent inventory ID present")
             .format();
@@ -99,6 +99,10 @@ public class SpecimenCsvImportAction extends CsvImportAction {
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
         bundle
             .tr("parent specimen in CSV file with inventory id \"{0}\" does not exist");
+
+    public static final Tr CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR =
+        bundle
+            .tr("the parent specimen of specimen with inventory id \"{0}\", parent specimen with inventory id \"{0}\", does not have a processing event");
 
     public static final Tr CSV_ORIGIN_CENTER_ERROR =
         bundle.tr("origin center in CSV file with name \"{0}\" does not exist");
@@ -142,10 +146,10 @@ public class SpecimenCsvImportAction extends CsvImportAction {
     private final Set<SpecimenImportInfo> specimenImportInfos =
         new HashSet<SpecimenImportInfo>(0);
 
-    private final Map<String, SpecimenImportInfo> sourceSpcInvIds =
+    private final Map<String, SpecimenImportInfo> parentSpcInvIds =
         new HashMap<String, SpecimenImportInfo>(0);
 
-    private final Map<String, Specimen> sourceSpecimens =
+    private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
 
     public SpecimenCsvImportAction(String filename) throws IOException {
@@ -158,7 +162,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
 
         final String[] header = new String[] {
             "inventoryId",
-            "parentInventoryID",
+            "parentInventoryId",
             "specimenType",
             "createdAt",
             "patientNumber",
@@ -177,7 +181,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             ArrayList<SpecimenCsvInfo> specimenCsvInfos =
                 new ArrayList<SpecimenCsvInfo>(0);
 
-            Map<String, SpecimenCsvInfo> sourceSpcMap =
+            Map<String, SpecimenCsvInfo> parentSpcMap =
                 new HashMap<String, SpecimenCsvInfo>();
 
             SpecimenCsvInfo csvInfo;
@@ -191,7 +195,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
                         addError(reader.getLineNumber(),
                             CSV_ALIQUOTED_SPC_ERROR);
                     }
-                    sourceSpcMap.put(csvInfo.getInventoryId(), csvInfo);
+                    parentSpcMap.put(csvInfo.getInventoryId(), csvInfo);
                 } else {
                     if ((csvInfo.getParentInventoryId() == null)
                         || csvInfo.getParentInventoryId().isEmpty()) {
@@ -202,7 +206,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
                     // check that parent and child specimens have the same
                     // patient number
                     SpecimenCsvInfo parentCsvInfo =
-                        sourceSpcMap.get(csvInfo.getParentInventoryId());
+                        parentSpcMap.get(csvInfo.getParentInventoryId());
 
                     if ((parentCsvInfo != null)
                         && !csvInfo.getPatientNumber().equals(
@@ -263,7 +267,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             specimenImportInfos.add(info);
 
             if (info.isSourceSpecimen()) {
-                sourceSpcInvIds.put(csvInfo.getInventoryId(), info);
+                parentSpcInvIds.put(csvInfo.getInventoryId(), info);
             }
         }
 
@@ -273,15 +277,19 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             if (info.isSourceSpecimen()) continue;
 
             SpecimenImportInfo parentInfo =
-                sourceSpcInvIds.get(info.getParentInventoryId());
-            info.setParentInfo(parentInfo);
+                parentSpcInvIds.get(info.getParentInventoryId());
 
-            // if this specimen has a parent specimen that is not in DB,
-            // is it in the CSV data?
-            if ((info.getPatient() == null) && (parentInfo == null)) {
-                addError(info.getLineNumber(),
-                    CSV_PARENT_SPECIMEN_ERROR.format(info
-                        .getParentInventoryId()));
+            if (parentInfo == null) {
+                // if this specimen has a parent specimen that is not in DB,
+                // is it in the CSV data?
+
+                if (info.getPatient() == null) {
+                    addError(info.getLineNumber(),
+                        CSV_PARENT_SPECIMEN_ERROR.format(info
+                            .getParentInventoryId()));
+                }
+            } else {
+                info.setParentInfo(parentInfo);
             }
         }
 
@@ -294,7 +302,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             if (info.isAliquotedSpecimen()) continue;
 
             Specimen spc = addSpecimen(info);
-            sourceSpecimens.put(spc.getInventoryId(), spc);
+            parentSpecimens.put(spc.getInventoryId(), spc);
 
             // add the processing event for this source specimen
             if (info.hasWorksheet()) {
@@ -309,9 +317,11 @@ public class SpecimenCsvImportAction extends CsvImportAction {
         for (SpecimenImportInfo info : specimenImportInfos) {
             if (info.isSourceSpecimen()) continue;
 
-            Specimen parentSpc =
-                sourceSpecimens.get(info.getParentInventoryId());
-            info.setParentSpecimen(parentSpc);
+            if (info.getParentSpecimen() == null) {
+                Specimen parentSpc =
+                    parentSpecimens.get(info.getParentInventoryId());
+                info.setParentSpecimen(parentSpc);
+            }
             addSpecimen(info);
         }
 
@@ -342,6 +352,12 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             Specimen parentSpecimen =
                 getSpecimen(csvInfo.getParentInventoryId());
             if (parentSpecimen != null) {
+                if (parentSpecimen.getProcessingEvent() == null) {
+                    addError(csvInfo.getLineNumber(),
+                        CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(csvInfo
+                            .getInventoryId(), parentSpecimen.getInventoryId()));
+
+                }
                 info.setParentSpecimen(parentSpecimen);
             }
         }

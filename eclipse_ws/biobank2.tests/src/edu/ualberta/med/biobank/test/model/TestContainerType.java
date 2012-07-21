@@ -289,7 +289,7 @@ public class TestContainerType extends DbTest {
 
     @Test
     public void illegalChildSpecimen() {
-        Specimen specimen = factory.createSpecimen();
+        Specimen specimen = factory.createChildSpecimen();
         Container container = factory.createContainer();
 
         SpecimenPosition sp = new SpecimenPosition();

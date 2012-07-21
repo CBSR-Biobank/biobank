@@ -57,7 +57,7 @@ public class SpecimenImportInfo {
             throw new IllegalStateException("parentInfo is null");
         }
         this.parentInfo = parentInfo;
-        log.debug("setting parent info for specimen {} to {}",
+        log.trace("setting parent info for specimen {} to {}",
             csvInfo.getInventoryId(), parentInfo.csvInfo.getInventoryId());
     }
 
@@ -192,43 +192,17 @@ public class SpecimenImportInfo {
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
 
-        log.debug("created processing event: worksheet={} parentSpc={}",
+        log.trace("created processing event: worksheet={} parentSpc={}",
             csvInfo.getWorksheet(), csvInfo.getInventoryId());
 
         return getPevent();
     }
 
     public Specimen getSpecimen() {
-        // add the specimen to the collection event
-        OriginInfo oi = new OriginInfo();
-        oi.setCenter(originCenter);
-
-        specimen = new Specimen();
-        specimen.setOriginInfo(oi);
-        specimen.setCurrentCenter(currentCenter);
-        specimen.setActivityStatus(ActivityStatus.ACTIVE);
-        specimen.setCreatedAt(csvInfo.getCreatedAt());
-        specimen.setInventoryId(csvInfo.getInventoryId());
-        specimen.setSpecimenType(specimenType);
-
         if (cevent == null) {
             throw new IllegalStateException(
                 "specimen does not have a collection event");
         }
-
-        specimen.setCollectionEvent(cevent);
-        if (isSourceSpecimen()) {
-            specimen.setOriginalCollectionEvent(cevent);
-            cevent.getOriginalSpecimens().add(specimen);
-        } else {
-            if (parentInfo.pevent == null) {
-                throw new IllegalStateException(
-                    "parent specimen pevent is null");
-            }
-            parentInfo.pevent.getSpecimens().add(specimen);
-            SpecimenActionHelper.setParent(specimen, parentSpecimen);
-        }
-        cevent.getAllSpecimens().add(specimen);
 
         if ((csvInfo.getParentInventoryId() != null)
             && !csvInfo.getParentInventoryId().isEmpty()
@@ -238,18 +212,51 @@ public class SpecimenImportInfo {
                     + " has not be created yet");
         }
 
-        SpecimenActionHelper.setQuantityFromType(specimen);
+        // add the specimen to the collection event
+        OriginInfo oi = new OriginInfo();
+        oi.setCenter(originCenter);
+
+        specimen = new Specimen();
+        specimen.setInventoryId(csvInfo.getInventoryId());
+        specimen.setSpecimenType(specimenType);
+        specimen.setCurrentCenter(currentCenter);
+        specimen.setCollectionEvent(cevent);
+        specimen.setOriginInfo(oi);
+        specimen.setCreatedAt(csvInfo.getCreatedAt());
+        specimen.setActivityStatus(ActivityStatus.ACTIVE);
+
+        if (isSourceSpecimen()) {
+            specimen.setOriginalCollectionEvent(cevent);
+            cevent.getOriginalSpecimens().add(specimen);
+        } else {
+            ProcessingEvent pevent;
+
+            if (parentSpecimen != null) {
+                pevent = parentSpecimen.getProcessingEvent();
+            } else {
+                if (parentInfo.pevent == null) {
+                    throw new IllegalStateException(
+                        "parent specimen pevent is null");
+                }
+                pevent = parentInfo.pevent;
+            }
+            pevent.getSpecimens().add(specimen);
+            SpecimenActionHelper.setParent(specimen, parentSpecimen);
+            SpecimenActionHelper.setQuantityFromType(specimen);
+        }
+        cevent.getAllSpecimens().add(specimen);
 
         if (container != null) {
             SpecimenActionHelper.createOrChangePosition(specimen, container,
                 specimenPos);
         }
 
-        log.trace("creating specimen: pt={} v#={} invId={}",
+        log.trace("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
                 csvInfo.getPatientNumber(),
                 csvInfo.getVisitNumber(),
-                csvInfo.getInventoryId()
+                csvInfo.getInventoryId(),
+                specimen.getOriginalCollectionEvent() != null
             });
 
         return specimen;

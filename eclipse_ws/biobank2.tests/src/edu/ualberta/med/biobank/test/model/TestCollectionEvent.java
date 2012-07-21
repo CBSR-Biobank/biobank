@@ -36,7 +36,7 @@ public class TestCollectionEvent extends DbTest {
     public void deleteWithSpecimens() {
         Transaction tx = session.beginTransaction();
 
-        Specimen specimen = factory.createSpecimen();
+        Specimen specimen = factory.createParentSpecimen();
 
         try {
             session.delete(specimen.getCollectionEvent());

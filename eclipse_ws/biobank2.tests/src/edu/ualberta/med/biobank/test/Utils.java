@@ -40,7 +40,7 @@ public class Utils {
         cal.set(Calendar.DAY_OF_YEAR, R.nextInt(365) + 1);
         cal.set(Calendar.HOUR_OF_DAY, R.nextInt(24));
         cal.set(Calendar.MINUTE, R.nextInt(60));
-        cal.set(Calendar.SECOND, R.nextInt(60));
+        cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTime();
     }
