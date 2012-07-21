@@ -253,21 +253,7 @@ public class TestSpecimenCsvImport extends ActionTest {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        factory.createTopContainer();
-        factory.createParentContainer();
-
-        // need to add the aliquoted specimen type to the valid specimen types
-        // for these containers' container types
-        ContainerType ctype = factory.createContainerType();
-        ctype.getChildContainerTypes().clear();
-        ctype.getSpecimenTypes().clear();
-        ctype.getSpecimenTypes().add(aqSpecimenType);
-
-        Container[] childL2Containers = new Container[] {
-            factory.createContainer(),
-            factory.createContainer(),
-            factory.createContainer(),
-        };
+        Set<Container> childL2Containers = createContainers(aqSpecimenType);
 
         tx.commit();
 
@@ -285,33 +271,50 @@ public class TestSpecimenCsvImport extends ActionTest {
             aliquotedSpecimensCsvInfos.add(csvInfo);
         }
 
-        // fill as many containers as space will allow
-        int count = 0;
-        for (Container container : childL2Containers) {
-            ctype = container.getContainerType();
+        fillContainersWithSpecimenFromCsv(childL2Containers,
+            aliquotedSpecimensCsvInfos);
 
-            int maxRows =
-                container.getContainerType().getCapacity().getRowCapacity();
-            int maxCols =
-                container.getContainerType().getCapacity().getColCapacity();
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
-            for (int r = 0; r < maxRows; ++r) {
-                for (int c = 0; c < maxCols; ++c) {
-                    if (count >= aliquotedSpecimensCsvInfos.size()) break;
+        try {
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(CSV_NAME);
+            exec(importAction);
+        } catch (CsvImportException e) {
+            showErrorsInLog(e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
 
-                    SpecimenCsvInfo csvInfo =
-                        aliquotedSpecimensCsvInfos.get(count);
-                    RowColPos pos = new RowColPos(r, c);
-                    csvInfo.setPalletPosition(ctype.getPositionString(pos));
-                    csvInfo.setPalletLabel(container.getLabel());
-                    csvInfo.setPalletProductBarcode(container
-                        .getProductBarcode());
-                    csvInfo.setRootContainerType(ctype.getNameShort());
+        checkCsvInfoAgainstDb(csvInfos);
+    }
 
-                    count++;
-                }
+    @Test
+    public void onlyParentSpecimensInCsvWithPositions() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+
+            // create 3 source specimens and parent specimens
+            for (int j = 0; j < 3; j++) {
+                factory.createSourceSpecimen();
             }
         }
+
+        Set<Container> childL2Containers =
+            createContainers(factory.getDefaultSourceSpecimenType());
+
+        tx.commit();
+
+        // make sure you can add parent specimens without a worksheet #
+        Set<SpecimenCsvInfo> csvInfos =
+            SpecimenCsvHelper.sourceSpecimensCreate(factory
+                .getDefaultClinic(), factory.getDefaultSite(), patients,
+                factory.getDefaultStudy().getSourceSpecimens());
+
+        fillContainersWithSpecimenFromCsv(childL2Containers,
+            new ArrayList<SpecimenCsvInfo>(csvInfos));
 
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -375,6 +378,57 @@ public class TestSpecimenCsvImport extends ActionTest {
 
             }
         }
+    }
+
+    private void fillContainersWithSpecimenFromCsv(Set<Container> containers,
+        List<SpecimenCsvInfo> specimenCsvInfo) {
+
+        // fill as many containers as space will allow
+        int count = 0;
+        for (Container container : containers) {
+            ContainerType ctype = container.getContainerType();
+
+            int maxRows =
+                container.getContainerType().getCapacity().getRowCapacity();
+            int maxCols =
+                container.getContainerType().getCapacity().getColCapacity();
+
+            for (int r = 0; r < maxRows; ++r) {
+                for (int c = 0; c < maxCols; ++c) {
+                    if (count >= specimenCsvInfo.size()) break;
+
+                    SpecimenCsvInfo csvInfo = specimenCsvInfo.get(count);
+                    RowColPos pos = new RowColPos(r, c);
+                    csvInfo.setPalletPosition(ctype.getPositionString(pos));
+                    csvInfo.setPalletLabel(container.getLabel());
+                    csvInfo.setPalletProductBarcode(container
+                        .getProductBarcode());
+                    csvInfo.setRootContainerType(ctype.getNameShort());
+
+                    count++;
+                }
+            }
+        }
+
+    }
+
+    // need to add allowed specimen type to the leaft containers' container
+    // types
+    private Set<Container> createContainers(SpecimenType specimenType) {
+        factory.createTopContainer();
+        factory.createParentContainer();
+
+        ContainerType ctype = factory.createContainerType();
+        ctype.getChildContainerTypes().clear();
+        ctype.getSpecimenTypes().clear();
+        ctype.getSpecimenTypes().add(specimenType);
+
+        Set<Container> result = new HashSet<Container>();
+        result.add(factory.createContainer());
+        result.add(factory.createContainer());
+        result.add(factory.createContainer());
+
+        return result;
     }
 
     private void showErrorsInLog(CsvImportException e) {
