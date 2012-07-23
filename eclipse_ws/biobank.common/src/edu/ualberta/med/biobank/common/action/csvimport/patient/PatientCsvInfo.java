@@ -4,6 +4,11 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.common.action.csvimport.CsvInfo;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 public class PatientCsvInfo extends CsvInfo {
     private static final long serialVersionUID = 1L;
 

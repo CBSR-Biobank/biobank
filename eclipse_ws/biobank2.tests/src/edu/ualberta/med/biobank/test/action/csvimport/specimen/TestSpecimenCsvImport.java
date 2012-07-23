@@ -30,6 +30,11 @@ import edu.ualberta.med.biobank.test.action.ActionTest;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
 public class TestSpecimenCsvImport extends ActionTest {
 

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.supercsv.cellprocessor.ParseDate;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -16,14 +17,12 @@ import org.supercsv.prefs.CsvPreference;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.csvimport.CsvImportAction;
 import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -32,32 +31,31 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
+@SuppressWarnings("nls")
 public class PatientCsvImportAction extends CsvImportAction {
     private static final long serialVersionUID = 1L;
 
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenCsvImportAction.class);
 
-    private static final Bundle bundle = new CommonBundle();
-
-    @SuppressWarnings("nls")
-    public static final String CSV_PARSE_ERROR =
-        "Parse error at line {0}\n{1}";
-
-    @SuppressWarnings("nls")
     public static final LString CSV_FILE_ERROR =
         bundle.tr("CVS file not loaded").format();
 
-    @SuppressWarnings("nls")
     public static final Tr CSV_STUDY_ERROR =
         bundle.tr("CSV study {0} does not exist");
 
-    @SuppressWarnings("nls")
+    // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        null,
-        new Unique(),
-        new ParseDate("yyyy-MM-dd HH:mm")
+        new StrNotNullOrEmpty(),            // studyName
+        new Unique(),                       // patientNumber
+        new ParseDate("yyyy-MM-dd HH:mm")   // createdAt
     };
+    // @formatter:on    
 
     private CompressedReference<ArrayList<PatientCsvInfo>> compressedList =
         null;
@@ -69,7 +67,6 @@ public class PatientCsvImportAction extends CsvImportAction {
         setCsvFile(filename);
     }
 
-    @SuppressWarnings("nls")
     private void setCsvFile(String filename) throws IOException {
         ICsvBeanReader reader = new CsvBeanReader(
             new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
@@ -144,7 +141,7 @@ public class PatientCsvImportAction extends CsvImportAction {
     }
 
     private void addPatient(PatientImportInfo importInfo) {
-        Patient patient = importInfo.getPatient();
+        Patient patient = importInfo.getNewPatient();
         context.getSession().saveOrUpdate(patient);
     }
 

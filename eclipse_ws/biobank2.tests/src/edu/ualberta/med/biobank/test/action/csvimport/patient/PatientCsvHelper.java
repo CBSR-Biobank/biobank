@@ -9,6 +9,11 @@ import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.csvimport.specimen.SpecimenCsvHelper;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 public class PatientCsvHelper {
     private static final NameGenerator nameGenerator = new NameGenerator(
         SpecimenCsvHelper.class.getSimpleName() + new Random());

@@ -18,6 +18,11 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
 public class SpecimenCsvHelper {
     private static final NameGenerator nameGenerator = new NameGenerator(

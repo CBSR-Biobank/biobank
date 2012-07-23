@@ -14,6 +14,7 @@ import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -23,13 +24,11 @@ import org.supercsv.prefs.CsvPreference;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.csvimport.CsvImportAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -61,11 +60,6 @@ public class SpecimenCsvImportAction extends CsvImportAction {
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenCsvImportAction.class);
 
-    private static final Bundle bundle = new CommonBundle();
-
-    public static final String CSV_PARSE_ERROR =
-        "Parse error at line {0}\n{1}";
-
     public static final LString CSV_SPC_PATIENT_ERROR =
         bundle
             .tr(
@@ -87,9 +81,6 @@ public class SpecimenCsvImportAction extends CsvImportAction {
 
     public static final LString CSV_PALLET_LABEL_ERROR =
         bundle.tr("pallet position defined but not label").format();
-
-    public static final LString CSV_FILE_ERROR =
-        bundle.tr("CVS file not loaded").format();
 
     public static final LString CSV_UNCOMPRESS_ERROR =
         bundle.tr("CVS file could not be uncompressed").format();
@@ -124,20 +115,20 @@ public class SpecimenCsvImportAction extends CsvImportAction {
 
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        new Unique(),                       // "inventoryId",
-        new Optional(),                     // "parentInventoryID",
-        null,                               // "specimenType",
-        new ParseDate("yyyy-MM-dd HH:mm"),  // "createdAt",
-        null,                               // "patientNumber",
-        new ParseInt(),                     // "visitNumber",
-        null,                               // "currentCenter",
-        null,                               // "originCenter",
-        new ParseBool(),                    // "sourceSpecimen",
-        new Optional(new Unique()),         // "worksheet",
-        new Optional(),                     // "palletProductBarcode",
-        new Optional(),                     // "rootContainerType",
-        new Optional(),                     // "palletLabel",
-        new Optional()                      // "palletPosition"
+        new Unique(),                       // inventoryId,
+        new Optional(),                     // parentInventoryID,
+        new StrNotNullOrEmpty(),            // specimenType,
+        new ParseDate("yyyy-MM-dd HH:mm"),  // createdAt,
+        new StrNotNullOrEmpty(),            // patientNumber,
+        new ParseInt(),                     // visitNumber,
+        new StrNotNullOrEmpty(),            // currentCenter,
+        new StrNotNullOrEmpty(),            // originCenter,
+        new ParseBool(),                    // sourceSpecimen,
+        new Optional(new Unique()),         // worksheet,
+        new Optional(),                     // palletProductBarcode,
+        new Optional(),                     // rootContainerType,
+        new Optional(),                     // palletLabel,
+        new Optional()                      // palletPosition
     }; 
     // @formatter:on    
 
@@ -179,7 +170,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
         };
 
         try {
-            ArrayList<SpecimenCsvInfo> specimenCsvInfos =
+            ArrayList<SpecimenCsvInfo> csvInfos =
                 new ArrayList<SpecimenCsvInfo>(0);
 
             Map<String, SpecimenCsvInfo> parentSpcMap =
@@ -227,7 +218,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
                 }
 
                 csvInfo.setLineNumber(reader.getLineNumber());
-                specimenCsvInfos.add(csvInfo);
+                csvInfos.add(csvInfo);
             }
 
             if (!errors.isEmpty()) {
@@ -236,7 +227,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
 
             compressedList =
                 new CompressedReference<ArrayList<SpecimenCsvInfo>>(
-                    specimenCsvInfos);
+                    csvInfos);
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
@@ -443,7 +434,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
             }
         }
 
-        Specimen spc = info.getSpecimen();
+        Specimen spc = info.getNewSpecimen();
         context.getSession().save(spc.getOriginInfo());
         context.getSession().save(spc);
 

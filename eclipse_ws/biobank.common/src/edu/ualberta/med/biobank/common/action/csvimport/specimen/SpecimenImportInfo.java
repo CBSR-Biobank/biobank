@@ -18,6 +18,11 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
 public class SpecimenImportInfo implements IImportInfo {
 
@@ -196,7 +201,7 @@ public class SpecimenImportInfo implements IImportInfo {
         return getPevent();
     }
 
-    Specimen getSpecimen() {
+    Specimen getNewSpecimen() {
         if (cevent == null) {
             throw new IllegalStateException(
                 "specimen does not have a collection event");

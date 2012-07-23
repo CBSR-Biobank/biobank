@@ -4,6 +4,11 @@ import edu.ualberta.med.biobank.common.action.csvimport.IImportInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 public class PatientImportInfo implements IImportInfo {
 
     private final PatientCsvInfo csvInfo;
@@ -26,7 +31,7 @@ public class PatientImportInfo implements IImportInfo {
         this.study = study;
     }
 
-    public Patient getPatient() {
+    public Patient getNewPatient() {
         Patient patient = new Patient();
         patient.setPnumber(csvInfo.getPatientNumber());
         patient.setCreatedAt(csvInfo.getCreatedAt());

@@ -5,6 +5,11 @@ import org.slf4j.Logger;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 public class CsvUtil {
 
     public static void showErrorsInLog(Logger log, CsvImportException e) {
