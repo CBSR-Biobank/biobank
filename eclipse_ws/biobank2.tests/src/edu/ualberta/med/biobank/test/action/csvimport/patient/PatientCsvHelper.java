@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.csvimport.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.csvimport.specimen.SpecimenCsvHelper;

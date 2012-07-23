@@ -1,9 +1,10 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.patient;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class PatientCsvInfo implements Serializable {
+import edu.ualberta.med.biobank.common.action.csvimport.CsvInfo;
+
+public class PatientCsvInfo extends CsvInfo {
     private static final long serialVersionUID = 1L;
 
     private String studyName;

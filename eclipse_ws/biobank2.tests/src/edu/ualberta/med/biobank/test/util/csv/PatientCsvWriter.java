@@ -9,7 +9,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.csvimport.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**

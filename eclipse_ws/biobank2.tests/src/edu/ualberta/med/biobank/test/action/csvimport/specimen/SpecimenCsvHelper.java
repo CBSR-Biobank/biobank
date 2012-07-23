@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;

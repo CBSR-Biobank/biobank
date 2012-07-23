@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 
 @SuppressWarnings("nls")
 public abstract class CsvImportAction implements Action<BooleanResult> {
@@ -82,6 +83,21 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
             .add(Restrictions.eq("name", name));
 
         return (SpecimenType) c.uniqueResult();
+    }
+
+    /*
+     * Generates an action exception if centre with name does not exist.
+     */
+    protected Study getStudy(String nameShort) {
+        if (context == null) {
+            throw new IllegalStateException(
+                "should only be called once the context is initialized");
+        }
+        Criteria c = context.getSession()
+            .createCriteria(Study.class, "st")
+            .add(Restrictions.eq("nameShort", nameShort));
+
+        return (Study) c.uniqueResult();
     }
 
     /*

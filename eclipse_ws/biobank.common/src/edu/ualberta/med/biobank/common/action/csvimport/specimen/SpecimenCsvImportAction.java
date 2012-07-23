@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.specimen;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,6 +26,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvImportAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -284,7 +285,7 @@ public class SpecimenCsvImportAction extends CsvImportAction {
                 // is it in the CSV data?
 
                 if (info.getPatient() == null) {
-                    addError(info.getLineNumber(),
+                    addError(info.getCsvLineNumber(),
                         CSV_PARENT_SPECIMEN_ERROR.format(info
                             .getParentInventoryId()));
                 }
