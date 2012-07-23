@@ -1,0 +1,112 @@
+Q1: how to identify dispatch? Note that waybill may not be set until later.
+	Decide later? Just store ids
+Q2: split 'saved' into 'created' and 'updated' events?
+Q3: how to identify processing event?
+	Decide later? Just store ids
+Q4: how to log scanning actions?
+	Don't?
+Q5: how to deal with reads on large pieces of data? record the page? record the ordering?
+Q6: how to deal with sending back only parts of an object?
+	Specific types for different kind of reads?
+Q7: how to identify shipments?
+	Decide later? Just store ids
+
+v Deleted center {0}
+v Read center {0}'s studies
+v Saved center {0}
+
+Deleted clinic {0}
+Read all clinics
+Read clinic {0}'s contacts
+Read clinic {0}
+Read clinic {0}'s studies
+Saved clinic {0}
+Read all contacts
+
+v Deleted patient {0}'s collection event {1}
+v Read patient {0}'s collection event {1}'s aliquoted specimens
+v Read patient {0}'s collection event {1}'s event attributes
+v Read patient {0}'s collection event {1}
+v Read patient {0}'s collection event {1}'s source specimens
+v Saved patient {0}'s collection event {1}
+
+v Created children for container {0} ({1})
+v Deleted children of container {0} ({1})
+v Deleted container {0} ({1})
+v Read child containers of container {0} ({1})
+v Read container {0} ({1})
+v Read container(s) labeled {0}
+v Read child specimens of container {0} ({1})
+v Move child containers of container {0} ({1}) to container {2} ({3})
+v Move child specimens of container {0} ({1}) to container {2} ({3})
+v Saved container {0} ({1})
+
+Deleted container type {0}
+Read container type {0}
+Saved container type {0}
+
+Imported patients from file {0}
+Imported specimens from file {0}
+
+Changed state of dispatch {0} from {1} to {2}
+Deleted dispatch {0}
+Read dispatch {0}
+Read dispatch {0}'s specimens
+Retrieved dispatch {0}
+Saved dispatch {0}
+
+Deleted patient {0}
+Read patient {0}'s collection events
+Read patient {0}
+Read patient {0}'s processing events
+Read patient {0}'s collection event summary information
+Merge patient {0} into patient {1}
+Save patient {0}
+
+Deleted processing event {0}
+Read processing event {0}
+Read processing event {0}'s source specimens
+Save processing event {0}
+
+Deleted advanced report {0}
+Ran advanced report {0}
+Saved advanced report {0}
+
+Specimen assign (via scan)
+Specimen link (via scan)
+Dispatch create (via scan)
+Shipment receive (via scan)
+
+Read shipment {0}
+Read shipment {0} specimens
+
+Deleted site {0}
+Read all sites
+Read site {0} container types
+Read site {0}
+Read site {0} studies
+Read site {0} top containers
+Saved site {0}
+
+Assigned specimen {0}
+Deleted specimen {0}
+Read specimen {0} dispatches
+Read specimen {0}
+Read possible types for specimen {0}
+Check if specimen {0} is used in dispatch
+Link specimen {0}
+Save specimen {0}
+
+Deleted specimen type {0}
+Read all specimen types
+Save specimen type {0}
+
+Deleted study {0}
+Saved event attribute of study {0}
+Read study {0}'s aliquoted specimens
+Read all studies
+Read study {0}'s clinics
+Read study {0}'s event attributes
+Read study {0}
+Read study {0}'s source specimens
+Save study {0}

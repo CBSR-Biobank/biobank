@@ -28,6 +28,7 @@ eclipse_ws/biobank2/bin
 eclipse_ws/biobank2/conf
 eclipse_ws/biobank2/lib/*.jar
 eclipse_ws/biobank2/log
+eclipse_ws/biobank2.tests/log
 eclipse_ws/biobank2/about.mappings
 eclipse_ws/biobank2/scanlib.*
 eclipse_ws/biobank2/about.mappings
@@ -40,7 +41,7 @@ eclipse_ws/biobank.mvp/bin
 eclipse_ws/biobank.mvp/output
 lib-sources/
 lib-sources.tar.bz2
-log/
+/log/
 model/*.png
 model/biobank.uml~
 model/biobank2.uml~
