@@ -331,7 +331,7 @@ public class TestSpecimenCsvImport extends ActionTest {
 
     private void checkCsvInfoAgainstDb(Set<SpecimenCsvInfo> csvInfos) {
         for (SpecimenCsvInfo csvInfo : csvInfos) {
-            Criteria c = session.createCriteria(Specimen.class, "p")
+            Criteria c = session.createCriteria(Specimen.class, "s")
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()));
 
             Specimen specimen = (Specimen) c.uniqueResult();
