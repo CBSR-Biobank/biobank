@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvhelper;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class SpecimenCsvHelper {
      * @param patients the patients that these specimens will belong to.
      * @throws IOException
      */
-    public static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
+    static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
         Center originCenter, Center currentCenter, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -64,7 +64,7 @@ public class SpecimenCsvHelper {
         return specimenInfos;
     }
 
-    public static Set<SpecimenCsvInfo> sourceSpecimensCreate(
+    static Set<SpecimenCsvInfo> sourceSpecimensCreate(
         Center originCenter,
         Center currentCenter, Set<Patient> patients,
         Set<SourceSpecimen> sourceSpecimens) {

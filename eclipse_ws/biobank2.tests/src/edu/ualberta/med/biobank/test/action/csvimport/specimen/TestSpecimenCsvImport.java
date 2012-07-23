@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
+import edu.ualberta.med.biobank.test.action.ActionTest;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
 @SuppressWarnings("nls")
@@ -81,7 +81,6 @@ public class TestSpecimenCsvImport extends ActionTest {
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
