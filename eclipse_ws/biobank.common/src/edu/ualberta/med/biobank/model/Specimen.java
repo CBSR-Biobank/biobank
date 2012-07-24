@@ -236,8 +236,7 @@ public class Specimen extends AbstractVersionedModel
         this.comments = comments;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_ID", updatable = false)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
     public Set<RequestSpecimen> getRequestSpecimens() {
         return this.requestSpecimens;
     }
