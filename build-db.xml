@@ -86,6 +86,11 @@
           <include name="**/*.sql"/>
         </fileset>
       </path>
+      <path>
+        <fileset dir="${db.after.import.dir}">
+          <include name="**/*.sql"/>
+        </fileset>
+      </path>
       <transaction>commit;</transaction>
     </sql>
   </target>
