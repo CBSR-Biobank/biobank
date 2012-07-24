@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,10 +14,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvImportAction;
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
@@ -27,9 +26,15 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.test.action.csvhelper.SpecimenCsvHelper;
+import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
 public class TestSpecimenCsvImport extends ActionTest {
 
@@ -81,12 +86,11 @@ public class TestSpecimenCsvImport extends ActionTest {
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
@@ -133,7 +137,7 @@ public class TestSpecimenCsvImport extends ActionTest {
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
@@ -186,7 +190,7 @@ public class TestSpecimenCsvImport extends ActionTest {
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
@@ -225,7 +229,7 @@ public class TestSpecimenCsvImport extends ActionTest {
             exec(importAction);
         } catch (CsvImportException e) {
             Assert.fail("errors in CVS data");
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
         } catch (Exception e) {
             Assert.fail("could not import data");
         }
@@ -281,7 +285,7 @@ public class TestSpecimenCsvImport extends ActionTest {
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
@@ -323,7 +327,7 @@ public class TestSpecimenCsvImport extends ActionTest {
                 new SpecimenCsvImportAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
-            showErrorsInLog(e);
+            CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
@@ -332,7 +336,7 @@ public class TestSpecimenCsvImport extends ActionTest {
 
     private void checkCsvInfoAgainstDb(Set<SpecimenCsvInfo> csvInfos) {
         for (SpecimenCsvInfo csvInfo : csvInfos) {
-            Criteria c = session.createCriteria(Specimen.class, "p")
+            Criteria c = session.createCriteria(Specimen.class, "s")
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()));
 
             Specimen specimen = (Specimen) c.uniqueResult();
@@ -429,13 +433,5 @@ public class TestSpecimenCsvImport extends ActionTest {
         result.add(factory.createContainer());
 
         return result;
-    }
-
-    private void showErrorsInLog(CsvImportException e) {
-        for (ImportError ie : e.getErrors()) {
-            log.error("ERROR: line no {}: {}", ie.getLineNumber(),
-                ie.getMessage());
-        }
-
     }
 }

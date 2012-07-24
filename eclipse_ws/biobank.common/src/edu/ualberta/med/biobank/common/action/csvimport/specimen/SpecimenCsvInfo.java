@@ -1,7 +1,8 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.specimen;
 
-import java.io.Serializable;
 import java.util.Date;
+
+import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
 
 /**
  * POJO used for CSV import.
@@ -9,7 +10,7 @@ import java.util.Date;
  * @author loyola
  * 
  */
-public class SpecimenCsvInfo implements Serializable {
+public class SpecimenCsvInfo implements ICsvInfo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -28,10 +29,12 @@ public class SpecimenCsvInfo implements Serializable {
     private String palletLabel;
     private String palletPosition;
 
+    @Override
     public int getLineNumber() {
         return lineNumber;
     }
 
+    @Override
     public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;
     }

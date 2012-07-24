@@ -1,14 +1,31 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.patient;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class PatientCsvInfo implements Serializable {
+import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
+
+/**
+ * 
+ * @author loyola
+ * 
+ */
+public class PatientCsvInfo implements ICsvInfo {
     private static final long serialVersionUID = 1L;
 
+    private int lineNumber;
     private String studyName;
     private String patientNumber;
     private Date createdAt;
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
     public String getStudyName() {
         return studyName;

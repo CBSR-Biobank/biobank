@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvhelper;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Patient;
@@ -18,6 +18,11 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
 public class SpecimenCsvHelper {
     private static final NameGenerator nameGenerator = new NameGenerator(
@@ -35,7 +40,7 @@ public class SpecimenCsvHelper {
      * @param patients the patients that these specimens will belong to.
      * @throws IOException
      */
-    public static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
+    static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
         Center originCenter, Center currentCenter, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -64,7 +69,7 @@ public class SpecimenCsvHelper {
         return specimenInfos;
     }
 
-    public static Set<SpecimenCsvInfo> sourceSpecimensCreate(
+    static Set<SpecimenCsvInfo> sourceSpecimensCreate(
         Center originCenter,
         Center currentCenter, Set<Patient> patients,
         Set<SourceSpecimen> sourceSpecimens) {
