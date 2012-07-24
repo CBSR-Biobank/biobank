@@ -20,6 +20,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -37,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         @UniqueConstraint(columnNames = { "PATIENT_ID", "VISIT_NUMBER" }) })
 @Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
 @Empty(property = "allSpecimens", groups = PreDelete.class)
-public class CollectionEvent extends AbstractBiobankModel
+public class CollectionEvent extends AbstractVersionedModel
     implements HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -114,6 +115,7 @@ public class CollectionEvent extends AbstractBiobankModel
         this.activityStatus = activityStatus;
     }
 
+    @NotAudited
     @OneToMany(cascade = javax.persistence.CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "collectionEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
     public Set<EventAttr> getEventAttrs() {

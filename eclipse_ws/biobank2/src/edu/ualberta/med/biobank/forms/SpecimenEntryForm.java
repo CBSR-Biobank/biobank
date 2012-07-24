@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
-import edu.ualberta.med.biobank.model.AbstractBiobankModel;
+import edu.ualberta.med.biobank.model.AbstractVersionedModel;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -102,7 +102,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText sourceSpecimenField;
 
-    private List<AbstractBiobankModel> specTypes;
+    private List<AbstractVersionedModel> specTypes;
 
     private Label sourceSpecimenLabel;
 
@@ -150,7 +150,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         List<SpecimenType> specimenTypes = new ArrayList<SpecimenType>();
-        for (AbstractBiobankModel a : specTypes)
+        for (AbstractVersionedModel a : specTypes)
             if (a instanceof AliquotedSpecimen)
                 specimenTypes.add(((AliquotedSpecimen) a).getSpecimenType());
             else
@@ -188,7 +188,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 }
 
                 private BigDecimal setQuantityFromType(SpecimenType specimenType) {
-                    for (AbstractBiobankModel as : specTypes) {
+                    for (AbstractVersionedModel as : specTypes) {
                         if (as instanceof AliquotedSpecimen) {
                             if (specimenType
                                 .equals(((AliquotedSpecimen) as)

@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 @Audited
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
-public class RequestSpecimen extends AbstractBiobankModel {
+public class RequestSpecimen extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

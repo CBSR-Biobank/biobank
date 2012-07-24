@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "ADDRESS")
-public class Address extends AbstractBiobankModel {
+public class Address extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
-public class Principal extends AbstractBiobankModel
+public class Principal extends AbstractVersionedModel
     implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

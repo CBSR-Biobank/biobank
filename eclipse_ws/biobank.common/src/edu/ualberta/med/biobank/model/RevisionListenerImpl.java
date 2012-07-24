@@ -1,14 +1,10 @@
-package edu.ualberta.med.biobank.model.util;
+package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 
 import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
-
-import edu.ualberta.med.biobank.model.Revision;
-import edu.ualberta.med.biobank.model.RevisionEntityType;
-import edu.ualberta.med.biobank.model.User;
 
 public class RevisionListenerImpl
     implements EntityTrackingRevisionListener {
@@ -31,18 +27,7 @@ public class RevisionListenerImpl
         String entityName, Serializable entityId, RevisionType revisionType,
         Object revisionEntity) {
         Revision revision = asRevision(revisionEntity);
-
-        // record which entity types have been modified in this revision so we
-        // can narrow down which tables to search when loading the revision
-        RevisionEntityType entityType = new RevisionEntityType();
-        entityType.setRevision(revision);
-        entityType.setType(entityName);
-
-        if (!revision.getEntityTypes().contains(entityType)) {
-            revision.getEntityTypes().add(entityType);
-        } else {
-            entityType.setRevision(null);
-        }
+        revision.getModifiedTypes().add(entityName);
     }
 
     private static Revision asRevision(Object object) {

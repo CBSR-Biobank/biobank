@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -50,7 +51,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @Empty(property = "childSpecimens", groups = PreDelete.class)
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
-public class Specimen extends AbstractBiobankModel
+public class Specimen extends AbstractVersionedModel
     implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -190,6 +191,7 @@ public class Specimen extends AbstractBiobankModel
         this.originalCollectionEvent = originalCollectionEvent;
     }
 
+    @NotAudited
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
@@ -234,8 +236,7 @@ public class Specimen extends AbstractBiobankModel
         this.comments = comments;
     }
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_ID", updatable = false)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
     public Set<RequestSpecimen> getRequestSpecimens() {
         return this.requestSpecimens;
     }

@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "SHIPMENT_INFO")
-public class ShipmentInfo extends AbstractBiobankModel {
+public class ShipmentInfo extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

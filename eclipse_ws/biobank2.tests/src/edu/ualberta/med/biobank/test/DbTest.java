@@ -19,7 +19,7 @@ public class DbTest extends BaseTest {
     private static final SessionProvider SESSION_PROVIDER;
 
     static {
-        SESSION_PROVIDER = new SessionProvider(Mode.RUN);
+        SESSION_PROVIDER = new SessionProvider(Mode.DEBUG);
         GLOBAL_ADMIN = getOrCreateSuperUser();
     }
 

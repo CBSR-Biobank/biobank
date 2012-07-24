@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.model.type.DispatchState;
 @Audited
 @Entity
 @Table(name = "DISPATCH")
-public class Dispatch extends AbstractBiobankModel
+public class Dispatch extends AbstractVersionedModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PRINTED_SS_INV_ITEM")
 @Unique(properties = "txt", groups = PrePersist.class)
-public class PrintedSsInvItem extends AbstractBiobankModel {
+public class PrintedSsInvItem extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private String txt;
