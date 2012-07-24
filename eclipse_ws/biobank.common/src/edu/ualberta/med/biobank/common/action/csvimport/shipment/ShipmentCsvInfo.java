@@ -11,8 +11,6 @@ public class ShipmentCsvInfo implements ICsvInfo {
     private Date dateReceived;
     private String sendingCenter;
     private String receivingCenter;
-    private String patientNumber;
-    private String inventoryId;
     private String shippingMethod;
     private String waybill;
     private String comment;
@@ -49,22 +47,6 @@ public class ShipmentCsvInfo implements ICsvInfo {
 
     public void setReceivingCenter(String receivingCenter) {
         this.receivingCenter = receivingCenter;
-    }
-
-    public String getPatientNumber() {
-        return patientNumber;
-    }
-
-    public void setPatientNumber(String patientNumber) {
-        this.patientNumber = patientNumber;
-    }
-
-    public String getInventoryId() {
-        return inventoryId;
-    }
-
-    public void setInventoryId(String inventoryId) {
-        this.inventoryId = inventoryId;
     }
 
     public String getShippingMethod() {

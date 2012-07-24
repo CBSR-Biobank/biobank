@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -102,12 +103,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         bundle
             .tr("the parent specimen of specimen with inventory id \"{0}\", parent specimen with inventory id \"{0}\", does not have a processing event");
 
-    public static final Tr CSV_ORIGIN_CENTER_ERROR =
-        bundle.tr("origin center in CSV file with name \"{0}\" does not exist");
-
-    public static final Tr CSV_CURRENT_CENTER_ERROR =
-        bundle
-            .tr("current center in CSV file with name \"{0}\" does not exist");
+    public static final Tr CSV_WAYBILL_ERROR =
+        bundle.tr("waybill \"{0}\" does not exist");
 
     public static final Tr CSV_SPECIMEN_TYPE_ERROR =
         bundle.tr("specimen type in CSV file with name \"{0}\" does not exist");
@@ -127,8 +124,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         new ParseDate("yyyy-MM-dd HH:mm"),  // createdAt,
         new StrNotNullOrEmpty(),            // patientNumber,
         new ParseInt(),                     // visitNumber,
-        new StrNotNullOrEmpty(),            // currentCenter,
-        new StrNotNullOrEmpty(),            // originCenter,
+        new Optional(),                     // waybill,
         new ParseBool(),                    // sourceSpecimen,
         new Optional(new Unique()),         // worksheet,
         new Optional(),                     // palletProductBarcode,
@@ -137,6 +133,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         new Optional()                      // palletPosition
     }; 
     // @formatter:on    
+
+    private final Center workingCenter;
 
     private final CsvErrorList errorList = new CsvErrorList();
 
@@ -152,7 +150,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
 
-    public SpecimenCsvImportAction(String filename) throws IOException {
+    public SpecimenCsvImportAction(Center workingCenter, String filename)
+        throws IOException {
+        this.workingCenter = workingCenter;
         setCsvFile(filename);
     }
 
@@ -167,8 +167,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             "createdAt",
             "patientNumber",
             "visitNumber",
-            "currentCenter",
-            "originCenter",
+            "waybill",
             "sourceSpecimen",
             "worksheet",
             "palletProductBarcode",
@@ -309,7 +308,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
             // add the processing event for this source specimen
             if (info.hasWorksheet()) {
-                ProcessingEvent pevent = info.createProcessingEvent();
+                ProcessingEvent pevent = info.getNewProcessingEvent();
                 context.getSession().saveOrUpdate(pevent);
 
                 // TODO: set activity status to closed?
@@ -370,22 +369,13 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             }
         }
 
-        Center originCenter =
-            CsvActionUtil.getCenter(context, csvInfo.getOriginCenter());
-        if (originCenter == null) {
+        OriginInfo originInfo =
+            CsvActionUtil.getOriginInfo(context, csvInfo.getWaybill());
+        if (originInfo == null) {
             errorList.addError(csvInfo.getLineNumber(),
-                CSV_ORIGIN_CENTER_ERROR.format(csvInfo.getOriginCenter()));
+                CSV_WAYBILL_ERROR.format(csvInfo.getWaybill()));
         } else {
-            info.setOriginCenter(originCenter);
-        }
-
-        Center currentCenter =
-            CsvActionUtil.getCenter(context, csvInfo.getCurrentCenter());
-        if (originCenter == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_CURRENT_CENTER_ERROR.format(csvInfo.getCurrentCenter()));
-        } else {
-            info.setCurrentCenter(currentCenter);
+            info.setOriginInfo(originInfo);
         }
 
         SpecimenType spcType =
@@ -427,6 +417,11 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 "should only be called once the context is initialized");
         }
 
+        OriginInfo originInfo = info.getOriginInfo();
+        if (originInfo == null) {
+            originInfo = info.getNewOriginInfo(workingCenter);
+        }
+
         CollectionEvent cevent = info.getCevent();
         if (cevent == null) {
             // see if this collection event was created for a previous specimen
@@ -449,7 +444,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
             // if still not found create one
             if (cevent == null) {
-                cevent = info.createCollectionEvent();
+                cevent = info.getNewCollectionEvent();
                 context.getSession().saveOrUpdate(cevent);
             }
         }

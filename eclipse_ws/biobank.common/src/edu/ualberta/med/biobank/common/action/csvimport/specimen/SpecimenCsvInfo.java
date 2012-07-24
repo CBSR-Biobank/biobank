@@ -20,8 +20,7 @@ public class SpecimenCsvInfo implements ICsvInfo {
     private Date createdAt;
     private String patientNumber;
     private Integer visitNumber;
-    private String currentCenter;
-    private String originCenter;
+    private String waybill;
     private Boolean sourceSpecimen = false;
     private String worksheet;
     private String palletProductBarcode;
@@ -87,20 +86,12 @@ public class SpecimenCsvInfo implements ICsvInfo {
         this.visitNumber = visitNumber;
     }
 
-    public String getCurrentCenter() {
-        return currentCenter;
+    public String getWaybill() {
+        return waybill;
     }
 
-    public void setCurrentCenter(String currentCenter) {
-        this.currentCenter = currentCenter;
-    }
-
-    public String getOriginCenter() {
-        return originCenter;
-    }
-
-    public void setOriginCenter(String originCenter) {
-        this.originCenter = originCenter;
+    public void setWaybill(String waybill) {
+        this.waybill = waybill;
     }
 
     public Boolean getSourceSpecimen() {

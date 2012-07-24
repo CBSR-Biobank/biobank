@@ -31,11 +31,9 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
@@ -75,8 +73,6 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         new ParseDate("yyyy-MM-dd HH:mm"), // dateReceived
         new StrNotNullOrEmpty(),           // sendingCenter
         new StrNotNullOrEmpty(),           // receivingCenter
-        new StrNotNullOrEmpty(),           // patientNumber
-        new StrNotNullOrEmpty(),           // inventoryId
         new StrNotNullOrEmpty(),           // shippingMethod
         new StrNotNullOrEmpty(),           // waybill
         null                               // comment
@@ -103,8 +99,6 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             "dateReceived",
             "sendingCenter",
             "receivingCenter",
-            "patientNumber",
-            "inventoryId",
             "shippingMethod",
             "waybill",
             "comment"
@@ -185,37 +179,19 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         Site receivingSite =
             CsvActionUtil.getSite(context, csvInfo.getReceivingCenter());
         if (receivingSite == null) {
-            errorList
-                .addError(csvInfo.getLineNumber(),
-                    CSV_RECEIVING_CENTER_ERROR.format(csvInfo
-                        .getReceivingCenter()));
+            errorList.addError(csvInfo.getLineNumber(),
+                CSV_RECEIVING_CENTER_ERROR.format(csvInfo
+                    .getReceivingCenter()));
         } else {
             info.setCurrentSite(receivingSite);
         }
 
-        Patient patient =
-            CsvActionUtil.getPatient(context, csvInfo.getPatientNumber());
-        if (patient == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_PNUMBER_ERROR.format(csvInfo.getPatientNumber()));
-        } else {
-            info.setPatient(patient);
-        }
-
-        Specimen specimen =
-            CsvActionUtil.getSpecimen(context, csvInfo.getInventoryId());
-        if (specimen == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_INVENTORY_ID_ERROR.format(csvInfo.getInventoryId()));
-        } else {
-            info.setSpecimen(specimen);
-        }
-
         ShippingMethod shippingMethod =
-            CsvActionUtil.getShippingMethod(context, csvInfo.getInventoryId());
+            CsvActionUtil.getShippingMethod(context,
+                csvInfo.getShippingMethod());
         if (shippingMethod == null) {
             errorList.addError(csvInfo.getLineNumber(),
-                CSV_SHIPPING_METHOD_ERROR.format(csvInfo.getInventoryId()));
+                CSV_SHIPPING_METHOD_ERROR.format(csvInfo.getShippingMethod()));
         } else {
             info.setShippingMethod(shippingMethod);
         }

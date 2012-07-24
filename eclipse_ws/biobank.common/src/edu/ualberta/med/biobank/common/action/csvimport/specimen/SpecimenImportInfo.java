@@ -35,8 +35,7 @@ public class SpecimenImportInfo implements IImportInfo {
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
     private Specimen parentSpecimen;
-    private Center originCenter;
-    private Center currentCenter;
+    private OriginInfo originInfo;
     private SpecimenType specimenType;
     private Container container;
     private RowColPos specimenPos;
@@ -105,20 +104,12 @@ public class SpecimenImportInfo implements IImportInfo {
         return csvInfo.getParentInventoryId();
     }
 
-    Center getOriginCenter() {
-        return originCenter;
+    OriginInfo getOriginInfo() {
+        return originInfo;
     }
 
-    void setOriginCenter(Center originCenter) {
-        this.originCenter = originCenter;
-    }
-
-    Center getCurrentCenter() {
-        return currentCenter;
-    }
-
-    void setCurrentCenter(Center currentCenter) {
-        this.currentCenter = currentCenter;
+    void setOriginInfo(OriginInfo originInfo) {
+        this.originInfo = originInfo;
     }
 
     SpecimenType getSpecimenType() {
@@ -166,7 +157,13 @@ public class SpecimenImportInfo implements IImportInfo {
 
     }
 
-    CollectionEvent createCollectionEvent() {
+    public OriginInfo getNewOriginInfo(Center center) {
+        originInfo = new OriginInfo();
+        originInfo.setCenter(center);
+        return originInfo;
+    }
+
+    CollectionEvent getNewCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
         cevent.setVisitNumber(csvInfo.getVisitNumber());
@@ -183,7 +180,7 @@ public class SpecimenImportInfo implements IImportInfo {
         return cevent;
     }
 
-    ProcessingEvent createProcessingEvent() {
+    ProcessingEvent getNewProcessingEvent() {
         if (parentSpecimen != null) {
             throw new IllegalStateException(
                 "this specimen has a parent specimen and cannot have a processing event");
@@ -191,7 +188,7 @@ public class SpecimenImportInfo implements IImportInfo {
         pevent = new ProcessingEvent();
         pevent.setWorksheet(csvInfo.getWorksheet());
         pevent.setCreatedAt(new Date());
-        pevent.setCenter(currentCenter);
+        pevent.setCenter(originInfo.getCenter());
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
 
@@ -215,16 +212,12 @@ public class SpecimenImportInfo implements IImportInfo {
                     + " has not be created yet");
         }
 
-        // add the specimen to the collection event
-        OriginInfo oi = new OriginInfo();
-        oi.setCenter(originCenter);
-
         specimen = new Specimen();
         specimen.setInventoryId(csvInfo.getInventoryId());
         specimen.setSpecimenType(specimenType);
-        specimen.setCurrentCenter(currentCenter);
+        specimen.setCurrentCenter(originInfo.getReceiverSite());
         specimen.setCollectionEvent(cevent);
-        specimen.setOriginInfo(oi);
+        specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(csvInfo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
