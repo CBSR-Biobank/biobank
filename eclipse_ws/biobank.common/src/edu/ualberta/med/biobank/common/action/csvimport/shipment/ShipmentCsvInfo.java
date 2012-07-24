@@ -2,11 +2,12 @@ package edu.ualberta.med.biobank.common.action.csvimport.shipment;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.csvimport.CsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
 
-public class ShipmentCsvInfo extends CsvInfo {
+public class ShipmentCsvInfo implements ICsvInfo {
     private static final long serialVersionUID = 1L;
 
+    private int lineNumber;
     private Date dateReceived;
     private String sendingCenter;
     private String receivingCenter;
@@ -15,6 +16,16 @@ public class ShipmentCsvInfo extends CsvInfo {
     private String shippingMethod;
     private String waybill;
     private String comment;
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
     public Date getDateReceived() {
         return dateReceived;

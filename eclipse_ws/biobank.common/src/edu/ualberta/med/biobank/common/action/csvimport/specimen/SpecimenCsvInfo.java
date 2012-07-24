@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.csvimport.specimen;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.csvimport.CsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
 
 /**
  * POJO used for CSV import.
@@ -10,9 +10,10 @@ import edu.ualberta.med.biobank.common.action.csvimport.CsvInfo;
  * @author loyola
  * 
  */
-public class SpecimenCsvInfo extends CsvInfo {
+public class SpecimenCsvInfo implements ICsvInfo {
     private static final long serialVersionUID = 1L;
 
+    private int lineNumber;
     private String inventoryId;
     private String parentInventoryID;
     private String specimenType;
@@ -27,6 +28,16 @@ public class SpecimenCsvInfo extends CsvInfo {
     private String rootContainerType;
     private String palletLabel;
     private String palletPosition;
+
+    @Override
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    @Override
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
     public String getInventoryId() {
         return inventoryId;
