@@ -18,12 +18,16 @@ import org.supercsv.prefs.CsvPreference;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvImportAction;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
 import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
@@ -40,8 +44,10 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class ShipmentCsvImportAction extends CsvImportAction {
+public class ShipmentCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
+
+    private static final Bundle bundle = new CommonBundle();
 
     private static Logger log = LoggerFactory
         .getLogger(ShipmentCsvImportAction.class.getName());
@@ -76,6 +82,8 @@ public class ShipmentCsvImportAction extends CsvImportAction {
         null                               // comment
     }; 
     // @formatter:on    
+
+    private final CsvErrorList errorList = new CsvErrorList();
 
     private CompressedReference<ArrayList<ShipmentCsvInfo>> compressedList =
         null;
@@ -115,8 +123,8 @@ public class ShipmentCsvImportAction extends CsvImportAction {
                 csvInfos.add(csvInfo);
             }
 
-            if (!errors.isEmpty()) {
-                throw new CsvImportException(errors);
+            if (!errorList.isEmpty()) {
+                throw new CsvImportException(errorList.getErrors());
             }
 
             compressedList =
@@ -125,7 +133,8 @@ public class ShipmentCsvImportAction extends CsvImportAction {
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
-                i18n.tr(CSV_PARSE_ERROR, e.getMessage(), e.getCsvContext()));
+                i18n.tr(CsvActionUtil.CSV_PARSE_ERROR, e.getMessage(),
+                    e.getCsvContext()));
         } finally {
             reader.close();
         }
@@ -139,67 +148,73 @@ public class ShipmentCsvImportAction extends CsvImportAction {
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new LocalizedException(CSV_FILE_ERROR);
+            throw new LocalizedException(CsvActionUtil.CSV_FILE_ERROR);
         }
 
-        this.context = context;
         boolean result = false;
 
         ArrayList<ShipmentCsvInfo> csvInfos = compressedList.get();
-        this.context.getSession().getTransaction();
+        context.getSession().getTransaction();
 
         for (ShipmentCsvInfo csvInfo : csvInfos) {
-            ShipmentImportInfo info = getDbInfo(csvInfo);
+            ShipmentImportInfo info = getDbInfo(context, csvInfo);
             shipmentImportInfos.add(info);
         }
 
-        if (!errors.isEmpty()) {
-            throw new CsvImportException(errors);
+        if (!errorList.isEmpty()) {
+            throw new CsvImportException(errorList.getErrors());
         }
 
         result = true;
         return new BooleanResult(result);
     }
 
-    private ShipmentImportInfo getDbInfo(ShipmentCsvInfo csvInfo) {
+    private ShipmentImportInfo getDbInfo(ActionContext context,
+        ShipmentCsvInfo csvInfo) {
         ShipmentImportInfo info = new ShipmentImportInfo(csvInfo);
 
-        Center sendingCenter = getCenter(csvInfo.getSendingCenter());
+        Center sendingCenter =
+            CsvActionUtil.getCenter(context, csvInfo.getSendingCenter());
         if (sendingCenter == null) {
-            addError(csvInfo.getLineNumber(),
+            errorList.addError(csvInfo.getLineNumber(),
                 CSV_SENDING_CENTER_ERROR.format(csvInfo.getSendingCenter()));
         } else {
             info.setOriginCenter(sendingCenter);
         }
 
-        Site receivingSite = getSite(csvInfo.getReceivingCenter());
+        Site receivingSite =
+            CsvActionUtil.getSite(context, csvInfo.getReceivingCenter());
         if (receivingSite == null) {
-            addError(csvInfo.getLineNumber(),
-                CSV_RECEIVING_CENTER_ERROR.format(csvInfo.getReceivingCenter()));
+            errorList
+                .addError(csvInfo.getLineNumber(),
+                    CSV_RECEIVING_CENTER_ERROR.format(csvInfo
+                        .getReceivingCenter()));
         } else {
             info.setCurrentSite(receivingSite);
         }
 
-        Patient patient = getPatient(csvInfo.getPatientNumber());
+        Patient patient =
+            CsvActionUtil.getPatient(context, csvInfo.getPatientNumber());
         if (patient == null) {
-            addError(csvInfo.getLineNumber(),
+            errorList.addError(csvInfo.getLineNumber(),
                 CSV_PNUMBER_ERROR.format(csvInfo.getPatientNumber()));
         } else {
             info.setPatient(patient);
         }
 
-        Specimen specimen = getSpecimen(csvInfo.getInventoryId());
+        Specimen specimen =
+            CsvActionUtil.getSpecimen(context, csvInfo.getInventoryId());
         if (specimen == null) {
-            addError(csvInfo.getLineNumber(),
+            errorList.addError(csvInfo.getLineNumber(),
                 CSV_INVENTORY_ID_ERROR.format(csvInfo.getInventoryId()));
         } else {
             info.setSpecimen(specimen);
         }
 
         ShippingMethod shippingMethod =
-            getShippingMethod(csvInfo.getInventoryId());
+            CsvActionUtil.getShippingMethod(context, csvInfo.getInventoryId());
         if (shippingMethod == null) {
-            addError(csvInfo.getLineNumber(),
+            errorList.addError(csvInfo.getLineNumber(),
                 CSV_SHIPPING_METHOD_ERROR.format(csvInfo.getInventoryId()));
         } else {
             info.setShippingMethod(shippingMethod);

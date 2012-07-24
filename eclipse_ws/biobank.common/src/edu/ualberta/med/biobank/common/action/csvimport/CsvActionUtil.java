@@ -1,17 +1,10 @@
 package edu.ualberta.med.biobank.common.action.csvimport;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Center;
@@ -29,33 +22,17 @@ import edu.ualberta.med.biobank.model.Study;
  * 
  */
 @SuppressWarnings("nls")
-public abstract class CsvImportAction implements Action<BooleanResult> {
-    private static final long serialVersionUID = 1L;
+public class CsvActionUtil {
 
-    protected static final int MAX_ERRORS_TO_REPORT = 50;
+    private static final Bundle bundle = new CommonBundle();
 
-    protected static final Bundle bundle = new CommonBundle();
-
-    protected static final LString CSV_FILE_ERROR =
+    public static final LString CSV_FILE_ERROR =
         bundle.tr("CVS file not loaded").format();
 
     public static final String CSV_PARSE_ERROR =
         "Parse error at line {0}\n{1}";
 
-    protected final Set<ImportError> errors = new TreeSet<ImportError>();
-
-    protected ActionContext context = null;
-
-    protected void addError(int lineNumber, LString message)
-        throws CsvImportException {
-        ImportError importError = new ImportError(lineNumber, message);
-        errors.add(importError);
-        if (errors.size() > MAX_ERRORS_TO_REPORT) {
-            throw new CsvImportException(errors);
-        }
-    }
-
-    protected Patient getPatient(String pnumber) {
+    public static Patient getPatient(ActionContext context, String pnumber) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -72,7 +49,7 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
      * Generates an action exception if specimen with inventory ID does not
      * exist.
      */
-    protected Specimen getSpecimen(String inventoryId) {
+    public static Specimen getSpecimen(ActionContext context, String inventoryId) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -89,7 +66,8 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if specimen type does not exist.
      */
-    protected SpecimenType getSpecimenType(String name) {
+    public static SpecimenType getSpecimenType(ActionContext context,
+        String name) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -105,7 +83,7 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if centre with name does not exist.
      */
-    protected Study getStudy(String nameShort) {
+    public static Study getStudy(ActionContext context, String nameShort) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -120,7 +98,7 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if centre with name does not exist.
      */
-    protected Center getCenter(String nameShort) {
+    public static Center getCenter(ActionContext context, String nameShort) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -136,7 +114,7 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if centre with name does not exist.
      */
-    protected Site getSite(String nameShort) {
+    public static Site getSite(ActionContext context, String nameShort) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -152,7 +130,7 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if container label does not exist.
      */
-    protected Container getContainer(String label) {
+    public static Container getContainer(ActionContext context, String label) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");
@@ -168,7 +146,8 @@ public abstract class CsvImportAction implements Action<BooleanResult> {
     /*
      * Generates an action exception if shippingMethod label does not exist.
      */
-    protected ShippingMethod getShippingMethod(String name) {
+    public static ShippingMethod getShippingMethod(ActionContext context,
+        String name) {
         if (context == null) {
             throw new IllegalStateException(
                 "should only be called once the context is initialized");

@@ -17,12 +17,16 @@ import org.supercsv.prefs.CsvPreference;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvImportAction;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
 import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -37,8 +41,10 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class PatientCsvImportAction extends CsvImportAction {
+public class PatientCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
+
+    private static final Bundle bundle = new CommonBundle();
 
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenCsvImportAction.class);
@@ -56,6 +62,8 @@ public class PatientCsvImportAction extends CsvImportAction {
         new ParseDate("yyyy-MM-dd HH:mm")   // createdAt
     };
     // @formatter:on    
+
+    private final CsvErrorList csvErrorList = new CsvErrorList();
 
     private CompressedReference<ArrayList<PatientCsvInfo>> compressedList =
         null;
@@ -94,7 +102,8 @@ public class PatientCsvImportAction extends CsvImportAction {
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
-                i18n.tr(CSV_PARSE_ERROR, e.getMessage(), e.getCsvContext()));
+                i18n.tr(CsvActionUtil.CSV_PARSE_ERROR, e.getMessage(),
+                    e.getCsvContext()));
         } finally {
             reader.close();
         }
@@ -111,15 +120,15 @@ public class PatientCsvImportAction extends CsvImportAction {
             throw new LocalizedException(CSV_FILE_ERROR);
         }
 
-        this.context = context;
         boolean result = false;
 
         ArrayList<PatientCsvInfo> patientCsvInfos = compressedList.get();
         for (PatientCsvInfo csvInfo : patientCsvInfos) {
-            Study study = getStudy(csvInfo.getStudyName());
+            Study study =
+                CsvActionUtil.getStudy(context, csvInfo.getStudyName());
 
             if (study == null) {
-                addError(csvInfo.getLineNumber(),
+                csvErrorList.addError(csvInfo.getLineNumber(),
                     CSV_STUDY_ERROR.format(csvInfo.getStudyName()));
                 continue;
             }
@@ -129,18 +138,18 @@ public class PatientCsvImportAction extends CsvImportAction {
             patientImportInfos.add(importInfo);
         }
 
-        if (!errors.isEmpty()) {
-            throw new CsvImportException(errors);
+        if (!csvErrorList.isEmpty()) {
+            throw new CsvImportException(csvErrorList.getErrors());
         }
 
         for (PatientImportInfo importInfo : patientImportInfos) {
-            addPatient(importInfo);
+            addPatient(context, importInfo);
         }
 
         return new BooleanResult(result);
     }
 
-    private void addPatient(PatientImportInfo importInfo) {
+    private void addPatient(ActionContext context, PatientImportInfo importInfo) {
         Patient patient = importInfo.getNewPatient();
         context.getSession().saveOrUpdate(patient);
     }
