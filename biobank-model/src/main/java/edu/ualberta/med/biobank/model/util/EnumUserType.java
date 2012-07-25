@@ -66,7 +66,7 @@ public class EnumUserType<T extends Enum<T>>
 
     private Object getId(Object value) {
         try {
-            Object id = value != null
+            Object id = (value != null)
                 ? idMethod.invoke(value, new Object[0])
                 : null;
             return id;
@@ -116,36 +116,20 @@ public class EnumUserType<T extends Enum<T>>
         return enumClass;
     }
 
-    // @Override
-    // public Object nullSafeGet(ResultSet rs, String[] names, Object owner)
-    // throws HibernateException, SQLException {
-    // // TODO: hibernate4 adds SessionImplementor to the parameters, so we can
-    // // call the correct (non-deprecated) type method.
-    // @SuppressWarnings("deprecation")
-    // Object id = type.get(rs, names[0]);
-    // T value = getValuesMap().get(id);
-    // return value;
-    // }
-
     @Override
     public Object nullSafeGet(ResultSet rs, String[] names,
         SessionImplementor session, Object owner) throws HibernateException,
         SQLException {
-        // FIXME old implementation above
-        return null;
+        Object id = type.get(rs, names[0], session);
+        T value = getValuesMap().get(id);
+        return value;
     }
-
-    // @Override
-    // public void nullSafeSet(PreparedStatement st, Object value, int index)
-    // throws HibernateException, SQLException {
-    // Object id = getId(value);
-    // st.setObject(index, id);
-    // }
 
     @Override
     public void nullSafeSet(PreparedStatement st, Object value, int index,
         SessionImplementor session) throws HibernateException, SQLException {
-        // FIXME old implementation above
+        Object id = getId(value);
+        st.setObject(index, id);
     }
 
     @Override
