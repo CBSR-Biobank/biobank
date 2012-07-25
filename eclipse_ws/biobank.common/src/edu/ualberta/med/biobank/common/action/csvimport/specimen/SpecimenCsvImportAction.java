@@ -369,13 +369,16 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             }
         }
 
-        OriginInfo originInfo =
-            CsvActionUtil.getOriginInfo(context, csvInfo.getWaybill());
-        if (originInfo == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_WAYBILL_ERROR.format(csvInfo.getWaybill()));
-        } else {
-            info.setOriginInfo(originInfo);
+        if ((csvInfo.getWaybill() != null)
+            && !csvInfo.getWaybill().isEmpty()) {
+            OriginInfo originInfo =
+                CsvActionUtil.getOriginInfo(context, csvInfo.getWaybill());
+            if (originInfo == null) {
+                errorList.addError(csvInfo.getLineNumber(),
+                    CSV_WAYBILL_ERROR.format(csvInfo.getWaybill()));
+            } else {
+                info.setOriginInfo(originInfo);
+            }
         }
 
         SpecimenType spcType =

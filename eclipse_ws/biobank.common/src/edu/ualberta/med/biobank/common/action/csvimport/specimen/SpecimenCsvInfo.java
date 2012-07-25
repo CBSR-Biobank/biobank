@@ -5,7 +5,7 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
 
 /**
- * POJO used for CSV import.
+ * POJO used by SuperCSV for CSV import feature.
  * 
  * @author loyola
  * 

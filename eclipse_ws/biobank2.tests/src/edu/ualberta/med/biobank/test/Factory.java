@@ -104,6 +104,10 @@ public class Factory {
         this.schemeGetter = new ContainerLabelingSchemeGetter();
     }
 
+    public NameGenerator getNameGenerator() {
+        return nameGenerator;
+    }
+
     public Comment getDefaultComment() {
         if (defaultComment == null) {
             defaultComment = createComment();
@@ -904,9 +908,13 @@ public class Factory {
 
     public OriginInfo createOriginInfo() {
         OriginInfo originInfo = new OriginInfo();
-        originInfo.setCenter(getDefaultSite());
+        originInfo.setCenter(getDefaultCenter());
 
-        originInfo.setShipmentInfo(getDefaultShipmentInfo());
+        ShipmentInfo shipmentInfo = getDefaultShipmentInfo();
+        if (shipmentInfo != null) {
+            originInfo.setShipmentInfo(shipmentInfo);
+            originInfo.setReceiverSite(getDefaultSite());
+        }
 
         setDefaultOriginInfo(originInfo);
         session.save(originInfo);
@@ -928,6 +936,7 @@ public class Factory {
         shipmentInfo.setReceivedAt(new Date());
         shipmentInfo.setWaybill(waybill);
         shipmentInfo.setBoxNumber("");
+        shipmentInfo.setShippingMethod(createShippingMethod());
 
         setDefaultShipmentInfo(shipmentInfo);
         session.save(shipmentInfo);

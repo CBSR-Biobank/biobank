@@ -44,17 +44,30 @@ public class TestSpecimenCsvImport extends ActionTest {
 
     private static final String CSV_NAME = "import_specimens.csv";
 
+    private SpecimenCsvHelper specimenCsvHelper;
+
+    private final Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
+
     private Transaction tx;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        specimenCsvHelper = new SpecimenCsvHelper(factory.getNameGenerator());
+
+        // add 2 shipments
 
         tx = session.beginTransaction();
         factory.createSite();
         factory.createClinic();
         factory.createStudy();
+
+        // source center on origin info will be the clinic created above
+        factory.createShipmentInfo();
+        originInfos.add(factory.createOriginInfo());
+        factory.createShipmentInfo();
+        originInfos.add(factory.createOriginInfo());
     }
 
     @Test
@@ -79,14 +92,9 @@ public class TestSpecimenCsvImport extends ActionTest {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        // add 2 shipments
-        Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
-        originInfos.add(factory.createOriginInfo());
-        originInfos.add(factory.createOriginInfo());
-
         tx.commit();
 
-        Set<SpecimenCsvInfo> csvInfos = SpecimenCsvHelper.createAllSpecimens(
+        Set<SpecimenCsvInfo> csvInfos = specimenCsvHelper.createAllSpecimens(
             factory.getDefaultStudy(), originInfos, patients);
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -116,16 +124,11 @@ public class TestSpecimenCsvImport extends ActionTest {
             }
         }
 
-        // add 2 shipments
-        Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
-        originInfos.add(factory.createOriginInfo());
-        originInfos.add(factory.createOriginInfo());
-
         tx.commit();
 
         // make sure you can add parent specimens without a worksheet #
         Set<SpecimenCsvInfo> csvInfos =
-            SpecimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
+            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
         // remove the worksheet # for the last half
@@ -189,7 +192,7 @@ public class TestSpecimenCsvImport extends ActionTest {
         tx.commit();
 
         Set<SpecimenCsvInfo> csvInfos =
-            SpecimenCsvHelper.createAliquotedSpecimens(
+            specimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), parentSpecimens);
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -223,16 +226,11 @@ public class TestSpecimenCsvImport extends ActionTest {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        // add 2 shipments
-        Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
-        originInfos.add(factory.createOriginInfo());
-        originInfos.add(factory.createOriginInfo());
-
         tx.commit();
 
         try {
             Set<SpecimenCsvInfo> csvInfo =
-                SpecimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
+                specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
                     originInfos, patients);
             SpecimenCsvWriter.write(CSV_NAME, csvInfo);
 
@@ -269,17 +267,12 @@ public class TestSpecimenCsvImport extends ActionTest {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        // add 2 shipments
-        Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
-        originInfos.add(factory.createOriginInfo());
-        originInfos.add(factory.createOriginInfo());
-
         Set<Container> childL2Containers = createContainers(aqSpecimenType);
 
         tx.commit();
 
         Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
-        csvInfos = SpecimenCsvHelper.createAllSpecimens(
+        csvInfos = specimenCsvHelper.createAllSpecimens(
             factory.getDefaultStudy(), originInfos, patients);
 
         // only the aliquoted specimens will have a position
@@ -322,11 +315,6 @@ public class TestSpecimenCsvImport extends ActionTest {
             }
         }
 
-        // add 2 shipments
-        Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
-        originInfos.add(factory.createOriginInfo());
-        originInfos.add(factory.createOriginInfo());
-
         Set<Container> childL2Containers =
             createContainers(factory.getDefaultSourceSpecimenType());
 
@@ -334,7 +322,7 @@ public class TestSpecimenCsvImport extends ActionTest {
 
         // make sure you can add parent specimens without a worksheet #
         Set<SpecimenCsvInfo> csvInfos =
-            SpecimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
+            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
         fillContainersWithSpecimenFromCsv(childL2Containers,
@@ -371,8 +359,10 @@ public class TestSpecimenCsvImport extends ActionTest {
             Assert.assertEquals(csvInfo.getVisitNumber(), specimen
                 .getCollectionEvent().getVisitNumber());
 
-            Assert.assertEquals(csvInfo.getWaybill(), specimen
-                .getOriginInfo().getShipmentInfo().getWaybill());
+            if (specimen.getOriginInfo().getShipmentInfo() != null) {
+                Assert.assertEquals(csvInfo.getWaybill(), specimen
+                    .getOriginInfo().getShipmentInfo().getWaybill());
+            }
 
             if (csvInfo.getSourceSpecimen()) {
                 Assert.assertNotNull(specimen.getOriginalCollectionEvent());

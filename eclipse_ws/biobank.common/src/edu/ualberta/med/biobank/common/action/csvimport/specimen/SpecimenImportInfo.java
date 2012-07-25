@@ -215,7 +215,12 @@ public class SpecimenImportInfo implements IImportInfo {
         specimen = new Specimen();
         specimen.setInventoryId(csvInfo.getInventoryId());
         specimen.setSpecimenType(specimenType);
-        specimen.setCurrentCenter(originInfo.getReceiverSite());
+
+        if (originInfo.getReceiverSite() == null) {
+            specimen.setCurrentCenter(originInfo.getCenter());
+        } else {
+            specimen.setCurrentCenter(originInfo.getReceiverSite());
+        }
         specimen.setCollectionEvent(cevent);
         specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(csvInfo.getCreatedAt());

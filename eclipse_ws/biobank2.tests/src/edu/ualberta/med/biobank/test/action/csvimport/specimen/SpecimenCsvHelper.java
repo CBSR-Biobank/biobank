@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
@@ -25,8 +24,11 @@ import edu.ualberta.med.biobank.test.Utils;
  */
 @SuppressWarnings("nls")
 public class SpecimenCsvHelper {
-    private static final NameGenerator nameGenerator = new NameGenerator(
-        SpecimenCsvHelper.class.getSimpleName() + new Random());
+    private final NameGenerator nameGenerator;
+
+    SpecimenCsvHelper(NameGenerator nameGenerator) {
+        this.nameGenerator = nameGenerator;
+    }
 
     /**
      * Creates a CSV with source specimens and aliquoted specimens.
@@ -40,7 +42,7 @@ public class SpecimenCsvHelper {
      * @param patients the patients that these specimens will belong to.
      * @throws IOException
      */
-    static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
+    Set<SpecimenCsvInfo> createAllSpecimens(Study study,
         Set<OriginInfo> originInfos, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -68,7 +70,7 @@ public class SpecimenCsvHelper {
         return specimenInfos;
     }
 
-    static Set<SpecimenCsvInfo> sourceSpecimensCreate(
+    Set<SpecimenCsvInfo> sourceSpecimensCreate(
         Set<OriginInfo> originInfos,
         Set<Patient> patients, Set<SourceSpecimen> sourceSpecimens) {
         Set<SpecimenCsvInfo> specimenInfos =
@@ -100,7 +102,7 @@ public class SpecimenCsvHelper {
      * Creates CSV specimens with only aliquoted specimens. Note that parent
      * specimens must already be present in the database.
      */
-    public static Set<SpecimenCsvInfo> createAliquotedSpecimens(Study study,
+    Set<SpecimenCsvInfo> createAliquotedSpecimens(Study study,
         Set<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -123,7 +125,7 @@ public class SpecimenCsvHelper {
      * 
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
-    private static Set<SpecimenCsvInfo> aliquotedSpecimensCreate(
+    private Set<SpecimenCsvInfo> aliquotedSpecimensCreate(
         Map<String, String> parentSpecimenInfoMap,
         Set<AliquotedSpecimen> aliquotedSpecimens) {
         Set<SpecimenCsvInfo> specimenInfos =
@@ -143,7 +145,7 @@ public class SpecimenCsvHelper {
         return specimenInfos;
     }
 
-    private static SpecimenCsvInfo sourceSpecimenCreate(
+    private SpecimenCsvInfo sourceSpecimenCreate(
         String specimenTypeName,
         String patientNumber, String waybill) {
         SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
@@ -154,7 +156,7 @@ public class SpecimenCsvHelper {
         return specimenInfo;
     }
 
-    private static SpecimenCsvInfo aliquotedSpecimenCreate(
+    private SpecimenCsvInfo aliquotedSpecimenCreate(
         String parentInventoryId, String specimenTypeName, String patientNumber) {
         SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
         specimenInfo.setInventoryId(nameGenerator.next(String.class));
