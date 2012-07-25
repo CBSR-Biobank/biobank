@@ -1,45 +1,51 @@
 @TypeDefs({
     @TypeDef(
         name = "activityStatus",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = ActivityStatus.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.ActivityStatus")
         }),
     @TypeDef(
         name = "attributeValueType",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = AttributeValueType.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.AttributeValueType")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.AttributeValueType")
         }),
     @TypeDef(
         name = "dispatchSpecimenState",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = DispatchSpecimenState.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.DispatchSpecimenState")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.type.DispatchSpecimenState")
         }),
     @TypeDef(
         name = "dispatchState",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = DispatchState.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.DispatchState")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.type.DispatchState")
         }),
     @TypeDef(
         name = "permissionEnum",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = PermissionEnum.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.PermissionEnum")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.PermissionEnum")
         }),
     @TypeDef(
         name = "requestSpecimenState",
-        typeClass = GenericEnumUserType.class,
+        typeClass = EnumUserType.class,
         defaultForType = RequestSpecimenState.class,
         parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
+            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
         })
 })
 package edu.ualberta.med.biobank.model;
@@ -51,5 +57,5 @@ import org.hibernate.annotations.TypeDefs;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
+import edu.ualberta.med.biobank.model.util.EnumUserType;
 
