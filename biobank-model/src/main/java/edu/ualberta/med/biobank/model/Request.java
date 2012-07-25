@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -95,8 +96,7 @@ public class Request extends AbstractModel
 
     @Override
     @NotNull(message = "{edu.ualberta.med.biobank.model.Request.address.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADDRESS_ID", nullable = false)
+    @Embedded
     public Address getAddress() {
         return this.address;
     }
