@@ -1,19 +1,22 @@
-MySQL Server
+MySQL SERVER
   - my.cnf must have "lower_case_table_names=1"
 
-
-Git Repo now at:
+GIT REPOSITORY LOCATION
   ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/biobank2.git
 
 BBPDB EXPORT
-- use Bullzip Access to Mysql to export data to MySQL
+  - use Bullzip Access to Mysql to export data to MySQL
 
+INSTALL ADDITIONAL MAVEN LIBRARIES
+  Maven repositories do not exist for the following jars and must be installed
+  locally.
 
-MAVEN ADDITIONAL LIBRARIES
-
-  mvn install:install-file -Dfile=jars/SuperCSV-1.52.jar -DgroupId=supercsv
+  mvn install:install-file -Dfile=jars/SuperCSV-1.52.jar -DgroupId=supercsv \
    -DartifactId=supercsv -Dversion=1.52 -Dpackaging=jar
 
-
-  mvn install:install-file -Dfile=jars/spiffy-all-0.05.jar -DgroupId=supercsv
+  mvn install:install-file -Dfile=jars/spiffy-all-0.05.jar -DgroupId=supercsv \
    -DartifactId=spiffy -Dversion=0.05 -Dpackaging=jar
+
+BUILD ECLIPSE PROJECTS
+
+  mvn eclipse:eclipse
