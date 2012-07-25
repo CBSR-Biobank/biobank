@@ -8,8 +8,6 @@ import java.util.List;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.common.util.NotAProxy;
-
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
@@ -22,7 +20,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum DispatchState implements NotAProxy, Serializable {
+public enum DispatchState implements Serializable {
     CREATION(0, Loader.i18n.tr("Creation")),
     IN_TRANSIT(1, Loader.i18n.tr("In Transit")),
     RECEIVED(2, Loader.i18n.tr("Received")),

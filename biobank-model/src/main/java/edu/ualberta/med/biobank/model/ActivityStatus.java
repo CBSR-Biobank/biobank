@@ -8,7 +8,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
@@ -22,7 +21,7 @@ import edu.ualberta.med.biobank.model.util.NotAProxy;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum ActivityStatus implements NotAProxy, Serializable {
+public enum ActivityStatus implements Serializable {
     ACTIVE(1, Loader.bundle.tr("Active").format()),
     CLOSED(2, Loader.bundle.tr("Closed").format()),
     // TODO: why can't there be a closed and flagged item or an active but

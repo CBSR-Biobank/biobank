@@ -11,8 +11,6 @@ import java.util.Map;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.model.util.NotAProxy;
-
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
@@ -26,7 +24,7 @@ import edu.ualberta.med.biobank.model.util.NotAProxy;
  * 
  */
 @SuppressWarnings("nls")
-public enum PermissionEnum implements NotAProxy, Serializable {
+public enum PermissionEnum implements Serializable {
     SPECIMEN_CREATE(2,
         Loader.i18n.tr("Specimen Create")),
     SPECIMEN_READ(3,
@@ -326,7 +324,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
      * @author jferland
      * 
      */
-    public enum Require implements NotAProxy, Serializable {
+    public enum Require implements Serializable {
         /**
          * Does nothing but make creating {@link EnumSet}-s easier.
          */

@@ -8,8 +8,6 @@ import java.util.List;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.model.util.NotAProxy;
-
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
@@ -22,7 +20,7 @@ import edu.ualberta.med.biobank.model.util.NotAProxy;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum AttributeValueType implements NotAProxy, Serializable {
+public enum AttributeValueType implements Serializable {
     STRING(0, Loader.i18n.tr("String")),
     NUMBER_INTEGER(1, Loader.i18n.tr("Number (integer)")),
     NUMBER_DECIMAL(2, Loader.i18n.tr("Number (decimal)")),
