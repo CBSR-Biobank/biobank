@@ -1,0 +1,12 @@
+package edu.ualberta.med.biobank.model;
+
+import edu.ualberta.med.biobank.i18n.Bundle;
+
+public class CommonBundle extends Bundle {
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
+    public CommonBundle() {
+        super("i18n.Messages");
+    }
+}
