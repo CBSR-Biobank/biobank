@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @MappedSuperclass
 // TODO: custom validator to check the type against the value
 public abstract class Attribute<T extends AttributeType<U>, U extends AttributeOption>
-    extends AbstractBiobankModel
+    extends AbstractModel
     implements HasCreatedAt {
     private static final long serialVersionUID = 1L;
 

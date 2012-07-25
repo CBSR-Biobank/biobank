@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "JASPER_TEMPLATE")
 @Unique(properties = "name", groups = PrePersist.class)
-public class JasperTemplate extends AbstractBiobankModel {
+public class JasperTemplate extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private String name;

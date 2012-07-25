@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -26,7 +25,7 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 @Audited
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
-public class DispatchSpecimen extends AbstractBiobankModel
+public class DispatchSpecimen extends AbstractModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

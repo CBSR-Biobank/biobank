@@ -18,7 +18,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -47,7 +46,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class),
     @NotUsed(by = CollectionEvent.class, property = "patient", groups = PreDelete.class)
 })
-public class Patient extends AbstractBiobankModel
+public class Patient extends AbstractModel
     implements HasCreatedAt, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

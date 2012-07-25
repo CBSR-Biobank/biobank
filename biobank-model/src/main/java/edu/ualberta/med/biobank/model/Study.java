@@ -16,7 +16,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -40,7 +39,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "nameShort", groups = PrePersist.class)
 })
 @NotUsed(by = Patient.class, property = "study", groups = PreDelete.class)
-public class Study extends AbstractBiobankModel
+public class Study extends AbstractModel
     implements HasName, HasNameShort, HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

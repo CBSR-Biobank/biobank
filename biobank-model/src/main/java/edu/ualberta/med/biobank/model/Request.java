@@ -18,7 +18,6 @@ import javax.validation.constraints.Null;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -32,7 +31,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Audited
 @Entity
 @Table(name = "REQUEST")
-public class Request extends AbstractBiobankModel
+public class Request extends AbstractModel
     implements HasCreatedAt, HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

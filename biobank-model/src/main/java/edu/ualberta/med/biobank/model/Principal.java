@@ -18,7 +18,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
@@ -27,7 +26,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
-public class Principal extends AbstractBiobankModel
+public class Principal extends AbstractModel
     implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

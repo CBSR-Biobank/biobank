@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "REPORT_FILTER")
-public class ReportFilter extends AbstractBiobankModel {
+public class ReportFilter extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private Integer position;

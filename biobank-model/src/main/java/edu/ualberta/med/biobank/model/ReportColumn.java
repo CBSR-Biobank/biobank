@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "REPORT_COLUMN")
-public class ReportColumn extends AbstractBiobankModel {
+public class ReportColumn extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private Integer position;

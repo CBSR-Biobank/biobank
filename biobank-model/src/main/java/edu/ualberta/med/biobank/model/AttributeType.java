@@ -14,11 +14,9 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.validator.constraint.UniqueElements;
-
 @MappedSuperclass
 public abstract class AttributeType<T extends AttributeOption>
-    extends AbstractBiobankModel {
+    extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private Boolean enabled;

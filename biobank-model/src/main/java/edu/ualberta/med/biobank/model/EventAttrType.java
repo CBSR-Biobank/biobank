@@ -6,14 +6,13 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
 // TODO: make enum?
 @Entity
 @Table(name = "EVENT_ATTR_TYPE")
-public class EventAttrType extends AbstractBiobankModel
+public class EventAttrType extends AbstractModel
     implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -12,7 +12,6 @@ import javax.persistence.ManyToMany;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;

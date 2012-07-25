@@ -8,7 +8,7 @@ import java.util.List;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT

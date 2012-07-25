@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;

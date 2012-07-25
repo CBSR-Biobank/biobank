@@ -22,7 +22,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -58,7 +57,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = ContainerPosition.class, property = "parentContainer", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractBiobankModel
+public class Container extends AbstractModel
     implements HasComments, HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

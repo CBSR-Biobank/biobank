@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 

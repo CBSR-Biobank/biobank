@@ -19,7 +19,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -36,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
 })
 @Unique(properties = "worksheet", groups = PrePersist.class)
-public class ProcessingEvent extends AbstractBiobankModel
+public class ProcessingEvent extends AbstractModel
     implements HasCreatedAt, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -22,7 +22,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -52,7 +51,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Dispatch.class, property = "senderCenter", groups = PreDelete.class),
     @NotUsed(by = Dispatch.class, property = "receiverCenter", groups = PreDelete.class)
 })
-public class Center extends AbstractBiobankModel
+public class Center extends AbstractModel
     implements HasName, HasNameShort, HasActivityStatus, HasComments,
     HasAddress {
     private static final long serialVersionUID = 1L;

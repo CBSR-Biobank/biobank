@@ -5,7 +5,7 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.validator.constraints.NotEmpty;
 
 @MappedSuperclass
-public class AttributeOption extends AbstractBiobankModel {
+public class AttributeOption extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private String value;

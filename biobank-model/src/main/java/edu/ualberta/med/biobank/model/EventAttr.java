@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Audited
 @Entity
 @Table(name = "EVENT_ATTR")
-public class EventAttr extends AbstractBiobankModel {
+public class EventAttr extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private String value;

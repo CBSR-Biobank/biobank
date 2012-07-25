@@ -14,7 +14,6 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -35,7 +34,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
     @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
 })
-public class SpecimenType extends AbstractBiobankModel
+public class SpecimenType extends AbstractModel
     implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

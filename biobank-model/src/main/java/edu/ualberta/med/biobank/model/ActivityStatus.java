@@ -5,11 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT

@@ -6,7 +6,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "REPORT_FILTER_VALUE")
-public class ReportFilterValue extends AbstractBiobankModel {
+public class ReportFilterValue extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private Integer position;
@@ -22,7 +22,7 @@ public class ReportFilterValue extends AbstractBiobankModel {
         this.position = position;
     }
 
-    @Column(name = "VALUE", columnDefinition="TEXT")
+    @Column(name = "VALUE", columnDefinition = "TEXT")
     public String getValue() {
         return this.value;
     }
@@ -31,7 +31,7 @@ public class ReportFilterValue extends AbstractBiobankModel {
         this.value = value;
     }
 
-    @Column(name = "SECOND_VALUE", columnDefinition="TEXT")
+    @Column(name = "SECOND_VALUE", columnDefinition = "TEXT")
     public String getSecondValue() {
         return this.secondValue;
     }

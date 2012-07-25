@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "PROPERTY_MODIFIER")
-public class PropertyModifier extends AbstractBiobankModel {
+public class PropertyModifier extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private String name;
