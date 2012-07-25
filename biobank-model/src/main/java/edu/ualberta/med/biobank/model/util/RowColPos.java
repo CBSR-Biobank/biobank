@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model.util;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.util.NullUtil;
+
 public class RowColPos implements Comparable<RowColPos>, Serializable {
     private static final long serialVersionUID = 1L;
 

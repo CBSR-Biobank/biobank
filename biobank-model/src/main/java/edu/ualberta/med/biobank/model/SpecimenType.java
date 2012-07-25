@@ -11,16 +11,18 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+@Audited
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 @Unique.List({
@@ -29,14 +31,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
+    @NotUsed(by = SpecimenType.class, property = "childSpecimenTypes", groups = PreDelete.class),
     @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
     @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
 })
-@Empty.List({
-    @Empty(property = "childSpecimenTypes", groups = PreDelete.class),
-    @Empty(property = "parentSpecimenTypes", groups = PreDelete.class)
-})
-public class SpecimenType extends AbstractVersionedModel
+public class SpecimenType extends AbstractBiobankModel
     implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -49,9 +48,6 @@ public class SpecimenType extends AbstractVersionedModel
 
     private String name;
     private String nameShort;
-    private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);
-    private Set<SpecimenType> parentSpecimenTypes =
-        new HashSet<SpecimenType>(0);
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
     @Override
@@ -76,24 +72,6 @@ public class SpecimenType extends AbstractVersionedModel
     @Override
     public void setNameShort(String nameShort) {
         this.nameShort = nameShort;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "specimenTypes")
-    public Set<ContainerType> getContainerTypes() {
-        return this.containerTypes;
-    }
-
-    public void setContainerTypes(Set<ContainerType> containerTypes) {
-        this.containerTypes = containerTypes;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childSpecimenTypes")
-    public Set<SpecimenType> getParentSpecimenTypes() {
-        return this.parentSpecimenTypes;
-    }
-
-    public void setParentSpecimenTypes(Set<SpecimenType> parentSpecimenTypes) {
-        this.parentSpecimenTypes = parentSpecimenTypes;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)

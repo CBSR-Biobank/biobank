@@ -1,48 +1,42 @@
 @TypeDefs({
     @TypeDef(
         name = "activityStatus",
-        typeClass = EnumUserType.class,
+        typeClass = GenericEnumUserType.class,
         defaultForType = ActivityStatus.class,
         parameters = {
-            @Parameter(name = EnumUserType.ID_METHOD_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.ActivityStatus")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.ActivityStatus")
         }),
-    // TODO: can we just make one "enum" type that is used by all enums that makes sure they implement some "getId()" interface and are enums and then just build an internal map?
     @TypeDef(
-        name = "activityType",
-        typeClass = EnumUserType.class,
-        defaultForType = ActivityType.class,
+        name = "attributeValueType",
+        typeClass = GenericEnumUserType.class,
+        defaultForType = AttributeValueType.class,
         parameters = {
-            @Parameter(name = EnumUserType.ID_METHOD_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.type.ActivityType")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.AttributeValueType")
         }),
     @TypeDef(
         name = "dispatchSpecimenState",
-        typeClass = EnumUserType.class,
+        typeClass = GenericEnumUserType.class,
         defaultForType = DispatchSpecimenState.class,
         parameters = {
-            @Parameter(name = EnumUserType.ID_METHOD_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.type.DispatchSpecimenState")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.DispatchSpecimenState")
         }),
     @TypeDef(
         name = "dispatchState",
-        typeClass = EnumUserType.class,
+        typeClass = GenericEnumUserType.class,
         defaultForType = DispatchState.class,
         parameters = {
-            @Parameter(name = EnumUserType.ID_METHOD_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.type.DispatchState")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.DispatchState")
         }),
     @TypeDef(
         name = "permissionEnum",
-        typeClass = EnumUserType.class,
+        typeClass = GenericEnumUserType.class,
         defaultForType = PermissionEnum.class,
         parameters = {
-            @Parameter(name = EnumUserType.ID_METHOD_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.PermissionEnum")
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.PermissionEnum")
         }),
     @TypeDef(
         name = "requestSpecimenState",
-        typeClass = EnumUserType.class,
+        typeClass = GenericEnumUserType.class,
         defaultForType = RequestSpecimenState.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
@@ -54,9 +48,8 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
-import edu.ualberta.med.biobank.model.type.ActivityType;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.model.util.EnumUserType;
+import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
 

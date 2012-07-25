@@ -2,23 +2,18 @@ package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.util.NullUtil;
+import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -47,7 +42,6 @@ public class Group extends Principal
 
     private String name;
     private String description;
-    private Set<User> users = new HashSet<User>(0);
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
@@ -71,18 +65,6 @@ public class Group extends Principal
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "GROUP_USER",
-        joinColumns = { @JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "USER_ID", nullable = false, updatable = false) })
-    public Set<User> getUsers() {
-        return this.users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 
     private static class NameComparator

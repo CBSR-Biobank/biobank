@@ -7,12 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
-public class ContainerLabelingScheme extends AbstractVersionedModel
+public class ContainerLabelingScheme extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 

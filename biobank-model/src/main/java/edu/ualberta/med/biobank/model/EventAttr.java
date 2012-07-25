@@ -13,11 +13,10 @@ import org.hibernate.envers.Audited;
 @Audited
 @Entity
 @Table(name = "EVENT_ATTR")
-public class EventAttr extends AbstractVersionedModel {
+public class EventAttr extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String value;
-    private CollectionEvent collectionEvent;
     private StudyEventAttr studyEventAttr;
 
     @Column(name = "VALUE")
@@ -27,17 +26,6 @@ public class EventAttr extends AbstractVersionedModel {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    @NotNull(message = "{edu.ualberta.med.biobank.model.EventAttr.collectionEvent.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
-    public CollectionEvent getCollectionEvent() {
-        return this.collectionEvent;
-    }
-
-    public void setCollectionEvent(CollectionEvent collectionEvent) {
-        this.collectionEvent = collectionEvent;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.EventAttr.studyEventAttr.NotNull}")

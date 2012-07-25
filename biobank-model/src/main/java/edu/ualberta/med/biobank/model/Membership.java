@@ -12,7 +12,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -20,6 +19,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
  */
 @Entity
 @Table(name = "MEMBERSHIP")
-public class Membership extends AbstractVersionedModel {
+public class Membership extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -65,7 +65,6 @@ public class Membership extends AbstractVersionedModel {
             "Can Manage Users").format();
     }
 
-    private Principal principal;
     private Domain domain = new Domain();
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
     private Set<Role> roles = new HashSet<Role>(0);
@@ -75,8 +74,8 @@ public class Membership extends AbstractVersionedModel {
     public Membership() {
     }
 
+    @Deprecated
     public Membership(Membership m, Principal p) {
-        setPrincipal(p);
         p.getMemberships().add(this);
 
         setDomain(new Domain(m.getDomain()));
@@ -122,17 +121,6 @@ public class Membership extends AbstractVersionedModel {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.principal.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PRINCIPAL_ID", nullable = false)
-    public Principal getPrincipal() {
-        return this.principal;
-    }
-
-    public void setPrincipal(Principal principal) {
-        this.principal = principal;
     }
 
     @Column(name = "USER_MANAGER")

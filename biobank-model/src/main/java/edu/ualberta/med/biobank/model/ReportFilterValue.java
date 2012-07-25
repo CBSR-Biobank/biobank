@@ -6,7 +6,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "REPORT_FILTER_VALUE")
-public class ReportFilterValue extends AbstractVersionedModel {
+public class ReportFilterValue extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private Integer position;

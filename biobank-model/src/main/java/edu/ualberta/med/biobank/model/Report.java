@@ -14,13 +14,14 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
 @javax.persistence.Entity
 @Table(name = "REPORT")
-public class Report extends AbstractVersionedModel
+public class Report extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

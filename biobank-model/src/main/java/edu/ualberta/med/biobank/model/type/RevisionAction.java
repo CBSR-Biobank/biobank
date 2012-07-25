@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.model.type;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-@SuppressWarnings({ "unused", "nls" })
 public enum RevisionAction {
     CONTAINER_TYPE_CREATE(
         1,

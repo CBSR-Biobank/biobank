@@ -11,7 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -23,11 +22,12 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -53,12 +53,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "containerType", "label" }, groups = PrePersist.class),
     @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
 })
-@Empty.List({
-    @Empty(property = "specimenPositions", groups = PreDelete.class),
-    @Empty(property = "childPositions", groups = PreDelete.class)
+@NotUsed.List({
+    @NotUsed(by = SpecimenPosition.class, property = "container", groups = PreDelete.class),
+    @NotUsed(by = ContainerPosition.class, property = "parentContainer", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractVersionedModel
+public class Container extends AbstractBiobankModel
     implements HasComments, HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -86,16 +86,12 @@ public class Container extends AbstractVersionedModel
     private String label;
     private Double temperature;
     private String path;
-    private Set<Comment> comments = new HashSet<Comment>(0);
-    private Set<ContainerPosition> childPositions =
-        new HashSet<ContainerPosition>(0);
     private Container topContainer;
-    private Set<SpecimenPosition> specimenPositions =
-        new HashSet<SpecimenPosition>(0);
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ContainerType containerType;
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     /**
      * Optional.
@@ -141,7 +137,7 @@ public class Container extends AbstractVersionedModel
     }
 
     @Override
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
@@ -154,15 +150,6 @@ public class Container extends AbstractVersionedModel
         this.comments = comments;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentContainer")
-    public Set<ContainerPosition> getChildPositions() {
-        return this.childPositions;
-    }
-
-    public void setChildPositions(Set<ContainerPosition> childPositions) {
-        this.childPositions = childPositions;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TOP_CONTAINER_ID")
     public Container getTopContainer() {
@@ -171,15 +158,6 @@ public class Container extends AbstractVersionedModel
 
     public void setTopContainer(Container topContainer) {
         this.topContainer = topContainer;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "container")
-    public Set<SpecimenPosition> getSpecimenPositions() {
-        return this.specimenPositions;
-    }
-
-    public void setSpecimenPositions(Set<SpecimenPosition> specimenPositions) {
-        this.specimenPositions = specimenPositions;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
@@ -200,7 +178,13 @@ public class Container extends AbstractVersionedModel
     }
 
     public void setPosition(ContainerPosition position) {
+        if (this.position != null) {
+            this.position.setContainer(null);
+        }
         this.position = position;
+        if (position != null) {
+            position.setContainer(this);
+        }
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Container.site.NotNull}")
@@ -250,36 +234,36 @@ public class Container extends AbstractVersionedModel
         return null;
     }
 
-    public boolean isPositionFree(RowColPos requestedPosition) {
-        if (getChildPositions().size() > 0) {
-            for (ContainerPosition pos : getChildPositions()) {
-                RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
-                if (requestedPosition.equals(rcp)) {
-                    return false;
-                }
-            }
-        }
+    // public boolean isPositionFree(RowColPos requestedPosition) {
+    // if (getChildPositions().size() > 0) {
+    // for (ContainerPosition pos : getChildPositions()) {
+    // RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+    // if (requestedPosition.equals(rcp)) {
+    // return false;
+    // }
+    // }
+    // }
+    //
+    // // else assume this container has specimens
+    // for (SpecimenPosition pos : getSpecimenPositions()) {
+    // RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+    // if (requestedPosition.equals(rcp)) {
+    // return false;
+    // }
+    // }
+    // return true;
+    // }
 
-        // else assume this container has specimens
-        for (SpecimenPosition pos : getSpecimenPositions()) {
-            RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
-            if (requestedPosition.equals(rcp)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Transient
-    public Container getChild(RowColPos requestedPosition) throws Exception {
-        for (ContainerPosition pos : getChildPositions()) {
-            RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
-            if (requestedPosition.equals(rcp)) {
-                return pos.getContainer();
-            }
-        }
-        return null;
-    }
+    // @Transient
+    // public Container getChild(RowColPos requestedPosition) throws Exception {
+    // for (ContainerPosition pos : getChildPositions()) {
+    // RowColPos rcp = new RowColPos(pos.getRow(), pos.getCol());
+    // if (requestedPosition.equals(rcp)) {
+    // return pos.getContainer();
+    // }
+    // }
+    // return null;
+    // }
 
     /**
      * Label can start with parent's label as prefix or without.
@@ -288,15 +272,15 @@ public class Container extends AbstractVersionedModel
      * @return
      * @throws Exception
      */
-    @Transient
-    public Container getChildByLabel(String childLabel) throws Exception {
-        // remove parent label from child label
-        if (childLabel.startsWith(getLabel())) {
-            childLabel = childLabel.substring(getLabel().length());
-        }
-        RowColPos pos = getPositionFromLabelingScheme(getLabel());
-        return getChild(pos);
-    }
+    // @Transient
+    // public Container getChildByLabel(String childLabel) throws Exception {
+    // // remove parent label from child label
+    // if (childLabel.startsWith(getLabel())) {
+    // childLabel = childLabel.substring(getLabel().length());
+    // }
+    // RowColPos pos = getPositionFromLabelingScheme(getLabel());
+    // return getChild(pos);
+    // }
 
     /**
      * position is 2 letters, or 2 number or 1 letter and 1 number... this
@@ -326,7 +310,7 @@ public class Container extends AbstractVersionedModel
         return rcp;
     }
 
-    public boolean hasSpecimens() {
-        return (getSpecimenPositions().size() > 0);
-    }
+    // public boolean hasSpecimens() {
+    // return (getSpecimenPositions().size() > 0);
+    // }
 }

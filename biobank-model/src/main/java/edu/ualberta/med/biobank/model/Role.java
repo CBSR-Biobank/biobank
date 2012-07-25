@@ -16,10 +16,11 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.util.NullUtil;
+import edu.ualberta.med.biobank.util.NullUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -27,7 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "ROLE")
 @Unique(properties = "name", groups = PrePersist.class)
 // TODO: check that no Membership uses this role before deleting
-public class Role extends AbstractVersionedModel {
+public class Role extends AbstractBiobankModel {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
     private static final long serialVersionUID = 1L;

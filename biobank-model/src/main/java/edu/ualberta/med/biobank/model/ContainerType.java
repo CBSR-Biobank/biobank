@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -55,16 +57,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
 })
 @NotUsed.List({
+    @NotUsed(by = ContainerType.class, property = "childContainerTypes", groups = PreDelete.class),
     @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class),
     @NotUsed(by = SpecimenPosition.class, property = "container.containerType", groups = PreDelete.class)
 })
 @Empty.List({
     @Empty(property = "childContainerTypes", groups = PreDelete.class),
-    @Empty(property = "parentContainerTypes", groups = PreDelete.class),
     @Empty(property = "specimenTypes", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType extends AbstractVersionedModel
+public class ContainerType extends AbstractBiobankModel
     implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -100,8 +102,6 @@ public class ContainerType extends AbstractVersionedModel
     private Capacity capacity = new Capacity();
     private Site site;
     private ContainerLabelingScheme childLabelingScheme;
-    private Set<ContainerType> parentContainerTypes =
-        new HashSet<ContainerType>(0);
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
@@ -147,7 +147,6 @@ public class ContainerType extends AbstractVersionedModel
         this.defaultTemperature = defaultTemperature;
     }
 
-    @NotAudited
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
@@ -195,7 +194,7 @@ public class ContainerType extends AbstractVersionedModel
     }
 
     @Override
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
         joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
@@ -241,15 +240,6 @@ public class ContainerType extends AbstractVersionedModel
     public void setChildLabelingScheme(
         ContainerLabelingScheme childLabelingScheme) {
         this.childLabelingScheme = childLabelingScheme;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "childContainerTypes")
-    public Set<ContainerType> getParentContainerTypes() {
-        return this.parentContainerTypes;
-    }
-
-    public void setParentContainerTypes(Set<ContainerType> parentContainerTypes) {
-        this.parentContainerTypes = parentContainerTypes;
     }
 
     @Transient

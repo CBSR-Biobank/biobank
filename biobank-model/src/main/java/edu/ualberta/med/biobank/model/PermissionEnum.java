@@ -11,7 +11,7 @@ import java.util.Map;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.model.util.NotAProxy;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
@@ -178,10 +178,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     SPECIMEN_LIST(66,
         Loader.i18n.tr("Specimen List")),
     LABEL_PRINTING(67,
-        Loader.i18n.tr("Label Printing")),
-
-    LEGACY_IMPORT_CSV(68,
-        Loader.i18n.tr("Specimen CSV Import"));
+        Loader.i18n.tr("Label Printing"));
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));

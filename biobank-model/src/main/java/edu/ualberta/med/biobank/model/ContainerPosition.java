@@ -68,7 +68,7 @@ public class ContainerPosition extends AbstractPosition {
         return container;
     }
 
-    public void setContainer(Container container) {
+    void setContainer(Container container) {
         this.container = container;
     }
 

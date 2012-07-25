@@ -7,6 +7,7 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -21,7 +22,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SHIPPING_METHOD")
 @Unique(properties = "name", groups = PrePersist.class)
 @NotUsed(by = ShipmentInfo.class, property = "shippingMethod", groups = PreDelete.class)
-public class ShippingMethod extends AbstractVersionedModel
+public class ShippingMethod extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

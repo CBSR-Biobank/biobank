@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -22,7 +23,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
 @NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
-public class StudyEventAttr extends AbstractVersionedModel
+public class StudyEventAttr extends AbstractBiobankModel
     implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

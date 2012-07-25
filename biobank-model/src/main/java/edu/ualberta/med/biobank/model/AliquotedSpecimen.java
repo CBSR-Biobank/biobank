@@ -12,7 +12,9 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -24,9 +26,10 @@ import edu.ualberta.med.biobank.i18n.Trnc;
  * required. The aliquoted specimen states the specimen types collected by a
  * study, the number of tubes and the required volume in each tube.
  */
+@Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
-public class AliquotedSpecimen extends AbstractVersionedModel
+public class AliquotedSpecimen extends AbstractBiobankModel
     implements HasActivityStatus {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -47,11 +50,21 @@ public class AliquotedSpecimen extends AbstractVersionedModel
             "Volume (ml)").format();
     }
 
+    private Study study;
     private SpecimenType specimenType;
     private Integer quantity;
     private BigDecimal volume;
-    private Study study;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+
+    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull")
+    @Column(name = "STUDY_ID")
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
+    }
 
     /**
      * @brief The number of aliquoted tubes to be collected of this specimen
@@ -91,20 +104,6 @@ public class AliquotedSpecimen extends AbstractVersionedModel
 
     public void setSpecimenType(SpecimenType specimenType) {
         this.specimenType = specimenType;
-    }
-
-    /**
-     * The study that this aliquoted specimen belongs to.
-     */
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID", nullable = false)
-    public Study getStudy() {
-        return this.study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
     }
 
     /**

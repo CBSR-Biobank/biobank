@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "ENTITY_PROPERTY")
-public class EntityProperty extends AbstractVersionedModel {
+public class EntityProperty extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     private String property;

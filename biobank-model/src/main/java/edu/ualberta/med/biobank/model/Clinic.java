@@ -1,17 +1,12 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 
 import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -51,24 +46,15 @@ public class Clinic extends Center {
     }
 
     private boolean sendsShipments = false;
-    private Set<Contact> contacts = new HashSet<Contact>(0);
 
     @Column(name = "SENDS_SHIPMENTS")
     // TODO: rename to isSendsShipments
+    // TODO: move to shipping method?
     public boolean getSendsShipments() {
         return this.sendsShipments;
     }
 
     public void setSendsShipments(boolean sendsShipments) {
         this.sendsShipments = sendsShipments;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "clinic")
-    public Set<Contact> getContacts() {
-        return this.contacts;
-    }
-
-    public void setContacts(Set<Contact> contacts) {
-        this.contacts = contacts;
     }
 }

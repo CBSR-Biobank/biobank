@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
@@ -50,7 +49,6 @@ public class SpecimenPosition extends AbstractPosition {
      * 
      * @return
      */
-    @NotAudited
     @ManyToOne
     @ForeignKey(name = "none")
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
@@ -60,6 +58,7 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setContainerType(ContainerType containerType) {
     }
 
@@ -71,7 +70,7 @@ public class SpecimenPosition extends AbstractPosition {
         return this.specimen;
     }
 
-    public void setSpecimen(Specimen specimen) {
+    void setSpecimen(Specimen specimen) {
         this.specimen = specimen;
     }
 
@@ -93,7 +92,6 @@ public class SpecimenPosition extends AbstractPosition {
      * 
      * @return
      */
-    @NotAudited
     @ManyToOne
     @ForeignKey(name = "none")
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
@@ -103,6 +101,7 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
+    @SuppressWarnings("unused")
     void setSpecimenType(SpecimenType specimenType) {
     }
 

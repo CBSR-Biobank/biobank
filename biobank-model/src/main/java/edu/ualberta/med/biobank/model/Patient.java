@@ -12,17 +12,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -44,9 +43,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PATIENT")
 @Unique(properties = "pnumber", groups = PrePersist.class)
-@NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class)
-@Empty(property = "collectionEvents", groups = PreDelete.class)
-public class Patient extends AbstractVersionedModel
+@NotUsed.List({
+    @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class),
+    @NotUsed(by = CollectionEvent.class, property = "patient", groups = PreDelete.class)
+})
+public class Patient extends AbstractBiobankModel
     implements HasCreatedAt, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -69,8 +70,6 @@ public class Patient extends AbstractVersionedModel
 
     private String pnumber;
     private Date createdAt;
-    private Set<CollectionEvent> collectionEvents =
-        new HashSet<CollectionEvent>(0);
     private Study study;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -96,15 +95,6 @@ public class Patient extends AbstractVersionedModel
         this.createdAt = createdAt;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "patient")
-    public Set<CollectionEvent> getCollectionEvents() {
-        return this.collectionEvents;
-    }
-
-    public void setCollectionEvents(Set<CollectionEvent> collectionEvents) {
-        this.collectionEvents = collectionEvents;
-    }
-
     @NotNull(message = "{edu.ualberta.med.biobank.model.Patient.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
@@ -117,7 +107,7 @@ public class Patient extends AbstractVersionedModel
     }
 
     @Override
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })

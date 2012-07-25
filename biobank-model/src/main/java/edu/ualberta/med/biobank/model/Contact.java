@@ -1,23 +1,20 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.validator.constraint.Empty;
+import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 /**
@@ -35,8 +32,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Audited
 @Entity
 @Table(name = "CONTACT")
-@Empty(property = "studies", groups = PreDelete.class)
-public class Contact extends AbstractVersionedModel
+@NotUsed(by = Study.class, property = "contact", groups = PreDelete.class)
+public class Contact extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -79,7 +76,6 @@ public class Contact extends AbstractVersionedModel
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private Set<Study> studies = new HashSet<Study>(0);
     private Clinic clinic;
 
     @Override
@@ -147,15 +143,6 @@ public class Contact extends AbstractVersionedModel
 
     public void setOfficeNumber(String officeNumber) {
         this.officeNumber = officeNumber;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contacts")
-    public Set<Study> getStudies() {
-        return this.studies;
-    }
-
-    public void setStudies(Set<Study> studies) {
-        this.studies = studies;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

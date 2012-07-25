@@ -13,22 +13,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -48,9 +45,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
-@Empty(property = "childSpecimens", groups = PreDelete.class)
-@NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
-public class Specimen extends AbstractVersionedModel
+@NotUsed.List({
+    @NotUsed(by = Specimen.class, property = "parentSpecimen", groups = PreDelete.class),
+    @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class),
+    @NotUsed(by = RequestSpecimen.class, property = "specimen", groups = PreDelete.class)
+})
+public class Specimen extends AbstractBiobankModel
     implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
@@ -90,21 +90,16 @@ public class Specimen extends AbstractVersionedModel
     private BigDecimal quantity;
     private Date createdAt;
     private Specimen topSpecimen = this;
+    private Specimen parentSpecimen;
     private CollectionEvent collectionEvent;
+    private Boolean sourceSpecimen;
     private Center currentCenter;
-    private Set<DispatchSpecimen> dispatchSpecimens =
-        new HashSet<DispatchSpecimen>(0);
-    private CollectionEvent originalCollectionEvent;
     private SpecimenType specimenType;
     private SpecimenPosition specimenPosition;
-    private Set<Specimen> childSpecimens = new HashSet<Specimen>(0);
-    private Set<Comment> comments = new HashSet<Comment>(0);
-    private Set<RequestSpecimen> requestSpecimens =
-        new HashSet<RequestSpecimen>(0);
     private OriginInfo originInfo;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ProcessingEvent processingEvent;
-    private Specimen parentSpecimen;
+    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -170,27 +165,16 @@ public class Specimen extends AbstractVersionedModel
         this.currentCenter = currentCenter;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
-    public Set<DispatchSpecimen> getDispatchSpecimens() {
-        return this.dispatchSpecimens;
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.isSourceSpecimen.NotNull}")
+    @Column(name = "SOURCE_SPECIMEN")
+    public Boolean isSourceSpecimen() {
+        return sourceSpecimen;
     }
 
-    public void setDispatchSpecimens(Set<DispatchSpecimen> dispatchSpecimens) {
-        this.dispatchSpecimens = dispatchSpecimens;
+    public void setSourceSpecimen(Boolean sourceSpecimen) {
+        this.sourceSpecimen = sourceSpecimen;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORIGINAL_COLLECTION_EVENT_ID")
-    public CollectionEvent getOriginalCollectionEvent() {
-        return this.originalCollectionEvent;
-    }
-
-    public void setOriginalCollectionEvent(
-        CollectionEvent originalCollectionEvent) {
-        this.originalCollectionEvent = originalCollectionEvent;
-    }
-
-    @NotAudited
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
@@ -202,27 +186,23 @@ public class Specimen extends AbstractVersionedModel
         this.specimenType = specimenType;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "specimen")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "specimen", orphanRemoval = true)
     public SpecimenPosition getSpecimenPosition() {
         return this.specimenPosition;
     }
 
     public void setSpecimenPosition(SpecimenPosition specimenPosition) {
+        if (this.specimenPosition != null) {
+            this.specimenPosition.setSpecimen(null);
+        }
         this.specimenPosition = specimenPosition;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentSpecimen")
-    @Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-    public Set<Specimen> getChildSpecimens() {
-        return this.childSpecimens;
-    }
-
-    public void setChildSpecimens(Set<Specimen> childSpecimens) {
-        this.childSpecimens = childSpecimens;
+        if (specimenPosition != null) {
+            specimenPosition.setSpecimen(this);
+        }
     }
 
     @Override
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
         joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
@@ -233,15 +213,6 @@ public class Specimen extends AbstractVersionedModel
     @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
-    }
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
-    public Set<RequestSpecimen> getRequestSpecimens() {
-        return this.requestSpecimens;
-    }
-
-    public void setRequestSpecimens(Set<RequestSpecimen> requestSpecimens) {
-        this.requestSpecimens = requestSpecimens;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.originInfo.NotNull}")
@@ -286,5 +257,9 @@ public class Specimen extends AbstractVersionedModel
 
     public void setParentSpecimen(Specimen parentSpecimen) {
         this.parentSpecimen = parentSpecimen;
+    }
+
+    public Set<SpecimenAttribute> getAttributes() {
+        return null;
     }
 }

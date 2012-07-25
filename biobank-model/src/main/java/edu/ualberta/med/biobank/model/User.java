@@ -8,13 +8,14 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
@@ -28,8 +29,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "email", groups = PrePersist.class),
     @Unique(properties = "login", groups = PrePersist.class)
 })
-public class User extends Principal
-    implements HasComments {
+public class User extends Principal {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -62,11 +62,10 @@ public class User extends Principal
 
     private String login;
     private Long csmUserId;
-    private boolean recvBulkEmails = true;
     private String fullName;
     private String email;
+    private boolean recvBulkEmails = true;
     private boolean needPwdChange = true;
-    private Set<Comment> comments = new HashSet<Comment>(0);
     private Set<Group> groups = new HashSet<Group>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.login.NotEmpty}")
@@ -128,19 +127,10 @@ public class User extends Principal
         this.needPwdChange = needPwdChange;
     }
 
-    @Override
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID", updatable = false)
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "USER_GROUP",
+        joinColumns = { @JoinColumn(name = "USER_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "GROUP_ID", nullable = false, updatable = false) })
     public Set<Group> getGroups() {
         return this.groups;
     }

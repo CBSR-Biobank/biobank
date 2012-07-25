@@ -1,18 +1,18 @@
 package edu.ualberta.med.biobank.model;
 
-import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CollectionTable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -20,78 +20,49 @@ import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
 
+import edu.ualberta.med.biobank.model.util.RevisionListenerImpl;
+
 @RevisionEntity(RevisionListenerImpl.class)
 @Entity
 @Table(name = "REVISION")
 public class Revision
-    implements Serializable, HasId<Long> {
+    implements IBiobankModel, HasCreatedAt {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private Long timestamp;
-    private Long generatedAt;
-    private Long committedAt;
+    private Integer id;
+    private Date createdAt;
     private User user;
-    private Set<String> modifiedTypes = new HashSet<String>(0);
+    private Set<RevisionEntityType> entityTypes =
+        new HashSet<RevisionEntityType>(0);
+
+    // TODO: include a set of RevisionAction-s that indicate what was done,
+    // needs to be a set because of batch actions.
 
     @Override
     @RevisionNumber
+    @GenericGenerator(name = "generator", strategy = "increment")
     @Id
-    @GeneratedValue(generator = "revision-number-generator")
-    @GenericGenerator(name = "revision-number-generator",
-        strategy = "edu.ualberta.med.biobank.model.id.RevisionNumberGenerator")
+    @GeneratedValue(generator = "generator")
     @Column(name = "ID", nullable = false)
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    /**
-     * Milliseconds since epoch when this object is created by Envers.
-     * 
-     * @return
-     */
+    @Override
     @RevisionTimestamp
-    @Column(name = "REVISION_TIMESTAMP")
-    public Long getTimestamp() {
-        return timestamp;
+    @Column(name = "CREATED_AT")
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    /**
-     * Milliseconds since epoch right after the {@link @RevisionNumber} was
-     * generated.
-     * 
-     * @return
-     */
-    @Column(name = "GENERATED_AT")
-    public Long getGeneratedAt() {
-        return generatedAt;
-    }
-
-    public void setGeneratedAt(Long generatedAt) {
-        this.generatedAt = generatedAt;
-    }
-
-    /**
-     * Milliseconds since epoch just before the transaction was committed.
-     * 
-     * @return
-     */
-    @Column(name = "COMMITTED_AT")
-    public Long getCommittedAt() {
-        return committedAt;
-    }
-
-    public void setCommittedAt(Long committedAt) {
-        this.committedAt = committedAt;
+    @Override
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     /**
@@ -110,23 +81,13 @@ public class Revision
         this.user = user;
     }
 
-    /**
-     * A list of entity names that were modified in this revision so that
-     * finding all entities modified in a given {@link Revision} can be faster
-     * (avoid scanning all tables).
-     * 
-     * @return
-     */
-    @ElementCollection
-    @CollectionTable(name = "REVISION_MODIFIED_TYPE",
-        joinColumns = @JoinColumn(name = "REVISION_ID"))
-    @Column(name = "MODIFIED_TYPE", nullable = false)
-    public Set<String> getModifiedTypes() {
-        return modifiedTypes;
+    @OneToMany(mappedBy = "revision", cascade = CascadeType.ALL)
+    public Set<RevisionEntityType> getEntityTypes() {
+        return entityTypes;
     }
 
-    public void setModifiedTypes(Set<String> modifiedTypes) {
-        this.modifiedTypes = modifiedTypes;
+    public void setEntityTypes(Set<RevisionEntityType> entityTypes) {
+        this.entityTypes = entityTypes;
     }
 
     @Override
