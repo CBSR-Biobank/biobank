@@ -8,3 +8,12 @@ Git Repo now at:
 BBPDB EXPORT
 - use Bullzip Access to Mysql to export data to MySQL
 
+
+MAVEN ADDITIONAL LIBRARIES
+
+  mvn install:install-file -Dfile=jars/SuperCSV-1.52.jar -DgroupId=supercsv
+   -DartifactId=supercsv -Dversion=1.52 -Dpackaging=jar
+
+
+  mvn install:install-file -Dfile=jars/spiffy-all-0.05.jar -DgroupId=supercsv
+   -DartifactId=spiffy -Dversion=0.05 -Dpackaging=jar
