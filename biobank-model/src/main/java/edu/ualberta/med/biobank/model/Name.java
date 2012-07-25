@@ -24,7 +24,6 @@ public class Name {
         tmp.put(AliquotedSpecimen.class,        bundle.tr("Aliquoted Specimen").format());
         tmp.put(Capacity.class,                 bundle.tr("Capacity").format());
         tmp.put(Center.class,                   bundle.tr("Center").format());
-        tmp.put(Clinic.class,                   bundle.tr("Clinic").format());
         tmp.put(CollectionEvent.class,          bundle.tr("Collection Event").format());
         tmp.put(Comment.class,                  bundle.tr("Comment").format());
         tmp.put(Contact.class,                  bundle.tr("Contact").format());
@@ -47,11 +46,9 @@ public class Name {
         tmp.put(ProcessingEvent.class,          bundle.tr("Processing Event").format());
         tmp.put(Request.class,                  bundle.tr("Request").format());
         tmp.put(RequestSpecimen.class,          bundle.tr("Request Specimen").format());
-        tmp.put(ResearchGroup.class,            bundle.tr("Research Group").format());
         tmp.put(Role.class,                     bundle.tr("Role").format());
         tmp.put(ShipmentInfo.class,             bundle.tr("Shipment Information").format());
         tmp.put(ShippingMethod.class,           bundle.tr("Shipping Method").format());
-        tmp.put(Site.class,                     bundle.tr("Site").format());
         tmp.put(SourceSpecimen.class,           bundle.tr("Source Specimen").format());
         tmp.put(Specimen.class,                 bundle.tr("Specimen").format());
         tmp.put(SpecimenPosition.class,         bundle.tr("Specimen Position").format());

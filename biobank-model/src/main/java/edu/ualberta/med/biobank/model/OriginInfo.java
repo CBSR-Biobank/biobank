@@ -33,7 +33,7 @@ public class OriginInfo extends AbstractModel
         "Origin Information");
 
     private Center center;
-    private Site receiverSite;
+    private Center receiverCenter;
     private ShipmentInfo shipmentInfo;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -73,12 +73,12 @@ public class OriginInfo extends AbstractModel
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RECEIVER_SITE_ID")
-    public Site getReceiverSite() {
-        return this.receiverSite;
+    @JoinColumn(name = "RECEIVER_CENTER_ID")
+    public Center getReceiverCenter() {
+        return this.receiverCenter;
     }
 
-    public void setReceiverSite(Site receiverSite) {
-        this.receiverSite = receiverSite;
+    public void setReceiverCenter(Center receiverCenter) {
+        this.receiverCenter = receiverCenter;
     }
 }

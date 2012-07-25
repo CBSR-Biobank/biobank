@@ -53,8 +53,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
         @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
 @Unique.List({
-    @Unique(properties = { "site", "name" }, groups = PrePersist.class),
-    @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
+    @Unique(properties = { "center", "name" }, groups = PrePersist.class),
+    @Unique(properties = { "center", "nameShort" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = ContainerType.class, property = "childContainerTypes", groups = PreDelete.class),
@@ -100,7 +100,7 @@ public class ContainerType extends AbstractModel
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Capacity capacity = new Capacity();
-    private Site site;
+    private Center center;
     private ContainerLabelingScheme childLabelingScheme;
 
     @Override
@@ -218,15 +218,15 @@ public class ContainerType extends AbstractModel
         this.capacity = capacity;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.site.NotNull}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
-    public Site getSite() {
-        return this.site;
+    public Center getCenter() {
+        return this.center;
     }
 
-    public void setSite(Site site) {
-        this.site = site;
+    public void setCenter(Center center) {
+        this.center = center;
     }
 
     @NotAudited

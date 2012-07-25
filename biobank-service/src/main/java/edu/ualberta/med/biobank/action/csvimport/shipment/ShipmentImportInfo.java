@@ -73,7 +73,7 @@ public class ShipmentImportInfo implements IImportInfo {
     public OriginInfo createOriginInfo() {
         originInfo = new OriginInfo();
         originInfo.setCenter(originCenter);
-        originInfo.setReceiverSite(currentSite);
+        originInfo.setReceiverCenter(currentSite);
 
         return originInfo;
     }

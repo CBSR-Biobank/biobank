@@ -26,7 +26,7 @@ public class ShipmentDeletePermission implements Permission {
                 ship = context.load(OriginInfo.class, shipmentId);
                 return PermissionEnum.ORIGIN_INFO_DELETE.isAllowed(
                     context.getUser(),
-                    ship.getReceiverSite())
+                    ship.getReceiverCenter())
                     && PermissionEnum.ORIGIN_INFO_CREATE.isAllowed(
                         context.getUser(),
                         context.load(Center.class, workingCenter));

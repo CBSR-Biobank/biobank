@@ -50,7 +50,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = ProcessingEvent.class, property = "center", groups = PreDelete.class),
     @NotUsed(by = OriginInfo.class, property = "center", groups = PreDelete.class),
     @NotUsed(by = Dispatch.class, property = "senderCenter", groups = PreDelete.class),
-    @NotUsed(by = Dispatch.class, property = "receiverCenter", groups = PreDelete.class)
+    @NotUsed(by = Dispatch.class, property = "receiverCenter", groups = PreDelete.class),
+    @NotUsed(by = Container.class, property = "center", groups = PreDelete.class),
+    @NotUsed(by = ContainerType.class, property = "center", groups = PreDelete.class)
 })
 public class Center extends AbstractModel
     implements HasName, HasNameShort, HasActivityStatus, HasComments,

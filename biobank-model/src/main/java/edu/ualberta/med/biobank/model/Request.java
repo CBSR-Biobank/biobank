@@ -57,7 +57,7 @@ public class Request extends AbstractModel
     private Date created;
     private Set<Dispatch> dispatches = new HashSet<Dispatch>(0);
     private Address address = new Address();
-    private ResearchGroup researchGroup;
+    private Study study;
 
     @Null(groups = PreDelete.class, message = "{edu.ualberta.med.biobank.model.Request.submitted.Null}")
     @Column(name = "SUBMITTED")
@@ -106,14 +106,14 @@ public class Request extends AbstractModel
         this.address = address;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.researchGroup.NotNull}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "RESEARCH_GROUP_ID", nullable = false)
-    public ResearchGroup getResearchGroup() {
-        return this.researchGroup;
+    @JoinColumn(name = "STUDY_ID", nullable = false)
+    public Study getStudy() {
+        return this.study;
     }
 
-    public void setResearchGroup(ResearchGroup researchGroup) {
-        this.researchGroup = researchGroup;
+    public void setStudy(Study study) {
+        this.study = study;
     }
 }

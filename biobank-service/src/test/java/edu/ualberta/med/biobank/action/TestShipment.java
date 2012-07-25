@@ -83,14 +83,14 @@ public class TestShipment extends ActionTest {
 
         Assert.assertTrue(info.originInfo.getCenter().getId()
             .equals(oisave.centerId));
-        Assert.assertTrue(info.originInfo.getReceiverSite().getId()
+        Assert.assertTrue(info.originInfo.getReceiverCenter().getId()
             .equals(oisave.siteId));
         for (SpecimenInfo spec : info.specimens) {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.specimen
                 .getId()));
             Assert.assertTrue(spec.specimen.getOriginInfo().getCenter().getId()
                 .equals(centerId));
-            Assert.assertTrue(spec.specimen.getOriginInfo().getReceiverSite()
+            Assert.assertTrue(spec.specimen.getOriginInfo().getReceiverCenter()
                 .getId()
                 .equals(siteId));
             Assert.assertTrue(spec.specimen.getCurrentCenter().getId()
@@ -161,7 +161,7 @@ public class TestShipment extends ActionTest {
                 .getCenter().getId()
                 .equals(centerId));
             Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getOriginInfo().getReceiverSite().getId()
+                .getOriginInfo().getReceiverCenter().getId()
                 .equals(siteId));
             Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
                 .getCurrentCenter().getId()

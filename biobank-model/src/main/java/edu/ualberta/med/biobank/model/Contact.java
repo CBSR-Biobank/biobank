@@ -75,7 +75,7 @@ public class Contact extends AbstractModel
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private Clinic clinic;
+    private StudyCenter studyCenter;
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
@@ -145,12 +145,12 @@ public class Contact extends AbstractModel
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CLINIC_ID", nullable = false)
-    public Clinic getClinic() {
-        return this.clinic;
+    @JoinColumn(name = "STUDY_CENTER_ID", nullable = false)
+    public StudyCenter getStudyCenter() {
+        return this.studyCenter;
     }
 
-    public void setClinic(Clinic clinic) {
-        this.clinic = clinic;
+    public void setStudyCenter(StudyCenter studyCenter) {
+        this.studyCenter = studyCenter;
     }
 }

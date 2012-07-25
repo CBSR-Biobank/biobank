@@ -50,8 +50,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 // out how to add DDL constraints from our annotations and how to get a bean's
 // value of a specific column.
 @Unique.List({
-    @Unique(properties = { "site", "containerType", "label" }, groups = PrePersist.class),
-    @Unique(properties = { "site", "productBarcode" }, groups = PrePersist.class)
+    @Unique(properties = { "center", "containerType", "label" }, groups = PrePersist.class),
+    @Unique(properties = { "center", "productBarcode" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = SpecimenPosition.class, property = "container", groups = PreDelete.class),
@@ -88,7 +88,7 @@ public class Container extends AbstractModel
     private String path;
     private Container topContainer;
     private ContainerPosition position;
-    private Site site;
+    private Center center;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ContainerType containerType;
     private Set<Comment> comments = new HashSet<Comment>(0);
@@ -187,15 +187,15 @@ public class Container extends AbstractModel
         }
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.site.NotNull}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SITE_ID", nullable = false)
-    public Site getSite() {
-        return this.site;
+    @JoinColumn(name = "CENTER_ID", nullable = false)
+    public Center getCenter() {
+        return this.center;
     }
 
-    public void setSite(Site site) {
-        this.site = site;
+    public void setCenter(Center center) {
+        this.center = center;
     }
 
     @Override

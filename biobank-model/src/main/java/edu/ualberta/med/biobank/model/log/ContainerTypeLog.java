@@ -11,7 +11,7 @@ public class ContainerTypeLog extends Log<LogType> {
 
     public ContainerTypeLog(ContainerType containerType, LogType logType) {
         super(logType);
-        setCenterId(containerType.getSite());
+        setCenterId(containerType.getCenter());
     }
 
     public enum LogType implements ILogType {
