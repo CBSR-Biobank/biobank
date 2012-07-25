@@ -46,8 +46,10 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         Query query = context.getSession().createQuery(ORIGIN_INFO_HQL);
         query.setParameter(0, oiId);
 
-        OriginInfo oi =
-            ActionContext.singleResult(query, OriginInfo.class, oiId);
+        OriginInfo oi = (OriginInfo) query.uniqueResult();
+        if (oi == null) {
+            throw new ActionException("No patient found with id:" + oiId);
+        }
 
         sInfo.originInfo = oi;
 
