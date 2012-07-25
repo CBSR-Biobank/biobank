@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.test.Utils;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenCsvHelper {
+class SpecimenCsvHelper {
     private final NameGenerator nameGenerator;
 
     SpecimenCsvHelper(NameGenerator nameGenerator) {

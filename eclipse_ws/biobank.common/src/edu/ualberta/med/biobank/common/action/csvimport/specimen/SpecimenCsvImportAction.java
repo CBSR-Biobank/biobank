@@ -352,17 +352,14 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 }
             }
         } else {
-            Specimen parentSpecimen =
-                CsvActionUtil.getSpecimen(context,
-                    csvInfo.getParentInventoryId());
+            Specimen parentSpecimen = CsvActionUtil.getSpecimen(context,
+                csvInfo.getParentInventoryId());
             if (parentSpecimen != null) {
                 if (parentSpecimen.getProcessingEvent() == null) {
-                    errorList
-                        .addError(
-                            csvInfo.getLineNumber(),
-                            CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(csvInfo
-                                .getInventoryId(),
-                                parentSpecimen.getInventoryId()));
+                    errorList.addError(csvInfo.getLineNumber(),
+                        CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(csvInfo
+                            .getInventoryId(),
+                            parentSpecimen.getInventoryId()));
 
                 }
                 info.setParentSpecimen(parentSpecimen);
@@ -416,8 +413,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
     private Specimen addSpecimen(ActionContext context, SpecimenImportInfo info) {
         if (context == null) {
-            throw new IllegalStateException(
-                "should only be called once the context is initialized");
+            throw new NullPointerException("context is null");
         }
 
         OriginInfo originInfo = info.getOriginInfo();

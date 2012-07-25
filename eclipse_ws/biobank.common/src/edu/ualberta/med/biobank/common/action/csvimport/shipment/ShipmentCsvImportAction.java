@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
@@ -159,6 +160,15 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             throw new CsvImportException(errorList.getErrors());
         }
 
+        for (ShipmentImportInfo info : shipmentImportInfos) {
+            OriginInfo originInfo = info.getNewOriginInfo();
+
+            context.getSession().save(
+                originInfo.getComments().iterator().next());
+            context.getSession().save(originInfo.getShipmentInfo());
+            context.getSession().save(originInfo);
+        }
+
         result = true;
         return new BooleanResult(result);
     }
@@ -166,6 +176,8 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
     private ShipmentImportInfo getDbInfo(ActionContext context,
         ShipmentCsvInfo csvInfo) {
         ShipmentImportInfo info = new ShipmentImportInfo(csvInfo);
+
+        info.setUser(context.getUser());
 
         Center sendingCenter =
             CsvActionUtil.getCenter(context, csvInfo.getSendingCenter());

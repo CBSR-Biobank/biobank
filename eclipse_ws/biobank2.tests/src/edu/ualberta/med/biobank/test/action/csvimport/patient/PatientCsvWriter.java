@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.util.csv;
+package edu.ualberta.med.biobank.test.action.csvimport.patient;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,17 +19,16 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
  * 
  */
 @SuppressWarnings("nls")
-public class PatientCsvWriter {
+class PatientCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.
      * 
      * @param filename The name of the CSV file to be saved.
-     * @param numRows The number of rows in the CSV file.
-     * @param studyName The short name to be used for the study.
+     * @param patientInfos set of beans containing the information for each row.
      * @throws IOException If the file could not be saved.
      */
-    public static void write(String filename, Set<PatientCsvInfo> patientInfos)
+    static void write(String filename, Set<PatientCsvInfo> patientInfos)
         throws IOException {
         final String[] header = new String[] {
             "Study", "Patient Number", "Created At"

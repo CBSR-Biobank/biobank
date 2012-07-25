@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.action.ActionTest;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
-import edu.ualberta.med.biobank.test.util.csv.SpecimenCsvWriter;
 
 /**
  * 

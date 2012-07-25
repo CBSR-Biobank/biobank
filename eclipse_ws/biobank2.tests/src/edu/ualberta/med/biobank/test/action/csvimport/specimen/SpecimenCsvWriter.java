@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.util.csv;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
  * @author loyola
  * 
  */
-public class SpecimenCsvWriter {
+class SpecimenCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.
@@ -31,7 +31,7 @@ public class SpecimenCsvWriter {
      * @throws IOException If the file could not be saved.
      */
     @SuppressWarnings("nls")
-    public static void write(String filename, Set<SpecimenCsvInfo> specimenInfos)
+    static void write(String filename, Set<SpecimenCsvInfo> specimenInfos)
         throws IOException {
         final String[] header = new String[] {
             "inventoryId",

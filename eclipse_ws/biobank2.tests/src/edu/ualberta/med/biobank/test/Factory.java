@@ -42,7 +42,6 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.csvimport.specimen.SpecimenCsvHelper;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum
