@@ -6,7 +6,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.Criteria;
-import org.hibernate.EntityMode;
 import org.hibernate.annotations.common.util.StringHelper;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -55,7 +54,7 @@ public class NotUsedValidator extends
             StringBuilder template = new StringBuilder();
 
             template.append("{");
-            template.append(meta.getMappedClass(EntityMode.POJO).getName());
+            template.append(meta.getMappedClass().getName());
             template.append(".");
             template.append(NotUsed.class.getSimpleName());
             template.append(".");

@@ -10,7 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -116,8 +116,8 @@ public class ValidContainerTypeValidator
         // Get the old value in the same transaction in case that transaction
         // has not been committed yet
         Connection conn = getEventSource().connection();
-        Session newSession = getEventSource().getSessionFactory()
-            .openSession(conn);
+        StatelessSession newSession = getEventSource().getSessionFactory()
+            .openStatelessSession(conn);
 
         try {
             oldCt = (ContainerType) newSession

@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.metadata.ClassMetadata;
 
@@ -65,7 +64,7 @@ public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
             ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
-            Class<?> klazz = meta.getMappedClass(EntityMode.POJO);
+            Class<?> klazz = meta.getMappedClass();
             String template = getDefaultMessageTemplate(klazz, property);
 
             context.disableDefaultConstraintViolation();
@@ -85,7 +84,7 @@ public class EmptyValidator extends EventSourceAwareConstraintValidator<Object>
         // from the local collection.
 
         String hql = MessageFormat.format(SIZE_QUERY_TEMPLATE,
-            property, meta.getMappedClass(EntityMode.POJO).getName());
+            property, meta.getMappedClass().getName());
 
         Query query = getEventSource().createQuery(hql).setParameter(0, value);
 

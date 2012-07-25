@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.EntityMode;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -69,7 +68,7 @@ public class UniqueValidator extends
             ClassMetadata meta = getEventSource().getSessionFactory()
                 .getClassMetadata(value.getClass());
 
-            Class<?> klazz = meta.getMappedClass(EntityMode.POJO);
+            Class<?> klazz = meta.getMappedClass();
             String template = getDefaultMessageTemplate(klazz, properties);
 
             context.disableDefaultConstraintViolation();
@@ -87,7 +86,7 @@ public class UniqueValidator extends
         DetachedCriteria criteria = DetachedCriteria.forClass(value.getClass());
         for (String property : properties) {
             criteria.add(Restrictions.eq(property,
-                meta.getPropertyValue(value, property, EntityMode.POJO)));
+                meta.getPropertyValue(value, property)));
         }
 
         if (id != null) {

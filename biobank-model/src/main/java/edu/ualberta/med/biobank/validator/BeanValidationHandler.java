@@ -16,7 +16,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
-import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
 import org.hibernate.action.internal.EntityDeleteAction;
 import org.hibernate.cfg.beanvalidation.HibernateTraversableResolver;
@@ -157,9 +156,7 @@ public class BeanValidationHandler implements PreInsertEventListener,
 
     private <T> void validate(Validator validator, T object,
         EventSource session, Class<?>[] groups) {
-        EntityMode mode = session.getEntityMode();
-
-        if (object == null || mode != EntityMode.POJO) return;
+        if (object == null) return;
         if (groups.length == 0) return;
 
         FlushMode oldMode = session.getFlushMode();
