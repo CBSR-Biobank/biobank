@@ -14,8 +14,8 @@ import edu.ualberta.med.biobank.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.action.study.StudySaveAction;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.IActionExecutor;
 

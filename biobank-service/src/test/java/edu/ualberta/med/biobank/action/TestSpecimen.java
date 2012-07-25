@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction
 import edu.ualberta.med.biobank.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
 

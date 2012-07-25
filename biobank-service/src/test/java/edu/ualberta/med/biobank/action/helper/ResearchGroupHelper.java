@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.action.helper;
 import edu.ualberta.med.biobank.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.action.researchGroup.ResearchGroupSaveAction;
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.action.IActionExecutor;
 
 public class ResearchGroupHelper extends Helper {

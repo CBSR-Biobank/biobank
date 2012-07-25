@@ -6,6 +6,8 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 @SuppressWarnings("nls")
 public class Name {

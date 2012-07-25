@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.action.security.RoleGetAllInput;
 import edu.ualberta.med.biobank.action.security.RoleGetAllOutput;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.action.ActionTest;
 
 public class TestRoleGetAllAction extends ActionTest {

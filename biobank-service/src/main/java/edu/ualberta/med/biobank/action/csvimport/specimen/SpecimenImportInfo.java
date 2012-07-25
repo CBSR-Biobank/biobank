@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.action.csvimport.IImportInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenActionHelper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
@@ -16,6 +15,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**

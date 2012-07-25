@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.info;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 
 public class ResearchGroupSaveInfo implements ActionResult{

@@ -14,11 +14,11 @@ import edu.ualberta.med.biobank.action.security.GroupGetAllInput;
 import edu.ualberta.med.biobank.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.test.AssertMore;
 import edu.ualberta.med.biobank.action.ActionTest;
 

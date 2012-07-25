@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class UserGetAction implements Action<UserGetOutput> {
     private static final long serialVersionUID = 1L;

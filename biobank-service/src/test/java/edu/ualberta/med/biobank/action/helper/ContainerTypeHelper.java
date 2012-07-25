@@ -4,9 +4,9 @@ import java.util.HashSet;
 
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeSaveAction;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ContainerTypeHelper {
 

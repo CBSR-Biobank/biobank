@@ -7,8 +7,8 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.SiteInfo;
 import edu.ualberta.med.biobank.permission.site.SiteReadPermission;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class SiteGetInfoAction implements Action<SiteInfo> {
     private static final long serialVersionUID = 1L;

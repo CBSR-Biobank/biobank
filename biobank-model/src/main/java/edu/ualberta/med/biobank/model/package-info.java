@@ -5,7 +5,7 @@
         defaultForType = ActivityStatus.class,
         parameters = {
             @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.ActivityStatus")
+                value = "edu.ualberta.med.biobank.model.type.ActivityStatus")
         }),
     @TypeDef(
         name = "attributeValueType",
@@ -13,7 +13,7 @@
         defaultForType = AttributeValueType.class,
         parameters = {
             @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.AttributeValueType")
+                value = "edu.ualberta.med.biobank.model.type.AttributeValueType")
         }),
     @TypeDef(
         name = "dispatchSpecimenState",
@@ -37,7 +37,7 @@
         defaultForType = PermissionEnum.class,
         parameters = {
             @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.PermissionEnum")
+                value = "edu.ualberta.med.biobank.model.type.PermissionEnum")
         }),
     @TypeDef(
         name = "requestSpecimenState",
@@ -54,8 +54,11 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
+import edu.ualberta.med.biobank.model.type.AttributeValueType;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.EnumUserType;
 

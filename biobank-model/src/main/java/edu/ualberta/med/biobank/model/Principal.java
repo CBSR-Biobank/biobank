@@ -20,6 +20,7 @@ import org.hibernate.annotations.Type;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 @Entity
 @Table(name = "PRINCIPAL")

@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.permission;
 
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 // TODO: find a better home?
 public class PermissionException extends RuntimeException {

@@ -14,9 +14,9 @@ import org.hibernate.event.PreUpdateEvent;
 import org.hibernate.event.PreUpdateEventListener;
 import org.hibernate.exception.ConstraintViolationException;
 
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class TestStuff {
     private final SessionFactory sessionFactory;

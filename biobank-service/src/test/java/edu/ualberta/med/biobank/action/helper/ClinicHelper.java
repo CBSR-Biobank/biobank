@@ -10,9 +10,9 @@ import edu.ualberta.med.biobank.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.action.csvimport.specimen.SpecimenCsvHelper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ClinicHelper extends Helper {
     private static final NameGenerator nameGenerator = new NameGenerator(

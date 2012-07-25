@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.type;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.CommonBundle;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT

@@ -22,6 +22,7 @@ import org.hibernate.annotations.Type;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 /**
  * A {@link User} should only be able to create

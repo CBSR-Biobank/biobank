@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class RequestRetrievalAction implements Action<ListResult<Request>> {
 

@@ -7,10 +7,10 @@ import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.permission.study.StudyUpdatePermission;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class StudyEventAttrSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

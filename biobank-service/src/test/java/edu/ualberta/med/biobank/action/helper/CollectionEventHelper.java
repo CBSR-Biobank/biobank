@@ -19,8 +19,8 @@ import edu.ualberta.med.biobank.action.info.CommentInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.IActionExecutor;
 

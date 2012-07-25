@@ -17,6 +17,7 @@ import org.hibernate.envers.Audited;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 /**
  * The specimens, derived from source specimens, that are collected for a study.

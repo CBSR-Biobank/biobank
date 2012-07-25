@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.type;
 
 import java.io.Serializable;
 import java.util.Arrays;

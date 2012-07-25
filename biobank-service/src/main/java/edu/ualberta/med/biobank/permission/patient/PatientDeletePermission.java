@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.permission.patient;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class PatientDeletePermission implements Permission {
 

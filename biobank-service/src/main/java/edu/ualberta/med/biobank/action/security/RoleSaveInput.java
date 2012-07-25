@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class RoleSaveInput implements ActionInput {
     private static final long serialVersionUID = 1L;

@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.permission.dispatch;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class DispatchChangeStatePermission implements Permission {
 

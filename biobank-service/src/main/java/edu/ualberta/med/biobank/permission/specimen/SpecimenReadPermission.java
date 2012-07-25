@@ -5,9 +5,9 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class SpecimenReadPermission implements Permission {
     private static final long serialVersionUID = 1L;

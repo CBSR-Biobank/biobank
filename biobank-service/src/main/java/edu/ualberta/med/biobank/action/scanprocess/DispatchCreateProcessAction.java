@@ -12,10 +12,10 @@ import edu.ualberta.med.biobank.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Tr;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 

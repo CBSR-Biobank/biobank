@@ -9,9 +9,9 @@ import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventDelete
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ProcessingEventDeleteAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

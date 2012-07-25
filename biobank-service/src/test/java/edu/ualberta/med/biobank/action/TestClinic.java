@@ -19,10 +19,10 @@ import edu.ualberta.med.biobank.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class TestClinic extends ActionTest {
 

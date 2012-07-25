@@ -5,10 +5,10 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public abstract class CenterSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

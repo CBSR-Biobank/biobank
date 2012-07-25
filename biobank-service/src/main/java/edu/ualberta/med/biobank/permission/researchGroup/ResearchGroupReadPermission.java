@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.permission.researchGroup;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ResearchGroup;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class ResearchGroupReadPermission implements Permission {
 

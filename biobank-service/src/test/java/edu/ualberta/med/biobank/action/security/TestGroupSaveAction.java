@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.action.ActionTest;
 
 public class TestGroupSaveAction extends ActionTest {

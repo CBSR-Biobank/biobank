@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.reports;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 /**
  * needs one parameters = study.nameShort

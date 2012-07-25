@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 /**
  * 

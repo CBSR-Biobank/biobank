@@ -9,11 +9,11 @@ import edu.ualberta.med.biobank.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.StudyEventAttrSaveInfo;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.action.IActionExecutor;
 
 public class StudyHelper extends Helper {
