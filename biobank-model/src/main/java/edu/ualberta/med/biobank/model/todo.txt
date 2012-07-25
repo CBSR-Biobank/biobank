@@ -1,10 +1,25 @@
-[ ] Merge center derived classes into center
+[v] Merge center derived classes into center
 [ ] Make a StudyCenter object
 [ ] Make (pnumber, study) unique instead of just pnumber
 [ ] Rethink OriginInfo and ShipmentInfo
 [ ] SendsShipments on clinic was to be replaced with what on ShippingMethod?
 [ ] How do contacts work again?
 [ ] Dispatch should be StudyCenter <-> StudyCenter
-[ ] Requests made for dispatches
+[ ] Requests made for dispatches, clarify this process
 [ ] Shipments should now just be Dispatches
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
+[ ] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
+[ ] Attributes
+[ ] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
+	it's just clutter
+[ ] Split Membership into StudyMembership and CenterMembership? But then how 
+	does a center (or study) control which users can work on a given study? 
+	Is that necessary?
+[ ] Rename name to description, don't make unique, rename nameShort to name?
+[ ] Put validation on interfaces to be shared by DTOs and Data model?
+[ ] Watch out for FK.sql-s, renaming columns
+[ ] Get rid of activity status in a lot of places?
+[ ] Merge ContainerPosition into container and SpecimenPositon into Specimen
+	so that changes to position can be tracked as part of the object?
+[ ] Think about how to deal with translation of global objects, such as,
+	Role, Environment, TubeType, etc.
