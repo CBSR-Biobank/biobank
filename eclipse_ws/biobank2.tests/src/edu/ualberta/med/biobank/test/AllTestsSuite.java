@@ -8,7 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.test.action.ActionSuite;
+import edu.ualberta.med.biobank.action.ActionSuite;
 import edu.ualberta.med.biobank.test.model.ModelSuite;
 
 @RunWith(Suite.class)
