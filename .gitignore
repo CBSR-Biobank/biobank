@@ -1,3 +1,4 @@
+target/
 po/output
 *sublime*
 .settings
@@ -5,6 +6,7 @@ po/output
 *.jasper
 backup/
 docs/doxygen
+.metadata
 eclipse_ws/.metadata
 eclipse_ws/biobank.common/bin
 eclipse_ws/biobank.common/output
