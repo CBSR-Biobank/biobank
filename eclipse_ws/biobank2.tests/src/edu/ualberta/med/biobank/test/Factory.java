@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -32,6 +33,8 @@ import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -88,6 +91,8 @@ public class Factory {
     private AliquotedSpecimen defaultAliquotedSpecimen;
     private Contact defaultContact;
     private Comment defaultComment;
+    private ShipmentInfo defaultShipmentInfo;
+    private ShippingMethod defaultShippingMethod;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -97,6 +102,15 @@ public class Factory {
         this.session = session;
         this.nameGenerator = new NameGenerator(root);
         this.schemeGetter = new ContainerLabelingSchemeGetter();
+    }
+
+    /**
+     * Made this public so that it can be used by other helpers. For example
+     * {@link SpecimenCsvHelper} uses this to generate strings used as values
+     * for attributes.
+     */
+    public NameGenerator getNameGenerator() {
+        return nameGenerator;
     }
 
     public Comment getDefaultComment() {
@@ -461,6 +475,22 @@ public class Factory {
 
     public void setDefaultChildSpecimen(Specimen defaultSpecimen) {
         this.defaultChildSpecimen = defaultSpecimen;
+    }
+
+    public ShipmentInfo getDefaultShipmentInfo() {
+        return defaultShipmentInfo;
+    }
+
+    public void setDefaultShipmentInfo(ShipmentInfo defaultShipmentInfo) {
+        this.defaultShipmentInfo = defaultShipmentInfo;
+    }
+
+    public ShippingMethod getDefaultShippingMethod() {
+        return defaultShippingMethod;
+    }
+
+    public void setDefaultShippingMethod(ShippingMethod shippingMethod) {
+        this.defaultShippingMethod = shippingMethod;
     }
 
     public Comment createComment() {
@@ -883,14 +913,52 @@ public class Factory {
 
     public OriginInfo createOriginInfo() {
         OriginInfo originInfo = new OriginInfo();
-        originInfo.setCenter(getDefaultSite());
+        originInfo.setCenter(getDefaultCenter());
 
-        // TODO: what about ShippingInfo?
+        ShipmentInfo shipmentInfo = getDefaultShipmentInfo();
+        if (shipmentInfo != null) {
+            originInfo.setShipmentInfo(shipmentInfo);
+            originInfo.setReceiverSite(getDefaultSite());
+        }
 
         setDefaultOriginInfo(originInfo);
         session.save(originInfo);
         session.flush();
         return originInfo;
+    }
+
+    public ShipmentInfo createShipmentInfo() {
+        String waybill = nameGenerator.next(ShipmentInfo.class);
+
+        ShipmentInfo shipmentInfo = new ShipmentInfo();
+
+        // set packed at to 2 days ago
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_YEAR, -2);
+
+        shipmentInfo.setPackedAt(cal.getTime());
+        shipmentInfo.setReceivedAt(new Date());
+        shipmentInfo.setWaybill(waybill);
+        shipmentInfo.setBoxNumber("");
+        shipmentInfo.setShippingMethod(createShippingMethod());
+
+        setDefaultShipmentInfo(shipmentInfo);
+        session.save(shipmentInfo);
+        session.flush();
+
+        return shipmentInfo;
+    }
+
+    public ShippingMethod createShippingMethod() {
+        String name = nameGenerator.next(ShippingMethod.class);
+        ShippingMethod shippingMethod = new ShippingMethod();
+        shippingMethod.setName(name);
+
+        setDefaultShippingMethod(shippingMethod);
+        session.save(shippingMethod);
+        session.flush();
+        return shippingMethod;
     }
 
     public User createUser() {

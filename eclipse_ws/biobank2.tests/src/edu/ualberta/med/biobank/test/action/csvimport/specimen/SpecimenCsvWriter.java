@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.util.csv;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
  * @author loyola
  * 
  */
-public class SpecimenCsvWriter {
+class SpecimenCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.
@@ -31,7 +31,7 @@ public class SpecimenCsvWriter {
      * @throws IOException If the file could not be saved.
      */
     @SuppressWarnings("nls")
-    public static void write(String filename, Set<SpecimenCsvInfo> specimenInfos)
+    static void write(String filename, Set<SpecimenCsvInfo> specimenInfos)
         throws IOException {
         final String[] header = new String[] {
             "inventoryId",
@@ -40,8 +40,7 @@ public class SpecimenCsvWriter {
             "createdAt",
             "patientNumber",
             "visitNumber",
-            "currentCenter",
-            "originCenter",
+            "waybill",
             "sourceSpecimen",
             "worksheet",
             "palletProductBarcode",
@@ -50,12 +49,10 @@ public class SpecimenCsvWriter {
             "palletPosition"
         };
 
-        ICsvMapWriter writer =
-            new CsvMapWriter(new FileWriter(filename),
-                CsvPreference.EXCEL_PREFERENCE);
+        ICsvMapWriter writer = new CsvMapWriter(new FileWriter(filename),
+            CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processing = new CellProcessor[] {
-            new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
@@ -84,14 +81,13 @@ public class SpecimenCsvWriter {
                     DateFormatter.formatAsDateTime(info.getCreatedAt()));
                 data.put(header[4], info.getPatientNumber());
                 data.put(header[5], info.getVisitNumber());
-                data.put(header[6], info.getCurrentCenter());
-                data.put(header[7], info.getOriginCenter());
-                data.put(header[8], info.getSourceSpecimen());
-                data.put(header[9], info.getWorksheet());
-                data.put(header[10], info.getPalletProductBarcode());
-                data.put(header[11], info.getRootContainerType());
-                data.put(header[12], info.getPalletLabel());
-                data.put(header[13], info.getPalletPosition());
+                data.put(header[6], info.getWaybill());
+                data.put(header[7], info.getSourceSpecimen());
+                data.put(header[8], info.getWorksheet());
+                data.put(header[9], info.getPalletProductBarcode());
+                data.put(header[10], info.getRootContainerType());
+                data.put(header[11], info.getPalletLabel());
+                data.put(header[12], info.getPalletPosition());
                 writer.write(data, header, processing);
             }
         } finally {

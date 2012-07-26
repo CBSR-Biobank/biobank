@@ -1,10 +1,11 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.specimen;
 
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.csvimport.IImportInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -17,30 +18,35 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
-public class SpecimenImportInfo {
+public class SpecimenImportInfo implements IImportInfo {
 
     private static Logger log = LoggerFactory
         .getLogger(SpecimenImportInfo.class.getName());
 
-    private SpecimenCsvInfo csvInfo;
+    private final SpecimenCsvInfo csvInfo;
     private SpecimenImportInfo parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
     private Specimen parentSpecimen;
-    private Center originCenter;
-    private Center currentCenter;
+    private OriginInfo originInfo;
     private SpecimenType specimenType;
     private Container container;
     private RowColPos specimenPos;
     private Specimen specimen;
 
     SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
-        this.setCsvInfo(csvInfo);
+        this.csvInfo = csvInfo;
     }
 
-    public int getLineNumber() {
+    @Override
+    public int getCsvLineNumber() {
         return csvInfo.getLineNumber();
     }
 
@@ -48,11 +54,11 @@ public class SpecimenImportInfo {
         return csvInfo;
     }
 
-    public SpecimenImportInfo getParentInfo() {
+    SpecimenImportInfo getParentInfo() {
         return parentInfo;
     }
 
-    public void setParentInfo(SpecimenImportInfo parentInfo) {
+    void setParentInfo(SpecimenImportInfo parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }
@@ -61,15 +67,11 @@ public class SpecimenImportInfo {
             csvInfo.getInventoryId(), parentInfo.csvInfo.getInventoryId());
     }
 
-    public void setCsvInfo(SpecimenCsvInfo csvInfo) {
-        this.csvInfo = csvInfo;
-    }
-
-    public Patient getPatient() {
+    Patient getPatient() {
         return patient;
     }
 
-    public void setPatient(Patient patient) {
+    void setPatient(Patient patient) {
         this.patient = patient;
     }
 
@@ -77,85 +79,77 @@ public class SpecimenImportInfo {
         return cevent;
     }
 
-    public void setCevent(CollectionEvent cevent) {
+    void setCevent(CollectionEvent cevent) {
         this.cevent = cevent;
     }
 
-    public ProcessingEvent getPevent() {
+    ProcessingEvent getPevent() {
         return pevent;
     }
 
-    public void setPevent(ProcessingEvent pevent) {
+    void setPevent(ProcessingEvent pevent) {
         this.pevent = pevent;
     }
 
-    public Specimen getParentSpecimen() {
+    Specimen getParentSpecimen() {
         return parentSpecimen;
     }
 
-    public void setParentSpecimen(Specimen parentSpecimen) {
+    void setParentSpecimen(Specimen parentSpecimen) {
         this.parentSpecimen = parentSpecimen;
         this.pevent = parentSpecimen.getProcessingEvent();
     }
 
-    public String getParentInventoryId() {
+    String getParentInventoryId() {
         return csvInfo.getParentInventoryId();
     }
 
-    public Center getOriginCenter() {
-        return originCenter;
+    OriginInfo getOriginInfo() {
+        return originInfo;
     }
 
-    public void setOriginCenter(Center originCenter) {
-        this.originCenter = originCenter;
+    void setOriginInfo(OriginInfo originInfo) {
+        this.originInfo = originInfo;
     }
 
-    public Center getCurrentCenter() {
-        return currentCenter;
-    }
-
-    public void setCurrentCenter(Center currentCenter) {
-        this.currentCenter = currentCenter;
-    }
-
-    public SpecimenType getSpecimenType() {
+    SpecimenType getSpecimenType() {
         return specimenType;
     }
 
-    public void setSpecimenType(SpecimenType specimenType) {
+    void setSpecimenType(SpecimenType specimenType) {
         this.specimenType = specimenType;
     }
 
-    public Container getContainer() {
+    Container getContainer() {
         return container;
     }
 
-    public void setContainer(Container container) {
+    void setContainer(Container container) {
         this.container = container;
     }
 
-    public RowColPos getSpecimenPos() {
+    RowColPos getSpecimenPos() {
         return specimenPos;
     }
 
-    public void setSpecimenPos(RowColPos specimenPos) {
+    void setSpecimenPos(RowColPos specimenPos) {
         this.specimenPos = specimenPos;
     }
 
-    public boolean isSourceSpecimen() {
+    boolean isSourceSpecimen() {
         return csvInfo.getSourceSpecimen();
     }
 
-    public boolean isAliquotedSpecimen() {
+    boolean isAliquotedSpecimen() {
         return !csvInfo.getSourceSpecimen();
     }
 
-    public boolean hasWorksheet() {
+    boolean hasWorksheet() {
         return (csvInfo.getWorksheet() != null)
             && !csvInfo.getWorksheet().isEmpty();
     }
 
-    public boolean hasPosition() {
+    boolean hasPosition() {
         return (csvInfo.getPalletLabel() != null)
             && !csvInfo.getPalletLabel().isEmpty()
             && (csvInfo.getPalletPosition() != null)
@@ -163,7 +157,13 @@ public class SpecimenImportInfo {
 
     }
 
-    public CollectionEvent createCollectionEvent() {
+    public OriginInfo getNewOriginInfo(Center center) {
+        originInfo = new OriginInfo();
+        originInfo.setCenter(center);
+        return originInfo;
+    }
+
+    CollectionEvent getNewCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
         cevent.setVisitNumber(csvInfo.getVisitNumber());
@@ -180,7 +180,7 @@ public class SpecimenImportInfo {
         return cevent;
     }
 
-    public ProcessingEvent createProcessingEvent() {
+    ProcessingEvent getNewProcessingEvent() {
         if (parentSpecimen != null) {
             throw new IllegalStateException(
                 "this specimen has a parent specimen and cannot have a processing event");
@@ -188,7 +188,7 @@ public class SpecimenImportInfo {
         pevent = new ProcessingEvent();
         pevent.setWorksheet(csvInfo.getWorksheet());
         pevent.setCreatedAt(new Date());
-        pevent.setCenter(currentCenter);
+        pevent.setCenter(originInfo.getCenter());
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
 
@@ -198,7 +198,7 @@ public class SpecimenImportInfo {
         return getPevent();
     }
 
-    public Specimen getSpecimen() {
+    Specimen getNewSpecimen() {
         if (cevent == null) {
             throw new IllegalStateException(
                 "specimen does not have a collection event");
@@ -212,16 +212,17 @@ public class SpecimenImportInfo {
                     + " has not be created yet");
         }
 
-        // add the specimen to the collection event
-        OriginInfo oi = new OriginInfo();
-        oi.setCenter(originCenter);
-
         specimen = new Specimen();
         specimen.setInventoryId(csvInfo.getInventoryId());
         specimen.setSpecimenType(specimenType);
-        specimen.setCurrentCenter(currentCenter);
+
+        if (originInfo.getReceiverSite() == null) {
+            specimen.setCurrentCenter(originInfo.getCenter());
+        } else {
+            specimen.setCurrentCenter(originInfo.getReceiverSite());
+        }
         specimen.setCollectionEvent(cevent);
-        specimen.setOriginInfo(oi);
+        specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(csvInfo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 

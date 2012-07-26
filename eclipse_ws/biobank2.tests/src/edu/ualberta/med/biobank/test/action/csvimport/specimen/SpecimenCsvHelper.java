@@ -1,16 +1,15 @@
-package edu.ualberta.med.biobank.test.action.csvhelper;
+package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.csvimport.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -18,10 +17,18 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
+/**
+ * 
+ * @author loyola
+ * 
+ */
 @SuppressWarnings("nls")
-public class SpecimenCsvHelper {
-    private static final NameGenerator nameGenerator = new NameGenerator(
-        SpecimenCsvHelper.class.getSimpleName() + new Random());
+class SpecimenCsvHelper {
+    private final NameGenerator nameGenerator;
+
+    SpecimenCsvHelper(NameGenerator nameGenerator) {
+        this.nameGenerator = nameGenerator;
+    }
 
     /**
      * Creates a CSV with source specimens and aliquoted specimens.
@@ -35,8 +42,8 @@ public class SpecimenCsvHelper {
      * @param patients the patients that these specimens will belong to.
      * @throws IOException
      */
-    public static Set<SpecimenCsvInfo> createAllSpecimens(Study study,
-        Center originCenter, Center currentCenter, Set<Patient> patients) {
+    Set<SpecimenCsvInfo> createAllSpecimens(Study study,
+        Set<OriginInfo> originInfos, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
                 "study does not have any source specimens");
@@ -48,7 +55,7 @@ public class SpecimenCsvHelper {
         }
 
         Set<SpecimenCsvInfo> specimenInfos = sourceSpecimensCreate(
-            originCenter, currentCenter, patients, study.getSourceSpecimens());
+            originInfos, patients, study.getSourceSpecimens());
 
         Map<String, String> parentSpecimenInfoMap =
             new HashMap<String, String>();
@@ -57,34 +64,34 @@ public class SpecimenCsvHelper {
                 specimenInfo.getPatientNumber());
         }
 
-        specimenInfos.addAll(aliquotedSpecimensCreate(originCenter,
-            currentCenter, parentSpecimenInfoMap,
+        specimenInfos.addAll(aliquotedSpecimensCreate(parentSpecimenInfoMap,
             study.getAliquotedSpecimens()));
 
         return specimenInfos;
     }
 
-    public static Set<SpecimenCsvInfo> sourceSpecimensCreate(
-        Center originCenter,
-        Center currentCenter, Set<Patient> patients,
-        Set<SourceSpecimen> sourceSpecimens) {
+    Set<SpecimenCsvInfo> sourceSpecimensCreate(
+        Set<OriginInfo> originInfos,
+        Set<Patient> patients, Set<SourceSpecimen> sourceSpecimens) {
         Set<SpecimenCsvInfo> specimenInfos =
             new LinkedHashSet<SpecimenCsvInfo>();
 
         // add parent specimens first
         for (SourceSpecimen ss : sourceSpecimens) {
             for (Patient p : patients) {
-                SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-                specimenInfo.setInventoryId(nameGenerator.next(String.class));
-                specimenInfo.setSpecimenType(ss.getSpecimenType().getName());
-                specimenInfo.setCreatedAt(Utils.getRandomDate());
-                specimenInfo.setPatientNumber(p.getPnumber());
-                specimenInfo.setVisitNumber(1);
-                specimenInfo.setCurrentCenter(currentCenter.getNameShort());
-                specimenInfo.setOriginCenter(originCenter.getNameShort());
-                specimenInfo.setWorksheet(nameGenerator.next(String.class));
-                specimenInfo.setSourceSpecimen(true);
-                specimenInfos.add(specimenInfo);
+                for (OriginInfo originInfo : originInfos) {
+                    // create ones with shipment info
+                    SpecimenCsvInfo specimenInfo =
+                        sourceSpecimenCreate(ss.getSpecimenType().getName(),
+                            p.getPnumber(), originInfo.getShipmentInfo()
+                                .getWaybill());
+                    specimenInfos.add(specimenInfo);
+                }
+
+                // create ones without shipment info
+                SpecimenCsvInfo specimenInfo =
+                    sourceSpecimenCreate(ss.getSpecimenType().getName(),
+                        p.getPnumber(), null);
             }
         }
 
@@ -95,8 +102,8 @@ public class SpecimenCsvHelper {
      * Creates CSV specimens with only aliquoted specimens. Note that parent
      * specimens must already be present in the database.
      */
-    public static Set<SpecimenCsvInfo> createAliquotedSpecimens(Study study,
-        Center originCenter, Center currentCenter, Set<Specimen> parentSpecimens) {
+    Set<SpecimenCsvInfo> createAliquotedSpecimens(Study study,
+        Set<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException(
                 "study does not have any source specimens");
@@ -109,8 +116,8 @@ public class SpecimenCsvHelper {
                 parentSpecimen.getCollectionEvent().getPatient().getPnumber());
         }
 
-        return aliquotedSpecimensCreate(originCenter, currentCenter,
-            parentSpecimenInfoMap, study.getAliquotedSpecimens());
+        return aliquotedSpecimensCreate(parentSpecimenInfoMap,
+            study.getAliquotedSpecimens());
     }
 
     /**
@@ -118,9 +125,8 @@ public class SpecimenCsvHelper {
      * 
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
-    private static Set<SpecimenCsvInfo> aliquotedSpecimensCreate(
-        Center originCenter,
-        Center currentCenter, Map<String, String> parentSpecimenInfoMap,
+    private Set<SpecimenCsvInfo> aliquotedSpecimensCreate(
+        Map<String, String> parentSpecimenInfoMap,
         Set<AliquotedSpecimen> aliquotedSpecimens) {
         Set<SpecimenCsvInfo> specimenInfos =
             new LinkedHashSet<SpecimenCsvInfo>();
@@ -128,18 +134,10 @@ public class SpecimenCsvHelper {
         for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap
             .entrySet()) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
-                SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-                specimenInfo.setInventoryId(nameGenerator
-                    .next(String.class));
-                specimenInfo.setParentInventoryId(parentSpecimenInfo.getKey());
-                specimenInfo
-                    .setSpecimenType(as.getSpecimenType().getName());
-                specimenInfo.setCreatedAt(Utils.getRandomDate());
-                specimenInfo
-                    .setPatientNumber(parentSpecimenInfo.getValue());
-                specimenInfo.setVisitNumber(1);
-                specimenInfo.setCurrentCenter(currentCenter.getNameShort());
-                specimenInfo.setOriginCenter(originCenter.getNameShort());
+                SpecimenCsvInfo specimenInfo =
+                    aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
+                        as.getSpecimenType().getName(),
+                        parentSpecimenInfo.getValue());
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -147,4 +145,26 @@ public class SpecimenCsvHelper {
         return specimenInfos;
     }
 
+    private SpecimenCsvInfo sourceSpecimenCreate(
+        String specimenTypeName,
+        String patientNumber, String waybill) {
+        SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
+            null, specimenTypeName, patientNumber);
+        specimenInfo.setWaybill(waybill);
+        specimenInfo.setWorksheet(nameGenerator.next(String.class));
+        specimenInfo.setSourceSpecimen(true);
+        return specimenInfo;
+    }
+
+    private SpecimenCsvInfo aliquotedSpecimenCreate(
+        String parentInventoryId, String specimenTypeName, String patientNumber) {
+        SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
+        specimenInfo.setInventoryId(nameGenerator.next(String.class));
+        specimenInfo.setParentInventoryId(parentInventoryId);
+        specimenInfo.setSpecimenType(specimenTypeName);
+        specimenInfo.setCreatedAt(Utils.getRandomDate());
+        specimenInfo.setPatientNumber(patientNumber);
+        specimenInfo.setVisitNumber(1);
+        return specimenInfo;
+    }
 }

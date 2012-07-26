@@ -1,15 +1,16 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.csvimport.specimen;
 
-import java.io.Serializable;
 import java.util.Date;
 
+import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
+
 /**
- * POJO used for CSV import.
+ * POJO used by SuperCSV for CSV import feature.
  * 
  * @author loyola
  * 
  */
-public class SpecimenCsvInfo implements Serializable {
+public class SpecimenCsvInfo implements ICsvInfo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
@@ -19,8 +20,7 @@ public class SpecimenCsvInfo implements Serializable {
     private Date createdAt;
     private String patientNumber;
     private Integer visitNumber;
-    private String currentCenter;
-    private String originCenter;
+    private String waybill;
     private Boolean sourceSpecimen = false;
     private String worksheet;
     private String palletProductBarcode;
@@ -28,10 +28,12 @@ public class SpecimenCsvInfo implements Serializable {
     private String palletLabel;
     private String palletPosition;
 
+    @Override
     public int getLineNumber() {
         return lineNumber;
     }
 
+    @Override
     public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;
     }
@@ -84,20 +86,12 @@ public class SpecimenCsvInfo implements Serializable {
         this.visitNumber = visitNumber;
     }
 
-    public String getCurrentCenter() {
-        return currentCenter;
+    public String getWaybill() {
+        return waybill;
     }
 
-    public void setCurrentCenter(String currentCenter) {
-        this.currentCenter = currentCenter;
-    }
-
-    public String getOriginCenter() {
-        return originCenter;
-    }
-
-    public void setOriginCenter(String originCenter) {
-        this.originCenter = originCenter;
+    public void setWaybill(String waybill) {
+        this.waybill = waybill;
     }
 
     public Boolean getSourceSpecimen() {
