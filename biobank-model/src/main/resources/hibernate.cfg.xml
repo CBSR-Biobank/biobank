@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
 		<!-- Properties for the session factory -->
@@ -11,11 +13,11 @@
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
 		<property name="c3p0.timeout">5000</property>
-		<!-- ZERO because when hibernate calls `result = conn.prepareStatement( 
-			sql );` (in AbstractBatcher) a PreparedStatement is returned by c3p0 that 
-			already has batches in it, so, if it was executed immediately, it would already 
-			insert rows, even though we never told it to add any, see this bug: http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=25357&atid=383690 
-			Possible fixes are for us to call clearBatch() on the ps, or to use another 
+		<!-- ZERO because when hibernate calls `result = conn.prepareStatement(
+			sql );` (in AbstractBatcher) a PreparedStatement is returned by c3p0 that
+			already has batches in it, so, if it was executed immediately, it would already
+			insert rows, even though we never told it to add any, see this bug: http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=25357&atid=383690
+			Possible fixes are for us to call clearBatch() on the ps, or to use another
 			connection pooler -->
 		<property name="c3p0.max_statements">0</property>
 		<property name="c3p0.idle_test_period">3000</property>
@@ -33,26 +35,24 @@
 		<property name="org.hibernate.envers.audit_table_suffix">_audit</property>
 		<property name="org.hibernate.envers.revision_field_name">REVISION_ID</property>
 		<property name="org.hibernate.envers.revision_type_field_name">REVISION_TYPE</property>
-		<!-- Note that as of 3.6.10 the following configuration options were added 
+		<!-- Note that as of 3.6.10 the following configuration options were added
 			and should be regarded as experimental only... -->
 		<property name="org.hibernate.envers.audit_strategy">org.hibernate.envers.strategy.ValidityAuditStrategy</property>
 		<property name="org.hibernate.envers.audit_strategy_validity_end_rev_field_name">END_REVISION_ID</property>
 		<property name="org.hibernate.envers.audit_strategy_validity_revend_timestamp_field_name">END_REVISION_TIME</property>
-		<!-- Turn off default Hibernate Bean Validator, only apply constraints 
+		<!-- Turn off default Hibernate Bean Validator, only apply constraints
 			to the database schema when generated with Hibernate -->
 		<property name="javax.persistence.validation.mode">ddl</property>
-		<!-- Mapped package loads package-info.java, which contains package-wide 
+		<!-- Mapped package loads package-info.java, which contains package-wide
 			information, such as, @TypeDefs -->
 		<mapping package="edu.ualberta.med.biobank.model" />
 		<!-- Mapped classes -->
 		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
-		<mapping class="edu.ualberta.med.biobank.model.Activity" />
 		<mapping class="edu.ualberta.med.biobank.model.Address" />
 		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Group" />
 		<mapping class="edu.ualberta.med.biobank.model.Capacity" />
 		<mapping class="edu.ualberta.med.biobank.model.Center" />
-		<mapping class="edu.ualberta.med.biobank.model.Clinic" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" />
 		<mapping class="edu.ualberta.med.biobank.model.Comment" />
 		<mapping class="edu.ualberta.med.biobank.model.Contact" />
@@ -86,13 +86,10 @@
 		<mapping class="edu.ualberta.med.biobank.model.Report" />
 		<mapping class="edu.ualberta.med.biobank.model.Request" />
 		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" />
-		<mapping class="edu.ualberta.med.biobank.model.ResearchGroup" />
 		<mapping class="edu.ualberta.med.biobank.model.Revision" />
-		<mapping class="edu.ualberta.med.biobank.model.RevisionEntityType" />
 		<mapping class="edu.ualberta.med.biobank.model.Role" />
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentInfo" />
 		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" />
-		<mapping class="edu.ualberta.med.biobank.model.Site" />
 		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" />
@@ -140,4 +137,3 @@
 		</event>
 	</session-factory>
 </hibernate-configuration>
-

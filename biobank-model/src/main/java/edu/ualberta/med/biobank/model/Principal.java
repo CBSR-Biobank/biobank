@@ -22,16 +22,13 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "DISCRIMINATOR",
-    discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 public class Principal extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Principal",
+    public static final Trnc NAME = bundle.trnc("model", "Principal",
         "Principals");
 
     private Set<Membership> memberships = new HashSet<Membership>(0);
@@ -43,7 +40,7 @@ public class Principal extends AbstractModel {
     // for a user.
     // @NotEmpty(groups = PreInsert.class, message =
     // "{edu.ualberta.med.biobank.model.Principal.memberships.NotEmpty}")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "principal")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public Set<Membership> getMemberships() {
         return this.memberships;
     }
