@@ -62,6 +62,10 @@
 [ ] Collection Event types
 [ ] Q: Sent samples freezer?
 	A: create a StudyCenter for each study, and assign the specimens to it
-[ ] Go over OHS's feature list.
+[ ] *Think more about differences between Shipment/ Dispatch/ Request because the workflow
+	and intent seems quite different.
+	Shipment - recording incoming things
+	Dispatch - decide and record outgoing things, then incoming
+	Request - 
 
 * requires thought/ feedback
