@@ -83,7 +83,7 @@ public abstract class AbstractModel
     }
 
     @Override
-    public void setTimeInserted(Date insertTime) {
-        this.timeInserted = insertTime;
+    public void setTimeInserted(Date timeInserted) {
+        this.timeInserted = timeInserted;
     }
 }
