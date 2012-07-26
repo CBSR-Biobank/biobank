@@ -53,7 +53,7 @@ public class TestContainer extends DbTest {
     @Test
     public void duplicateLabelDifferentSiteAndContainerType() {
         Container c1 = factory.createContainer();
-        factory.createSite(); // new default site
+        factory.createCenter(); // new default site
         factory.createContainerType(); // new default container type
         Container c2 = factory.createContainer();
 
@@ -108,7 +108,7 @@ public class TestContainer extends DbTest {
     @Test
     public void duplicateProductBarcodeDifferentSite() {
         Container c1 = factory.createContainer();
-        factory.createSite(); // new default site
+        factory.createCenter(); // new default site
         Container c2 = factory.createContainer();
 
         c2.setProductBarcode(c1.getProductBarcode());

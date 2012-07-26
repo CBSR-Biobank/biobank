@@ -11,7 +11,6 @@ import org.junit.Before;
 import edu.ualberta.med.biobank.SessionProvider.Mode;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class DbTest extends BaseTest {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
@@ -76,8 +75,7 @@ public class DbTest extends BaseTest {
         globalAdmin.setFullName(GLOBAL_ADMIN_LOGIN);
         globalAdmin.setEmail(GLOBAL_ADMIN_LOGIN);
         globalAdmin.setNeedPwdChange(false);
-        globalAdmin.setNeedPwdChange(false);
-        globalAdmin.setActivityStatus(ActivityStatus.ACTIVE);
+        globalAdmin.setEnabled(true);
 
         session.save(globalAdmin);
 

@@ -151,7 +151,7 @@ public class TestContainer extends ActionTest {
         factory.createTopContainer();
         Container childContainer = factory.createContainer();
 
-        factory.createSite();
+        factory.createCenter();
         factory.createTopContainerType();
         Container topContainerS2 = factory.createTopContainer();
 

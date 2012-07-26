@@ -55,7 +55,7 @@ public class TestSpecimenCsvImport extends ActionTest {
         // add 2 shipments
 
         tx = session.beginTransaction();
-        factory.createSite();
+        factory.createCenter();
         factory.createClinic();
         factory.createStudy();
 

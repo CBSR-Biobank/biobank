@@ -146,7 +146,7 @@ public class TestGroupGetAllAction extends ActionTest {
     @Test
     public void domainSpecific() {
         Transaction tx = session.beginTransaction();
-        Site site1 = factory.createSite();
+        Site site1 = factory.createCenter();
         Study studyA = factory.createStudy();
         Group group1A = factory.createGroup();
         factory.createMembership();
@@ -156,7 +156,7 @@ public class TestGroupGetAllAction extends ActionTest {
         Membership man1Amembership = man1A.getMemberships().iterator().next();
         man1Amembership.getPermissions().add(PermissionEnum.CLINIC_READ);
 
-        Site site2 = factory.createSite();
+        Site site2 = factory.createCenter();
         Study studyB = factory.createStudy();
         Group group2B = factory.createGroup();
         factory.createMembership();

@@ -29,7 +29,7 @@ public class TestUserSaveAction extends ActionTest {
     public void insert() {
         Transaction tx = session.beginTransaction();
         Role role = factory.createRole();
-        Center center = factory.createSite();
+        Center center = factory.createCenter();
         Study study = factory.createStudy();
         Group group = factory.createGroup();
         tx.commit();

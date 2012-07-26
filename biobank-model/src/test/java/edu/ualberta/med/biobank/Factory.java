@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test;
+package edu.ualberta.med.biobank;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Contact;
@@ -25,17 +24,14 @@ import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
-import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
@@ -58,9 +54,7 @@ public class Factory {
     private final NameGenerator nameGenerator;
     private final Session session;
 
-    private Site defaultSite;
     private Center defaultCenter;
-    private Clinic defaultClinic;
     private ContainerType defaultTopContainerType;
     private ContainerType defaultContainerType;
     private SpecimenType defaultSourceSpecimenType;
@@ -75,7 +69,6 @@ public class Factory {
     private Study defaultStudy;
     private Patient defaultPatient;
     private CollectionEvent defaultCollectionEvent;
-    private OriginInfo defaultOriginInfo;
     private User defaultUser;
     private Group defaultGroup;
     private Principal defaultPrincipal;
@@ -85,7 +78,6 @@ public class Factory {
     private DispatchSpecimen defaultDispatchSpecimen;
     private Request defaultRequest;
     private RequestSpecimen defaultRequestSpecimen;
-    private ResearchGroup defaultResearchGroup;
     private ProcessingEvent defaultProcessingEvent;
     private SourceSpecimen defaultSourceSpecimen;
     private AliquotedSpecimen defaultAliquotedSpecimen;
@@ -135,17 +127,6 @@ public class Factory {
         this.defaultContact = defaultContact;
     }
 
-    public Clinic getDefaultClinic() {
-        if (defaultClinic == null) {
-            defaultClinic = createClinic();
-        }
-        return defaultClinic;
-    }
-
-    public void setDefaultClinic(Clinic defaultClinic) {
-        this.defaultClinic = defaultClinic;
-    }
-
     public SourceSpecimen getDefaultSourceSpecimen() {
         if (defaultSourceSpecimen == null) {
             defaultSourceSpecimen = createSourceSpecimen();
@@ -184,17 +165,6 @@ public class Factory {
         this.defaultProcessingEvent = defaultProcessingEvent;
     }
 
-    public ResearchGroup getDefaultResearchGroup() {
-        if (defaultResearchGroup == null) {
-            defaultResearchGroup = createResearchGroup();
-        }
-        return defaultResearchGroup;
-    }
-
-    public void setDefaultResearchGroup(ResearchGroup researchGroup) {
-        this.defaultResearchGroup = researchGroup;
-    }
-
     public Request getDefaultRequest() {
         if (defaultRequest == null) {
             defaultRequest = createRequest();
@@ -219,7 +189,8 @@ public class Factory {
 
     public Dispatch getDefaultDispatch() {
         if (defaultDispatch == null) {
-            defaultDispatch = createDispatch(getDefaultCenter(), createSite());
+            defaultDispatch =
+                createDispatch(getDefaultCenter(), createCenter());
         }
         return defaultDispatch;
     }
@@ -253,7 +224,7 @@ public class Factory {
 
     public Center getDefaultCenter() {
         if (defaultCenter == null) {
-            defaultCenter = createSite();
+            defaultCenter = createCenter();
         }
         return defaultCenter;
     }
@@ -336,17 +307,6 @@ public class Factory {
         this.defaultTopContainerType = defaultTopContainerType;
     }
 
-    public OriginInfo getDefaultOriginInfo() {
-        if (defaultOriginInfo == null) {
-            defaultOriginInfo = createOriginInfo();
-        }
-        return defaultOriginInfo;
-    }
-
-    public void setDefaultOriginInfo(OriginInfo defaultOriginInfo) {
-        this.defaultOriginInfo = defaultOriginInfo;
-    }
-
     public Study getDefaultStudy() {
         if (defaultStudy == null) {
             defaultStudy = createStudy();
@@ -378,17 +338,6 @@ public class Factory {
 
     public void setDefaultCollectionEvent(CollectionEvent defaultCollectionEvent) {
         this.defaultCollectionEvent = defaultCollectionEvent;
-    }
-
-    public Site getDefaultSite() {
-        if (defaultSite == null) {
-            defaultSite = createSite();
-        }
-        return defaultSite;
-    }
-
-    public void setDefaultSite(Site defaultSite) {
-        this.defaultSite = defaultSite;
     }
 
     public ContainerType getDefaultContainerType() {
@@ -508,7 +457,6 @@ public class Factory {
     public Contact createContact() {
         String name = nameGenerator.next(Contact.class);
         Contact contact = new Contact();
-        contact.setClinic(getDefaultClinic());
         contact.setName(name);
 
         setDefaultContact(contact);
@@ -517,28 +465,11 @@ public class Factory {
         return contact;
     }
 
-    public Clinic createClinic() {
-        // Use Center.class because the name must be unique on Center
-        String name = nameGenerator.next(Center.class);
-
-        Clinic clinic = new Clinic();
-        clinic.setName(name);
-        clinic.setNameShort(name);
-        clinic.getAddress().setCity("testville");
-
-        setDefaultCenter(clinic);
-        setDefaultClinic(clinic);
-        session.save(clinic);
-        session.flush();
-        return clinic;
-    }
-
     public SourceSpecimen createSourceSpecimen() {
         SourceSpecimen sourceSpecimen = new SourceSpecimen();
         sourceSpecimen.setStudy(getDefaultStudy());
         sourceSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
-        getDefaultStudy().getSourceSpecimens().add(sourceSpecimen);
         setDefaultSourceSpecimen(sourceSpecimen);
         session.save(sourceSpecimen);
         session.flush();
@@ -552,7 +483,6 @@ public class Factory {
         aliquotedSpecimen.setQuantity(1);
         aliquotedSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
 
-        getDefaultStudy().getAliquotedSpecimens().add(aliquotedSpecimen);
         setDefaultAliquotedSpecimen(aliquotedSpecimen);
         session.save(aliquotedSpecimen);
         session.flush();
@@ -573,23 +503,6 @@ public class Factory {
         return processingEvent;
     }
 
-    public ResearchGroup createResearchGroup() {
-        // Use Center.class because the name must be unique on Center
-        String name = nameGenerator.next(Center.class);
-
-        ResearchGroup researchGroup = new ResearchGroup();
-        researchGroup.getAddress().setCity("testville");
-        researchGroup.setName(name);
-        researchGroup.setNameShort(name);
-        researchGroup.setStudy(getDefaultStudy());
-
-        setDefaultCenter(researchGroup);
-        setDefaultResearchGroup(researchGroup);
-        session.save(researchGroup);
-        session.flush();
-        return researchGroup;
-    }
-
     public Request createRequest() {
         Request request = new Request();
 
@@ -599,7 +512,7 @@ public class Factory {
         session.save(address);
 
         request.setCreatedAt(new Date());
-        request.setResearchGroup(getDefaultResearchGroup());
+        request.setStudy(getDefaultStudy());
 
         setDefaultRequest(request);
         session.save(request);
@@ -644,19 +557,17 @@ public class Factory {
         return dispatchSpecimen;
     }
 
-    public Site createSite() {
-        // Use Center.class because the name must be unique on Center
+    public Center createCenter() {
         String name = nameGenerator.next(Center.class);
-        Site site = new Site();
-        site.setName(name);
-        site.setNameShort(name);
-        site.getAddress().setCity("testville");
+        Center center = new Center();
+        center.setName(name);
+        center.setNameShort(name);
+        center.getAddress().setCity("testville");
 
-        setDefaultSite(site);
-        setDefaultCenter(site);
-        session.save(site);
+        setDefaultCenter(center);
+        session.save(center);
         session.flush();
-        return site;
+        return center;
     }
 
     public ContainerType createContainerType() {
@@ -665,7 +576,7 @@ public class Factory {
         ContainerType containerType = new ContainerType();
         containerType.setName(name);
         containerType.setNameShort(name);
-        containerType.setSite(getDefaultSite());
+        containerType.setCenter(getDefaultCenter());
         containerType.setCapacity(new Capacity(getDefaultCapacity()));
         containerType
             .setChildLabelingScheme(getDefaultContainerLabelingScheme());
@@ -693,9 +604,9 @@ public class Factory {
         String label = nameGenerator.next(Container.class);
 
         Container container = new Container();
-        container.setSite(getDefaultSite());
-        if (!getDefaultTopContainerType().getSite().equals(
-            container.getSite())) {
+        container.setCenter(getDefaultCenter());
+        if (!getDefaultTopContainerType().getCenter()
+            .equals(container.getCenter())) {
             // make sure sites match
             createTopContainerType();
         }
@@ -708,7 +619,7 @@ public class Factory {
         Container parentContainer = getDefaultParentContainer();
         if (parentContainer != null) {
             ContainerType containerType = getDefaultContainerType();
-            if (!containerType.getSite().equals(container.getSite())) {
+            if (!containerType.getCenter().equals(container.getCenter())) {
                 // make sure sites match
                 containerType = createContainerType();
             }
@@ -716,7 +627,6 @@ public class Factory {
 
             ContainerType parentCt = parentContainer.getContainerType();
             parentCt.getChildContainerTypes().add(containerType);
-            containerType.getParentContainerTypes().add(parentCt);
 
             session.update(parentCt);
             session.flush();
@@ -780,9 +690,9 @@ public class Factory {
 
         Specimen specimen = new Specimen();
         specimen.setInventoryId(name);
-        specimen.setCurrentCenter(getDefaultSite());
+        specimen.setCurrentCenter(getDefaultCenter());
         specimen.setCollectionEvent(getDefaultCollectionEvent());
-        specimen.setOriginInfo(getDefaultOriginInfo());
+        specimen.setOriginCenter(getDefaultStudyCenter());
         specimen.setCreatedAt(new Date());
 
         return specimen;

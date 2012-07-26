@@ -17,42 +17,42 @@ import edu.ualberta.med.biobank.validator.constraint.Empty;
 public class TestCenter extends DbTest {
     @Test
     public void emptyName() {
-        HasXHelper.checkEmptyName(session, factory.createSite());
+        HasXHelper.checkEmptyName(session, factory.createCenter());
     }
 
     @Test
     public void duplicateName() {
         HasXHelper.checkDuplicateName(session,
-            factory.createSite(),
-            factory.createSite());
+            factory.createCenter(),
+            factory.createCenter());
     }
 
     @Test
     public void emptyNameShort() {
-        HasXHelper.checkEmptyNameShort(session, factory.createSite());
+        HasXHelper.checkEmptyNameShort(session, factory.createCenter());
     }
 
     @Test
     public void duplicateNameShort() {
         HasXHelper.checkDuplicateNameShort(session,
-            factory.createSite(),
-            factory.createSite());
+            factory.createCenter(),
+            factory.createCenter());
     }
 
     @Test
     public void nullActivityStatus() {
-        HasXHelper.checkNullActivityStatus(session, factory.createSite());
+        HasXHelper.checkNullActivityStatus(session, factory.createCenter());
     }
 
     @Test
     public void expectedActivityStatusIds() {
         HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createSite());
+            factory.createCenter());
     }
 
     @Test
     public void nullAddress() {
-        Center center = factory.createSite();
+        Center center = factory.createCenter();
 
         try {
             center.setAddress(null);
@@ -71,8 +71,8 @@ public class TestCenter extends DbTest {
     public void deleteWithSrcDispatches() {
         Transaction tx = session.beginTransaction();
 
-        Center sender = factory.createSite();
-        Center receiver = factory.createSite();
+        Center sender = factory.createCenter();
+        Center receiver = factory.createCenter();
         factory.createDispatch(sender, receiver);
 
         try {
@@ -90,8 +90,8 @@ public class TestCenter extends DbTest {
     public void deleteWithDstDispatches() {
         Transaction tx = session.beginTransaction();
 
-        Center sender = factory.createSite();
-        Center receiver = factory.createSite();
+        Center sender = factory.createCenter();
+        Center receiver = factory.createCenter();
         factory.createDispatch(sender, receiver);
 
         try {

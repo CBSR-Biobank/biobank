@@ -43,7 +43,7 @@ public class TestShipmentCsvInfo extends ActionTest {
         shipmentCsvHelper = new ShipmentCsvHelper(factory.getNameGenerator());
 
         tx = session.beginTransaction();
-        factory.createSite();
+        factory.createCenter();
         factory.createClinic();
         factory.createStudy();
     }

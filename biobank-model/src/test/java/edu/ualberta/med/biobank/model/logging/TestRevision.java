@@ -11,7 +11,7 @@ public class TestRevision extends LoggingTest {
     @Test
     public void revisionEntityTypes() {
         Transaction tx = session.beginTransaction();
-        Site site = factory.createSite();
+        Site site = factory.createCenter();
         tx.commit();
 
         tx = session.beginTransaction();
@@ -27,7 +27,7 @@ public class TestRevision extends LoggingTest {
     @Test
     public void twoSessions() {
         session.beginTransaction();
-        Site site = factory.createSite();
+        Site site = factory.createCenter();
         session.getTransaction().commit();
 
         Session s1 = openSession();

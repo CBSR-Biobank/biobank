@@ -54,8 +54,8 @@ public class TestDispatch extends DbTest {
     public void stateIds() {
         Transaction tx = session.beginTransaction();
 
-        Site sender = factory.createSite();
-        Site receiver = factory.createSite();
+        Site sender = factory.createCenter();
+        Site receiver = factory.createCenter();
         Dispatch dispatch = factory.createDispatch(sender, receiver);
 
         Query query = HibernateHelper.getDehydratedPropertyQuery(

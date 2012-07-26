@@ -35,7 +35,7 @@ public class TestContainerType extends DbTest {
     public void duplicateNameDifferentSite() {
         ContainerType original = factory.createContainerType();
 
-        factory.createSite();
+        factory.createCenter();
         ContainerType duplicate = factory.createContainerType();
         duplicate.setName(original.getName());
 
@@ -77,7 +77,7 @@ public class TestContainerType extends DbTest {
 
         ContainerType original = factory.createContainerType();
 
-        factory.createSite();
+        factory.createCenter();
         ContainerType duplicate = factory.createContainerType();
         duplicate.setNameShort(original.getNameShort());
 
@@ -233,7 +233,7 @@ public class TestContainerType extends DbTest {
     public void containerTypeChildSiteMismatch() {
         ContainerType childCt = factory.createContainerType();
 
-        factory.createSite();
+        factory.createCenter();
         ContainerType topCt = factory.createTopContainerType();
 
         try {
@@ -250,7 +250,7 @@ public class TestContainerType extends DbTest {
     @Test
     public void containerContainerTypeSiteMismatch() {
         Container container = factory.createContainer();
-        Site newSite = factory.createSite();
+        Site newSite = factory.createCenter();
 
         try {
             container.getContainerType().setSite(newSite);

@@ -56,7 +56,7 @@ public class TestSite extends DbTest {
     public void deleteWithProcessingEvents() {
         Transaction tx = session.beginTransaction();
 
-        Site site = factory.createSite();
+        Site site = factory.createCenter();
         ProcessingEvent event = factory.createProcessingEvent();
 
         if (!event.getCenter().equals(site)) {
