@@ -160,7 +160,7 @@ class SpecimenCsvHelper {
         specimenInfo.setInventoryId(nameGenerator.next(String.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
-        specimenInfo.setCreatedAt(Utils.getRandomDate());
+        specimenInfo.setTimeCreated(Utils.getRandomDate());
         specimenInfo.setPatientNumber(patientNumber);
         specimenInfo.setVisitNumber(1);
         return specimenInfo;

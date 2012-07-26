@@ -2,12 +2,12 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 
-public interface HasInsertTime {
+public interface HasTimeInserted {
     /**
      * @return the {@link Date} when the implementing instance was inserted into
      *         the database.
      */
-    public Date getInsertTime();
+    public Date getTimeInserted();
 
-    public void setInsertTime(Date insertTime);
+    public void setTimeInserted(Date timeInserted);
 }

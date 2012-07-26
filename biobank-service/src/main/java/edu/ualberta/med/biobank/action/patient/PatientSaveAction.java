@@ -56,7 +56,7 @@ public class PatientSaveAction implements Action<IdResult> {
         }
 
         patientToSave.setPnumber(pnumber);
-        patientToSave.setCreatedAt(createdAt);
+        patientToSave.setTimeCreated(createdAt);
         patientToSave.setStudy(context.load(Study.class, studyId));
         saveComment(context, patientToSave);
 

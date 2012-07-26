@@ -6,16 +6,16 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
-import edu.ualberta.med.biobank.model.constraint.HasValidLastUpdateTime;
+import edu.ualberta.med.biobank.model.constraint.HasValidTimeUpdated;
 
 @MappedSuperclass
 public abstract class AbstractVersionedModel
     extends AbstractModel
-    implements HasValidLastUpdateTime {
+    implements HasValidTimeUpdated {
     private static final long serialVersionUID = 1L;
 
     private Integer version;
-    private Date lastUpdateTime;
+    private Date timeUpdated;
 
     @Version
     @Column(name = "VERSION", nullable = false)
@@ -34,13 +34,13 @@ public abstract class AbstractVersionedModel
     }
 
     @Override
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
+    public Date getTimeUpdated() {
+        return timeUpdated;
     }
 
     @Override
-    public void setLastUpdateTime(Date lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
+    public void setTimeUpdated(Date timeUpdated) {
+        this.timeUpdated = timeUpdated;
     }
 
 }

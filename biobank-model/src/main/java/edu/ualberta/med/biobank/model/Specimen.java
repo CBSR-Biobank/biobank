@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = RequestSpecimen.class, property = "specimen", groups = PreDelete.class)
 })
 public class Specimen extends AbstractModel
-    implements HasComments, HasCreatedAt {
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -86,7 +86,7 @@ public class Specimen extends AbstractModel
 
     private String inventoryId;
     private BigDecimal quantity;
-    private Date createdAt;
+    private Date timeCreated;
     private Specimen topSpecimen = this;
     private Specimen parentSpecimen;
     private CollectionEvent collectionEvent;
@@ -119,16 +119,14 @@ public class Specimen extends AbstractModel
         this.quantity = quantity;
     }
 
-    @Override
-    @NotNull(message = "{Specimen.createdAt.NotNull}")
-    @Column(name = "CREATED_AT", nullable = false)
-    public Date getCreatedAt() {
-        return this.createdAt;
+    @NotNull(message = "{Specimen.timeCreated.NotNull}")
+    @Column(name = "TIME_CREATED")
+    public Date getTimeCreated() {
+        return this.timeCreated;
     }
 
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setTimeCreated(Date timeCreated) {
+        this.timeCreated = timeCreated;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

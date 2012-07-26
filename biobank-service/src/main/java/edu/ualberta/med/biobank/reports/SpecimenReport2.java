@@ -74,7 +74,7 @@ public class SpecimenReport2 extends AbstractReport {
                 ProcessingEvent pe = parentSpecimen.getProcessingEvent();
                 if (pe != null) {
                     dateProcessed = DateFormatter.formatAsDate(pe
-                        .getCreatedAt());
+                        .getTimeDone());
                 }
             }
 

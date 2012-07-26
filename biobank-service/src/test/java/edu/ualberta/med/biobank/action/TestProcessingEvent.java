@@ -75,7 +75,7 @@ public class TestProcessingEvent extends ActionTest {
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
-        Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
+        Assert.assertEquals(date, peventInfo.pevent.getTimeDone());
         Assert
             .assertEquals(0, peventInfo.sourceSpecimenInfos.size());
     }
@@ -145,7 +145,7 @@ public class TestProcessingEvent extends ActionTest {
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
-        Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
+        Assert.assertEquals(date, peventInfo.pevent.getTimeDone());
         Assert
             .assertEquals(1, peventInfo.sourceSpecimenInfos.size());
 

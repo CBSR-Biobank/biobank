@@ -347,7 +347,7 @@ public class TestSpecimenCsvImport extends ActionTest {
             Assert.assertEquals(csvInfo.getSpecimenType(),
                 specimen.getSpecimenType().getName());
             Assert.assertEquals(0, DateCompare.compare(csvInfo.getCreatedAt(),
-                specimen.getCreatedAt()));
+                specimen.getTimeCreated()));
             Assert.assertEquals(csvInfo.getPatientNumber(), specimen
                 .getCollectionEvent().getPatient().getPnumber());
 

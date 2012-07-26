@@ -93,7 +93,7 @@ public class SpecimenReport3 extends AbstractReport {
                 String pnumber = specimen.getCollectionEvent().getPatient()
                     .getPnumber();
                 String inventoryId = specimen.getInventoryId();
-                Date dateDrawn = specimen.getTopSpecimen().getCreatedAt();
+                Date dateDrawn = specimen.getTopSpecimen().getTimeCreated();
                 String specimenType = specimen.getSpecimenType().getNameShort();
                 String positionString = specimen.getSpecimenPosition()
                     .getContainer().getLabel()

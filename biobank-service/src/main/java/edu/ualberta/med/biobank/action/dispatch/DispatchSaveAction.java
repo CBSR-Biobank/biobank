@@ -83,7 +83,7 @@ public class DispatchSaveAction implements Action<IdResult> {
             Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
-            newComment.setCreatedAt(new Date());
+            newComment.setTimeCreated(new Date());
             newComment.setMessage(dInfo.comment);
             newComment.setUser(context.getUser());
             context.getSession().saveOrUpdate(newComment);

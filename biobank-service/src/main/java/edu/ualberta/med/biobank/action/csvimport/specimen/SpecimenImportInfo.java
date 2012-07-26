@@ -187,7 +187,7 @@ public class SpecimenImportInfo implements IImportInfo {
         }
         pevent = new ProcessingEvent();
         pevent.setWorksheet(csvInfo.getWorksheet());
-        pevent.setCreatedAt(new Date());
+        pevent.setTimeDone(new Date());
         pevent.setCenter(originInfo.getCenter());
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
@@ -223,7 +223,7 @@ public class SpecimenImportInfo implements IImportInfo {
         }
         specimen.setCollectionEvent(cevent);
         specimen.setOriginInfo(originInfo);
-        specimen.setCreatedAt(csvInfo.getCreatedAt());
+        specimen.setTimeCreated(csvInfo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
         if (isSourceSpecimen()) {

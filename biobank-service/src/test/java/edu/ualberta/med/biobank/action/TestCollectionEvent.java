@@ -124,7 +124,7 @@ public class TestCollectionEvent extends ActionTest {
                     .getId());
                 Assert
                     .assertEquals(info.activityStatus, sp.getActivityStatus());
-                Assert.assertEquals(info.createdAt, sp.getCreatedAt());
+                Assert.assertEquals(info.createdAt, sp.getTimeCreated());
                 // set the id to make some modification tests after that.
                 info.id = sp.getId();
             }
@@ -173,7 +173,7 @@ public class TestCollectionEvent extends ActionTest {
                     .getSpecimenType().getId());
                 Assert.assertEquals(newSpec.activityStatus,
                     sp.getActivityStatus());
-                Assert.assertEquals(newSpec.createdAt, sp.getCreatedAt());
+                Assert.assertEquals(newSpec.createdAt, sp.getTimeCreated());
             }
             if (sp.getInventoryId().equals(modifiedSpec.inventoryId)) {
                 Assert.assertEquals(modifiedSpec.inventoryId,

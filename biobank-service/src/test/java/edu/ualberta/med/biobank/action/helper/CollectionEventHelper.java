@@ -93,7 +93,7 @@ public class CollectionEventHelper extends Helper {
         HashSet<CommentInfo> commentInfos = new HashSet<CommentInfo>();
         for (Comment comment : comments) {
             CommentInfo commentInfo = new CommentInfo(comment.getMessage(),
-                comment.getCreatedAt(), comment.getUser().getId());
+                comment.getTimeCreated(), comment.getUser().getId());
             commentInfo.id = comment.getId();
             commentInfos.add(commentInfo);
         }
@@ -113,7 +113,7 @@ public class CollectionEventHelper extends Helper {
             saveCEventSpecimenInfo.inventoryId =
                 specimenInfo.specimen.getInventoryId();
             saveCEventSpecimenInfo.createdAt =
-                specimenInfo.specimen.getCreatedAt();
+                specimenInfo.specimen.getTimeCreated();
             saveCEventSpecimenInfo.activityStatus =
                 specimenInfo.specimen.getActivityStatus();
             saveCEventSpecimenInfo.specimenTypeId =

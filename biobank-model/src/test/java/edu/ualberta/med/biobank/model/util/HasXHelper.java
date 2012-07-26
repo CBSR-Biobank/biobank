@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.model.HasActivityStatus;
-import edu.ualberta.med.biobank.model.HasCreatedAt;
+import edu.ualberta.med.biobank.model.HasCreationTime;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
@@ -107,9 +107,9 @@ public class HasXHelper {
     }
 
     public static void checkNullCreatedAt(Session session,
-        HasCreatedAt hasCreatedAt) {
+        HasCreationTime hasCreatedAt) {
         try {
-            hasCreatedAt.setCreatedAt(null);
+            hasCreatedAt.setTimeCreated(null);
             session.save(hasCreatedAt);
             session.flush();
             Assert.fail("null createdAt should not be allowed");

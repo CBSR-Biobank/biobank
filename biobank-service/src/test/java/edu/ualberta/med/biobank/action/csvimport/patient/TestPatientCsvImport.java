@@ -90,7 +90,7 @@ public class TestPatientCsvImport extends ActionTest {
             Assert.assertEquals(csvInfo.getStudyName(),
                 patient.getStudy().getNameShort());
             Assert.assertEquals(csvInfo.getCreatedAt(),
-                patient.getCreatedAt());
+                patient.getTimeCreated());
         }
     }
 }

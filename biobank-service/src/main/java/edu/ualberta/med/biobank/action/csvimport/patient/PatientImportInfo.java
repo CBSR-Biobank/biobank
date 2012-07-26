@@ -34,7 +34,7 @@ public class PatientImportInfo implements IImportInfo {
     public Patient getNewPatient() {
         Patient patient = new Patient();
         patient.setPnumber(csvInfo.getPatientNumber());
-        patient.setCreatedAt(csvInfo.getCreatedAt());
+        patient.setTimeCreated(csvInfo.getCreatedAt());
         patient.setStudy(study);
         return patient;
     }

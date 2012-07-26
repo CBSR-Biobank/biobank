@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "REQUEST")
 public class Request extends AbstractModel
-    implements HasCreatedAt, HasAddress {
+    implements HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -54,7 +54,6 @@ public class Request extends AbstractModel
     }
 
     private Date submitted;
-    private Date created;
     private Set<Dispatch> dispatches = new HashSet<Dispatch>(0);
     private Address address = new Address();
     private Study study;
@@ -67,19 +66,6 @@ public class Request extends AbstractModel
 
     public void setSubmitted(Date submitted) {
         this.submitted = submitted;
-    }
-
-    @Override
-    @NotNull(message = "{Request.created.NotNull}")
-    @Column(name = "CREATED", nullable = false)
-    // TODO: rename column to CREATED_AT?
-    public Date getCreatedAt() {
-        return this.created;
-    }
-
-    @Override
-    public void setCreatedAt(Date created) {
-        this.created = created;
     }
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

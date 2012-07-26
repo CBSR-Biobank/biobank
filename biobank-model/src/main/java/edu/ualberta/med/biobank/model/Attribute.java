@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,12 +14,10 @@ import javax.validation.constraints.NotNull;
 @MappedSuperclass
 // TODO: custom validator to check the type against the value
 public abstract class Attribute<T extends AttributeType<U>, U extends AttributeOption>
-    extends AbstractModel
-    implements HasCreatedAt {
+    extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private T attributeType;
-    private Date createdAt;
     private String value;
     private Set<U> options = new HashSet<U>(0);
 
@@ -32,17 +29,6 @@ public abstract class Attribute<T extends AttributeType<U>, U extends AttributeO
 
     public void setAttributeType(T attributeType) {
         this.attributeType = attributeType;
-    }
-
-    @NotNull(message = "{Attribute.createdAt.NotNull")
-    @Override
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     @Column(name = "value")

@@ -49,7 +49,7 @@ public class CommentInfo implements ActionResult {
 
     public static CommentInfo createFromModel(Comment c) {
         CommentInfo ci =
-            new CommentInfo(c.getMessage(), c.getCreatedAt(), c.getUser()
+            new CommentInfo(c.getMessage(), c.getTimeCreated(), c.getUser()
                 .getId());
         ci.id = c.getId();
         return ci;

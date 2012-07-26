@@ -445,7 +445,7 @@ public class Factory {
     public Comment createComment() {
         Comment comment = new Comment();
         comment.setUser(getDefaultUser());
-        comment.setCreatedAt(new Date());
+        comment.setTimeCreated(new Date());
         comment.setMessage("test");
 
         setDefaultComment(comment);
@@ -495,7 +495,7 @@ public class Factory {
         ProcessingEvent processingEvent = new ProcessingEvent();
         processingEvent.setWorksheet(worksheet);
         processingEvent.setCenter(getDefaultCenter());
-        processingEvent.setCreatedAt(new Date());
+        processingEvent.setTimeDone(new Date());
 
         setDefaultProcessingEvent(processingEvent);
         session.save(processingEvent);
@@ -511,7 +511,7 @@ public class Factory {
 
         session.save(address);
 
-        request.setCreatedAt(new Date());
+        request.setTimeCreated(new Date());
         request.setStudy(getDefaultStudy());
 
         setDefaultRequest(request);
@@ -693,7 +693,7 @@ public class Factory {
         specimen.setCurrentCenter(getDefaultCenter());
         specimen.setCollectionEvent(getDefaultCollectionEvent());
         specimen.setOriginCenter(getDefaultStudyCenter());
-        specimen.setCreatedAt(new Date());
+        specimen.setTimeCreated(new Date());
 
         return specimen;
     }
@@ -813,7 +813,7 @@ public class Factory {
         Patient patient = new Patient();
         patient.setPnumber(name);
         patient.setStudy(getDefaultStudy());
-        patient.setCreatedAt(new Date());
+        patient.setTimeCreated(new Date());
 
         setDefaultPatient(patient);
         session.save(patient);

@@ -29,7 +29,7 @@ public class CommentUtil {
             if (!trimmedMessage.isEmpty()) {
                 comment = new Comment();
                 comment.setUser(user);
-                comment.setCreatedAt(date);
+                comment.setTimeCreated(date);
                 comment.setMessage(trimmedMessage);
             }
         }

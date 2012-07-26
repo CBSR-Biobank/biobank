@@ -44,7 +44,7 @@ public class SpecimenReport1 extends AbstractReport {
                 .getPnumber();
             String inventoryId = specimen.getInventoryId();
             String dateDrawn = DateFormatter.formatAsDate(specimen
-                .getTopSpecimen().getCreatedAt());
+                .getTopSpecimen().getTimeCreated());
             String specimenType = specimen.getSpecimenType().getNameShort();
             String currentCenter = specimen.getCurrentCenter().getNameShort();
 

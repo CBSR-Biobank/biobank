@@ -18,6 +18,7 @@
 	(1) immutable
 	(2) embeddable
 	A: ???
+	[ ] Replace Row/Col with a `position` column
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
 	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity and 
 	[v] add listeners to update the properties

@@ -78,7 +78,7 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         peventToSave.setActivityStatus(activityStatus);
         peventToSave.setCenter(context.load(Center.class, centerId));
         setComments(context, peventToSave);
-        peventToSave.setCreatedAt(createdAt);
+        peventToSave.setTimeDone(createdAt);
         peventToSave.setWorksheet(worksheet);
 
         // set processing event on added specimens

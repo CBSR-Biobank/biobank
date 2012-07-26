@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,7 +49,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = CollectionEvent.class, property = "patient", groups = PreDelete.class)
 })
 public class Patient extends AbstractModel
-    implements HasCreatedAt, HasComments {
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -71,7 +70,6 @@ public class Patient extends AbstractModel
     }
 
     private String pnumber;
-    private Date createdAt;
     private Study study;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -83,18 +81,6 @@ public class Patient extends AbstractModel
 
     public void setPnumber(String pnumber) {
         this.pnumber = pnumber;
-    }
-
-    @Override
-    @NotNull(message = "{Patient.createdAt.NotNull}")
-    @Column(name = "CREATED_AT")
-    public Date getCreatedAt() {
-        return this.createdAt;
-    }
-
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     @NotNull(message = "{Patient.study.NotNull}")

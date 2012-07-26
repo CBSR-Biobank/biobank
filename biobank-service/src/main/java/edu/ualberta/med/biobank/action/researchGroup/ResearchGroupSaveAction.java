@@ -64,7 +64,7 @@ public class ResearchGroupSaveAction implements Action<IdResult> {
             Set<Comment> comments = rg.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
-            newComment.setCreatedAt(new Date());
+            newComment.setTimeCreated(new Date());
             newComment.setMessage(rgInfo.comment);
             newComment.setUser(context.getUser());
             context.getSession().saveOrUpdate(newComment);

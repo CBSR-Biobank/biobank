@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Unique(properties = "worksheet", groups = PrePersist.class)
 public class ProcessingEvent extends AbstractModel
-    implements HasCreatedAt, HasComments {
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -56,7 +56,7 @@ public class ProcessingEvent extends AbstractModel
     }
 
     private String worksheet;
-    private Date createdAt;
+    private Date timeDone;
     private Center center;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -70,16 +70,14 @@ public class ProcessingEvent extends AbstractModel
         this.worksheet = worksheet;
     }
 
-    @Override
-    @NotNull(message = "{ProcessingEvent.createdAt.NotNull}")
-    @Column(name = "CREATED_AT", nullable = false)
-    public Date getCreatedAt() {
-        return this.createdAt;
+    @NotNull(message = "{ProcessingEvent.timeDone.NotNull}")
+    @Column(name = "TIME_DONE")
+    public Date getTimeDone() {
+        return this.timeDone;
     }
 
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setTimeDone(Date timeDone) {
+        this.timeDone = timeDone;
     }
 
     @NotNull(message = "{ProcessingEvent.center.NotNull}")

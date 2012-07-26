@@ -204,7 +204,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 // cascade will save-update the specimens from this list:
                 specimen.setOriginalCollectionEvent(ceventToSave);
                 saveSpecimenComments(context, specimen, specInfo.comments);
-                specimen.setCreatedAt(specInfo.createdAt);
+                specimen.setTimeCreated(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
                 specimen.setSpecimenType(context.load(SpecimenType.class,

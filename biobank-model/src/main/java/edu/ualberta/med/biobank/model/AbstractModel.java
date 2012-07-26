@@ -14,15 +14,15 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.proxy.HibernateProxyHelper;
 
-import edu.ualberta.med.biobank.model.constraint.HasValidInsertTime;
+import edu.ualberta.med.biobank.model.constraint.HasValidTimeInserted;
 
 @MappedSuperclass
 public abstract class AbstractModel
-    implements IBiobankModel, HasValidInsertTime {
+    implements IBiobankModel, HasValidTimeInserted {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private Date insertTime;
+    private Date timeInserted;
 
     @Override
     @Id
@@ -77,13 +77,13 @@ public abstract class AbstractModel
     }
 
     @Override
-    @Column(name = "INSERT_TIME")
-    public Date getInsertTime() {
-        return insertTime;
+    @Column(name = "TIME_INSERTED")
+    public Date getTimeInserted() {
+        return timeInserted;
     }
 
     @Override
-    public void setInsertTime(Date insertTime) {
-        this.insertTime = insertTime;
+    public void setTimeInserted(Date insertTime) {
+        this.timeInserted = insertTime;
     }
 }

@@ -52,7 +52,7 @@ public class RequestHelper extends Helper {
         Request request = new Request();
         request.setResearchGroup((ResearchGroup) session.get(
             ResearchGroup.class, rgId));
-        request.setCreatedAt(new Date());
+        request.setTimeCreated(new Date());
         request.setAddress(((ResearchGroup) session.get(ResearchGroup.class,
             rgId)).getAddress());
 

@@ -101,7 +101,7 @@ public class ShipmentImportInfo implements IImportInfo {
         Comment comment = new Comment();
         comment.setMessage(csvInfo.getComment());
         comment.setUser(user);
-        comment.setCreatedAt(timeNow);
+        comment.setTimeCreated(timeNow);
         originInfo.getComments().add(comment);
 
         ShipmentInfo shipmentInfo = new ShipmentInfo();

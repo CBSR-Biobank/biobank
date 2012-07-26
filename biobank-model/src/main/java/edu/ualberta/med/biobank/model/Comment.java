@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,8 +19,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "COMMENT")
-public class Comment extends AbstractModel
-    implements HasCreatedAt {
+public class Comment extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -43,7 +40,6 @@ public class Comment extends AbstractModel
     }
 
     private String message;
-    private Date createdAt;
     private User user;
 
     @NotEmpty(message = "{Comment.message.NotNull}")
@@ -54,18 +50,6 @@ public class Comment extends AbstractModel
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Override
-    @NotNull(message = "{Comment.createdAt.NotNull}")
-    @Column(name = "CREATED_AT")
-    public Date getCreatedAt() {
-        return this.createdAt;
-    }
-
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     // TODO: stop this property from being updated, and test that!

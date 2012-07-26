@@ -5,17 +5,17 @@ import java.util.Date;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 
-import edu.ualberta.med.biobank.model.HasInsertTime;
+import edu.ualberta.med.biobank.model.HasTimeInserted;
 
-public class InsertTimeListener
+public class TimeInsertedListener
     implements PreInsertEventListener {
     private static final long serialVersionUID = 1L;
 
     @Override
     public boolean onPreInsert(PreInsertEvent event) {
         Object entity = event.getEntity();
-        if (entity instanceof HasInsertTime) {
-            ((HasInsertTime) entity).setInsertTime(new Date());
+        if (entity instanceof HasTimeInserted) {
+            ((HasTimeInserted) entity).setTimeInserted(new Date());
         }
         return false;
     }

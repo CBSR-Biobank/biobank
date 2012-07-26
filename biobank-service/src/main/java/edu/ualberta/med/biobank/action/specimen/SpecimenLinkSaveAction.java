@@ -90,7 +90,7 @@ public class SpecimenLinkSaveAction implements
             // in specimen link, this is always a new specimen
             Specimen specimen = new Specimen();
             specimen.setInventoryId(asi.inventoryId);
-            specimen.setCreatedAt(currentDate);
+            specimen.setTimeCreated(currentDate);
             specimen.setSpecimenType(context.load(SpecimenType.class,
                 asi.typeId));
             specimen.setActivityStatus(asi.activityStatus);

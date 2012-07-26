@@ -68,7 +68,7 @@ public class TestPatient extends ActionTest {
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertNotNull(p);
         Assert.assertEquals(pnumber, p.getPnumber());
-        Assert.assertEquals(date, p.getCreatedAt());
+        Assert.assertEquals(date, p.getTimeCreated());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class TestPatient extends ActionTest {
         // Check patient is in database with correct values
         Patient p = (Patient) session.get(Patient.class, id);
         Assert.assertEquals(newPNumber, p.getPnumber());
-        Assert.assertEquals(newDate, p.getCreatedAt());
+        Assert.assertEquals(newDate, p.getTimeCreated());
     }
 
     @Test
