@@ -60,7 +60,7 @@ public class ProcessingEvent extends AbstractModel
     private Center center;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.worksheet.NotEmpty}")
+    @NotEmpty(message = "{ProcessingEvent.worksheet.NotEmpty}")
     @Column(name = "WORKSHEET", length = 150, unique = true)
     public String getWorksheet() {
         return this.worksheet;
@@ -71,7 +71,7 @@ public class ProcessingEvent extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.createdAt.NotNull}")
+    @NotNull(message = "{ProcessingEvent.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
@@ -82,7 +82,7 @@ public class ProcessingEvent extends AbstractModel
         this.createdAt = createdAt;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ProcessingEvent.center.NotNull}")
+    @NotNull(message = "{ProcessingEvent.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {

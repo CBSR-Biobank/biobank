@@ -28,7 +28,7 @@ public class EventAttr extends AbstractModel {
         this.value = value;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.EventAttr.studyEventAttr.NotNull}")
+    @NotNull(message = "{EventAttr.studyEventAttr.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_EVENT_ATTR_ID", nullable = false)
     public StudyEventAttr getStudyEventAttr() {

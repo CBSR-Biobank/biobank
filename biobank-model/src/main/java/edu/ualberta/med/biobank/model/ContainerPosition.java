@@ -27,7 +27,7 @@ public class ContainerPosition extends AbstractPosition {
     private Container parentContainer;
     private Container container;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.parentContainer.NotNull}")
+    @NotNull(message = "{ContainerPosition.parentContainer.NotNull}")
     @ManyToOne
     @ForeignKey(name = "FK_ContainerPosition_parentContainer")
     @JoinColumn(name = "PARENT_CONTAINER_ID")
@@ -60,7 +60,7 @@ public class ContainerPosition extends AbstractPosition {
     void setParentContainerType(ContainerType parentContainerType) {
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerPosition.container.NotNull}")
+    @NotNull(message = "{ContainerPosition.container.NotNull}")
     @OneToOne
     @ForeignKey(name = "none")
     @JoinColumn(name = "CONTAINER_ID")

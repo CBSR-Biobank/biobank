@@ -24,7 +24,7 @@ public class EntityProperty extends AbstractModel {
     private PropertyType propertyType;
     private Set<EntityFilter> entityFilters = new HashSet<EntityFilter>(0);
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.EntityProperty.property.NotEmpty}")
+    @NotEmpty(message = "{EntityProperty.property.NotEmpty}")
     @Column(name = "PROPERTY")
     public String getProperty() {
         return this.property;
@@ -44,7 +44,7 @@ public class EntityProperty extends AbstractModel {
         this.entityColumns = entityColumns;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.EntityProperty.propertyType.NotNull}")
+    @NotNull(message = "{EntityProperty.propertyType.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PROPERTY_TYPE_ID", nullable = false)
     public PropertyType getPropertyType() {

@@ -80,7 +80,7 @@ public class Center extends AbstractModel
     private Boolean enabled;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.name.NotEmpty}")
+    @NotEmpty(message = "{Center.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -92,7 +92,7 @@ public class Center extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Center.nameShort.NotEmpty}")
+    @NotEmpty(message = "{Center.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;
@@ -104,7 +104,7 @@ public class Center extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Center.address.NotNull}")
+    @NotNull(message = "{Center.address.NotNull}")
     @Embedded
     public Address getAddress() {
         return this.address;

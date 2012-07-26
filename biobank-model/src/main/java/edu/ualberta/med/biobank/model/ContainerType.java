@@ -102,7 +102,7 @@ public class ContainerType extends AbstractModel
     private Boolean enabled;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
+    @NotEmpty(message = "{ContainerType.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -114,7 +114,7 @@ public class ContainerType extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
+    @NotEmpty(message = "{ContainerType.name.NotEmpty}")
     @Column(name = "NAME_SHORT")
     public String getNameShort() {
         return this.nameShort;
@@ -203,7 +203,7 @@ public class ContainerType extends AbstractModel
     }
 
     @Valid
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.capacity.NotNull}")
+    @NotNull(message = "{ContainerType.capacity.NotNull}")
     @Embedded
     public Capacity getCapacity() {
         return this.capacity;
@@ -213,7 +213,7 @@ public class ContainerType extends AbstractModel
         this.capacity = capacity;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.center.NotNull}")
+    @NotNull(message = "{ContainerType.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SITE_ID", nullable = false)
     public Center getCenter() {
@@ -225,7 +225,7 @@ public class ContainerType extends AbstractModel
     }
 
     @NotAudited
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.childLabelingScheme.NotNull}")
+    @NotNull(message = "{ContainerType.childLabelingScheme.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHILD_LABELING_SCHEME_ID", nullable = false)
     public ContainerLabelingScheme getChildLabelingScheme() {

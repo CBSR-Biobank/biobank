@@ -81,7 +81,7 @@ public class Address implements Serializable {
         this.street2 = street2;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Address.city.NotEmpty}")
+    @NotEmpty(message = "{Address.city.NotEmpty}")
     @Column(name = "CITY", length = 50)
     public String getCity() {
         return this.city;

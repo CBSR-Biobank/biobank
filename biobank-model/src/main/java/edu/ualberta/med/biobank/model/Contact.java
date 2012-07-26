@@ -78,7 +78,7 @@ public class Contact extends AbstractModel
     private StudyCenter studyCenter;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Contact.name.NotNull}")
+    @NotEmpty(message = "{Contact.name.NotNull}")
     @Column(name = "NAME", length = 100)
     public String getName() {
         return this.name;

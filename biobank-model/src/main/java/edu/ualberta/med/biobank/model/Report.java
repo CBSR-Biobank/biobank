@@ -48,7 +48,7 @@ public class Report extends AbstractModel
     private Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(0);
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Report.name.NotEmpty}")
+    @NotEmpty(message = "{Report.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -105,7 +105,7 @@ public class Report extends AbstractModel
         this.reportColumns = reportColumns;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Report.entity.NotNull}")
+    @NotNull(message = "{Report.entity.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ENTITY_ID", nullable = false)
     public Entity getEntity() {

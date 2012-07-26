@@ -42,7 +42,7 @@ public abstract class Log<T extends Enum<T> & ILogType>
         this.logType = logType;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Log.user.NotNull}")
+    @NotNull(message = "{Log.user.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     public User getUser() {
@@ -53,7 +53,7 @@ public abstract class Log<T extends Enum<T> & ILogType>
         this.user = user;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Log.createdAt.NotNull}")
+    @NotNull(message = "{Log.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Long getCreatedAt() {
         return createdAt;
@@ -98,7 +98,7 @@ public abstract class Log<T extends Enum<T> & ILogType>
         this.logType = event;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Log.logTypeId.NotNull}")
+    @NotNull(message = "{Log.logTypeId.NotNull}")
     @Column(name = "LOG_TYPE_ID")
     Integer getLogTypeId() {
         return (logType != null) ? logType.getId() : null;

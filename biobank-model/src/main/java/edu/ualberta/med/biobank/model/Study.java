@@ -55,7 +55,7 @@ public class Study extends AbstractModel
     private Boolean enabled;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.name.NotEmpty}")
+    @NotEmpty(message = "{Study.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;
@@ -67,7 +67,7 @@ public class Study extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.nameShort.NotEmpty}")
+    @NotEmpty(message = "{Study.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
     public String getNameShort() {
         return this.nameShort;

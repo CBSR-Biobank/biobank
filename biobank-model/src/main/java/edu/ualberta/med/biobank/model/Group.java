@@ -43,7 +43,7 @@ public class Group extends Principal
     private String description;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.BbGroup.name.NotEmpty}")
+    @NotEmpty(message = "{BbGroup.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;

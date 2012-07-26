@@ -14,7 +14,7 @@ public abstract class StudyAttributeType<T extends AttributeOption>
 
     private Study study;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.StudyAttributeType.study.NotNull}")
+    @NotNull(message = "{StudyAttributeType.study.NotNull}")
     public Study getStudy() {
         return study;
     }

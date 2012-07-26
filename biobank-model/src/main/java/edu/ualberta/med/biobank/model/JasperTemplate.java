@@ -18,7 +18,7 @@ public class JasperTemplate extends AbstractModel {
     private String name;
     private String xml;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.JasperTemplate.name.NotEmpty}")
+    @NotEmpty(message = "{JasperTemplate.name.NotEmpty}")
     @Column(name = "NAME", unique = true, length = 50)
     public String getName() {
         return this.name;
@@ -28,7 +28,7 @@ public class JasperTemplate extends AbstractModel {
         this.name = name;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.JasperTemplate.xml.NotEmpty}")
+    @NotEmpty(message = "{JasperTemplate.xml.NotEmpty}")
     @Column(name = "XML", columnDefinition = "TEXT")
     public String getXml() {
         return this.xml;

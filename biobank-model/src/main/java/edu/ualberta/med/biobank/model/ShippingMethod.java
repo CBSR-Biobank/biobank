@@ -42,7 +42,7 @@ public class ShippingMethod extends AbstractModel
     private Boolean waybillRequired = Boolean.TRUE;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.ShippingMethod.name.NotEmpty}")
+    @NotEmpty(message = "{ShippingMethod.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;

@@ -99,7 +99,7 @@ public class Specimen extends AbstractModel
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean usable;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
+    @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
     public String getInventoryId() {
         return this.inventoryId;
@@ -109,7 +109,7 @@ public class Specimen extends AbstractModel
         this.inventoryId = inventoryId;
     }
 
-    @Digits(integer = 10, fraction = 10, message = "{edu.ualberta.med.biobank.model.Specimen.quantity.Digits}")
+    @Digits(integer = 10, fraction = 10, message = "{Specimen.quantity.Digits}")
     @Column(name = "QUANTITY", precision = 10, scale = 10)
     public BigDecimal getQuantity() {
         return this.quantity;
@@ -120,7 +120,7 @@ public class Specimen extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.createdAt.NotNull}")
+    @NotNull(message = "{Specimen.createdAt.NotNull}")
     @Column(name = "CREATED_AT", nullable = false)
     public Date getCreatedAt() {
         return this.createdAt;
@@ -141,7 +141,7 @@ public class Specimen extends AbstractModel
         this.topSpecimen = topSpecimen;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.collectionEvent.NotNull}")
+    @NotNull(message = "{Specimen.collectionEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
     public CollectionEvent getCollectionEvent() {
@@ -152,7 +152,7 @@ public class Specimen extends AbstractModel
         this.collectionEvent = collectionEvent;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.currentCenter.NotNull}")
+    @NotNull(message = "{Specimen.currentCenter.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
     public Center getCurrentCenter() {
@@ -163,7 +163,7 @@ public class Specimen extends AbstractModel
         this.currentCenter = currentCenter;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.isSourceSpecimen.NotNull}")
+    @NotNull(message = "{Specimen.isSourceSpecimen.NotNull}")
     @Column(name = "SOURCE_SPECIMEN")
     public Boolean isSourceSpecimen() {
         return sourceSpecimen;
@@ -173,7 +173,7 @@ public class Specimen extends AbstractModel
         this.sourceSpecimen = sourceSpecimen;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.specimenType.NotNull}")
+    @NotNull(message = "{Specimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {
@@ -213,7 +213,7 @@ public class Specimen extends AbstractModel
         this.comments = comments;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.originInfo.NotNull}")
+    @NotNull(message = "{Specimen.originInfo.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false)
     public OriginInfo getOriginInfo() {

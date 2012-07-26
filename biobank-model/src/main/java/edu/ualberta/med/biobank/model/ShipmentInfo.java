@@ -90,7 +90,7 @@ public class ShipmentInfo extends AbstractModel {
         this.boxNumber = boxNumber;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ShipmentInfo.shippingMethod.NotNull}")
+    @NotNull(message = "{ShipmentInfo.shippingMethod.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SHIPPING_METHOD_ID", nullable = false)
     public ShippingMethod getShippingMethod() {

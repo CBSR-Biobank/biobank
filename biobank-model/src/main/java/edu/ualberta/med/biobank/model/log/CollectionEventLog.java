@@ -20,7 +20,7 @@ public class CollectionEventLog extends Log<LogType> {
         setCollectionEventId(collectionEvent);
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEventLog.collectionEventId.NotNull}")
+    @NotNull(message = "{CollectionEventLog.collectionEventId.NotNull}")
     @Column(name = "COLLECTION_EVENT_ID")
     public Integer getCollectionEventId() {
         return collectionEventId;

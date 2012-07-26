@@ -67,7 +67,7 @@ public class User extends Principal {
     private boolean needPwdChange = true;
     private Set<Group> groups = new HashSet<Group>(0);
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.User.login.NotEmpty}")
+    @NotEmpty(message = "{User.login.NotEmpty}")
     @Column(name = "LOGIN", unique = true)
     public String getLogin() {
         return this.login;
@@ -77,7 +77,7 @@ public class User extends Principal {
         this.login = login;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.User.csmUserId.NotNull}")
+    @NotNull(message = "{User.csmUserId.NotNull}")
     @Column(name = "CSM_USER_ID", unique = true)
     public Long getCsmUserId() {
         return this.csmUserId;

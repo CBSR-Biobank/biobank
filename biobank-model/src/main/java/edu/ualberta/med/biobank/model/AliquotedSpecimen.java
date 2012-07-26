@@ -53,7 +53,7 @@ public class AliquotedSpecimen extends AbstractModel {
     private BigDecimal volume;
     private Boolean enabled;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull")
+    @NotNull(message = "{AliquotedSpecimen.study.NotNull")
     @Column(name = "STUDY_ID")
     public Study getStudy() {
         return study;
@@ -79,7 +79,7 @@ public class AliquotedSpecimen extends AbstractModel {
     /**
      * @brief The volume to be collected in each tube.
      */
-    @Digits(integer = 10, fraction = 10, message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.volume.Digits}")
+    @Digits(integer = 10, fraction = 10, message = "{AliquotedSpecimen.volume.Digits}")
     @Column(name = "VOLUME", precision = 10, scale = 10)
     public BigDecimal getVolume() {
         return this.volume;
@@ -92,7 +92,7 @@ public class AliquotedSpecimen extends AbstractModel {
     /**
      * @brief The specimen type that has to be collected for the study.
      */
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.specimenType.NotNull}")
+    @NotNull(message = "{AliquotedSpecimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {

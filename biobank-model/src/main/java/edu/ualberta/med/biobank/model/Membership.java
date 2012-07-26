@@ -87,7 +87,7 @@ public class Membership extends AbstractModel {
         getRoles().addAll(m.getRoles());
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Membership.domain.NotNull}")
+    @NotNull(message = "{Membership.domain.NotNull}")
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "DOMAIN_ID", unique = true)
     public Domain getDomain() {

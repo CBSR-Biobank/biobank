@@ -10,7 +10,7 @@ public class AttributeOption extends AbstractModel {
 
     private String value;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.AttributeOption.value.NotEmpty}")
+    @NotEmpty(message = "{AttributeOption.value.NotEmpty}")
     public String getValue() {
         return value;
     }

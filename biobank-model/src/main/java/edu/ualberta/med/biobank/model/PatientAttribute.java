@@ -20,7 +20,7 @@ public class PatientAttribute
 
     private Patient patient;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.PatientAttribute.patient.NotNull}")
+    @NotNull(message = "{PatientAttribute.patient.NotNull}")
     @Column(name = "PATIENT_ID")
     public Patient getPatient() {
         return patient;

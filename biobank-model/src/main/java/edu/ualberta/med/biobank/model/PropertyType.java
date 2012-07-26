@@ -21,7 +21,7 @@ public class PropertyType extends AbstractModel {
     private Set<PropertyModifier> propertyModifiers =
         new HashSet<PropertyModifier>(0);
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.PropertyType.name.NotEmpty}")
+    @NotEmpty(message = "{PropertyType.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;

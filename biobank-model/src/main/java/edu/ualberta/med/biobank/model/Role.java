@@ -50,7 +50,7 @@ public class Role extends AbstractModel {
     private String name;
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Role.name.NotEmpty}")
+    @NotEmpty(message = "{Role.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false)
     public String getName() {
         return this.name;

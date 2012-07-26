@@ -40,8 +40,8 @@ public abstract class AbstractPosition extends AbstractModel {
     private Integer row;
     private Integer col;
 
-    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.Min}")
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.row.NotNull}")
+    @Min(value = 0, message = "{AbstractPosition.row.Min}")
+    @NotNull(message = "{AbstractPosition.row.NotNull}")
     @Column(name = "ROW", nullable = false)
     public Integer getRow() {
         return this.row;
@@ -51,8 +51,8 @@ public abstract class AbstractPosition extends AbstractModel {
         this.row = row;
     }
 
-    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.Min}")
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AbstractPosition.col.NotNull}")
+    @Min(value = 0, message = "{AbstractPosition.col.Min}")
+    @NotNull(message = "{AbstractPosition.col.NotNull}")
     @Column(name = "COL", nullable = false)
     public Integer getCol() {
         return this.col;

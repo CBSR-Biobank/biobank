@@ -20,7 +20,7 @@ public class SpecimenAttribute
 
     private Specimen specimen;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenAttribute.specimen.NotNull}")
+    @NotNull(message = "{SpecimenAttribute.specimen.NotNull}")
     @Column(name = "SPECIMEN_ID")
     public Specimen getSpecimen() {
         return specimen;

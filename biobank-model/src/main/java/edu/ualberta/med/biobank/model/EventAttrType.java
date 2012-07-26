@@ -26,7 +26,7 @@ public class EventAttrType extends AbstractModel
     private String name;
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.EventAttrType.name.NotEmpty}")
+    @NotEmpty(message = "{EventAttrType.name.NotEmpty}")
     @Column(name = "NAME", unique = true, nullable = false, length = 50)
     public String getName() {
         return this.name;

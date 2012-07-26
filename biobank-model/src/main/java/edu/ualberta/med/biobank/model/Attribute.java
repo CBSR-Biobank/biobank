@@ -24,7 +24,7 @@ public abstract class Attribute<T extends AttributeType<U>, U extends AttributeO
     private String value;
     private Set<U> options = new HashSet<U>(0);
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Attribute.attributeType.NotNull")
+    @NotNull(message = "{Attribute.attributeType.NotNull")
     @Column(name = "ATTRIBUTE_TYPE")
     public T getAttributeType() {
         return attributeType;
@@ -34,7 +34,7 @@ public abstract class Attribute<T extends AttributeType<U>, U extends AttributeO
         this.attributeType = attributeType;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Attribute.createdAt.NotNull")
+    @NotNull(message = "{Attribute.createdAt.NotNull")
     @Override
     public Date getCreatedAt() {
         return createdAt;

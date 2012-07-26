@@ -18,8 +18,8 @@
 	(2) embeddable
 	A: ???
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
-	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity
-	and add listeners to update the properties
+	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity and 
+	[ ]add listeners to update the properties
 [ ] *Specimen CreatedAt vs TimeDrawn, etc.
 	Q: Are specimens from an organism and aliquots the result of aliquotting?
 	Does "samples" include both? CreatedAt would just be the phyiscal time a
@@ -33,7 +33,7 @@
 	- Consider type validation (e.g. legal options, legal regex, legal range).
 	- Consider calling "Annotations"?
 	- Share annotations in a pool, per study? Parent studies? (inherit definitions?)
-[ ] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
+[v] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
 	it's just clutter
 	- Yes
 [ ] *Split Membership into StudyMembership and CenterMembership? But then how 

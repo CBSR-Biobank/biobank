@@ -105,7 +105,7 @@ public class Container extends AbstractModel
         this.productBarcode = productBarcode;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Container.label.NotEmpty}")
+    @NotEmpty(message = "{Container.label.NotEmpty}")
     @Column(name = "LABEL", nullable = false)
     public String getLabel() {
         return this.label;
@@ -158,7 +158,7 @@ public class Container extends AbstractModel
         this.topContainer = topContainer;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.containerType.NotNull}")
+    @NotNull(message = "{Container.containerType.NotNull}")
     @ManyToOne
     @JoinColumn(name = "CONTAINER_TYPE_ID")
     @ForeignKey(name = "FK_Container_containerType")
@@ -185,7 +185,7 @@ public class Container extends AbstractModel
         }
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.center.NotNull}")
+    @NotNull(message = "{Container.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {

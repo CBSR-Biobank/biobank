@@ -59,7 +59,7 @@ public class Request extends AbstractModel
     private Address address = new Address();
     private Study study;
 
-    @Null(groups = PreDelete.class, message = "{edu.ualberta.med.biobank.model.Request.submitted.Null}")
+    @Null(groups = PreDelete.class, message = "{Request.submitted.Null}")
     @Column(name = "SUBMITTED")
     public Date getSubmitted() {
         return this.submitted;
@@ -70,7 +70,7 @@ public class Request extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.created.NotNull}")
+    @NotNull(message = "{Request.created.NotNull}")
     @Column(name = "CREATED", nullable = false)
     // TODO: rename column to CREATED_AT?
     public Date getCreatedAt() {
@@ -95,7 +95,7 @@ public class Request extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.address.NotNull}")
+    @NotNull(message = "{Request.address.NotNull}")
     @Embedded
     public Address getAddress() {
         return this.address;
@@ -106,7 +106,7 @@ public class Request extends AbstractModel
         this.address = address;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Request.study.NotNull}")
+    @NotNull(message = "{Request.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {

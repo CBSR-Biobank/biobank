@@ -44,7 +44,7 @@ public class RequestSpecimen extends AbstractModel {
     private Specimen specimen;
     private Request request;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.RequestSpecimen.state.NotNull}")
+    @NotNull(message = "{RequestSpecimen.state.NotNull}")
     @Column(name = "STATE", nullable = false)
     @Type(type = "requestSpecimenState")
     public RequestSpecimenState getState() {
@@ -64,7 +64,7 @@ public class RequestSpecimen extends AbstractModel {
         this.claimedBy = claimedBy;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.RequestSpecimen.specimen.NotNull}")
+    @NotNull(message = "{RequestSpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {
@@ -75,7 +75,7 @@ public class RequestSpecimen extends AbstractModel {
         this.specimen = specimen;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.RequestSpecimen.request.NotNull}")
+    @NotNull(message = "{RequestSpecimen.request.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REQUEST_ID", nullable = false)
     public Request getRequest() {

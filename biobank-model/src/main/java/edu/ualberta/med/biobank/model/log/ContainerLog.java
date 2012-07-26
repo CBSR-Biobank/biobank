@@ -24,7 +24,7 @@ public class ContainerLog extends Log<LogType> {
         setContainerId(container);
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerLog.containerId.NotNull}")
+    @NotNull(message = "{ContainerLog.containerId.NotNull}")
     @Column(name = "CONTAINER_ID")
     public Integer getContainerId() {
         return containerId;

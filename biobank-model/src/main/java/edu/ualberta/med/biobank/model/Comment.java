@@ -46,7 +46,7 @@ public class Comment extends AbstractModel
     private Date createdAt;
     private User user;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.Comment.message.NotNull}")
+    @NotEmpty(message = "{Comment.message.NotNull}")
     @Column(name = "MESSAGE", columnDefinition = "TEXT")
     public String getMessage() {
         return this.message;
@@ -57,7 +57,7 @@ public class Comment extends AbstractModel
     }
 
     @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Comment.createdAt.NotNull}")
+    @NotNull(message = "{Comment.createdAt.NotNull}")
     @Column(name = "CREATED_AT")
     public Date getCreatedAt() {
         return this.createdAt;
@@ -70,7 +70,7 @@ public class Comment extends AbstractModel
 
     // TODO: stop this property from being updated, and test that!
     @NotAudited
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Comment.user.NotNull}")
+    @NotNull(message = "{Comment.user.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
     public User getUser() {

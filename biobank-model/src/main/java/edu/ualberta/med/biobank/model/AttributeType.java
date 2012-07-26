@@ -28,7 +28,7 @@ public abstract class AttributeType<T extends AttributeOption>
     private Set<T> options = new HashSet<T>(0);
     private AttributeValueType valueType;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AttributeType.enabled.NotNull}")
+    @NotNull(message = "{AttributeType.enabled.NotNull}")
     @Column(name = "ENABLED")
     public Boolean isEnabled() {
         return enabled;
@@ -38,7 +38,7 @@ public abstract class AttributeType<T extends AttributeOption>
         this.enabled = enabled;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.AttributeType.label.NotEmpty}")
+    @NotEmpty(message = "{AttributeType.label.NotEmpty}")
     @Column(name = "LABEL")
     public String getLabel() {
         return label;
@@ -59,7 +59,7 @@ public abstract class AttributeType<T extends AttributeOption>
         this.options = options;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AttributeType.required.NotNull}")
+    @NotNull(message = "{AttributeType.required.NotNull}")
     @Column(name = "REQUIRED")
     public Boolean isRequired() {
         return required;
@@ -69,7 +69,7 @@ public abstract class AttributeType<T extends AttributeOption>
         this.required = required;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AttributeType.valueType.NotNull}")
+    @NotNull(message = "{AttributeType.valueType.NotNull}")
     @Type(type = "attributeValueType")
     @Column(name = "VALUE_TYPE")
     public AttributeValueType getValueType() {

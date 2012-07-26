@@ -48,7 +48,7 @@ public class DispatchSpecimen extends AbstractModel
     private Specimen specimen;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.state.NotNull}")
+    @NotNull(message = "{DispatchSpecimen.state.NotNull}")
     @Column(name = "STATE")
     @Type(type = "dispatchSpecimenState")
     public DispatchSpecimenState getState() {
@@ -59,7 +59,7 @@ public class DispatchSpecimen extends AbstractModel
         this.state = state;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.dispatch.NotNull}")
+    @NotNull(message = "{DispatchSpecimen.dispatch.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DISPATCH_ID", nullable = false)
     public Dispatch getDispatch() {
@@ -70,7 +70,7 @@ public class DispatchSpecimen extends AbstractModel
         this.dispatch = dispatch;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.DispatchSpecimen.specimen.NotNull}")
+    @NotNull(message = "{DispatchSpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {

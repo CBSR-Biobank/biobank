@@ -63,8 +63,8 @@ public class CollectionEvent extends AbstractModel
     private Set<EventAttr> eventAttrs = new HashSet<EventAttr>(0);
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    @Min(value = 1, message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.Min}")
-    @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.visitNumber.NotNull}")
+    @Min(value = 1, message = "{CollectionEvent.visitNumber.Min}")
+    @NotNull(message = "{CollectionEvent.visitNumber.NotNull}")
     @Column(name = "VISIT_NUMBER", nullable = false)
     public Integer getVisitNumber() {
         return this.visitNumber;
@@ -74,7 +74,7 @@ public class CollectionEvent extends AbstractModel
         this.visitNumber = visitNumber;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.patient.NotNull}")
+    @NotNull(message = "{CollectionEvent.patient.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PATIENT_ID", nullable = false)
     public Patient getPatient() {

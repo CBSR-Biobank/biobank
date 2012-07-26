@@ -63,7 +63,7 @@ public class Dispatch extends AbstractModel
     private ShipmentInfo shipmentInfo;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.state.NotNull}")
+    @NotNull(message = "{Dispatch.state.NotNull}")
     @Column(name = "STATE")
     @Type(type = "dispatchState")
     public DispatchState getState() {
@@ -74,7 +74,7 @@ public class Dispatch extends AbstractModel
         this.state = state;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.senderCenter.NotNull}")
+    @NotNull(message = "{Dispatch.senderCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SENDER_CENTER_ID", nullable = false)
     public Center getSenderCenter() {
@@ -95,7 +95,7 @@ public class Dispatch extends AbstractModel
         this.shipmentInfo = shipmentInfo;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Dispatch.receiverCenter.NotNull}")
+    @NotNull(message = "{Dispatch.receiverCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_CENTER_ID", nullable = false)
     public Center getReceiverCenter() {

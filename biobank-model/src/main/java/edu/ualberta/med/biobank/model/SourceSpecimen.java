@@ -53,7 +53,7 @@ public class SourceSpecimen extends AbstractModel {
     private boolean needOriginalVolume = false;
     private SpecimenType specimenType;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull")
+    @NotNull(message = "{AliquotedSpecimen.study.NotNull")
     @Column(name = "STUDY_ID")
     public Study getStudy() {
         return study;
@@ -73,7 +73,7 @@ public class SourceSpecimen extends AbstractModel {
         this.needOriginalVolume = needOriginalVolume;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.SourceSpecimen.specimenType.NotNull}")
+    @NotNull(message = "{SourceSpecimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
     public SpecimenType getSpecimenType() {

@@ -22,7 +22,7 @@ public class CollectionEventAttribute
 
     private CollectionEvent collectionEvent;
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEventAttribute.collectionEvent.NotNull}")
+    @NotNull(message = "{CollectionEventAttribute.collectionEvent.NotNull}")
     @Column(name = "COLLECTION_EVENT_ID")
     public CollectionEvent getCollectionEvent() {
         return collectionEvent;

@@ -28,7 +28,7 @@ public class EntityFilter extends AbstractModel {
         this.filterType = filterType;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.EntityFilter.name.NotEmpty}")
+    @NotEmpty(message = "{EntityFilter.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;
@@ -38,7 +38,7 @@ public class EntityFilter extends AbstractModel {
         this.name = name;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.EntityFilter.entityProperty.NotNull}")
+    @NotNull(message = "{EntityFilter.entityProperty.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ENTITY_PROPERTY_ID", nullable = false)
     public EntityProperty getEntityProperty() {

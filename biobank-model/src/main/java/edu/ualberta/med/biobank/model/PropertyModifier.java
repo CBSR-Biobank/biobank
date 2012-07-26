@@ -14,7 +14,7 @@ public class PropertyModifier extends AbstractModel {
     private String name;
     private String propertyModifier;
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.PropertyModifier.name.NotEmpty}")
+    @NotEmpty(message = "{PropertyModifier.name.NotEmpty}")
     @Column(name = "NAME")
     public String getName() {
         return this.name;

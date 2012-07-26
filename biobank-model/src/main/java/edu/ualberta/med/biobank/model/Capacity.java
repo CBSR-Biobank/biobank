@@ -48,8 +48,8 @@ public class Capacity implements Serializable {
         this.colCapacity = other.getColCapacity();
     }
 
-    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.Min}")
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.NotNull}")
+    @Min(value = 0, message = "{Capacity.rowCapacity.Min}")
+    @NotNull(message = "{Capacity.rowCapacity.NotNull}")
     @Column(name = "ROW_CAPACITY", nullable = false)
     public Integer getRowCapacity() {
         return this.rowCapacity;
@@ -59,8 +59,8 @@ public class Capacity implements Serializable {
         this.rowCapacity = rowCapacity;
     }
 
-    @Min(value = 0, message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.Min}")
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Capacity.rowCapacity.NotNull}")
+    @Min(value = 0, message = "{Capacity.rowCapacity.Min}")
+    @NotNull(message = "{Capacity.rowCapacity.NotNull}")
     @Column(name = "COL_CAPACITY", nullable = false)
     public Integer getColCapacity() {
         return this.colCapacity;

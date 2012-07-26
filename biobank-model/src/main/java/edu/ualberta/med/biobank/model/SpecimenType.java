@@ -50,7 +50,7 @@ public class SpecimenType extends AbstractModel
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.name.NotEmpty}")
+    @NotEmpty(message = "{SpecimenType.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
@@ -62,7 +62,7 @@ public class SpecimenType extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.SpecimenType.nameShort.NotEmpty}")
+    @NotEmpty(message = "{SpecimenType.nameShort.NotEmpty}")
     @Column(name = "NAME_SHORT", unique = true)
     public String getNameShort() {
         return this.nameShort;
