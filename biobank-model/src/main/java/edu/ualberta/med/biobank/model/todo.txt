@@ -23,3 +23,6 @@
 	so that changes to position can be tracked as part of the object?
 [ ] Think about how to deal with translation of global objects, such as,
 	Role, Environment, TubeType, etc.
+[ ] ProcessingEvent <-> Specimen and children
+[ ] Specimen thaw and other problem events?
+[ ] Collection Event types
