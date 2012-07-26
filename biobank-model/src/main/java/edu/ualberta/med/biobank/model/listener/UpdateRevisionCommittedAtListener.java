@@ -1,10 +1,10 @@
-package edu.ualberta.med.biobank.auditor;
+package edu.ualberta.med.biobank.model.listener;
 
 import org.hibernate.Session;
-import org.hibernate.action.AfterTransactionCompletionProcess;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.event.PreInsertEvent;
-import org.hibernate.event.PreInsertEventListener;
+import org.hibernate.action.spi.AfterTransactionCompletionProcess;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreInsertEventListener;
 
 import edu.ualberta.med.biobank.model.Revision;
 

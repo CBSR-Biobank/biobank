@@ -1,10 +1,13 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.listener;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 
 import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
+
+import edu.ualberta.med.biobank.model.Revision;
+import edu.ualberta.med.biobank.model.User;
 
 public class RevisionListenerImpl
     implements EntityTrackingRevisionListener {

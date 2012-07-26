@@ -1,13 +1,16 @@
-package edu.ualberta.med.biobank.auditor;
+package edu.ualberta.med.biobank.model.listener;
 
 import java.util.Map;
 
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.envers.configuration.AuditConfiguration;
 import org.hibernate.envers.configuration.AuditEntitiesConfiguration;
-import org.hibernate.event.Initializable;
-import org.hibernate.event.PreUpdateEvent;
-import org.hibernate.event.PreUpdateEventListener;
+import org.hibernate.event.spi.PreUpdateEvent;
+import org.hibernate.event.spi.PreUpdateEventListener;
+import org.hibernate.integrator.spi.Integrator;
+import org.hibernate.metamodel.source.MetadataImplementor;
+import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 import edu.ualberta.med.biobank.model.Revision;
 
@@ -23,14 +26,27 @@ import edu.ualberta.med.biobank.model.Revision;
  */
 // TODO: write a test case to check whether this does its job.
 public class ValidEndRevisionListener
-    implements PreUpdateEventListener, Initializable {
+    implements PreUpdateEventListener, Integrator {
     private static final long serialVersionUID = 1L;
 
     private AuditConfiguration verCfg;
 
     @Override
-    public void initialize(Configuration cfg) {
-        verCfg = AuditConfiguration.getFor(cfg);
+    public void integrate(Configuration configuration,
+        SessionFactoryImplementor sessionFactory,
+        SessionFactoryServiceRegistry serviceRegistry) {
+        verCfg = AuditConfiguration.getFor(configuration);
+    }
+
+    @Override
+    public void integrate(MetadataImplementor metadata,
+        SessionFactoryImplementor sessionFactory,
+        SessionFactoryServiceRegistry serviceRegistry) {
+    }
+
+    @Override
+    public void disintegrate(SessionFactoryImplementor sessionFactory,
+        SessionFactoryServiceRegistry serviceRegistry) {
     }
 
     @Override

@@ -20,6 +20,8 @@ import org.hibernate.envers.RevisionEntity;
 import org.hibernate.envers.RevisionNumber;
 import org.hibernate.envers.RevisionTimestamp;
 
+import edu.ualberta.med.biobank.model.listener.RevisionListenerImpl;
+
 @RevisionEntity(RevisionListenerImpl.class)
 @Entity
 @Table(name = "REVISION")
