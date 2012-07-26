@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -38,6 +39,7 @@ public class ShippingMethod extends AbstractModel
     }
 
     private String name;
+    private boolean waybillRequired;
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ShippingMethod.name.NotEmpty}")
@@ -50,4 +52,15 @@ public class ShippingMethod extends AbstractModel
     public void setName(String name) {
         this.name = name;
     }
+
+    @NotNull(message = "{ShippingMethod.waybillRequired.NotEmpty}")
+    @Column(name = "WAYBILL_REQUIRED")
+    public boolean isWaybillRequired() {
+        return waybillRequired;
+    }
+
+    public void setWaybillRequired(boolean waybillRequired) {
+        this.waybillRequired = waybillRequired;
+    }
+
 }

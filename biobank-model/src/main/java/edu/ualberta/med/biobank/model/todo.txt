@@ -1,28 +1,67 @@
 [v] Merge center derived classes into center
 [ ] Make a StudyCenter object
 [ ] Make (pnumber, study) unique instead of just pnumber
-[ ] Rethink OriginInfo and ShipmentInfo
-[ ] SendsShipments on clinic was to be replaced with what on ShippingMethod?
-[ ] How do contacts work again?
+[ ] *Rethink OriginInfo and ShipmentInfo
+[v] SendsShipments on clinic was to be replaced with what on ShippingMethod? 
+[ ] Q: How do contacts work again?
+	A: make ContactUsers that function like StudyCenter-s
+[ ] Q: Who makes StudyCenter-s?
+	A: Studies make the link?
 [ ] Dispatch should be StudyCenter <-> StudyCenter
-[ ] Requests made for dispatches, clarify this process
+[ ] *Requests made for dispatches, clarify this process
+	- requires thinking
 [ ] Shipments should now just be Dispatches
+	- Yes
+[ ] Specimen will have a originCenter and currentCenter and no originInfo
+[ ] Q: Make SpecimenPosition and ContainerPosition either:
+	(1) immutable
+	(2) embeddable
+	A: ???
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
+	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity
+	and add listeners to update the properties
+[ ] *Specimen CreatedAt vs TimeDrawn, etc.
+	Q: Are specimens from an organism and aliquots the result of aliquotting?
+	Does "samples" include both? CreatedAt would just be the phyiscal time a
+	sample is created/ drawn (e.g. whenever it's put in its tube).
+[ ] Specimen vs Aliquot objects
+	- see above
 [ ] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
+	- Yes
 [ ] Attributes
+	- Yes
+	- Consider type validation (e.g. legal options, legal regex, legal range).
 [ ] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
 	it's just clutter
-[ ] Split Membership into StudyMembership and CenterMembership? But then how 
+	- Yes
+[ ] *Split Membership into StudyMembership and CenterMembership? But then how 
 	does a center (or study) control which users can work on a given study? 
 	Is that necessary?
+	A: get more feedback from aaron
 [ ] Rename name to description, don't make unique, rename nameShort to name?
+	- Yes
 [ ] Put validation on interfaces to be shared by DTOs and Data model?
+	- Yes
+[ ] Splitting model into abstract classes and then transient methods?
+	- Yes, investigate/ try
+[ ] Q: put report model objects in subpackage?
+	- Yes, for membershipts too? Label printing too?	
 [ ] Watch out for FK.sql-s, renaming columns
 [ ] Get rid of activity status in a lot of places?
-[ ] Merge ContainerPosition into container and SpecimenPositon into Specimen
-	so that changes to position can be tracked as part of the object?
-[ ] Think about how to deal with translation of global objects, such as,
+	- Yes, replace with either (1) enabled/ disabled (2) active/ inactive (e.g. Study/Center)
+	- SpecimenFlag/Comment thing that is put on a (potentially huge) set of specimens.
+		- have a flag from a global list of definied options, with clarifying comment
+	which will take the idea of "flagged"
+[ ] Eliminate old "Shipment" and rename Dispatch to "Shipment"
+[ ] *Labeling Scheme refactoring?
+	- Probably replace "Row Col" with "index"?
+[ ] **Think about how to deal with translation of global objects, such as,
 	Role, Environment, TubeType, etc.
 [ ] ProcessingEvent <-> Specimen and children
-[ ] Specimen thaw and other problem events?
+	- Yes, discuessed already
 [ ] Collection Event types
+[ ] Q: Sent samples freezer?
+	A: create a StudyCenter for each study, and assign the specimens to it
+[ ] Go over OHS's feature list.
+
+* requires thought/ feedback
