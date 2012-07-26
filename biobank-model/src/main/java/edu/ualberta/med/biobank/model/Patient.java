@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
@@ -40,8 +41,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "PATIENT")
-@Unique(properties = "pnumber", groups = PrePersist.class)
+@Table(name = "PATIENT",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "STUDY_ID", "PNUMBER" }) })
+@Unique(properties = { "study", "pnumber" }, groups = PrePersist.class)
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class),
     @NotUsed(by = CollectionEvent.class, property = "patient", groups = PreDelete.class)
@@ -73,7 +76,7 @@ public class Patient extends AbstractModel
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Patient.pnumber.NotEmpty}")
-    @Column(name = "PNUMBER", unique = true, nullable = false, length = 100)
+    @Column(name = "PNUMBER", nullable = false, length = 100)
     public String getPnumber() {
         return this.pnumber;
     }

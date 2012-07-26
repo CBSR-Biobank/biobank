@@ -1,6 +1,6 @@
 [v] Merge center derived classes into center
 [ ] Make a StudyCenter object
-[ ] Make (pnumber, study) unique instead of just pnumber
+[v] Make (pnumber, study) unique instead of just pnumber
 [ ] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod? 
 [ ] Q: How do contacts work again?
