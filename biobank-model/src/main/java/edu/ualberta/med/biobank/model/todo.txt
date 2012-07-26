@@ -19,7 +19,9 @@
 	A: ???
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
 	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity and 
-	[ ]add listeners to update the properties
+	[ ] add listeners to update the properties
+	[ ] override date type to save to a decimal(17,3) or a long or something so
+		can have millisecond precision in mysql db
 [ ] *Specimen CreatedAt vs TimeDrawn, etc.
 	Q: Are specimens from an organism and aliquots the result of aliquotting?
 	Does "samples" include both? CreatedAt would just be the phyiscal time a

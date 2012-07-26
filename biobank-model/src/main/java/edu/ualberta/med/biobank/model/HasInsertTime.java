@@ -1,15 +1,13 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
+
 public interface HasInsertTime {
     /**
-     * Use a {@link Long} instead of {@link Date} because MySQL's DATETIME type
-     * is precise only to the second, not the millisecond. Millisecond precision
-     * is important for the logs.
-     * 
-     * @return
+     * @return the {@link Date} when the implementing instance was inserted into
+     *         the database.
      */
-    // TODO: write UserType to convert BIGINT to Date
-    public Long getTimestamp();
+    public Date getInsertTime();
 
-    public void setTimestamp(Long insertTime);
+    public void setInsertTime(Date insertTime);
 }
