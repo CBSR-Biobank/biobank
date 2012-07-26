@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.SQLInsert;
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -28,7 +27,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -67,7 +65,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractModel
-    implements HasName, HasNameShort, HasActivityStatus, HasComments {
+    implements HasName, HasNameShort, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -97,11 +95,11 @@ public class ContainerType extends AbstractModel
     private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypes =
         new HashSet<ContainerType>(0);
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Capacity capacity = new Capacity();
     private Center center;
     private ContainerLabelingScheme childLabelingScheme;
+    private Boolean enabled;
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
@@ -180,17 +178,14 @@ public class ContainerType extends AbstractModel
         this.childContainerTypes = childContainerTypes;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{ContainerType.enabled.NotNull}")
+    @Column(name = "IS_ENABLED")
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override

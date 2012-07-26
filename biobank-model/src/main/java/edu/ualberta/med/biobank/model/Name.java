@@ -6,7 +6,6 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 @SuppressWarnings("nls")
@@ -19,7 +18,6 @@ public class Name {
         Map<Class<?>, LString> tmp = new HashMap<Class<?>, LString>();
 
         // @formatter:off
-        tmp.put(ActivityStatus.class,           bundle.tr("Activity Status").format());
         tmp.put(Address.class,                  bundle.tr("Address").format());
         tmp.put(AliquotedSpecimen.class,        bundle.tr("Aliquoted Specimen").format());
         tmp.put(Capacity.class,                 bundle.tr("Capacity").format());

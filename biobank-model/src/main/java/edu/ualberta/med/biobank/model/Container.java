@@ -18,14 +18,12 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -59,7 +57,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @ValidContainer(groups = PrePersist.class)
 public class Container extends AbstractModel
-    implements HasComments, HasActivityStatus {
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -89,9 +87,9 @@ public class Container extends AbstractModel
     private Container topContainer;
     private ContainerPosition position;
     private Center center;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ContainerType containerType;
     private Set<Comment> comments = new HashSet<Comment>(0);
+    private Boolean enabled;
 
     /**
      * Optional.
@@ -198,17 +196,14 @@ public class Container extends AbstractModel
         this.center = center;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{Container.enabled.NotNull}")
+    @Column(name = "IS_ENABLED")
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Transient

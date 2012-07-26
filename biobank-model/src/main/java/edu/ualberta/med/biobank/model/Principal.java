@@ -16,19 +16,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
-
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
-public class Principal extends AbstractModel
-    implements HasActivityStatus {
+public class Principal extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -39,7 +35,7 @@ public class Principal extends AbstractModel
         "Principals");
 
     private Set<Membership> memberships = new HashSet<Membership>(0);
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+    private Boolean enabled;
 
     // Require at least one membership on creation so there is some loose
     // association between the creator and the created user.
@@ -56,17 +52,14 @@ public class Principal extends AbstractModel
         this.memberships = memberships;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Principal.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{Principal.enabled.NotNull}")
+    @Column(name = "IS_ENABLED")
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**

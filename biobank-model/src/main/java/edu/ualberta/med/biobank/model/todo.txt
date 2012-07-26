@@ -49,9 +49,9 @@
 [ ] Q: put report model objects in subpackage?
 	- Yes, for membershipts too? Label printing too?	
 [ ] Watch out for FK.sql-s, renaming columns
-[ ] Get rid of activity status in a lot of places?
+[v] Get rid of activity status in a lot of places?
 	- Yes, replace with either (1) enabled/ disabled (2) active/ inactive (e.g. Study/Center)
-	- SpecimenFlag/Comment thing that is put on a (potentially huge) set of specimens.
+	[ ] - SpecimenFlag/Comment thing that is put on a (potentially huge) set of specimens.
 		- have a flag from a global list of definied options, with clarifying comment
 	which will take the idea of "flagged"
 [ ] Eliminate old "Shipment" and rename Dispatch to "Shipment"
@@ -76,6 +76,10 @@
 [ ] *Think of the SpecimenLog/SpecimenEvent as a list of things being done to specimens,
 	not so much as the action being called on them. If 30,000 specimens are thawed, then
 	there should be 30,000 events recorded on each of them.
-	
+[ ] Dispatch containers AND specimens, but then product barcode must be globally unique!
+[ ] Global list of tube types, defined however, centers can make their own groups of tube
+	types and then have their CT have a list of those
+[ ] Aaron would like the sample-type restriction to be able to be assigned at any level
+	(e.g. freezer, hotel, pallet)
 
 * requires thought/ feedback

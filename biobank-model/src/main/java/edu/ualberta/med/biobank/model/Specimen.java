@@ -18,14 +18,12 @@ import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -51,7 +49,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = RequestSpecimen.class, property = "specimen", groups = PreDelete.class)
 })
 public class Specimen extends AbstractModel
-    implements HasActivityStatus, HasComments, HasCreatedAt {
+    implements HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -98,8 +96,8 @@ public class Specimen extends AbstractModel
     private SpecimenPosition specimenPosition;
     private OriginInfo originInfo;
     private ProcessingEvent processingEvent;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
+    private Boolean usable;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -226,17 +224,14 @@ public class Specimen extends AbstractModel
         this.originInfo = originInfo;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{Specimen.usable.NotNull}")
+    @Column(name = "IS_USABLE")
+    public Boolean isUsable() {
+        return usable;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setUsable(Boolean usable) {
+        this.usable = usable;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

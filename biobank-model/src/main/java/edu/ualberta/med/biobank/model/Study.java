@@ -12,13 +12,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -41,7 +39,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @NotUsed(by = Patient.class, property = "study", groups = PreDelete.class)
 public class Study extends AbstractModel
-    implements HasName, HasNameShort, HasActivityStatus {
+    implements HasName, HasNameShort {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -53,8 +51,8 @@ public class Study extends AbstractModel
 
     private String name;
     private String nameShort;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Contact> contacts = new HashSet<Contact>(0);
+    private Boolean enabled;
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Study.name.NotEmpty}")
@@ -80,17 +78,14 @@ public class Study extends AbstractModel
         this.nameShort = nameShort;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Study.activityStatus.NotEmpty}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{Study.enabled.NotNull}")
+    @Column(name = "IS_ENABLED")
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)

@@ -17,13 +17,11 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -37,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = { "patient", "visitNumber" }, groups = PrePersist.class)
 @NotUsed(by = Specimen.class, property = "collectionEvent", groups = PreDelete.class)
 public class CollectionEvent extends AbstractModel
-    implements HasActivityStatus, HasComments {
+    implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -62,7 +60,6 @@ public class CollectionEvent extends AbstractModel
 
     private Integer visitNumber;
     private Patient patient;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<EventAttr> eventAttrs = new HashSet<EventAttr>(0);
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -86,19 +83,6 @@ public class CollectionEvent extends AbstractModel
 
     public void setPatient(Patient patient) {
         this.patient = patient;
-    }
-
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.CollectionEvent.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
-    }
-
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
     }
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

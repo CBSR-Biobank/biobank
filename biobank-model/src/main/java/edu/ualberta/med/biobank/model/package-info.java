@@ -1,13 +1,5 @@
 @TypeDefs({
     @TypeDef(
-        name = "activityStatus",
-        typeClass = EnumUserType.class,
-        defaultForType = ActivityStatus.class,
-        parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.type.ActivityStatus")
-        }),
-    @TypeDef(
         name = "attributeValueType",
         typeClass = EnumUserType.class,
         defaultForType = AttributeValueType.class,
@@ -54,7 +46,6 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.type.AttributeValueType;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;

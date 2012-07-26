@@ -8,13 +8,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
@@ -23,8 +21,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "STUDY_EVENT_ATTR")
 @NotUsed(by = EventAttr.class, property = "studyEventAttr", groups = PreDelete.class)
-public class StudyEventAttr extends AbstractModel
-    implements HasActivityStatus {
+public class StudyEventAttr extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -45,7 +42,7 @@ public class StudyEventAttr extends AbstractModel
     private boolean required = false;
     private GlobalEventAttr globalEventAttr;
     private Study study;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+    private Boolean enabled;
 
     @Column(name = "PERMISSIBLE")
     public String getPermissible() {
@@ -88,16 +85,13 @@ public class StudyEventAttr extends AbstractModel
         this.study = study;
     }
 
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.StudyEventAttr.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{StudyEventAttr.enabled.NotNull}")
+    @Column(name = "IS_ENABLED")
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

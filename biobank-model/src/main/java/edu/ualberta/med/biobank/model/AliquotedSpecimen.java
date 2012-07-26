@@ -11,13 +11,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 /**
  * The specimens, derived from source specimens, that are collected for a study.
@@ -29,8 +27,7 @@ import edu.ualberta.med.biobank.model.type.ActivityStatus;
 @Audited
 @Entity
 @Table(name = "ALIQUOTED_SPECIMEN")
-public class AliquotedSpecimen extends AbstractModel
-    implements HasActivityStatus {
+public class AliquotedSpecimen extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -54,7 +51,7 @@ public class AliquotedSpecimen extends AbstractModel
     private SpecimenType specimenType;
     private Integer quantity;
     private BigDecimal volume;
-    private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
+    private Boolean enabled;
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.study.NotNull")
     @Column(name = "STUDY_ID")
@@ -107,20 +104,17 @@ public class AliquotedSpecimen extends AbstractModel
     }
 
     /**
-     * If activity status is ACTIVE then this type of specimen has to be
-     * collected. If the activity status is closed then this specimen type is no
-     * longer being collected for this study.
+     * If this {@link AliquotedSpecimen#isEnabled()}, then this processing step
+     * is stilling being done, otherwise, it is kept as a record, but is not
+     * currently performed.
      */
-    @Override
-    @NotNull(message = "{edu.ualberta.med.biobank.model.AliquotedSpecimen.activityStatus.NotNull}")
-    @Column(name = "ACTIVITY_STATUS_ID", nullable = false)
-    @Type(type = "activityStatus")
-    public ActivityStatus getActivityStatus() {
-        return this.activityStatus;
+    @NotNull(message = "{AliquotedSpecimen.enabled.NotNull}")
+    @Column(name = "IS_ENABLED", nullable = false)
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    @Override
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
