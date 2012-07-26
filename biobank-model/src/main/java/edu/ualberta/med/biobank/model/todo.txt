@@ -12,7 +12,8 @@
 	- requires thinking
 [ ] Shipments should now just be Dispatches
 	- Yes
-[ ] Specimen will have a originCenter and currentCenter and no originInfo
+[v] Specimen will have a originCenter and currentCenter and no originInfo
+	[v] Remove OriginInfo
 [ ] Q: Make SpecimenPosition and ContainerPosition either:
 	(1) immutable
 	(2) embeddable

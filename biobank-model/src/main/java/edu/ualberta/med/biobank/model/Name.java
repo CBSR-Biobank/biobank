@@ -37,7 +37,6 @@ public class Name {
         tmp.put(GlobalEventAttr.class,          bundle.tr("Global Event Attribute").format());
         tmp.put(Group.class,                    bundle.tr("Group").format());
         tmp.put(Membership.class,               bundle.tr("Membership").format());
-        tmp.put(OriginInfo.class,               bundle.tr("Origin Information").format());
         tmp.put(Patient.class,                  bundle.tr("Patient").format());
         tmp.put(PermissionEnum.class,           bundle.tr("Permission").format());
         tmp.put(Principal.class,                bundle.tr("Principal").format());

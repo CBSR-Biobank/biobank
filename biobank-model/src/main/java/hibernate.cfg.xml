@@ -73,7 +73,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" />
 		<mapping class="edu.ualberta.med.biobank.model.Log" />
 		<mapping class="edu.ualberta.med.biobank.model.Membership" />
-		<mapping class="edu.ualberta.med.biobank.model.OriginInfo" />
 		<mapping class="edu.ualberta.med.biobank.model.Patient" />
 		<mapping class="edu.ualberta.med.biobank.model.Principal" />
 		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" />
@@ -100,6 +99,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
+		<mapping class="edu.ualberta.med.biobank.model.StudyCenter" />
 		<mapping class="edu.ualberta.med.biobank.model.User" />
 
 		<event type="pre-update">

@@ -91,10 +91,10 @@ public class Specimen extends AbstractModel
     private Specimen parentSpecimen;
     private CollectionEvent collectionEvent;
     private Boolean sourceSpecimen;
-    private Center currentCenter;
+    private StudyCenter originCenter;
+    private StudyCenter currentCenter;
     private SpecimenType specimenType;
     private SpecimenPosition specimenPosition;
-    private OriginInfo originInfo;
     private ProcessingEvent processingEvent;
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean usable;
@@ -153,17 +153,28 @@ public class Specimen extends AbstractModel
     }
 
     @NotNull(message = "{Specimen.currentCenter.NotNull}")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
-    public Center getCurrentCenter() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CURRENT_STUDY_CENTER_ID", nullable = false)
+    public StudyCenter getCurrentCenter() {
         return this.currentCenter;
     }
 
-    public void setCurrentCenter(Center currentCenter) {
+    public void setCurrentCenter(StudyCenter currentCenter) {
         this.currentCenter = currentCenter;
     }
 
-    @NotNull(message = "{Specimen.isSourceSpecimen.NotNull}")
+    @NotNull(message = "{Specimen.originCenter.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ORIGIN_STUDY_CENTER_ID", nullable = false)
+    public StudyCenter getOriginCenter() {
+        return originCenter;
+    }
+
+    public void setOriginCenter(StudyCenter originCenter) {
+        this.originCenter = originCenter;
+    }
+
+    @NotNull(message = "{Specimen.sourceSpecimen.NotNull}")
     @Column(name = "SOURCE_SPECIMEN")
     public Boolean isSourceSpecimen() {
         return sourceSpecimen;
@@ -211,17 +222,6 @@ public class Specimen extends AbstractModel
     @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
-    }
-
-    @NotNull(message = "{Specimen.originInfo.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false)
-    public OriginInfo getOriginInfo() {
-        return this.originInfo;
-    }
-
-    public void setOriginInfo(OriginInfo originInfo) {
-        this.originInfo = originInfo;
     }
 
     @NotNull(message = "{Specimen.usable.NotNull}")
