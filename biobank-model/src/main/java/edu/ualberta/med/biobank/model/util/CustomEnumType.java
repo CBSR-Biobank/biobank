@@ -30,7 +30,7 @@ import org.hibernate.usertype.UserType;
  * @param <T> the enum type
  */
 @SuppressWarnings("nls")
-public class EnumUserType<T extends Enum<T>>
+public class CustomEnumType<T extends Enum<T>>
     implements UserType, ParameterizedType {
 
     public static final String ID_METHOD_NAME_PARAM = "identifierMethod";

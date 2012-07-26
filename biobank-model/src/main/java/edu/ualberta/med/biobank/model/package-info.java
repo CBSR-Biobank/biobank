@@ -1,42 +1,42 @@
 @TypeDefs({
     @TypeDef(
         name = "attributeValueType",
-        typeClass = EnumUserType.class,
+        typeClass = CustomEnumType.class,
         defaultForType = AttributeValueType.class,
         parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            @Parameter(name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
                 value = "edu.ualberta.med.biobank.model.type.AttributeValueType")
         }),
     @TypeDef(
         name = "dispatchSpecimenState",
-        typeClass = EnumUserType.class,
+        typeClass = CustomEnumType.class,
         defaultForType = DispatchSpecimenState.class,
         parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            @Parameter(name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
                 value = "edu.ualberta.med.biobank.model.type.DispatchSpecimenState")
         }),
     @TypeDef(
         name = "dispatchState",
-        typeClass = EnumUserType.class,
+        typeClass = CustomEnumType.class,
         defaultForType = DispatchState.class,
         parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            @Parameter(name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
                 value = "edu.ualberta.med.biobank.model.type.DispatchState")
         }),
     @TypeDef(
         name = "permissionEnum",
-        typeClass = EnumUserType.class,
+        typeClass = CustomEnumType.class,
         defaultForType = PermissionEnum.class,
         parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            @Parameter(name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
                 value = "edu.ualberta.med.biobank.model.type.PermissionEnum")
         }),
     @TypeDef(
         name = "requestSpecimenState",
-        typeClass = EnumUserType.class,
+        typeClass = CustomEnumType.class,
         defaultForType = RequestSpecimenState.class,
         parameters = {
-            @Parameter(name = EnumUserType.ENUM_CLASS_NAME_PARAM,
+            @Parameter(name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
                 value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
         })
 })
@@ -51,5 +51,5 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
-import edu.ualberta.med.biobank.model.util.EnumUserType;
+import edu.ualberta.med.biobank.model.util.CustomEnumType;
 
