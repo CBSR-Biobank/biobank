@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.action;
 import java.io.Serializable;
 
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 /**
  * Implementations of this interface should follow the template
@@ -19,7 +18,7 @@ import edu.ualberta.med.biobank.model.util.NotAProxy;
 // (the handler has a Session and a User, and can populate the response however
 // it wants, using whatever it wants). This will make them easier to mock as
 // well.
-public interface Action<T extends ActionResult> extends NotAProxy, Serializable {
+public interface Action<T extends ActionResult> extends Serializable {
     public boolean isAllowed(ActionContext context) throws ActionException;
 
     public T run(ActionContext context) throws ActionException;
