@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,11 +14,15 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.proxy.HibernateProxyHelper;
 
+import edu.ualberta.med.biobank.model.constraint.HasValidInsertTime;
+
 @MappedSuperclass
-public class AbstractModel implements IBiobankModel {
+public abstract class AbstractModel
+    implements IBiobankModel, HasValidInsertTime {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+    private Date insertTime;
 
     @Override
     @Id
@@ -68,5 +74,16 @@ public class AbstractModel implements IBiobankModel {
     @SuppressWarnings("unused")
     private static Class<?> proxiedClass(Object o) {
         return HibernateProxyHelper.getClassWithoutInitializingProxy(o);
+    }
+
+    @Override
+    @Column(name = "INSERT_TIME")
+    public Date getInsertTime() {
+        return insertTime;
+    }
+
+    @Override
+    public void setInsertTime(Date insertTime) {
+        this.insertTime = insertTime;
     }
 }

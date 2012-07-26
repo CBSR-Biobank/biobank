@@ -1,14 +1,21 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
+import edu.ualberta.med.biobank.model.constraint.HasValidLastUpdateTime;
+
 @MappedSuperclass
-public abstract class AbstractVersionedModel extends AbstractModel {
+public abstract class AbstractVersionedModel
+    extends AbstractModel
+    implements HasValidLastUpdateTime {
     private static final long serialVersionUID = 1L;
 
     private Integer version;
+    private Date lastUpdateTime;
 
     @Version
     @Column(name = "VERSION", nullable = false)
@@ -25,4 +32,15 @@ public abstract class AbstractVersionedModel extends AbstractModel {
     void setVersion(Integer version) {
         this.version = version;
     }
+
+    @Override
+    public Date getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    @Override
+    public void setLastUpdateTime(Date lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+    }
+
 }
