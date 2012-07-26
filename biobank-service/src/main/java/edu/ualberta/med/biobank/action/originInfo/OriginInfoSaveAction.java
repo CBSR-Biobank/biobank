@@ -23,6 +23,13 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.permission.shipment.OriginInfoUpdatePermission;
 
+/**
+ * Used to save a shipment from a clinic that does not have access to the
+ * Biobank software.
+ * 
+ * @author unknown
+ * 
+ */
 public class OriginInfoSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

@@ -1,15 +1,16 @@
-package edu.ualberta.med.biobank.action.shipment;
+package edu.ualberta.med.biobank.common.action.shipment;
 
 import java.util.ArrayList;
 
 import org.hibernate.Query;
 
-import edu.ualberta.med.biobank.action.Action;
-import edu.ualberta.med.biobank.action.ActionContext;
-import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.action.info.ShipmentReadInfo;
-import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
 /**
@@ -24,10 +25,6 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     @SuppressWarnings("nls")
     private static final String ORIGIN_INFO_HQL =
         "SELECT DISTINCT oi FROM " + OriginInfo.class.getName() + " oi"
-            + " INNER JOIN FETCH oi.shipmentInfo si"
-            + " INNER JOIN FETCH si.shippingMethod"
-            + " INNER JOIN FETCH oi.center"
-            + " LEFT JOIN FETCH oi.comments"
             + " WHERE oi.id=?";
 
     private final Integer oiId;
@@ -53,6 +50,18 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
             ActionContext.singleResult(query, OriginInfo.class, oiId);
 
         sInfo.originInfo = oi;
+
+        oi.getCenter().getName();
+        oi.getReceiverSite().getName();
+
+        if (oi.getShipmentInfo() != null) {
+            oi.getShipmentInfo().getShippingMethod().getName();
+        }
+
+        for (Comment comment : oi.getComments()) {
+            comment.getUser().getLogin();
+        }
+
         sInfo.specimens = new ArrayList<SpecimenInfo>(
             new ShipmentGetSpecimenListInfoAction(oiId).run(context)
                 .getList());

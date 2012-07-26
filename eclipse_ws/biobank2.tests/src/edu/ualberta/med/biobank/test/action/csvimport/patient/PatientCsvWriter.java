@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.util.csv;
+package edu.ualberta.med.biobank.test.action.csvimport.patient;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.action.csvimport.patient.PatientCsvInfo;
-import edu.ualberta.med.biobank.util.DateFormatter;
+import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
  * Used for testing the Patient CSV file Legacy Import feature.
@@ -19,17 +19,16 @@ import edu.ualberta.med.biobank.util.DateFormatter;
  * 
  */
 @SuppressWarnings("nls")
-public class PatientCsvWriter {
+class PatientCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.
      * 
      * @param filename The name of the CSV file to be saved.
-     * @param numRows The number of rows in the CSV file.
-     * @param studyName The short name to be used for the study.
+     * @param patientInfos set of beans containing the information for each row.
      * @throws IOException If the file could not be saved.
      */
-    public static void write(String filename, Set<PatientCsvInfo> patientInfos)
+    static void write(String filename, Set<PatientCsvInfo> patientInfos)
         throws IOException {
         final String[] header = new String[] {
             "Study", "Patient Number", "Created At"

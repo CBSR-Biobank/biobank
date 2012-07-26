@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.action.csvimport.shipment;
+package edu.ualberta.med.biobank.common.action.csvimport.shipment;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,23 +19,22 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.action.Action;
-import edu.ualberta.med.biobank.action.ActionContext;
-import edu.ualberta.med.biobank.action.BooleanResult;
-import edu.ualberta.med.biobank.action.csvimport.CsvActionUtil;
-import edu.ualberta.med.biobank.action.csvimport.CsvErrorList;
-import edu.ualberta.med.biobank.action.csvimport.specimen.SpecimenCsvImportAction;
-import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
+import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
+import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
@@ -75,8 +74,6 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         new ParseDate("yyyy-MM-dd HH:mm"), // dateReceived
         new StrNotNullOrEmpty(),           // sendingCenter
         new StrNotNullOrEmpty(),           // receivingCenter
-        new StrNotNullOrEmpty(),           // patientNumber
-        new StrNotNullOrEmpty(),           // inventoryId
         new StrNotNullOrEmpty(),           // shippingMethod
         new StrNotNullOrEmpty(),           // waybill
         null                               // comment
@@ -103,8 +100,6 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             "dateReceived",
             "sendingCenter",
             "receivingCenter",
-            "patientNumber",
-            "inventoryId",
             "shippingMethod",
             "waybill",
             "comment"
@@ -165,6 +160,15 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             throw new CsvImportException(errorList.getErrors());
         }
 
+        for (ShipmentImportInfo info : shipmentImportInfos) {
+            OriginInfo originInfo = info.getNewOriginInfo();
+
+            context.getSession().save(
+                originInfo.getComments().iterator().next());
+            context.getSession().save(originInfo.getShipmentInfo());
+            context.getSession().save(originInfo);
+        }
+
         result = true;
         return new BooleanResult(result);
     }
@@ -172,6 +176,8 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
     private ShipmentImportInfo getDbInfo(ActionContext context,
         ShipmentCsvInfo csvInfo) {
         ShipmentImportInfo info = new ShipmentImportInfo(csvInfo);
+
+        info.setUser(context.getUser());
 
         Center sendingCenter =
             CsvActionUtil.getCenter(context, csvInfo.getSendingCenter());
@@ -185,37 +191,19 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         Site receivingSite =
             CsvActionUtil.getSite(context, csvInfo.getReceivingCenter());
         if (receivingSite == null) {
-            errorList
-                .addError(csvInfo.getLineNumber(),
-                    CSV_RECEIVING_CENTER_ERROR.format(csvInfo
-                        .getReceivingCenter()));
+            errorList.addError(csvInfo.getLineNumber(),
+                CSV_RECEIVING_CENTER_ERROR.format(csvInfo
+                    .getReceivingCenter()));
         } else {
             info.setCurrentSite(receivingSite);
         }
 
-        Patient patient =
-            CsvActionUtil.getPatient(context, csvInfo.getPatientNumber());
-        if (patient == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_PNUMBER_ERROR.format(csvInfo.getPatientNumber()));
-        } else {
-            info.setPatient(patient);
-        }
-
-        Specimen specimen =
-            CsvActionUtil.getSpecimen(context, csvInfo.getInventoryId());
-        if (specimen == null) {
-            errorList.addError(csvInfo.getLineNumber(),
-                CSV_INVENTORY_ID_ERROR.format(csvInfo.getInventoryId()));
-        } else {
-            info.setSpecimen(specimen);
-        }
-
         ShippingMethod shippingMethod =
-            CsvActionUtil.getShippingMethod(context, csvInfo.getInventoryId());
+            CsvActionUtil.getShippingMethod(context,
+                csvInfo.getShippingMethod());
         if (shippingMethod == null) {
             errorList.addError(csvInfo.getLineNumber(),
-                CSV_SHIPPING_METHOD_ERROR.format(csvInfo.getInventoryId()));
+                CSV_SHIPPING_METHOD_ERROR.format(csvInfo.getShippingMethod()));
         } else {
             info.setShippingMethod(shippingMethod);
         }

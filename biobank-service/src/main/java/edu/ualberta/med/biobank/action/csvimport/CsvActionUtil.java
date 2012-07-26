@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
@@ -34,7 +35,7 @@ public class CsvActionUtil {
 
     public static Patient getPatient(ActionContext context, String pnumber) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -51,7 +52,7 @@ public class CsvActionUtil {
      */
     public static Specimen getSpecimen(ActionContext context, String inventoryId) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -69,7 +70,7 @@ public class CsvActionUtil {
     public static SpecimenType getSpecimenType(ActionContext context,
         String name) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -85,7 +86,7 @@ public class CsvActionUtil {
      */
     public static Study getStudy(ActionContext context, String nameShort) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
         Criteria c = context.getSession()
@@ -100,7 +101,7 @@ public class CsvActionUtil {
      */
     public static Center getCenter(ActionContext context, String nameShort) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -116,7 +117,7 @@ public class CsvActionUtil {
      */
     public static Site getSite(ActionContext context, String nameShort) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -128,11 +129,11 @@ public class CsvActionUtil {
     }
 
     /*
-     * Generates an action exception if container label does not exist.
+     * 
      */
     public static Container getContainer(ActionContext context, String label) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
@@ -143,13 +144,28 @@ public class CsvActionUtil {
         return (Container) c.uniqueResult();
     }
 
+    public static OriginInfo getOriginInfo(ActionContext context,
+        String waybill) {
+        if (context == null) {
+            throw new NullPointerException(
+                "should only be called once the context is initialized");
+        }
+
+        Criteria c = context.getSession()
+            .createCriteria(OriginInfo.class, "oi")
+            .createAlias("oi.shipmentInfo", "si", Criteria.LEFT_JOIN)
+            .add(Restrictions.eq("si.waybill", waybill));
+
+        return (OriginInfo) c.uniqueResult();
+    }
+
     /*
-     * Generates an action exception if shippingMethod label does not exist.
+     * 
      */
     public static ShippingMethod getShippingMethod(ActionContext context,
         String name) {
         if (context == null) {
-            throw new IllegalStateException(
+            throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
 
