@@ -85,5 +85,14 @@
 	types and then have their CT have a list of those
 [ ] Aaron would like the sample-type restriction to be able to be assigned at any level
 	(e.g. freezer, hotel, pallet)
+[ ] *Server API should have multiple versions that we support? *shudder*
 
 * requires thought/ feedback
+
+=-=-=-=-=-=-=-=-=-=
+
+THOUGHTS ON: ANNOTATIONS
+
+Have an abstract Annotation class with JOINED InheritanceType
+
+For: Patient, CollectionEvent, Specimen, Shipment/Dispatch?
