@@ -3,34 +3,37 @@ package edu.ualberta.med.biobank;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 public class SessionProvider {
-    public enum Mode {
-        DEBUG,
-        RUN;
-    }
+	public enum Mode {
+		DEBUG, RUN;
+	}
 
-    private final SessionFactory sessionFactory;
+	private final SessionFactory sessionFactory;
+	private final ServiceRegistry serviceRegistry;
 
-    public SessionProvider(Mode mode) {
-        // configure() configures settings from hibernate.cfg.xml found into the
-        // biobank-orm jar
-        Configuration configuration = new Configuration().configure();
+	public SessionProvider(Mode mode) {
+		// configure() configures settings from hibernate.cfg.xml found in the
+		// resources directory
+		Configuration configuration = new Configuration().configure();
 
-        if (mode == Mode.DEBUG) {
-            configuration.setProperty("hibernate.show_sql", "true");
-            configuration.setProperty("hibernate.format_sql", "true");
-            configuration.setProperty("hibernate.use_sql_comments", "true");
-        }
+		if (mode == Mode.DEBUG) {
+			configuration.setProperty("hibernate.show_sql", "true");
+			configuration.setProperty("hibernate.format_sql", "true");
+			configuration.setProperty("hibernate.use_sql_comments", "true");
+		}
+		serviceRegistry = new ServiceRegistryBuilder().applySettings(
+				configuration.getProperties()).buildServiceRegistry();
+		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+	}
 
-        sessionFactory = configuration.buildSessionFactory();
-    }
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
 
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
-    public Session openSession() {
-        return sessionFactory.openSession();
-    }
+	public Session openSession() {
+		return sessionFactory.openSession();
+	}
 }

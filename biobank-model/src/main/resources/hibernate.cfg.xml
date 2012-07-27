@@ -5,10 +5,22 @@
 <hibernate-configuration>
 	<session-factory>
 		<!-- Properties for the session factory -->
+
+		<!-- MySQL paramerters start -->
+        <!--
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
-		<property name="connection.username">dummy</property>
-		<property name="connection.password">ozzy498</property>
+		-->
+        <!-- MySQL paramerters end -->
+
+        <!-- HSQL DB paramerters start -->
+        <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+        <property name="connection.url">jdbc:hsqldb:mem:biobank</property>
+        <!-- HSQL DB paramerters end -->
+
+        <property name="connection.username">dummy</property>
+        <property name="connection.password">ozzy498</property>
+
 		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
