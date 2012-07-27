@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.hibernate.MappingException;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.id.enhanced.OptimizerFactory;
+import org.hibernate.id.enhanced.OptimizerFactory.StandardOptimizerDescriptor;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.type.Type;
 
@@ -39,7 +40,8 @@ public class CustomTableGenerator extends TableGenerator {
 
         // make sure the 'next_val' column means the next free value, NOT the
         // next free value minus the increment
-        params.put(TableGenerator.OPT_PARAM, OptimizerFactory.POOL_LO);
+        params.put(TableGenerator.OPT_PARAM,
+            StandardOptimizerDescriptor.POOLED_LO.getExternalName());
 
         // make sure to use the 'target_table' property as the segment name
         params.put(TableGenerator.CONFIG_PREFER_SEGMENT_PER_ENTITY, "true");
