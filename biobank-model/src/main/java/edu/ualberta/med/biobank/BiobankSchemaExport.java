@@ -24,8 +24,7 @@ public class BiobankSchemaExport {
     }
 
     public BiobankSchemaExport() throws SQLException {
-        Configuration config = new Configuration();
-        config.configure("/hibernate.cfg.xml");
+        Configuration config = new Configuration().configure();
 
         dbCon = DriverManager.getConnection(
             config.getProperty("hibernate.connection.url"),
