@@ -40,16 +40,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "SITE_ID", "CONTAINER_TYPE_ID",
-            "LABEL" }),
-        @UniqueConstraint(columnNames = { "SITE_ID", "PRODUCT_BARCODE" }) })
+        @UniqueConstraint(columnNames = { "CENTER_ID", "CONTAINER_TYPE_ID", "LABEL" })})
 // TODO: consider pulling @UniqueConstraint into this @Unique annotation,
 // because this is a total repeating of constraints. Would then need to figure
 // out how to add DDL constraints from our annotations and how to get a bean's
 // value of a specific column.
 @Unique.List({
     @Unique(properties = { "center", "containerType", "label" }, groups = PrePersist.class),
-    @Unique(properties = { "center", "productBarcode" }, groups = PrePersist.class)
+    @Unique(properties = { "productBarcode" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = SpecimenPosition.class, property = "container", groups = PreDelete.class),
@@ -96,7 +94,7 @@ public class Container extends AbstractModel
      * 
      * @return
      */
-    @Column(name = "PRODUCT_BARCODE")
+    @Column(name = "PRODUCT_BARCODE", unique = true)
     public String getProductBarcode() {
         return this.productBarcode;
     }
