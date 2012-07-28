@@ -1,28 +1,63 @@
 package edu.ualberta.med.biobank;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.EnversSchemaGenerator;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 
+@SuppressWarnings("nls")
 public class BiobankSchemaExport {
 
-    public static void main(String[] args) {
-        Configuration config = new Configuration().configure();
+    private final Connection dbCon;
 
-        config.setProperty("hibernate.dialect",
-            "org.hibernate.dialect.MySQL5InnoDBDialect");
-        config.setProperty("hibernate.connection.driver_class",
-            "com.mysql.jdbc.Driver");
-        // config.setProperty("hibernate.connection.url",
-        // "jdbc:mysql://localhost:3306/biobank");
-        // config.setProperty("hibernate.connection.username", "dummy");
-        // config.setProperty("hibernate.connection.password", "ozzy498");
-        config.setProperty("hibernate.show_sql", "true");
+    public static void main(String[] args) {
+        try {
+            new BiobankSchemaExport();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public BiobankSchemaExport() throws SQLException {
+        Configuration config = new Configuration();
+        config.configure("/hibernate.cfg.xml");
+
+        dbCon = DriverManager.getConnection(
+            config.getProperty("hibernate.connection.url"),
+            config.getProperty("hibernate.connection.username"),
+            config.getProperty("hibernate.connection.password"));
+
+        String[] split =
+            config.getProperty("hibernate.connection.url").split("/");
+
+        if (split.length != 4) {
+            throw new IllegalStateException(
+                "badly formtatted hibernate.connection.url in hibernate configuration file");
+        }
+
+        dropDatabase(split[3]);
 
         SchemaExport schemaExport = new EnversSchemaGenerator(config).export();
 
-        /** Just dump the schema SQLs to the console , but not execute them ***/
         schemaExport.setOutputFile("schema.sql");
-        schemaExport.create(true, false);
+        schemaExport.drop(false, true);
+        schemaExport.create(false, true);
+
     }
+
+    /*
+     * Drops and recreates the named database.
+     */
+    private void dropDatabase(String name) throws SQLException {
+        Statement stmt = dbCon.createStatement();
+        stmt.execute("DROP DATABASE " + name + ";");
+        stmt.execute("CREATE DATABASE " + name + ";");
+
+    }
+
 }

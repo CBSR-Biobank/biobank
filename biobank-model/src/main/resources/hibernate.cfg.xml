@@ -7,15 +7,15 @@
 		<!-- Properties for the session factory -->
 
 		<!-- MySQL paramerters start -->
-        <!--
 		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
-		-->
         <!-- MySQL paramerters end -->
 
         <!-- HSQL DB paramerters start -->
+        <!--
         <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
-        <property name="connection.url">jdbc:hsqldb:mem:biobank</property>
+        <property name="connection.url">jdbc:hsqldb:data/biobank</property>
+        -->
         <!-- HSQL DB paramerters end -->
 
         <property name="connection.username">dummy</property>

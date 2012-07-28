@@ -60,11 +60,10 @@
         <artifactId>commons-lang</artifactId>
         <version>2.2</version>
     </dependency>
-            
     <dependency>
-        <groupId>hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>1.8.0.1</version>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.21</version>
     </dependency>
 
   </dependencies>
