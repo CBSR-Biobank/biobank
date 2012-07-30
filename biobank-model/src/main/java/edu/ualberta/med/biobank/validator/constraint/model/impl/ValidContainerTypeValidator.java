@@ -143,7 +143,7 @@ public class ValidContainerTypeValidator
         // labeling is done row by row)
 
         isValid &= NullUtil.eq(ct.getCapacity(), oldCt.getCapacity());
-        isValid &= NullUtil.eq(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= NullUtil.eq(ct.isTopLevel(), oldCt.isTopLevel());
         isValid &= NullUtil.eq(ct.getChildLabelingScheme(),
             oldCt.getChildLabelingScheme());
 

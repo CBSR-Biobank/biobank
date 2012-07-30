@@ -23,8 +23,8 @@ class ShipmentCsvHelper {
             for (ShippingMethod shippingMethod : shippingMethods) {
                 ShipmentCsvInfo csvInfo = new ShipmentCsvInfo();
                 csvInfo.setDateReceived(new Date());
-                csvInfo.setSendingCenter(sendingCenter.getNameShort());
-                csvInfo.setReceivingCenter(receivingCenter.getNameShort());
+                csvInfo.setSendingCenter(sendingCenter.getName());
+                csvInfo.setReceivingCenter(receivingCenter.getName());
                 csvInfo.setShippingMethod(shippingMethod.getName());
                 csvInfo.setWaybill(nameGenerator.next(String.class));
                 csvInfo.setComment(nameGenerator.next(String.class));

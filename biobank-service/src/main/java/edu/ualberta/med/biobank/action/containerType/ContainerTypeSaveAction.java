@@ -112,8 +112,8 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         // 3) ensure removed child container types are not in use
         // 4) ensure removed specimen types are not in use
 
-        containerType.setName(name);
-        containerType.setNameShort(nameShort);
+        containerType.setDescription(name);
+        containerType.setName(nameShort);
         containerType.setSite(context.load(Site.class, siteId));
         containerType.setTopLevel(topLevel);
         containerType.getCapacity().setRowCapacity(rowCapacity);

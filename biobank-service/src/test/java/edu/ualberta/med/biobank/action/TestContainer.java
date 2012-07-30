@@ -10,11 +10,9 @@ import edu.ualberta.med.biobank.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.action.container.ContainerSaveAction;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.model.Container;
 
 public class TestContainer extends ActionTest {
 

@@ -91,7 +91,7 @@ public class UserGetAction implements Action<UserGetOutput> {
                 Group copy = new Group();
                 copy.setId(g.getId());
                 copy.setName(g.getName());
-                copy.setDescription(g.getDescription());
+                copy.setName(g.getName());
 
                 dst.getGroups().add(copy);
             }

@@ -3,18 +3,18 @@ package edu.ualberta.med.biobank.action.specimen;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
-import edu.ualberta.med.biobank.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.permission.specimen.SpecimenAssignPermission;
 
 public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
     private static final long serialVersionUID = 1L;
@@ -80,7 +80,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         res.parentBarcode = container.getProductBarcode();
         res.parentTypeName = container.getContainerType().getName();
         res.parentLabel = container.getLabel();
-        res.siteName = container.getSite().getNameShort();
+        res.siteName = container.getSite().getName();
 
         res.specimens =
             new ArrayList<SpecimenAssignSaveAction.SpecimenResInfo>();
@@ -101,7 +101,7 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
                 .getPnumber();
             rInfo.visitNumber = specimen.getCollectionEvent().getVisitNumber()
                 .toString();
-            rInfo.centerName = specimen.getCurrentCenter().getNameShort();
+            rInfo.centerName = specimen.getCurrentCenter().getName();
             res.specimens.add(rInfo);
         }
 

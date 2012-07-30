@@ -113,7 +113,7 @@ public class TestGroupGetAllAction extends ActionTest {
         for (Group group : output.getAllManageableGroups()) {
             group.getId();
             group.getName();
-            group.getDescription();
+            group.getName();
             group.getActivityStatus();
 
             for (Membership m : group.getMemberships()) {

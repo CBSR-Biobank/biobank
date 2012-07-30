@@ -59,7 +59,7 @@ public class ContainerReport2 extends AbstractReport {
                                             .getContainerType()
                                             .getChildLabelingSchemeId(), rows,
                                             cols),
-                                container.getContainerType().getNameShort() });
+                                container.getContainerType().getName() });
 
                     }
                 }

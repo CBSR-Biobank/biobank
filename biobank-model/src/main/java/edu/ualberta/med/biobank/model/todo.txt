@@ -44,7 +44,7 @@
 	does a center (or study) control which users can work on a given study? 
 	Is that necessary?
 	A: get more feedback from aaron
-[ ] Rename name to description, don't make unique, rename nameShort to name?
+[v] Rename name to description, don't make unique, rename nameShort to name?
 	- Yes
 [ ] Put validation on interfaces to be shared by DTOs and Data model?
 	- Yes
@@ -96,3 +96,8 @@ THOUGHTS ON: ANNOTATIONS
 Have an abstract Annotation class with JOINED InheritanceType
 
 For: Patient, CollectionEvent, Specimen, Shipment/Dispatch?
+
+THOUGHTS ON: DYNAMIC-ISH CONTAINER TYPES
+
+- have different naming stategies, e.g. enumerated (just a list) and 2d? Then centers can create
+their own naming scheme that uses a (code-based) strategy?

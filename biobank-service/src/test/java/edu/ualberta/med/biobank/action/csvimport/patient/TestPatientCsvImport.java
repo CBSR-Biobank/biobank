@@ -47,7 +47,7 @@ public class TestPatientCsvImport extends ActionTest {
         tx.commit();
 
         Set<PatientCsvInfo> csvInfos = patientCsvHelper.createPatients(
-            factory.getDefaultStudy().getNameShort(), 100);
+            factory.getDefaultStudy().getName(), 100);
         PatientCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
@@ -88,7 +88,7 @@ public class TestPatientCsvImport extends ActionTest {
             Patient patient = (Patient) c.uniqueResult();
 
             Assert.assertEquals(csvInfo.getStudyName(),
-                patient.getStudy().getNameShort());
+                patient.getStudy().getName());
             Assert.assertEquals(csvInfo.getCreatedAt(),
                 patient.getTimeCreated());
         }

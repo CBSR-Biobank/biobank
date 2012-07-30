@@ -60,8 +60,8 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         specimenType =
             context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
-        specimenType.setName(name);
-        specimenType.setNameShort(nameShort);
+        specimenType.setDescription(name);
+        specimenType.setName(nameShort);
 
         saveChildSpecimenTypes(context);
 

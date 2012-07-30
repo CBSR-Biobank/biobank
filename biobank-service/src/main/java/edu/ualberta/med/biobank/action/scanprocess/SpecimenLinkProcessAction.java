@@ -140,7 +140,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                                 .getVisitNumber(), foundSpecimen
                                 .getCollectionEvent().getPatient()
                                 .getPnumber(), foundSpecimen
-                                .getCurrentCenter().getNameShort()));
+                                .getCurrentCenter().getName()));
                 else
                     appendNewLog(MessageFormat
                         .format(
@@ -149,11 +149,11 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                             foundSpecimen.getParentSpecimen()
                                 .getInventoryId(), foundSpecimen
                                 .getParentSpecimen().getSpecimenType()
-                                .getNameShort(), foundSpecimen
+                                .getName(), foundSpecimen
                                 .getCollectionEvent().getVisitNumber(),
                             foundSpecimen.getCollectionEvent().getPatient()
                                 .getPnumber(), foundSpecimen
-                                .getCurrentCenter().getNameShort()));
+                                .getCurrentCenter().getName()));
             } else {
                 cell.setStatus(CellInfoStatus.NO_TYPE);
             }

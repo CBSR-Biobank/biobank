@@ -110,7 +110,7 @@ public class SpecimenActionHelper {
         if (addTopParentShortName)
             position += " (" //$NON-NLS-1$ 
                 + specimen.getSpecimenPosition().getContainer()
-                    .getContainerType().getNameShort() + ")"; //$NON-NLS-1$
+                    .getContainerType().getName() + ")"; //$NON-NLS-1$
         return position;
     }
 }

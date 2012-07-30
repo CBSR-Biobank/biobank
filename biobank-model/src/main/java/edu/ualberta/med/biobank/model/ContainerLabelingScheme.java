@@ -37,13 +37,11 @@ public class ContainerLabelingScheme extends AbstractModel
     private Integer maxCols;
     private Integer maxCapacity;
 
-    @Override
     @Column(name = "NAME", length = 50, unique = true)
     public String getName() {
         return this.name;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }

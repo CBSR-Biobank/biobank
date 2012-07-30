@@ -560,8 +560,8 @@ public class Factory {
     public Center createCenter() {
         String name = nameGenerator.next(Center.class);
         Center center = new Center();
+        center.setDescription(name);
         center.setName(name);
-        center.setNameShort(name);
         center.getAddress().setCity("testville");
 
         setDefaultCenter(center);
@@ -574,8 +574,8 @@ public class Factory {
         String name = nameGenerator.next(ContainerType.class);
 
         ContainerType containerType = new ContainerType();
+        containerType.setDescription(name);
         containerType.setName(name);
-        containerType.setNameShort(name);
         containerType.setCenter(getDefaultCenter());
         containerType.setCapacity(new Capacity(getDefaultCapacity()));
         containerType
@@ -676,8 +676,8 @@ public class Factory {
         String name = nameGenerator.next(SpecimenType.class);
 
         SpecimenType specimenType = new SpecimenType();
+        specimenType.setDescription(name);
         specimenType.setName(name);
-        specimenType.setNameShort(name);
 
         setDefaultSourceSpecimenType(specimenType);
         session.save(specimenType);
@@ -779,8 +779,8 @@ public class Factory {
         String name = nameGenerator.next(Study.class);
 
         Study study = new Study();
+        study.setDescription(name);
         study.setName(name);
-        study.setNameShort(name);
 
         setDefaultStudy(study);
         session.save(study);
@@ -906,7 +906,7 @@ public class Factory {
 
         Group group = new Group();
         group.setName(name);
-        group.setDescription(name);
+        group.setName(name);
 
         // temporary membership, for creating
         Membership m = new Membership();

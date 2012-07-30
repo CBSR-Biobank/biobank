@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -411,7 +410,7 @@ public class TestSpecimenCsvImport extends ActionTest {
                     csvInfo.setPalletLabel(container.getLabel());
                     csvInfo.setPalletProductBarcode(container
                         .getProductBarcode());
-                    csvInfo.setRootContainerType(ctype.getNameShort());
+                    csvInfo.setRootContainerType(ctype.getName());
 
                     count++;
                 }

@@ -63,7 +63,7 @@ public class TestResearchGroup extends ActionTest {
         ResearchGroupReadInfo rg = exec(reader);
 
         Assert.assertTrue(rg.researchGroup.getName().equals(name + "rg"));
-        Assert.assertTrue(rg.researchGroup.getNameShort().equals(name + "rg"));
+        Assert.assertTrue(rg.researchGroup.getName().equals(name + "rg"));
         Assert.assertTrue(rg.researchGroup.getStudy().getId().equals(studyId));
         Assert
             .assertTrue(rg.researchGroup.getActivityStatus() == ActivityStatus.ACTIVE);

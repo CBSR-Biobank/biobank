@@ -10,11 +10,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
+import edu.ualberta.med.biobank.action.helper.PatientHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
+import edu.ualberta.med.biobank.action.helper.StudyHelper;
 import edu.ualberta.med.biobank.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.action.info.SiteInfo;
 import edu.ualberta.med.biobank.action.info.StudyCountInfo;
@@ -25,18 +30,8 @@ import edu.ualberta.med.biobank.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.action.site.SiteGetStudyInfoAction;
 import edu.ualberta.med.biobank.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
-import edu.ualberta.med.biobank.action.helper.PatientHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
-import edu.ualberta.med.biobank.action.helper.StudyHelper;
 
 public class TestSite extends ActionTest {
 
@@ -134,7 +129,7 @@ public class TestSite extends ActionTest {
 
         // ensure we can change short name on existing site
         siteInfo = exec(new SiteGetInfoAction(siteId));
-        siteInfo.getSite().setNameShort(name + "_2");
+        siteInfo.getSite().setName(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         exec(siteSaveAction);
     }

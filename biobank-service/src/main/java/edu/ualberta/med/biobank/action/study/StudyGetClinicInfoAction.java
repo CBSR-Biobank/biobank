@@ -102,7 +102,7 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
             List<Contact> contactList = contactsByClinic.get(clinic);
             if (contactList == null) {
                 throw new LocalizedException(CLINIC_REQUIRES_CONTACTS
-                    .format(clinic.getNameShort()));
+                    .format(clinic.getName()));
             }
             ClinicInfo info = new ClinicInfo(clinic, (Long) row[1],
                 (Long) row[2], contactList);

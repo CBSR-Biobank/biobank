@@ -25,8 +25,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 @Unique.List({
-    @Unique(properties = "name", groups = PrePersist.class),
-    @Unique(properties = "nameShort", groups = PrePersist.class)
+    @Unique(properties = "name", groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
@@ -35,7 +34,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
 })
 public class SpecimenType extends AbstractModel
-    implements HasName, HasNameShort {
+    implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -46,7 +45,7 @@ public class SpecimenType extends AbstractModel
         "Specimen Types");
 
     private String name;
-    private String nameShort;
+    private String description;
     private Set<SpecimenType> childSpecimenTypes = new HashSet<SpecimenType>(0);
 
     @Override
@@ -62,15 +61,14 @@ public class SpecimenType extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{SpecimenType.nameShort.NotEmpty}")
-    @Column(name = "NAME_SHORT", unique = true)
-    public String getNameShort() {
-        return this.nameShort;
+    @Column(name = "DESCRIPTION")
+    public String getDescription() {
+        return this.description;
     }
 
     @Override
-    public void setNameShort(String nameShort) {
-        this.nameShort = nameShort;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)

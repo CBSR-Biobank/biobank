@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.permission.study.StudyUpdatePermission;
@@ -244,8 +243,8 @@ public class StudySaveAction implements Action<IdResult> {
         study = context.get(Study.class, id, new Study());
 
         study.setId(id);
-        study.setName(name);
-        study.setNameShort(nameShort);
+        study.setDescription(name);
+        study.setName(nameShort);
         study.setActivityStatus(activityStatus);
 
         saveContacts(context);
@@ -281,7 +280,7 @@ public class StudySaveAction implements Action<IdResult> {
                 contact.setStudies(contactStudies);
             } else {
                 throw new LocalizedException(
-                    REMOVED_CONTACT_MISSING_STUDY.format(study.getNameShort()));
+                    REMOVED_CONTACT_MISSING_STUDY.format(study.getName()));
             }
         }
     }

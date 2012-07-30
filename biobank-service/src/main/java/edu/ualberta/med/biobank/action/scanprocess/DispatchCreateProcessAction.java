@@ -216,7 +216,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
                 "Specimen {0} is currently assigned to center" +
                     " {1}. It should first be sent to center {2}.")
                 .format(specimen.getInventoryId(), specimen.getCurrentCenter()
-                    .getNameShort(), sender.getNameShort()));
+                    .getName(), sender.getName()));
         } else {
             Map<Integer, ItemState> currentSpecimenIds = data
                 .getCurrentDispatchSpecimenIds();

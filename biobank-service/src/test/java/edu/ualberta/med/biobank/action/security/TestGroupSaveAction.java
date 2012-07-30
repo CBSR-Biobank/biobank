@@ -39,7 +39,7 @@ public class TestGroupSaveAction extends ActionTest {
 
         Group group = new Group();
         group.setName(factory.getName(Group.class));
-        group.setDescription("nothing to see here");
+        group.setName("nothing to see here");
 
         group.getMemberships().add(membership);
         membership.setPrincipal(group);
@@ -58,7 +58,7 @@ public class TestGroupSaveAction extends ActionTest {
             group.getName(), saved.getName());
 
         Assert.assertEquals("description not inserted properly",
-            group.getDescription(), saved.getDescription());
+            group.getName(), saved.getName());
 
         Set<Membership> savedMemberships = saved.getMemberships();
 

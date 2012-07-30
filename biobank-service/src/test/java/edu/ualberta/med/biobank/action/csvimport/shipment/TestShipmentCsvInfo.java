@@ -92,9 +92,9 @@ public class TestShipmentCsvInfo extends ActionTest {
                 DateCompare.compare(csvInfo.getDateReceived(), originInfo
                     .getShipmentInfo().getReceivedAt()));
             Assert.assertEquals(csvInfo.getSendingCenter(), originInfo
-                .getCenter().getNameShort());
+                .getCenter().getName());
             Assert.assertEquals(csvInfo.getReceivingCenter(), originInfo
-                .getReceiverSite().getNameShort());
+                .getReceiverSite().getName());
             Assert.assertEquals(csvInfo.getShippingMethod(), originInfo
                 .getShipmentInfo().getShippingMethod().getName());
             Assert.assertTrue(originInfo.getComments().size() > 0);

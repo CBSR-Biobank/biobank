@@ -6,7 +6,6 @@ import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction.
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ContainerTypeHelper {
 
@@ -39,12 +38,12 @@ public class ContainerTypeHelper {
             .getName());
         containerTypeSaveAction.setNameShort(containerTypeInfo
             .getContainerType()
-            .getNameShort());
+            .getName());
         containerTypeSaveAction.setSiteId(containerTypeInfo.getContainerType()
             .getSite().getId());
         containerTypeSaveAction.setTopLevel(containerTypeInfo
             .getContainerType()
-            .getTopLevel());
+            .isTopLevel());
 
         containerTypeSaveAction.setRowCapacity(containerTypeInfo
             .getContainerType()

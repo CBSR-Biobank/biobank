@@ -17,6 +17,9 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAct
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
+import edu.ualberta.med.biobank.action.helper.StudyHelper;
 import edu.ualberta.med.biobank.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -36,11 +39,6 @@ import edu.ualberta.med.biobank.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.action.study.StudyInfo;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
-import edu.ualberta.med.biobank.action.helper.StudyHelper;
 
 public class TestPatient extends ActionTest {
 

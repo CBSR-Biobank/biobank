@@ -66,7 +66,7 @@ public class SpecimenReport2 extends AbstractReport {
             String pnumber = specimen.getCollectionEvent().getPatient()
                 .getPnumber();
             String inventoryId = specimen.getInventoryId();
-            String specimenType = specimen.getSpecimenType().getNameShort();
+            String specimenType = specimen.getSpecimenType().getName();
 
             Object dateProcessed = NO_DATE_PROCESSED;
             Specimen parentSpecimen = specimen.getParentSpecimen();

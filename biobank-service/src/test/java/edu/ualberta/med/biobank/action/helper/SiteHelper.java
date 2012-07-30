@@ -74,7 +74,7 @@ public class SiteHelper extends Helper {
 
         siteSaveAction.setId(siteInfo.getSite().getId());
         siteSaveAction.setName(siteInfo.getSite().getName());
-        siteSaveAction.setNameShort(siteInfo.getSite().getNameShort());
+        siteSaveAction.setName(siteInfo.getSite().getName());
         siteSaveAction
             .setActivityStatus(siteInfo.getSite().getActivityStatus());
         siteSaveAction.setAddress(siteInfo.getSite().getAddress());

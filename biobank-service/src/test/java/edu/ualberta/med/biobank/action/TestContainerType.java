@@ -16,13 +16,10 @@ import edu.ualberta.med.biobank.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeSaveAction;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class TestContainerType extends ActionTest {
 

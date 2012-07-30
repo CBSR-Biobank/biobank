@@ -331,7 +331,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         if (currentPosition == null) {
             currentPosition = "none";
         }
-        String siteName = foundSpecimen.getCurrentCenter().getNameShort();
+        String siteName = foundSpecimen.getCurrentCenter().getName();
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell.setTitle(foundSpecimen
             .getCollectionEvent().getPatient().getPnumber());

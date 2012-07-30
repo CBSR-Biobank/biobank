@@ -60,8 +60,8 @@ public abstract class CenterSaveAction implements Action<IdResult> {
         throws ActionException {
         // TODO: version check?
 
-        center.setName(name);
-        center.setNameShort(nameShort);
+        center.setDescription(name);
+        center.setName(nameShort);
 
         center.setActivityStatus(activityStatus);
 

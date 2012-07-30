@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.action.helper;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.action.study.StudyInfo;
 import edu.ualberta.med.biobank.action.study.StudySaveAction;
@@ -13,8 +14,6 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.action.IActionExecutor;
 
 public class StudyHelper extends Helper {
     public static StudySaveAction getSaveAction(String name, String nameShort,
@@ -43,7 +42,7 @@ public class StudyHelper extends Helper {
         StudySaveAction saveStudy = new StudySaveAction();
         saveStudy.setId(studyInfo.getStudy().getId());
         saveStudy.setName(studyInfo.getStudy().getName());
-        saveStudy.setNameShort(studyInfo.getStudy().getNameShort());
+        saveStudy.setNameShort(studyInfo.getStudy().getName());
         saveStudy.setActivityStatus(studyInfo.getStudy().getActivityStatus());
 
         Set<Integer> ids = new HashSet<Integer>();

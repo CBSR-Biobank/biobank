@@ -9,7 +9,6 @@ import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -32,11 +31,6 @@ public class ShippingMethod extends AbstractModel
         "model",
         "Shipping Method",
         "Shipping Methods");
-
-    public static class PropertyName {
-        public static final LString NAME =
-            HasName.PropertyName.NAME;
-    }
 
     private String name;
     private Boolean waybillRequired = Boolean.TRUE;

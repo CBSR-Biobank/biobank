@@ -24,24 +24,22 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.action.collectionEvent.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.action.eventattr.GlobalEventAttrInfo;
 import edu.ualberta.med.biobank.action.eventattr.GlobalEventAttrInfoGetAction;
+import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.action.study.StudyInfo;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.util.MathUtil;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
 
 public class TestCollectionEvent extends ActionTest {
 
@@ -245,8 +243,7 @@ public class TestCollectionEvent extends ActionTest {
             .getPatient().getPnumber());
 
         Assert.assertEquals(patientInfo.patient.getStudy().getName(),
-            info.cevent
-                .getPatient().getStudy().getName());
+            info.cevent.getPatient().getStudy().getName());
 
         // TODO: add test to check if the comments' user is fetched
 

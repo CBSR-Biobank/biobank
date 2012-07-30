@@ -43,7 +43,7 @@ public class ResearchGroupGetAllAction implements
             if (new ResearchGroupReadPermission(rg.getId()).isAllowed(context))
                 adapterInfo
                     .put(rg.getId(), new ResearchGroupAdapterInfo(rg.getId(),
-                        rg.getNameShort()));
+                        rg.getName()));
         return new MapResult<Integer, ResearchGroupAdapterInfo>(adapterInfo);
     }
 }

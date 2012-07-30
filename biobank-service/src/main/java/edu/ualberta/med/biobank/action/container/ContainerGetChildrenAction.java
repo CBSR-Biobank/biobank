@@ -10,11 +10,11 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.permission.container.ContainerReadPermission;
 
 public class ContainerGetChildrenAction implements
     Action<ListResult<Container>> {
@@ -70,7 +70,7 @@ public class ContainerGetChildrenAction implements
                     ctSet.add(ct);
 
                     log.info("run: parentContainerId={} childCtype={}",
-                        parentContainerId, ct.getNameShort());
+                        parentContainerId, ct.getName());
 
                     ct.getCapacity().getRowCapacity();
 

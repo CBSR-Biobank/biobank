@@ -89,7 +89,7 @@ public class ClinicHelper extends Helper {
 
         saveAction.setId(clinicInfo.clinic.getId());
         saveAction.setName(clinicInfo.clinic.getName());
-        saveAction.setNameShort(clinicInfo.clinic.getNameShort());
+        saveAction.setName(clinicInfo.clinic.getName());
         saveAction.setActivityStatus(clinicInfo.clinic.getActivityStatus());
         saveAction.setSendsShipments(clinicInfo.clinic.getSendsShipments());
         saveAction.setAddress(clinicInfo.clinic.getAddress());

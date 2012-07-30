@@ -9,11 +9,11 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
-import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
 
 public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
     private static final long serialVersionUID = 1L;

@@ -11,17 +11,14 @@ import org.hibernate.Transaction;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.AssertConstraintViolation;
-import edu.ualberta.med.biobank.model.HasActivityStatus;
-import edu.ualberta.med.biobank.model.HasCreationTime;
+import edu.ualberta.med.biobank.model.HasDescription;
 import edu.ualberta.med.biobank.model.HasName;
-import edu.ualberta.med.biobank.model.HasNameShort;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class HasXHelper {
-    public static void checkEmptyName(Session session, HasName named) {
+    public static void checkEmptyName(Session session, HasDescription named) {
         try {
-            named.setName(null);
+            named.setDescription(null);
             session.save(named);
             session.flush();
             Assert.fail("null name should not be allowed");
@@ -33,7 +30,7 @@ public class HasXHelper {
         }
 
         try {
-            named.setName("");
+            named.setDescription("");
             session.save(named);
             session.flush();
             Assert.fail("empty name should not be allowed");
@@ -45,7 +42,8 @@ public class HasXHelper {
         }
     }
 
-    public static <T extends HasName> void checkDuplicateName(Session session,
+    public static <T extends HasDescription> void checkDuplicateName(
+        Session session,
         T original, T duplicate) {
         Transaction tx = session.getTransaction();
 
@@ -63,9 +61,9 @@ public class HasXHelper {
     }
 
     public static void checkEmptyNameShort(Session session,
-        HasNameShort shortNamed) {
+        HasName shortNamed) {
         try {
-            shortNamed.setNameShort(null);
+            shortNamed.setName(null);
             session.save(shortNamed);
             session.flush();
             Assert.fail("null nameShort should not be allowed");
@@ -77,7 +75,7 @@ public class HasXHelper {
         }
 
         try {
-            shortNamed.setNameShort("");
+            shortNamed.setName("");
             session.save(shortNamed);
             session.flush();
             Assert.fail("empty nameShort should not be allowed");
@@ -89,11 +87,11 @@ public class HasXHelper {
         }
     }
 
-    public static <T extends HasNameShort> void checkDuplicateNameShort(
+    public static <T extends HasName> void checkDuplicateNameShort(
         Session session, T original, T duplicate) {
         Transaction tx = session.getTransaction();
 
-        duplicate.setNameShort(original.getNameShort());
+        duplicate.setName(original.getName());
 
         try {
             session.update(duplicate);

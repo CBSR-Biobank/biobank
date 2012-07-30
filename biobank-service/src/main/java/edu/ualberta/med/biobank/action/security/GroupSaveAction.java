@@ -48,7 +48,7 @@ public class GroupSaveAction implements Action<IdResult> {
         checkFullyManageable(group, executingUser);
 
         group.setName(input.getName());
-        group.setDescription(input.getDescription());
+        group.setName(input.getName());
 
         Set<User> users = context.load(User.class, input.getUserIds());
         group.getUsers().clear();

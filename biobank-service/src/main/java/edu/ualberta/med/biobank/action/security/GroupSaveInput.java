@@ -24,7 +24,7 @@ public class GroupSaveInput implements ActionInput {
 
         this.groupId = group.getId();
         this.name = group.getName();
-        this.description = group.getDescription();
+        this.description = group.getName();
 
         this.memberships = new HashSet<Membership>(group.getMemberships());
         this.userIds = new HashSet<Integer>(IdUtil.getIds(group.getUsers()));

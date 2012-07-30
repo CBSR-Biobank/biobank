@@ -20,6 +20,8 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAct
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.action.info.SiteInfo;
@@ -36,10 +38,6 @@ import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
 
 public class TestProcessingEvent extends ActionTest {
 
@@ -176,7 +174,8 @@ public class TestProcessingEvent extends ActionTest {
                 specimenInfo.specimen.getCollectionEvent().getPatient()
                     .getPnumber());
 
-            Assert.assertEquals(patientInfo.patient.getStudy().getName(),
+            Assert.assertEquals(
+                patientInfo.patient.getStudy().getName(),
                 specimenInfo.specimen.getCollectionEvent().getPatient()
                     .getStudy().getName());
 

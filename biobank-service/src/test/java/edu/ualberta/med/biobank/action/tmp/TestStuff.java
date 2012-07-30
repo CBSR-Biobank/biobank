@@ -56,7 +56,7 @@ public class TestStuff {
             s1 = new Site();
             s1.setAddress(new Address());
             s1.setName("a");
-            s1.setNameShort("b");
+            s1.setName("b");
         }
 
         ActivityStatus active = ActivityStatus.ACTIVE;
@@ -67,7 +67,7 @@ public class TestStuff {
         // s1.setAddress(null);
 
         s1.setActivityStatus(active);
-        s1.setNameShort(new BigInteger(130, new Random()).toString(32));
+        s1.setName(new BigInteger(130, new Random()).toString(32));
 
         System.out.println("start");
 

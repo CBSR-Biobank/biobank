@@ -24,6 +24,10 @@ import edu.ualberta.med.biobank.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.action.helper.ClinicHelper;
+import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
+import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
+import edu.ualberta.med.biobank.action.helper.StudyHelper;
 import edu.ualberta.med.biobank.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.action.patient.PatientGetInfoAction.PatientInfo;
@@ -37,7 +41,6 @@ import edu.ualberta.med.biobank.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.AliquotedSpecimenSaveInfo;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.SourceSpecimenSaveInfo;
 import edu.ualberta.med.biobank.action.study.StudySaveAction.StudyEventAttrSaveInfo;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
@@ -45,12 +48,6 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.action.helper.ClinicHelper;
-import edu.ualberta.med.biobank.action.helper.CollectionEventHelper;
-import edu.ualberta.med.biobank.action.helper.SiteHelper.Provisioning;
-import edu.ualberta.med.biobank.action.helper.StudyHelper;
 
 /**
  * This test suite assumes that the association between Sites and Studies is
@@ -174,7 +171,7 @@ public class TestStudy extends ActionTest {
 
         // ensure we can change short name on existing study
         studyInfo = exec(new StudyGetInfoAction(studyId));
-        studyInfo.getStudy().setNameShort(name + "_2");
+        studyInfo.getStudy().setName(name + "_2");
         studySaveAction = StudyHelper.getSaveAction(studyInfo);
         exec(studySaveAction);
     }

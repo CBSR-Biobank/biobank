@@ -48,11 +48,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
-        @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
+        @UniqueConstraint(columnNames = { "CENTER_ID", "NAME" }) })
 @Unique.List({
-    @Unique(properties = { "center", "name" }, groups = PrePersist.class),
-    @Unique(properties = { "center", "nameShort" }, groups = PrePersist.class)
+    @Unique(properties = { "center", "name" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = ContainerType.class, property = "childContainerTypes", groups = PreDelete.class),
@@ -65,7 +63,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractModel
-    implements HasName, HasNameShort, HasComments {
+    implements HasName, HasDescription, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -89,7 +87,7 @@ public class ContainerType extends AbstractModel
     }
 
     private String name;
-    private String nameShort;
+    private String description;
     private boolean topLevel = false;
     private Double defaultTemperature;
     private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
@@ -100,6 +98,17 @@ public class ContainerType extends AbstractModel
     private Center center;
     private ContainerLabelingScheme childLabelingScheme;
     private Boolean enabled;
+
+    @Override
+    @Column(name = "DESCRIPTION")
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     @NotEmpty(message = "{ContainerType.name.NotEmpty}")
@@ -113,21 +122,8 @@ public class ContainerType extends AbstractModel
         this.name = name;
     }
 
-    @Override
-    @NotEmpty(message = "{ContainerType.name.NotEmpty}")
-    @Column(name = "NAME_SHORT")
-    public String getNameShort() {
-        return this.nameShort;
-    }
-
-    @Override
-    public void setNameShort(String nameShort) {
-        this.nameShort = nameShort;
-    }
-
-    @Column(name = "TOP_LEVEL")
-    // TODO: rename to isTopLevel
-    public boolean getTopLevel() {
+    @Column(name = "IS_TOP_LEVEL")
+    public boolean isTopLevel() {
         return this.topLevel;
     }
 
@@ -158,13 +154,13 @@ public class ContainerType extends AbstractModel
     }
 
     /**
-     * The custom @SQLInsert allows a `SITE_ID` to be inserted into the
+     * The custom @SQLInsert allows a `CENTER_ID` to be inserted into the
      * correlation table so a foreign key can be created to ensure that
      * {@link ContainerType}-s with the same {@link Site} can be related.
      * 
      * @return
      */
-    @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, SITE_ID) SELECT ?, ID, SITE_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
+    @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, CENTER_ID) SELECT ?, ID, CENTER_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
@@ -215,7 +211,7 @@ public class ContainerType extends AbstractModel
 
     @NotNull(message = "{ContainerType.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SITE_ID", nullable = false)
+    @JoinColumn(name = "CENTER_ID", nullable = false)
     public Center getCenter() {
         return this.center;
     }

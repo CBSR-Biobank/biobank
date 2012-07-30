@@ -34,12 +34,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "STUDY")
 @Unique.List({
-    @Unique(properties = "name", groups = PrePersist.class),
-    @Unique(properties = "nameShort", groups = PrePersist.class)
+    @Unique(properties = "name", groups = PrePersist.class)
 })
 @NotUsed(by = Patient.class, property = "study", groups = PreDelete.class)
 public class Study extends AbstractModel
-    implements HasName, HasNameShort {
+    implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -50,13 +49,13 @@ public class Study extends AbstractModel
         "Studies");
 
     private String name;
-    private String nameShort;
+    private String description;
     private Set<Contact> contacts = new HashSet<Contact>(0);
     private Boolean enabled;
 
     @Override
     @NotEmpty(message = "{Study.name.NotEmpty}")
-    @Column(name = "NAME", unique = true, nullable = false)
+    @Column(name = "NAME", unique = true, nullable = false, length = 50)
     public String getName() {
         return this.name;
     }
@@ -67,15 +66,14 @@ public class Study extends AbstractModel
     }
 
     @Override
-    @NotEmpty(message = "{Study.nameShort.NotEmpty}")
-    @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
-    public String getNameShort() {
-        return this.nameShort;
+    @Column(name = "DESCRIPTION")
+    public String getDescription() {
+        return this.description;
     }
 
     @Override
-    public void setNameShort(String nameShort) {
-        this.nameShort = nameShort;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @NotNull(message = "{Study.enabled.NotNull}")

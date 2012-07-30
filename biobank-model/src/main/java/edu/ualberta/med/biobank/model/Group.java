@@ -17,10 +17,10 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
-@DiscriminatorValue("BbGroup")
+@DiscriminatorValue("Group")
 @Unique(properties = "name", groups = PrePersist.class)
 public class Group extends Principal
-    implements HasName {
+    implements HasName, HasDescription {
     public static final NameComparator NAME_COMPARATOR = new NameComparator();
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public class Group extends Principal
     private String description;
 
     @Override
-    @NotEmpty(message = "{BbGroup.name.NotEmpty}")
+    @NotEmpty(message = "{Group.name.NotEmpty}")
     @Column(name = "NAME", unique = true)
     public String getName() {
         return this.name;
@@ -54,9 +54,7 @@ public class Group extends Principal
         this.name = name;
     }
 
-    // TODO: enforce this again, someday
-    // @NotEmpty(message =
-    // "{edu.ualberta.med.biobank.model.BbGroup.description.NotEmpty}")
+    @NotEmpty(message = "{Group.description.NotEmpty}")
     @Column(name = "DESCRIPTION")
     public String getDescription() {
         return this.description;

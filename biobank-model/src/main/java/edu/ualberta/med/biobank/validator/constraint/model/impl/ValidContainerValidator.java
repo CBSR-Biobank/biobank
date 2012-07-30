@@ -39,7 +39,7 @@ public class ValidContainerValidator
 
     private boolean checkParent(Container container,
         ConstraintValidatorContext context) {
-        if (container.getContainerType().getTopLevel()) {
+        if (container.getContainerType().isTopLevel()) {
             if (container.getPosition() != null) {
                 context.buildConstraintViolationWithTemplate(ILLEGAL_PARENT)
                     .addNode("position")

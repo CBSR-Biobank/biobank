@@ -29,11 +29,6 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
-/**
- * An abstract class that represents either a collection location, a research
- * location, or repository site. See \ref Clinic, \ref Site and \ref
- * ResearchGroup.
- */
 @Audited
 @Entity
 @Table(name = "CENTER")
@@ -41,8 +36,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @DiscriminatorColumn(name = "DISCRIMINATOR",
     discriminatorType = DiscriminatorType.STRING)
 @Unique.List({
-    @Unique(properties = "name", groups = PrePersist.class),
-    @Unique(properties = "nameShort", groups = PrePersist.class)
+    @Unique(properties = "name", groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = ProcessingEvent.class, property = "center", groups = PreDelete.class),
@@ -52,7 +46,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = ContainerType.class, property = "center", groups = PreDelete.class)
 })
 public class Center extends AbstractModel
-    implements HasName, HasNameShort, HasComments, HasAddress {
+    implements HasName, HasDescription, HasComments, HasAddress {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -73,14 +67,25 @@ public class Center extends AbstractModel
     }
 
     private String name;
-    private String nameShort;
+    private String description;
     private Address address = new Address();
-    private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean enabled;
+    private Set<Comment> comments = new HashSet<Comment>(0);
+
+    @Override
+    @Column(name = "DESCRIPTION")
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     @NotEmpty(message = "{Center.name.NotEmpty}")
-    @Column(name = "NAME", unique = true, nullable = false)
+    @Column(name = "NAME", unique = true, nullable = false, length = 50)
     public String getName() {
         return this.name;
     }
@@ -88,18 +93,6 @@ public class Center extends AbstractModel
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    @NotEmpty(message = "{Center.nameShort.NotEmpty}")
-    @Column(name = "NAME_SHORT", unique = true, nullable = false, length = 50)
-    public String getNameShort() {
-        return this.nameShort;
-    }
-
-    @Override
-    public void setNameShort(String nameShort) {
-        this.nameShort = nameShort;
     }
 
     @Override

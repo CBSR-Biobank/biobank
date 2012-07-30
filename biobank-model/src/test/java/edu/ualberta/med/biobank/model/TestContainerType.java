@@ -8,16 +8,7 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
-import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
-import edu.ualberta.med.biobank.AssertMore;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
@@ -79,7 +70,7 @@ public class TestContainerType extends DbTest {
 
         factory.createCenter();
         ContainerType duplicate = factory.createContainerType();
-        duplicate.setNameShort(original.getNameShort());
+        duplicate.setName(original.getName());
 
         try {
             session.update(duplicate);
@@ -95,7 +86,7 @@ public class TestContainerType extends DbTest {
     public void duplicateSiteAndNameShort() {
         ContainerType original = factory.createContainerType();
         ContainerType duplicate = factory.createContainerType();
-        duplicate.setNameShort(original.getNameShort());
+        duplicate.setName(original.getName());
 
         try {
             session.update(duplicate);
@@ -350,7 +341,7 @@ public class TestContainerType extends DbTest {
 
         try {
             ContainerType topCt = topContainer.getContainerType();
-            topCt.setTopLevel(!topCt.getTopLevel());
+            topCt.setTopLevel(!topCt.isTopLevel());
             session.update(topCt);
             session.flush();
             Assert.fail("cannot change topLevel if children exist");
@@ -406,7 +397,7 @@ public class TestContainerType extends DbTest {
 
         try {
             ContainerType topCt = topContainer.getContainerType();
-            topCt.setTopLevel(!topCt.getTopLevel());
+            topCt.setTopLevel(!topCt.isTopLevel());
             session.update(topCt);
             session.flush();
             Assert.fail("cannot change topLevel if children exist");

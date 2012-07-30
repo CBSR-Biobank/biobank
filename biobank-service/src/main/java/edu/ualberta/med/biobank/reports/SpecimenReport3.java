@@ -94,7 +94,7 @@ public class SpecimenReport3 extends AbstractReport {
                     .getPnumber();
                 String inventoryId = specimen.getInventoryId();
                 Date dateDrawn = specimen.getTopSpecimen().getTimeCreated();
-                String specimenType = specimen.getSpecimenType().getNameShort();
+                String specimenType = specimen.getSpecimenType().getName();
                 String positionString = specimen.getSpecimenPosition()
                     .getContainer().getLabel()
                     + specimen.getSpecimenPosition().getPositionString();

@@ -10,13 +10,11 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
-import edu.ualberta.med.biobank.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.permission.specimen.SpecimenLinkPermission;
 
 public class SpecimenLinkSaveAction implements
     Action<ListResult<AliquotedSpecimenResInfo>> {
@@ -112,14 +110,14 @@ public class SpecimenLinkSaveAction implements
             res.inventoryId = specimen.getInventoryId();
             res.typeName = specimen.getSpecimenType().getName();
             res.parentTypeName = specimen.getParentSpecimen().getSpecimenType()
-                .getNameShort();
+                .getName();
             res.parentInventoryId = specimen.getParentSpecimen()
                 .getInventoryId();
             res.patientPNumber = specimen.getParentSpecimen()
                 .getCollectionEvent().getPatient().getPnumber();
             res.visitNumber = specimen.getParentSpecimen().getCollectionEvent()
                 .getVisitNumber().toString();
-            res.currentCenterName = specimen.getCurrentCenter().getNameShort();
+            res.currentCenterName = specimen.getCurrentCenter().getName();
             res.position = SpecimenActionHelper.getPositionString(specimen,
                 true, false);
             resList.add(res);
