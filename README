@@ -7,6 +7,11 @@ GIT REPOSITORY LOCATION
 BBPDB EXPORT
   - use Bullzip Access to MySQL to export data to MySQL
 
+INSTALL GETTEXT
+  Gettext is used for i18n, it must be installed.
+
+  sudo apt-get install gettext
+
 INSTALL ADDITIONAL MAVEN LIBRARIES
   Maven repositories do not exist for the following jars and must be installed
   locally.

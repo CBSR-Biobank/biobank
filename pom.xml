@@ -28,6 +28,16 @@
     </repository>
   </repositories>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>gettext-commons-site</id>
+      <url>http://gettext-commons.googlecode.com/svn/maven-repository/</url>
+      <releases>
+        <updatePolicy>daily</updatePolicy>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <pluginManagement>
       <plugins>

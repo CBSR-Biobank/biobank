@@ -1,5 +1,5 @@
 target/
-po/output
+/po/output
 *sublime*
 .settings
 .options
