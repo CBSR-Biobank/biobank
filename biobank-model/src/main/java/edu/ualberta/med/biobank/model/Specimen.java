@@ -251,8 +251,4 @@ public class Specimen extends AbstractModel
     public void setParentSpecimen(Specimen parentSpecimen) {
         this.parentSpecimen = parentSpecimen;
     }
-
-    public Set<SpecimenAttribute> getAttributes() {
-        return null;
-    }
 }
