@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-class Template implements Serializable {
+public class Template implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected final Bundle bundle;

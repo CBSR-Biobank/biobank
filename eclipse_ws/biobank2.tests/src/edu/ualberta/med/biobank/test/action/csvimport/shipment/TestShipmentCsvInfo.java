@@ -17,9 +17,13 @@ import edu.ualberta.med.biobank.common.action.csvimport.shipment.ShipmentCsvImpo
 import edu.ualberta.med.biobank.common.action.csvimport.shipment.ShipmentCsvInfo;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.csvimport.AssertCsvImportException;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.test.action.csvimport.specimen.TestSpecimenCsvImport;
 
@@ -78,6 +82,92 @@ public class TestShipmentCsvInfo extends ActionTest {
         }
 
         checkCsvInfoAgainstDb(csvInfos);
+    }
+
+    @Test
+    public void badSendingCenter() throws IOException {
+        // create a new shipping method
+        Set<ShippingMethod> shippingMethods =
+            new HashSet<ShippingMethod>();
+        shippingMethods.add(factory.createShippingMethod());
+
+        tx.commit();
+
+        // do not persist this clinic to the database
+        Clinic badClinic = new Clinic();
+        badClinic.setNameShort(factory.getNameGenerator().next(Center.class));
+
+        Set<ShipmentCsvInfo> csvInfos = shipmentCsvHelper.createShipments(
+            badClinic, factory.getDefaultSite(), shippingMethods, 1);
+        ShipmentCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            ShipmentCsvImportAction importAction =
+                new ShipmentCsvImportAction(CSV_NAME);
+            exec(importAction);
+            Assert.fail("errors should have been reported in CVS data");
+        } catch (CsvImportException e) {
+            new AssertCsvImportException()
+                .withMessage(ShipmentCsvImportAction.CSV_SENDING_CENTER_ERROR
+                    .format(badClinic.getNameShort()));
+        }
+    }
+
+    @Test
+    public void badReceivingCenter() throws IOException {
+        // create a new shipping method
+        Set<ShippingMethod> shippingMethods =
+            new HashSet<ShippingMethod>();
+        shippingMethods.add(factory.createShippingMethod());
+
+        tx.commit();
+
+        // do not persist this clinic to the database
+        Site badSite = new Site();
+        badSite.setNameShort(factory.getNameGenerator().next(Center.class));
+
+        Set<ShipmentCsvInfo> csvInfos = shipmentCsvHelper.createShipments(
+            factory.getDefaultClinic(), badSite, shippingMethods, 1);
+        ShipmentCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            ShipmentCsvImportAction importAction =
+                new ShipmentCsvImportAction(CSV_NAME);
+            exec(importAction);
+            Assert.fail("errors should have been reported in CVS data");
+        } catch (CsvImportException e) {
+            new AssertCsvImportException()
+                .withMessage(ShipmentCsvImportAction.CSV_RECEIVING_CENTER_ERROR
+                    .format(badSite.getNameShort()));
+        }
+    }
+
+    @Test
+    public void badShippingMethods() throws IOException {
+        tx.commit();
+
+        // create new shipping methods but do not persist them
+        // to the database
+        ShippingMethod badShippingMethod =
+            shipmentCsvHelper.getNewShippingMethod();
+        Set<ShippingMethod> shippingMethods = new HashSet<ShippingMethod>();
+        shippingMethods.add(badShippingMethod);
+
+        Set<ShipmentCsvInfo> csvInfos =
+            shipmentCsvHelper.createShipments(factory.getDefaultClinic(),
+                factory.getDefaultSite(), shippingMethods, 1);
+        ShipmentCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            ShipmentCsvImportAction importAction =
+                new ShipmentCsvImportAction(CSV_NAME);
+            exec(importAction);
+            Assert.fail("errors should have been reported in CVS data");
+        } catch (CsvImportException e) {
+            new AssertCsvImportException()
+                .withMessage(ShipmentCsvImportAction.CSV_SHIPPING_METHOD_ERROR
+                    .format(badShippingMethod.getName())).assertIn(e);
+        }
     }
 
     private void checkCsvInfoAgainstDb(Set<ShipmentCsvInfo> csvInfos) {

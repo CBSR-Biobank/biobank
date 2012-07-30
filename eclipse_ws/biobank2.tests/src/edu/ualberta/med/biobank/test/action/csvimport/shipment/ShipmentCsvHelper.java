@@ -34,4 +34,11 @@ class ShipmentCsvHelper {
         }
         return csvInfos;
     }
+
+    ShippingMethod getNewShippingMethod() {
+        String name = nameGenerator.next(ShippingMethod.class);
+        ShippingMethod shippingMethod = new ShippingMethod();
+        shippingMethod.setName(name);
+        return shippingMethod;
+    }
 }
