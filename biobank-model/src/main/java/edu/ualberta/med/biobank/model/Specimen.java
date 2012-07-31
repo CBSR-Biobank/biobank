@@ -86,10 +86,9 @@ public class Specimen extends AbstractModel
 
     private String inventoryId;
     private BigDecimal quantity;
+    private SpecimenTree familyTree;
     private Date timeCreated;
-    private Specimen topSpecimen = this;
     private Specimen parentSpecimen;
-    private CollectionEvent collectionEvent;
     private Boolean sourceSpecimen;
     private StudyCenter originCenter;
     private StudyCenter currentCenter;
@@ -129,25 +128,15 @@ public class Specimen extends AbstractModel
         this.timeCreated = timeCreated;
     }
 
+    @NotNull(message = "{Specimen.familyTree.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TOP_SPECIMEN_ID")
-    public Specimen getTopSpecimen() {
-        return this.topSpecimen;
+    @Column(name = "SPECIMEN_TREE_ID", nullable = false)
+    public SpecimenTree getFamilyTree() {
+        return familyTree;
     }
 
-    public void setTopSpecimen(Specimen topSpecimen) {
-        this.topSpecimen = topSpecimen;
-    }
-
-    @NotNull(message = "{Specimen.collectionEvent.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
-    public CollectionEvent getCollectionEvent() {
-        return this.collectionEvent;
-    }
-
-    public void setCollectionEvent(CollectionEvent collectionEvent) {
-        this.collectionEvent = collectionEvent;
+    public void setFamilyTree(SpecimenTree familyTree) {
+        this.familyTree = familyTree;
     }
 
     @NotNull(message = "{Specimen.currentCenter.NotNull}")
