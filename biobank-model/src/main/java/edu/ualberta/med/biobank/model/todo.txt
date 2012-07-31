@@ -86,6 +86,7 @@
 [ ] Aaron would like the sample-type restriction to be able to be assigned at any level
 	(e.g. freezer, hotel, pallet)
 [ ] *Server API should have multiple versions that we support? *shudder*
+[ ] Specimen should have an amount and unit (e.g. volume, mass, punches remaining?, etc.)?
 
 * requires thought/ feedback
 
@@ -101,3 +102,13 @@ THOUGHTS ON: DYNAMIC-ISH CONTAINER TYPES
 
 - have different naming stategies, e.g. enumerated (just a list) and 2d? Then centers can create
 their own naming scheme that uses a (code-based) strategy?
+
+QUESTIONS FOR TECHS/ BRUCE
+
+Q1: Can a specimen ever be part of no study?
+	Can a specimen be part of more than one study?
+	Can a specimen move to a different study?
+
+Q2: Can a specimen have more than one parent?
+	From more than one patient?
+	From more than one collection event?
