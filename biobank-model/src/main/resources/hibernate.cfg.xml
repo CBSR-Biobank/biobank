@@ -21,7 +21,6 @@
         <property name="connection.username">dummy</property>
         <property name="connection.password">ozzy498</property>
 
-		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
 		<property name="c3p0.timeout">5000</property>
