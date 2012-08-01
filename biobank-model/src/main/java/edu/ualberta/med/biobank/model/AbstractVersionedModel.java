@@ -34,6 +34,7 @@ public abstract class AbstractVersionedModel
     }
 
     @Override
+    @Column(name = "TIME_UPDATED")
     public Date getTimeUpdated() {
         return timeUpdated;
     }

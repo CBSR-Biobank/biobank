@@ -130,7 +130,7 @@ public class Specimen extends AbstractModel
 
     @NotNull(message = "{Specimen.familyTree.NotNull")
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "SPECIMEN_TREE_ID", nullable = false)
+    @JoinColumn(name = "SPECIMEN_TREE_ID", nullable = false)
     public SpecimenTree getFamilyTree() {
         return familyTree;
     }

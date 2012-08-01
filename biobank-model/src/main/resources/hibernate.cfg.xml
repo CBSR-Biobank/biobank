@@ -104,6 +104,8 @@
 		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenTree" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenTreePatient" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
