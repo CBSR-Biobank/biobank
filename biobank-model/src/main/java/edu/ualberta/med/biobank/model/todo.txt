@@ -87,6 +87,10 @@
 	(e.g. freezer, hotel, pallet)
 [ ] *Server API should have multiple versions that we support? *shudder*
 [ ] Specimen should have an amount and unit (e.g. volume, mass, punches remaining?, etc.)?
+[v] Specimen-s should have a SpecimenTree for their family, which has the Patient and
+	then can have a single CollectionEvent.
+[ ] Study-s can have an share Protocol-s. Protocol-s could be independently managed or
+	owned by a single Study?
 
 * requires thought/ feedback
 
