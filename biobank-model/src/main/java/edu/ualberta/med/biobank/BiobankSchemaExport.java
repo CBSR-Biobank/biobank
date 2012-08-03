@@ -54,8 +54,8 @@ public class BiobankSchemaExport {
      */
     private void dropDatabase(String name) throws SQLException {
         Statement stmt = dbCon.createStatement();
-        stmt.execute("DROP DATABASE " + name + ";");
-        stmt.execute("CREATE DATABASE " + name + ";");
+        // stmt.execute("DROP DATABASE " + name + ";");
+        // stmt.execute("CREATE DATABASE " + name + ";");
 
     }
 
