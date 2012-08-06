@@ -208,6 +208,34 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @Test
+    public void onlyChildSpecimensNoCollectionEvent() throws Exception {
+        Patient patient = factory.createPatient();
+
+        factory.createSpecimenType();
+        AliquotedSpecimen aliquotedSpecimen =
+            factory.createAliquotedSpecimen();
+
+        tx.commit();
+
+        Set<SpecimenCsvInfo> csvInfos = new HashSet<SpecimenCsvInfo>();
+        csvInfos.add(
+            specimenCsvHelper.aliquotedSpecimenCreate(null,
+                aliquotedSpecimen.getSpecimenType().getName(),
+                patient.getPnumber(), 1));
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(factory.getDefaultSite(), CSV_NAME);
+            exec(importAction);
+            Assert
+                .fail("should not be allowed to create aliquot specimens with no collection events");
+        } catch (CsvImportException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
     public void missingPatient() {
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());

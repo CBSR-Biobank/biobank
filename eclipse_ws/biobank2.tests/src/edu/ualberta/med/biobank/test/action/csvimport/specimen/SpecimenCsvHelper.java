@@ -138,7 +138,7 @@ class SpecimenCsvHelper {
                 SpecimenCsvInfo specimenInfo =
                     aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
                         as.getSpecimenType().getName(),
-                        parentSpecimenInfo.getValue());
+                        parentSpecimenInfo.getValue(), 1);
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -147,25 +147,26 @@ class SpecimenCsvHelper {
     }
 
     private SpecimenCsvInfo sourceSpecimenCreate(
-        String specimenTypeName,
-        String patientNumber, String waybill) {
+        String specimenTypeName, String patientNumber, String waybill) {
         SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
-            null, specimenTypeName, patientNumber);
+            null, specimenTypeName, patientNumber, 1);
         specimenInfo.setWaybill(waybill);
         specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
         specimenInfo.setSourceSpecimen(true);
         return specimenInfo;
     }
 
-    private SpecimenCsvInfo aliquotedSpecimenCreate(
-        String parentInventoryId, String specimenTypeName, String patientNumber) {
+    public SpecimenCsvInfo aliquotedSpecimenCreate(
+        String parentInventoryId, String specimenTypeName,
+        String patientNumber,
+        int visitNumber) {
         SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
         specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
         specimenInfo.setPatientNumber(patientNumber);
-        specimenInfo.setVisitNumber(1);
+        specimenInfo.setVisitNumber(visitNumber);
         return specimenInfo;
     }
 }
