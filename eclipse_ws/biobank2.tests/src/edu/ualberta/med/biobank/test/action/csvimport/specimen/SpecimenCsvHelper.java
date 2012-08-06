@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -151,7 +152,7 @@ class SpecimenCsvHelper {
         SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
             null, specimenTypeName, patientNumber);
         specimenInfo.setWaybill(waybill);
-        specimenInfo.setWorksheet(nameGenerator.next(String.class));
+        specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
         specimenInfo.setSourceSpecimen(true);
         return specimenInfo;
     }
@@ -159,7 +160,7 @@ class SpecimenCsvHelper {
     private SpecimenCsvInfo aliquotedSpecimenCreate(
         String parentInventoryId, String specimenTypeName, String patientNumber) {
         SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-        specimenInfo.setInventoryId(nameGenerator.next(String.class));
+        specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
