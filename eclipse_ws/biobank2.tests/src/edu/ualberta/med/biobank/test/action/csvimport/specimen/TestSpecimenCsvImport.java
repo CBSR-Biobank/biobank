@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.csvimport.AssertCsvImportException;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 
 /**
@@ -231,44 +233,44 @@ public class TestSpecimenCsvImport extends ActionTest {
             Assert
                 .fail("should not be allowed to create aliquot specimens with no collection events");
         } catch (CsvImportException e) {
-            CsvUtil.showErrorsInLog(log, e);
+            new AssertCsvImportException()
+                .withMessage(SpecimenCsvImportAction.CSV_CEVENT_ERROR
+                    .format());
         }
     }
 
     @Test
-    public void missingPatient() {
+    public void missingPatient() throws IOException {
         Set<Patient> patients = new HashSet<Patient>();
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
-        patients.add(factory.createPatient());
+        Patient patient = factory.createPatient();
+        patients.add(patient);
 
         Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
-        sourceSpecimens.add(factory.createSourceSpecimen());
-        sourceSpecimens.add(factory.createSourceSpecimen());
         sourceSpecimens.add(factory.createSourceSpecimen());
 
         Set<AliquotedSpecimen> aliquotedSpecimens =
             new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
-        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
         tx.commit();
 
-        try {
-            Set<SpecimenCsvInfo> csvInfo =
-                specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
-                    originInfos, patients);
-            SpecimenCsvWriter.write(CSV_NAME, csvInfo);
+        Set<SpecimenCsvInfo> csvInfos =
+            specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
+                originInfos, patients);
+        // set all patient numbers to null
+        for (SpecimenCsvInfo csvInfo : csvInfos) {
+            csvInfo.setPatientNumber("");
+        }
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
+        try {
             SpecimenCsvImportAction importAction =
                 new SpecimenCsvImportAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
-            Assert.fail("errors in CVS data");
-            CsvUtil.showErrorsInLog(log, e);
-        } catch (Exception e) {
-            Assert.fail("could not import data");
+            Assert
+                .fail("should not be allowed to import spcecimens when patient number is missing");
+        } catch (IllegalStateException e) {
+
         }
     }
 
