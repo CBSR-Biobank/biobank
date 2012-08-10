@@ -58,7 +58,6 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
-    @SuppressWarnings("unused")
     void setContainerType(ContainerType containerType) {
     }
 
@@ -70,7 +69,7 @@ public class SpecimenPosition extends AbstractPosition {
         return this.specimen;
     }
 
-    void setSpecimen(Specimen specimen) {
+    public void setSpecimen(Specimen specimen) {
         this.specimen = specimen;
     }
 
@@ -101,7 +100,6 @@ public class SpecimenPosition extends AbstractPosition {
             : null;
     }
 
-    @SuppressWarnings("unused")
     void setSpecimenType(SpecimenType specimenType) {
     }
 

@@ -16,7 +16,8 @@ import org.hibernate.envers.Audited;
 /**
  * Represents a directional parent-child relationship between two
  * {@link Specimen}s so that a {@link Specimen} can have multiple parents and
- * multiple children.
+ * multiple children. However, note that a parent-child relationship can only
+ * exist between two {@link Specimen}s from the same {@link Patient}.
  * 
  * @author Jonathan Ferland
  * @see {@link SpecimenPath}
@@ -30,6 +31,7 @@ public class SpecimenLink implements Serializable {
     private LinkId id;
     private Specimen parent;
     private Specimen child;
+    private Patient patient;
 
     // TODO: consider ProcessingEvents
 
@@ -64,6 +66,23 @@ public class SpecimenLink implements Serializable {
 
     public void setChild(Specimen child) {
         this.child = child;
+    }
+
+    /**
+     * Necessary read-only property to ensure that a {@link SpecimenLink} can
+     * only exist between a {@link #getParent()} and {@link #getChild()} with
+     * the same {@link Specimen#getPatient()}.
+     * 
+     * @return
+     */
+    @NotNull(message = "{SpecimenLink.patient.NotNull}")
+    @ManyToOne
+    @JoinColumn(name = "PATIENT_ID", nullable = false)
+    Patient getPatient() {
+        return null; // TODO: parent.getPatient();
+    }
+
+    void setPatient(Patient patient) {
     }
 
     @Embeddable

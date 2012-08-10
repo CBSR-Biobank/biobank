@@ -49,19 +49,9 @@ public class Patient extends AbstractModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
 
-    private String pnumber;
     private Study study;
+    private String pnumber;
     private Set<Comment> comments = new HashSet<Comment>(0);
-
-    @NotEmpty(message = "{Patient.pnumber.NotEmpty}")
-    @Column(name = "PNUMBER", nullable = false, length = 100)
-    public String getPnumber() {
-        return this.pnumber;
-    }
-
-    public void setPnumber(String pnumber) {
-        this.pnumber = pnumber;
-    }
 
     @NotNull(message = "{Patient.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -72,6 +62,16 @@ public class Patient extends AbstractModel
 
     public void setStudy(Study study) {
         this.study = study;
+    }
+
+    @NotEmpty(message = "{Patient.pnumber.NotEmpty}")
+    @Column(name = "PNUMBER", nullable = false, length = 100)
+    public String getPnumber() {
+        return this.pnumber;
+    }
+
+    public void setPnumber(String pnumber) {
+        this.pnumber = pnumber;
     }
 
     @Override

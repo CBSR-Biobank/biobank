@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,17 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Digits;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -44,59 +39,23 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @NotUsed.List({
-    @NotUsed(by = Specimen.class, property = "parentSpecimen", groups = PreDelete.class),
     @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class),
     @NotUsed(by = RequestSpecimen.class, property = "specimen", groups = PreDelete.class)
 })
 public class Specimen extends AbstractModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
-
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Specimen",
-        "Specimens");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString INVENTORY_ID = bundle.trc(
-            "model",
-            "Inventory Id").format();
-        public static final LString CHILD_SPECIMENS = bundle.trc(
-            "model",
-            "Child Specimens").format();
-        public static final LString CURRENT_CENTER = bundle.trc(
-            "model",
-            "Current Center").format();
-        public static final LString CREATED_AT = bundle.trc(
-            "model",
-            "Created At").format();
-        public static final LString PARENT_SPECIMEN = bundle.trc(
-            "model",
-            "Parent Specimen").format();
-        public static final LString QUANTITY = bundle.trc(
-            "model",
-            "Quantity").format();
-        public static final LString TOP_SPECIMEN = bundle.trc(
-            "model",
-            "Top Specimen").format();
-    }
 
     private String inventoryId;
-    private BigDecimal quantity;
-    private SpecimenTree familyTree;
+    private Vessel vessel;
     private Date timeCreated;
-    private Specimen parentSpecimen;
+    private SpecimenGroup group;
+    private Amount amount;
     private Boolean sourceSpecimen;
     private StudyCenter originCenter;
     private StudyCenter currentCenter;
-    private SpecimenType specimenType;
-    private SpecimenPosition specimenPosition;
-    private ProcessingEvent processingEvent;
-    private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean usable;
+    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -108,14 +67,14 @@ public class Specimen extends AbstractModel
         this.inventoryId = inventoryId;
     }
 
-    @Digits(integer = 10, fraction = 10, message = "{Specimen.quantity.Digits}")
-    @Column(name = "QUANTITY", precision = 10, scale = 10)
-    public BigDecimal getQuantity() {
-        return this.quantity;
+    @Valid
+    @NotNull(message = "{Specimen.amount.NotNull}")
+    public Amount getAmount() {
+        return amount;
     }
 
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
+    public void setAmount(Amount amount) {
+        this.amount = amount;
     }
 
     @NotNull(message = "{Specimen.timeCreated.NotNull}")
@@ -126,17 +85,6 @@ public class Specimen extends AbstractModel
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
-    }
-
-    @NotNull(message = "{Specimen.familyTree.NotNull")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_TREE_ID", nullable = false)
-    public SpecimenTree getFamilyTree() {
-        return familyTree;
-    }
-
-    public void setFamilyTree(SpecimenTree familyTree) {
-        this.familyTree = familyTree;
     }
 
     @NotNull(message = "{Specimen.currentCenter.NotNull}")
@@ -171,30 +119,14 @@ public class Specimen extends AbstractModel
         this.sourceSpecimen = sourceSpecimen;
     }
 
-    @NotNull(message = "{Specimen.specimenType.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
-    public SpecimenType getSpecimenType() {
-        return this.specimenType;
+    @NotNull(message = "{Specimen.usable.NotNull}")
+    @Column(name = "IS_USABLE")
+    public Boolean isUsable() {
+        return usable;
     }
 
-    public void setSpecimenType(SpecimenType specimenType) {
-        this.specimenType = specimenType;
-    }
-
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "specimen", orphanRemoval = true)
-    public SpecimenPosition getSpecimenPosition() {
-        return this.specimenPosition;
-    }
-
-    public void setSpecimenPosition(SpecimenPosition specimenPosition) {
-        if (this.specimenPosition != null) {
-            this.specimenPosition.setSpecimen(null);
-        }
-        this.specimenPosition = specimenPosition;
-        if (specimenPosition != null) {
-            specimenPosition.setSpecimen(this);
-        }
+    public void setUsable(Boolean usable) {
+        this.usable = usable;
     }
 
     @Override
@@ -209,35 +141,5 @@ public class Specimen extends AbstractModel
     @Override
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
-    }
-
-    @NotNull(message = "{Specimen.usable.NotNull}")
-    @Column(name = "IS_USABLE")
-    public Boolean isUsable() {
-        return usable;
-    }
-
-    public void setUsable(Boolean usable) {
-        this.usable = usable;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PROCESSING_EVENT_ID")
-    public ProcessingEvent getProcessingEvent() {
-        return this.processingEvent;
-    }
-
-    public void setProcessingEvent(ProcessingEvent processingEvent) {
-        this.processingEvent = processingEvent;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_SPECIMEN_ID")
-    public Specimen getParentSpecimen() {
-        return this.parentSpecimen;
-    }
-
-    public void setParentSpecimen(Specimen parentSpecimen) {
-        this.parentSpecimen = parentSpecimen;
     }
 }
