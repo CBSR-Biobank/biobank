@@ -25,13 +25,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Audited
 @Entity
-@Table(name = "COLLECTION_EVENT",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "PATIENT_ID",
-            "COLLECTION_EVENT_TYPE_ID", "VISIT_NUMBER" })
-    })
+@Table(name = "COLLECTION_EVENT", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "PATIENT_ID", "COLLECTION_EVENT_TYPE_ID",
+        "VISIT_NUMBER" })
+})
 @Unique(properties = { "patient", "type", "visitNumber" }, groups = PrePersist.class)
-@NotUsed(by = Specimen.class, property = "collectionEvent", groups = PreDelete.class)
+@NotUsed(by = SpecimenToCollectionEvent.class, property = "visit", groups = PreDelete.class)
 public class CollectionEvent extends AbstractModel
     implements HasComments {
     private static final long serialVersionUID = 1L;

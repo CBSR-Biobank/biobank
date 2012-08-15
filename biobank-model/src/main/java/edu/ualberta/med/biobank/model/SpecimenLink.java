@@ -16,8 +16,7 @@ import org.hibernate.envers.Audited;
 /**
  * Represents a directional parent-child relationship between two
  * {@link Specimen}s so that a {@link Specimen} can have multiple parents and
- * multiple children. However, note that a parent-child relationship can only
- * exist between two {@link Specimen}s from the same {@link Patient}.
+ * multiple children.
  * 
  * @author Jonathan Ferland
  * @see {@link SpecimenPath}
@@ -28,19 +27,18 @@ import org.hibernate.envers.Audited;
 public class SpecimenLink implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private LinkId id;
+    private SpecimenLinkId id;
     private Specimen parent;
     private Specimen child;
-    private Patient patient;
 
     // TODO: consider ProcessingEvents
 
     @EmbeddedId
-    public LinkId getId() {
+    public SpecimenLinkId getId() {
         return id;
     }
 
-    public void setId(LinkId id) {
+    public void setId(SpecimenLinkId id) {
         this.id = id;
     }
 
@@ -68,25 +66,9 @@ public class SpecimenLink implements Serializable {
         this.child = child;
     }
 
-    /**
-     * Necessary read-only property to ensure that a {@link SpecimenLink} can
-     * only exist between a {@link #getParent()} and {@link #getChild()} with
-     * the same {@link Specimen#getPatient()}.
-     * 
-     * @return
-     */
-    @NotNull(message = "{SpecimenLink.patient.NotNull}")
-    @ManyToOne
-    @JoinColumn(name = "PATIENT_ID", nullable = false)
-    Patient getPatient() {
-        return null; // TODO: parent.getPatient();
-    }
-
-    void setPatient(Patient patient) {
-    }
-
     @Embeddable
-    public static class LinkId implements Serializable {
+    public static class SpecimenLinkId
+        implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private Integer parentId;
@@ -124,7 +106,7 @@ public class SpecimenLink implements Serializable {
             if (this == obj) return true;
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
-            LinkId other = (LinkId) obj;
+            SpecimenLinkId other = (SpecimenLinkId) obj;
             if (childId == null) {
                 if (other.childId != null) return false;
             } else if (!childId.equals(other.childId)) return false;

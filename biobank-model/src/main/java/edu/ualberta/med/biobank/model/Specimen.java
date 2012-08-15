@@ -51,7 +51,6 @@ public class Specimen extends AbstractModel
     private Date timeCreated;
     private SpecimenGroup group;
     private Amount amount;
-    private Boolean sourceSpecimen;
     private StudyCenter originCenter;
     private StudyCenter currentCenter;
     private Boolean usable;
@@ -107,16 +106,6 @@ public class Specimen extends AbstractModel
 
     public void setOriginCenter(StudyCenter originCenter) {
         this.originCenter = originCenter;
-    }
-
-    @NotNull(message = "{Specimen.sourceSpecimen.NotNull}")
-    @Column(name = "SOURCE_SPECIMEN")
-    public Boolean isSourceSpecimen() {
-        return sourceSpecimen;
-    }
-
-    public void setSourceSpecimen(Boolean sourceSpecimen) {
-        this.sourceSpecimen = sourceSpecimen;
     }
 
     @NotNull(message = "{Specimen.usable.NotNull}")
