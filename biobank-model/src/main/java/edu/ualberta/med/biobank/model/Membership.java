@@ -68,8 +68,8 @@ public class Membership extends AbstractModel {
     private Domain domain = new Domain();
     private Set<PermissionEnum> permissions = new HashSet<PermissionEnum>(0);
     private Set<Role> roles = new HashSet<Role>(0);
-    private boolean userManager = false;
-    private boolean everyPermission = false;
+    private Boolean userManager;
+    private Boolean everyPermission;
 
     public Membership() {
     }
@@ -124,21 +124,21 @@ public class Membership extends AbstractModel {
     }
 
     @Column(name = "USER_MANAGER")
-    public boolean isUserManager() {
+    public Boolean isUserManager() {
         return userManager;
     }
 
-    public void setUserManager(boolean userManager) {
+    public void setUserManager(Boolean userManager) {
         this.userManager = userManager;
         if (userManager) setEveryPermission(true);
     }
 
     @Column(name = "EVERY_PERMISSION")
-    public boolean isEveryPermission() {
+    public Boolean isEveryPermission() {
         return everyPermission || isUserManager();
     }
 
-    public void setEveryPermission(boolean everyPermission) {
+    public void setEveryPermission(Boolean everyPermission) {
         this.everyPermission = everyPermission;
         if (!everyPermission) setUserManager(false);
     }

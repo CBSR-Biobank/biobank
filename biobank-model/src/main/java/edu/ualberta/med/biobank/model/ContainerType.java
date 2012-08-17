@@ -88,7 +88,7 @@ public class ContainerType extends AbstractModel
 
     private String name;
     private String description;
-    private boolean topLevel = false;
+    private Boolean topLevel;
     private Double defaultTemperature;
     private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypes =
@@ -122,12 +122,13 @@ public class ContainerType extends AbstractModel
         this.name = name;
     }
 
-    @Column(name = "IS_TOP_LEVEL")
-    public boolean isTopLevel() {
+    @NotNull(message = "{ContainerType.topLevel.NotNull}")
+    @Column(name = "IS_TOP_LEVEL", nullable = false)
+    public Boolean isTopLevel() {
         return this.topLevel;
     }
 
-    public void setTopLevel(boolean topLevel) {
+    public void setTopLevel(Boolean topLevel) {
         this.topLevel = topLevel;
     }
 

@@ -74,7 +74,7 @@
 	Dispatch - decide and record outgoing things, then incoming
 	Request - 
 	[ ] Perhaps Shipment references a Manifest with specimens and shipment info?
-[ ] Update boolean primitives to be Boolean objects so can better search by example
+[v] Update boolean primitives to be Boolean objects so can better search by example
 [v] *SpecimenType refactoring
 [ ] *ContainerType refactoring
 [ ] *Think of the SpecimenLog/SpecimenEvent as a list of things being done to specimens,

@@ -63,8 +63,8 @@ public class User extends Principal {
     private Long csmUserId;
     private String fullName;
     private String email;
-    private boolean recvBulkEmails = true;
-    private boolean needPwdChange = true;
+    private Boolean recvBulkEmails;
+    private Boolean needPwdChange;
     private Set<Group> groups = new HashSet<Group>(0);
 
     @NotEmpty(message = "{User.login.NotEmpty}")
@@ -89,11 +89,11 @@ public class User extends Principal {
 
     @Column(name = "RECV_BULK_EMAILS")
     // TODO: rename to isRecvBulkEmails
-    public boolean getRecvBulkEmails() {
+    public Boolean getRecvBulkEmails() {
         return this.recvBulkEmails;
     }
 
-    public void setRecvBulkEmails(boolean recvBulkEmails) {
+    public void setRecvBulkEmails(Boolean recvBulkEmails) {
         this.recvBulkEmails = recvBulkEmails;
     }
 
@@ -118,11 +118,11 @@ public class User extends Principal {
 
     @Column(name = "NEED_PWD_CHANGE")
     // TODO: rename to isRecvBulkEmails
-    public boolean getNeedPwdChange() {
+    public Boolean getNeedPwdChange() {
         return this.needPwdChange;
     }
 
-    public void setNeedPwdChange(boolean needPwdChange) {
+    public void setNeedPwdChange(Boolean needPwdChange) {
         this.needPwdChange = needPwdChange;
     }
 

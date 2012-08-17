@@ -41,8 +41,8 @@ public class Report extends AbstractModel
     private String name;
     private String description;
     private Integer userId;
-    private boolean isPublic;
-    private boolean isCount;
+    private Boolean isPublic;
+    private Boolean isCount;
     private Set<ReportColumn> reportColumns = new HashSet<ReportColumn>(0);
     private Entity entity;
     private Set<ReportFilter> reportFilters = new HashSet<ReportFilter>(0);
@@ -59,11 +59,13 @@ public class Report extends AbstractModel
         this.name = name;
     }
 
+    @Override
     @Column(name = "DESCRIPTION", columnDefinition = "TEXT")
     public String getDescription() {
         return this.description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -78,20 +80,20 @@ public class Report extends AbstractModel
     }
 
     @Column(name = "IS_PUBLIC", nullable = false)
-    public boolean getIsPublic() {
+    public Boolean getIsPublic() {
         return this.isPublic;
     }
 
-    public void setIsPublic(boolean isPublic) {
+    public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
     }
 
     @Column(name = "IS_COUNT", nullable = false)
-    public boolean getIsCount() {
+    public Boolean getIsCount() {
         return this.isCount;
     }
 
-    public void setIsCount(boolean isCount) {
+    public void setIsCount(Boolean isCount) {
         this.isCount = isCount;
     }
 

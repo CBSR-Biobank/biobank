@@ -50,7 +50,7 @@ public class SourceSpecimen extends AbstractModel {
     }
 
     private Study study;
-    private boolean needOriginalVolume = false;
+    private Boolean needOriginalVolume;
     private SpecimenType specimenType;
 
     @NotNull(message = "{AliquotedSpecimen.study.NotNull")
@@ -65,11 +65,11 @@ public class SourceSpecimen extends AbstractModel {
 
     @Column(name = "NEED_ORIGINAL_VOLUME")
     // TODO: rename to isNeedOriginalVolume
-    public boolean getNeedOriginalVolume() {
+    public Boolean getNeedOriginalVolume() {
         return this.needOriginalVolume;
     }
 
-    public void setNeedOriginalVolume(boolean needOriginalVolume) {
+    public void setNeedOriginalVolume(Boolean needOriginalVolume) {
         this.needOriginalVolume = needOriginalVolume;
     }
 

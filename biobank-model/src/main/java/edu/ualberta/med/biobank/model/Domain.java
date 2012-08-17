@@ -40,8 +40,8 @@ public class Domain extends AbstractModel {
 
     private Set<Center> centers = new HashSet<Center>(0);
     private Set<Study> studies = new HashSet<Study>(0);
-    private boolean allCenters = false;
-    private boolean allStudies = false;
+    private Boolean allCenters;
+    private Boolean allStudies;
 
     public Domain() {
     }
@@ -79,28 +79,29 @@ public class Domain extends AbstractModel {
     }
 
     @Column(name = "ALL_CENTERS")
-    public boolean isAllCenters() {
+    public Boolean isAllCenters() {
         return allCenters;
     }
 
-    public void setAllCenters(boolean allCenters) {
+    public void setAllCenters(Boolean allCenters) {
         this.allCenters = allCenters;
         if (allCenters) getCenters().clear();
     }
 
     @Column(name = "ALL_STUDIES")
-    public boolean isAllStudies() {
+    public Boolean isAllStudies() {
         return allStudies;
     }
 
-    public void setAllStudies(boolean allStudies) {
+    public void setAllStudies(Boolean allStudies) {
         this.allStudies = allStudies;
         if (allStudies) getStudies().clear();
     }
 
     @Transient
     public boolean isGlobal() {
-        return isAllCenters() && isAllStudies();
+        return Boolean.TRUE.equals(isAllCenters())
+            && Boolean.TRUE.equals(isAllStudies());
     }
 
     @Transient
@@ -112,7 +113,8 @@ public class Domain extends AbstractModel {
 
     @Transient
     public boolean contains(Center center) {
-        return isAllCenters() || getCenters().contains(center);
+        return Boolean.TRUE.equals(isAllCenters())
+            || getCenters().contains(center);
     }
 
     /**
@@ -125,21 +127,22 @@ public class Domain extends AbstractModel {
      */
     @Transient
     public boolean containsAllCenters(Domain that) {
-        return isAllCenters()
-            || (!that.isAllCenters() && getCenters()
-                .containsAll(that.getCenters()));
+        if (Boolean.TRUE.equals(isAllCenters())) return true;
+        return !Boolean.TRUE.equals(that.isAllCenters())
+            && getCenters().containsAll(that.getCenters());
     }
 
     @Transient
     public boolean contains(Study study) {
-        return isAllStudies() || getStudies().contains(study);
+        return Boolean.TRUE.equals(isAllStudies())
+            || getStudies().contains(study);
     }
 
     @Transient
     public boolean containsAllStudies(Domain that) {
-        return isAllStudies()
-            || (!that.isAllStudies() && getStudies()
-                .containsAll(that.getStudies()));
+        if (Boolean.TRUE.equals(isAllStudies())) return true;
+        return !Boolean.TRUE.equals(that.isAllStudies())
+            && getStudies().containsAll(that.getStudies());
     }
 
     @Transient

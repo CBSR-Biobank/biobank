@@ -39,7 +39,7 @@ public class StudyEventAttr extends AbstractModel {
     }
 
     private String permissible;
-    private boolean required = false;
+    private Boolean required;
     private GlobalEventAttr globalEventAttr;
     private Study study;
     private Boolean enabled;
@@ -55,11 +55,11 @@ public class StudyEventAttr extends AbstractModel {
 
     @Column(name = "REQUIRED")
     // TODO: rename to isRequired
-    public boolean getRequired() {
+    public Boolean getRequired() {
         return this.required;
     }
 
-    public void setRequired(boolean required) {
+    public void setRequired(Boolean required) {
         this.required = required;
     }
 
