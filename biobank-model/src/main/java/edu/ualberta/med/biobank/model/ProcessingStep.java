@@ -19,11 +19,13 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Represents a regularly performed procedure carried out on one or more
- * expected types of {@link Specimen}s. There is also one or more expected
- * resulting types of {@link Specimen}s.
+ * Describes a regularly performed portion of a procedure with a unique name
+ * (within its {@link Study}). There may be several associated
+ * {@link SpecimenProcesingStep}s to further define legal procedures and log
+ * procedures on different types of {@link Specimen}s.
  * 
  * @author Jonathan Ferland
+ * @see SpecimenProcessingStep
  */
 @Audited
 @Entity
