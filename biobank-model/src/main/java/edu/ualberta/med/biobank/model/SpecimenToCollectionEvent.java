@@ -20,7 +20,7 @@ import org.hibernate.envers.Audited;
  * {@link Patient} (e.g. blood directly drawn or urine directly collected).
  * However, it is possible that the directly collected {@link Specimen}s were
  * discarded and/or are not tracked in the system, so the
- * {@link #originalSpecimen} property is used to determine if the
+ * {@link #isOriginalSpecimen()} value is used to determine if the
  * {@link #getSpecimen()} truly was directly collected from the {@link Patient}.
  * <p>
  * {@link Specimen}s can have more than one {@link CollectionEvent}
