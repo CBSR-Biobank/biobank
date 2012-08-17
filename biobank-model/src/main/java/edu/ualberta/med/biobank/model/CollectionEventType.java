@@ -16,6 +16,12 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * A uniquely named (with its {@link Study}) classification of visit to a
+ * {@link Patient}.
+ * 
+ * @author Jonathan Ferland
+ */
 @Audited
 @Entity
 @Table(name = "COLLECTION_EVENT_TYPE",

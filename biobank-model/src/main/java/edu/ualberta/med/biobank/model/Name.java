@@ -19,7 +19,6 @@ public class Name {
 
         // @formatter:off
         tmp.put(Address.class,                  bundle.tr("Address").format());
-        tmp.put(AliquotedSpecimen.class,        bundle.tr("Aliquoted Specimen").format());
         tmp.put(Capacity.class,                 bundle.tr("Capacity").format());
         tmp.put(Center.class,                   bundle.tr("Center").format());
         tmp.put(CollectionEvent.class,          bundle.tr("Collection Event").format());

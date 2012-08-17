@@ -19,9 +19,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @Table(name = "SPECIMEN_TYPE")
 @NotUsed.List({
-    @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class),
-    @NotUsed(by = SourceSpecimen.class, property = "specimenType", groups = PreDelete.class),
-    @NotUsed(by = AliquotedSpecimen.class, property = "specimenType", groups = PreDelete.class)
+    @NotUsed(by = Specimen.class, property = "specimenType", groups = PreDelete.class)
 })
 public class SpecimenType extends AbstractUniquelyNamedModel {
     private static final long serialVersionUID = 1L;
