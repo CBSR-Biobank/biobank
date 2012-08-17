@@ -21,7 +21,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SPECIMEN_POSITION",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "CONTAINER_ID", "ROW", "COL" }) })
-@Unique(properties = { "container", "row", "col" }, groups = PrePersist.class)
+@Unique.List({
+    @Unique(properties = { "container", "row", "col" }, groups = PrePersist.class),
+    @Unique(properties = { "specimen" }, groups = PrePersist.class)
+})
 public class SpecimenPosition extends AbstractPosition {
     private static final long serialVersionUID = 1L;
 

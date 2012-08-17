@@ -28,8 +28,9 @@
 	Q: Are specimens from an organism and aliquots the result of aliquotting?
 	Does "samples" include both? CreatedAt would just be the phyiscal time a
 	sample is created/ drawn (e.g. whenever it's put in its tube).
-[ ] Specimen vs Aliquot objects
-	- see above
+[v] Specimen vs Aliquot objects
+	Q: Represent them as the same object?
+	A: Yes! Otherwise very complicated doubling of relationships, everywhere.
 [ ] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
 	- Yes
 [ ] Attributes
@@ -44,6 +45,8 @@
 	does a center (or study) control which users can work on a given study? 
 	Is that necessary?
 	A: get more feedback from aaron
+	A2: could just have a set of specific studies or default "all studies"
+	on the CenterMembership
 [v] Rename name to description, don't make unique, rename nameShort to name?
 	- Yes
 [ ] Put validation on interfaces to be shared by DTOs and Data model?
