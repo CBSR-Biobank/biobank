@@ -20,15 +20,16 @@ import org.hibernate.envers.Audited;
  * {@link Patient} (e.g. blood directly drawn or urine directly collected).
  * However, it is possible that the directly collected {@link Specimen}s were
  * discarded and/or are not tracked in the system, so the
- * {@link #sourceSpecimen} property is used to determine if the
+ * {@link #originalSpecimen} property is used to determine if the
  * {@link #getSpecimen()} truly was directly collected from the {@link Patient}.
  * <p>
- * {@link Specimen}s can have more than one {@link CollectionEvent} when
+ * {@link Specimen}s can have more than one {@link CollectionEvent}
  * <ol>
- * <li>a {@link Specimen} is associated with {@link CollectionEvent}s from
- * multiple {@link Study}s, or when</li>
- * <li>a {@link Specimen} is associated with multiple {@link CollectionEvent}s
- * from a single {@link Study}, or</li>
+ * <li>when a {@link Specimen} is associated with {@link CollectionEvent}s from
+ * multiple {@link Study}s, or</li>
+ * <li>when a {@link Specimen} is associated with multiple
+ * {@link CollectionEvent}s from a single {@link Study}, probably because it was
+ * not directly collected from a {@link Patient}, or</li>
  * <li>some combination of the above</li>
  * </ol>
  * 
@@ -41,22 +42,22 @@ public class SpecimenToCollectionEvent
     implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private SpecimenToVisitId id;
+    private SpecimenToCollectionEventId id;
     private Specimen specimen;
     private CollectionEvent collectionEvent;
-    private Boolean sourceSpecimen;
+    private Boolean originalSpecimen;
 
     @EmbeddedId
-    public SpecimenToVisitId getId() {
+    public SpecimenToCollectionEventId getId() {
         return id;
     }
 
-    public void setId(SpecimenToVisitId id) {
+    public void setId(SpecimenToCollectionEventId id) {
         this.id = id;
     }
 
     @MapsId("specimenId")
-    @NotNull(message = "{SpecimenToVisit.specimen.NotNull}")
+    @NotNull(message = "{SpecimenToCollectionEvent.specimen.NotNull}")
     @ManyToOne
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
     public Specimen getSpecimen() {
@@ -68,15 +69,15 @@ public class SpecimenToCollectionEvent
     }
 
     @MapsId("collectionEventId")
-    @NotNull(message = "{SpecimenToVisit.visit.NotNull}")
+    @NotNull(message = "{SpecimenToCollectionEvent.collectionEvent.NotNull}")
     @ManyToOne
-    @JoinColumn(name = "VISIT_ID", nullable = false)
-    public CollectionEvent getVisit() {
+    @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
+    public CollectionEvent getCollectionEvent() {
         return collectionEvent;
     }
 
-    public void setVisit(CollectionEvent visit) {
-        this.collectionEvent = visit;
+    public void setVisit(CollectionEvent collectionEvent) {
+        this.collectionEvent = collectionEvent;
     }
 
     /**
@@ -84,14 +85,14 @@ public class SpecimenToCollectionEvent
      *         from the {@link #collectionEvent}'s
      *         {@link CollectionEvent#getPatient()}, otherwise return false.
      */
-    @NotNull(message = "{SpecimenToVisit.sourceSpecimen.NotNull}")
-    @Column(name = "IS_SOURCE_SPECIMEN", nullable = false)
-    public Boolean isSourceSpecimen() {
-        return sourceSpecimen;
+    @NotNull(message = "{SpecimenToCollectionEvent.originalSpecimen.NotNull}")
+    @Column(name = "IS_ORIGINAL_SPECIMEN", nullable = false)
+    public Boolean isOriginalSpecimen() {
+        return originalSpecimen;
     }
 
-    public void setSourceSpecimen(Boolean sourceSpecimen) {
-        this.sourceSpecimen = sourceSpecimen;
+    public void setOriginalSpecimen(Boolean originalSpecimen) {
+        this.originalSpecimen = originalSpecimen;
     }
 
     @Override
@@ -122,7 +123,7 @@ public class SpecimenToCollectionEvent
     }
 
     @Embeddable
-    public static class SpecimenToVisitId
+    public static class SpecimenToCollectionEventId
         implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -162,8 +163,8 @@ public class SpecimenToCollectionEvent
             if (this == obj) return true;
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
-            SpecimenToVisitId other =
-                (SpecimenToVisitId) obj;
+            SpecimenToCollectionEventId other =
+                (SpecimenToCollectionEventId) obj;
             if (specimenId == null) {
                 if (other.specimenId != null) return false;
             } else if (!specimenId.equals(other.specimenId)) return false;
