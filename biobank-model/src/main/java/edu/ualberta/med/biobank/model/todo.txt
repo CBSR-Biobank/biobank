@@ -117,9 +117,17 @@ their own naming scheme that uses a (code-based) strategy?
 QUESTIONS FOR TECHS/ BRUCE
 
 Q1: Can a specimen ever be part of no study?
+	A: No
 	Can a specimen be part of more than one study?
+	A: No
 	Can a specimen move to a different study?
+	A: Yes
+	Can data be collected in multiple studies?
+	A: Yes
 
 Q2: Can a specimen have more than one parent?
+	A: Yes
 	From more than one patient?
+	A: Yes, but very unlikely. Parentage study?
 	From more than one collection event?
+	A: Yes, but unlikely
