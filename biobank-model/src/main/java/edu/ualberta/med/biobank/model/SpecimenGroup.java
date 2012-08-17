@@ -65,8 +65,8 @@ public class SpecimenGroup
     }
 
     @NotEmpty(message = "{SpecimenGroup.name.NotEmpty}")
-    @Size(max = 100, message = "{SpecimenGroup.name.Size}")
-    @Column(name = "STUDY_ID", nullable = false, length = 100)
+    @Size(max = 50, message = "{SpecimenGroup.name.Size}")
+    @Column(name = "STUDY_ID", nullable = false, length = 50)
     public String getName() {
         return name;
     }

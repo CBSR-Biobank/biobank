@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 import org.hibernate.envers.Audited;
 
@@ -25,9 +27,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Audited
 @Entity
-@Table(name = "COLLECTION_EVENT", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "PATIENT_ID", "COLLECTION_EVENT_TYPE_ID",
-        "VISIT_NUMBER" })
+@Table(name = "COLLECTION_EVENT", uniqueConstraints = { @UniqueConstraint(
+    columnNames = { "PATIENT_ID", "COLLECTION_EVENT_TYPE_ID", "VISIT_NUMBER" })
 })
 @Unique(properties = { "patient", "type", "visitNumber" }, groups = PrePersist.class)
 @NotUsed(by = SpecimenToCollectionEvent.class, property = "visit", groups = PreDelete.class)
@@ -38,6 +39,7 @@ public class CollectionEvent extends AbstractModel
     private Patient patient;
     private CollectionEventType type;
     private Integer visitNumber;
+    private Date timeDone;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotNull(message = "{CollectionEvent.patient.NotNull}")
@@ -71,6 +73,24 @@ public class CollectionEvent extends AbstractModel
 
     public void setVisitNumber(Integer visitNumber) {
         this.visitNumber = visitNumber;
+    }
+
+    /**
+     * If a {@link CollectionEvent} does not have any associated
+     * {@link Specimen}s, then the time it occurred at must be able to be stored
+     * on the {@link CollectionEvent} itself.
+     * 
+     * @return when this {@link CollectionEvent} occurred.
+     */
+    @NotNull(message = "{CollectionEvent.timeDone.NotNull}")
+    @Past(message = "{CollectionEvent.timeDone.Past}")
+    @Column(name = "TIME_DONE", nullable = false)
+    public Date getTimeDone() {
+        return timeDone;
+    }
+
+    public void setTimeDone(Date timeDone) {
+        this.timeDone = timeDone;
     }
 
     @Override
