@@ -16,6 +16,8 @@ import javax.validation.constraints.Past;
 import org.hibernate.annotations.Index;
 import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.model.type.Amount;
+
 /**
  * This record could be interpreted as a parent-child relationship between two
  * {@link Specimen}s.
