@@ -19,32 +19,34 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Describes a regularly performed portion of a procedure with a unique name
- * (within its {@link Study}). There may be several associated
- * {@link SpecimenProcesingStep}s to further define legal procedures and log
- * procedures on different types of {@link Specimen}s.
+ * Describes a regularly performed procedure with a unique name (within its
+ * {@link Study}). There should be one or more associated
+ * {@link SpecimenProcesingType}s and {@link SpecimenProcesingLinkType}s that
+ * (1) further define legal procedures and (2) allow logging of procedures
+ * performed on different types of {@link Specimen}s.
  * 
  * @author Jonathan Ferland
- * @see SpecimenProcessingStep
+ * @see SpecimenProcessingType
  */
 @Audited
 @Entity
-@Table(name = "PROCESSING_STEP",
+@Table(name = "PROCESSING_TYPE",
     uniqueConstraints = { @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" }) })
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
-@NotUsed(by = SpecimenProcessingStep.class, property = "processingStep", groups = PreDelete.class)
-public class ProcessingStep
+@NotUsed(by = SpecimenProcessingType.class, property = "type", groups = PreDelete.class)
+public class ProcessingType
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;
     private String name;
     private String description;
+    private Boolean enabled;
 
     /**
-     * @return the {@link Study} this {@link ProcessingStep} belongs to.
+     * @return the {@link Study} this {@link ProcessingType} belongs to.
      */
-    @NotNull(message = "{ProcessingStep.study.NotNull}")
+    @NotNull(message = "{ProcessingType.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_ID", nullable = false)
     public Study getStudy() {
@@ -56,11 +58,11 @@ public class ProcessingStep
     }
 
     /**
-     * @return a short name that uniquely identifies a {@link ProcessingStep}
+     * @return a short name that uniquely identifies a {@link ProcessingType}
      *         within a {@link Study}.
      */
-    @NotEmpty(message = "{ProcessingStep.name.NotEmpty")
-    @Size(max = 50, message = "{ProcessingStep.name.Size}")
+    @NotEmpty(message = "{ProcessingType.name.NotEmpty")
+    @Size(max = 50, message = "{ProcessingType.name.Size}")
     @Column(name = "NAME", length = 50, nullable = false)
     public String getName() {
         return name;
@@ -71,10 +73,10 @@ public class ProcessingStep
     }
 
     /**
-     * @return an optional detailed description of the {@link ProcessingStep},
+     * @return an optional detailed description of the {@link ProcessingType},
      *         or null.
      */
-    @Size(max = 10000, message = "{ProcessingStep.description.Size}")
+    @Size(max = 10000, message = "{ProcessingType.description.Size}")
     @Column(name = "DESCRIPTION", length = 10000)
     public String getDescription() {
         return description;
@@ -82,5 +84,19 @@ public class ProcessingStep
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return true if this {@link ProcessingType} is still being performed, or
+     *         false if this {@link ProcessingType} is no longer being carried
+     *         out, but exists for historical and record-keeping purposes.
+     */
+    @NotNull(message = "{ProcessingType.enabled.NotNull}")
+    public Boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }

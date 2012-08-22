@@ -59,13 +59,7 @@ public abstract class AnnotationType
     private Study study;
     private String name;
     private String description;
-    private Boolean enabled; // TODO: replace "enabled" and "required" with a
-                             // links from various types, so can share from
-                             // entity types
-    private Boolean required;
     private Boolean multiValue;
-
-    // TODO: AnnotationOwnerType { SPECIMEN, COLLECTION_EVENT, PATIENT }
 
     /**
      * @return the {@link Study} that this {@link AnnotationType} belongs to.
@@ -107,36 +101,6 @@ public abstract class AnnotationType
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * @return true if this {@link AnnotationType} is still being used and if
-     *         values can still be entered, otherwise false when values cannot
-     *         be entered but this {@link AnnotationType} must be kept for
-     *         historical and record-keeping purposes.
-     */
-    @NotNull(message = "{AnnotationType.enabled.NotNull}")
-    @Column(name = "IS_ENABLED", nullable = false)
-    public Boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     * @return true if this {@link AnnotationType} <em>must</em> be assigned a
-     *         value.
-     */
-    @NotNull(message = "{AnnotationType.required.NotNull}")
-    @Column(name = "IS_REQUIRED", nullable = false)
-    public Boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(Boolean required) {
-        this.required = required;
     }
 
     /**
