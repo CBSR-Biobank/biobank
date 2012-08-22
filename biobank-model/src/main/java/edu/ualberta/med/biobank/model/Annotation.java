@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.FetchType;
@@ -8,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
@@ -20,6 +23,7 @@ public abstract class Annotation
     // TODO: validate, one column must be not-null (and correspond to the Type)
 
     private AnnotationType type;
+    private Date timeAnnotated;
     private String stringValue;
     private Decimal numberValue;
     private AnnotationOption optionId;
@@ -33,6 +37,16 @@ public abstract class Annotation
 
     public void setType(AnnotationType type) {
         this.type = type;
+    }
+
+    @Past
+    @Column(name = "TIME_ANNOTATED")
+    public Date getTimeAnnotated() {
+        return timeAnnotated;
+    }
+
+    public void setTimeAnnotated(Date timeAnnotated) {
+        this.timeAnnotated = timeAnnotated;
     }
 
     @Size(max = 100, message = "{Annotation.stringValue.Size}")
