@@ -84,10 +84,9 @@ public class SpecimenProcessingLink
     }
 
     /**
-     * @return the type of processing that the involed {@link Specimen}s
-     *         underwent.
+     * @return the type of processing that the involved {@link Specimen}s
+     *         underwent, or null if unspecified.
      */
-    @NotNull(message = "{SpecimenProcessingLink.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_PROCESSING_LINK_TYPE_ID", nullable = false)
     public SpecimenProcessingLinkType getType() {
