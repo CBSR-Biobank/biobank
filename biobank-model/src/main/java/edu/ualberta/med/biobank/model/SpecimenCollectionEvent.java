@@ -15,7 +15,9 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 
 /**
- * Joins {@link Specimen}s to {@link CollectionEvent}s. The
+ * Joins {@link Specimen}s to {@link CollectionEvent}s, which provides
+ * generalised parentage information about where {@link Specimen}s came from (
+ * {@link SpecimenProcessingLink} provides much more specific information). The
  * {@link #isOriginalSpecimen()} value is used to determine whether the
  * {@link #getSpecimen()} truly was directly collected from the {@link Patient}
  * (e.g. blood directly drawn or urine directly collected).
@@ -31,6 +33,7 @@ import org.hibernate.envers.Audited;
  * </ol>
  * 
  * @author Jonathan Ferland
+ * @see SpecimenProcessingLink
  */
 @Audited
 @Entity

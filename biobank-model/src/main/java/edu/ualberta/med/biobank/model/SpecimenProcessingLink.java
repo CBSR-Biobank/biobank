@@ -22,8 +22,23 @@ import edu.ualberta.med.biobank.model.type.Amount;
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
  * {@link SpecimenProcessingLinkType}.
+ * <p>
+ * This entity provides more detailed information about the parentage of a
+ * {@link Specimen}, i.e. the {@link #input}-{@link #output} pair could be
+ * considered a parent-child relationship. This is opposed to
+ * {@link CollectionEvent}s, which provide much more general heritage
+ * information. So, special care must be taken to ensure that
+ * {@link SpecimenCollectionEvent} and {@link SpecimenProcessingLink} entities
+ * are consistent. The {@link #output} must be in all the same
+ * {@link CollectionEvent}s as the {@link #input}, but if two {@link Specimen}s
+ * are in the same {@link CollectionEvent} they do <em>not</em> need to be
+ * associated (directly or transitively) through a
+ * {@link SpecimenProcessingLink}. Also note that the {@link #input} does
+ * <em>not</em> need to be in the same {@link CollectionEvent}(s) as the
+ * {@link #output}.
  * 
  * @author Jonathan Ferland
+ * @see SpecimenCollectionEvent
  */
 @Audited
 @Entity
