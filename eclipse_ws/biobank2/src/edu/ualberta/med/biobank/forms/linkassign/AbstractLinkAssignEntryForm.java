@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -49,9 +48,6 @@ public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
-
-    protected static BgcLogger log = BgcLogger
-        .getLogger(AbstractLinkAssignEntryForm.class.getName());
 
     enum Mode {
         SINGLE_NO_POSITION,
@@ -315,8 +311,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Show either single or multiple selection fields
      */
     protected void showModeComposite(Mode mode) {
-        log.debug("showModeComposite: " + mode);
-
         setMode(mode);
         boolean single = mode.isSingleMode();
         widgetCreator.showWidget(singleFieldsComposite, single);
@@ -418,8 +412,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        log.debug("manageDoubleClick");
-
         PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
             .getObjectAtCoordinates(e.x, e.y);
         if (canScanTubeAlone(cell) && isScanTubeAloneMode()) {
@@ -575,8 +567,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * single assign. Display containers
      */
     protected void displaySinglePositions(boolean show) {
-        log.debug("displaySinglePositions: " + show);
-
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {
                 widgetCreator.showWidget(secondSingleParentWidget, show);
@@ -641,10 +631,6 @@ public abstract class AbstractLinkAssignEntryForm extends
     @SuppressWarnings("nls")
     protected void initContainersFromPosition(BgcBaseText positionText,
         boolean isContainerPosition, ContainerTypeWrapper type) {
-        log.debug("initContainersFromPosition: pos=" + positionText.getText()
-            + " isContainerPosition=" + isContainerPosition + " containerType="
-            + ((type == null) ? "null" : type.getName()));
-
         parentContainers = null;
         try {
             parentContainers = null;
@@ -695,8 +681,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      */
     @SuppressWarnings("nls")
     private void initParentContainers(ContainerWrapper bottomContainer) {
-        log.debug("initParentContainers: " + bottomContainer.getLabel());
-
         parentContainers = new ArrayList<ContainerWrapper>();
         ContainerWrapper parent = bottomContainer;
         while (parent != null) {
@@ -725,8 +709,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      */
     protected void checkPositionAndSpecimen(final BgcBaseText inventoryIdField,
         final BgcBaseText positionField) {
-        log.debug("checkPositionAndSpecimen");
-
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @SuppressWarnings("nls")
             @Override
@@ -796,8 +778,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * assign multiple
      */
     protected void showOnlyPallet(boolean onlyPallet) {
-        log.debug("showOnlyPallet: " + onlyPallet);
-
         widgetCreator.showWidget(freezerLabel, !onlyPallet);
         widgetCreator.showWidget(freezerWidget, !onlyPallet);
         widgetCreator.showWidget(hotelLabel, !onlyPallet);
@@ -818,8 +798,6 @@ public abstract class AbstractLinkAssignEntryForm extends
      * assign multiple
      */
     protected void showOnlyPallet(final boolean show, boolean async) {
-        log.debug("showOnlyPallet: show=" + show + " async=" + async);
-
         if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
