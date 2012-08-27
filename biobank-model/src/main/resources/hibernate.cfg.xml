@@ -60,11 +60,12 @@
 		<!-- Mapped classes -->
 		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.Address" />
-		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" />
+		<mapping class="edu.ualberta.med.biobank.model.AnatomicalSource" />
 		<mapping class="edu.ualberta.med.biobank.model.Group" />
 		<mapping class="edu.ualberta.med.biobank.model.Capacity" />
 		<mapping class="edu.ualberta.med.biobank.model.Center" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" />
+		<mapping class="edu.ualberta.med.biobank.model.CollectionEventType" />
 		<mapping class="edu.ualberta.med.biobank.model.Comment" />
 		<mapping class="edu.ualberta.med.biobank.model.Contact" />
 		<mapping class="edu.ualberta.med.biobank.model.Container" />
@@ -82,13 +83,14 @@
 		<mapping class="edu.ualberta.med.biobank.model.EventAttrType" />
 		<mapping class="edu.ualberta.med.biobank.model.GlobalEventAttr" />
 		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" />
-		<mapping class="edu.ualberta.med.biobank.model.Log" />
 		<mapping class="edu.ualberta.med.biobank.model.Membership" />
 		<mapping class="edu.ualberta.med.biobank.model.Patient" />
+		<mapping class="edu.ualberta.med.biobank.model.PreservationType" />
 		<mapping class="edu.ualberta.med.biobank.model.Principal" />
 		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" />
 		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" />
 		<mapping class="edu.ualberta.med.biobank.model.ProcessingEvent" />
+		<mapping class="edu.ualberta.med.biobank.model.ProcessingType" />
 		<mapping class="edu.ualberta.med.biobank.model.PropertyModifier" />
 		<mapping class="edu.ualberta.med.biobank.model.PropertyType" />
 		<mapping class="edu.ualberta.med.biobank.model.ReportColumn" />
@@ -103,14 +105,19 @@
 		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" />
 		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenGroup" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenPosition" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenTree" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenTreePatient" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessing" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLink" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingType" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLinkType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyEventAttr" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyCenter" />
+		<mapping class="edu.ualberta.med.biobank.model.Unit" />
 		<mapping class="edu.ualberta.med.biobank.model.User" />
+		<mapping class="edu.ualberta.med.biobank.model.Vessel" />
 
 		<event type="pre-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />

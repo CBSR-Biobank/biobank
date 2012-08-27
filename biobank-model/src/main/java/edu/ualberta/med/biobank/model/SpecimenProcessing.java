@@ -55,7 +55,7 @@ public class SpecimenProcessing
      *         underwent, or null if unspecified.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "PROCESSING_TYPE_ID")
+    @JoinColumn(name = "PROCESSING_TYPE_ID")
     public SpecimenProcessingType getType() {
         return type;
     }

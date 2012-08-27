@@ -5,13 +5,10 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -44,13 +41,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" })
     })
-@DiscriminatorColumn(name = "DISCRIMINATOR")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
 @NotUsed.List({
-    @NotUsed(by = CollectionEventAnnotation.class, property = "type", groups = PreDelete.class),
-    @NotUsed(by = PatientAnnotation.class, property = "type", groups = PreDelete.class),
-    @NotUsed(by = SpecimenAnnotation.class, property = "type", groups = PreDelete.class)
+    @NotUsed(by = Annotation.class, property = "type", groups = PreDelete.class)
 })
 public abstract class AnnotationType
     extends AbstractVersionedModel {
@@ -59,7 +52,24 @@ public abstract class AnnotationType
     private Study study;
     private String name;
     private String description;
-    private Boolean multiValue;
+    private AnnotationValueType valueType;
+
+    public enum AnnotationValueType {
+        NUMBER("N"),
+        DATE("D"),
+        STRING("S"),
+        OPTIONS("O");
+
+        private final String id;
+
+        private AnnotationValueType(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+    }
 
     /**
      * @return the {@link Study} that this {@link AnnotationType} belongs to.
@@ -103,26 +113,6 @@ public abstract class AnnotationType
         this.description = description;
     }
 
-    /**
-     * @return true if this {@link AnnotationType} is intended to accept
-     *         multiple values, otherwise false.
-     */
-    @NotNull(message = "{AnnotationType.multiValue.NotNull}")
-    @Column(name = "IS_MULTI_VALUE", nullable = false)
-    public Boolean isMultiValue() {
-        return multiValue;
-    }
-
-    public void setMultiValue(Boolean multiValue) {
-        this.multiValue = multiValue;
-    }
-
-    @DiscriminatorValue("STR")
-    public static class StringAnnotationType
-        extends AnnotationType {
-        private static final long serialVersionUID = 1L;
-    }
-
     @DiscriminatorValue("NUM")
     public static class NumberAnnotationType
         extends AnnotationType {
@@ -146,8 +136,22 @@ public abstract class AnnotationType
         extends AnnotationType {
         private static final long serialVersionUID = 1L;
 
+        private Boolean multiValue;
         private Set<AnnotationOption> options =
             new HashSet<AnnotationOption>(0);
+
+        /**
+         * @return true if multiple options can be selected, otherwise false.
+         */
+        @NotNull(message = "{AnnotationType.multiValue.NotNull}")
+        @Column(name = "IS_MULTI_VALUE", nullable = false)
+        public Boolean isMultiValue() {
+            return multiValue;
+        }
+
+        public void setMultiValue(Boolean multiValue) {
+            this.multiValue = multiValue;
+        }
 
         @UniqueElements(properties = { "value" }, groups = PrePersist.class)
         @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

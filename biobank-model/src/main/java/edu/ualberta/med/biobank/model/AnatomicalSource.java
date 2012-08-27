@@ -21,6 +21,6 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "anotomicalSource", groups = PreDelete.class)
 })
-public class AnotomicalSource extends AbstractUniquelyNamedModel {
+public class AnatomicalSource extends AbstractUniquelyNamedModel {
     private static final long serialVersionUID = 1L;
 }

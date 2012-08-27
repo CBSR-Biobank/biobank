@@ -1,32 +1,42 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
+
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
 
-@MappedSuperclass
-public abstract class Annotation
+@Audited
+@Entity
+@Table(name = "ANNOTATION")
+public class Annotation
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     // TODO: validate, one column must be not-null (and correspond to the Type)
+    // TODO: validate multiValue options
 
     private AnnotationType type;
-    private Date timeAnnotated;
     private String stringValue;
     private Decimal numberValue;
-    private AnnotationOption optionId;
+    private Date dateValue;
+    private Set<AnnotationOption> options = new HashSet<AnnotationOption>(0);
 
     @NotNull(message = "{Annotation.type.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
@@ -37,16 +47,6 @@ public abstract class Annotation
 
     public void setType(AnnotationType type) {
         this.type = type;
-    }
-
-    @Past
-    @Column(name = "TIME_ANNOTATED")
-    public Date getTimeAnnotated() {
-        return timeAnnotated;
-    }
-
-    public void setTimeAnnotated(Date timeAnnotated) {
-        this.timeAnnotated = timeAnnotated;
     }
 
     @Size(max = 100, message = "{Annotation.stringValue.Size}")
@@ -69,13 +69,24 @@ public abstract class Annotation
         this.numberValue = numberValue;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ANNOTATION_OPTION_ID")
-    public AnnotationOption getOptionId() {
-        return optionId;
+    @Column(name = "DATE_VALUE")
+    public Date getDateValue() {
+        return dateValue;
     }
 
-    public void setOptionId(AnnotationOption optionId) {
-        this.optionId = optionId;
+    public void setDateValue(Date dateValue) {
+        this.dateValue = dateValue;
+    }
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "ANNOTATION_ANNOTATION_OPTION",
+        joinColumns = { @JoinColumn(name = "ANNOTATION_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "ANNOTATION_OPTION_ID", unique = false, nullable = false, updatable = false) })
+    public Set<AnnotationOption> getOptions() {
+        return options;
+    }
+
+    public void setOptions(Set<AnnotationOption> options) {
+        this.options = options;
     }
 }

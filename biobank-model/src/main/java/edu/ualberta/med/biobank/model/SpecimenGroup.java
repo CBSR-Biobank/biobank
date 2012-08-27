@@ -51,7 +51,7 @@ public class SpecimenGroup
     private String name;
     private String description;
     private Preservation preservation;
-    private AnotomicalSource anotomicalSource;
+    private AnatomicalSource anatomicalSource;
     private SpecimenType specimenType;
 
     @NotNull(message = "{SpecimenGroup.study.NotNull}")
@@ -66,7 +66,7 @@ public class SpecimenGroup
 
     @NotEmpty(message = "{SpecimenGroup.name.NotEmpty}")
     @Size(max = 50, message = "{SpecimenGroup.name.Size}")
-    @Column(name = "STUDY_ID", nullable = false, length = 50)
+    @Column(name = "NAME", nullable = false, length = 50)
     public String getName() {
         return name;
     }
@@ -95,14 +95,14 @@ public class SpecimenGroup
         this.preservation = preservation;
     }
 
-    @NotEmpty(message = "{SpecimenGroup.anotomicalSource.NotEmpty}")
-    @Column(name = "ANOTOMICAL_SOURCE_ID", nullable = false)
-    public AnotomicalSource getAnotomicalSource() {
-        return anotomicalSource;
+    @NotEmpty(message = "{SpecimenGroup.anatomicalSource.NotEmpty}")
+    @Column(name = "ANATOMICAL_SOURCE_ID", nullable = false)
+    public AnatomicalSource getAnatomicalSource() {
+        return anatomicalSource;
     }
 
-    public void setAnotomicalSource(AnotomicalSource anotomicalSource) {
-        this.anotomicalSource = anotomicalSource;
+    public void setAnatomicalSource(AnatomicalSource anatomicalSource) {
+        this.anatomicalSource = anatomicalSource;
     }
 
     @NotEmpty(message = "{SpecimenGroup.specimenType.NotEmpty}")
