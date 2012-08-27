@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -67,6 +69,10 @@ public abstract class Annotation
 
     @Valid
     @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "NUMBER_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "NUMBER_VALUE_SCALE"))
+    })
     public Decimal getNumberValue() {
         return numberValue;
     }
