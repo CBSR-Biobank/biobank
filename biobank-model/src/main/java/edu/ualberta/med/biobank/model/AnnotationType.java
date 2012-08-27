@@ -1,10 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -35,6 +39,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" })
     })
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
 @NotUsed.List({
     @NotUsed(by = Annotation.class, property = "type", groups = PreDelete.class)
@@ -46,24 +52,6 @@ public abstract class AnnotationType
     private Study study;
     private String name;
     private String description;
-    private AnnotationValueType valueType;
-
-    public enum AnnotationValueType {
-        NUMBER("NUM"),
-        DATE("DAT"),
-        STRING("STR"),
-        OPTIONS("OPT");
-
-        private final String id;
-
-        private AnnotationValueType(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-    }
 
     /**
      * @return the {@link Study} that this {@link AnnotationType} belongs to.
@@ -107,6 +95,12 @@ public abstract class AnnotationType
         this.description = description;
     }
 
+    @DiscriminatorValue("STR")
+    public static class StringAnnotationType
+        extends AnnotationType {
+        private static final long serialVersionUID = 1L;
+    }
+
     @DiscriminatorValue("NUM")
     public static class NumberAnnotationType
         extends AnnotationType {
@@ -125,8 +119,14 @@ public abstract class AnnotationType
         }
     }
 
+    @DiscriminatorValue("DAT")
+    public static class DateAnnotationType
+        extends AnnotationType {
+        private static final long serialVersionUID = 1L;
+    }
+
     @DiscriminatorValue("SEL")
-    public static class SelectAnnotationType
+    public static class SelectionAnnotationType
         extends AnnotationType {
         private static final long serialVersionUID = 1L;
 
