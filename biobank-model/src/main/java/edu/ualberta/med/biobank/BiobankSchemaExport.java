@@ -47,6 +47,7 @@ public class BiobankSchemaExport {
         schemaExport.drop(false, true);
         schemaExport.create(false, true);
 
+        System.out.println("done!");
     }
 
     /*

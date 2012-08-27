@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.i18n;
 
-import edu.ualberta.med.biobank.common.action.exception.ActionException;
-
 /**
  * 
  * @author Jonathan Ferland

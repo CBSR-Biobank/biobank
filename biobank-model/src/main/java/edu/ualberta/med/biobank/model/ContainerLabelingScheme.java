@@ -37,11 +37,13 @@ public class ContainerLabelingScheme extends AbstractModel
     private Integer maxCols;
     private Integer maxCapacity;
 
+    @Override
     @Column(name = "NAME", length = 50, unique = true)
     public String getName() {
         return this.name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -253,8 +255,8 @@ public class ContainerLabelingScheme extends AbstractModel
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper
-                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
+            String maxValue =
+                rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
             String msgStart =
                 MessageFormat
@@ -372,8 +374,8 @@ public class ContainerLabelingScheme extends AbstractModel
         int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper
-                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
+            String maxValue =
+                rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
             String msgStart =
                 MessageFormat

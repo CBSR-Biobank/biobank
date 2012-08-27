@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
@@ -11,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -24,7 +19,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.model.type.DecimalRange;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.constraint.UniqueElements;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -55,10 +49,10 @@ public abstract class AnnotationType
     private AnnotationValueType valueType;
 
     public enum AnnotationValueType {
-        NUMBER("N"),
-        DATE("D"),
-        STRING("S"),
-        OPTIONS("O");
+        NUMBER("NUM"),
+        DATE("DAT"),
+        STRING("STR"),
+        OPTIONS("OPT");
 
         private final String id;
 
@@ -137,8 +131,6 @@ public abstract class AnnotationType
         private static final long serialVersionUID = 1L;
 
         private Boolean multiValue;
-        private Set<AnnotationOption> options =
-            new HashSet<AnnotationOption>(0);
 
         /**
          * @return true if multiple options can be selected, otherwise false.
@@ -151,17 +143,6 @@ public abstract class AnnotationType
 
         public void setMultiValue(Boolean multiValue) {
             this.multiValue = multiValue;
-        }
-
-        @UniqueElements(properties = { "value" }, groups = PrePersist.class)
-        @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "ANNOTATION_TYPE_ID", nullable = false)
-        public Set<AnnotationOption> getOptions() {
-            return options;
-        }
-
-        public void setOptions(Set<AnnotationOption> options) {
-            this.options = options;
         }
     }
 }
