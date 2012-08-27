@@ -24,6 +24,7 @@ public class StudyEventAttrSelectionWidget extends BgcBaseWidget {
 
     Map<String, StudyEventAttrCustom> seAttrSettings;
 
+    @SuppressWarnings("nls")
     public StudyEventAttrSelectionWidget(Composite parent, int style,
         Set<GlobalEventAttr> globalEventAttrs,
         Set<StudyEventAttr> studyEventAttrs, BgcEntryFormWidgetListener listener) {

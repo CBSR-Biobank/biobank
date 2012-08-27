@@ -5,18 +5,23 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableWidget;
-import edu.ualberta.med.biobank.widgets.infotables.Messages;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(StudyContactEntryInfoTable.class);
 
     private static final int PAGE_SIZE_ROWS = 10;
 
@@ -30,22 +35,23 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         String pagerNumber;
         String officeNumber;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort, name,
                 title, emailAddress, mobileNumber, pagerNumber, officeNumber },
-                "\t"); //$NON-NLS-1$
+                "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyContactEntryInfoTable_clinic_label,
-        Messages.StudyContactEntryInfoTable_name_label,
-        Messages.StudyContactEntryInfoTable_title_label,
-        Messages.StudyContactEntryInfoTable_email_label,
-        Messages.StudyContactEntryInfoTable_mobile_label,
-        Messages.StudyContactEntryInfoTable_pager_label,
-        Messages.StudyContactEntryInfoTable_office_label };
+        Clinic.NAME.singular().toString(),
+        Contact.PropertyName.NAME.toString(),
+        Contact.PropertyName.TITLE.toString(),
+        Contact.PropertyName.EMAIL_ADDRESS.toString(),
+        Contact.PropertyName.MOBILE_NUMBER.toString(),
+        Contact.PropertyName.PAGER_NUMBER.toString(),
+        Contact.PropertyName.OFFICE_NUMBER.toString() };
 
     public StudyContactEntryInfoTable(Composite parent,
         List<Contact> contactCollection) {
@@ -62,9 +68,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -82,12 +88,13 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
                 case 6:
                     return item.officeNumber;
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
     }
 
+    @SuppressWarnings("nls")
     @Override
     public TableRowData getCollectionModelObject(Object o) throws Exception {
         if (o == null)
@@ -95,12 +102,12 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<Contact> {
         TableRowData info = new TableRowData();
         info.contact = (Contact) o;
         Clinic clinic = info.contact.getClinic();
-        Assert.isNotNull(clinic, "contact's clinic is null"); //$NON-NLS-1$
+        Assert.isNotNull(clinic, "contact's clinic is null");
         info.clinicNameShort = clinic.getNameShort();
         info.name = info.contact.getName();
         info.title = info.contact.getTitle();
         if (info.title == null) {
-            info.title = ""; //$NON-NLS-1$
+            info.title = StringUtil.EMPTY_STRING;
         }
         info.emailAddress = info.contact.getEmailAddress();
         info.mobileNumber = info.contact.getMobileNumber();

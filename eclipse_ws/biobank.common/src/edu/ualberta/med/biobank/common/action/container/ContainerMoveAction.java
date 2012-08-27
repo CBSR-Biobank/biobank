@@ -1,28 +1,24 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import java.util.ArrayList;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class ContainerMoveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
-
-    private static Logger log = LoggerFactory
-        .getLogger(ContainerMoveAction.class.getName());
+    private static final Bundle bundle = new CommonBundle();
+    private static final Logger log = LoggerFactory
+        .getLogger(ContainerMoveAction.class);
 
     public final Integer containerToMoveId;
     public final Integer newParentContainerId;
@@ -30,6 +26,7 @@ public class ContainerMoveAction implements Action<IdResult> {
 
     private ActionContext context;
 
+    @SuppressWarnings("nls")
     public ContainerMoveAction(Container containerToMove,
         Container newParentContainer, String newLabel) {
         if (containerToMove == null) {
@@ -63,6 +60,7 @@ public class ContainerMoveAction implements Action<IdResult> {
                 .isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         this.context = context;
@@ -88,14 +86,9 @@ public class ContainerMoveAction implements Action<IdResult> {
 
             log.debug("container " + containerToMoveId + " moved under parent "
                 + newParentContainerId);
-        } catch (ConstraintViolationException e) {
-            ArrayList<String> msgs = new ArrayList<String>();
-            for (ConstraintViolation<?> cv : e.getConstraintViolations()) {
-                msgs.add(cv.getMessage());
-            }
-            throw new ActionException(StringUtils.join(msgs.toArray(), "\n"));
         } catch (Exception e) {
-            throw new ActionException(e);
+            throw new ActionException(bundle.tr("Unable to move container.")
+                .format(), e);
         }
 
         // update the path information for this container and its children
@@ -105,6 +98,7 @@ public class ContainerMoveAction implements Action<IdResult> {
 
     }
 
+    @SuppressWarnings("nls")
     private void updateContainerAndChildren(Container container,
         Container parentContainer) {
         if (context == null) {

@@ -7,11 +7,16 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.common.util.IBusyListener;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class ProgressMonitorDialogBusyListener implements IBusyListener {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ProgressMonitorDialogBusyListener.class);
+
     private final String task;
     private final Semaphore semaphore = new Semaphore(1);
 
@@ -22,6 +27,7 @@ public class ProgressMonitorDialogBusyListener implements IBusyListener {
     @Override
     public void showBusy() {
         Display.getDefault().asyncExec(new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 IRunnableContext context = new ProgressMonitorDialog(Display
@@ -40,12 +46,16 @@ public class ProgressMonitorDialogBusyListener implements IBusyListener {
                                 semaphore.release();
                                 monitor.done();
                             } catch (Exception e) {
-                                BgcPlugin.openAsyncError("Thread Error", e); 
+                                BgcPlugin.openAsyncError(
+                                    // dialog title
+                                    i18n.tr("Thread Error"), e);
                             }
                         }
                     });
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Loading Error", e);
+                    BgcPlugin.openAsyncError(
+                        // dialog title
+                        i18n.tr("Loading Error"), e);
                 }
             }
         });

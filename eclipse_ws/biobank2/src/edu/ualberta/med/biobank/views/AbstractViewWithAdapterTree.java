@@ -28,7 +28,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     protected AbstractAdapterBase rootNode;
 
-    private ISourceProviderListener sourceListener;
+    private final ISourceProviderListener sourceListener;
 
     private static BgcLogger logger = BgcLogger
         .getLogger(AbstractViewWithAdapterTree.class.getName());
@@ -87,6 +87,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     public abstract String getId();
 
+    @SuppressWarnings("nls")
     public void activate() {
         IWorkbenchWindow window = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
@@ -98,7 +99,7 @@ public abstract class AbstractViewWithAdapterTree extends
                 } catch (PartInitException pie) {
                     logger
                         .error(
-                            Messages.AbstractViewWithAdapterTree_view_activate_error_title,
+                            "Error activating the view",
                             pie);
                 }
             }

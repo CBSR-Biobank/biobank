@@ -15,6 +15,7 @@ import org.hibernate.util.StringHelper;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
+@SuppressWarnings("nls")
 public class NotUsedValidator extends
     EventSourceAwareConstraintValidator<Object>
     implements ConstraintValidator<NotUsed, Object> {
@@ -71,7 +72,7 @@ public class NotUsedValidator extends
 
     private int countRows(Object value, String property) {
         Criteria criteria = getEventSource().createCriteria(by);
-        
+
         String association = StringHelper.root(property);
         while (!association.equals(property)) {
             criteria = criteria.createCriteria(association);

@@ -7,28 +7,37 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Contact;
 
 public class ContactAddDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ContactAddDialog.class);
 
-    private ContactWrapper contactWrapper;
-    private String currentTitle;
+    private final ContactWrapper contactWrapper;
+    private final String currentTitle;
 
     public ContactAddDialog(Shell parent) {
         this(parent, new ContactWrapper(SessionManager.getAppService()));
     }
 
+    @SuppressWarnings("nls")
     public ContactAddDialog(Shell parent, ContactWrapper contactWrapper) {
         super(parent);
         Assert.isNotNull(contactWrapper);
         this.contactWrapper = contactWrapper;
-        currentTitle = contactWrapper.getName() == null ? "Add Contact"
-            : "Edit Contact";
+        currentTitle = contactWrapper.getName() == null
+            // add contact dialog title
+            ? i18n.tr("Add Contact")
+            // edit contact dialog title
+            : i18n.tr("Edit Contact");
     }
 
     @Override
@@ -36,12 +45,15 @@ public class ContactAddDialog extends BgcBaseDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
         if (contactWrapper.getName() == null) {
-            return "Add a contact person to this clinic";
+            // add contact dialog title area message
+            return i18n.tr("Add a contact person to this clinic");
         }
-        return "Edit contact person for this clinic";
+        // edit contact dialog title area message
+        return i18n.tr("Edit contact person for this clinic");
     }
 
     @Override
@@ -56,34 +68,42 @@ public class ContactAddDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, BgcBaseText.class,
-            SWT.BORDER, "Name", new String[0],
+            SWT.BORDER,
+            Contact.PropertyName.NAME.toString(),
+            new String[0],
             contactWrapper, ContactPeer.NAME.getName(), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Title", new String[0],
+            Contact.PropertyName.TITLE.toString(),
+            new String[0],
             contactWrapper, ContactPeer.TITLE.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Email", new String[0],
+            Contact.PropertyName.EMAIL_ADDRESS.toString(),
+            new String[0],
             contactWrapper, ContactPeer.EMAIL_ADDRESS.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Mobile #", new String[0],
+            Contact.PropertyName.MOBILE_NUMBER.toString(),
+            new String[0],
             contactWrapper, ContactPeer.MOBILE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Pager #", new String[0],
+            Contact.PropertyName.PAGER_NUMBER.toString(),
+            new String[0],
             contactWrapper, ContactPeer.PAGER_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Office #", new String[0],
+            Contact.PropertyName.OFFICE_NUMBER.toString(),
+            new String[0],
             contactWrapper, ContactPeer.OFFICE_NUMBER.getName(), null);
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Fax #", new String[0], contactWrapper,
+            Contact.PropertyName.FAX_NUMBER.toString(),
+            new String[0], contactWrapper,
             ContactPeer.FAX_NUMBER.getName(), null);
     }
 

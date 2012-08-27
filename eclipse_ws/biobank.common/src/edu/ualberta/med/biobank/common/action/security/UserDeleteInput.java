@@ -8,6 +8,7 @@ public class UserDeleteInput implements ActionInput {
 
     private final Integer userId;
 
+    @SuppressWarnings("nls")
     public UserDeleteInput(User user) {
         if (user == null)
             throw new IllegalArgumentException("null user");

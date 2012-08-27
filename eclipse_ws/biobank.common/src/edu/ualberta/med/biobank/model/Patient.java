@@ -18,6 +18,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -43,6 +47,23 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Empty(property = "collectionEvents", groups = PreDelete.class)
 public class Patient extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Patient",
+        "Patients");
+
+    @SuppressWarnings("nls")
+    public static class PropertyName {
+        public static final LString CREATED_AT = bundle.trc(
+            "model",
+            "Created At").format();
+        public static final LString PNUMBER = bundle.trc(
+            "model",
+            "Patient Number").format();
+    }
 
     private String pnumber;
     private Date createdAt;

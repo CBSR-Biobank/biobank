@@ -16,6 +16,7 @@ public class ContainerMoveSpecimensAction implements Action<IdResult> {
     public final Integer fromContainerId;
     public final Integer toContainerId;
 
+    @SuppressWarnings("nls")
     public ContainerMoveSpecimensAction(Container fromContainer,
         Container toContainer) {
         if (fromContainer == null) {

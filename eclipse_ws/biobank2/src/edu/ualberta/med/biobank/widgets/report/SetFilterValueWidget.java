@@ -22,7 +22,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -35,8 +38,12 @@ import edu.ualberta.med.biobank.model.ReportFilterValue;
  * 
  */
 public class SetFilterValueWidget implements FilterValueWidget {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SetFilterValueWidget.class);
+
     public enum Mode {
-        ViewMode, EditMode;
+        ViewMode,
+        EditMode;
     }
 
     private static final IElementComparer COMPARER = new IElementComparer() {
@@ -117,7 +124,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
         }
     };
 
-    private final Collection<ChangeListener<ChangeEvent>> listeners = new ArrayList<ChangeListener<ChangeEvent>>();
+    private final Collection<ChangeListener<ChangeEvent>> listeners =
+        new ArrayList<ChangeListener<ChangeEvent>>();
     private final Composite container;
     private final ViewModeControls viewModeControls;
     private final EditModeControls editModeControls;
@@ -158,7 +166,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
     @Override
     public Collection<ReportFilterValue> getValues() {
-        Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> values =
+            new ArrayList<ReportFilterValue>();
         ListViewer listViewer = editModeControls.getListViewer();
         ReportFilterValue value;
         for (int i = 0, n = listViewer.getList().getItemCount(); i < n; i++) {
@@ -173,7 +182,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
         ListViewer listViewer = editModeControls.getListViewer();
         listViewer.remove(getValues().toArray());
 
-        Collection<ReportFilterValue> validValues = new ArrayList<ReportFilterValue>();
+        Collection<ReportFilterValue> validValues =
+            new ArrayList<ReportFilterValue>();
         for (ReportFilterValue value : values) {
             if (isValid(value)) {
                 validValues.add(value);
@@ -253,7 +263,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
     }
 
     private class ViewModeControls extends Composite {
-        private Text readOnlyText;
+        private final Text readOnlyText;
         private Button editModeButton;
 
         public ViewModeControls(Composite parent) {
@@ -271,25 +281,29 @@ public class SetFilterValueWidget implements FilterValueWidget {
             updateViewText();
         }
 
+        @SuppressWarnings("nls")
         public void updateViewText() {
             List<String> strings = new ArrayList<String>();
             for (ReportFilterValue value : getValues()) {
                 strings.add(SetFilterValueWidget.this.toString(value));
             }
-            String list = StringUtils.join(strings, ", "); //$NON-NLS-1$
+            String list = StringUtils.join(strings, ", ");
 
             if (list.isEmpty()) {
-                list = Messages.SetFilterValueWidget_novalue_label;
+                list = i18n.tr("<no values added>");
             }
 
             readOnlyText.setText(list);
         }
 
+        @SuppressWarnings("nls")
         private void createEditModeButton() {
             editModeButton = new Button(this, SWT.NONE);
             editModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_DOWN));
-            editModeButton.setToolTipText(Messages.SetFilterValueWidget_expand_label);
+            editModeButton.setToolTipText(
+                // button tooltip.
+                i18n.tr("Expand to add values"));
             editModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -329,11 +343,14 @@ public class SetFilterValueWidget implements FilterValueWidget {
             return filterValueWidget;
         }
 
+        @SuppressWarnings("nls")
         private void createAddButton() {
             addButton = new Button(this, SWT.NONE);
             addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_ADD));
-            addButton.setToolTipText(Messages.SetFilterValueWidget_add_label);
+            addButton.setToolTipText(
+                // button tooltip.
+                i18n.tr("Add value to list"));
             addButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -368,7 +385,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
             GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
             layoutData.horizontalSpan = 4;
-            layoutData.heightHint = 3 * listViewer.getList().getItemHeight() + 2;
+            layoutData.heightHint =
+                3 * listViewer.getList().getItemHeight() + 2;
 
             listViewer.getControl().setLayoutData(layoutData);
 
@@ -380,7 +398,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
                         ReportFilterValue value = ((ReportFilterValue) element);
                         return SetFilterValueWidget.this.toString(value);
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             });
             listViewer.setComparator(COMPARATOR);
@@ -396,11 +414,14 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         }
 
+        @SuppressWarnings("nls")
         private void createRemoveButton() {
             removeButton = new Button(this, SWT.NONE);
             removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_REMOVE));
-            removeButton.setToolTipText(Messages.SetFilterValueWidget_remove_label);
+            removeButton.setToolTipText(
+                // button tooltip.
+                i18n.tr("Remove selected value(s) from list"));
             removeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -414,11 +435,14 @@ public class SetFilterValueWidget implements FilterValueWidget {
             SetFilterValueWidget.this.notifyListeners(null);
         }
 
+        @SuppressWarnings("nls")
         private void createViewModeButton() {
             viewModeButton = new Button(this, SWT.NONE);
             viewModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
                 .get(BgcPlugin.IMG_UP));
-            viewModeButton.setToolTipText(Messages.SetFilterValueWidget_collapse_label);
+            viewModeButton.setToolTipText(
+                // button tooltip.
+                i18n.tr("Collapse"));
             viewModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
@@ -430,7 +454,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
         }
 
         private Collection<ReportFilterValue> getSelectedValues() {
-            Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+            Collection<ReportFilterValue> values =
+                new ArrayList<ReportFilterValue>();
             ISelection selection = listViewer.getSelection();
             if (selection instanceof IStructuredSelection) {
                 Iterator<?> it = ((IStructuredSelection) selection).iterator();

@@ -3,14 +3,19 @@ package edu.ualberta.med.biobank.forms.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.ItemState;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 
 public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DispatchTableGroup.class);
 
     public DispatchTableGroup(DispatchSpecimenState ds, String alternateLabel,
         DispatchWrapper dispatch) {
@@ -21,16 +26,19 @@ public class DispatchTableGroup extends TableGroup<DispatchWrapper> {
         super(ds, dispatch);
     }
 
+    @SuppressWarnings("nls")
     public static List<DispatchTableGroup> getGroupsForShipment(
         DispatchWrapper ship) {
 
         List<DispatchTableGroup> groups = new ArrayList<DispatchTableGroup>();
         if (ship.isInCreationState()) {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
-                "Added", ship));
+                // tree node label
+                i18n.tr("Added"), ship));
         } else {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.NONE,
-                "Non processed", ship));
+                // tree node label
+                i18n.tr("Non processed"), ship));
         }
         if (ship.hasBeenReceived()) {
             groups.add(new DispatchTableGroup(DispatchSpecimenState.RECEIVED,

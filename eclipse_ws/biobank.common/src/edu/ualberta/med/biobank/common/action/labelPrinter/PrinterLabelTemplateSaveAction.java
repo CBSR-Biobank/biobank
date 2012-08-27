@@ -38,6 +38,7 @@ public class PrinterLabelTemplateSaveAction implements Action<IdResult> {
         return new LabelPrintingPermission().isAllowed(context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         log.debug("run: id={} name={}", id, name);

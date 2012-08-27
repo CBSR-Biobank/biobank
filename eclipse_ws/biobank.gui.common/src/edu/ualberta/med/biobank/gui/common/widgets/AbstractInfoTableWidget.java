@@ -28,6 +28,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.util.DelegatingList;
 import edu.ualberta.med.biobank.common.util.ListChangeHandler;
@@ -57,6 +59,17 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     implements IInfoTablePagination, ListChangeSource<T> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(AbstractInfoTableWidget.class);
+
+    @SuppressWarnings("nls")
+    private static final String ADD_MENU_ITEM_TEXT = i18n.tr("Add");
+    @SuppressWarnings("nls")
+    private static final String EDIT_MENU_ITEM_TEXT = i18n.tr("Edit");
+    @SuppressWarnings("nls")
+    private static final String DELETE_MENU_ITEM_TEXT = i18n.tr("Delete");
+    @SuppressWarnings("nls")
+    public static final String LOADING = i18n.tr("loading...");
 
     public static class RowItem {
         int itemNumber;
@@ -78,9 +91,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     protected boolean autoSizeColumns;
 
-    private BgcTableSorter tableSorter;
+    private final BgcTableSorter tableSorter;
 
-    private BgcLabelProvider labelProvider;
+    private final BgcLabelProvider labelProvider;
 
     protected PaginationWidget paginationWidget;
 
@@ -141,6 +154,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         // This code serves to provide menus on a selection basis, with
         // permission checking
         menu.addListener(SWT.Show, new Listener() {
+            @SuppressWarnings("nls")
             @Override
             public void handleEvent(Event event) {
 
@@ -150,7 +164,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     items.clear();
                     if (addItemListeners.getListeners().length > 0) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_add);
+                        item.setText(ADD_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -162,7 +176,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     if (editItemListeners.getListeners().length > 0
                         && canEdit(getSelection())) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_edit);
+                        item.setText(EDIT_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -174,7 +188,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                     if (deleteItemListeners.getListeners().length > 0
                         && canDelete(getSelection())) {
                         MenuItem item = new MenuItem(menu, SWT.PUSH);
-                        item.setText(Messages.AbstractInfoTableWidget_delete);
+                        item.setText(DELETE_MENU_ITEM_TEXT);
                         item.addSelectionListener(new SelectionAdapter() {
                             @Override
                             public void widgetSelected(SelectionEvent event) {
@@ -184,8 +198,9 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                         items.add(item);
                     }
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError("Error",
-                        "Unable to load menu for selection", e);
+                    BgcPlugin.openAsyncError(
+                        // dialog message.
+                        i18n.tr("Unable to load menu for selection"), e);
                 }
             }
         });
@@ -388,14 +403,15 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
      */
     public abstract T getSelection();
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     public void doubleClick() {
         // get selection as derived class object
         Object selection = getSelection();
         try {
             if (!canView(getSelection())) return;
         } catch (Exception e) {
-            BgcPlugin.openAsyncError("Error", "Unable to open form.", e);
+            BgcPlugin.openAsyncError(
+                i18n.tr("Unable to open form."), e);
         }
         final InfoTableEvent<T> event = new InfoTableEvent<T>(this,
             new InfoTableSelection(selection));

@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
+
 public class Sleak {
     Display display;
     Shell shell;
@@ -120,7 +122,7 @@ public class Sleak {
             // if (object instanceof Region)
             // regions++;
         }
-        String string = ""; //$NON-NLS-1$
+        String string = StringUtil.EMPTY_STRING;
         if (colors != 0)
             string += colors + " Color(s)\n"; //$NON-NLS-1$
         if (cursors != 0)
@@ -172,7 +174,7 @@ public class Sleak {
         System.arraycopy(diffObjects, 0, objects, 0, count);
         System.arraycopy(diffErrors, 0, errors, 0, count);
         list.removeAll();
-        text.setText(""); //$NON-NLS-1$
+        text.setText(StringUtil.EMPTY_STRING);
         canvas.redraw();
         for (int i = 0; i < objects.length; i++) {
             list.add(objectName(objects[i]));

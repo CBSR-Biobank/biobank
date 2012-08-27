@@ -5,20 +5,26 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 
 public class ShippingMethodDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ShippingMethodDialog.class);
 
-    private String message;
-    private ShippingMethodWrapper origShippingMethod;
-    private ShippingMethodWrapper tmpShippingMethod;
-    private String currentTitle;
+    private final String message;
+    private final ShippingMethodWrapper origShippingMethod;
+    private final ShippingMethodWrapper tmpShippingMethod;
+    private final String currentTitle;
 
+    @SuppressWarnings("nls")
     public ShippingMethodDialog(Shell parent,
         ShippingMethodWrapper shippingMethod, String message) {
         super(parent);
@@ -26,13 +32,15 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         this.tmpShippingMethod = new ShippingMethodWrapper(null);
         copyTo(origShippingMethod, tmpShippingMethod);
         this.message = message;
-        currentTitle = (shippingMethod.getName() == null ? "Add Shipping Method"
-            : "Edit Shipping Method");
+        currentTitle = (shippingMethod.getName() == null
+            // TR: dialog title
+            ? i18n.tr("Add Shipping Method")
+            // TR: dialog title
+            : i18n.tr("Edit Shipping Method"));
     }
 
     private void copyTo(ShippingMethodWrapper src, ShippingMethodWrapper dest) {
         dest.setName(src.getName());
-
     }
 
     @Override
@@ -50,6 +58,7 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) {
         Composite content = new Composite(parent, SWT.NONE);
@@ -57,9 +66,11 @@ public class ShippingMethodDialog extends BgcBaseDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BgcBaseText.class, SWT.BORDER,
-            "Name", null, tmpShippingMethod,
+            ShippingMethod.PropertyName.NAME.toString(),
+            null, tmpShippingMethod,
             ShippingMethodPeer.NAME.getName(), new NonEmptyStringValidator(
-                "Shipping method must have a name."));
+                // TR: validation error message
+                i18n.tr("Shipping method must have a name.")));
     }
 
     @Override

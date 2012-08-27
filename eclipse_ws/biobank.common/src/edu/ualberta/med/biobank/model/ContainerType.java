@@ -21,7 +21,11 @@ import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -59,6 +63,26 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Container Type",
+        "Container Types");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString CHILD_LABELING_SCHEME = bundle.trc(
+            "model",
+            "Child Labeling Scheme").format();
+        public static final LString DEFAULT_TEMPERATURE = bundle.trc(
+            "model",
+            "Default Temperature").format();
+        public static final LString TOP_LEVEL = bundle.trc(
+            "model",
+            "Top Level").format();
+    }
 
     private String name;
     private String nameShort;

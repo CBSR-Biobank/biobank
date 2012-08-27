@@ -17,8 +17,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Listener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.security.ManagerContext;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcWizardPage;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
@@ -30,6 +33,13 @@ import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidg
 import edu.ualberta.med.biobank.widgets.trees.permission.PermissionNode;
 
 public class MembershipPermissionsPage extends BgcWizardPage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(MembershipPermissionsPage.class);
+
+    @SuppressWarnings("nls")
+    // TR: membership permissions page dialog title
+    private static final String TITLE = i18n.tr("Roles and Permissions");
+
     // track the permissions and roles the the user explicitly clicks on and off
     // (as opposed to automatically removed by switching domains)
     private final Set<PermissionEnum> explicitPerms =
@@ -50,10 +60,12 @@ public class MembershipPermissionsPage extends BgcWizardPage {
     private final WritableValue validPermissions = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
+    @SuppressWarnings("nls")
     MembershipPermissionsPage(Membership membership, ManagerContext context) {
-        super("", "Roles and Permissions", null);
+        super(StringUtil.EMPTY_STRING, TITLE, null);
 
-        setMessage("What the user (or group) is allowed to do");
+        // TR: membership permissions page dialog title area message
+        setMessage(i18n.tr("What the user (or group) is allowed to do"));
 
         this.membership = membership;
         this.context = context;
@@ -72,6 +84,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         updatePermissionSelections();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite container = new Composite(parent, SWT.NONE);
@@ -81,14 +94,17 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         createEveryPermissionButton(container);
         createUserManagerButton(container);
 
-        Group rolesGroup = createGroup(container, "Roles");
+        Group rolesGroup =
+            createGroup(container, Role.NAME.plural().toString());
         createRolesWidget(rolesGroup);
         updateRoleSelections();
 
         createPermissionsTree(container);
         updatePermissionSelections();
 
-        createPermissionsValidation("Select at least one permission or role (with permissions) to grant");
+        createPermissionsValidation(
+        // TR: validation message if no permissions are selected
+        i18n.tr("Select at least one permission or role (with permissions) to grant"));
 
         rolesWidget.addSelectionChangedListener(rolesSelectionHandler);
         permissionsTree.addCheckStateListener(permissionsCheckStateHandler);
@@ -189,11 +205,17 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         return options;
     }
 
+    @SuppressWarnings("nls")
     private void createUserManagerButton(Composite parent) {
         userManagerButton = new Button(parent, SWT.CHECK);
-        userManagerButton.setText("Can create users");
+
+        // TR: user manager checkbox label
+        userManagerButton.setText(i18n.tr("Can create users"));
+
+        // TR: user manager checkbox tooltip
         userManagerButton
-            .setToolTipText("Can manage, create, edit, and delete users and groups (for the previously selected centers and studies).");
+            .setToolTipText(
+            i18n.tr("Can manage, create, edit, and delete users and groups (for the previously selected centers and studies)."));
 
         GridData gd = new GridData();
         gd.horizontalIndent = 20;
@@ -209,11 +231,18 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createEveryPermissionButton(Composite parent) {
         everyPermissionButton = new Button(parent, SWT.CHECK);
-        everyPermissionButton.setText("Grant all permissions and roles");
+
+        // TR: grant all permissions checkbox label
+        everyPermissionButton.setText(i18n
+            .tr("Grant all permissions and roles"));
+
+        // TR: grant all permissions checkbox tooltip
         everyPermissionButton
-            .setToolTipText("Grant all current and future roles and permissions");
+            .setToolTipText(i18n
+                .tr("Grant all current and future roles and permissions"));
         everyPermissionButton.setSelection(membership.isEveryPermission());
         everyPermissionButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -239,10 +268,14 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         return group;
     }
 
+    @SuppressWarnings("nls")
     private void createRolesWidget(Composite parent) {
         rolesWidget = new MultiSelectWidget<Role>(parent, SWT.NONE,
-            "Available Roles",
-            "Selected Roles", 100) {
+            // label for roles that can be selected from a multi-combo box
+            i18n.tr("Available roles"),
+            // label for roles that have be selected from a multi-combo box
+            i18n.tr("Selected Centers"),
+            100) {
             @Override
             protected String getTextForObject(Role role) {
                 return role.getName();

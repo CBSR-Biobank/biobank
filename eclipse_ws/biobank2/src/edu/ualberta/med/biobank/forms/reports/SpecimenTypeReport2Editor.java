@@ -5,9 +5,13 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-public class SpecimenTypeReport2Editor extends ReportsEditor {
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 
-    public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor"; 
+public class SpecimenTypeReport2Editor extends ReportsEditor {
+    @SuppressWarnings("nls")
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor";
 
     @Override
     protected void createOptionSection(Composite parent) {
@@ -19,7 +23,9 @@ public class SpecimenTypeReport2Editor extends ReportsEditor {
 
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Specimen Type", "Study" };
+        return new String[] {
+            SpecimenType.NAME.format(1).toString(),
+            Study.NAME.format(1).toString() };
     }
 
     @Override

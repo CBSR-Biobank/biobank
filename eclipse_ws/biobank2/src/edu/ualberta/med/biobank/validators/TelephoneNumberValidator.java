@@ -12,11 +12,12 @@ public class TelephoneNumberValidator extends AbstractValidator {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if (!(value instanceof String)) {
             throw new RuntimeException(
-                Messages.TelephoneNumberValidator_nonstring_error_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         String v = (String) value;

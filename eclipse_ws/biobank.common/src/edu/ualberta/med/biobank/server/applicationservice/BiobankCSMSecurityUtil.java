@@ -1,31 +1,66 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
+import org.acegisecurity.Authentication;
+import org.acegisecurity.context.SecurityContextHolder;
+
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.i18n.Tr;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
 import gov.nih.nci.security.authorization.domainobjects.User;
+import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-
-import java.text.MessageFormat;
-
-import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContextHolder;
-import org.apache.log4j.Logger;
 
 public class BiobankCSMSecurityUtil {
+    private static final Bundle bundle = new CommonBundle();
 
-    private static Logger log = Logger.getLogger(BiobankCSMSecurityUtil.class
-        .getName());
+    @SuppressWarnings("nls")
+    public static final String APPLICATION_CONTEXT_NAME = "biobank";
+    @SuppressWarnings("nls")
+    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: ";
+    @SuppressWarnings("nls")
+    public static final String CENTER_FEATURE_START_NAME = "Center Feature: ";
 
-    public static final String APPLICATION_CONTEXT_NAME = "biobank"; //$NON-NLS-1$
-
-    public static final String GLOBAL_FEATURE_START_NAME = "Global Feature: "; //$NON-NLS-1$
-
-    public static final String CENTER_FEATURE_START_NAME = "Center Feature: "; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final Tr LOGIN_EXISTS =
+        bundle.tr("Login {0} already exists.");
+    @SuppressWarnings("nls")
+    private static final LString LOGIN_REQUIRED =
+        bundle.tr("Login should be set").format();
+    @SuppressWarnings("nls")
+    private static final Tr CSM_USER_IS_NULL =
+        bundle.tr("User with id {0} is missing a csmUserId.");
+    @SuppressWarnings("nls")
+    private static final Tr CSM_USER_ID_NOT_FOUND =
+        bundle.tr("CSM Security user with id {0} not found.");
+    @SuppressWarnings("nls")
+    private static final LString UNEXPECTED_PROBLEM =
+        bundle.tr("Unexpected problem while modifying user.").format();
+    @SuppressWarnings("nls")
+    private static final Tr USER_NOT_FOUND =
+        bundle.tr("User {0} not found.");
+    @SuppressWarnings("nls")
+    private static final LString CANNOT_DELETE_SELF =
+        bundle.tr("User cannot delete himself.").format();
+    @SuppressWarnings("nls")
+    private static final LString SELF_PW_UPDATE_ONLY =
+        bundle.tr("Only the user itself can modify its password through" +
+            " this method").format();
+    @SuppressWarnings("nls")
+    private static final LString OLD_PW_INCORRECT =
+        bundle.tr("Cannot modify password: verification password is" +
+            " incorrect.").format();
+    @SuppressWarnings("nls")
+    private static final LString OLD_PW_CANNOT_EQUAL_NEW =
+        bundle.tr("New password needs to be different from the old one.")
+            .format();
 
     public static void modifyPassword(Long csmUserId, String oldPassword,
-        String newPassword) throws ApplicationException {
+        String newPassword) {
         try {
             UserProvisioningManager upm =
                 SecurityServiceProvider
@@ -36,27 +71,18 @@ public class BiobankCSMSecurityUtil {
             String userLogin = authentication.getName();
             User user = upm.getUser(userLogin);
             if (!user.getUserId().equals(csmUserId))
-                throw new ApplicationException(
-                    Messages
-                        .getString("BiobankCSMSecurityUtil.pwd.modify.itself.error")); //$NON-NLS-1$
+                throw new LocalizedException(SELF_PW_UPDATE_ONLY);
             if (!oldPassword.equals(authentication.getCredentials())) {
-                throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.pwd.verif.error.msg")); //$NON-NLS-1$
+                throw new LocalizedException(OLD_PW_INCORRECT);
             }
             if (oldPassword.equals(newPassword)) {
-                throw new ApplicationException(
-                    Messages.getString("BiobankSecurityUtil.pwd.new.error.msg")); //$NON-NLS-1$
+                throw new LocalizedException(OLD_PW_CANNOT_EQUAL_NEW);
             }
             user.setPassword(newPassword);
             user.setStartDate(null);
             upm.modifyUser(user);
-        } catch (ApplicationException ae) {
-            log.error("Error modifying password", ae); //$NON-NLS-1$
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error modifying password", ex); //$NON-NLS-1$
-            throw new ApplicationException(ex);
+        } catch (CSException e) {
+            throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }
 
@@ -67,15 +93,13 @@ public class BiobankCSMSecurityUtil {
     }
 
     public static Long persistUser(edu.ualberta.med.biobank.model.User user,
-        String password) throws ApplicationException {
+        String password) {
         try {
             UserProvisioningManager upm =
                 SecurityServiceProvider
                     .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             if (user.getLogin() == null)
-                throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.login.set.error.msg")); //$NON-NLS-1$
+                throw new LocalizedException(LOGIN_REQUIRED);
             boolean newUser = (user.getId() == null);
             User serverUser;
             if (newUser) {
@@ -83,27 +107,19 @@ public class BiobankCSMSecurityUtil {
                 if (serverUser == null) {
                     serverUser = new User();
                 } else
-                    throw new ApplicationException(
-                        MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.login.exists.error"), user.getLogin())); //$NON-NLS-1$
+                    throw new LocalizedException(LOGIN_EXISTS.format(
+                        user.getLogin()));
             } else {
                 if (user.getCsmUserId() == null)
-                    throw new ApplicationException(
-                        MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.user.csm.missing.error"), //$NON-NLS-1$
-                            user.getId()));
+                    throw new LocalizedException(
+                        CSM_USER_IS_NULL.format(user.getId()));
                 serverUser = null;
                 try {
                     serverUser = upm
                         .getUserById(user.getCsmUserId().toString());
                 } catch (CSObjectNotFoundException confe) {
-                    throw new ApplicationException(
-                        MessageFormat.format(
-                            Messages
-                                .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
-                            user.getCsmUserId()), confe);
+                    throw new LocalizedException(CSM_USER_ID_NOT_FOUND.format(
+                        user.getCsmUserId()), confe);
                 }
             }
             serverUser.setLoginName(user.getLogin());
@@ -126,17 +142,12 @@ public class BiobankCSMSecurityUtil {
                     .valueOf(1));
 
             return serverUser.getUserId();
-        } catch (ApplicationException ae) {
-            log.error("Error persisting csm security user", ae); //$NON-NLS-1$
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error persisting csm security user", ex); //$NON-NLS-1$
-            throw new ApplicationException(ex.getMessage(), ex);
+        } catch (CSException e) {
+            throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }
 
-    public static void deleteUser(edu.ualberta.med.biobank.model.User user)
-        throws ApplicationException {
+    public static void deleteUser(edu.ualberta.med.biobank.model.User user) {
         try {
             UserProvisioningManager upm =
                 SecurityServiceProvider
@@ -144,59 +155,39 @@ public class BiobankCSMSecurityUtil {
             String currentLogin = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
             if (currentLogin.equals(user.getLogin())) {
-                throw new ApplicationException(
-                    Messages
-                        .getString("BiobankSecurityUtil.delete.self.error.msg")); //$NON-NLS-1$
+                throw new LocalizedException(CANNOT_DELETE_SELF);
             }
             if (user.getCsmUserId() == null)
-                throw new ApplicationException(
-                    MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.user.csm.missing.error"), user.getId())); //$NON-NLS-1$
+                throw new LocalizedException(CSM_USER_ID_NOT_FOUND.format(user
+                    .getId()));
             User serverUser = upm.getUserById(user.getCsmUserId().toString());
             if (serverUser == null) {
-                throw new ApplicationException(
-                    MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
-                        user.getCsmUserId()));
+                throw new LocalizedException(CSM_USER_ID_NOT_FOUND.format(
+                    user.getCsmUserId()));
             }
             upm.removeUser(serverUser.getUserId().toString());
-        } catch (ApplicationException ae) {
-            log.error("Error deleting security user", ae); //$NON-NLS-1$
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error deleting security user", ex); //$NON-NLS-1$
-            throw new ApplicationException(ex.getMessage(), ex);
+        } catch (CSException e) {
+            throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }
 
-    public static String getUserPassword(String login)
-        throws ApplicationException {
+    public static String getUserPassword(String login) {
         try {
             UserProvisioningManager upm =
                 SecurityServiceProvider
                     .getUserProvisioningManager(BiobankCSMSecurityUtil.APPLICATION_CONTEXT_NAME);
             User serverUser = upm.getUser(login);
             if (serverUser == null) {
-                throw new ApplicationException(
-                    MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.user.notfound.error"), login)); //$NON-NLS-1$
+                throw new LocalizedException(USER_NOT_FOUND.format(login));
             }
             // FIXME how safe is this?
             return serverUser.getPassword();
-        } catch (ApplicationException ae) {
-            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
-            throw new ApplicationException(ex.getMessage(), ex);
+        } catch (CSException e) {
+            throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }
 
-    public static boolean isUserLockedOut(Long csmUserId)
-        throws ApplicationException {
+    public static boolean isUserLockedOut(Long csmUserId) {
         try {
             UserProvisioningManager upm =
                 SecurityServiceProvider
@@ -206,18 +197,11 @@ public class BiobankCSMSecurityUtil {
                 return LockoutManager.getInstance().isUserLockedOut(
                     serverUser.getLoginName());
             } catch (CSObjectNotFoundException onfe) {
-                throw new ApplicationException(
-                    MessageFormat.format(
-                        Messages
-                            .getString("BiobankCSMSecurityUtil.csm.user.not.found.error"), //$NON-NLS-1$
-                        csmUserId), onfe);
+                throw new LocalizedException(CSM_USER_ID_NOT_FOUND
+                    .format(csmUserId), onfe);
             }
-        } catch (ApplicationException ae) {
-            log.error("Error retrieving csm security user password", ae); //$NON-NLS-1$
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error retrieving csm security user password", ex); //$NON-NLS-1$
-            throw new ApplicationException(ex.getMessage(), ex);
+        } catch (CSException e) {
+            throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }
 }

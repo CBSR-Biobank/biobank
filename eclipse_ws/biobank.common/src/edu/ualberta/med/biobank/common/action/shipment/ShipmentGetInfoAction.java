@@ -4,12 +4,15 @@ import java.util.ArrayList;
 
 import org.hibernate.Query;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
@@ -19,10 +22,15 @@ import edu.ualberta.med.biobank.model.OriginInfo;
  * @author aaron
  * 
  */
+@SuppressWarnings("nls")
 public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("nls")
+    private static final Bundle bundle = new CommonBundle();
+
+    public static final Tr ORIGIN_INFO_NULL_ERROR =
+        bundle.tr("No origin info found with id {} ");
+
     private static final String ORIGIN_INFO_HQL =
         "SELECT DISTINCT oi FROM " + OriginInfo.class.getName() + " oi"
             + " WHERE oi.id=?";
@@ -48,7 +56,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
         OriginInfo oi = (OriginInfo) query.uniqueResult();
         if (oi == null) {
-            throw new ActionException("No origin info found with id: " + oiId);
+            throw new ActionException(ORIGIN_INFO_NULL_ERROR.format(oiId));
         }
 
         sInfo.originInfo = oi;

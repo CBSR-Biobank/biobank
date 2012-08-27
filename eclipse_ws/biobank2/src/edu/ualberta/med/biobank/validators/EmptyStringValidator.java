@@ -11,11 +11,12 @@ public class EmptyStringValidator extends AbstractValidator {
         super(message);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
-                Messages.EmptyStringValidator_nonstring_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         if ((value == null) || ((String) value).isEmpty()) {

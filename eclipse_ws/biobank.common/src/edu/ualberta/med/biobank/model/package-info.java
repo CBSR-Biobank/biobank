@@ -12,13 +12,6 @@
         defaultForType = PermissionEnum.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.PermissionEnum")
-        }),
-    @TypeDef(
-        name = "rank",
-        typeClass = GenericEnumUserType.class,
-        defaultForType = Rank.class,
-        parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.Rank")
         })
 })
 package edu.ualberta.med.biobank.model;

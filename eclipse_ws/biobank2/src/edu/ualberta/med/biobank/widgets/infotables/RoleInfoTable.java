@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -10,10 +9,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteInput;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.dialogs.user.RoleEditDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
@@ -22,16 +24,19 @@ import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
+import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.Role;
 
 public abstract class RoleInfoTable extends
     DefaultAbstractInfoTableWidget<Role> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(RequestDispatchInfoTable.class);
     public static final int ROWS_PER_PAGE = 12;
 
     private static final String[] HEADINGS =
-        new String[] { Messages.RoleInfoTable_name_label };
+        new String[] { HasName.PropertyName.NAME.toString() };
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "nls" })
     public RoleInfoTable(Composite parent, List<Role> collection) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
         addEditItemListener(new IInfoTableEditItemListener<Role>() {
@@ -59,7 +64,7 @@ public abstract class RoleInfoTable extends
         });
 
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.RoleInfoTable_duplicate_label);
+        item.setText(i18n.trc("duplicate (verb)", "Duplicate"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -81,7 +86,7 @@ public abstract class RoleInfoTable extends
                 case 0:
                     return role.getName();
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -97,15 +102,18 @@ public abstract class RoleInfoTable extends
         }
     }
 
+    @SuppressWarnings("nls")
     protected boolean deleteRole(Role role) {
         try {
             String name = role.getName();
-            String message = MessageFormat.format(
-                Messages.RoleInfoTable_delete_confirm_msg,
-                new Object[] { name });
+            String message =
+                // dialog message.
+                i18n.tr("Are you certain you want to delete \"{0}\"?",
+                    name);
 
             if (BgcPlugin.openConfirm(
-                Messages.RoleInfoTable_delete_confirm_title, message)) {
+                // dialog title.
+                i18n.tr("Confirm Deletion"), message)) {
 
                 SessionManager.getAppService().doAction(
                     new RoleDeleteAction(new RoleDeleteInput(role)));
@@ -118,7 +126,9 @@ public abstract class RoleInfoTable extends
             }
         } catch (Exception e) {
             BgcPlugin
-                .openAsyncError(Messages.RoleInfoTable_delete_error_msg, e);
+                .openAsyncError(
+                    // dialog title.
+                    i18n.tr("Unable to delete role."), e);
         }
         return false;
     }

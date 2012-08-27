@@ -7,8 +7,13 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicVisitInfoTable extends
@@ -27,9 +32,9 @@ public class ClinicVisitInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ClinicVisitInfoTable_nber_label,
-        Messages.ClinicVisitInfoTable_source_specs_label,
-        Messages.ClinicVisitInfoTable_aliquoted_spec_label };
+        CollectionEvent.PropertyName.VISIT_NUMBER.toString(),
+        SourceSpecimen.NAME.plural().toString(),
+        AliquotedSpecimen.NAME.plural().toString() };
 
     public ClinicVisitInfoTable(Composite parent,
         List<PatientCEventInfo> collection) {
@@ -45,9 +50,9 @@ public class ClinicVisitInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -59,7 +64,7 @@ public class ClinicVisitInfoTable extends
                     return NumberFormatter
                         .format(item.cevent.aliquotedSpecimenCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

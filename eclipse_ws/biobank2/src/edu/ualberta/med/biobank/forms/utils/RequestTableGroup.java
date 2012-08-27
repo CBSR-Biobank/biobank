@@ -7,22 +7,26 @@ import java.util.List;
 
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.request.RequestGetSpecimenInfosAction;
-import edu.ualberta.med.biobank.common.util.ItemState;
-import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.type.ItemState;
+import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.TreeItemAdapter;
 import edu.ualberta.med.biobank.treeview.request.RequestContainerAdapter;
 
 public class RequestTableGroup extends TableGroup<RequestWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(RequestTableGroup.class);
 
     public RequestTableGroup(RequestSpecimenState ds, String alternateLabel,
         RequestWrapper request) {
@@ -33,17 +37,20 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
         super(ds, request);
     }
 
+    @SuppressWarnings("nls")
     public static List<RequestTableGroup> getGroupsForRequest(
         RequestWrapper ship) {
         ArrayList<RequestTableGroup> groups =
             new ArrayList<RequestTableGroup>();
         groups.add(new RequestTableGroup(null,
-            Messages.RequestTableGroup_0, ship));
+            // tree node label
+            i18n.tr("All"), ship));
         groups.add(new RequestTableGroup(RequestSpecimenState.PULLED_STATE,
             ship));
         return groups;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void createAdapterTree(ItemState state, RequestWrapper request)
         throws Exception {
@@ -55,8 +62,11 @@ public class RequestTableGroup extends TableGroup<RequestWrapper> {
             results =
                 SessionManager.getAppService().doAction(specAction).getList();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(Messages.RequestTableGroup_1,
-                Messages.RequestTableGroup_2, e);
+            BgcPlugin.openAsyncError(
+                // dialog title
+                i18n.tr("Error"),
+                // dialog message
+                i18n.tr("Unable to retrieve data from server"), e);
         }
 
         HashSet<Integer> containers = new HashSet<Integer>();

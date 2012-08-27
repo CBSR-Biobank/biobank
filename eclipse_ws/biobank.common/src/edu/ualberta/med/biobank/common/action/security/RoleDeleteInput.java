@@ -8,6 +8,7 @@ public class RoleDeleteInput implements ActionInput {
 
     private final Integer roleId;
 
+    @SuppressWarnings("nls")
     public RoleDeleteInput(Role role) {
         if (role == null)
             throw new IllegalArgumentException("null role");

@@ -22,6 +22,10 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -48,6 +52,23 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 public class Center extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Center",
+        "Centers");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString DST_DISPATCHES = bundle.trc(
+            "model",
+            "Destination Dispatches").format();
+        public static final LString SRC_DISPATCHES = bundle.trc(
+            "model",
+            "Source Dispatches").format();
+    }
 
     private String name;
     private String nameShort;

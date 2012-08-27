@@ -11,8 +11,13 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
@@ -23,18 +28,19 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
         public Long patientCount;
         public Long visitCount;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
             return StringUtils.join(new String[] { studyShortName,
-                (patientCount != null) ? patientCount.toString() : "", //$NON-NLS-1$
-                (visitCount != null) ? visitCount.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+                (patientCount != null) ? patientCount.toString() : StringUtil.EMPTY_STRING,
+                (visitCount != null) ? visitCount.toString() : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.ClinicStudyInfoTable_study_label,
-        Messages.ClinicStudyInfoTable_patient_count_label,
-        Messages.ClinicStudyInfoTable_cvent_count_label };
+        Study.NAME.singular().toString(),
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString() };
 
     public ClinicStudyInfoTable(Composite parent,
         List<StudyCountInfo> studyCountInfo) {
@@ -51,9 +57,9 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
 
                 switch (columnIndex) {
@@ -64,7 +70,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                 case 2:
                     return NumberFormatter.format(item.visitCount);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

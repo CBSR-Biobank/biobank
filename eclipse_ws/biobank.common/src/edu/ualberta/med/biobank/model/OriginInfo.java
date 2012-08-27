@@ -16,10 +16,21 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "ORIGIN_INFO")
 public class OriginInfo extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Origin Information",
+        "Origin Information");
 
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Set<Specimen> specimens = new HashSet<Specimen>(0);

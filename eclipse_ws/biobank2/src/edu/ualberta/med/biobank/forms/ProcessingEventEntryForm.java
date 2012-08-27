@@ -9,11 +9,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
@@ -38,8 +39,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -55,15 +58,20 @@ import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoListen
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 
 public class ProcessingEventEntryForm extends BiobankEntryForm {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ProcessingEventEntryForm.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
         "edu.ualberta.med.biobank.forms.ProcessingEventEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String MSG_NEW_PEVENT_OK =
-        "Creating a new processing event";
+        i18n.tr("Creating a new processing event");
 
+    @SuppressWarnings("nls")
     private static final String MSG_PEVENT_OK =
-        "Editing a processing event";
+        i18n.tr("Editing a processing event");
 
     private ProcessingEventAdapter pEventAdapter;
 
@@ -87,6 +95,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     protected Study study;
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ProcessingEventAdapter,
@@ -97,16 +106,16 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         setPEventInfo(adapter.getId());
         String tabName;
         if (pEventAdapter.getId() == null) {
-            tabName = "New processing event";
+            tabName = i18n.tr("New processing event");
         } else {
             if (pevent.getWorksheet() == null)
                 tabName =
-                    NLS.bind(
+                    i18n.tr(
                         "Processing event {0} on {1}",
                         pevent.getWorksheet(), pevent.getFormattedCreatedAt());
             else
                 tabName =
-                    NLS.bind(
+                    i18n.tr(
                         "Processing event date {0}",
                         DateFormatter.formatAsDateTime(pevent.getCreatedAt()));
         }
@@ -134,15 +143,17 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         comment.setWrappedObject(new Comment());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Processing event information");
+        form.setText(i18n.tr("Processing event information"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
         createSpecimensSection();
     }
 
+    @SuppressWarnings("nls")
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -152,34 +163,37 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            "Center", pevent.getCenter()
+            Center.NAME.singular().toString(), pevent.getCenter()
                 .getName());
 
         dateWidget =
             createDateTimeWidget(
                 client,
-                "Start time",
+                i18n.tr("Start time"),
                 pevent.getCreatedAt(),
                 pevent,
                 ProcessingEventPeer.CREATED_AT.getName(),
                 new NotNullValidator(
-                    "A creation date/time should be selected"));
+                    // validation error message.
+                    i18n.tr("A creation date/time should be selected")));
         setFirstControl(dateWidget);
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            "Worksheet", null, pevent,
+            ProcessingEvent.PropertyName.WORKSHEET.toString(), null, pevent,
             ProcessingEventPeer.WORKSHEET.getName(),
             (!pevent.isNew() && pevent.getWorksheet() == null) ? null
                 : new NonEmptyStringValidator(
-                    "Worksheet cannot be null"));
+                    // validation error message.
+                    i18n.tr("Worksheet cannot be null")));
 
         activityStatusComboViewer =
             createComboViewer(
                 client,
-                "Activity status",
+                ActivityStatus.NAME.singular().toString(),
                 ActivityStatus.valuesList(),
                 pevent.getActivityStatus(),
-                "Processing event must have an activity status ",
+                // validation error message.
+                i18n.tr("Processing event must have an activity status"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -198,8 +212,10 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
 
     }
 
+    @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client = createSectionWithClient("Comments");
+        Composite client =
+            createSectionWithClient(Comment.NAME.plural().toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
@@ -212,15 +228,16 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
         createBoundWidgetWithLabel(client, BgcBaseText.class,
-            SWT.MULTI, "Add a comment", null, comment, "message", null);
+            SWT.MULTI, i18n.tr("Add a comment"), null, comment, "message", null);
 
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimensSection() {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
         Composite client =
-            createSectionWithClient("Source specimens");
+            createSectionWithClient(SourceSpecimen.NAME.plural().toString());
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
@@ -263,22 +280,24 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     case PRE_ADD:
                         if (specimen == null)
                             throw new VetoException(
-                                "No specimen found for that inventory id.");
+                                // exception message.
+                                i18n.tr("No specimen found for that inventory id."));
                         else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter()
                             .equals(specimen.getCurrentCenter())) {
-                            String centerName =
-                                "'none'";
+                            String centerName = i18n.tr("'none'");
                             if (specimen.getCurrentCenter() != null)
                                 centerName =
                                     specimen.getCurrentCenter().getNameShort();
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "Specimen is currently in center {0}. You can''t process it.",
                                     centerName));
                         } else if (specimen.getProcessingEvent() != null) {
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "This specimen is already in processing event ''{0}'' ({1}). Remove it from the other processing event first.",
                                     specimen.getProcessingEvent()
                                         .getWorksheet(), specimen
@@ -286,22 +305,26 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                         .getFormattedCreatedAt()));
                         } else if (!specimen.isActive())
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "This specimen has status ''{0}''. Only ''Active'' specimens can be added to a processing event.",
                                     specimen.getActivityStatus().getName()));
                         else if (specimen.isUsedInDispatch())
                             throw new VetoException(
-                                "Specimen is currently listed in a dispatch.");
+                                // exception message.
+                                i18n.tr("Specimen is currently listed in a dispatch."));
                         else if (specimen.getParentContainer() != null)
                             throw new VetoException(
-                                "Specimen is currently listed as stored in a container.");
+                                // exception message.
+                                i18n.tr("Specimen is currently listed as stored in a container."));
                         else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter().getStudyCollection()
                             .contains(
                                 specimen.getCollectionEvent().getPatient()
                                     .getStudy()))
                             throw new VetoException(
-                                NLS.bind(
+                                // exception message.
+                                i18n.tr(
                                     "This specimen is from study ''{0}''. This study is not linked to your current working center. Processing is not allowed.",
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
@@ -321,14 +344,16 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                         .getPatient().getStudy();
                                 } catch (Exception e) {
                                     throw new VetoException(
-                                        "All Specimens must be part of the same study.");
+                                        // exception message.
+                                        i18n.tr("All Specimens must be part of the same study."));
                                 }
                             }
                         }
                         if (!specimen.getCollectionEvent().getPatient()
                             .getStudy().getWrappedObject().equals(study))
                             throw new VetoException(
-                                "In a processing event, all specimens must be part of the same study.");
+                                // exception message.
+                                i18n.tr("In a processing event, all specimens must be part of the same study."));
                     case POST_ADD:
                         specimen.setProcessingEvent(pevent);
                         specimen.setActivityStatus(closedActivityStatus);
@@ -336,13 +361,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                     case PRE_DELETE:
                         if (specimen.getChildSpecimenCollection(false).size() != 0)
                             throw new VetoException(
-                                "Cannot remove processed specimens with children.");
+                                // exception message.
+                                i18n.tr("Cannot remove processed specimens with children."));
                     }
                 }
             };
 
         specimenEntryWidget.addBinding(widgetCreator,
-            "Specimens should be added to a processing event");
+            i18n.tr("Specimens should be added to a processing event"));
 
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
         specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);

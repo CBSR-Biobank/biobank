@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.widgets.infotables;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -10,16 +12,25 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.study.StudyDeletePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyReadPermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.Patient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(NewStudyInfoTable.class);
+
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.StudyInfoTable_name_label,
-        Messages.StudyInfoTable_nameshort_label,
-        Messages.StudyInfoTable_status_label,
-        Messages.StudyInfoTable_patients_label,
-        Messages.StudyInfoTable_visits_label };
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        i18n.tr("Status"),
+        Patient.NAME.plural().toString(),
+        CollectionEvent.NAME.plural().toString() };
 
     public NewStudyInfoTable(Composite parent, List<StudyCountInfo> studies) {
         super(parent, studies, HEADINGS, 10,
@@ -41,14 +52,15 @@ public class NewStudyInfoTable extends InfoTableWidget<StudyCountInfo> {
                     return info.getStudy().getNameShort();
                 case 2:
                     return (info.getStudy().getActivityStatus() != null) ? info
-                        .getStudy().getActivityStatus().getName() : ""; //$NON-NLS-1$
+                        .getStudy().getActivityStatus().getName()
+                        : StringUtil.EMPTY_STRING;
                 case 3:
                     return NumberFormatter.format(info.getPatientCount());
                 case 4:
                     return NumberFormatter.format(info
                         .getCollectionEventCount());
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };

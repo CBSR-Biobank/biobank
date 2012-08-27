@@ -1,20 +1,30 @@
 package edu.ualberta.med.biobank.common.action.security;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.EmptyResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankCSMSecurityUtil;
-import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
     private static final Permission PERMISSION = new UserManagerPermission();
+
+    @SuppressWarnings("nls")
+    public static final LString INADEQUATE_PERMISSIONS_ERRMSG =
+        bundle.tr("You do not have adequate permissions to delete this user.")
+            .format();
+    @SuppressWarnings("nls")
+    public static final LString CSM_USER_DELETE_FAILURE_ERRMSG =
+        bundle.tr("Unable to delete associated CSM user.").format();
 
     private final UserDeleteInput input;
 
@@ -32,7 +42,7 @@ public class UserDeleteAction implements Action<EmptyResult> {
         User user = context.load(User.class, input.getUserId());
 
         if (!user.isFullyManageable(context.getUser())) {
-            throw new ActionException("insufficient power");
+            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
 
         // the group side is the managing side, so we must remove the user from
@@ -46,15 +56,7 @@ public class UserDeleteAction implements Action<EmptyResult> {
         context.getSession().delete(user);
         context.getSession().flush();
 
-        try {
-            BiobankCSMSecurityUtil.deleteUser(user);
-        } catch (ApplicationException e) {
-            // don't throw an exception if the user object cannot even be found.
-            if (!(e.getCause() instanceof CSObjectNotFoundException)) {
-                throw new ActionException(
-                    "unable to delete underlying CSM user", e);
-            }
-        }
+        BiobankCSMSecurityUtil.deleteUser(user);
 
         return new EmptyResult();
     }

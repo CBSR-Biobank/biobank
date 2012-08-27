@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.cglib.proxy.Enhancer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class AdapterFactory {
-
     private static List<String> adaptersPackages;
 
     static {
@@ -23,6 +23,7 @@ public class AdapterFactory {
         }
     }
 
+    @SuppressWarnings("nls")
     public static AbstractAdapterBase getAdapter(Object object) {
         Class<?> objectClass = object.getClass();
         // FIXME need something better in common, or just this might be inside
@@ -32,12 +33,13 @@ public class AdapterFactory {
         }
         String objectClassName = objectClass.getSimpleName();
         String adapterClassName =
-            objectClassName.replace("Wrapper", "") + "Adapter"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            objectClassName.replace("Wrapper", StringUtil.EMPTY_STRING)
+                + "Adapter";
         try {
             for (String packageName : adaptersPackages) {
                 Class<?> klass;
                 try {
-                    klass = Class.forName(packageName + "." + adapterClassName); //$NON-NLS-1$
+                    klass = Class.forName(packageName + "." + adapterClassName);
                 } catch (ClassNotFoundException e) {
                     // try next package
                     continue;
@@ -50,11 +52,11 @@ public class AdapterFactory {
                 return (AbstractAdapterBase) constructor
                     .newInstance(new Object[] { null, object });
             }
-            throw new Exception("No adapter class found:" + adapterClassName); //$NON-NLS-1$
+            throw new Exception("No adapter class found:" + adapterClassName);
         } catch (Exception e) {
             throw new RuntimeException(
-                "error in invoking adapter for object: " + objectClassName //$NON-NLS-1$
-                    + " (adapter name is " + adapterClassName + "). ", e); //$NON-NLS-1$ //$NON-NLS-2$
+                "error in invoking adapter for object: " + objectClassName
+                    + " (adapter name is " + adapterClassName + "). ", e);
         }
     }
 }

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.views;
 
 import java.util.Map;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -11,24 +10,34 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.part.ViewPart;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.reports.ReportsPermission;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.trees.ReportTreeWidget;
 
 public class ReportsView extends ViewPart {
+    private static final I18n i18n = I18nFactory.getI18n(ReportsView.class);
 
     public static BgcLogger logger = BgcLogger.getLogger(ReportsView.class
         .getName());
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.ReportsView"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.views.ReportsView";
 
     public static ReportsView currentInstance;
 
@@ -86,12 +95,14 @@ public class ReportsView extends ViewPart {
                     try {
                         if (sourceName
                             .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_OUT)) {
+                            && sourceValue
+                                .equals(LoginPermissionSessionState.LOGGED_OUT)) {
                             allowed = false;
                         }
                         else if (sourceName
                             .equals(LoginPermissionSessionState.LOGIN_STATE_SOURCE_NAME)
-                            && sourceValue.equals(LoginPermissionSessionState.LOGGED_IN)) {
+                            && sourceValue
+                                .equals(LoginPermissionSessionState.LOGGED_IN)) {
                             allowed =
                                 SessionManager.getAppService().isAllowed(
                                     new ReportsPermission());
@@ -114,60 +125,60 @@ public class ReportsView extends ViewPart {
 
         // Specimens
         specimenTab = new CTabItem(top, SWT.NONE);
-        specimenTab.setText(Messages.ReportsView_specimens_tab_label);
+        specimenTab.setText(Specimen.NAME.plural().toString());
         Composite specimenBody = new Composite(top, SWT.NONE);
         specimenBody.setLayout(treeLayout);
         specimenBody.setLayoutData(treeGd);
         specimenTab.setControl(specimenBody);
         specimenTree = new ReportTreeWidget(specimenBody);
-        specimenRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        specimenRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         specimenTree.setLayoutData(treeGd);
 
         top.setSelection(specimenTab);
 
         // Clinics
         clinicTab = new CTabItem(top, SWT.NONE);
-        clinicTab.setText(Messages.ReportsView_clinics_tab_label);
+        clinicTab.setText(Clinic.NAME.plural().toString());
         Composite clinicBody = new Composite(top, SWT.NONE);
         clinicBody.setLayout(treeLayout);
         clinicBody.setLayoutData(treeGd);
         clinicTab.setControl(clinicBody);
         clinicTree = new ReportTreeWidget(clinicBody);
-        clinicRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        clinicRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         clinicTree.setLayoutData(treeGd);
 
         // Patients
         patientTab = new CTabItem(top, SWT.NONE);
-        patientTab.setText(Messages.ReportsView_patients_tab_label);
+        patientTab.setText(Patient.NAME.plural().toString());
         Composite patientBody = new Composite(top, SWT.NONE);
         patientBody.setLayout(treeLayout);
         patientBody.setLayoutData(treeGd);
         patientTab.setControl(patientBody);
         patientTree = new ReportTreeWidget(patientBody);
-        patientRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        patientRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         patientTree.setLayoutData(treeGd);
 
         // Specimen Types
         specimenTypeTab = new CTabItem(top, SWT.NONE);
-        specimenTypeTab.setText(Messages.ReportsView_specTypes_tab_label);
+        specimenTypeTab.setText(SpecimenType.NAME.plural().toString());
         Composite specimenTypeBody = new Composite(top, SWT.NONE);
         specimenTypeBody.setLayout(treeLayout);
         specimenTypeBody.setLayoutData(treeGd);
         specimenTypeTab.setControl(specimenTypeBody);
         specimenTypeTree = new ReportTreeWidget(specimenTypeBody);
         specimenTypeRoot =
-            new AbstractReportTreeNode(""); //$NON-NLS-1$
+            new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         specimenTypeTree.setLayoutData(treeGd);
 
         // Containers
         containerTab = new CTabItem(top, SWT.NONE);
-        containerTab.setText(Messages.ReportsView_containers_tab_label);
+        containerTab.setText(Container.NAME.plural().toString());
         Composite containerBody = new Composite(top, SWT.NONE);
         containerBody.setLayout(treeLayout);
         containerBody.setLayoutData(treeGd);
         containerTab.setControl(containerBody);
         containerTree = new ReportTreeWidget(containerBody);
-        containerRoot = new AbstractReportTreeNode(""); //$NON-NLS-1$
+        containerRoot = new AbstractReportTreeNode(StringUtil.EMPTY_STRING);
         containerTree.setLayoutData(treeGd);
 
         initializeNewReports(specimenRoot, clinicRoot, patientRoot,
@@ -208,6 +219,7 @@ public class ReportsView extends ViewPart {
         }
     }
 
+    @SuppressWarnings("nls")
     private void addInTree(AbstractReportTreeNode specimens,
         AbstractReportTreeNode clinics, AbstractReportTreeNode patients,
         AbstractReportTreeNode specimenTypes,
@@ -235,8 +247,9 @@ public class ReportsView extends ViewPart {
             child.setParent(containers);
             break;
         default:
-            throw new Exception(NLS.bind("Unable to place report node: {0}", //$NON-NLS-1$
-                child.getLabel()));
+            throw new Exception(
+                // exception message.
+                i18n.tr("Unable to place report node: {0}", child.getLabel()));
         }
     }
 

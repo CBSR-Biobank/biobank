@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 /**
  * Not used at the moment. Only here for an example.
@@ -19,6 +21,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  */
 public class DefaultTopPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
+    private static final I18n i18n = I18nFactory
+        .getI18n(DefaultTopPreferencePage.class);
+
     private Composite createComposite(Composite parent, int numColumns) {
         noDefaultAndApplyButton();
 
@@ -41,7 +46,9 @@ public class DefaultTopPreferencePage extends PreferencePage implements
     protected Control createContents(Composite parent) {
         Composite composite = createScrolledComposite(parent);
 
-        String description = Messages.DefaultTopPreferencePage_description;
+        @SuppressWarnings("nls")
+        String description =
+            i18n.tr("Expand the tree to edit preferences for a specific feature.");
         Text text = new Text(composite, 8);
 
         text.setBackground(composite.getBackground());

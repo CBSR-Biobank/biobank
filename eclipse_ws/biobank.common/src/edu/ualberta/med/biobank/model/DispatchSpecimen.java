@@ -14,10 +14,29 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @Entity
 @Table(name = "DISPATCH_SPECIMEN")
 public class DispatchSpecimen extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Dispatched Specimen",
+        "Dispatched Specimens");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString STATE = bundle.trc(
+            "model",
+            "State").format();
+    }
 
     private Integer state;
     private Dispatch dispatch;

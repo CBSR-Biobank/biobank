@@ -2,18 +2,21 @@ package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.Collection;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenActionHelper {
+    private static final Bundle bundle = new CommonBundle();
 
     public static void setParent(ActionContext actionContext,
         Specimen specimen,
@@ -46,6 +49,7 @@ public class SpecimenActionHelper {
                 }
     }
 
+    @SuppressWarnings("nls")
     public static void setPosition(ActionContext actionContext,
         Specimen specimen,
         RowColPos rcp, Integer containerId) {
@@ -77,7 +81,9 @@ public class SpecimenActionHelper {
         } else if ((rcp == null && containerId != null)
             || (rcp != null && containerId == null)) {
             throw new ActionException(
-                "Problem: position and parent container should be both null or both set"); //$NON-NLS-1$
+                bundle
+                    .tr("Parent container and position should either both be set or both be null")
+                    .format());
         }
     }
 

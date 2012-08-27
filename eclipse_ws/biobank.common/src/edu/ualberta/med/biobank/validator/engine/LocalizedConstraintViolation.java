@@ -21,11 +21,11 @@ import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpo
  * 
  * @author Jonathan Ferland
  */
-public class LocalizedConstraintViolation<T> implements ConstraintViolation<T>,
-    Serializable {
+public class LocalizedConstraintViolation<T>
+    implements ConstraintViolation<T>, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final OgnlMessageInterpolator MESSAGE_INTERPOLATOR =
+    private static final OgnlMessageInterpolator interpolator =
         new OgnlMessageInterpolator();
 
     private final ConstraintViolation<T> delegate;
@@ -90,6 +90,6 @@ public class LocalizedConstraintViolation<T> implements ConstraintViolation<T>,
         T rootBean = getRootBean();
         Context context = new MessageInterpolatorContext(descriptor, rootBean);
 
-        message = MESSAGE_INTERPOLATOR.interpolate(template, context);
+        message = interpolator.interpolate(template, context);
     }
 }

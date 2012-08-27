@@ -5,13 +5,14 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -24,6 +25,9 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 // TODO: delete AbstractReportsGroup
 public class ReportEntityGroup extends AdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ReportEntityGroup.class);
+
     private final AbstractReportGroup parent;
     private final Entity entity;
 
@@ -34,9 +38,10 @@ public class ReportEntityGroup extends AdapterBase {
         this.entity = entity;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void openViewForm() {
-        Assert.isTrue(false, "should not be called"); //$NON-NLS-1$
+        Assert.isTrue(false, "should not be called");
     }
 
     @Override
@@ -49,12 +54,12 @@ public class ReportEntityGroup extends AdapterBase {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (parent.isModifiable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText(NLS.bind(Messages.ReportEntityGroup_new_label,
-                entity.getName()));
+            mi.setText(i18n.tr("New {0} Report", entity.getName()));
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {

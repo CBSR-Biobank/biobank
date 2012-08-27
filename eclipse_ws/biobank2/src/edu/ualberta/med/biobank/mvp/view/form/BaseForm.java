@@ -21,6 +21,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 public class BaseForm {
+    @SuppressWarnings("nls")
     private static final String PAGE_KEY = "page";
     private final SectionMonitor sectionMonitor = new SectionMonitor();
     private final ScrolledForm scrolledForm;

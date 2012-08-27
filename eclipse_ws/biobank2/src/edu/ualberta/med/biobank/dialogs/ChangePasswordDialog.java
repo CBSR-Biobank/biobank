@@ -15,6 +15,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -23,6 +25,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
 public class ChangePasswordDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ChangePasswordDialog.class);
 
     public static final int MIN_PASSWORD_LENGTH = 5;
 
@@ -38,12 +42,14 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         this.forceChange = forceChange;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("Change Password");
+        shell.setText(i18n.tr("Change Password"));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -55,20 +61,22 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         oldPassText = createPassWordText(contents,
-            "Old Password");
+            i18n.tr("Old Password"));
         new Label(contents, SWT.NONE);
         new Label(contents, SWT.NONE); // shhhh! don't tell anyone i did this.
         newPass1Text = createPassWordText(contents,
-            "Password");
+            i18n.tr("Password"));
         newPass2Text = createPassWordText(contents,
-            "Re-type Password");
+            i18n.tr("Re-type Password"));
 
         oldPassText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().equals(""))
-                    setErrorMessage("Please enter your old password");
+                if (text.getText().isEmpty())
+                    setErrorMessage(
+                    // TR: validation error message
+                    i18n.tr("Please enter your old password"));
                 else {
                     setErrorMessage(null);
                 }
@@ -79,7 +87,11 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (text.getText().length() < MIN_PASSWORD_LENGTH)
-                    setErrorMessage("Please enter your new password (at least 5 characters)");
+                    setErrorMessage(
+                    // TR: validation error message
+                    i18n.tr(
+                        "Please enter your new password (at least {0} characters)",
+                        MIN_PASSWORD_LENGTH));
                 else {
                     setErrorMessage(null);
                     newPass2Text.notifyListeners(SWT.Modify, new Event());
@@ -91,7 +103,9 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
                 if (!text.getText().equals(newPass1Text.getText()))
-                    setErrorMessage("Please re-enter your new password");
+                    setErrorMessage(
+                    // TR: validation error message
+                    i18n.tr("Please re-enter your new password"));
                 else {
                     setErrorMessage(null);
                     oldPassText.notifyListeners(SWT.Modify, new Event());
@@ -102,8 +116,9 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         if (forceChange) {
             // will ask about bulk email on the same time
             checkBulk = new Button(contents, SWT.CHECK);
-            checkBulk
-                .setText("I want to receive emails about new versions");
+            checkBulk.setText(
+                // TR: checkbox text
+                i18n.tr("I want to receive emails about new versions"));
             checkBulk
                 .setSelection(SessionManager.getUser().getRecvBulkEmails());
         }
@@ -133,6 +148,7 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         return false;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
         if ((newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
@@ -161,8 +177,10 @@ public class ChangePasswordDialog extends BgcBaseDialog {
             // SessionManager.getInstance().getSession().resetAppService();
             BgcPlugin
                 .openInformation(
-                    "Password modified",
-                    "Your password has been successfully changed. You will need to reconnect again to see your data");
+                    // TR: dialog title
+                    i18n.tr("Password modified"),
+                    // TR: dialog message
+                    i18n.tr("Your password has been successfully changed. You will need to reconnect again to see your data"));
 
             if (forceChange && newPass1Text.getText().isEmpty()) {
                 return;
@@ -192,19 +210,25 @@ public class ChangePasswordDialog extends BgcBaseDialog {
         return contents;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        return "Change your password to something different.";
+        // dialog title area message
+        return i18n.tr("Change your password to something different.");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        return "Change Password";
+        // dialog title area title
+        return i18n.tr("Change Password");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        return "Change Password";
+        // dialog shell title
+        return i18n.tr("Change Password");
     }
 
     public static void open(Shell shell, boolean forceChange) {

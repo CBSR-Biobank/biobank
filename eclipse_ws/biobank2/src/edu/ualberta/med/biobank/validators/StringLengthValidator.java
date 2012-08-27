@@ -13,18 +13,19 @@ import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
  */
 public class StringLengthValidator extends AbstractValidator {
 
-    private int length;
+    private final int length;
 
     public StringLengthValidator(int length, String message) {
         super(message);
         this.length = length;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public IStatus validate(Object value) {
         if ((value != null) && !(value instanceof String)) {
             throw new RuntimeException(
-                Messages.StringLengthValidator_nonstring_error_msg);
+                "Not supposed to be called for non-strings.");
         }
 
         if ((value != null) && ((String) value).length() >= length) {

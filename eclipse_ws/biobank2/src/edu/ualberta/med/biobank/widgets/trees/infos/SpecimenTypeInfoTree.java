@@ -5,20 +5,28 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankCollectionModel;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 
 public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTypeInfoTree.class);
 
     private static final String[] HEADINGS = new String[] {
-        Messages.SpecimenTypeInfoTree_name_label,
-        Messages.SpecimenTypeInfoTree_nameShort_label };
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString() };
 
-    protected List<SpecimenTypeWrapper> needReload = new ArrayList<SpecimenTypeWrapper>();
+    protected List<SpecimenTypeWrapper> needReload =
+        new ArrayList<SpecimenTypeWrapper>();
 
     public SpecimenTypeInfoTree(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
@@ -28,18 +36,20 @@ public class SpecimenTypeInfoTree extends InfoTreeWidget<SpecimenTypeWrapper> {
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
+            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 SpecimenTypeWrapper item = null;
                 if (element instanceof SpecimenTypeWrapper)
                     item = (SpecimenTypeWrapper) element;
                 else
-                    item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
+                    item =
+                        (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.SpecimenTypeInfoTree_loading;
+                        return i18n.tr("loading...");
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:

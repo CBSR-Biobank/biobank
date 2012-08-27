@@ -5,6 +5,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -21,6 +23,8 @@ import edu.ualberta.med.biobank.widgets.trees.permission.PermissionCheckTreeWidg
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RoleEditDialog extends AbstractSecurityEditDialog {
+    private static final I18n i18n = I18nFactory.getI18n(RoleEditDialog.class);
+
     private final String currentTitle;
     private final String titleAreaMessage;
 
@@ -30,6 +34,7 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
 
     private PermissionCheckTreeWidget tree;
 
+    @SuppressWarnings("nls")
     public RoleEditDialog(Shell parent, Role role) {
         super(parent);
 
@@ -43,11 +48,15 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         this.roleWrapper = new RoleWrapper(service, role);
 
         if (role.isNew()) {
-            currentTitle = "Add Role";
-            titleAreaMessage = "Add a new role";
+            // TR: add a role dialog title
+            currentTitle = i18n.tr("Add Role");
+            // TR: add a role dialog title area message
+            titleAreaMessage = i18n.tr("Add a new role");
         } else {
-            currentTitle = "Edit Role";
-            titleAreaMessage = "Modify an existing role's information";
+            // TR: edit a role dialog title
+            currentTitle = i18n.tr("Edit Role");
+            // TR: edit a role dialog title area message
+            titleAreaMessage = i18n.tr("Modify an existing role's information");
         }
     }
 
@@ -71,6 +80,7 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         return currentTitle;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent)
         throws ApplicationException {
@@ -79,9 +89,11 @@ public class RoleEditDialog extends AbstractSecurityEditDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BgcBaseText.class, SWT.BORDER,
-            "Name", null, roleWrapper,
+            Role.Property.NAME.toString(),
+            null, roleWrapper,
             RolePeer.NAME.getName(), new NonEmptyStringValidator(
-                "A valid name is required."));
+                // TR: validation message when a role name is not entered
+                i18n.tr("A valid name is required.")));
 
         tree = new PermissionCheckTreeWidget(contents, true,
             PermissionEnum.valuesList());

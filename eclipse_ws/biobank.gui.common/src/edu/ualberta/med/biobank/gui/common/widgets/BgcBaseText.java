@@ -27,13 +27,14 @@ public class BgcBaseText extends BgcBaseWidget {
         this(parent, style, null);
     }
 
+    @SuppressWarnings("nls")
     public BgcBaseText(Composite parent, int style, FormToolkit toolkit) {
         super(parent, SWT.NONE);
         this.alreadyFocused = false;
         if (toolkit == null) {
             this.text = new Text(this, style | SWT.BORDER);
         } else {
-            this.text = toolkit.createText(this, "", style | SWT.BORDER); //$NON-NLS-1$
+            this.text = toolkit.createText(this, "", style | SWT.BORDER);
         }
         this.text.addFocusListener(getFocusListener());
         this.text.addMouseListener(getMouseListener());
@@ -177,8 +178,8 @@ public class BgcBaseText extends BgcBaseWidget {
     public void setEditable(boolean b) {
         text.setEditable(b);
     }
-    
-    public void setTextLimit(int limit){
+
+    public void setTextLimit(int limit) {
         text.setTextLimit(limit);
     }
 

@@ -8,6 +8,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
@@ -15,15 +17,23 @@ import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeDeletePermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeReadPermission;
 import edu.ualberta.med.biobank.common.permission.containerType.ContainerTypeUpdatePermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcLabelProvider;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableDoubleClickItemListener;
+import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeInfoTable extends
     InfoTableWidget<SiteContainerTypeInfo> {
+    public static final I18n i18n = I18nFactory
+        .getI18n(ContainerTypeInfoTable.class);
 
     private static class TableRowData {
         SiteContainerTypeInfo containerType;
@@ -34,24 +44,32 @@ public class ContainerTypeInfoTable extends
         Long inUseCount;
         Double temperature;
 
+        @SuppressWarnings("nls")
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { name, nameShort,
-                (capacity != null) ? capacity.toString() : "", status, //$NON-NLS-1$
-                (inUseCount != null) ? inUseCount.toString() : "", //$NON-NLS-1$
-                (temperature != null) ? temperature.toString() : "" }, "\t"); //$NON-NLS-1$ //$NON-NLS-2$
+            return StringUtils.join(new String[] {
+                name,
+                nameShort,
+                (capacity != null) ? capacity.toString()
+                    : StringUtil.EMPTY_STRING,
+                status,
+                (inUseCount != null) ? inUseCount.toString()
+                    : StringUtil.EMPTY_STRING,
+                (temperature != null) ? temperature.toString()
+                    : StringUtil.EMPTY_STRING }, "\t");
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] HEADINGS = new String[] {
-        Messages.ContainerTypeInfoTable_name_label,
-        Messages.ContainerTypeInfoTable_nameshort_label,
-        Messages.ContainerTypeInfoTable_capacity_label,
-        Messages.ContainerTypeInfoTable_status_label,
-        Messages.ContainerTypeInfoTable_use_label,
-        Messages.ContainerTypeInfoTable_temperature_label };
+        HasName.PropertyName.NAME.toString(),
+        HasNameShort.PropertyName.NAME_SHORT.toString(),
+        Capacity.NAME.singular().toString(),
+        i18n.tr("Status"),
+        i18n.tr("In Use"),
+        Container.PropertyName.TEMPERATURE.toString() };
 
-    private SiteAdapter siteAdapter;
+    private final SiteAdapter siteAdapter;
 
     public ContainerTypeInfoTable(Composite parent, SiteAdapter site,
         List<SiteContainerTypeInfo> containerTypeInfo) {
@@ -69,9 +87,9 @@ public class ContainerTypeInfoTable extends
                     (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
-                        return Messages.infotable_loading_msg;
+                        return AbstractInfoTableWidget.LOADING;
                     }
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
                 switch (columnIndex) {
                 case 0:
@@ -87,7 +105,7 @@ public class ContainerTypeInfoTable extends
                 case 5:
                     return NumberFormatter.format(item.temperature);
                 default:
-                    return ""; //$NON-NLS-1$
+                    return StringUtil.EMPTY_STRING;
                 }
             }
         };
@@ -139,13 +157,14 @@ public class ContainerTypeInfoTable extends
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void addClickListener(
         IInfoTableDoubleClickItemListener<SiteContainerTypeInfo> listener) {
         doubleClickListeners.add(listener);
         // TODO: this code makes no sense. See jon for why.
         MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText(Messages.ContainerTypeInfoTable_edit_label);
+        mi.setText(i18n.tr("Edit"));
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

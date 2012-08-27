@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
@@ -21,6 +20,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -71,6 +72,7 @@ import edu.ualberta.med.biobank.widgets.trees.infos.listener.InfoTreeEvent;
  * 
  */
 public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
+    private static final I18n i18n = I18nFactory.getI18n(InfoTreeWidget.class);
 
     /*
      * see http://lekkimworld.com/2008/03/27/setting_table_row_height_in_swt
@@ -165,8 +167,9 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         return false;
     }
 
+    @SuppressWarnings("nls")
     protected BiobankCollectionModel getSelectionInternal() {
-        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed"); //$NON-NLS-1$
+        Assert.isTrue(!treeViewer.getTree().isDisposed(), "widget is disposed");
         IStructuredSelection stSelection = (IStructuredSelection) treeViewer
             .getSelection();
 
@@ -214,6 +217,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         setCollection(collection, null);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void treeLoader(final List<T> collection, final T selection) {
         final Tree tree = treeViewer.getTree();
@@ -285,7 +289,7 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
                 }
             });
         } catch (Exception e) {
-            logger.error("setCollection error", e); //$NON-NLS-1$
+            logger.error("setCollection error", e);
         }
     }
 
@@ -302,10 +306,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         return type;
     }
 
+    @SuppressWarnings("nls")
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
         editItem = new MenuItem(getMenu(), SWT.PUSH);
-        editItem.setText(Messages.InfoTreeWidget_edit_label);
+        editItem.setText(i18n.tr("Edit"));
         editItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -339,12 +344,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
+    @SuppressWarnings("nls")
     public void addAddItemListener(IInfoTreeAddItemListener<T> listener) {
         addItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_add_label);
+        item.setText(i18n.tr("Add"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -353,12 +359,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
+    @SuppressWarnings("nls")
     public void addEditItemListener(IInfoTreeEditItemListener<T> listener) {
         editItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_edit_label);
+        item.setText(i18n.tr("Edit"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -367,12 +374,13 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         });
     }
 
+    @SuppressWarnings("nls")
     public void addDeleteItemListener(IInfoTreeDeleteItemListener<T> listener) {
         deleteItemListeners.add(listener);
 
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText(Messages.InfoTreeWidget_delete_label);
+        item.setText(i18n.tr("Delete"));
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -505,10 +513,11 @@ public abstract class InfoTreeWidget<T> extends AbstractInfoTreeWidget<T> {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setPageLabelText() {
-        pageLabel.setText(NLS.bind(Messages.InfoTreeWidget_pages_text,
-            (pageInfo.page + 1), +pageInfo.pageTotal));
+        pageLabel.setText(i18n.tr("Page: {0} of {1}",
+            (pageInfo.page + 1), pageInfo.pageTotal));
     }
 
     @Override

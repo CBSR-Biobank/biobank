@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.Report;
@@ -13,9 +16,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PrivateReportsGroup extends AbstractReportGroup {
-    private static final String NODE_NAME = Messages.PrivateReportsGroup_myreport_node_label;
-    private static final String HQL_REPORT_OF_USER = "from " //$NON-NLS-1$
-        + Report.class.getName() + " where userId = ?"; //$NON-NLS-1$
+    private static final I18n i18n = I18nFactory
+        .getI18n(PrivateReportsGroup.class);
+
+    @SuppressWarnings("nls")
+    private static final String NODE_NAME = i18n.tr("My Reports");
+    @SuppressWarnings("nls")
+    private static final String HQL_REPORT_OF_USER = "from "
+        + Report.class.getName() + " where userId = ?";
 
     public PrivateReportsGroup(AdapterBase parent, int id) {
         super(parent, id, NODE_NAME);

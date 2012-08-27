@@ -6,15 +6,23 @@ import java.util.List;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenTypeReport1Editor extends ReportsEditor {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTypeReport1Editor.class);
 
+    @SuppressWarnings("nls")
     public static String ID =
-        "edu.ualberta.med.biobank.editors.AliquotCountEditor"; 
+        "edu.ualberta.med.biobank.editors.AliquotCountEditor";
 
     private ComboViewer studyCombo;
 
@@ -23,7 +31,7 @@ public class SpecimenTypeReport1Editor extends ReportsEditor {
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(SessionManager
             .getAppService());
         studyCombo = widgetCreator.createComboViewer(parent,
-            "Study", studies, null,
+            Study.NAME.format(1).toString(), studies, null,
             new BiobankLabelProvider());
         studyCombo.setLabelProvider(new BiobankLabelProvider() {
             @Override
@@ -42,19 +50,24 @@ public class SpecimenTypeReport1Editor extends ReportsEditor {
         report.setParams(params);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String[] getColumnNames() {
-        return new String[] { "Patient Number",
-            "First Time Processed",
-            "First Time Drawn",
-            "Specimen Type",
-            "Total" };
+        return new String[] {
+            Patient.PropertyName.PNUMBER.toString(),
+            // table column name
+            i18n.tr("First Time Processed"),
+            // table column name
+            i18n.tr("First Time Drawn"),
+            SpecimenType.NAME.format(1).toString(),
+            // table column name
+            i18n.tr("Total") };
     }
 
     @Override
     protected List<String> getParamNames() {
         List<String> name = new ArrayList<String>();
-        name.add("Study");
+        name.add(Study.NAME.format(1).toString());
         return name;
     }
 

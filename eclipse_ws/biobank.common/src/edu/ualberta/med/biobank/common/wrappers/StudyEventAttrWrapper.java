@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
-import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -53,15 +52,5 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
     public static List<StudyEventAttrWrapper> getStudyEventAttrCollection(
         StudyWrapper study) {
         return study.getStudyEventAttrCollection(false);
-    }
-
-    @Deprecated
-    @Override
-    protected void addDeleteTasks(TaskList tasks) {
-
-        tasks.add(check().notUsedBy(EventAttr.class,
-            EventAttrPeer.STUDY_EVENT_ATTR));
-
-        super.addDeleteTasks(tasks);
     }
 }

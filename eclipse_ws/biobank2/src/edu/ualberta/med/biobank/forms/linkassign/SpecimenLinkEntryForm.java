@@ -13,7 +13,6 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -26,6 +25,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -37,7 +38,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -48,7 +49,11 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
@@ -58,14 +63,20 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version. 
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
-
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenLinkEntryForm.class);
 
     protected static BgcLogger log = BgcLogger
         .getLogger(SpecimenLinkEntryForm.class.getName());
 
+    @SuppressWarnings("nls")
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
+
+    @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
+
+    @SuppressWarnings("nls")
     private static final String NEW_SINGLE_POSITION_BINDING =
         "newSinglePosition-binding";
 
@@ -97,8 +108,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private final Map<Integer, Integer> typesRows =
         new HashMap<Integer, Integer>();
     // List of specimen types that a pallet can have.
-    // private List<SpecimenTypeWrapper> palletSpecimenTypes;
-
+    private List<SpecimenTypeWrapper> palletSpecimenTypes;
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 
@@ -107,31 +117,38 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             widgetCreator, this);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         log.debug("init");
         super.init();
-        setPartName("Linking specimens");
+        // TR: title
+        setPartName(i18n.tr("Linking specimens"));
         setCanLaunchScan(true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getFormTitle() {
-        return "Linking specimens";
+        // TR: form title
+        return i18n.tr("Linking specimens");
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected boolean isSingleMode() {
         log.debug("isSingleMode:" + mode.isSingleMode());
         return mode.isSingleMode();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setMode(Mode m) {
         log.debug("setMode: " + mode);
         mode = m;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getActivityTitle() {
         return "Specimen Link";
@@ -142,9 +159,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return logger;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getOkMessage() {
-        return "Link specimens to their source specimens";
+        // TR: title area message
+        return i18n.tr("Link specimens to their source specimens");
     }
 
     @Override
@@ -184,6 +203,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             });
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createMultipleFields(Composite parent) {
         multipleOptionsFields = toolkit.createComposite(parent);
@@ -211,12 +231,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         typesSelectionPerRowComposite.setLayoutData(gd);
 
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Source Specimen");
+            StringUtil.EMPTY_STRING);
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Aliquoted Specimen Types");
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
+            SourceSpecimen.NAME.singular().toString());
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            // label
+            i18n.tr("Aliquoted Specimen Types"));
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            StringUtil.EMPTY_STRING);
 
         specimenTypesWidgets =
             new ArrayList<AliquotedSpecimenSelectionWidget>();
@@ -271,6 +294,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void defaultInitialisation() {
         log.debug("defaultInitialisation");
@@ -278,6 +302,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setNeedSinglePosition(boolean position) {
         log.debug("setNeedSinglePosition: " + position);
@@ -286,6 +311,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.showWidget(newSinglePositionText, position);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createSingleFields(Composite parent) {
         Composite fieldsComposite = toolkit.createComposite(parent);
@@ -301,12 +327,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         final NonEmptyStringValidator idValidator =
             new NonEmptyStringValidator(
-                "Inventory ID cannot be empty");
+                // validation error message
+                i18n.tr("Inventory ID cannot be empty"));
         // inventoryID
         final BgcBaseText inventoryIdText =
             (BgcBaseText) createBoundWidgetWithLabel(
                 fieldsComposite, BgcBaseText.class, SWT.NONE,
-                "Inventory ID",
+                Specimen.PropertyName.INVENTORY_ID.toString(),
                 new String[0],
                 singleSpecimen, SpecimenPeer.INVENTORY_ID.getName(),
                 idValidator,
@@ -333,21 +360,24 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 inventoryIdModified = true;
-                newSinglePositionText.setText("");
+                newSinglePositionText.setText(StringUtil.EMPTY_STRING);
                 canSaveSingleSpecimen.setValue(false);
             }
         });
 
         // position field
         newSinglePositionLabel = widgetCreator.createLabel(fieldsComposite,
-            "Position");
+            AbstractPosition.NAME.singular().toString());
         newSinglePositionValidator = new StringLengthValidator(4,
-            "Enter a position");
-        newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue("",
-                String.class), newSinglePositionValidator,
-            NEW_SINGLE_POSITION_BINDING);
+            // validation error message
+            i18n.tr("Enter a position"));
+        newSinglePositionText =
+            (BgcBaseText) widgetCreator.createBoundWidget(
+                fieldsComposite, BgcBaseText.class, SWT.NONE,
+                newSinglePositionLabel, new String[0], new WritableValue(
+                    StringUtil.EMPTY_STRING,
+                    String.class), newSinglePositionValidator,
+                NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -386,6 +416,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         singleTypesWidget.addBindings();
     }
 
+    @SuppressWarnings("nls")
     private void checkInventoryId(BgcBaseText inventoryIdText) {
         log.debug("checkInventoryId: " + inventoryIdText.getText());
         boolean ok = true;
@@ -395,16 +426,18 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             if (specimen != null) {
                 BgcPlugin
                     .openAsyncError(
-                        "InventoryId error",
-                        NLS.bind(
-                            "InventoryId {0} already exists.",
+                        // dialog title
+                        i18n.tr("InventoryId error"),
+                        // dialog message
+                        i18n.tr("InventoryId {0} already exists.",
                             inventoryIdText.getText()));
                 ok = false;
             }
         } catch (Exception e) {
             BgcPlugin
                 .openAsyncError(
-                    "Error checking inventoryId",
+                    // dialog title
+                    i18n.tr("Error checking inventoryId"),
                     e);
             ok = false;
         }
@@ -427,6 +460,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void updateAvailableSpecimenTypes() {
         log.debug("updateAvailableSpecimenTypes");
@@ -439,8 +473,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * 
      * @param typesRowss used only in multiple to indicate the count of each row
      *            after scan has been done.
-     * @throws ApplicationException
      */
+    @SuppressWarnings("nls")
     private void setTypeCombos() {
         log.debug("setTypeCombos");
 
@@ -516,6 +550,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             && linkFormPatientManagement.fieldsValid();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void doBeforeSave() throws Exception {
         log.debug("doBeforeSave");
@@ -530,6 +565,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
         log.debug("saveForm");
@@ -542,8 +578,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             "SpecimenLink");
     }
 
+    @SuppressWarnings("nls")
     private void saveMultipleSpecimens() throws Exception {
-        log.debug("saveForm");
+        log.debug("saveMultipleSpecimens");
 
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletCell> cells =
@@ -573,6 +610,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         printSaveMultipleLogMessage(resList);
     }
 
+    @SuppressWarnings("nls")
     protected void printSaveMultipleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
         log.debug("printSaveMultipleLogMessage");
@@ -601,6 +639,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 .getCurrentWorkingCenter().getNameShort()));
     }
 
+    @SuppressWarnings("nls")
     private void saveSingleSpecimen() throws Exception {
         log.debug("saveSingleSpecimen");
 
@@ -623,6 +662,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         printSaveSingleLogMessage(resList);
     }
 
+    @SuppressWarnings("nls")
     protected void printSaveSingleLogMessage(
         List<AliquotedSpecimenResInfo> resList) {
         log.debug("printSaveSingleLogMessage");
@@ -645,6 +685,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setValues() throws Exception {
         log.debug("setValues");
@@ -656,6 +697,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         form.layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void reset(boolean resetAll) {
         log.debug("reset: " + resetAll);
@@ -670,6 +712,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.reset(resetAll);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public boolean onClose() {
         log.debug("onClose");
@@ -677,6 +720,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return super.onClose();
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: do this before multiple scan is made
@@ -688,6 +732,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         beforeScans(true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: do this before scan of one tube is really made
@@ -701,6 +746,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: do this before any scan is really launched
      */
+    @SuppressWarnings("nls")
     private void beforeScans(boolean resetTypeRows) {
         log.debug("beforeScans: " + resetTypeRows);
         preSelections = new ArrayList<SpecimenHierarchyInfo>();
@@ -711,6 +757,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             typesRows.clear();
     }
 
+    @SuppressWarnings("nls")
     @Override
     /**
      * Multiple linking: return fake cells for testing
@@ -729,6 +776,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
@@ -738,6 +786,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 .getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
@@ -756,6 +805,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void afterScanAndProcess(final Integer rowToProcess) {
         Display.getDefault().asyncExec(new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 log.debug("afterScanAndProcess: asyncExec");
@@ -796,6 +846,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: Post process of only one cell after server call has
      * been made
      */
+    @SuppressWarnings("nls")
     @Override
     protected void processCellResult(final RowColPos rcp, PalletCell cell) {
         log.debug("processCellResult");
@@ -820,6 +871,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * @param typesRows contains a row:count map
      * @param row row of the widget we want to update.
      */
+    @SuppressWarnings("nls")
     private void setCountOnSpecimenWidget(Map<Integer, Integer> typesRows,
         int row) {
         log.debug("setCountOnSpecimenWidget");
@@ -835,6 +887,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: apply a source and type to a specific cell.
      */
+    @SuppressWarnings("nls")
     private void setHierarchyToCell(PalletCell cell,
         SpecimenHierarchyInfo selection) {
         log.debug("setHierarchyToCell");
@@ -844,12 +897,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             cell.setStatus(UICellStatus.TYPE);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Mode initialisationMode() {
         log.debug("initialisationMode: " + mode);
         return mode;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void enableFields(boolean enable) {
         log.debug("enableFields: " + enable);

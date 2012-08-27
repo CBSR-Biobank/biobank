@@ -6,11 +6,13 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
+import edu.ualberta.med.biobank.model.Address;
 
 public abstract class AddressViewFormCommon extends BiobankViewForm {
 
     protected void createAddressSection(ModelWrapper<?> wrapperObject) {
-        Composite client = createSectionWithClient("Address");
+        Composite client =
+            createSectionWithClient(Address.NAME.format(1).toString());
         Section section = (Section) client.getParent();
         section.setExpanded(false);
         createAddressArea(client, wrapperObject);

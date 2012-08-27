@@ -39,6 +39,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TypedListener;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.CDT.PickerPart;
 import edu.ualberta.med.biobank.gui.common.widgets.nebula.v.VButton;
@@ -65,6 +67,17 @@ import edu.ualberta.med.biobank.gui.common.widgets.nebula.v.VTracker;
  * @see CDT
  */
 public class CDateTime extends BaseCombo {
+    private static final I18n i18n = I18nFactory.getI18n(CDateTime.class);
+
+    @SuppressWarnings("nls")
+    private static final String CLEAR_BUTTON_TEXT = i18n.tr("Clear");
+    @SuppressWarnings("nls")
+    private static final String CANCEL_BUTTON_TEXT = i18n.tr("Cancel");
+    @SuppressWarnings("nls")
+    private static final String ACCEPT_BUTTON_TEXT = i18n.tr("Accept");
+    @SuppressWarnings("nls")
+    private static final String NULL_CHOOSE_TIME_TEXT = i18n
+        .tr("<choose time>");
 
     /**
      * A simple class used for editing a field numerically.
@@ -73,7 +86,7 @@ public class CDateTime extends BaseCombo {
     private class EditField {
 
         private String buffer;
-        private int digits;
+        private final int digits;
         private int count = 0;
 
         EditField(int digits, int initialValue) {
@@ -249,7 +262,8 @@ public class CDateTime extends BaseCombo {
             }
         }
     };
-    private Point textSelectionOffset = new Point(0, 0); // x = selOffset start,
+    private final Point textSelectionOffset = new Point(0, 0); // x = selOffset
+                                                               // start,
     // y = selOffset amount
     private EditField editField;
 
@@ -428,7 +442,7 @@ public class CDateTime extends BaseCombo {
 
         VButton b = new VButton(tb, SWT.OK | SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.OkButton);
-        b.setToolTipText(Resources.getString("accept.text", locale)); //$NON-NLS-1$
+        b.setToolTipText(ACCEPT_BUTTON_TEXT);
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -439,7 +453,7 @@ public class CDateTime extends BaseCombo {
 
         b = new VButton(tb, SWT.CANCEL | SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.CancelButton);
-        b.setToolTipText(Resources.getString("cancel.text", locale)); //$NON-NLS-1$
+        b.setToolTipText(CANCEL_BUTTON_TEXT);
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -451,8 +465,8 @@ public class CDateTime extends BaseCombo {
 
         b = new VButton(tb, SWT.NO_FOCUS);
         b.setData(CDT.PickerPart, PickerPart.ClearButton);
-        b.setText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
-        b.setToolTipText(Resources.getString("clear.text", locale)); //$NON-NLS-1$
+        b.setText(CLEAR_BUTTON_TEXT);
+        b.setToolTipText(CLEAR_BUTTON_TEXT);
         b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
         b.addListener(SWT.Selection, new Listener() {
             @Override
@@ -858,9 +872,9 @@ public class CDateTime extends BaseCombo {
     public String getNullText() {
         if (nullText == null) {
             if (isDate) {
-                return Resources.getString("null_text.date", locale); //$NON-NLS-1$
+                return NULL_CHOOSE_TIME_TEXT;
             }
-            return Resources.getString("null_text.time", locale); //$NON-NLS-1$
+            return NULL_CHOOSE_TIME_TEXT;
         }
         return nullText;
     }
@@ -1601,9 +1615,9 @@ public class CDateTime extends BaseCombo {
     private void updateNullText() {
         if (defaultNullText) {
             if (isDate) {
-                nullText = Resources.getString("null_text.date", locale); //$NON-NLS-1$
+                nullText = "<choose date>"; //$NON-NLS-1$
             } else {
-                nullText = Resources.getString("null_text.time", locale); //$NON-NLS-1$
+                nullText = "<choose time>"; //$NON-NLS-1$
             }
             if (!hasSelection()) {
                 updateText();

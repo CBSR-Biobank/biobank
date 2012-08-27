@@ -5,21 +5,23 @@ import java.util.Map;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupAdapterInfo;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupDeletePermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupReadPermission;
 import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupUpdatePermission;
 import edu.ualberta.med.biobank.forms.ResearchGroupEntryForm;
 import edu.ualberta.med.biobank.forms.ResearchGroupViewForm;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractNewAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ResearchGroupAdapter extends AbstractNewAdapterBase {
+    private static final I18n i18n = I18nFactory
+        .getI18n(ResearchGroupAdapter.class);
 
     ResearchGroupAdapterInfo rg;
 
@@ -39,20 +41,9 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     public void init() {
-        try {
-            this.isDeletable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupDeletePermission(rg.id));
-            this.isReadable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupReadPermission(rg.id));
-            this.isEditable =
-                SessionManager.getAppService().isAllowed(
-                    new ResearchGroupUpdatePermission(rg.id));
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError("Permission Error",
-                "Unable to retrieve user permissions");
-        }
+        this.isDeletable = isAllowed(new ResearchGroupDeletePermission(rg.id));
+        this.isReadable = isAllowed(new ResearchGroupReadPermission(rg.id));
+        this.isEditable = isAllowed(new ResearchGroupUpdatePermission(rg.id));
     }
 
     @Override
@@ -67,19 +58,20 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
 
     @Override
     public String getTooltipTextInternal() {
-        return getTooltipText(Messages.ResearchGroupAdapter_tooltip);
+        return getTooltipText(ResearchGroup.NAME.singular().toString());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, Messages.ResearchGroupAdapter_menu_label);
-        addViewMenu(menu, Messages.ResearchGroupAdapter_menu_label);
-        addDeleteMenu(menu, Messages.ResearchGroupAdapter_menu_label);
+        addEditMenu(menu, ResearchGroup.NAME.singular().toString());
+        addViewMenu(menu, ResearchGroup.NAME.singular().toString());
+        addDeleteMenu(menu, ResearchGroup.NAME.singular().toString());
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getConfirmDeleteMessage() {
-        return Messages.ResearchGroupAdapter_delete_confirm_msg;
+        return i18n.tr("Are you sure you want to delete this research group?");
     }
 
     @Override

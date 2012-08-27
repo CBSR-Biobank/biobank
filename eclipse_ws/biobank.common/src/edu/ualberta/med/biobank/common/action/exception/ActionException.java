@@ -1,28 +1,20 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
+import edu.ualberta.med.biobank.i18n.LocalizedException;
+import edu.ualberta.med.biobank.i18n.LString;
+
 /**
  * 
- * @author jferland
- * 
+ * @author Jonathan Ferland
  */
-public class ActionException extends RuntimeException {
+public class ActionException extends LocalizedException {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * So only derived classes can use the empty constructor.
-     */
-    protected ActionException() {
+    public ActionException(LString localizedString) {
+        super(localizedString);
     }
 
-    public ActionException(String message) {
-        super(message);
-    }
-
-    public ActionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ActionException(Throwable cause) {
-        super(cause);
+    public ActionException(LString localizedString, Throwable cause) {
+        super(localizedString, cause);
     }
 }

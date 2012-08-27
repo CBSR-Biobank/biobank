@@ -14,10 +14,29 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.i18n.Trnc;
+
 @javax.persistence.Entity
 @Table(name = "REPORT")
 public class Report extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
+
+    @SuppressWarnings("nls")
+    public static final Trnc NAME = bundle.trnc(
+        "model",
+        "Report",
+        "Reports");
+
+    @SuppressWarnings("nls")
+    public static class Property {
+        public static final LString NAME = bundle.trc(
+            "model",
+            "Name").format();
+    }
 
     private String name;
     private String description;

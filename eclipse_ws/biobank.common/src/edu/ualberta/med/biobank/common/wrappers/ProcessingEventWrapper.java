@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,8 +33,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     private static final ProcessingEventLogProvider LOG_PROVIDER =
         new ProcessingEventLogProvider();
-    private static final String HAS_DERIVED_SPECIMENS_MSG = Messages
-        .getString("ProcessingEventWrapper.has.derived.specimens.msg"); //$NON-NLS-1$
     private Set<SpecimenWrapper> removedSpecimens =
         new HashSet<SpecimenWrapper>();
 
@@ -207,9 +204,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(ProcessingEventPeer.WORKSHEET));
-        tasks.add(check().unique(ProcessingEventPeer.WORKSHEET));
-
         super.addPersistTasks(tasks);
 
         tasks.persistAdded(this, ProcessingEventPeer.SPECIMENS);
@@ -219,15 +213,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     protected void addDeleteTasks(TaskList tasks) {
         tasks.persistRemoved(this, ProcessingEventPeer.SPECIMENS);
-
-        String hasDerivedSpecimensMsg = MessageFormat.format(
-            HAS_DERIVED_SPECIMENS_MSG, getWorksheet(), getFormattedCreatedAt());
-        tasks.add(check().notUsedBy(Specimen.class,
-            SpecimenPeer.PARENT_SPECIMEN.to(SpecimenPeer.PROCESSING_EVENT),
-            hasDerivedSpecimensMsg));
-
-        tasks.add(check().notUsedBy(Specimen.class,
-            SpecimenPeer.PROCESSING_EVENT));
 
         super.addDeleteTasks(tasks);
     }

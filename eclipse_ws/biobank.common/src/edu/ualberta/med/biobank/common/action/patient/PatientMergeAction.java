@@ -24,8 +24,8 @@ public class PatientMergeAction implements Action<BooleanResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer patient1Id;
-    private Integer patient2Id;
+    private final Integer patient1Id;
+    private final Integer patient2Id;
 
     public PatientMergeAction(Integer patient1Id, Integer patient2Id) {
         this.patient1Id = patient1Id;
@@ -46,8 +46,7 @@ public class PatientMergeAction implements Action<BooleanResult> {
         Patient patient1 = context.load(Patient.class, patient1Id);
         Patient patient2 = context.load(Patient.class, patient2Id);
         if (!patient1.getStudy().equals(patient2.getStudy())) {
-            throw new PatientMergeException(
-                PatientMergeException.ExceptionTypeEnum.STUDY);
+            throw new PatientMergeException();
         }
 
         Set<CollectionEvent> c1events =
@@ -75,10 +74,11 @@ public class PatientMergeAction implements Action<BooleanResult> {
             }
 
             context.getSession().saveOrUpdate(patient1);
-            
-            // flush so deleting the patient realizes its collection events have been removed.
+
+            // flush so deleting the patient realizes its collection events have
+            // been removed.
             context.getSession().flush();
-            
+
             context.getSession().delete(patient2);
 
             // FIXME see how logs should be done properly...

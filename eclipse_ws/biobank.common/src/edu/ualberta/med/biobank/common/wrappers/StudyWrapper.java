@@ -372,12 +372,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(StudyPeer.NAME));
-        tasks.add(check().notNull(StudyPeer.NAME_SHORT));
-
-        tasks.add(check().unique(StudyPeer.NAME));
-        tasks.add(check().unique(StudyPeer.NAME_SHORT));
-
         tasks.deleteRemoved(this, StudyPeer.STUDY_EVENT_ATTRS);
         tasks.deleteRemoved(this, StudyPeer.SOURCE_SPECIMENS);
         tasks.deleteRemoved(this, StudyPeer.ALIQUOTED_SPECIMENS);
@@ -392,8 +386,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(StudyPeer.PATIENTS));
-
         tasks.delete(this, StudyPeer.STUDY_EVENT_ATTRS);
         tasks.delete(this, StudyPeer.SOURCE_SPECIMENS);
         tasks.delete(this, StudyPeer.ALIQUOTED_SPECIMENS);

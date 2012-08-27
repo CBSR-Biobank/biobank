@@ -4,11 +4,13 @@ import java.util.Collection;
 
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.HasName;
+import edu.ualberta.med.biobank.model.HasNameShort;
 import edu.ualberta.med.biobank.mvp.presenter.impl.SiteViewPresenter;
 import edu.ualberta.med.biobank.mvp.user.ui.ValueField;
 import edu.ualberta.med.biobank.mvp.view.item.Adapter;
@@ -43,6 +45,7 @@ public class SiteViewFormView extends AbstractViewFormView
     private final TranslatedTextBox<ActivityStatus> activityStatus =
         new TranslatedTextBox<ActivityStatus>(ACTIVITY_STATUS_ADAPTER);
 
+    @SuppressWarnings("nls")
     @Override
     protected void onCreate(BaseForm baseForm) {
         super.onCreate(baseForm);
@@ -51,31 +54,31 @@ public class SiteViewFormView extends AbstractViewFormView
 
         InputTable table = new InputTable(baseForm.getPage());
 
-        table.addLabel("Name");
+        table.addLabel(HasName.PropertyName.NAME.toString());
         name.setText(table.addReadOnlyText());
 
-        table.addLabel("Name Short");
+        table.addLabel(HasNameShort.PropertyName.NAME_SHORT.toString());
         nameShort.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_studyCount_label);
+        table.addLabel("Total studies");
         studyCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.site_field_type_label);
+        table.addLabel(ContainerType.NAME.plural().toString());
         containerTypeCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_topLevelCount_label);
+        table.addLabel("Top level containers");
         topContainerCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_patientCount_label);
+        table.addLabel("Total patients");
         patientCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_peventCount_label);
+        table.addLabel("Total collection events");
         collectionEventCount.setText(table.addReadOnlyText());
 
-        table.addLabel(Messages.SiteViewForm_field_totalSpecimen);
+        table.addLabel("Total specimens");
         aliquotedSpecimenCount.setText(table.addReadOnlyText());
 
-        table.addLabel("Activity status");
+        table.addLabel(ActivityStatus.NAME.singular().toString());
         activityStatus.setText(table.addReadOnlyText());
     }
 

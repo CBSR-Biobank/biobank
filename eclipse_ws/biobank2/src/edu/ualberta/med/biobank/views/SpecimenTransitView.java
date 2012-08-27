@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -14,11 +13,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoReadPermission;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -26,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -41,9 +44,12 @@ import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
+    private static final I18n i18n = I18nFactory
+        .getI18n(SpecimenTransitView.class);
 
+    @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.views.SpecimenTransitView"; //$NON-NLS-1$
+        "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(SpecimenTransitView.class.getName());
@@ -84,6 +90,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         rootNode.addChild(searchedNode);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createTreeTextOptions(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
@@ -94,7 +101,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         composite.setLayout(layout);
 
         radioWaybill = new Button(composite, SWT.RADIO);
-        radioWaybill.setText(Messages.SpecimenTransitView_waybill_label);
+        radioWaybill.setText(ShipmentInfo.PropertyName.WAYBILL.toString());
         radioWaybill.setSelection(true);
         radioWaybill.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -106,7 +113,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         });
 
         radioDateReceived = new Button(composite, SWT.RADIO);
-        radioDateReceived.setText(Messages.SpecimenTransitView_received_label);
+        radioDateReceived.setText(
+            // radio button label.
+            i18n.tr("Date Received"));
         radioDateReceived.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -117,7 +126,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         });
 
         radioDateSent = new Button(composite, SWT.RADIO);
-        radioDateSent.setText(Messages.SpecimenTransitView_packed_label);
+        radioDateSent.setText(
+            // radio button label.
+            i18n.tr("Date Packed"));
         radioDateSent.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -145,7 +156,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             }
         });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
-        searchButton.setText(Messages.SpecimenTransitView_go_label);
+        searchButton.setText(
+            // button label.
+            i18n.tr("Go"));
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -162,6 +175,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         treeText.getParent().layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void reload() {
         if (rootNode != null) {
@@ -169,7 +183,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             try {
                 createNodes();
             } catch (Exception e) {
-                logger.error(Messages.SpecimenTransitView_nodes_error_title, e);
+                logger.error("Error creating nodes", e);
 
             }
             for (AbstractAdapterBase adaper : rootNode.getChildren()) {
@@ -189,6 +203,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         super.reload();
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void internalSearch() {
         try {
@@ -197,23 +212,28 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 String msg;
                 if (radioWaybill.getSelection()) {
                     msg =
-                        NLS
-                            .bind(
-                                Messages.SpecimenTransitView_notfound_waybill_error_msg,
-                                treeText.getText());
+                        // dialog message.
+                        i18n.tr(
+                            "No Dispatches/Shipments found for waybill {0}",
+                            treeText.getText());
                 } else {
-                    msg = NLS.bind(
-                        Messages.SpecimenTransitView_notfound_date_error_msg,
-                        DateFormatter.formatAsDate(dateWidget.getDate()));
+                    msg =
+                        // dialog message.
+                        i18n.tr(
+                            "No Dispatches/Shipments found for date {0}",
+                            DateFormatter.formatAsDate(dateWidget.getDate()));
                 }
                 BgcPlugin.openMessage(
-                    Messages.SpecimenTransitView_notfound_error_title, msg);
+                    // dialog title.
+                    i18n.tr("Dispatch not found"), msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 2);
             }
         } catch (Exception e) {
-            BgcPlugin.openError(Messages.SpecimenTransitView_search_error_msg,
+            BgcPlugin.openError(
+                // dialog title.
+                i18n.tr("Search error"),
                 e);
         }
     }
@@ -253,6 +273,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
@@ -274,27 +295,30 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         } else {
             searchedNode.performExpand();
             BgcPlugin.openMessage(
-                Messages.SpecimenTransitView_res_dialog_title, NLS.bind(
-                    Messages.SpecimenTransitView_found_multiple_msg,
-                    searchedObjects.size()));
+                // dialog title.
+                i18n.tr("Shipments"),
+                // dialog message.
+                i18n.tr("{0} found.", searchedObjects.size()));
         }
     }
 
+    @SuppressWarnings("nls")
     public static AbstractAdapterBase addToNode(AdapterBase parentNode,
         Object obj) {
         if (currentInstance != null && obj instanceof OriginInfoWrapper) {
             OriginInfoWrapper originInfo = (OriginInfoWrapper) obj;
-            String text = ""; //$NON-NLS-1$
+            String text = StringUtil.EMPTY_STRING;
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {
                 Date date;
                 if (currentInstance.radioDateReceived.getSelection()) {
-                    text =
-                        Messages.SpecimenTransitView_date_received_node_label;
+                    // label.
+                    text = i18n.tr("Received");
                     date = originInfo.getShipmentInfo().getReceivedAt();
                 } else {
-                    text = Messages.SpecimenTransitView_date_packed_node_label;
+                    // label.
+                    text = i18n.tr("Packed");
                     date = originInfo.getShipmentInfo().getPackedAt();
                 }
                 if (date == null)
@@ -364,9 +388,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         return currentInstance;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected String getTreeTextToolTip() {
-        return Messages.SpecimenTransitView_search_text_tooltip;
+        // tooltip.
+        return i18n.tr("Enter a dispatch/shipment waybill and hit enter");
     }
 
     @Override

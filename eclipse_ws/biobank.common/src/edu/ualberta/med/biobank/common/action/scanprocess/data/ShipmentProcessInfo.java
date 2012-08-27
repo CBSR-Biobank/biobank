@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.common.util.ItemState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ItemWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.type.ItemState;
 
 public class ShipmentProcessInfo extends AbstractProcessPalletInfo {
 

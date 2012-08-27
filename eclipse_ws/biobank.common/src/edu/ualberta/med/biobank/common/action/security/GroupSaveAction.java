@@ -2,12 +2,15 @@ package edu.ualberta.med.biobank.common.action.security;
 
 import java.util.Set;
 
+import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Domain;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -17,7 +20,13 @@ import edu.ualberta.med.biobank.util.SetDiff.Pair;
 
 public class GroupSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+    private static final Bundle bundle = new CommonBundle();
     private static final Permission PERMISSION = new UserManagerPermission();
+
+    @SuppressWarnings("nls")
+    public static final LString INADEQUATE_PERMISSIONS_ERRMSG =
+        bundle.tr("You do not have adequate permissions to save this group.")
+            .format();
 
     private final GroupSaveInput input;
 
@@ -55,8 +64,7 @@ public class GroupSaveAction implements Action<IdResult> {
 
     private void checkFullyManageable(Group group, User executingUser) {
         if (!group.isFullyManageable(executingUser)) {
-            // TODO: better message
-            throw new ActionException("group is not manageable");
+            throw new ActionException(INADEQUATE_PERMISSIONS_ERRMSG);
         }
     }
 

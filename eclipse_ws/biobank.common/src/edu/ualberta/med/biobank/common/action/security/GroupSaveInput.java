@@ -17,6 +17,7 @@ public class GroupSaveInput implements ActionInput {
     private final Set<Integer> userIds;
     private final Set<Membership> memberships;
 
+    @SuppressWarnings("nls")
     public GroupSaveInput(Group group) {
         if (group == null)
             throw new IllegalArgumentException("null group");

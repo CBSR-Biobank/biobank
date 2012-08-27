@@ -1,47 +1,39 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
-import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
-import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
-import edu.ualberta.med.biobank.common.wrappers.actions.IfAction.Is;
 import edu.ualberta.med.biobank.common.wrappers.actions.UpdateChildrensTopSpecimenAction;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.checks.SpecimenPostPersistChecks;
 import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.loggers.SpecimenLogProvider;
 import edu.ualberta.med.biobank.common.wrappers.tasks.NoActionWrapperQueryTask;
-import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage;
-import edu.ualberta.med.biobank.common.wrappers.util.LazyMessage.LazyArg;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
-    private static final String BAD_SAMPLE_TYPE_MSG = Messages
-        .getString("SpecimenWrapper.bad.specimen.type.msg"); //$NON-NLS-1$
-    private static final String DISPATCHS_CACHE_KEY = "dispatchs"; //$NON-NLS-1$
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenWrapper.class);
+    @SuppressWarnings("nls")
+    private static final String DISPATCHS_CACHE_KEY = "dispatchs";
     private static final SpecimenLogProvider LOG_PROVIDER =
         new SpecimenLogProvider();
 
@@ -63,13 +55,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         // its top is itself.
         newObject.setTopSpecimen(newObject);
         return newObject;
-    }
-
-    public void checkInventoryIdUnique() throws BiobankException,
-        ApplicationException {
-        checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
-            getInventoryId(),
-            Messages.getString("SpecimenWrapper.spec.with.id.text")); //$NON-NLS-1$
     }
 
     public String getFormattedCreatedAt() {
@@ -120,16 +105,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return getPositionString(true, true);
     }
 
-    public String getCenterString() {
-        CenterWrapper<?> center = getCurrentCenter();
-        if (center != null) {
-            return center.getNameShort();
-        }
-        // TODO should never see that ? should never retrieve a Specimen which
-        // site cannot be displayed ?
-        return "CANNOT DISPLAY INFORMATION"; //$NON-NLS-1$
-    }
-
     @Override
     public SpecimenLogProvider getLogProvider() {
         return LOG_PROVIDER;
@@ -138,21 +113,22 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * Set the position in the given container using the positionString
      */
+    @SuppressWarnings("nls")
     public void setParentFromPositionString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
             .getRowColFromPositionString(
-                positionString.replaceFirst(parentContainer.getLabel(), "")); //$NON-NLS-1$
+                positionString.replaceFirst(parentContainer.getLabel(), ""));
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setParent(parentContainer, rcp);
         } else {
-            throw new Exception(
-                MessageFormat.format(
-                    Messages
-                        .getString("SpecimenWrapper.position.not.valid.msg"), positionString)); //$NON-NLS-1$
+            // {0} position string, e.g. "AA" or "12"
+            throw new Exception(i18n.tr("Position \"{0}\" not valid.",
+                positionString));
         }
     }
 
+    @SuppressWarnings("nls")
     public String getPositionString(boolean fullString,
         boolean addTopParentShortName) {
         RowColPos position = getPosition();
@@ -169,8 +145,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .getNameShort();
         if (addTopParentShortName && nameShort != null)
             return directParent.getLabel()
-                + getPositionStringInParent(position, directParent) + " (" //$NON-NLS-1$
-                + nameShort + ")"; //$NON-NLS-1$
+                + getPositionStringInParent(position, directParent) + " ("
+                + nameShort + ")";
         return directParent.getLabel()
             + getPositionStringInParent(position, directParent);
     }
@@ -199,13 +175,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
     }
 
-    private static final String Specimen_QRY = "from " //$NON-NLS-1$
-        + Specimen.class.getName() + " where " //$NON-NLS-1$
-        + SpecimenPeer.INVENTORY_ID.getName() + " = ?"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String Specimen_QRY = "from "
+        + Specimen.class.getName() + " where "
+        + SpecimenPeer.INVENTORY_ID.getName() + " = ?";
 
     /**
      * search in all Specimens list. No matter which site added it.
      */
+    @SuppressWarnings("nls")
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException, BiobankCheckException {
@@ -216,15 +194,19 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             return null;
         if (specimens.size() == 1)
             return new SpecimenWrapper(appService, specimens.get(0));
-        throw new BiobankCheckException("Error retrieving specimens: found " //$NON-NLS-1$
-            + specimens.size() + " results."); //$NON-NLS-1$
+
+        // {0} number of specimens found
+        throw new BiobankCheckException(i18n.tr(
+            "Error retrieving specimens: found {0} results.",
+            specimens.size()));
     }
 
-    private static final String SPECIMENS_NON_ACTIVE_QRY = "from " //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
         + Specimen.class.getName()
-        + " spec where spec." //$NON-NLS-1$
+        + " spec where spec."
         + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
-        + " = ? and activityStatus != ?"; //$NON-NLS-1$
+        + " = ? and activityStatus != ?";
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
         WritableApplicationService appService, CenterWrapper<?> center)
@@ -241,6 +223,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return list;
     }
 
+    @SuppressWarnings("nls")
     public static List<SpecimenWrapper> getSpecimensInSiteWithPositionLabel(
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException, BiobankException {
@@ -251,7 +234,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             RowColPos rcp = null;
             try {
                 rcp = container.getContainerType().getRowColFromPositionString(
-                    positionString.replaceFirst(container.getLabel(), "")); //$NON-NLS-1$
+                    positionString.replaceFirst(container.getLabel(), ""));
             } catch (Exception e) {
                 // Should never happen: it has been already tested in
                 // getPossibleParentsMethod
@@ -362,11 +345,12 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * method to change the top {@code Specimen}. The top {@code Specimen} will
      * be automatically updated.
      */
+    @SuppressWarnings("nls")
     @Override
     @Deprecated
     public void setTopSpecimen(SpecimenBaseWrapper specimen) {
         throw new UnsupportedOperationException(
-            "Not allowed to directly set the top Specimen. Set the parent Specimen instead."); //$NON-NLS-1$
+            "Not allowed to directly set the top Specimen. Set the parent Specimen instead.");
     }
 
     protected void setTopSpecimenInternal(SpecimenWrapper specimen,
@@ -409,32 +393,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return super.getTopSpecimen();
     }
 
-    private void addTasksToPostCheckLegalSampleType(TaskList tasks) {
-        LazyArg containerLabel = LazyMessage.newArg(this,
-            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER
-                .to(ContainerPeer.LABEL)));
-
-        LazyArg specimenType = LazyMessage.newArg(this,
-            SpecimenPeer.SPECIMEN_TYPE.to(SpecimenTypePeer.NAME_SHORT));
-
-        LazyMessage badSampleTypeMsg = new LazyMessage(BAD_SAMPLE_TYPE_MSG,
-            containerLabel, specimenType);
-
-        Property<Collection<SpecimenType>, Specimen> pathToLegalSpecimenTypeOptions =
-            SpecimenPeer.SPECIMEN_POSITION
-                .to(SpecimenPositionPeer.CONTAINER
-                    .to(ContainerPeer.CONTAINER_TYPE
-                        .to(ContainerTypePeer.SPECIMEN_TYPES)));
-
-        BiobankSessionAction checkLegalSampleType = check().legalOption(
-            pathToLegalSpecimenTypeOptions, SpecimenPeer.SPECIMEN_TYPE,
-            badSampleTypeMsg);
-
-        tasks.add(check().ifProperty(
-            SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.ID),
-            Is.NOT_NULL, checkLegalSampleType));
-    }
-
     private void addTasksToUpdateChildren(TaskList tasks) {
         if (topSpecimenChanged) {
             SpecimenWrapper topSpecimen = getTopSpecimen();
@@ -466,29 +424,18 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {
-        tasks.add(check().notNull(SpecimenPeer.SPECIMEN_TYPE));
-        tasks.add(check().notNull(SpecimenPeer.INVENTORY_ID));
-
-        tasks.add(check().unique(SpecimenPeer.INVENTORY_ID));
-
         tasks.deleteRemovedValue(this, SpecimenPeer.SPECIMEN_POSITION);
 
         super.addPersistTasks(tasks);
 
         tasks.persist(this, SpecimenPeer.SPECIMEN_POSITION);
 
-        addTasksToPostCheckLegalSampleType(tasks);
-
         addTasksToUpdateChildren(tasks);
-
-        tasks.add(new SpecimenPostPersistChecks(this));
     }
 
     @Deprecated
     @Override
     protected void addDeleteTasks(TaskList tasks) {
-        tasks.add(check().empty(SpecimenPeer.CHILD_SPECIMENS));
-
         // Either Hibernate must delete this object (via the defined cascade) or
         // do it here, but not both. If both are done, then a
         // StaleStateException is thrown because an attempt is made to delete an
@@ -519,11 +466,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
      * return a string with collection date (different from created at if it is
      * an aliquoted specimen) + the collection center
      */
+    @SuppressWarnings("nls")
     public String getCollectionInfo() {
-        return getTopSpecimen().getFormattedCreatedAt()
-            + " in " //$NON-NLS-1$
-            + getTopSpecimen().getOriginInfo().getCenter().getNameShort()
-            + " (visit #" + getCollectionEvent().getVisitNumber() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        // {0} when the top specimen was created
+        // {1} where the specimen originated from
+        // {2} the visit number of the collection event
+        return i18n.tr("{0} in {1} (visit #{2})",
+            getTopSpecimen().getFormattedCreatedAt(),
+            getTopSpecimen().getOriginInfo().getCenter().getNameShort(),
+            getCollectionEvent().getVisitNumber());
     }
 
     public boolean hasUnknownImportType() {
