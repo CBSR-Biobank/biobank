@@ -43,7 +43,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
 @NotUsed.List({
-    @NotUsed(by = Annotation.class, property = "type", groups = PreDelete.class)
+    @NotUsed(by = AbstractAnnotation.class, property = "type", groups = PreDelete.class)
 })
 public abstract class AnnotationType
     extends AbstractVersionedModel {

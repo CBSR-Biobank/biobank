@@ -1,31 +1,24 @@
 package edu.ualberta.med.biobank.model;
 
-import javax.persistence.Entity;
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PrePersist;
-
-@Audited
-@Entity
-@Table(name = "CONTAINER_POSITION",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "PARENT_CONTAINER_ID", "ROW", "COL" }) })
-@Unique(properties = { "parentContainer", "row", "col" }, groups = PrePersist.class)
-public class ContainerPosition extends AbstractPosition {
+@Embeddable
+public class ContainerPosition implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Container parentContainer;
-    private Container container;
+    private Integer position;
+    private Integer left;
+    private Integer right;
 
     @NotNull(message = "{ContainerPosition.parentContainer.NotNull}")
     @ManyToOne

@@ -58,10 +58,10 @@
 			information, such as, @TypeDefs -->
 		<mapping package="edu.ualberta.med.biobank.model" />
 		<!-- Mapped classes -->
+		<mapping class="edu.ualberta.med.biobank.model.AbstractAnnotation" />
 		<mapping class="edu.ualberta.med.biobank.model.AbstractPosition" />
 		<mapping class="edu.ualberta.med.biobank.model.Address" />
 		<mapping class="edu.ualberta.med.biobank.model.AnatomicalSource" />
-		<mapping class="edu.ualberta.med.biobank.model.Annotation" />
 		<mapping class="edu.ualberta.med.biobank.model.AnnotationOption" />
 		<mapping class="edu.ualberta.med.biobank.model.AnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.Group" />

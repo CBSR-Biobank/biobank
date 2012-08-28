@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.model.type.Decimal;
 @Table(name = "ANNOTATION")
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Annotation
+public abstract class AbstractAnnotation
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 

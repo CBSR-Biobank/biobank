@@ -21,9 +21,6 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -40,13 +37,15 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "CENTER_ID", "CONTAINER_TYPE_ID", "LABEL" })})
+        @UniqueConstraint(columnNames = { "TREE_ID", "LABEL" }),
+        @UniqueConstraint(columnNames = { "PRODUCT_BARCODE" })
+    })
 // TODO: consider pulling @UniqueConstraint into this @Unique annotation,
 // because this is a total repeating of constraints. Would then need to figure
 // out how to add DDL constraints from our annotations and how to get a bean's
 // value of a specific column.
 @Unique.List({
-    @Unique(properties = { "center", "containerType", "label" }, groups = PrePersist.class),
+    @Unique(properties = { "tree", "label" }, groups = PrePersist.class),
     @Unique(properties = { "productBarcode" }, groups = PrePersist.class)
 })
 @NotUsed.List({
@@ -57,34 +56,20 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 public class Container extends AbstractModel
     implements HasComments {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Container",
-        "Containers");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString LABEL = bundle.trc(
-            "model",
-            "Label").format();
-        public static final LString PRODUCT_BARCODE = bundle.trc(
-            "model",
-            "Product Barcode").format();
-        public static final LString TEMPERATURE = bundle.trc(
-            "model",
-            "Temperature").format();
-    }
-
-    private String productBarcode;
+    /**
+     * The label is meant to be a delimited path of positions back to root that
+     * must be unique within a {@link ContainerTree} (clearly, as no two
+     * {@link Container}s or {@link Specimen}s can be in the same position). The
+     * label must be delimited to avoid confusion, but perhaps users may enter
+     * non-delimited versions (but that is 2^(n-1) different possible delimited
+     * labels to search).
+     */
+    private ContainerTree tree;
     private String label;
-    private Double temperature;
-    private String path;
-    private Container topContainer;
-    private ContainerPosition position;
-    private Center center;
+    private ParentContainer parent;
+    // TODO: the above three must be consistent with each other
+    private String productBarcode;
     private ContainerType containerType;
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean enabled;

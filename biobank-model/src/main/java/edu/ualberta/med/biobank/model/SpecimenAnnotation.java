@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @UniqueConstraint(columnNames = { "SPECIMEN_ID", "ANNOTATION_TYPE_ID" }) })
 @Unique(properties = { "specimen", "type" }, groups = PrePersist.class)
 public class SpecimenAnnotation
-    extends Annotation {
+    extends AbstractAnnotation {
     private static final long serialVersionUID = 1L;
 
     private Specimen specimen;

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Unique(properties = { "patient", "type" }, groups = PrePersist.class)
 public class PatientAnnotation
-    extends Annotation {
+    extends AbstractAnnotation {
     private static final long serialVersionUID = 1L;
 
     private Patient patient;

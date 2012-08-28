@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Unique(properties = { "collectionEvent", "type" }, groups = PrePersist.class)
 public class CollectionEventAnnotation
-    extends Annotation {
+    extends AbstractAnnotation {
     private static final long serialVersionUID = 1L;
 
     private CollectionEvent collectionEvent;

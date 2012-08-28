@@ -24,9 +24,6 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -65,37 +62,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 public class ContainerType extends AbstractModel
     implements HasName, HasDescription, HasComments {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Container Type",
-        "Container Types");
-
-    @SuppressWarnings("nls")
-    public static class Property {
-        public static final LString CHILD_LABELING_SCHEME = bundle.trc(
-            "model",
-            "Child Labeling Scheme").format();
-        public static final LString DEFAULT_TEMPERATURE = bundle.trc(
-            "model",
-            "Default Temperature").format();
-        public static final LString TOP_LEVEL = bundle.trc(
-            "model",
-            "Top Level").format();
-    }
-
+    private Center center;
     private String name;
     private String description;
     private Boolean topLevel;
-    private Double defaultTemperature;
-    private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
+    private Boolean shared;
+    private final Set<Vessel> vessels = new HashSet<Vessel>(0);
     private Set<ContainerType> childContainerTypes =
         new HashSet<ContainerType>(0);
-    private Set<Comment> comments = new HashSet<Comment>(0);
     private Capacity capacity = new Capacity();
-    private Center center;
     private ContainerLabelingScheme childLabelingScheme;
     private Boolean enabled;
 
