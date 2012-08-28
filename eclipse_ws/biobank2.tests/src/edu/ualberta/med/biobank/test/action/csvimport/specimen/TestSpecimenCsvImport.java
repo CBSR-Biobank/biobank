@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +27,6 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.action.ActionTest;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 
@@ -55,13 +55,13 @@ public class TestSpecimenCsvImport extends ActionTest {
         super.setUp();
         specimenCsvHelper = new SpecimenCsvHelper(factory.getNameGenerator());
 
-        // add 2 shipments
-
         tx = session.beginTransaction();
         factory.createSite();
         factory.createClinic();
         factory.createStudy();
 
+        // add 2 shipments
+        //
         // source center on origin info will be the clinic created above
         factory.createShipmentInfo();
         originInfos.add(factory.createOriginInfo());
@@ -245,6 +245,54 @@ public class TestSpecimenCsvImport extends ActionTest {
     }
 
     @Test
+    public void withComments() throws IOException {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+
+            // create 3 source specimens and parent specimens
+            for (int j = 0; j < 3; j++) {
+                factory.createSourceSpecimen();
+                Specimen parentSpecimen = factory.createParentSpecimen();
+                parentSpecimen.setProcessingEvent(factory
+                    .createProcessingEvent());
+                parentSpecimens.add(parentSpecimen);
+            }
+        }
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        Set<SpecimenCsvInfo> csvInfos =
+            specimenCsvHelper.createAliquotedSpecimens(
+                factory.getDefaultStudy(), parentSpecimens);
+        specimenCsvHelper.addComments(csvInfos);
+        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenCsvImportAction importAction =
+                new SpecimenCsvImportAction(factory.getDefaultSite(), CSV_NAME);
+            exec(importAction);
+        } catch (CsvImportException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
+    }
+
+    @Test
     public void noErrorsWithContainers() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
@@ -283,8 +331,8 @@ public class TestSpecimenCsvImport extends ActionTest {
             aliquotedSpecimensCsvInfos.add(csvInfo);
         }
 
-        fillContainersWithSpecimenFromCsv(childL2Containers,
-            aliquotedSpecimensCsvInfos);
+        specimenCsvHelper.fillContainersWithSpecimenFromCsv(
+            aliquotedSpecimensCsvInfos, childL2Containers);
 
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -324,8 +372,8 @@ public class TestSpecimenCsvImport extends ActionTest {
             specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
-        fillContainersWithSpecimenFromCsv(childL2Containers,
-            new ArrayList<SpecimenCsvInfo>(csvInfos));
+        specimenCsvHelper.fillContainersWithSpecimenFromCsv(
+            new ArrayList<SpecimenCsvInfo>(csvInfos), childL2Containers);
 
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -388,39 +436,15 @@ public class TestSpecimenCsvImport extends ActionTest {
                     specimen.getSpecimenPosition().getContainer().getLabel());
 
             }
-        }
-    }
 
-    private void fillContainersWithSpecimenFromCsv(Set<Container> containers,
-        List<SpecimenCsvInfo> specimenCsvInfo) {
+            if ((csvInfo.getComment() != null)
+                && !csvInfo.getComment().isEmpty()) {
+                Assert.assertEquals(1, specimen.getComments().size());
+                Assert.assertEquals(csvInfo.getComment(),
+                    specimen.getComments().iterator().next().getMessage());
 
-        // fill as many containers as space will allow
-        int count = 0;
-        for (Container container : containers) {
-            ContainerType ctype = container.getContainerType();
-
-            int maxRows =
-                container.getContainerType().getCapacity().getRowCapacity();
-            int maxCols =
-                container.getContainerType().getCapacity().getColCapacity();
-
-            for (int r = 0; r < maxRows; ++r) {
-                for (int c = 0; c < maxCols; ++c) {
-                    if (count >= specimenCsvInfo.size()) break;
-
-                    SpecimenCsvInfo csvInfo = specimenCsvInfo.get(count);
-                    RowColPos pos = new RowColPos(r, c);
-                    csvInfo.setPalletPosition(ctype.getPositionString(pos));
-                    csvInfo.setPalletLabel(container.getLabel());
-                    csvInfo.setPalletProductBarcode(container
-                        .getProductBarcode());
-                    csvInfo.setRootContainerType(ctype.getNameShort());
-
-                    count++;
-                }
             }
         }
-
     }
 
     // need to add allowed specimen type to the leaft containers' container

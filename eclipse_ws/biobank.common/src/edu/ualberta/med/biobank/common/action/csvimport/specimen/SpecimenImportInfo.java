@@ -10,12 +10,14 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**
@@ -40,6 +42,7 @@ public class SpecimenImportInfo implements IImportInfo {
     private Container container;
     private RowColPos specimenPos;
     private Specimen specimen;
+    private User user;
 
     SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
         this.csvInfo = csvInfo;
@@ -144,6 +147,14 @@ public class SpecimenImportInfo implements IImportInfo {
         return !csvInfo.getSourceSpecimen();
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     boolean hasWorksheet() {
         return (csvInfo.getWorksheet() != null)
             && !csvInfo.getWorksheet().isEmpty();
@@ -225,6 +236,20 @@ public class SpecimenImportInfo implements IImportInfo {
         specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(csvInfo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
+
+        if ((csvInfo.getComment() != null)
+            && !csvInfo.getComment().isEmpty()) {
+            if (user == null) {
+                throw new IllegalStateException(
+                    "user is null, cannot add comment");
+            }
+
+            Comment comment = new Comment();
+            comment.setMessage(csvInfo.getComment());
+            comment.setUser(user);
+            comment.setCreatedAt(new Date());
+            specimen.getComments().add(comment);
+        }
 
         if (isSourceSpecimen()) {
             specimen.setOriginalCollectionEvent(cevent);

@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -68,20 +69,16 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         .getI18n(SpecimenCsvImportAction.class);
 
     public static final LString CSV_SPC_PATIENT_ERROR =
-        bundle
-            .tr(
-                "parent specimen and child specimen do not have the same patient number")
-            .format();
+        bundle.tr("parent specimen and child specimen "
+            + "do not have the same patient number").format();
 
     public static final LString CSV_PARENT_SPC_ERROR =
-        bundle.tr(
-            "specimen is a source specimen but parent inventory ID present")
-            .format();
+        bundle.tr("specimen is a source specimen but parent " +
+            "inventory ID present").format();
 
     public static final LString CSV_ALIQUOTED_SPC_ERROR =
-        bundle
-            .tr("specimen is not a source specimen but parent inventory ID is not present")
-            .format();
+        bundle.tr("specimen is not a source specimen but parent "
+            + "inventory ID is not present").format();
 
     public static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet label defined but not position").format();
@@ -96,12 +93,13 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         bundle.tr("patient in CSV file with number \"{0}\" not exist");
 
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
-        bundle
-            .tr("parent specimen in CSV file with inventory id \"{0}\" does not exist");
+        bundle.tr("parent specimen in CSV file with inventory id " +
+            "\"{0}\" does not exist");
 
     public static final Tr CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR =
-        bundle
-            .tr("the parent specimen of specimen with inventory id \"{0}\", parent specimen with inventory id \"{0}\", does not have a processing event");
+        bundle.tr("the parent specimen of specimen with "
+            + "inventory id \"{0}\", parent specimen with "
+            + "inventory id \"{0}\", does not have a processing event");
 
     public static final Tr CSV_WAYBILL_ERROR =
         bundle.tr("waybill \"{0}\" does not exist");
@@ -130,7 +128,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         new Optional(),                     // palletProductBarcode,
         new Optional(),                     // rootContainerType,
         new Optional(),                     // palletLabel,
-        new Optional()                      // palletPosition
+        new Optional(),                     // palletPosition,
+        new Optional()                      // comment
     }; 
     // @formatter:on    
 
@@ -173,7 +172,8 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             "palletProductBarcode",
             "rootContainerType",
             "palletLabel",
-            "palletPosition"
+            "palletPosition",
+            "comment"
         };
 
         try {
@@ -335,6 +335,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     private SpecimenImportInfo getDbInfo(ActionContext context,
         SpecimenCsvInfo csvInfo) {
         SpecimenImportInfo info = new SpecimenImportInfo(csvInfo);
+        info.setUser(context.getUser());
 
         Patient patient = loadPatient(context, csvInfo.getPatientNumber());
         info.setPatient(patient);
@@ -449,6 +450,13 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         Specimen spc = info.getNewSpecimen();
+
+        // check if this specimen has a comment and if so save it to DB
+        if (!spc.getComments().isEmpty()) {
+            Comment comment = spc.getComments().iterator().next();
+            context.getSession().save(comment);
+        }
+
         context.getSession().save(spc.getOriginInfo());
         context.getSession().save(spc);
 

@@ -3,17 +3,21 @@ package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
@@ -92,6 +96,7 @@ class SpecimenCsvHelper {
                 SpecimenCsvInfo specimenInfo =
                     sourceSpecimenCreate(ss.getSpecimenType().getName(),
                         p.getPnumber(), null);
+                specimenInfos.add(specimenInfo);
             }
         }
 
@@ -151,7 +156,7 @@ class SpecimenCsvHelper {
         SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
             null, specimenTypeName, patientNumber);
         specimenInfo.setWaybill(waybill);
-        specimenInfo.setWorksheet(nameGenerator.next(String.class));
+        specimenInfo.setWorksheet(nameGenerator.next(Specimen.class));
         specimenInfo.setSourceSpecimen(true);
         return specimenInfo;
     }
@@ -159,12 +164,49 @@ class SpecimenCsvHelper {
     private SpecimenCsvInfo aliquotedSpecimenCreate(
         String parentInventoryId, String specimenTypeName, String patientNumber) {
         SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-        specimenInfo.setInventoryId(nameGenerator.next(String.class));
+        specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
         specimenInfo.setPatientNumber(patientNumber);
         specimenInfo.setVisitNumber(1);
         return specimenInfo;
+    }
+
+    public void fillContainersWithSpecimenFromCsv(
+        List<SpecimenCsvInfo> specimenCsvInfos, Set<Container> containers) {
+
+        // fill as many containers as space will allow
+        int count = 0;
+        for (Container container : containers) {
+            ContainerType ctype = container.getContainerType();
+
+            int maxRows =
+                container.getContainerType().getCapacity().getRowCapacity();
+            int maxCols =
+                container.getContainerType().getCapacity().getColCapacity();
+
+            for (int r = 0; r < maxRows; ++r) {
+                for (int c = 0; c < maxCols; ++c) {
+                    if (count >= specimenCsvInfos.size()) break;
+
+                    SpecimenCsvInfo csvInfo = specimenCsvInfos.get(count);
+                    RowColPos pos = new RowColPos(r, c);
+                    csvInfo.setPalletPosition(ctype.getPositionString(pos));
+                    csvInfo.setPalletLabel(container.getLabel());
+                    csvInfo.setPalletProductBarcode(container
+                        .getProductBarcode());
+                    csvInfo.setRootContainerType(ctype.getNameShort());
+
+                    count++;
+                }
+            }
+        }
+    }
+
+    public void addComments(Set<SpecimenCsvInfo> specimenCsvInfos) {
+        for (SpecimenCsvInfo specimenCsvInfo : specimenCsvInfos) {
+            specimenCsvInfo.setComment(nameGenerator.next(String.class));
+        }
     }
 }
