@@ -1,26 +1,39 @@
 package edu.ualberta.med.biobank.model;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
-import javax.validation.constraints.Min;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-@Embeddable
-public class ParentContainer implements Serializable {
+import org.hibernate.annotations.Immutable;
+import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
+
+@Audited
+@Immutable
+@Entity
+@Table(name = "PARENT_CONTAINER",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+            "CONTAINER_ID",
+            "CONTAINER_CHILD_POSITION_ID" })
+    })
+@Unique(properties = { "container", "position" }, groups = PrePersist.class)
+public class ParentContainer
+    extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private Container container;
-    private Integer position;
+    private ContainerChildPosition position;
 
     @NotNull(message = "{ParentContainer.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PARENT_CONTAINER_ID")
+    @JoinColumn(name = "PARENT_CONTAINER_ID", nullable = false, updatable = false)
     public Container getContainer() {
         return container;
     }
@@ -30,18 +43,13 @@ public class ParentContainer implements Serializable {
     }
 
     @NotNull(message = "{ParentContainer.position.NotNull}")
-    @Min(value = 0, message = "{ParentContainer.position.Min}")
-    @Column(name = "POSITION_IN_PARENT_CONTAINER")
-    public Integer getPosition() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_CHILD_POSITION_ID", nullable = false, updatable = false)
+    public ContainerChildPosition getPosition() {
         return position;
     }
 
-    public void setPosition(Integer position) {
+    public void setPosition(ContainerChildPosition position) {
         this.position = position;
-    }
-
-    @Transient
-    public String getLabel() {
-        return null; // TODO: implement this
     }
 }

@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.type.Amount;
+import edu.ualberta.med.biobank.model.type.Decimal;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -50,9 +50,8 @@ public class SpecimenProcessingLinkType
     private ProcessingType type;
     private SpecimenGroup inputGroup;
     private SpecimenGroup outputGroup;
-    private Amount expectedInputChange;
-    private Amount expectedOutputChange;
-    private Vessel outputVessel;
+    private Decimal expectedInputChange;
+    private Decimal expectedOutputChange;
     private Integer outputCount;
 
     /**
@@ -109,15 +108,14 @@ public class SpecimenProcessingLinkType
     @Valid
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "value.value", column = @Column(name = "EXPECTED_INPUT_CHANGE_VALUE")),
-        @AttributeOverride(name = "value.scale", column = @Column(name = "EXPECTED_INPUT_CHANGE_SCALE")),
-        @AttributeOverride(name = "unit", column = @Column(name = "EXPECTED_INPUT_CHANGE_UNIT"))
+        @AttributeOverride(name = "value", column = @Column(name = "EXPECTED_INPUT_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "EXPECTED_INPUT_CHANGE_SCALE"))
     })
-    public Amount getExpectedInputChange() {
+    public Decimal getExpectedInputChange() {
         return expectedInputChange;
     }
 
-    public void setExpectedInputChange(Amount expectedInputChange) {
+    public void setExpectedInputChange(Decimal expectedInputChange) {
         this.expectedInputChange = expectedInputChange;
     }
 
@@ -128,38 +126,25 @@ public class SpecimenProcessingLinkType
     @Valid
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "value.value", column = @Column(name = "EXPECTED_OUTPUT_CHANGE_VALUE")),
-        @AttributeOverride(name = "value.scale", column = @Column(name = "EXPECTED_OUTPUT_CHANGE_SCALE")),
-        @AttributeOverride(name = "unit", column = @Column(name = "EXPECTED_OUTPUT_CHANGE_UNIT"))
+        @AttributeOverride(name = "value", column = @Column(name = "EXPECTED_OUTPUT_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "EXPECTED_OUTPUT_CHANGE_SCALE"))
     })
-    public Amount getExpectedOutputChange() {
+    public Decimal getExpectedOutputChange() {
         return expectedOutputChange;
     }
 
-    public void setExpectedOutputChange(Amount expectedOutputChange) {
+    public void setExpectedOutputChange(Decimal expectedOutputChange) {
         this.expectedOutputChange = expectedOutputChange;
     }
 
     /**
-     * @return the default type of {@link Vessel} that resulting
-     *         {@link Specimen} outputs are expected to be put into.
-     */
-    @NotNull(message = "{SpecimenProcessingLinkType.outputVessel.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "VESSEL_ID", nullable = false)
-    public Vessel getOutputVessel() {
-        return outputVessel;
-    }
-
-    public void setOutputVessel(Vessel outputVessel) {
-        this.outputVessel = outputVessel;
-    }
-
-    /**
+     * A value of zero implies that the {@link Specimen} input should be the
+     * same as the output.
+     * 
      * @return the number of expected resulting output {@link Specimen}s when
      *         this process is carried out, or null if unspecified.
      */
-    @Min(value = 1, message = "{CollectionEvent.outputCount.Min}")
+    @Min(value = 0, message = "{CollectionEvent.outputCount.Min}")
     @Column(name = "OUTPUT_COUNT")
     public Integer getOutputCount() {
         return outputCount;

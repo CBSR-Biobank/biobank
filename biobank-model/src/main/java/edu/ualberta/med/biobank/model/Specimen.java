@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,7 +22,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.model.type.Amount;
+import edu.ualberta.med.biobank.model.type.Decimal;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -48,10 +51,10 @@ public class Specimen extends AbstractModel
     private static final long serialVersionUID = 1L;
 
     private String inventoryId;
-    private Vessel vessel;
+    private ParentContainer parentContainer;
     private Date timeCreated;
     private SpecimenGroup group;
-    private Amount amount;
+    private Decimal amount;
     private StudyCenter originCenter;
     private StudyCenter currentCenter;
     private Boolean usable;
@@ -67,13 +70,27 @@ public class Specimen extends AbstractModel
         this.inventoryId = inventoryId;
     }
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "PARENT_CONTAINER_ID", unique = true)
+    public ParentContainer getParentContainer() {
+        return parentContainer;
+    }
+
+    public void setParentContainer(ParentContainer parentContainer) {
+        this.parentContainer = parentContainer;
+    }
+
     @Valid
     @NotNull(message = "{Specimen.amount.NotNull}")
-    public Amount getAmount() {
+    @AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "AMOUNT_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "AMOUNT_SCALE"))
+    })
+    public Decimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Amount amount) {
+    public void setAmount(Decimal amount) {
         this.amount = amount;
     }
 
@@ -85,6 +102,16 @@ public class Specimen extends AbstractModel
 
     public void setTimeCreated(Date timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SPECIMEN_GROUP_ID", nullable = false)
+    public SpecimenGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(SpecimenGroup group) {
+        this.group = group;
     }
 
     @NotNull(message = "{Specimen.currentCenter.NotNull}")

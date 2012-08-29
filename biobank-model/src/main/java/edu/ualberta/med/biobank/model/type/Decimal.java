@@ -27,7 +27,7 @@ public class Decimal implements Serializable {
 
     @NotNull(message = "{Decimal.value.NotNull}")
     @Digits(integer = 10, fraction = 10, message = "{Decimal.value.Digits}")
-    @Column(name = "VALUE", nullable = false, precision = 10, scale = 10)
+    @Column(name = "DECIMAL_VALUE", nullable = false, precision = 10, scale = 10)
     public BigDecimal getValue() {
         return value;
     }
@@ -42,7 +42,7 @@ public class Decimal implements Serializable {
      */
     @NotNull(message = "{Decimal.scale.NotNull}")
     @Min(value = 0, message = "{Decimal.scale.Min}")
-    @Column(name = "SCALE", nullable = false)
+    @Column(name = "DECIMAL_SCALE", nullable = false)
     Integer getScale() {
         return (value != null) ? value.scale() : scale;
     }

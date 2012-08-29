@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,7 +15,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.type.Amount;
+import edu.ualberta.med.biobank.model.type.Decimal;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -41,7 +44,7 @@ public class SpecimenProcessingType
 
     private ProcessingType type;
     private SpecimenGroup group;
-    private Amount expectedAmountChange;
+    private Decimal expectedAmountChange;
 
     /**
      * @return the {@link ProcessingType} that this
@@ -80,11 +83,15 @@ public class SpecimenProcessingType
      */
     @Valid
     @Embedded
-    public Amount getExpectedAmountChange() {
+    @AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "EXPECTED_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "EXPECTED_CHANGE_SCALE"))
+    })
+    public Decimal getExpectedAmountChange() {
         return expectedAmountChange;
     }
 
-    public void setExpectedAmountChange(Amount expectedAmountChange) {
+    public void setExpectedAmountChange(Decimal expectedAmountChange) {
         this.expectedAmountChange = expectedAmountChange;
     }
 }

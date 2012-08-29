@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -15,7 +17,7 @@ import javax.validation.constraints.Past;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.type.Amount;
+import edu.ualberta.med.biobank.model.type.Decimal;
 
 /**
  * A record of the actual {@link Specimen} and amount involved in a
@@ -33,7 +35,7 @@ public class SpecimenProcessing
     private Specimen specimen;
     private SpecimenProcessingType type;
     private Date timeDone;
-    private Amount actualAmountChange;
+    private Decimal actualAmountChange;
     private ProcessingEvent processingEvent;
 
     /**
@@ -85,11 +87,15 @@ public class SpecimenProcessing
      */
     @Valid
     @Embedded
-    public Amount getActualAmountChange() {
+    @AttributeOverrides({
+        @AttributeOverride(name = "value", column = @Column(name = "ACTUAL_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "ACTUAL_CHANGE_SCALE"))
+    })
+    public Decimal getActualAmountChange() {
         return actualAmountChange;
     }
 
-    public void setActualAmountChange(Amount actualAmountChange) {
+    public void setActualAmountChange(Decimal actualAmountChange) {
         this.actualAmountChange = actualAmountChange;
     }
 

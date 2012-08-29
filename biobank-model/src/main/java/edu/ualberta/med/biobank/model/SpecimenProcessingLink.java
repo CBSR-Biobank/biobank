@@ -17,7 +17,7 @@ import javax.validation.constraints.Past;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.type.Amount;
+import edu.ualberta.med.biobank.model.type.Decimal;
 
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
@@ -51,8 +51,8 @@ public class SpecimenProcessingLink
     private Specimen output;
     private SpecimenProcessingLinkType type;
     private Date timeDone;
-    private Amount actualInputAmountChange;
-    private Amount actualOutputAmountChange;
+    private Decimal actualInputAmountChange;
+    private Decimal actualOutputAmountChange;
     private ProcessingEvent processingEvent;
 
     /**
@@ -116,15 +116,14 @@ public class SpecimenProcessingLink
     @Valid
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "value.value", column = @Column(name = "ACTUAL_INPUT_CHANGE_VALUE")),
-        @AttributeOverride(name = "value.scale", column = @Column(name = "ACTUAL_INPUT_CHANGE_SCALE")),
-        @AttributeOverride(name = "unit", column = @Column(name = "ACTUAL_INPUT_CHANGE_UNIT"))
+        @AttributeOverride(name = "value", column = @Column(name = "ACTUAL_INPUT_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "ACTUAL_INPUT_CHANGE_SCALE"))
     })
-    public Amount getActualInputAmountChange() {
+    public Decimal getActualInputAmountChange() {
         return actualInputAmountChange;
     }
 
-    public void setActualInputAmountChange(Amount actualInputAmountChange) {
+    public void setActualInputAmountChange(Decimal actualInputAmountChange) {
         this.actualInputAmountChange = actualInputAmountChange;
     }
 
@@ -134,15 +133,14 @@ public class SpecimenProcessingLink
     @Valid
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "value.value", column = @Column(name = "ACTUAL_OUTPUT_CHANGE_VALUE")),
-        @AttributeOverride(name = "value.scale", column = @Column(name = "ACTUAL_OUTPUT_CHANGE_SCALE")),
-        @AttributeOverride(name = "unit", column = @Column(name = "ACTUAL_OUTPUT_CHANGE_UNIT"))
+        @AttributeOverride(name = "value", column = @Column(name = "ACTUAL_OUTPUT_CHANGE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "ACTUAL_OUTPUT_CHANGE_SCALE"))
     })
-    public Amount getActualOutputAmountChange() {
+    public Decimal getActualOutputAmountChange() {
         return actualOutputAmountChange;
     }
 
-    public void setActualOutputAmountChange(Amount actualOutputAmountChange) {
+    public void setActualOutputAmountChange(Decimal actualOutputAmountChange) {
         this.actualOutputAmountChange = actualOutputAmountChange;
     }
 

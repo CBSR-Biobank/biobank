@@ -53,6 +53,8 @@ public class SpecimenGroup
     private Preservation preservation;
     private AnatomicalSource anatomicalSource;
     private SpecimenType specimenType;
+    private Vessel vessel;
+    private String unit;
 
     @NotNull(message = "{SpecimenGroup.study.NotNull}")
     @Column(name = "STUDY_ID", nullable = false)
@@ -113,5 +115,30 @@ public class SpecimenGroup
 
     public void setSpecimenType(SpecimenType specimenType) {
         this.specimenType = specimenType;
+    }
+
+    @NotNull(message = "{SpecimenGroup.vessel.NotNull}")
+    @Column(name = "VESSEL_ID", nullable = false)
+    public Vessel getVessel() {
+        return vessel;
+    }
+
+    public void setVessel(Vessel vessel) {
+        this.vessel = vessel;
+    }
+
+    /**
+     * @return how the {@link Specimen#amount} of each {@link Specimen} is
+     *         measured (e.g. in mL, m, g, mg, etc.).
+     */
+    @NotEmpty(message = "{SpecimenGroup.unit.NotEmpty}")
+    @Size(max = 20, message = "{SpecimenGroup.unit.Size}")
+    @Column(name = "UNIT", nullable = false, length = 20)
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }
