@@ -25,26 +25,25 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * @author Jonathan Ferland
  * @see ContainerSchema
  */
-
 @Audited
 @Immutable
 @Entity
-@Table(name = "CONTAINER_CHILD_POSITION",
+@Table(name = "CONTAINER_SCHEMA_POSITION",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "CONTAINER_CHILD_SCHEMA_ID", "LABEL" })
+        @UniqueConstraint(columnNames = { "CONTAINER_SCHEMA_ID", "LABEL" })
     })
 @Unique(properties = { "schema", "label" }, groups = PrePersist.class)
 @NotUsed(by = ParentContainer.class, property = "position", groups = PreDelete.class)
-public class ContainerChildPosition
+public class ContainerSchemaPosition
     extends AbstractModel {
     private static final long serialVersionUID = 1L;
 
     private ContainerSchema schema;
     private String label;
 
-    @NotNull(message = "{ContainerChildPosition.schema.NotNull}")
+    @NotNull(message = "{ContainerSchemaPosition.schema.NotNull}")
     @ManyToOne
-    @JoinColumn(name = "CONTAINER_CHILD_SCHEMA_ID", nullable = false, updatable = false)
+    @JoinColumn(name = "CONTAINER_SCHEMA_ID", nullable = false, updatable = false)
     public ContainerSchema getSchema() {
         return schema;
     }
@@ -53,8 +52,8 @@ public class ContainerChildPosition
         this.schema = schema;
     }
 
-    @NotNull(message = "{ContainerChildPosition.label.NotNull}")
-    @Size(max = 4, message = "{ContainerChildPosition.label.Size}")
+    @NotNull(message = "{ContainerSchemaPosition.label.NotNull}")
+    @Size(max = 4, message = "{ContainerSchemaPosition.label.Size}")
     @Column(name = "LABEL", length = 4, nullable = false, updatable = false)
     public String getLabel() {
         return label;
@@ -78,7 +77,7 @@ public class ContainerChildPosition
         if (this == obj) return true;
         if (!super.equals(obj)) return false;
         if (getClass() != obj.getClass()) return false;
-        ContainerChildPosition other = (ContainerChildPosition) obj;
+        ContainerSchemaPosition other = (ContainerSchemaPosition) obj;
         if (label == null) {
             if (other.label != null) return false;
         } else if (!label.equals(other.label)) return false;

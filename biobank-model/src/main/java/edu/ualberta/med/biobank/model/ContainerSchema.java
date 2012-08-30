@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * labelled.
  * 
  * @author Jonathan Ferland
- * @see ContainerChildPosition
+ * @see ContainerSchemaPosition
  */
 @Audited
 @Entity
@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         @UniqueConstraint(columnNames = { "CENTER_ID", "NAME" })
     })
 @Unique(properties = { "center", "name" }, groups = PrePersist.class)
-@NotUsed(by = ContainerChildPosition.class, property = "schema", groups = PreDelete.class)
+@NotUsed(by = ContainerSchemaPosition.class, property = "schema", groups = PreDelete.class)
 public class ContainerSchema
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;

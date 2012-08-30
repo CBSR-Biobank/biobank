@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
             "CONTAINER_ID",
-            "CONTAINER_CHILD_POSITION_ID" })
+            "CONTAINER_SCHEMA_POSITION_ID" })
     })
 @Unique(properties = { "container", "position" }, groups = PrePersist.class)
 public class ParentContainer
@@ -29,7 +29,7 @@ public class ParentContainer
     private static final long serialVersionUID = 1L;
 
     private Container container;
-    private ContainerChildPosition position;
+    private ContainerSchemaPosition position;
 
     @NotNull(message = "{ParentContainer.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,12 +44,12 @@ public class ParentContainer
 
     @NotNull(message = "{ParentContainer.position.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTAINER_CHILD_POSITION_ID", nullable = false, updatable = false)
-    public ContainerChildPosition getPosition() {
+    @JoinColumn(name = "CONTAINER_SCHEMA_POSITION_ID", nullable = false, updatable = false)
+    public ContainerSchemaPosition getPosition() {
         return position;
     }
 
-    public void setPosition(ContainerChildPosition position) {
+    public void setPosition(ContainerSchemaPosition position) {
         this.position = position;
     }
 }

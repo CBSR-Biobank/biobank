@@ -171,15 +171,16 @@ public class Container extends AbstractModel
         }
 
         /**
-         * If this has a {@link #getParent()}, then this {@link ContainerNode}'s
-         * position (i.e. {@link ParentContainer#getPosition()}) prepended with
-         * this parent's label, recursively, back to a root of a
-         * {@link ContainerTree}. Otherwise, a user-defined label. The label
-         * must be delimited to avoid confusion, but perhaps users may enter
-         * non-delimited versions (but that is 2^(n-1) different possible
+         * The label must be delimited to avoid confusion, but perhaps users may
+         * enter non-delimited versions (but that is 2^(n-1) different possible
          * delimited labels to search).
          * 
-         * @return the label.
+         * @return if this has a {@link #getParent()}, then return this
+         *         {@link ContainerNode}'s position (i.e.
+         *         {@link ParentContainer#getPosition()}) delimited and
+         *         prepended with this parent's label, recursively, back to a
+         *         root of a {@link ContainerTree}. Otherwise, a user-defined
+         *         label.
          */
         // TODO: ask cbsr if we can just not store labels?
         @NotEmpty(message = "{Container.label.NotEmpty}")
