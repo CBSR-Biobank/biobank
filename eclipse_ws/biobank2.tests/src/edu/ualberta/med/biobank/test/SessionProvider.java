@@ -18,7 +18,7 @@ public class SessionProvider {
         Configuration configuration = new Configuration().configure();
 
         if (mode == Mode.DEBUG) {
-            configuration.setProperty("hibernate.show_sql", "true");
+            configuration.setProperty("hibernate.show_sql", "false");
             configuration.setProperty("hibernate.format_sql", "true");
             configuration.setProperty("hibernate.use_sql_comments", "true");
         }
