@@ -54,7 +54,7 @@
 
   <target name="messages-jar"
           description="Generates Java ResourceBundles and jars them up"
-          depends="init.dir,init.gettext">
+          depends="init.dir,init.gettext,messages-bundle">
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"
                   outputDirectory="${po.output.dir}"
