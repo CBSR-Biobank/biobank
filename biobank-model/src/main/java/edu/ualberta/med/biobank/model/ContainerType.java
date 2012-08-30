@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Empty.List({
     @Empty(property = "childContainerTypes", groups = PreDelete.class),
-    @Empty(property = "specimenTypes", groups = PreDelete.class)
+    @Empty(property = "childVessels", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractModel
@@ -60,10 +60,9 @@ public class ContainerType extends AbstractModel
     private String description;
     private Boolean topLevel;
     private Boolean shared;
-    private final Set<Vessel> vessels = new HashSet<Vessel>(0);
-    private Set<ContainerType> childContainerTypes =
-        new HashSet<ContainerType>(0);
-    private ContainerSchema childSchema;
+    private ContainerSchema schema;
+    private Set<Vessel> vessels = new HashSet<Vessel>(0);
+    private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);
     private Boolean enabled;
 
     /**
@@ -106,6 +105,10 @@ public class ContainerType extends AbstractModel
         this.description = description;
     }
 
+    /**
+     * @return true if this {@link ContainerType} should <em>not</em> be able to
+     *         be the child of another {@link ContainerType}, otherwise false.
+     */
     @NotNull(message = "{ContainerType.topLevel.NotNull}")
     @Column(name = "IS_TOP_LEVEL", nullable = false)
     public Boolean isTopLevel() {
@@ -117,19 +120,65 @@ public class ContainerType extends AbstractModel
     }
 
     /**
+     * @return true if this {@link ContainerType} can be used by (but not
+     *         modified by) other {@link Center}s, otherwise false.
+     */
+    @NotNull(message = "{ContainerType.shared.NotNull}")
+    @Column(name = "IS_SHARED", nullable = false)
+    public Boolean isShared() {
+        return shared;
+    }
+
+    public void setShared(Boolean shared) {
+        this.shared = shared;
+    }
+
+    /**
+     * @return how {@link Container}s with this {@link ContainerType} are
+     *         designed and laid out, with labelled positions for children.
+     */
+    @NotNull(message = "{ContainerType.schema.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_SCHEMA_ID", nullable = false)
+    public ContainerSchema getSchema() {
+        return schema;
+    }
+
+    public void setSchema(ContainerSchema schema) {
+        this.schema = schema;
+    }
+
+    /**
+     * @return the {@link Vessel}s that this {@link ContainerType} can hold as
+     *         children (must be empty if {@link #getChildContainerTypes()} is
+     *         not).
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "CONTAINER_TYPE_VESSEL",
+        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_VESSEL_ID", nullable = false, updatable = false) })
+    public Set<Vessel> getChildVessels() {
+        return vessels;
+    }
+
+    public void setChildVessels(Set<Vessel> childVessels) {
+        this.vessels = childVessels;
+    }
+
+    /**
      * @return the {@link ContainerType}s that this {@link ContainerType} can
-     *         hold as children.
+     *         hold as children (must be empty if {@link #getVessels()} is not).
      */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
         joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
     public Set<ContainerType> getChildContainerTypes() {
-        return this.childContainerTypes;
+        return this.containerTypes;
     }
 
     public void setChildContainerTypes(Set<ContainerType> childContainerTypes) {
-        this.childContainerTypes = childContainerTypes;
+        this.containerTypes = childContainerTypes;
     }
 
     /**

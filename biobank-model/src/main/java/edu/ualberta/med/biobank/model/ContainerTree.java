@@ -26,8 +26,8 @@ public class ContainerTree
     @Valid
     @NotNull(message = "{ContainerTree.temperature.NotNull}")
     @AttributeOverrides({
-        @AttributeOverride(name = "value", column = @Column(name = "EXPECTED_CHANGE_VALUE")),
-        @AttributeOverride(name = "scale", column = @Column(name = "EXPECTED_CHANGE_SCALE"))
+        @AttributeOverride(name = "value", column = @Column(name = "TEMPERATURE_VALUE")),
+        @AttributeOverride(name = "scale", column = @Column(name = "TEMPERATURE_SCALE"))
     })
     public Decimal getTemperature() {
         return temperature;
