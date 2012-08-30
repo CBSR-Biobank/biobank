@@ -12,6 +12,9 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * A standardised set of the types of containers that {@link Specimen}s are
  * <em>directly</em> stored in, such as, specific types of tubes, vials, slides,
  * etc..
+ * <p>
+ * A single global (to the database) list of {@link Vessel}s is important
+ * because they referenced by both {@link Center}s and {@link Study}s.
  * 
  * @author Jonathan Ferland
  */

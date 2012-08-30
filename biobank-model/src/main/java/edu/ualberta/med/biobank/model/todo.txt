@@ -14,17 +14,20 @@
 	- Yes
 [v] Specimen will have a originCenter and currentCenter and no originInfo
 	[v] Remove OriginInfo
-[ ] Q: Make SpecimenPosition and ContainerPosition either:
+[v] Q: Make SpecimenPosition and ContainerPosition either:
 	(1) immutable
 	(2) embeddable
-	A: ???
-	[ ] Replace Row/Col with a `position` column
+	A: Made them immutable but not embeddable so could have constraints
+	on the entity, and also because not all specimens and containers will
+	have a position.
+	[v] Replace Row/Col with a `position` column
+	A: yes, done, sorta
 [ ] Standardization of HasCreationTime and HasLastModifiedTime
 	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity and 
 	[v] add listeners to update the properties
 	[ ] override date type to save to a decimal(17,3) or a long or something so
 		can have millisecond precision in mysql db
-[ ] *Specimen CreatedAt vs TimeDrawn, etc.
+[v] *Specimen CreatedAt vs TimeDrawn, etc.
 	Q: Are specimens from an organism and aliquots the result of aliquotting?
 	Does "samples" include both? CreatedAt would just be the phyiscal time a
 	sample is created/ drawn (e.g. whenever it's put in its tube).
@@ -86,7 +89,7 @@
 [ ] Dispatch containers AND specimens, but then product barcode must be globally unique!
 [ ] Global list of tube types, defined however, centers can make their own groups of tube
 	types and then have their CT have a list of those
-[ ] Aaron would like the sample-type restriction to be able to be assigned at any level
+[v] Aaron would like the sample-type restriction to be able to be assigned at any level
 	(e.g. freezer, hotel, pallet)
 [ ] *Server API should have multiple versions that we support? *shudder*
 [v] Specimen should have an amount and unit (e.g. volume, mass, punches remaining?, etc.)?
@@ -95,8 +98,11 @@
 [x] Q: Study-s can have an share Protocol-s. Protocol-s could be independently managed or
 	owned by a single Study?
 	A: too complicated for now, just do Study-s
-[ ] How to deal with 96 well plates where the wells do not have ids, only the plate does?
-[ ] How to deal with duplicate ids? Namespaces (e.g. distributer)? Unique per container?
+[v] How to deal with 96 well plates where the wells do not have ids, only the plate does?
+	A: fine, but all specimens should still have an inventory id for referencing them,
+	whether it's attached or not.
+[ ] *How to deal with duplicate ids? Namespaces (e.g. distributer)? Unique per container?
+	Q: ask CBSR!!
 [ ] Check ValidityAuditStrategy when it comes to ids that are join-table ids, it doesn't 
 	seem to update unless not add
 * requires thought/ feedback

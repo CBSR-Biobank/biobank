@@ -60,6 +60,7 @@ public class Container extends AbstractModel
     private String productBarcode;
     private ContainerType containerType;
     private ContainerNode node;
+    private ContainerConstraints constraints;
     private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean enabled;
 
@@ -80,7 +81,7 @@ public class Container extends AbstractModel
     }
 
     @NotNull(message = "{Container.containerType.NotNull}")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_TYPE_ID")
     public ContainerType getContainerType() {
         return containerType;
@@ -99,6 +100,21 @@ public class Container extends AbstractModel
 
     public void setNode(ContainerNode node) {
         this.node = node;
+    }
+
+    /**
+     * @return optional information about what types of {@link Specimen}s this
+     *         {@link Container} and its children can legally contain, or null
+     *         if none specified.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_CONSTRAINTS_ID")
+    public ContainerConstraints getConstraints() {
+        return constraints;
+    }
+
+    public void setConstraints(ContainerConstraints constraints) {
+        this.constraints = constraints;
     }
 
     @Override
@@ -183,6 +199,7 @@ public class Container extends AbstractModel
          *         label.
          */
         // TODO: ask cbsr if we can just not store labels?
+        // TODO: but a label is needed for easy location display and look-up?
         @NotEmpty(message = "{Container.label.NotEmpty}")
         @Column(name = "LABEL", nullable = false)
         public String getLabel() {
