@@ -57,7 +57,6 @@ public class Specimen extends AbstractModel
     private Decimal amount;
     private Location originLocation;
     private Location currentLocation;
-    private Center owningCenter;
     private Boolean usable;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -137,17 +136,6 @@ public class Specimen extends AbstractModel
 
     public void setOriginLocation(Location originLocation) {
         this.originLocation = originLocation;
-    }
-
-    @NotNull(message = "{Specimen.owningCenter.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OWNING_CENTER_ID", nullable = false)
-    public Center getOwningCenter() {
-        return owningCenter;
-    }
-
-    public void setOwningCenter(Center owningCenter) {
-        this.owningCenter = owningCenter;
     }
 
     @NotNull(message = "{Specimen.usable.NotNull}")
