@@ -57,7 +57,7 @@ public class Dispatch extends AbstractModel
             "State").format();
     }
 
-    private DispatchState state = DispatchState.CREATION;
+    private DispatchState state;
     private Center senderCenter;
     private Center receiverCenter;
     private ShipmentInfo shipmentInfo;

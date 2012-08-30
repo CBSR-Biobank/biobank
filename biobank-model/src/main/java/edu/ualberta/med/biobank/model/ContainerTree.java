@@ -4,6 +4,9 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,9 +22,34 @@ public class ContainerTree
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private Center center;
-    private Center owner;
+    private Location currentLocation;
+    private Center owningCenter;
     private Decimal temperature;
+
+    /**
+     * @return the current location of all the {@link Container}s in this
+     *         {@link ContainerTree}, or null if there is no location.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CURRENT_LOCATION_ID", nullable = false)
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    @NotNull(message = "{Specimen.owningCenter.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNING_CENTER_ID", nullable = false)
+    public Center getOwningCenter() {
+        return owningCenter;
+    }
+
+    public void setOwningCenter(Center owningCenter) {
+        this.owningCenter = owningCenter;
+    }
 
     @Valid
     @NotNull(message = "{ContainerTree.temperature.NotNull}")

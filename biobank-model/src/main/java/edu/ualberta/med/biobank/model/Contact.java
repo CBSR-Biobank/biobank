@@ -75,7 +75,7 @@ public class Contact extends AbstractModel
     private String emailAddress;
     private String pagerNumber;
     private String officeNumber;
-    private StudyCenter studyCenter;
+    private StudyLocation studyCenter;
 
     @Override
     @NotEmpty(message = "{Contact.name.NotNull}")
@@ -146,11 +146,11 @@ public class Contact extends AbstractModel
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "STUDY_CENTER_ID", nullable = false)
-    public StudyCenter getStudyCenter() {
+    public StudyLocation getStudyCenter() {
         return this.studyCenter;
     }
 
-    public void setStudyCenter(StudyCenter studyCenter) {
+    public void setStudyCenter(StudyLocation studyCenter) {
         this.studyCenter = studyCenter;
     }
 }

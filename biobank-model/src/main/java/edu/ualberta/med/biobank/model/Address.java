@@ -5,84 +5,49 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 
 @Embeddable
 public class Address implements Serializable {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Address",
-        "Addresses");
-
-    @SuppressWarnings("nls")
-    public static class Property {
-        public static final LString CITY = bundle.trc(
-            "model",
-            "City").format();
-        public static final LString COUNTRY = bundle.trc(
-            "model",
-            "Country").format();
-        public static final LString EMAIL_ADDRESS = bundle.trc(
-            "model",
-            "Email Address").format();
-        public static final LString FAX_NUMBER = bundle.trc(
-            "model",
-            "Fax Number").format();
-        public static final LString PHONE_NUMBER = bundle.trc(
-            "model",
-            "Phone Number").format();
-        public static final LString POSTAL_CODE = bundle.trc(
-            "model",
-            "Postal/ Zip Code").format();
-        public static final LString PROVINCE = bundle.trc(
-            "model",
-            "Province/ State").format();
-        public static final LString STREET1 = bundle.trc(
-            "model",
-            "Street 1").format();
-        public static final LString STREET2 = bundle.trc(
-            "model",
-            "Street 2").format();
-    }
-
-    private String street1;
-    private String street2;
+    private String name;
+    private String streetAddress;
     private String city;
     private String province;
     private String postalCode;
+    private String pOBoxNumber;
+    // TODO: move this out of address and into a contact class
     private String emailAddress;
     private String phoneNumber;
     private String faxNumber;
-    private String country;
+    private String countryISOCode;
 
-    @Column(name = "STREET1")
-    public String getStreet1() {
-        return this.street1;
+    @NotEmpty(message = "{Address.name.NotEmpty}")
+    @Length(max = 100, message = "{Address.name.Length}")
+    @Column(name = "NAME", length = 100)
+    public String getName() {
+        return name;
     }
 
-    public void setStreet1(String street1) {
-        this.street1 = street1;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @Column(name = "STREET2")
-    public String getStreet2() {
-        return this.street2;
+    @Length(max = 255, message = "{Address.streetAddress.Length}")
+    @Column(name = "STREET_ADDRESS", length = 255)
+    public String getStreetAddress() {
+        return this.streetAddress;
     }
 
-    public void setStreet2(String street2) {
-        this.street2 = street2;
+    public void setStreetAddress(String streetAddress) {
+        this.streetAddress = streetAddress;
     }
 
     @NotEmpty(message = "{Address.city.NotEmpty}")
-    @Column(name = "CITY", length = 50)
+    @Length(max = 150, message = "{Address.city.Length}")
+    @Column(name = "CITY", length = 150)
     public String getCity() {
         return this.city;
     }
@@ -91,6 +56,7 @@ public class Address implements Serializable {
         this.city = city;
     }
 
+    @Length(max = 50, message = "{Address.province.Length}")
     @Column(name = "PROVINCE", length = 50)
     public String getProvince() {
         return this.province;
@@ -100,7 +66,8 @@ public class Address implements Serializable {
         this.province = province;
     }
 
-    @Column(name = "POSTAL_CODE", length = 50)
+    @Length(max = 20, message = "{Address.postalCode.Length}")
+    @Column(name = "POSTAL_CODE", length = 20)
     public String getPostalCode() {
         return this.postalCode;
     }
@@ -109,6 +76,17 @@ public class Address implements Serializable {
         this.postalCode = postalCode;
     }
 
+    @Length(max = 50, message = "{Address.pOBoxNumber.Length}")
+    @Column(name = "PO_BOX_NUMBER", length = 50)
+    public String getPOBoxNumber() {
+        return pOBoxNumber;
+    }
+
+    public void setPOBoxNumber(String pOBoxNumber) {
+        this.pOBoxNumber = pOBoxNumber;
+    }
+
+    @Length(max = 100, message = "{Address.emailAddress.Length}")
     @Column(name = "EMAIL_ADDRESS", length = 100)
     public String getEmailAddress() {
         return this.emailAddress;
@@ -118,6 +96,7 @@ public class Address implements Serializable {
         this.emailAddress = emailAddress;
     }
 
+    @Length(max = 50, message = "{Address.phoneNumber.Length}")
     @Column(name = "PHONE_NUMBER", length = 50)
     public String getPhoneNumber() {
         return this.phoneNumber;
@@ -127,6 +106,7 @@ public class Address implements Serializable {
         this.phoneNumber = phoneNumber;
     }
 
+    @Length(max = 50, message = "{Address.faxNumber.Length}")
     @Column(name = "FAX_NUMBER", length = 50)
     public String getFaxNumber() {
         return this.faxNumber;
@@ -136,12 +116,16 @@ public class Address implements Serializable {
         this.faxNumber = faxNumber;
     }
 
-    @Column(name = "COUNTRY", length = 50)
-    public String getCountry() {
-        return this.country;
+    /**
+     * @return the 3-character ISO country code.
+     */
+    @Length(min = 3, max = 3, message = "{Location.GLN.Length}")
+    @Column(name = "COUNTRY_ISO_CODE", length = 3)
+    public String getCountryISOCode() {
+        return this.countryISOCode;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setCountryISOCode(String countryISOCode) {
+        this.countryISOCode = countryISOCode;
     }
 }

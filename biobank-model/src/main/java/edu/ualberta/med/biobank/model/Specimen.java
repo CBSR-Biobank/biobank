@@ -55,8 +55,9 @@ public class Specimen extends AbstractModel
     private Date timeCreated;
     private SpecimenGroup group;
     private Decimal amount;
-    private StudyCenter originCenter;
-    private StudyCenter currentCenter;
+    private Location originLocation;
+    private Location currentLocation;
+    private Center owningCenter;
     private Boolean usable;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -114,26 +115,39 @@ public class Specimen extends AbstractModel
         this.group = group;
     }
 
-    @NotNull(message = "{Specimen.currentCenter.NotNull}")
+    /**
+     * @return this {@link Specimen}'s current location, or null if no location.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENT_STUDY_CENTER_ID", nullable = false)
-    public StudyCenter getCurrentCenter() {
-        return this.currentCenter;
+    @JoinColumn(name = "CURRENT_LOCATION_ID")
+    public Location getCurrentLocation() {
+        return this.currentLocation;
     }
 
-    public void setCurrentCenter(StudyCenter currentCenter) {
-        this.currentCenter = currentCenter;
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
-    @NotNull(message = "{Specimen.originCenter.NotNull}")
+    @NotNull(message = "{Specimen.originLocation.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORIGIN_STUDY_CENTER_ID", nullable = false)
-    public StudyCenter getOriginCenter() {
-        return originCenter;
+    @JoinColumn(name = "ORIGIN_LOCATION_ID", nullable = false)
+    public Location getOriginLocation() {
+        return originLocation;
     }
 
-    public void setOriginCenter(StudyCenter originCenter) {
-        this.originCenter = originCenter;
+    public void setOriginLocation(Location originLocation) {
+        this.originLocation = originLocation;
+    }
+
+    @NotNull(message = "{Specimen.owningCenter.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNING_CENTER_ID", nullable = false)
+    public Center getOwningCenter() {
+        return owningCenter;
+    }
+
+    public void setOwningCenter(Center owningCenter) {
+        this.owningCenter = owningCenter;
     }
 
     @NotNull(message = "{Specimen.usable.NotNull}")

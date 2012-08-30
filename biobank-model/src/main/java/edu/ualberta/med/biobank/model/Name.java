@@ -18,20 +18,15 @@ public class Name {
 
         // @formatter:off
         tmp.put(Address.class,                  bundle.tr("Address").format());
-        tmp.put(Capacity.class,                 bundle.tr("Capacity").format());
         tmp.put(Center.class,                   bundle.tr("Center").format());
         tmp.put(CollectionEvent.class,          bundle.tr("Collection Event").format());
         tmp.put(Comment.class,                  bundle.tr("Comment").format());
         tmp.put(Contact.class,                  bundle.tr("Contact").format());
         tmp.put(Container.class,                bundle.tr("Container").format());
-        tmp.put(ContainerLabelingScheme.class,  bundle.tr("Container Labeling Scheme").format());
         tmp.put(ContainerType.class,            bundle.tr("Container Type").format());
         tmp.put(Dispatch.class,                 bundle.tr("Dispatch").format());
         tmp.put(DispatchSpecimen.class,         bundle.tr("Dispatch Specimen").format());
         tmp.put(Domain.class,                   bundle.tr("Domain").format());
-        tmp.put(EventAttr.class,                bundle.tr("Event Attribute").format());
-        tmp.put(EventAttrType.class,            bundle.tr("Event Attribute Type").format());
-        tmp.put(GlobalEventAttr.class,          bundle.tr("Global Event Attribute").format());
         tmp.put(Group.class,                    bundle.tr("Group").format());
         tmp.put(Membership.class,               bundle.tr("Membership").format());
         tmp.put(Patient.class,                  bundle.tr("Patient").format());
@@ -46,7 +41,6 @@ public class Name {
         tmp.put(Specimen.class,                 bundle.tr("Specimen").format());
         tmp.put(SpecimenType.class,             bundle.tr("Specimen Type").format());
         tmp.put(Study.class,                    bundle.tr("Study").format());
-        tmp.put(StudyEventAttr.class,           bundle.tr("Study Event Attribute").format());
         tmp.put(User.class,                     bundle.tr("User").format());
         // @formatter:on
 
