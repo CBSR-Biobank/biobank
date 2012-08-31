@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 
 public class SpecimenGetDispatchesAction implements
     Action<SpecimenDispatchesInfo> {
@@ -19,7 +19,7 @@ public class SpecimenGetDispatchesAction implements
 
     @SuppressWarnings("nls")
     private static final String SPECIMEN_DISPATCH_HQL =
-        "SELECT dispatch FROM " + Dispatch.class.getName() + " dispatch"
+        "SELECT dispatch FROM " + Shipment.class.getName() + " dispatch"
             + " INNER JOIN FETCH dispatch.senderCenter"
             + " INNER JOIN FETCH dispatch.receiverCenter"
             + " LEFT JOIN FETCH dispatch.shipmentInfo"
@@ -30,13 +30,13 @@ public class SpecimenGetDispatchesAction implements
     public static class SpecimenDispatchesInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
-        public List<Dispatch> dispatches;
+        public List<Shipment> dispatches;
 
-        public SpecimenDispatchesInfo(List<Dispatch> dispatches) {
+        public SpecimenDispatchesInfo(List<Shipment> dispatches) {
             this.dispatches = dispatches;
         }
 
-        public List<Dispatch> getDispatches() {
+        public List<Shipment> getDispatches() {
             return dispatches;
         }
     }
@@ -55,13 +55,13 @@ public class SpecimenGetDispatchesAction implements
     @Override
     public SpecimenDispatchesInfo run(ActionContext context)
         throws ActionException {
-        List<Dispatch> dispatches = new ArrayList<Dispatch>(0);
+        List<Shipment> dispatches = new ArrayList<Shipment>(0);
 
         Query query = context.getSession().createQuery(SPECIMEN_DISPATCH_HQL);
         query.setParameter(0, specimenId);
 
         @SuppressWarnings("unchecked")
-        List<Dispatch> resultset = query.list();
+        List<Shipment> resultset = query.list();
         if (resultset != null) {
             dispatches.addAll(resultset);
         }

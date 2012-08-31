@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.type.ShipmentItemState;
 import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
@@ -125,10 +125,10 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
                 cell.setInformation(bundle.tr(
                     "Specimen should not be in shipment").format());
             } else {
-                if (DispatchSpecimenState.RECEIVED == state) {
+                if (ShipmentItemState.RECEIVED == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
                     cell.setStatus(CellInfoStatus.IN_SHIPMENT_RECEIVED);
-                } else if (DispatchSpecimenState.EXTRA == state) {
+                } else if (ShipmentItemState.EXTRA == state) {
                     updateCellWithSpecimen(cell, foundSpecimen);
                     cell.setStatus(CellInfoStatus.EXTRA);
                 } else {

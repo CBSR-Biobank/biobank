@@ -20,8 +20,8 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -74,8 +74,8 @@ public class Factory {
     private Principal defaultPrincipal;
     private Membership defaultMembership;
     private Role defaultRole;
-    private Dispatch defaultDispatch;
-    private DispatchSpecimen defaultDispatchSpecimen;
+    private Shipment defaultDispatch;
+    private ShipmentSpecimen defaultDispatchSpecimen;
     private Request defaultRequest;
     private RequestSpecimen defaultRequestSpecimen;
     private ProcessingEvent defaultProcessingEvent;
@@ -83,7 +83,7 @@ public class Factory {
     private AliquotedSpecimen defaultAliquotedSpecimen;
     private Contact defaultContact;
     private Comment defaultComment;
-    private ShipmentInfo defaultShipmentInfo;
+    private ShipmentData defaultShipmentInfo;
     private ShippingMethod defaultShippingMethod;
 
     public Factory(Session session) {
@@ -187,7 +187,7 @@ public class Factory {
         this.defaultRequestSpecimen = requiestSpecimen;
     }
 
-    public Dispatch getDefaultDispatch() {
+    public Shipment getDefaultDispatch() {
         if (defaultDispatch == null) {
             defaultDispatch =
                 createDispatch(getDefaultCenter(), createCenter());
@@ -195,11 +195,11 @@ public class Factory {
         return defaultDispatch;
     }
 
-    public void setDefaultDispatch(Dispatch defaultDispatch) {
+    public void setDefaultDispatch(Shipment defaultDispatch) {
         this.defaultDispatch = defaultDispatch;
     }
 
-    public DispatchSpecimen getDefaultDispatchSpecimen() {
+    public ShipmentSpecimen getDefaultDispatchSpecimen() {
         if (defaultDispatchSpecimen == null) {
             defaultDispatchSpecimen = createDispatchSpecimen();
         }
@@ -207,7 +207,7 @@ public class Factory {
     }
 
     public void setDefaultDispatchSpecimen(
-        DispatchSpecimen defaultDispatchSpecimen) {
+        ShipmentSpecimen defaultDispatchSpecimen) {
         this.defaultDispatchSpecimen = defaultDispatchSpecimen;
     }
 
@@ -426,11 +426,11 @@ public class Factory {
         this.defaultChildSpecimen = defaultSpecimen;
     }
 
-    public ShipmentInfo getDefaultShipmentInfo() {
+    public ShipmentData getDefaultShipmentInfo() {
         return defaultShipmentInfo;
     }
 
-    public void setDefaultShipmentInfo(ShipmentInfo defaultShipmentInfo) {
+    public void setDefaultShipmentInfo(ShipmentData defaultShipmentInfo) {
         this.defaultShipmentInfo = defaultShipmentInfo;
     }
 
@@ -533,8 +533,8 @@ public class Factory {
         return requestSpecimen;
     }
 
-    public Dispatch createDispatch(Center sender, Center receiver) {
-        Dispatch dispatch = new Dispatch();
+    public Shipment createDispatch(Center sender, Center receiver) {
+        Shipment dispatch = new Shipment();
 
         dispatch.setSenderCenter(sender);
         dispatch.setReceiverCenter(receiver);
@@ -545,8 +545,8 @@ public class Factory {
         return dispatch;
     }
 
-    public DispatchSpecimen createDispatchSpecimen() {
-        DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
+    public ShipmentSpecimen createDispatchSpecimen() {
+        ShipmentSpecimen dispatchSpecimen = new ShipmentSpecimen();
         dispatchSpecimen.setDispatch(getDefaultDispatch());
 
         Specimen specimen = createParentSpecimen();
@@ -825,7 +825,7 @@ public class Factory {
         OriginInfo originInfo = new OriginInfo();
         originInfo.setCenter(getDefaultCenter());
 
-        ShipmentInfo shipmentInfo = getDefaultShipmentInfo();
+        ShipmentData shipmentInfo = getDefaultShipmentInfo();
         if (shipmentInfo != null) {
             originInfo.setShipmentInfo(shipmentInfo);
             originInfo.setReceiverSite(getDefaultSite());
@@ -837,10 +837,10 @@ public class Factory {
         return originInfo;
     }
 
-    public ShipmentInfo createShipmentInfo() {
-        String waybill = nameGenerator.next(ShipmentInfo.class);
+    public ShipmentData createShipmentInfo() {
+        String waybill = nameGenerator.next(ShipmentData.class);
 
-        ShipmentInfo shipmentInfo = new ShipmentInfo();
+        ShipmentData shipmentInfo = new ShipmentData();
 
         // set packed at to 2 days ago
         Calendar cal = Calendar.getInstance();

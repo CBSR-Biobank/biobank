@@ -22,7 +22,7 @@ public class ContainerTree
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private Location currentLocation;
+    private CenterLocation location;
     private Center owningCenter;
     private Decimal temperature;
 
@@ -31,13 +31,13 @@ public class ContainerTree
      *         {@link ContainerTree}, or null if there is no location.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENT_LOCATION_ID", nullable = false)
-    public Location getCurrentLocation() {
-        return currentLocation;
+    @JoinColumn(name = "CENTER_LOCATION_ID", nullable = false)
+    public CenterLocation getLocation() {
+        return location;
     }
 
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
+    public void setLocation(CenterLocation location) {
+        this.location = location;
     }
 
     @NotNull(message = "{Specimen.owningCenter.NotNull}")

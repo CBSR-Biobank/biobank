@@ -1,20 +1,11 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -40,13 +31,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @NotUsed.List({
     @NotUsed(by = ProcessingEvent.class, property = "center", groups = PreDelete.class),
-    @NotUsed(by = Dispatch.class, property = "senderCenter", groups = PreDelete.class),
-    @NotUsed(by = Dispatch.class, property = "receiverCenter", groups = PreDelete.class),
     @NotUsed(by = Container.class, property = "center", groups = PreDelete.class),
     @NotUsed(by = ContainerType.class, property = "center", groups = PreDelete.class)
 })
-public class Center extends AbstractModel
-    implements HasName, HasDescription, HasComments, HasAddress {
+public class Center
+    extends AbstractModel
+    implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -68,9 +58,7 @@ public class Center extends AbstractModel
 
     private String name;
     private String description;
-    private Address address = new Address();
     private Boolean enabled;
-    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @Override
     @Column(name = "DESCRIPTION")
@@ -95,18 +83,6 @@ public class Center extends AbstractModel
         this.name = name;
     }
 
-    @Override
-    @NotNull(message = "{Center.address.NotNull}")
-    @Embedded
-    public Address getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
     @NotNull(message = "{Center.enabled.NotNull}")
     @Column(name = "IS_ENABLED")
     public Boolean isEnabled() {
@@ -115,19 +91,5 @@ public class Center extends AbstractModel
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    @Override
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "CENTER_COMMENT",
-        joinColumns = { @JoinColumn(name = "CENTER_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 }

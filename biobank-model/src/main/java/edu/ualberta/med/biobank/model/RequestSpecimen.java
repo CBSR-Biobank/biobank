@@ -11,9 +11,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 @Audited
@@ -21,48 +18,11 @@ import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 @Table(name = "REQUEST_SPECIMEN")
 public class RequestSpecimen extends AbstractModel {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Requested Specimen",
-        "Requested Specimens");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString CLAIMED_BY = bundle.trc(
-            "model",
-            "Claimed By").format();
-        public static final LString STATE = bundle.trc(
-            "model",
-            "State").format();
-    }
-
-    private RequestSpecimenState state = RequestSpecimenState.AVAILABLE_STATE;
-    private String claimedBy;
     private Specimen specimen;
     private Request request;
-
-    @NotNull(message = "{RequestSpecimen.state.NotNull}")
-    @Column(name = "STATE", nullable = false)
-    @Type(type = "requestSpecimenState")
-    public RequestSpecimenState getState() {
-        return this.state;
-    }
-
-    public void setState(RequestSpecimenState state) {
-        this.state = state;
-    }
-
-    @Column(name = "CLAIMED_BY", length = 50)
-    public String getClaimedBy() {
-        return this.claimedBy;
-    }
-
-    public void setClaimedBy(String claimedBy) {
-        this.claimedBy = claimedBy;
-    }
+    private RequestSpecimenState state;
+    private User claimedBy;
 
     @NotNull(message = "{RequestSpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -84,5 +44,26 @@ public class RequestSpecimen extends AbstractModel {
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    @NotNull(message = "{RequestSpecimen.state.NotNull}")
+    @Column(name = "STATE", nullable = false)
+    @Type(type = "requestSpecimenState")
+    public RequestSpecimenState getState() {
+        return this.state;
+    }
+
+    public void setState(RequestSpecimenState state) {
+        this.state = state;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "CLAIMED_BY_USER_ID")
+    public User getClaimedBy() {
+        return this.claimedBy;
+    }
+
+    public void setClaimedBy(User claimedBy) {
+        this.claimedBy = claimedBy;
     }
 }

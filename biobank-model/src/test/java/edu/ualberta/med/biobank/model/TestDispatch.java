@@ -6,9 +6,9 @@ import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.util.HibernateHelper;
 
@@ -56,13 +56,13 @@ public class TestDispatch extends DbTest {
 
         Site sender = factory.createCenter();
         Site receiver = factory.createCenter();
-        Dispatch dispatch = factory.createDispatch(sender, receiver);
+        Shipment dispatch = factory.createDispatch(sender, receiver);
 
         Query query = HibernateHelper.getDehydratedPropertyQuery(
             session, dispatch, "state");
 
         try {
-            for (DispatchState state : DispatchState.values()) {
+            for (ShipmentState state : ShipmentState.values()) {
                 dispatch.setState(state);
                 session.update(dispatch);
                 session.flush();

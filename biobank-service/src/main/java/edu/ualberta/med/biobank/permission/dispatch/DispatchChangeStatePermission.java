@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.permission.dispatch;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class DispatchChangeStatePermission implements Permission {
@@ -19,12 +19,12 @@ public class DispatchChangeStatePermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Dispatch dispatch = context.load(Dispatch.class, dispatchId);
+        Shipment dispatch = context.load(Shipment.class, dispatchId);
         User user = context.getUser();
-        return (!DispatchState.CREATION.equals(dispatch.getState())
+        return (!ShipmentState.PACKED.equals(dispatch.getState())
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
             dispatch.getReceiverCenter()))
-            || (DispatchState.CREATION.equals(dispatch.getState())
+            || (ShipmentState.PACKED.equals(dispatch.getState())
             && PermissionEnum.DISPATCH_CHANGE_STATE.isAllowed(user,
                 dispatch.getSenderCenter()));
     }

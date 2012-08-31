@@ -10,22 +10,22 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.type.ShipmentItemState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
-public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
+public class DispatchRetrievalAction implements Action<ListResult<Shipment>> {
     private static final long serialVersionUID = 1L;
 
-    private final DispatchState state;
+    private final ShipmentState state;
     private final Integer centerId;
     private final Boolean isSender;
     private final Boolean noErrors;
 
     private static String DISPATCH_HQL_STATE_SELECT =
-        "SELECT DISTINCT d FROM " + Dispatch.class.getName() + " d" //$NON-NLS-1$ //$NON-NLS-2$
+        "SELECT DISTINCT d FROM " + Shipment.class.getName() + " d" //$NON-NLS-1$ //$NON-NLS-2$
             + " LEFT JOIN FETCH d.dispatchSpecimens" //$NON-NLS-1$
             + " INNER JOIN FETCH d.senderCenter" //$NON-NLS-1$
             + " INNER JOIN FETCH d.receiverCenter" //$NON-NLS-1$
@@ -40,12 +40,12 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     private static String EMPTY_HQL = " AND NOT EXISTS "; //$NON-NLS-1$
 
     private static String NO_ERRORS_HQL = "(FROM " //$NON-NLS-1$
-        + DispatchSpecimen.class.getName() + " ds" //$NON-NLS-1$
-        + " WHERE (ds.state=" + DispatchSpecimenState.MISSING.getId() //$NON-NLS-1$
-        + " OR ds.state=" + DispatchSpecimenState.EXTRA.getId() //$NON-NLS-1$
+        + ShipmentSpecimen.class.getName() + " ds" //$NON-NLS-1$
+        + " WHERE (ds.state=" + ShipmentItemState.MISSING.getId() //$NON-NLS-1$
+        + " OR ds.state=" + ShipmentItemState.EXTRA.getId() //$NON-NLS-1$
         + ") AND ds.dispatch.id=d.id) "; //$NON-NLS-1$
 
-    public DispatchRetrievalAction(DispatchState state, Integer centerId,
+    public DispatchRetrievalAction(ShipmentState state, Integer centerId,
         Boolean isSender, Boolean noErrors) {
         this.state = state;
         this.centerId = centerId;
@@ -60,7 +60,7 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
     }
 
     @Override
-    public ListResult<Dispatch> run(ActionContext context)
+    public ListResult<Shipment> run(ActionContext context)
         throws ActionException {
         StringBuffer qryBuf = new StringBuffer(DISPATCH_HQL_STATE_SELECT);
         if (isSender)
@@ -79,18 +79,18 @@ public class DispatchRetrievalAction implements Action<ListResult<Dispatch>> {
         q.setParameter(0, state);
         q.setParameter(1, centerId);
 
-        ArrayList<Dispatch> dispatches = new ArrayList<Dispatch>();
+        ArrayList<Shipment> dispatches = new ArrayList<Shipment>();
 
         Query query = context.getSession().createQuery(qryBuf.toString());
         query.setParameter(0, state);
         query.setParameter(1, centerId);
 
         @SuppressWarnings("unchecked")
-        List<Dispatch> results = query.list();
+        List<Shipment> results = query.list();
         if (results != null) {
             dispatches.addAll(results);
         }
 
-        return new ListResult<Dispatch>(dispatches);
+        return new ListResult<Shipment>(dispatches);
     }
 }

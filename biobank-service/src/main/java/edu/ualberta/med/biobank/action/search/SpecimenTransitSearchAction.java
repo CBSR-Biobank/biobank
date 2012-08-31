@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.IBiobankModel;
 import edu.ualberta.med.biobank.model.OriginInfo;
 
@@ -35,7 +35,7 @@ public class SpecimenTransitSearchAction implements
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL_STRING = "from "
-        + Dispatch.class.getName() + " as o "
+        + Shipment.class.getName() + " as o "
         + "inner join fetch o.shipmentInfo as s "
         + "inner join fetch o.senderCenter "
         + "inner join fetch o.receiverCenter";

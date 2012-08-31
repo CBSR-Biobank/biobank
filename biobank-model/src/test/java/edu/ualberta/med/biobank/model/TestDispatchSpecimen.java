@@ -6,8 +6,8 @@ import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.type.ShipmentItemState;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.util.HibernateHelper;
 
@@ -16,13 +16,13 @@ public class TestDispatchSpecimen extends DbTest {
     public void stateIds() {
         Transaction tx = session.beginTransaction();
 
-        DispatchSpecimen dispatchSpecimen = factory.createDispatchSpecimen();
+        ShipmentSpecimen dispatchSpecimen = factory.createDispatchSpecimen();
 
         Query query = HibernateHelper.getDehydratedPropertyQuery(
             session, dispatchSpecimen, "state");
 
         try {
-            for (DispatchSpecimenState state : DispatchSpecimenState.values()) {
+            for (ShipmentItemState state : ShipmentItemState.values()) {
                 dispatchSpecimen.setState(state);
                 session.update(dispatchSpecimen);
                 session.flush();

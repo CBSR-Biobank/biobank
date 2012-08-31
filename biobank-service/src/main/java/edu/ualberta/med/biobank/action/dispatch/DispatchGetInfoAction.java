@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.permission.dispatch.DispatchReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 
 public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
     private static final long serialVersionUID = 1L;
@@ -25,7 +25,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL = "SELECT distinct dispatch "
-        + "FROM " + Dispatch.class.getName() + " dispatch"
+        + "FROM " + Shipment.class.getName() + " dispatch"
         + " LEFT JOIN FETCH dispatch.shipmentInfo si"
         + " LEFT JOIN FETCH si.shippingMethod"
         + " INNER JOIN FETCH dispatch.receiverCenter"
@@ -57,7 +57,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
         if (rows.size() == 1) {
             Object row = rows.get(0);
 
-            sInfo.dispatch = (Dispatch) row;
+            sInfo.dispatch = (Shipment) row;
             sInfo.specimens =
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 

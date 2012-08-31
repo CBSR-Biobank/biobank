@@ -6,12 +6,12 @@ import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.permission.dispatch.DispatchChangeStatePermission;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class DispatchChangeStateAction implements Action<IdResult> {
 
@@ -20,10 +20,10 @@ public class DispatchChangeStateAction implements Action<IdResult> {
      */
     private static final long serialVersionUID = 1L;
     private Integer id;
-    private DispatchState newState;
+    private ShipmentState newState;
     private ShipmentInfoSaveInfo shipInfo;
 
-    public DispatchChangeStateAction(Integer id, DispatchState state,
+    public DispatchChangeStateAction(Integer id, ShipmentState state,
         ShipmentInfoSaveInfo shipInfo) {
         this.id = id;
         this.newState = state;
@@ -37,21 +37,21 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        Dispatch disp =
-            context.load(Dispatch.class, id);
+        Shipment disp =
+            context.load(Shipment.class, id);
 
         disp.setState(newState);
 
-        if (newState.equals(DispatchState.LOST))
-            for (DispatchSpecimen ds : disp.getDispatchSpecimens())
+        if (newState.equals(ShipmentState.LOST))
+            for (ShipmentSpecimen ds : disp.getDispatchSpecimens())
                 ds.getSpecimen().setActivityStatus(ActivityStatus.FLAGGED);
 
         if (shipInfo == null)
             disp.setShipmentInfo(null);
         else {
-            ShipmentInfo si =
+            ShipmentData si =
                 context
-                    .get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());
+                    .get(ShipmentData.class, shipInfo.siId, new ShipmentData());
             si.setBoxNumber(shipInfo.boxNumber);
             si.setPackedAt(shipInfo.packedAt);
             si.setReceivedAt(shipInfo.receivedAt);

@@ -7,11 +7,11 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.BooleanResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentItemState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
 
@@ -40,16 +40,16 @@ public class SpecimenIsUsedInDispatchAction implements Action<BooleanResult> {
             specimenId);
         // FIXME reused code from wrapper. Might be more efficient to use a hql
         // query!
-        Collection<DispatchSpecimen> dsas = specimen
+        Collection<ShipmentSpecimen> dsas = specimen
             .getDispatchSpecimens();
         if (dsas != null)
-            for (DispatchSpecimen dsa : dsas) {
-                Dispatch dispatch = dsa.getDispatch();
+            for (ShipmentSpecimen dsa : dsas) {
+                Shipment dispatch = dsa.getDispatch();
                 if (!dispatch.getId().equals(excludedDispatchId)
-                    && (EnumSet.of(DispatchState.CREATION,
-                        DispatchState.IN_TRANSIT, DispatchState.RECEIVED)
+                    && (EnumSet.of(ShipmentState.PACKED,
+                        ShipmentState.IN_TRANSIT, ShipmentState.RECEIVED)
                         .contains(dispatch.getState()))) {
-                    if (DispatchSpecimenState.MISSING == dsa.getState()) {
+                    if (ShipmentItemState.MISSING == dsa.getState()) {
                         return new BooleanResult(false);
                     }
                     return new BooleanResult(true);

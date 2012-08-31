@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -104,7 +104,7 @@ public class ShipmentImportInfo implements IImportInfo {
         comment.setTimeCreated(timeNow);
         originInfo.getComments().add(comment);
 
-        ShipmentInfo shipmentInfo = new ShipmentInfo();
+        ShipmentData shipmentInfo = new ShipmentData();
         shipmentInfo.setPackedAt(csvInfo.getDateReceived());
         shipmentInfo.setReceivedAt(timeNow);
         shipmentInfo.setWaybill(csvInfo.getWaybill());

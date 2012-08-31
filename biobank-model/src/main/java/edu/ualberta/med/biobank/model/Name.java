@@ -17,15 +17,14 @@ public class Name {
         Map<Class<?>, LString> tmp = new HashMap<Class<?>, LString>();
 
         // @formatter:off
-        tmp.put(Address.class,                  bundle.tr("Address").format());
         tmp.put(Center.class,                   bundle.tr("Center").format());
         tmp.put(CollectionEvent.class,          bundle.tr("Collection Event").format());
         tmp.put(Comment.class,                  bundle.tr("Comment").format());
         tmp.put(Contact.class,                  bundle.tr("Contact").format());
         tmp.put(Container.class,                bundle.tr("Container").format());
         tmp.put(ContainerType.class,            bundle.tr("Container Type").format());
-        tmp.put(Dispatch.class,                 bundle.tr("Dispatch").format());
-        tmp.put(DispatchSpecimen.class,         bundle.tr("Dispatch Specimen").format());
+        tmp.put(Shipment.class,                 bundle.tr("Dispatch").format());
+        tmp.put(ShipmentSpecimen.class,         bundle.tr("Dispatch Specimen").format());
         tmp.put(Domain.class,                   bundle.tr("Domain").format());
         tmp.put(Group.class,                    bundle.tr("Group").format());
         tmp.put(Membership.class,               bundle.tr("Membership").format());
@@ -35,7 +34,7 @@ public class Name {
         tmp.put(Request.class,                  bundle.tr("Request").format());
         tmp.put(RequestSpecimen.class,          bundle.tr("Request Specimen").format());
         tmp.put(Role.class,                     bundle.tr("Role").format());
-        tmp.put(ShipmentInfo.class,             bundle.tr("Shipment Information").format());
+        tmp.put(ShipmentData.class,             bundle.tr("Shipment Information").format());
         tmp.put(ShippingMethod.class,           bundle.tr("Shipping Method").format());
         tmp.put(SourceSpecimen.class,           bundle.tr("Source Specimen").format());
         tmp.put(Specimen.class,                 bundle.tr("Specimen").format());

@@ -1,15 +1,9 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -39,19 +33,19 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PATIENT",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "STUDY_ID", "PNUMBER" }) })
+        @UniqueConstraint(columnNames = { "STUDY_ID", "PNUMBER" })
+    })
 @Unique(properties = { "study", "pnumber" }, groups = PrePersist.class)
 @NotUsed.List({
     @NotUsed(by = Specimen.class, property = "collectionEvent.patient", groups = PreDelete.class),
     @NotUsed(by = CollectionEvent.class, property = "patient", groups = PreDelete.class)
 })
-public class Patient extends AbstractModel
-    implements HasComments {
+public class Patient
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;
     private String pnumber;
-    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotNull(message = "{Patient.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -72,19 +66,5 @@ public class Patient extends AbstractModel
 
     public void setPnumber(String pnumber) {
         this.pnumber = pnumber;
-    }
-
-    @Override
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "PATIENT_COMMENT",
-        joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 }

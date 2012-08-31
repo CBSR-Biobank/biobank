@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,8 +9,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -53,15 +49,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = ParentContainer.class, property = "container", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container extends AbstractModel
-    implements HasComments {
+public class Container
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private String productBarcode;
     private ContainerType containerType;
     private ContainerNode node;
     private ContainerConstraints constraints;
-    private Set<Comment> comments = new HashSet<Comment>(0);
     private Boolean enabled;
 
     /**
@@ -115,20 +110,6 @@ public class Container extends AbstractModel
 
     public void setConstraints(ContainerConstraints constraints) {
         this.constraints = constraints;
-    }
-
-    @Override
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "CONTAINER_COMMENT",
-        joinColumns = { @JoinColumn(name = "CONTAINER_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 
     /**

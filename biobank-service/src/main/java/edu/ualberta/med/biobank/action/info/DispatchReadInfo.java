@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.action.info;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 
 public class DispatchReadInfo implements ActionResult {
 
@@ -12,7 +12,7 @@ public class DispatchReadInfo implements ActionResult {
      * 
      */
     private static final long serialVersionUID = 1L;
-    public Dispatch dispatch;
-    public Set<DispatchSpecimen> specimens;
+    public Shipment dispatch;
+    public Set<ShipmentSpecimen> specimens;
 
 }

@@ -1,16 +1,11 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -42,15 +37,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     })
 @Unique(properties = { "patient", "type", "visitNumber" }, groups = PrePersist.class)
 @NotUsed(by = SpecimenCollectionEvent.class, property = "collectionEvent", groups = PreDelete.class)
-public class CollectionEvent extends AbstractModel
-    implements HasComments {
+public class CollectionEvent
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private Patient patient;
     private CollectionEventType type;
     private Integer visitNumber;
     private Date timeDone;
-    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotNull(message = "{CollectionEvent.patient.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -101,19 +95,5 @@ public class CollectionEvent extends AbstractModel
 
     public void setTimeDone(Date timeDone) {
         this.timeDone = timeDone;
-    }
-
-    @Override
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "COLLECTION_EVENT_COMMENT",
-        joinColumns = { @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 }

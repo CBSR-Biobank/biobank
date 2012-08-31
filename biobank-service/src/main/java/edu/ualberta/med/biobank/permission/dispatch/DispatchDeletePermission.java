@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.permission.dispatch;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class DispatchDeletePermission implements Permission {
@@ -19,13 +19,13 @@ public class DispatchDeletePermission implements Permission {
     @Override
     public boolean isAllowed(ActionContext context) {
         if (shipmentId != null) {
-            Dispatch ship = null;
+            Shipment ship = null;
             try {
-                ship = context.load(Dispatch.class, shipmentId);
+                ship = context.load(Shipment.class, shipmentId);
             } catch (ModelNotFoundException e) {
                 return false;
             }
-            if (DispatchState.CREATION.equals(ship.getState()))
+            if (ShipmentState.PACKED.equals(ship.getState()))
                 return PermissionEnum.DISPATCH_DELETE.isAllowed(
                     context.getUser(),
                     ship.getSenderCenter());

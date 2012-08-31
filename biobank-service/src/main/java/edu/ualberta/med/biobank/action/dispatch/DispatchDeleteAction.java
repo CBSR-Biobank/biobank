@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class DispatchDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;
@@ -22,7 +22,7 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
 
     protected final Integer shipId;
 
-    public DispatchDeleteAction(Dispatch dispatch) {
+    public DispatchDeleteAction(Shipment dispatch) {
         if (dispatch == null) {
             throw new IllegalArgumentException();
         }
@@ -36,9 +36,9 @@ public class DispatchDeleteAction implements Action<EmptyResult> {
 
     @Override
     public EmptyResult run(ActionContext context) throws ActionException {
-        Dispatch ship = context.get(Dispatch.class, shipId);
+        Shipment ship = context.get(Shipment.class, shipId);
 
-        if (DispatchState.CREATION == ship.getState()) {
+        if (ShipmentState.PACKED == ship.getState()) {
             context.getSession().delete(ship);
         } else {
             throw new LocalizedException(CREATION_ONLY_ERRMSG);

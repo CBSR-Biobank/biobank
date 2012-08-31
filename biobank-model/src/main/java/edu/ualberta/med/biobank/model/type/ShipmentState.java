@@ -14,19 +14,21 @@ import java.io.Serializable;
  * @author Jonathan Ferland
  */
 @SuppressWarnings("nls")
-public enum RequestSpecimenState implements Serializable {
-    AVAILABLE_STATE(0),
-    PULLED_STATE(1),
-    UNAVAILABLE_STATE(2),
-    DISPATCHED_STATE(3);
+public enum ShipmentState implements Serializable {
+    CREATED("C"),
+    PACKED("P"),
+    SENT("S"),
+    RECEIVED("R"),
+    UNPACKED("U"),
+    LOST("L");
 
-    private Integer id;
+    private String id;
 
-    private RequestSpecimenState(Integer id) {
+    private ShipmentState(String id) {
         this.id = id;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 }

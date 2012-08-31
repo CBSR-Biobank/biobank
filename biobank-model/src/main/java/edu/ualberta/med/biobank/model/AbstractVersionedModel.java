@@ -43,5 +43,4 @@ public abstract class AbstractVersionedModel
     public void setTimeUpdated(Date timeUpdated) {
         this.timeUpdated = timeUpdated;
     }
-
 }

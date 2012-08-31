@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -62,9 +62,9 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         oi.setReceiverCenter(context.get(Site.class, oiInfo.siteId));
         oi.setCenter(context.get(Center.class, oiInfo.centerId));
 
-        ShipmentInfo si =
+        ShipmentData si =
             context
-                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+                .get(ShipmentData.class, siInfo.siId, new ShipmentData());
         si.setBoxNumber(siInfo.boxNumber);
         si.setPackedAt(siInfo.packedAt);
         si.setReceivedAt(siInfo.receivedAt);

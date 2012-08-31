@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -11,8 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -43,11 +39,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SPECIMEN")
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @NotUsed.List({
-    @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class),
+    @NotUsed(by = ShipmentSpecimen.class, property = "specimen", groups = PreDelete.class),
     @NotUsed(by = RequestSpecimen.class, property = "specimen", groups = PreDelete.class)
 })
-public class Specimen extends AbstractModel
-    implements HasComments {
+public class Specimen
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private String inventoryId;
@@ -55,10 +51,9 @@ public class Specimen extends AbstractModel
     private Date timeCreated;
     private SpecimenGroup group;
     private Decimal amount;
-    private Location originLocation;
-    private Location currentLocation;
+    private CenterLocation originLocation;
+    private CenterLocation location;
     private Boolean usable;
-    private Set<Comment> comments = new HashSet<Comment>(0);
 
     @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -118,23 +113,23 @@ public class Specimen extends AbstractModel
      * @return this {@link Specimen}'s current location, or null if no location.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURRENT_LOCATION_ID")
-    public Location getCurrentLocation() {
-        return this.currentLocation;
+    @JoinColumn(name = "CENTER_LOCATION_ID")
+    public CenterLocation getLocation() {
+        return this.location;
     }
 
-    public void setCurrentLocation(Location currentLocation) {
-        this.currentLocation = currentLocation;
+    public void setLocation(CenterLocation location) {
+        this.location = location;
     }
 
     @NotNull(message = "{Specimen.originLocation.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ORIGIN_LOCATION_ID", nullable = false)
-    public Location getOriginLocation() {
+    @JoinColumn(name = "ORIGIN_CENTER_LOCATION_ID", nullable = false)
+    public CenterLocation getOriginLocation() {
         return originLocation;
     }
 
-    public void setOriginLocation(Location originLocation) {
+    public void setOriginLocation(CenterLocation originLocation) {
         this.originLocation = originLocation;
     }
 
@@ -146,19 +141,5 @@ public class Specimen extends AbstractModel
 
     public void setUsable(Boolean usable) {
         this.usable = usable;
-    }
-
-    @Override
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(name = "SPECIMEN_COMMENT",
-        joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Comment> getComments() {
-        return this.comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 }

@@ -1,59 +1,24 @@
 package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
+import org.hibernate.validator.constraints.Length;
 
 @Audited
-@Entity
-@Table(name = "COMMENT")
-public class Comment extends AbstractModel {
+@MappedSuperclass
+public abstract class Comment
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Comment",
-        "Comments");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString CREATED_AT = bundle.trc(
-            "model",
-            "Created At").format();
-        public static final LString MESSAGE = bundle.trc(
-            "model",
-            "Message").format();
-    }
-
-    private String message;
     private User user;
+    private String message;
 
-    @NotEmpty(message = "{Comment.message.NotNull}")
-    @Column(name = "MESSAGE", columnDefinition = "TEXT")
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    // TODO: stop this property from being updated, and test that!
-    @NotAudited
     @NotNull(message = "{Comment.user.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)
@@ -63,5 +28,16 @@ public class Comment extends AbstractModel {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @NotNull(message = "{Comment.message.NotNull}")
+    @Length(min = 1, max = 5000, message = "{Comment.message.Length}")
+    @Column(name = "MESSAGE", nullable = false, length = 5000)
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

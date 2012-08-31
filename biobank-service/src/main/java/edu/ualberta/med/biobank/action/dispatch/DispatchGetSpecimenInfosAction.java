@@ -11,14 +11,14 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.SetResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.dispatch.DispatchReadPermission;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 
 public class DispatchGetSpecimenInfosAction implements
-    Action<SetResult<DispatchSpecimen>> {
+    Action<SetResult<ShipmentSpecimen>> {
 
     @SuppressWarnings("nls")
     public static final String DISPATCH_SPECIMEN_INFO_HQL =
-        "SELECT dspec FROM " + DispatchSpecimen.class.getName() + " dspec"
+        "SELECT dspec FROM " + ShipmentSpecimen.class.getName() + " dspec"
             + " INNER JOIN FETCH dspec.specimen spec"
             + " INNER JOIN FETCH spec.specimenType"
             + " INNER JOIN FETCH spec.collectionEvent cevent"
@@ -41,10 +41,10 @@ public class DispatchGetSpecimenInfosAction implements
     }
 
     @Override
-    public SetResult<DispatchSpecimen> run(ActionContext context)
+    public SetResult<ShipmentSpecimen> run(ActionContext context)
         throws ActionException {
-        Set<DispatchSpecimen> specInfos =
-            new HashSet<DispatchSpecimen>();
+        Set<ShipmentSpecimen> specInfos =
+            new HashSet<ShipmentSpecimen>();
 
         Query query =
             context.getSession().createQuery(DISPATCH_SPECIMEN_INFO_HQL);
@@ -53,8 +53,8 @@ public class DispatchGetSpecimenInfosAction implements
         @SuppressWarnings("unchecked")
         List<Object> rows = query.list();
         for (Object row : rows) {
-            specInfos.add((DispatchSpecimen) row);
+            specInfos.add((ShipmentSpecimen) row);
         }
-        return new SetResult<DispatchSpecimen>(specInfos);
+        return new SetResult<ShipmentSpecimen>(specInfos);
     }
 }

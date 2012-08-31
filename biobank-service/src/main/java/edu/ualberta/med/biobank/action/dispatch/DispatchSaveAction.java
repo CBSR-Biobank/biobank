@@ -15,12 +15,12 @@ import edu.ualberta.med.biobank.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class DispatchSaveAction implements Action<IdResult> {
 
@@ -46,14 +46,14 @@ public class DispatchSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        Dispatch disp =
-            context.get(Dispatch.class, dInfo.id, new Dispatch());
+        Shipment disp =
+            context.get(Shipment.class, dInfo.id, new Shipment());
 
         disp.setReceiverCenter(context.get(Center.class, dInfo.receiverId));
         disp.setSenderCenter(context.get(Center.class, dInfo.senderId));
 
         if (dInfo.state == null)
-            dInfo.state = DispatchState.CREATION;
+            dInfo.state = ShipmentState.PACKED;
 
         disp.setState(dInfo.state);
 
@@ -62,9 +62,9 @@ public class DispatchSaveAction implements Action<IdResult> {
             dsInfos));
 
         if (siInfo != null) {
-            ShipmentInfo si =
+            ShipmentData si =
                 context
-                    .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+                    .get(ShipmentData.class, siInfo.siId, new ShipmentData());
             si.setBoxNumber(siInfo.boxNumber);
             si.setPackedAt(siInfo.packedAt);
             si.setReceivedAt(siInfo.receivedAt);
@@ -98,15 +98,15 @@ public class DispatchSaveAction implements Action<IdResult> {
         return new IdResult(disp.getId());
     }
 
-    private Set<DispatchSpecimen> reassemble(ActionContext context,
-        Dispatch dispatch,
+    private Set<ShipmentSpecimen> reassemble(ActionContext context,
+        Shipment dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
-        Set<DispatchSpecimen> dispSpecimens =
-            new HashSet<DispatchSpecimen>();
+        Set<ShipmentSpecimen> dispSpecimens =
+            new HashSet<ShipmentSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
-            DispatchSpecimen dspec =
-                context.get(DispatchSpecimen.class, dsInfo.id,
-                    new DispatchSpecimen());
+            ShipmentSpecimen dspec =
+                context.get(ShipmentSpecimen.class, dsInfo.id,
+                    new ShipmentSpecimen());
             Specimen spec = context.load(Specimen.class,
                 dsInfo.specimenId);
             spec.setCurrentCenter(context.get(Center.class, dInfo.receiverId));

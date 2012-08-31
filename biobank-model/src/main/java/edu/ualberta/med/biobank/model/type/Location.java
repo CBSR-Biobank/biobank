@@ -1,32 +1,24 @@
-package edu.ualberta.med.biobank.model;
-
-import java.io.Serializable;
+package edu.ualberta.med.biobank.model.type;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
 
 @Embeddable
-public class Address implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class Location {
     private String name;
-    private String streetAddress;
+    private String street;
     private String city;
     private String province;
     private String postalCode;
     private String pOBoxNumber;
-    // TODO: move this out of address and into a contact class
-    private String emailAddress;
-    private String phoneNumber;
-    private String faxNumber;
     private String countryISOCode;
 
-    @NotEmpty(message = "{Address.name.NotEmpty}")
-    @Length(max = 100, message = "{Address.name.Length}")
-    @Column(name = "NAME", length = 100)
+    @NotNull(message = "{Address.name.NotNull")
+    @Length(min = 1, max = 100, message = "{Address.name.Length}")
+    @Column(name = "NAME", nullable = false, length = 100)
     public String getName() {
         return name;
     }
@@ -35,17 +27,16 @@ public class Address implements Serializable {
         this.name = name;
     }
 
-    @Length(max = 255, message = "{Address.streetAddress.Length}")
-    @Column(name = "STREET_ADDRESS", length = 255)
-    public String getStreetAddress() {
-        return this.streetAddress;
+    @Length(max = 255, message = "{Address.street.Length}")
+    @Column(name = "STREET", length = 255)
+    public String getStreet() {
+        return this.street;
     }
 
-    public void setStreetAddress(String streetAddress) {
-        this.streetAddress = streetAddress;
+    public void setStreet(String street) {
+        this.street = street;
     }
 
-    @NotEmpty(message = "{Address.city.NotEmpty}")
     @Length(max = 150, message = "{Address.city.Length}")
     @Column(name = "CITY", length = 150)
     public String getCity() {
@@ -84,36 +75,6 @@ public class Address implements Serializable {
 
     public void setPOBoxNumber(String pOBoxNumber) {
         this.pOBoxNumber = pOBoxNumber;
-    }
-
-    @Length(max = 100, message = "{Address.emailAddress.Length}")
-    @Column(name = "EMAIL_ADDRESS", length = 100)
-    public String getEmailAddress() {
-        return this.emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-
-    @Length(max = 50, message = "{Address.phoneNumber.Length}")
-    @Column(name = "PHONE_NUMBER", length = 50)
-    public String getPhoneNumber() {
-        return this.phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    @Length(max = 50, message = "{Address.faxNumber.Length}")
-    @Column(name = "FAX_NUMBER", length = 50)
-    public String getFaxNumber() {
-        return this.faxNumber;
-    }
-
-    public void setFaxNumber(String faxNumber) {
-        this.faxNumber = faxNumber;
     }
 
     /**

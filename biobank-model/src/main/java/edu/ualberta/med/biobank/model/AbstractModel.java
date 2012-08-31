@@ -77,7 +77,7 @@ public abstract class AbstractModel
     }
 
     @Override
-    @Column(name = "TIME_INSERTED")
+    @Column(name = "TIME_INSERTED", updatable = false)
     public Date getTimeInserted() {
         return timeInserted;
     }

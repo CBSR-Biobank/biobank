@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -15,14 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 
 import org.hibernate.envers.Audited;
-
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 /**
  * caTissue Term - Specimen Distribution: An event that results in transfer of a
@@ -32,65 +25,13 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Audited
 @Entity
 @Table(name = "REQUEST")
-public class Request extends AbstractModel
-    implements HasAddress {
+public class Request
+    extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Request",
-        "Requests");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString CREATED = bundle.trc(
-            "model",
-            "Time Created").format();
-        public static final LString SUBMITTED = bundle.trc(
-            "model",
-            "Time Submitted").format();
-    }
-
-    private Date submitted;
-    private Set<Dispatch> dispatches = new HashSet<Dispatch>(0);
-    private Address address = new Address();
     private Study study;
-
-    @Null(groups = PreDelete.class, message = "{Request.submitted.Null}")
-    @Column(name = "SUBMITTED")
-    public Date getSubmitted() {
-        return this.submitted;
-    }
-
-    public void setSubmitted(Date submitted) {
-        this.submitted = submitted;
-    }
-
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinTable(name = "REQUEST_DISPATCH",
-        joinColumns = { @JoinColumn(name = "REQUEST_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "DISPATCH_ID", unique = true, nullable = false, updatable = false) })
-    public Set<Dispatch> getDispatches() {
-        return this.dispatches;
-    }
-
-    public void setDispatches(Set<Dispatch> dispatches) {
-        this.dispatches = dispatches;
-    }
-
-    @Override
-    @NotNull(message = "{Request.address.NotNull}")
-    @Embedded
-    public Address getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public void setAddress(Address address) {
-        this.address = address;
-    }
+    private Date timeSubmitted;
+    private Set<Shipment> shipments = new HashSet<Shipment>(0);
 
     @NotNull(message = "{Request.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -101,5 +42,26 @@ public class Request extends AbstractModel
 
     public void setStudy(Study study) {
         this.study = study;
+    }
+
+    @Column(name = "TIME_SUBMITTED")
+    public Date getTimeSubmitted() {
+        return timeSubmitted;
+    }
+
+    public void setTimeSubmitted(Date timeSubmitted) {
+        this.timeSubmitted = timeSubmitted;
+    }
+
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinTable(name = "REQUEST_SHIPMENT",
+        joinColumns = { @JoinColumn(name = "REQUEST_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "SHIPMENT_ID", unique = true, nullable = false, updatable = false) })
+    public Set<Shipment> getShipments() {
+        return this.shipments;
+    }
+
+    public void setShipments(Set<Shipment> shipments) {
+        this.shipments = shipments;
     }
 }

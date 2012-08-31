@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.permission.request.UpdateRequestPermission;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
@@ -52,7 +52,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
             new RequestStateChangeAction(specs, rsstate);
         stateaction.run(context);
         Request request = context.get(Request.class, requestId);
-        Dispatch d = context.load(Dispatch.class, dInfo.id, new Dispatch());
+        Shipment d = context.load(Shipment.class, dInfo.id, new Shipment());
         d.setId(dInfo.id);
         d.setReceiverCenter(context.load(Center.class, dInfo.receiverId));
         d.setSenderCenter(context.load(Center.class, dInfo.senderId));
@@ -63,7 +63,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
         context.getSession().flush();
 
         for (DispatchSpecimenInfo ds : dspecs) {
-            DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
+            ShipmentSpecimen dispatchSpecimen = new ShipmentSpecimen();
             dispatchSpecimen.setId(ds.id);
             dispatchSpecimen.setDispatch(d);
             dispatchSpecimen.setSpecimen(context.load(Specimen.class,

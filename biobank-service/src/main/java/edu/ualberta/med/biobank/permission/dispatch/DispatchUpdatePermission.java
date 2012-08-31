@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.permission.dispatch;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class DispatchUpdatePermission implements Permission {
@@ -17,8 +17,8 @@ public class DispatchUpdatePermission implements Permission {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        Dispatch dispatch =
-            context.get(Dispatch.class, dispatchId, new Dispatch());
+        Shipment dispatch =
+            context.get(Shipment.class, dispatchId, new Shipment());
         return PermissionEnum.DISPATCH_UPDATE.isAllowed(context.getUser(),
             dispatch.getReceiverCenter())
             || PermissionEnum.DISPATCH_UPDATE.isAllowed(context.getUser(),

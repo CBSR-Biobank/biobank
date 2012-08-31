@@ -21,9 +21,9 @@ import edu.ualberta.med.biobank.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
-import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.action.helper.ShipmentInfoHelper;
@@ -65,7 +65,7 @@ public class TestDispatch extends ActionTest {
 
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.CREATION,
+                ShipmentState.PACKED,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -83,7 +83,7 @@ public class TestDispatch extends ActionTest {
             .equals(d.receiverId));
         Assert.assertTrue(info.dispatch.getSenderCenter().getId()
             .equals(d.senderId));
-        for (DispatchSpecimen spec : info.specimens) {
+        for (ShipmentSpecimen spec : info.specimens) {
             boolean found = false;
             for (DispatchSpecimenInfo spec2 : specs) {
                 if (spec2.specimenId.equals(spec.getSpecimen().getId()))
@@ -137,7 +137,7 @@ public class TestDispatch extends ActionTest {
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.CREATION,
+                ShipmentState.PACKED,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -149,32 +149,32 @@ public class TestDispatch extends ActionTest {
                 .getId();
 
         exec(new DispatchChangeStateAction(id,
-            DispatchState.IN_TRANSIT, shipsave));
+            ShipmentState.IN_TRANSIT, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.IN_TRANSIT));
+                .equals(ShipmentState.IN_TRANSIT));
 
         exec(new DispatchChangeStateAction(id,
-            DispatchState.LOST, shipsave));
+            ShipmentState.LOST, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.LOST));
+                .equals(ShipmentState.LOST));
 
         exec(new DispatchChangeStateAction(id,
-            DispatchState.CLOSED, shipsave));
+            ShipmentState.CLOSED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.CLOSED));
+                .equals(ShipmentState.CLOSED));
 
         exec(new DispatchChangeStateAction(id,
-            DispatchState.RECEIVED, shipsave));
+            ShipmentState.RECEIVED, shipsave));
         Assert
             .assertTrue(exec(new DispatchGetInfoAction(id)).dispatch
                 .getState()
-                .equals(DispatchState.RECEIVED));
+                .equals(ShipmentState.RECEIVED));
 
     }
 
@@ -182,7 +182,7 @@ public class TestDispatch extends ActionTest {
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.IN_TRANSIT,
+                ShipmentState.IN_TRANSIT,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
@@ -202,7 +202,7 @@ public class TestDispatch extends ActionTest {
         }
 
         DispatchChangeStateAction stateChange =
-            new DispatchChangeStateAction(id, DispatchState.CREATION, shipsave);
+            new DispatchChangeStateAction(id, ShipmentState.PACKED, shipsave);
         exec(stateChange);
         exec(new DispatchDeleteAction(info.dispatch));
     }
@@ -212,7 +212,7 @@ public class TestDispatch extends ActionTest {
 
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
-                DispatchState.IN_TRANSIT,
+                ShipmentState.IN_TRANSIT,
                 name + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
