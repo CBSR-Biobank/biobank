@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 
@@ -17,20 +19,29 @@ public class ClinicGetStudyInfoAction implements
     Action<ListResult<StudyCountInfo>> {
     private static final long serialVersionUID = 1L;
 
-    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String STUDY_INFO_HQL =    
-        "SELECT clinics,studies,COUNT(DISTINCT patients),"
-        + " COUNT(DISTINCT cevents)"
-        + " FROM edu.ualberta.med.biobank.model.Clinic clinics"
-        + " INNER JOIN clinics.originInfos oi"        
-        + " INNER JOIN oi.specimens spcs"        
-        + " INNER JOIN spcs.collectionEvent cevents"
-        + " INNER JOIN cevents.patient patients"
-        + " INNER JOIN patients.study studies"
-        + " WHERE clinics.id=?"
-        + " GROUP BY clinics,studies";
-    // @formatter:on
+    private static final String CLINIC_STUDIES_HQL =
+        "SELECT studies"
+            + " FROM " + Clinic.class.getName() + " clinic"
+            + " INNER JOIN clinic.originInfos oi"
+            + " INNER JOIN oi.specimens spcs"
+            + " INNER JOIN spcs.collectionEvent cevents"
+            + " INNER JOIN cevents.patient patients"
+            + " INNER JOIN patients.study studies"
+            + " WHERE clinic.id=?";
+
+    @SuppressWarnings("nls")
+    private static final String STUDY_INFO_HQL =
+        "SELECT clinics.id,studies.id,COUNT(DISTINCT patients),"
+            + " COUNT(DISTINCT cevents)"
+            + " FROM " + Clinic.class.getName() + " clinics"
+            + " INNER JOIN clinics.originInfos oi"
+            + " INNER JOIN oi.specimens spcs"
+            + " INNER JOIN spcs.collectionEvent cevents"
+            + " INNER JOIN cevents.patient patients"
+            + " INNER JOIN patients.study studies"
+            + " WHERE clinics.id=?"
+            + " GROUP BY clinics.id,studies.id";
 
     private final Integer clinicId;
 
@@ -47,20 +58,36 @@ public class ClinicGetStudyInfoAction implements
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ListResult<StudyCountInfo> run(ActionContext context)
         throws ActionException {
         ArrayList<StudyCountInfo> infos = new ArrayList<StudyCountInfo>();
 
-        Query query = context.getSession().createQuery(STUDY_INFO_HQL);
+        Map<Integer, Study> studiesById = new HashMap<Integer, Study>();
+
+        Query query = context.getSession().createQuery(CLINIC_STUDIES_HQL);
         query.setParameter(0, clinicId);
 
-        @SuppressWarnings("unchecked")
+        List<Study> studies = query.list();
+        for (Study study : studies) {
+            studiesById.put(study.getId(), study);
+        }
+
+        query = context.getSession().createQuery(STUDY_INFO_HQL);
+        query.setParameter(0, clinicId);
+
         List<Object[]> results = query.list();
         for (Object[] row : results) {
+            Study study = studiesById.get(row[1]);
+
+            if (study == null) {
+                throw new NullPointerException(
+                    "study not found in query result"); //$NON-NLS-1$
+            }
+
             StudyCountInfo info =
-                new StudyCountInfo((Study) row[1], (Long) row[2],
-                    (Long) row[3]);
+                new StudyCountInfo(study, (Long) row[2], (Long) row[3]);
             infos.add(info);
         }
 

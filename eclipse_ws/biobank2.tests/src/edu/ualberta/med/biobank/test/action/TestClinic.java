@@ -278,9 +278,8 @@ public class TestClinic extends TestAction {
         exec(new ClinicDeleteAction(clinicInfo.clinic));
 
         // hql query for clinic should return empty
-        Query q =
-            session.createQuery("SELECT COUNT(*) FROM "
-                + Clinic.class.getName() + " WHERE id=?");
+        Query q = session.createQuery("SELECT COUNT(*) FROM "
+            + Clinic.class.getName() + " WHERE id=?");
         q.setParameter(0, clinicId);
         Long result = HibernateUtil.getCountFromQuery(q);
 

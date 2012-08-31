@@ -16,7 +16,7 @@ public class StudyGetEventAttrInfoAction implements
     Action<MapResult<Integer, StudyEventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
-    private Integer studyId;
+    private final Integer studyId;
 
     @SuppressWarnings("nls")
     private static final String STUDY_EVENT_ATTR_QRY =
@@ -24,8 +24,7 @@ public class StudyGetEventAttrInfoAction implements
             + " FROM " + StudyEventAttr.class.getName() + " as seAttr"
             + " LEFT JOIN FETCH seAttr.globalEventAttr as geAttr"
             + " LEFT JOIN FETCH geAttr.eventAttrType as attrType"
-            + " WHERE seAttr.study.id=?"
-            + " GROUP BY seAttr";
+            + " WHERE seAttr.study.id=?";
 
     public StudyGetEventAttrInfoAction(Integer studyId) {
         this.studyId = studyId;

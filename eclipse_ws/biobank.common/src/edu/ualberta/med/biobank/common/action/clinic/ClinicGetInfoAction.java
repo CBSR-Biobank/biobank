@@ -31,13 +31,14 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @SuppressWarnings("nls")
     private static final String CLINIC_COUNT_INFO_HQL =
-        "SELECT clinic,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
+        "SELECT clinic.id,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinic"
             + " LEFT JOIN clinic.originInfos oi"
             + " LEFT JOIN oi.specimens spcs"
             + " LEFT JOIN spcs.collectionEvent cevents"
             + " LEFT JOIN cevents.patient patients"
-            + " WHERE clinic.id=?";
+            + " WHERE clinic.id=?"
+            + " GROUP BY clinic.id";
 
     private final Integer clinicId;
     private final ClinicGetContactsAction getContacts;
