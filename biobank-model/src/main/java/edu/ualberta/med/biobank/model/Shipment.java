@@ -19,8 +19,12 @@ import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 /**
+ * Represents a transfer of {@link Specimen}s and/or {@link Container}s from one
+ * {@link CenterLocation} to another.
  * 
  * @author Jonathan Ferland
+ * @see ShipmentSpecimen
+ * @see ShipmentContainer
  */
 @Audited
 @Entity

@@ -7,10 +7,10 @@
 	A: make ContactUsers that function like StudyCenter-s
 [v] Q: Who makes StudyCenter-s?
 	A: Studies make the link?
-[ ] Dispatch should be StudyCenter <-> StudyCenter
-[ ] *Requests made for dispatches, clarify this process
+[v] Dispatch should be StudyCenter <-> StudyCenter
+[v] *Requests made for dispatches, clarify this process
 	- requires thinking
-[ ] Shipments should now just be Dispatches
+[v] Shipments should now just be Dispatches
 	- Yes
 [v] Specimen will have a originCenter and currentCenter and no originInfo
 	[v] Remove OriginInfo
@@ -64,29 +64,31 @@
 	[ ] - SpecimenFlag/Comment thing that is put on a (potentially huge) set of specimens.
 		- have a flag from a global list of definied options, with clarifying comment
 	which will take the idea of "flagged"
-[ ] Eliminate old "Shipment" and rename Dispatch to "Shipment"
+[v] Eliminate old "Shipment" and rename Dispatch to "Shipment"
 [v] *Labeling Scheme refactoring?
 	- Probably replace "Row Col" with "index"?
 [ ] **Think about how to deal with translation of global objects, such as,
 	Role, Environment, TubeType, etc.
+	A: Possibly _don't_. Just assume that everyone within a server is communicating in
+	the same language?
 [v] ProcessingEvent <-> Specimen and children
 	- Yes, discuessed already
 [v] Collection Event types
-[ ] Q: Sent samples freezer?
-	A: create a StudyCenter for each study, and assign the specimens to it
-[ ] *Think more about differences between Shipment/ Dispatch/ Request because the workflow
+[v] Q: Sent samples freezer?
+	A: create a CenterLocation, and assign the specimens to it
+[v] *Think more about differences between Shipment/ Dispatch/ Request because the workflow
 	and intent seems quite different.
 	Shipment - recording incoming things
 	Dispatch - decide and record outgoing things, then incoming
 	Request - 
-	[ ] Perhaps Shipment references a Manifest with specimens and shipment info?
+	[x] Perhaps Shipment references a Manifest with specimens and shipment info?
 [v] Update boolean primitives to be Boolean objects so can better search by example
 [v] *SpecimenType refactoring
 [ ] *ContainerType refactoring
 [ ] *Think of the SpecimenLog/SpecimenEvent as a list of things being done to specimens,
 	not so much as the action being called on them. If 30,000 specimens are thawed, then
 	there should be 30,000 events recorded on each of them.
-[ ] Dispatch containers AND specimens, but then product barcode must be globally unique!
+[v] Dispatch containers AND specimens, but then product barcode must be globally unique!
 [ ] Global list of tube types, defined however, centers can make their own groups of tube
 	types and then have their CT have a list of those
 [v] Aaron would like the sample-type restriction to be able to be assigned at any level

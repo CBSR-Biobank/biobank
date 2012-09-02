@@ -18,9 +18,14 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 
 /**
- * caTissue Term - Specimen Distribution: An event that results in transfer of a
- * specimen from a Repository to a Laboratory
+ * Represents a {@link Study}'s order to move a list of specific
+ * {@link Specimen}s (via {@link RequestSpecimen}), wherever they're located, to
+ * a given {@link CenterLocation}. A {@link Request} can result in one or more
+ * {@link Shipment}s being created to track distinct transfers from one
+ * {@link CenterLocation} to another.
  * 
+ * @author Jonathan Ferland
+ * @see RequestSpecimen
  */
 @Audited
 @Entity
@@ -31,6 +36,7 @@ public class Request
 
     private Study study;
     private Date timeSubmitted;
+    private CenterLocation toLocation;
     private Set<Shipment> shipments = new HashSet<Shipment>(0);
 
     @NotNull(message = "{Request.study.NotNull}")
@@ -51,6 +57,17 @@ public class Request
 
     public void setTimeSubmitted(Date timeSubmitted) {
         this.timeSubmitted = timeSubmitted;
+    }
+
+    @NotNull(message = "{Request.toLocation.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "TO_CENTER_LOCATION_ID", nullable = false)
+    public CenterLocation getToLocation() {
+        return toLocation;
+    }
+
+    public void setToLocation(CenterLocation toLocation) {
+        this.toLocation = toLocation;
     }
 
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)

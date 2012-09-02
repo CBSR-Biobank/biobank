@@ -15,11 +15,31 @@ import java.io.Serializable;
  */
 @SuppressWarnings("nls")
 public enum ShipmentState implements Serializable {
+    /**
+     * The {@link Shipment} is in the process of being created.
+     */
     CREATED("C"),
+    /**
+     * The {@link Shipment} is put together in a box, but not sent out.
+     */
     PACKED("P"),
+    /**
+     * The {@link Shipment} has been sent (possibly by a courrier) to its
+     * destination.
+     */
     SENT("S"),
+    /**
+     * The {@link Shipment} has arrived at its expected destination, but has not
+     * been unpacked.
+     */
     RECEIVED("R"),
+    /**
+     * The {@link Shipment} has arrived and its contents were confirmed.
+     */
     UNPACKED("U"),
+    /**
+     * The {@link Shipment} never arrived and may never arrive.
+     */
     LOST("L");
 
     private String id;
