@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
-@DiscriminatorValue("Group")
+@DiscriminatorValue("G")
 @Unique(properties = "name", groups = PrePersist.class)
 public class Group extends Principal
     implements HasName, HasDescription {

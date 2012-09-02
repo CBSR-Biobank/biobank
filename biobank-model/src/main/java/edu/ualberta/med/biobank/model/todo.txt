@@ -2,7 +2,16 @@
 [v] Make a StudyCenter object
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
-[v] SendsShipments on clinic was to be replaced with what on ShippingMethod? 
+[v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Q: consider having only SpecimenProcessingLink and not SpecimenProcessing
+	Because why bother with two types of definitions when both can be represented
+	by one class?
+	A: ??
+[ ] Reports should be global or center-, study-, or center-study-specific.
+[ ] Prefix all report objects with "Report" so it's more clear what objects
+ 	are involved?
+[ ] Make annotation type requirements for specific collection event types and/or
+	specimen groups?
 [ ] Q: How do contacts work again?
 	A: make ContactUsers that function like StudyCenter-s
 [v] Q: Who makes StudyCenter-s?

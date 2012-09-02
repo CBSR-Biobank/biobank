@@ -13,58 +13,29 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
-@DiscriminatorValue("User")
+@DiscriminatorValue("U")
 @Unique.List({
-    @Unique(properties = "csmUserId", groups = PrePersist.class),
     @Unique(properties = "email", groups = PrePersist.class),
     @Unique(properties = "login", groups = PrePersist.class)
 })
 public class User extends Principal {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "User",
-        "Users");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString COMMENTS = Comment.NAME.plural();
-        public static final LString EMAIL_ADDRESS = bundle.trc(
-            "model",
-            "Email").format();
-        public static final LString FULL_NAME = bundle.trc(
-            "model",
-            "Full Name").format();
-        public static final LString GROUPS = Group.NAME.plural();
-        public static final LString LOGIN = bundle.trc(
-            "model",
-            "Login").format();
-        public static final LString NEEDS_PASSWORD_CHANGE = bundle.trc(
-            "model",
-            "Needs Password Change").format();
-        public static final LString RECEIVE_BULK_EMAILS = bundle.trc(
-            "model",
-            "Receive Bulk Email").format();
-    }
-
+    // TODO: when a user registers, check existing UserContacts and update them
+    // to point to the registered user. But careful about extra information that
+    // is exposed as a result.
     private String login;
-    private Long csmUserId;
     private String fullName;
     private String email;
-    private Boolean recvBulkEmails;
-    private Boolean needPwdChange;
+    private Boolean passwordChangeNeeded;
+    private Boolean mailingListSubscriber;
     private Set<Group> groups = new HashSet<Group>(0);
 
     @NotEmpty(message = "{User.login.NotEmpty}")
@@ -77,24 +48,24 @@ public class User extends Principal {
         this.login = login;
     }
 
-    @NotNull(message = "{User.csmUserId.NotNull}")
-    @Column(name = "CSM_USER_ID", unique = true)
-    public Long getCsmUserId() {
-        return this.csmUserId;
+    @NotNull(message = "{User.passwordChangeNeeded.NotNull}")
+    @Column(name = "IS_PASSWORD_CHANGE_NEEDED", nullable = false)
+    public Boolean getPasswordChangeNeeded() {
+        return passwordChangeNeeded;
     }
 
-    public void setCsmUserId(Long csmUserId) {
-        this.csmUserId = csmUserId;
+    public void setPasswordChangeNeeded(Boolean passwordChangeNeeded) {
+        this.passwordChangeNeeded = passwordChangeNeeded;
     }
 
-    @Column(name = "RECV_BULK_EMAILS")
-    // TODO: rename to isRecvBulkEmails
-    public Boolean getRecvBulkEmails() {
-        return this.recvBulkEmails;
+    @NotNull(message = "{User.mailingListSubscriber.NotNull}")
+    @Column(name = "IS_MAILING_LIST_SUBSCRIBER", nullable = false)
+    public Boolean getMailingListSubscriber() {
+        return mailingListSubscriber;
     }
 
-    public void setRecvBulkEmails(Boolean recvBulkEmails) {
-        this.recvBulkEmails = recvBulkEmails;
+    public void setMailingListSubscriber(Boolean mailingListSubscriber) {
+        this.mailingListSubscriber = mailingListSubscriber;
     }
 
     @Column(name = "FULL_NAME")
@@ -106,7 +77,7 @@ public class User extends Principal {
         this.fullName = fullName;
     }
 
-    // TODO: write an email check that allows null @Email
+    @Email
     @Column(name = "EMAIL", unique = true)
     public String getEmail() {
         return this.email;
@@ -114,16 +85,6 @@ public class User extends Principal {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    @Column(name = "NEED_PWD_CHANGE")
-    // TODO: rename to isRecvBulkEmails
-    public Boolean getNeedPwdChange() {
-        return this.needPwdChange;
-    }
-
-    public void setNeedPwdChange(Boolean needPwdChange) {
-        this.needPwdChange = needPwdChange;
     }
 
     @ManyToMany(fetch = FetchType.LAZY)
