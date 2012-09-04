@@ -14,12 +14,11 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
-import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.ParentContainer;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Vessel;
 import edu.ualberta.med.biobank.model.util.NullUtil;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
@@ -30,13 +29,11 @@ public class ValidContainerTypeValidator
     implements ConstraintValidator<ValidContainerType, Object> {
     public static final String MULTIPLE_CHILD_TYPES =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.multipleChildTypes}";
-    public static final String OVER_CAPACITY =
-        "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.overCapacity}";
     public static final String ILLEGAL_CHANGE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChange}";
-    public static final String REMOVED_CT_IN_USE =
+    public static final String REMOVED_CONTAINER_TYPES_IN_USE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalChildContainerTypeRemove}";
-    public static final String REMOVED_ST_IN_USE =
+    public static final String REMOVED_VESSELS_IN_USE =
         "{edu.ualberta.med.biobank.model.ContainerType.ValidContainerType.illegalSpecimenTypeRemove}";
 
     @Override
@@ -56,13 +53,12 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
-        isValid &= checkCapacity(ct, context);
         isValid &= checkChildrenTypes(ct, context);
 
         if (oldCt != null) {
             isValid &= checkChanges(ct, oldCt, context);
             isValid &= checkRemovedChildContainerTypes(ct, oldCt, context);
-            isValid &= checkRemovedSpecimenTypes(ct, oldCt, context);
+            isValid &= checkRemovedVessels(ct, oldCt, context);
         }
 
         return isValid;
@@ -73,37 +69,16 @@ public class ValidContainerTypeValidator
         // if either set is initialised we must load the other one to be sure,
         // otherwise assume this check passed before and still does
         if (Hibernate.isInitialized(ct.getChildContainerTypes()) ||
-            Hibernate.isInitialized(ct.getSpecimenTypes())) {
+            Hibernate.isInitialized(ct.getChildVessels())) {
             if (!ct.getChildContainerTypes().isEmpty()
-                && !ct.getSpecimenTypes().isEmpty()) {
+                && !ct.getChildVessels().isEmpty()) {
                 context
                     .buildConstraintViolationWithTemplate(MULTIPLE_CHILD_TYPES)
                     .addNode("childContainerTypes")
-                    .addNode("specimenTypes")
+                    .addNode("childVessels")
                     .addConstraintViolation();
                 return false;
             }
-        }
-        return true;
-    }
-
-    private boolean checkCapacity(ContainerType ct,
-        ConstraintValidatorContext context) {
-        ContainerLabelingScheme scheme = ct.getChildLabelingScheme();
-        Capacity capacity = ct.getCapacity();
-        // allow other validation to handle null issues, so do extensive null
-        // checking here
-        if (scheme != null &&
-            capacity != null &&
-            capacity.getRowCapacity() != null &&
-            capacity.getColCapacity() != null &&
-            !scheme.canLabel(capacity)) {
-            context.buildConstraintViolationWithTemplate(OVER_CAPACITY)
-                .addNode("childLabelingScheme")
-                // TODO: any way to mark rowCapacity and colCapacity?
-                .addNode("capacity")
-                .addConstraintViolation();
-            return false;
         }
         return true;
     }
@@ -136,22 +111,13 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
-        // TODO: should be able to change capacity and labeling scheme as long
-        // as it does not cause any existing containers or specimens to have a
-        // label change. For example, it is probably okay to add and remove
-        // rows, but not columns if more than one row is filled (assuming
-        // labeling is done row by row)
-
-        isValid &= NullUtil.eq(ct.getCapacity(), oldCt.getCapacity());
         isValid &= NullUtil.eq(ct.isTopLevel(), oldCt.isTopLevel());
-        isValid &= NullUtil.eq(ct.getChildLabelingScheme(),
-            oldCt.getChildLabelingScheme());
+        isValid &= NullUtil.eq(ct.getSchema(), oldCt.getSchema());
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(ILLEGAL_CHANGE)
-                .addNode("capacity")
                 .addNode("topLevel")
-                .addNode("childLabelingScheme")
+                .addNode("schema")
                 .addConstraintViolation();
         }
 
@@ -159,8 +125,7 @@ public class ValidContainerTypeValidator
     }
 
     private boolean isUsed(ContainerType ct) {
-        return isUsed(ct, SpecimenPosition.class, "containerType")
-            || isUsed(ct, ContainerPosition.class, "parentContainerType");
+        return isUsed(ct, ParentContainer.class, "container.containerType");
     }
 
     private boolean isUsed(ContainerType ct, Class<?> by, String property) {
@@ -184,36 +149,10 @@ public class ValidContainerTypeValidator
         if (removed.isEmpty()) return true;
 
         List<?> results = getEventSource()
-            .createCriteria(ContainerPosition.class)
+            .createCriteria(Container.class)
             .add(Restrictions.in("containerType", removed))
-            .add(Restrictions.eq("parentContainerType", ct))
-            .setProjection(Projections.rowCount())
-            .list();
-
-        Number count = (Number) results.iterator().next();
-        boolean isValid = count.intValue() == 0;
-
-        if (!isValid) {
-            context.buildConstraintViolationWithTemplate(
-                REMOVED_CT_IN_USE)
-                .addNode("childContainerTypes")
-                .addConstraintViolation();
-        }
-
-        return isValid;
-    }
-
-    private boolean checkRemovedSpecimenTypes(ContainerType ct,
-        ContainerType oldCt, ConstraintValidatorContext context) {
-        Set<SpecimenType> removed = new HashSet<SpecimenType>();
-        removed.addAll(oldCt.getSpecimenTypes());
-        removed.removeAll(ct.getSpecimenTypes());
-
-        if (removed.isEmpty()) return true;
-
-        List<?> results = getEventSource()
-            .createCriteria(SpecimenPosition.class)
-            .add(Restrictions.in("specimenType", removed))
+            .createCriteria("parent")
+            .createCriteria("container")
             .add(Restrictions.eq("containerType", ct))
             .setProjection(Projections.rowCount())
             .list();
@@ -223,8 +162,38 @@ public class ValidContainerTypeValidator
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(
-                REMOVED_ST_IN_USE)
-                .addNode("specimenTypes")
+                REMOVED_CONTAINER_TYPES_IN_USE)
+                .addNode("childContainerTypes")
+                .addConstraintViolation();
+        }
+
+        return isValid;
+    }
+
+    private boolean checkRemovedVessels(ContainerType ct,
+        ContainerType oldCt, ConstraintValidatorContext context) {
+        Set<Vessel> removed = new HashSet<Vessel>();
+        removed.addAll(oldCt.getChildVessels());
+        removed.removeAll(ct.getChildVessels());
+
+        if (removed.isEmpty()) return true;
+
+        List<?> results = getEventSource()
+            .createCriteria(Specimen.class)
+            .add(Restrictions.in("vessel", removed))
+            .createCriteria("parent")
+            .createCriteria("container")
+            .add(Restrictions.eq("containerType", ct))
+            .setProjection(Projections.rowCount())
+            .list();
+
+        Number count = (Number) results.iterator().next();
+        boolean isValid = count.intValue() == 0;
+
+        if (!isValid) {
+            context.buildConstraintViolationWithTemplate(
+                REMOVED_VESSELS_IN_USE)
+                .addNode("childVessels")
                 .addConstraintViolation();
         }
 

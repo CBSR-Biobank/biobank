@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
             "CONTAINER_SCHEMA_POSITION_ID" })
     })
 @Unique(properties = { "container", "position" }, groups = PrePersist.class)
+// TODO: why is this not just inside Specimen and Container?
 public class ParentContainer
     extends AbstractModel {
     private static final long serialVersionUID = 1L;

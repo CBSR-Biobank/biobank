@@ -52,7 +52,10 @@ public class SpecimenProcessingLinkType
     private SpecimenGroup outputGroup;
     private Decimal expectedInputChange;
     private Decimal expectedOutputChange;
+    private Integer inputcount;
     private Integer outputCount;
+    private Vessel inputVessel;
+    private Vessel outputVessel;
 
     /**
      * @return the {@link ProcessingType} that this
@@ -138,6 +141,20 @@ public class SpecimenProcessingLinkType
     }
 
     /**
+     * @return the number of expected input {@link Specimen}s when this process
+     *         is carried out, or null if unspecified.
+     */
+    @Min(value = 1, message = "{CollectionEvent.inputCount.Min}")
+    @Column(name = "OUTPUT_COUNT")
+    public Integer getInputcount() {
+        return inputcount;
+    }
+
+    public void setInputcount(Integer inputcount) {
+        this.inputcount = inputcount;
+    }
+
+    /**
      * A value of zero implies that the {@link Specimen} input should be the
      * same as the output.
      * 
@@ -152,5 +169,31 @@ public class SpecimenProcessingLinkType
 
     public void setOutputCount(Integer outputCount) {
         this.outputCount = outputCount;
+    }
+
+    /**
+     * @return the expected {@link Vessel} that the input {@link Specimen}s
+     *         should be in, or null if unspecified.
+     */
+    @Column(name = "INPUT_VESSEL_ID")
+    public Vessel getInputVessel() {
+        return inputVessel;
+    }
+
+    public void setInputVessel(Vessel inputVessel) {
+        this.inputVessel = inputVessel;
+    }
+
+    /**
+     * @return the expected {@link Vessel} that the output {@link Specimen}s
+     *         should be put into, or null if unspecified.
+     */
+    @Column(name = "OUTPUT_VESSEL_ID")
+    public Vessel getOutputVessel() {
+        return outputVessel;
+    }
+
+    public void setOutputVessel(Vessel outputVessel) {
+        this.outputVessel = outputVessel;
     }
 }

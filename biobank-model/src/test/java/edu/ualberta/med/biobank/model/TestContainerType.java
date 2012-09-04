@@ -197,7 +197,7 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot remove child container types in use");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
-                .withTemplate(ValidContainerTypeValidator.REMOVED_CT_IN_USE)
+                .withTemplate(ValidContainerTypeValidator.REMOVED_CONTAINER_TYPES_IN_USE)
                 .assertIn(e);
         }
     }
@@ -215,7 +215,7 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot remove specimen types in use");
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation()
-                .withTemplate(ValidContainerTypeValidator.REMOVED_ST_IN_USE)
+                .withTemplate(ValidContainerTypeValidator.REMOVED_VESSELS_IN_USE)
                 .assertIn(e);
         }
     }

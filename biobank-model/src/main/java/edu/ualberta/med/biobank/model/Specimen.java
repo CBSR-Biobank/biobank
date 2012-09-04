@@ -51,6 +51,7 @@ public class Specimen
     private Date timeCreated;
     private SpecimenGroup group;
     private Decimal amount;
+    private Vessel vessel;
     private CenterLocation originLocation;
     private CenterLocation location;
     private Boolean usable;
@@ -87,6 +88,16 @@ public class Specimen
 
     public void setAmount(Decimal amount) {
         this.amount = amount;
+    }
+
+    @NotNull(message = "{SpecimenGroup.vessel.NotNull}")
+    @Column(name = "VESSEL_ID", nullable = false)
+    public Vessel getVessel() {
+        return vessel;
+    }
+
+    public void setVessel(Vessel vessel) {
+        this.vessel = vessel;
     }
 
     @NotNull(message = "{Specimen.timeCreated.NotNull}")

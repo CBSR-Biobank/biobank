@@ -20,7 +20,7 @@ public class ContainerLog extends Log<LogType> {
 
     public ContainerLog(Container container, LogType logType) {
         super(logType);
-        setCenterId(container.getCenter());
+        setCenterId(container.getTree().getLocation().getCenter());
         setContainerId(container);
     }
 

@@ -1,11 +1,7 @@
 package edu.ualberta.med.biobank.model;
 
-import java.io.Serializable;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -13,7 +9,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
@@ -43,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 // value of a specific column.
 @Unique.List({
     @Unique(properties = { "productBarcode" }, groups = PrePersist.class),
-    @Unique(properties = { "node.tree", "label" }, groups = PrePersist.class)
+    @Unique(properties = { "tree", "label" }, groups = PrePersist.class)
 })
 @NotUsed.List({
     @NotUsed(by = ParentContainer.class, property = "container", groups = PreDelete.class)
@@ -55,9 +50,14 @@ public class Container
 
     private String productBarcode;
     private ContainerType containerType;
-    private ContainerNode node;
     private ContainerConstraints constraints;
     private Boolean enabled;
+    private ParentContainer parent;
+    private ContainerTree tree;
+    private String label;
+    private Integer left;
+    private Integer right;
+    private Integer depth;
 
     /**
      * Optional, but globally unique (if specified) barcode. Global uniqueness
@@ -86,15 +86,48 @@ public class Container
         this.containerType = containerType;
     }
 
-    @NotNull(message = "{Container.node.NotNull}")
-    @Valid
-    @Embedded
-    public ContainerNode getNode() {
-        return node;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "PARENT_CONTAINER_ID", unique = true)
+    public ParentContainer getParent() {
+        return parent;
     }
 
-    public void setNode(ContainerNode node) {
-        this.node = node;
+    public void setParent(ParentContainer parent) {
+        this.parent = parent;
+    }
+
+    @NotNull(message = "{ContainerNode.tree.NotNull}")
+    @ManyToOne
+    @JoinColumn(name = "CONTAINER_TREE_ID", nullable = false)
+    public ContainerTree getTree() {
+        return tree;
+    }
+
+    public void setTree(ContainerTree tree) {
+        this.tree = tree;
+    }
+
+    /**
+     * The label must be delimited to avoid confusion, but perhaps users may
+     * enter non-delimited versions (but that is 2^(n-1) different possible
+     * delimited labels to search).
+     * 
+     * @return if this has a {@link #getParent()}, then return this
+     *         {@link Container}'s position (i.e.
+     *         {@link ParentContainer#getPosition()}) delimited and prepended
+     *         with this parent's label, recursively, back to a root of a
+     *         {@link ContainerTree}. Otherwise, a user-defined label.
+     */
+    // TODO: ask cbsr if we can just not store labels?
+    // TODO: but a label is needed for easy location display and look-up?
+    @NotEmpty(message = "{Container.label.NotEmpty}")
+    @Column(name = "LABEL", nullable = false)
+    public String getLabel() {
+        return this.label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     /**
@@ -126,125 +159,33 @@ public class Container
         this.enabled = enabled;
     }
 
-    /**
-     * Holds information about a {@link Container}'s place in a
-     * {@link Container} hierarchy.
-     * <p>
-     * Uses Nested Sets (AKA Modified Preorder Tree Traversal) for more
-     * efficient querying of children.
-     * 
-     * @author Jonathan Ferland
-     */
-    @Embeddable
-    public static class ContainerNode implements Serializable {
-        private static final long serialVersionUID = 1L;
+    @NotNull(message = "{Container.left.NotNull}")
+    @Column(name = "`LEFT`", nullable = false)
+    public Integer getLeft() {
+        return left;
+    }
 
-        private ParentContainer parent;
-        private ContainerTree tree;
-        private String label;
-        private Integer left;
-        private Integer right;
-        private Integer depth;
+    public void setLeft(Integer left) {
+        this.left = left;
+    }
 
-        @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "PARENT_CONTAINER_ID", unique = true)
-        public ParentContainer getParent() {
-            return parent;
-        }
+    @NotNull(message = "{Container.right.NotNull}")
+    @Column(name = "`RIGHT`", nullable = false)
+    public Integer getRight() {
+        return right;
+    }
 
-        public void setParent(ParentContainer parent) {
-            this.parent = parent;
-        }
+    public void setRight(Integer right) {
+        this.right = right;
+    }
 
-        @NotNull(message = "{ContainerNode.tree.NotNull}")
-        @ManyToOne
-        @JoinColumn(name = "CONTAINER_TREE_ID", nullable = false)
-        public ContainerTree getTree() {
-            return tree;
-        }
+    @NotNull(message = "{Container.depth.NotNull}")
+    @Column(name = "`DEPTH`", nullable = false)
+    public Integer getDepth() {
+        return depth;
+    }
 
-        public void setTree(ContainerTree tree) {
-            this.tree = tree;
-        }
-
-        /**
-         * The label must be delimited to avoid confusion, but perhaps users may
-         * enter non-delimited versions (but that is 2^(n-1) different possible
-         * delimited labels to search).
-         * 
-         * @return if this has a {@link #getParent()}, then return this
-         *         {@link ContainerNode}'s position (i.e.
-         *         {@link ParentContainer#getPosition()}) delimited and
-         *         prepended with this parent's label, recursively, back to a
-         *         root of a {@link ContainerTree}. Otherwise, a user-defined
-         *         label.
-         */
-        // TODO: ask cbsr if we can just not store labels?
-        // TODO: but a label is needed for easy location display and look-up?
-        @NotEmpty(message = "{Container.label.NotEmpty}")
-        @Column(name = "LABEL", nullable = false)
-        public String getLabel() {
-            return this.label;
-        }
-
-        public void setLabel(String label) {
-            this.label = label;
-        }
-
-        @NotNull(message = "{Container.left.NotNull}")
-        @Column(name = "`LEFT`", nullable = false)
-        public Integer getLeft() {
-            return left;
-        }
-
-        public void setLeft(Integer left) {
-            this.left = left;
-        }
-
-        @NotNull(message = "{Container.right.NotNull}")
-        @Column(name = "`RIGHT`", nullable = false)
-        public Integer getRight() {
-            return right;
-        }
-
-        public void setRight(Integer right) {
-            this.right = right;
-        }
-
-        @NotNull(message = "{Container.depth.NotNull}")
-        @Column(name = "`DEPTH`", nullable = false)
-        public Integer getDepth() {
-            return depth;
-        }
-
-        public void setDepth(Integer depth) {
-            this.depth = depth;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result
-                + ((parent == null) ? 0 : parent.hashCode());
-            result = prime * result
-                + ((tree == null) ? 0 : tree.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null) return false;
-            if (getClass() != obj.getClass()) return false;
-            ContainerNode other = (ContainerNode) obj;
-            if (parent == null) {
-                if (other.parent != null) return false;
-            } else if (!parent.equals(other.parent)) return false;
-            if (tree == null) {
-                if (other.tree != null) return false;
-            } else if (!tree.equals(other.tree)) return false;
-            return true;
-        }
+    public void setDepth(Integer depth) {
+        this.depth = depth;
     }
 }

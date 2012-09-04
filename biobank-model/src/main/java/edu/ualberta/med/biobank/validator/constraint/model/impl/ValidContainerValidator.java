@@ -40,16 +40,16 @@ public class ValidContainerValidator
     private boolean checkParent(Container container,
         ConstraintValidatorContext context) {
         if (container.getContainerType().isTopLevel()) {
-            if (container.getPosition() != null) {
+            if (container.getParent() != null) {
                 context.buildConstraintViolationWithTemplate(ILLEGAL_PARENT)
-                    .addNode("position")
+                    .addNode("parent")
                     .addConstraintViolation();
                 return false;
             }
         } else {
-            if (container.getPosition() == null) {
+            if (container.getParent() == null) {
                 context.buildConstraintViolationWithTemplate(MISSING_PARENT)
-                    .addNode("position")
+                    .addNode("parent")
                     .addConstraintViolation();
                 return false;
             }

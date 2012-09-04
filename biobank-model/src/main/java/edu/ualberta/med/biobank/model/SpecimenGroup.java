@@ -53,7 +53,6 @@ public class SpecimenGroup
     private Preservation preservation;
     private AnatomicalSource anatomicalSource;
     private SpecimenType specimenType;
-    private Vessel vessel;
     private String unit;
 
     @NotNull(message = "{SpecimenGroup.study.NotNull}")
@@ -115,16 +114,6 @@ public class SpecimenGroup
 
     public void setSpecimenType(SpecimenType specimenType) {
         this.specimenType = specimenType;
-    }
-
-    @NotNull(message = "{SpecimenGroup.vessel.NotNull}")
-    @Column(name = "VESSEL_ID", nullable = false)
-    public Vessel getVessel() {
-        return vessel;
-    }
-
-    public void setVessel(Vessel vessel) {
-        this.vessel = vessel;
     }
 
     /**
