@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Container;
@@ -50,9 +49,6 @@ public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
-
-    protected static BgcLogger log = BgcLogger
-        .getLogger(AbstractLinkAssignEntryForm.class.getName());
 
     enum Mode {
         SINGLE_NO_POSITION,
@@ -315,10 +311,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Show either single or multiple selection fields
      */
-    @SuppressWarnings("nls")
     protected void showModeComposite(Mode mode) {
-        log.debug("showModeComposite: " + mode);
-
         setMode(mode);
         boolean single = mode.isSingleMode();
         widgetCreator.showWidget(singleFieldsComposite, single);
@@ -419,10 +412,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Multiple assign
      */
-    @SuppressWarnings("nls")
     protected void manageDoubleClick(MouseEvent e) {
-        log.debug("manageDoubleClick");
-
         PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
             .getObjectAtCoordinates(e.x, e.y);
         if (canScanTubeAlone(cell) && isScanTubeAloneMode()) {
@@ -577,10 +567,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * single assign. Display containers
      */
-    @SuppressWarnings("nls")
     protected void displaySinglePositions(boolean show) {
-        log.debug("displaySinglePositions: " + show);
-
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {
                 widgetCreator.showWidget(secondSingleParentWidget, show);
@@ -639,16 +626,13 @@ public abstract class AbstractLinkAssignEntryForm extends
      * and multiple assign.
      * 
      * @param positionText the position to use for initialisation
+     * @param isContainerPosition if true, the position is a full container
+     *            position, if false, it is a full specimen position
      */
-    @SuppressWarnings("nls")
+    @SuppressWarnings("unused")
     protected void initContainersFromPosition(BgcBaseText positionText,
         ContainerTypeWrapper type) {
-        log.debug("initContainersFromPosition: pos=" + positionText.getText()
-            + " containerType="
-            + ((type == null) ? "null" : type.getName()));
-
         parentContainers = new ArrayList<ContainerWrapper>();
-
         try {
             List<Container> foundContainers =
                 SessionManager.getAppService().doAction(
@@ -657,8 +641,9 @@ public abstract class AbstractLinkAssignEntryForm extends
                             .getId())).getList();
             if (foundContainers.isEmpty())
                 BgcPlugin
-                    .openAsyncError("Unable to find a container with label "
-                        + positionText.getText());
+                    .openAsyncError(
+                    i18n.tr("Unable to find a container with label ", //$NON-NLS-1$
+                        positionText.getText()));
             else if (foundContainers.size() == 1) {
                 parentContainers.add(new ContainerWrapper(SessionManager
                     .getAppService(), foundContainers.get(0)));
@@ -675,9 +660,9 @@ public abstract class AbstractLinkAssignEntryForm extends
                     }
                     BgcPlugin.openError(
                         // TR: dialog title
-                        i18n.tr("Container problem"),
+                        i18n.tr("Container problem"), //$NON-NLS-1$
                         // TR: dialog message
-                        i18n.tr("More than one container found matching {0}",
+                        i18n.tr("More than one container found matching {0}", //$NON-NLS-1$
                             sb.toString()));
                     focusControl(positionText);
                 } else {
@@ -690,7 +675,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         } catch (Exception ex) {
             BgcPlugin.openError(
                 // TR: dialog title
-                i18n.tr("Init container from position"), ex);
+                i18n.tr("Init container from position"), ex); //$NON-NLS-1$
             focusControl(positionText);
         }
     }
@@ -700,12 +685,10 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * Single assign. Check can really add to the position
      */
-    @SuppressWarnings("nls")
     protected void checkPositionAndSpecimen(final BgcBaseText inventoryIdField,
         final BgcBaseText positionField) {
-        log.debug("checkPositionAndSpecimen");
-
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @SuppressWarnings("nls")
             @Override
             public void run() {
                 try {
@@ -772,10 +755,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * assign multiple
      */
-    @SuppressWarnings("nls")
     protected void showOnlyPallet(boolean onlyPallet) {
-        log.debug("showOnlyPallet: " + onlyPallet);
-
         widgetCreator.showWidget(freezerLabel, !onlyPallet);
         widgetCreator.showWidget(freezerWidget, !onlyPallet);
         widgetCreator.showWidget(hotelLabel, !onlyPallet);
@@ -795,10 +775,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     /**
      * assign multiple
      */
-    @SuppressWarnings("nls")
     protected void showOnlyPallet(final boolean show, boolean async) {
-        log.debug("showOnlyPallet: show=" + show + " async=" + async);
-
         if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override

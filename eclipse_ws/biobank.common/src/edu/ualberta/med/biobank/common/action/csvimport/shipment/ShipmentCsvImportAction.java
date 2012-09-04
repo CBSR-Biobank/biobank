@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -47,9 +45,6 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
 
     private static final Bundle bundle = new CommonBundle();
-
-    private static Logger log = LoggerFactory
-        .getLogger(ShipmentCsvImportAction.class.getName());
 
     private static final I18n i18n = I18nFactory
         .getI18n(SpecimenCsvImportAction.class);

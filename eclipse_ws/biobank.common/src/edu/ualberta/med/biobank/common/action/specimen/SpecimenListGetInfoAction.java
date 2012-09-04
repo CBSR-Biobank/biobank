@@ -22,7 +22,7 @@ public abstract class SpecimenListGetInfoAction implements
     // can't use distinct because we are not selecting an object
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
-        "SELECT spec,parent.label,pos.positionString,toptype.nameShort, count(comment)"
+        "SELECT spec,parent.label,pos.positionString,toptype.nameShort"
             + " FROM " + Specimen.class.getName() + " spec"
             + " INNER JOIN FETCH spec.specimenType"
             + " INNER JOIN FETCH spec.currentCenter"
@@ -34,11 +34,15 @@ public abstract class SpecimenListGetInfoAction implements
             + " INNER JOIN FETCH spec.originInfo originInfo"
             + " INNER JOIN FETCH originInfo.center"
             + " INNER JOIN FETCH cevent.patient patient"
-            + " INNER JOIN FETCH patient.study study"
-            + " LEFT JOIN spec.comments comment";
+            + " INNER JOIN FETCH patient.study study";
 
-    // used in subclass
-    protected static final String SPEC_BASE_END = " GROUP BY spec.id"; //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    protected static final String SPEC_COMMENT_CNT_QRY =
+        "SELECT count(comments) "
+            + "FROM " + Specimen.class.getName() + " specimen "
+            + "LEFT JOIN specimen.comments comments "
+            + "WHERE specimen.id=? "
+            + "GROUP BY specimen.id";
 
     @Override
     public boolean isAllowed(ActionContext context) {
@@ -46,9 +50,10 @@ public abstract class SpecimenListGetInfoAction implements
         return false;
     }
 
+    @SuppressWarnings("nls")
     public ListResult<SpecimenInfo> run(ActionContext context, String queryStr,
         Integer idParameter) throws ActionException {
-        ArrayList<SpecimenInfo> specs = new ArrayList<SpecimenInfo>();
+        ArrayList<SpecimenInfo> infos = new ArrayList<SpecimenInfo>();
 
         Query query = context.getSession().createQuery(queryStr);
         query.setParameter(0, idParameter);
@@ -61,11 +66,17 @@ public abstract class SpecimenListGetInfoAction implements
             specInfo.parentLabel = (String) row[1];
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
-            specInfo.comment = ((Long) row[4]).equals(new Long(0)) ? "N" //$NON-NLS-1$
-                : "Y"; //$NON-NLS-1$
-            specs.add(specInfo);
+            infos.add(specInfo);
         }
 
-        return new ListResult<SpecimenInfo>(specs);
+        for (SpecimenInfo info : infos) {
+            query = context.getSession().createQuery(SPEC_COMMENT_CNT_QRY);
+            query.setParameter(0, info.specimen.getId());
+            Long numComments = (Long) query.uniqueResult();
+
+            info.comment = (numComments > 0) ? "Y" : "N";
+        }
+
+        return new ListResult<SpecimenInfo>(infos);
     }
 }

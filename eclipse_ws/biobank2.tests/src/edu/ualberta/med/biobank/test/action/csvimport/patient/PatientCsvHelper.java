@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.test.Utils;
  * 
  */
 class PatientCsvHelper {
-    private static NameGenerator nameGenerator;
+    private final NameGenerator nameGenerator;
 
     PatientCsvHelper(NameGenerator nameGenerator) {
         this.nameGenerator = nameGenerator;

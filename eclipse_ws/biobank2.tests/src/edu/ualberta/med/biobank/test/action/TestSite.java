@@ -116,7 +116,6 @@ public class TestSite extends ActionTest {
             .getCity());
         Assert.assertEquals(ActivityStatus.ACTIVE,
             siteInfo.getSite().getActivityStatus());
-        // expected 1 but was 0
         Assert.assertEquals(new Long(1), siteInfo.getPatientCount());
         Assert.assertEquals(new Long(1), siteInfo.getProcessingEventCount());
         Assert.assertEquals(new Long(1), siteInfo.getSpecimenCount());

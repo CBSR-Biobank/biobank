@@ -67,7 +67,7 @@ public abstract class AbstractTodayNode<E extends IBiobankModel> extends
         return null;
     }
 
-    @SuppressWarnings("nls")
+    @SuppressWarnings({ "nls", "unchecked" })
     @Override
     public void performExpand() {
         try {

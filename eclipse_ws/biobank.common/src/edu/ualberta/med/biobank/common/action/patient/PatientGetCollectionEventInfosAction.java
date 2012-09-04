@@ -30,14 +30,14 @@ public class PatientGetCollectionEventInfosAction implements
 
     @SuppressWarnings("nls")
     private static final String CEVENT_COUNT_INFO_QRY =
-        "SELECT cevent, COUNT(DISTINCT sourcesSpecs), "
+        "SELECT cevent.id, COUNT(DISTINCT sourcesSpecs), "
             + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourcesSpecs),"
             + " MIN(sourcesSpecs." + SpecimenPeer.CREATED_AT.getName() + ")"
             + " FROM " + CollectionEvent.class.getName() + " as cevent"
             + " LEFT JOIN cevent.originalSpecimens as sourcesSpecs"
             + " LEFT JOIN cevent.allSpecimens as allSpecs"
             + " WHERE cevent.patient.id=?"
-            + " GROUP BY cevent";
+            + " GROUP BY cevent.id";
 
     private final Integer patientId;
 
@@ -80,8 +80,14 @@ public class PatientGetCollectionEventInfosAction implements
 
         List<Object[]> rows2 = query.list();
         for (Object[] row : rows2) {
-            PatientCEventInfo ceventInfo =
-                ceventInfoMap.get(((CollectionEvent) row[0]).getId());
+            Integer ceventId = (Integer) row[0];
+            PatientCEventInfo ceventInfo = ceventInfoMap.get(ceventId);
+
+            if (ceventInfo == null) {
+                throw new NullPointerException(
+                    "collection event not found in query result"); //$NON-NLS-1$
+            }
+
             ceventInfo.sourceSpecimenCount = (Long) row[1];
             ceventInfo.aliquotedSpecimenCount = (Long) row[2];
             ceventInfo.minSourceSpecimenDate = (Date) row[3];

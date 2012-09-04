@@ -93,7 +93,6 @@ mkdir "tmp";
 $VERSION = getVersion();
 $BIOBANK_FOLDER = "BioBank_v${VERSION}_win32";
 
-makeNsis("tmp/no_jre/$BIOBANK_FOLDER", 0);
 makeNsis("tmp/with_jre/$BIOBANK_FOLDER", 1);
 
 print "Cleaning up....\n";

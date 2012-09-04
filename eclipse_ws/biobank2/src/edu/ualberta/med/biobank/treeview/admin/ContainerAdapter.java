@@ -70,7 +70,7 @@ public class ContainerAdapter extends AdapterBase {
 
         this.isDeletable = isAllowed(new ContainerDeletePermission(id));
         this.isReadable =
-            isAllowed(new ContainerReadPermission(container.getWrappedObject()));
+            isAllowed(new ContainerReadPermission(container.getSite().getId()));
         this.isEditable = isAllowed(new ContainerUpdatePermission(id));
     }
 

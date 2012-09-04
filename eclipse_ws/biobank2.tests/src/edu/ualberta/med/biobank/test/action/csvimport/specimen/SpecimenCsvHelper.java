@@ -89,9 +89,8 @@ class SpecimenCsvHelper {
                 }
 
                 // create ones without shipment info
-                SpecimenCsvInfo specimenInfo =
-                    sourceSpecimenCreate(ss.getSpecimenType().getName(),
-                        p.getPnumber(), null);
+                sourceSpecimenCreate(ss.getSpecimenType().getName(),
+                    p.getPnumber(), null);
             }
         }
 

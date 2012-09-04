@@ -16,7 +16,7 @@ public class CollectionEventGetEventAttrInfoAction implements
     Action<MapResult<Integer, EventAttrInfo>> {
 
     private static final long serialVersionUID = 1L;
-    private Integer ceventId;
+    private final Integer ceventId;
 
     @SuppressWarnings("nls")
     private static final String EVENT_ATTR_QRY =
@@ -25,8 +25,7 @@ public class CollectionEventGetEventAttrInfoAction implements
             + " LEFT JOIN FETCH eAttr.studyEventAttr as seAttr"
             + " LEFT JOIN seAttr.globalEventAttr as geAttr"
             + " LEFT JOIN geAttr.eventAttrType as attrType"
-            + " WHERE eAttr.collectionEvent.id =?"
-            + " GROUP BY eAttr";
+            + " WHERE eAttr.collectionEvent.id =?";
 
     public CollectionEventGetEventAttrInfoAction(Integer ceventId) {
         this.ceventId = ceventId;
