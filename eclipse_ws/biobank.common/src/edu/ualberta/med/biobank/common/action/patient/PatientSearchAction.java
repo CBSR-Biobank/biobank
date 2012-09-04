@@ -1,9 +1,8 @@
 package edu.ualberta.med.biobank.common.action.patient;
 
-import java.text.MessageFormat;
-import java.util.List;
-
+import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -11,7 +10,6 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -28,19 +26,12 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_QRY =
-        " SELECT p, study, COUNT(cevents)"
+        " SELECT p.id,COUNT(cevents)"
             + " FROM " + Patient.class.getName() + " p"
             + " LEFT JOIN p.study study"
             + " LEFT JOIN p.collectionEvents cevents"
-            + " WHERE {0} GROUP BY p";
-
-    @SuppressWarnings("nls")
-    private static final String WHERE_FOR_PNUMBER = "p."
-        + PatientPeer.PNUMBER.getName() + "=?";
-
-    @SuppressWarnings("nls")
-    private static final String WHERE_FOR_ID = "p." + PatientPeer.ID.getName()
-        + "=?";
+            + " WHERE p.id=?"
+            + " GROUP BY p.id";
 
     private String pnumber;
     private Integer patientId;
@@ -68,25 +59,38 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
     @Override
     public SearchedPatientInfo run(ActionContext context)
         throws ActionException {
-        String hql = MessageFormat.format(PATIENT_INFO_QRY,
-            pnumber == null ? WHERE_FOR_ID : WHERE_FOR_PNUMBER);
+        @SuppressWarnings("nls")
+        Criteria criteria = context.getSession()
+            .createCriteria(Patient.class, "p");
 
-        Query query = context.getSession().createQuery(hql);
-        query.setParameter(0, pnumber == null ? patientId : pnumber);
+        if (pnumber != null) {
+            criteria.add(Restrictions.eq("pnumber", pnumber)); //$NON-NLS-1$
+        } else {
+            criteria.add(Restrictions.eq("id", patientId)); //$NON-NLS-1$
+        }
 
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = query.list();
-        if (rows.size() == 0) {
-            return null;
+        Patient patient = (Patient) criteria.uniqueResult();
+
+        if (patient == null) {
+            throw new NullPointerException("patient not found in query result"); //$NON-NLS-1$
         }
-        if (rows.size() == 1) {
-            SearchedPatientInfo pinfo = new SearchedPatientInfo();
-            Object[] row = rows.get(0);
-            pinfo.patient = (Patient) row[0];
-            pinfo.study = (Study) row[1];
-            pinfo.ceventsCount = (Long) row[2];
-            return pinfo;
+
+        Query query = context.getSession().createQuery(PATIENT_INFO_QRY);
+        query.setParameter(0, patient.getId());
+
+        Object[] row = (Object[]) query.uniqueResult();
+
+        if (row == null) {
+            throw new NullPointerException("query returned null"); //$NON-NLS-1$
         }
-        throw new ActionException(MULTIPLE_PATIENTS_FOUND.format(pnumber));
+
+        // load study details
+        patient.getStudy().getNameShort();
+
+        SearchedPatientInfo pinfo = new SearchedPatientInfo();
+        pinfo.patient = patient;
+        pinfo.study = patient.getStudy();
+        pinfo.ceventsCount = (Long) row[1];
+        return pinfo;
     }
 }

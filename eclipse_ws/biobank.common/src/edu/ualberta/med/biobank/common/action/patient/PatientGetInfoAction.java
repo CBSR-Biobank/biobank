@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.common.action.patient;
 
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -25,15 +27,14 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
 
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_HQL =
-        "SELECT patient,COUNT(DISTINCT sourceSpecs),"
+        "SELECT patient.id,COUNT(DISTINCT sourceSpecs),"
             + "COUNT(DISTINCT allSpecs) - COUNT(DISTINCT sourceSpecs)"
             + " FROM " + Patient.class.getName() + " patient"
-            + " INNER JOIN FETCH patient.study study"
             + " LEFT JOIN patient.collectionEvents cevents"
             + " LEFT JOIN cevents.originalSpecimens sourceSpecs"
             + " LEFT JOIN cevents.allSpecimens allSpecs"
-            + " WHERE patient.id = ?"
-            + " GROUP BY patient";
+            + " WHERE patient.id=?"
+            + " GROUP BY patient.id";
 
     private final Integer patientId;
 
@@ -60,12 +61,25 @@ public class PatientGetInfoAction implements Action<PatientInfo> {
     public PatientInfo run(ActionContext context) throws ActionException {
         PatientInfo pInfo = new PatientInfo();
 
+        @SuppressWarnings("nls")
+        Criteria criteria = context.getSession()
+            .createCriteria(Patient.class, "p")
+            .add(Restrictions.eq("id", patientId));
+
+        pInfo.patient = (Patient) criteria.uniqueResult();
+
+        // load the study on this patient
+        pInfo.patient.getStudy().getNameShort();
+
+        if (pInfo.patient == null) {
+            throw new NullPointerException("patient not found in query result"); //$NON-NLS-1$
+        }
+
         Query query = context.getSession().createQuery(PATIENT_INFO_HQL);
         query.setParameter(0, patientId);
 
         Object[] results = (Object[]) query.uniqueResult();
 
-        pInfo.patient = (Patient) results[0];
         pInfo.sourceSpecimenCount = (Long) results[1];
         pInfo.aliquotedSpecimenCount = (Long) results[2];
         pInfo.ceventInfos = new PatientGetCollectionEventInfosAction(patientId)

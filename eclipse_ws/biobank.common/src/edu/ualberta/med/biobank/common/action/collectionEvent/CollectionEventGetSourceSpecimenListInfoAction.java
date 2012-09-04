@@ -15,10 +15,9 @@ public class CollectionEventGetSourceSpecimenListInfoAction extends
     private static final String SOURCE_SPEC_QRY =
         SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " LEFT JOIN FETCH spec.processingEvent"
-            + " WHERE spec.originalCollectionEvent.id=?"
-            + SpecimenListGetInfoAction.SPEC_BASE_END;
+            + " WHERE spec.originalCollectionEvent.id=?";
 
-    private Integer ceventId;
+    private final Integer ceventId;
 
     public CollectionEventGetSourceSpecimenListInfoAction(Integer cevenId) {
         this.ceventId = cevenId;

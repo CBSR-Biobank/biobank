@@ -19,7 +19,7 @@ public class TestDb extends TestBase {
     private static final SessionProvider SESSION_PROVIDER;
 
     static {
-        SESSION_PROVIDER = new SessionProvider(Mode.DEBUG);
+        SESSION_PROVIDER = new SessionProvider(Mode.RUN);
         GLOBAL_ADMIN = getOrCreateSuperUser();
     }
 

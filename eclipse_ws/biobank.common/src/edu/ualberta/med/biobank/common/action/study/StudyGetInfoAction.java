@@ -23,11 +23,12 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
 
     @SuppressWarnings("nls")
     private static final String STUDY_COUNT_INFO_HQL =
-        "SELECT study,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
+        "SELECT study.id,COUNT(DISTINCT patients),COUNT(DISTINCT cevents)"
             + " FROM " + Study.class.getName() + " study"
             + " LEFT JOIN study.patients as patients"
             + " LEFT JOIN patients.collectionEvents AS cevents"
-            + " WHERE study.id = ?";
+            + " WHERE study.id = ?"
+            + " GROUP BY study.id";
 
     private final Integer studyId;
     private final StudyGetClinicInfoAction getClinicInfo;
