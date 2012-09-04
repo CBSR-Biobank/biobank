@@ -122,21 +122,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        // TODO: test invalid act status: 5, -1
-        Address address = new Address();
-        address.setCity(name);
-        siteSaveAction.setAddress(address);
         Set<Integer> studyIds = new HashSet<Integer>();
-        studyIds.add(null);
-        siteSaveAction.setStudyIds(studyIds);
-        try {
-            exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with a null site id");
-        } catch (ModelNotFoundException e) {
-            Assert.assertTrue(true);
-        }
-
         studyIds.clear();
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
@@ -149,7 +135,10 @@ public class TestSite extends TestAction {
         }
 
         // success path
+        Address address = new Address();
+        address.setCity(Utils.getRandomString(5, 10));
         siteSaveAction.setStudyIds(new HashSet<Integer>());
+        siteSaveAction.setAddress(address);
         exec(siteSaveAction);
     }
 
