@@ -40,7 +40,7 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
 
     @SuppressWarnings("nls")
     private static final String STUDY_CLINIC_INFO_HQL =
-        "SELECT clinics,COUNT(DISTINCT patients),"
+        "SELECT clinics.id,COUNT(DISTINCT patients),"
             + " COUNT(DISTINCT cevents)"
             + " FROM " + Study.class.getName() + " study"
             + " INNER JOIN study.contacts contacts"
@@ -72,6 +72,8 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
     public ListResult<ClinicInfo> run(ActionContext context)
         throws ActionException {
 
+        Map<Integer, Clinic> clinicsById = new HashMap<Integer, Clinic>();
+
         // first get contacts by clinic
         Map<Clinic, List<Contact>> contactsByClinic =
             new HashMap<Clinic, List<Contact>>();
@@ -81,6 +83,8 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
         List<Object[]> results = query.list();
         for (Object[] row : results) {
             Clinic clinic = (Clinic) row[0];
+            clinicsById.put(clinic.getId(), clinic);
+
             Contact contact = (Contact) row[1];
             List<Contact> contactList = contactsByClinic.get(clinic);
             if (contactList == null) {
@@ -98,7 +102,14 @@ public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> 
 
         results = query.list();
         for (Object[] row : results) {
-            Clinic clinic = (Clinic) row[0];
+            Integer clinicId = (Integer) row[0];
+            Clinic clinic = clinicsById.get(clinicId);
+
+            if (clinic == null) {
+                throw new NullPointerException(
+                    "clinic not found in query result"); //$NON-NLS-1$
+            }
+
             List<Contact> contactList = contactsByClinic.get(clinic);
             if (contactList == null) {
                 throw new LocalizedException(CLINIC_REQUIRES_CONTACTS

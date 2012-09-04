@@ -15,8 +15,7 @@ public class ProcessingEventGetSourceSpecimenListInfoAction extends
         SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " INNER JOIN FETCH spec.processingEvent"
             + " LEFT JOIN FETCH spec.childSpecimens"
-            + " WHERE spec.processingEvent.id=?"
-            + SpecimenListGetInfoAction.SPEC_BASE_END;
+            + " WHERE spec.processingEvent.id=?";
 
     private final Integer peventId;
 

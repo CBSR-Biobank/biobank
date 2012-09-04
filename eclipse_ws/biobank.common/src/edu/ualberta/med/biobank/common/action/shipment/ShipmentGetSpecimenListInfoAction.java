@@ -13,11 +13,10 @@ public class ShipmentGetSpecimenListInfoAction extends
     @SuppressWarnings("nls")
     private static final String SPEC_QRY =
         SpecimenListGetInfoAction.SPEC_BASE_QRY
-            + " WHERE originInfo.id=?"
-            + SpecimenListGetInfoAction.SPEC_BASE_END;
+            + " WHERE originInfo.id=?";
 
     private static final long serialVersionUID = 1L;
-    private Integer oiId;
+    private final Integer oiId;
 
     public ShipmentGetSpecimenListInfoAction(Integer oiId) {
         this.oiId = oiId;

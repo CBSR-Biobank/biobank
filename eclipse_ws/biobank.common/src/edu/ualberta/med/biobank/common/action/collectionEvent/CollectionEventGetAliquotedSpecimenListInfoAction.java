@@ -16,10 +16,9 @@ public class CollectionEventGetAliquotedSpecimenListInfoAction extends
             + " LEFT JOIN FETCH spec.parentSpecimen parentSpec"
             + " LEFT JOIN FETCH parentSpec.processingEvent"
             + " WHERE spec.collectionEvent.id=?"
-            + " AND spec.parentSpecimen IS NOT null"
-            + SpecimenListGetInfoAction.SPEC_BASE_END;
+            + " AND spec.parentSpecimen IS NOT null";
 
-    private Integer ceventId;
+    private final Integer ceventId;
 
     public CollectionEventGetAliquotedSpecimenListInfoAction(Integer cevenId) {
         this.ceventId = cevenId;

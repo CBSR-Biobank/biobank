@@ -16,8 +16,7 @@ public class ContainerGetSpecimenListInfoAction extends
         SpecimenListGetInfoAction.SPEC_BASE_QRY
             + " INNER JOIN FETCH spec.specimenPosition p"
             + " INNER JOIN FETCH p.container c"
-            + " WHERE c.id=?"
-            + SpecimenListGetInfoAction.SPEC_BASE_END;
+            + " WHERE c.id=?";
 
     private static final long serialVersionUID = 1L;
     private final Integer containerId;
