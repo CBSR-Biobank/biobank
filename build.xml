@@ -14,7 +14,8 @@ End:
   </exec>
 
   <property environment="env" />
-
+  <property name="doxygen" location="/usr/bin/doxygen" />
+  <property name="xsltproc" location="/usr/bin/xsltproc" />
 
   <!-- TODO: move as many properties as possible into build.properties -->
   <!-- TODO: add tasks to push database properties to various files -->
@@ -496,6 +497,166 @@ End:
   </target>
 
   <!-- JUnit -->
+
+  <property name="doxygen.output" location="docs/doxygen" />
+  <property name="test.output" location="testing" />
+  <property name="test.output.raw" value="${test.output}/raw" />
+  <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
+
+  <path id="common.class.path">
+    <fileset dir="${eclipse.proj.dir.common}/lib/client">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+  <path id="test.class.path">
+    <pathelement location="${test.build.dir}" />
+  </path>
+
+  <target name="clean-test-results">
+    <delete dir="${test.output}" />
+  </target>
+
+  <target name="clean-tests" depends="clean-test-results">
+    <delete dir="${test.build.dir}" />
+  </target>
+
+  <target name="test-prepare">
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${test.output}" />
+    <mkdir dir="${test.output.raw}" />
+  </target>
+
+  <!---->
+  <target name="tests-compile" depends="build-common-project,test-prepare" >
+    <copy includeemptydirs="false"
+          todir="${test.build.dir}" overwrite="true">
+      <fileset dir="${eclipse.proj.dir.tests}/src">
+        <exclude name="**/*.launch" />
+        <exclude name="**/*.java" />
+      </fileset>
+      <fileset dir="${eclipse.proj.dir.tools}/src">
+    	<exclude name="**/*.launch" />
+    	<exclude name="**/*.java" />
+      </fileset>
+    </copy>
+    <javac destdir="${test.build.dir}"
+           debug="true"
+           debuglevel="lines,source"
+           includeantruntime="false">
+      <src path="${eclipse.proj.dir.tests}/src" />
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <include name="**/tools/utils/*.java" />
+      <include name="**/test/reports/**/*.java" />
+      <include name="**/Test*.java" />
+      <exclude name="**/presenters/**" />
+      <exclude name="**/TestingDispatcher.java" />
+     <classpath>
+        <pathelement location="${eclipse.proj.dir.common}/output" />
+        <pathelement location="${eclipse.proj.dir.common}/lib/client" />
+        <pathelement location="${req.jars.dir}" />
+      </classpath>
+      <classpath refid="biobank.common.build.classpath" />
+    </javac>
+  </target>
+
+  <fileset id="testcase.files" dir="${eclipse.proj.dir.tests}/src">
+    <exclude name="**/speed/**" />
+    <exclude name="**/TestReportsProcedurallyGeneratedData.java" />
+    <exclude name="**/TestAction.java" />
+    <exclude name="**/TestCommon.java" />
+    <exclude name="**/TestingDispatcher.java" />
+    <exclude name="**/TestHibernateLocking.java" />
+    <exclude name="**/TestDatabase.java" />
+    <exclude name="**/TestFunctionalities.java" />
+    <exclude name="**/TestReportsOnExistingData.java" />
+    <exclude name="**/AllTests.java" />
+    <exclude name="**/wrappers/**" />
+    <exclude name="**/presenters/**" />
+    <include name="**/Test*.java" />
+  </fileset>
+
+  <!-- target name="test-debug">
+    <pathconvert pathsep="${line.separator}" property="sounds" refid="testcase.files"/>
+    <echo file="sounds.txt">${sounds}</echo>
+  </target -->
+
+  <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
+    <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
+      <classpath refid="test.class.path" />
+      <classpath refid="biobank.common.run.classpath" />
+      <sysproperty key="server" value="http://localhost:8080" />
+      <formatter usefile="yes" type="xml" />
+      <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
+      <batchtest todir="${test.output.raw}" unless="testcase">
+        <fileset refid="testcase.files" />
+      </batchtest>
+    </junit>
+    <junitreport todir="${test.output}">
+      <fileset dir="${test.output.raw}">
+        <include name="TEST-*.xml" />
+      </fileset>
+      <report format="noframes" todir="${test.output}/html" />
+    </junitreport>
+    <echo message="test report: file://${test.output}/html/junit-noframes.html" />
+  </target>
+
+  <property name="emma.dir" value="${req.jars.dir}" />
+  <path id="emma.lib">
+    <pathelement location="${emma.dir}/emma.jar" />
+    <pathelement location="${emma.dir}/emma_ant.jar" />
+  </path>
+
+  <target name="emma"
+          description="turns on EMMA's on-the-fly instrumentation mode">
+    <property name="emma.enabled" value="true" />
+  </target>
+
+  <target name="test-emma"
+          depends="tests-compile"
+          description="executes test cases with code coverage">
+    <delete file="${test.output}/coverage.emma" />
+    <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
+      <classpath refid="biobank.common.run.classpath" />
+      <classpath refid="test.class.path" />
+      <classpath refid="emma.lib" />
+      <formatter usefile="yes" type="brief" />
+      <formatter type="xml" />
+      <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
+      <batchtest todir="testing/raw" unless="testcase">
+        <fileset refid="testcase.files" />
+      </batchtest>
+      <jvmarg value="-Xbootclasspath/a:${emma.dir}/emma.jar" />
+      <jvmarg value="emmarun" />
+      <jvmarg value="-out" />
+      <jvmarg value="${test.output}/coverage.emma" />
+      <jvmarg value="-raw" />
+      <jvmarg value="-merge" />
+      <jvmarg value="yes" />
+      <jvmarg value="-ix" />
+      <jvmarg value="edu.ualberta.med.biobank.common*" />
+    </junit>
+    <junitreport todir="${test.output}">
+      <fileset dir="${test.output.raw}">
+        <include name="TEST-*.xml" />
+      </fileset>
+      <report format="noframes" todir="${test.output}/html" />
+    </junitreport>
+    <java classname="emma" fork="true" failonerror="true">
+      <arg value="report" />
+      <arg value="-r" />
+      <arg value="html" />
+      <arg value="-sp" />
+      <arg value="eclipse_ws/biobank.common/src" />
+      <arg value="-in" />
+      <arg value="testing/coverage.emma" />
+      <classpath>
+        <pathelement path="${emma.dir}/emma.jar" />
+      </classpath>
+    </java>
+    <echo message="test report: file://${test.output}/html/junit-noframes.html" />
+    <echo message="coverage report: file://${converage.output}/index.html" />
+  </target>
+
 
   <target name="eclipse.home.env">
     <fail unless="env.ECLIPSE_HOME"
