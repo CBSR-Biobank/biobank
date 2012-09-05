@@ -14,9 +14,11 @@ import edu.ualberta.med.biobank.model.Site;
 
 public class SiteGetAllAction implements Action<ListResult<Site>> {
 
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings("nls")
     private static final String ALL_SITES = "from "
         + Site.class.getName();
-    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {

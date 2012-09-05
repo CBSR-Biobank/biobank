@@ -244,11 +244,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             context.getSession().delete(specimen);
         } else {
             throw new ActionException(
-                bundle
-                    .tr(
-                        "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
-                    .format(
-                        specimen.getInventoryId()));
+                bundle.tr("Specimen {0} has children and cannot be deleted. " //$NON-NLS-1$
+                    + "Instead, move it to a different collection event.") //$NON-NLS-1$
+                    .format(specimen.getInventoryId()));
         }
     }
 
@@ -286,8 +284,9 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     sAttr = studyEventAttrInfo == null ? null
                         : studyEventAttrInfo.attr;
                     if (sAttr == null) {
-                        throw new ActionException(STUDY_EVENT_ATTR_MISSING_ERRMSG
-                            .format(attrInfo.studyEventAttrId));
+                        throw new ActionException(
+                            STUDY_EVENT_ATTR_MISSING_ERRMSG
+                                .format(attrInfo.studyEventAttrId));
                     }
                 }
 
@@ -298,73 +297,75 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
                 if (attrInfo.value != null) {
                     // validate the value
-            attrInfo.value = attrInfo.value.trim();
-            if (attrInfo.value.length() > 0) {
-                EventAttrTypeEnum type = attrInfo.type;
-                List<String> permissibleSplit = null;
+                    attrInfo.value = attrInfo.value.trim();
+                    if (attrInfo.value.length() > 0) {
+                        EventAttrTypeEnum type = attrInfo.type;
+                        List<String> permissibleSplit = null;
 
-                if (type == EventAttrTypeEnum.SELECT_SINGLE
-                    || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                    String permissible = sAttr.getPermissible();
-                    if (permissible != null) {
-                        permissibleSplit = Arrays.asList(permissible
-                            .split(";")); //$NON-NLS-1$
-                    }
-                }
-
-                if (type == EventAttrTypeEnum.SELECT_SINGLE) {
-                    if (!permissibleSplit.contains(attrInfo.value)) {
-                        String label =
-                            sAttr.getGlobalEventAttr().getLabel();
-                        throw new ActionException(
-                            INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
-                                .format(attrInfo.value, label));
-                    }
-                } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                    for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
-                        if (!permissibleSplit.contains(singleVal)) {
-                            String label =
-                                sAttr.getGlobalEventAttr().getLabel();
-                            throw new ActionException(
-                                INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
-                                    .format(singleVal, attrInfo.value,
-                                        label));
+                        if (type == EventAttrTypeEnum.SELECT_SINGLE
+                            || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                            String permissible = sAttr.getPermissible();
+                            if (permissible != null) {
+                                permissibleSplit = Arrays.asList(permissible
+                                    .split(";")); //$NON-NLS-1$
+                            }
                         }
-                    }
-                } else if (type == EventAttrTypeEnum.NUMBER) {
-                    Double.parseDouble(attrInfo.value);
-                } else if (type == EventAttrTypeEnum.DATE_TIME) {
-                    try {
-                        DateFormatter.dateFormatter
-                            .parse(attrInfo.value);
-                    } catch (ParseException e) {
-                        throw new ActionException(CANNOT_PARSE_DATE_ERRMSG
-                            .format(attrInfo.value));
-                    }
-                } else if (type == EventAttrTypeEnum.TEXT) {
-                    // do nothing
-                } else {
-                    throw new ActionException(UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
-                        .format(type.getName()));
+
+                        if (type == EventAttrTypeEnum.SELECT_SINGLE) {
+                            if (!permissibleSplit.contains(attrInfo.value)) {
+                                String label =
+                                    sAttr.getGlobalEventAttr().getLabel();
+                                throw new ActionException(
+                                    INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
+                                        .format(attrInfo.value, label));
+                            }
+                        } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
+                            for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
+                if (!permissibleSplit.contains(singleVal)) {
+                    String label =
+                        sAttr.getGlobalEventAttr().getLabel();
+                    throw new ActionException(
+                        INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
+                            .format(singleVal, attrInfo.value,
+                                label));
                 }
             }
-        }
-
-        EventAttr eventAttr;
-        if (ceventAttrInfo == null) {
-            eventAttr = new EventAttr();
-            cevent.getEventAttrs().add(eventAttr);
-            eventAttr.setCollectionEvent(cevent);
-            eventAttr.setStudyEventAttr(sAttr);
+        } else if (type == EventAttrTypeEnum.NUMBER) {
+            Double.parseDouble(attrInfo.value);
+        } else if (type == EventAttrTypeEnum.DATE_TIME) {
+            try {
+                DateFormatter.dateFormatter
+                    .parse(attrInfo.value);
+            } catch (ParseException e) {
+                throw new ActionException(
+                    CANNOT_PARSE_DATE_ERRMSG
+                        .format(attrInfo.value));
+            }
+        } else if (type == EventAttrTypeEnum.TEXT) {
+            // do nothing
         } else {
-            eventAttr = ceventAttrInfo.attr;
+            throw new ActionException(
+                UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
+                    .format(type.getName()));
         }
-        eventAttr.setValue(attrInfo.value);
-
-        // FIXME need to remove attributes ? when they don't exist
-        // anymore
-        // in study maybe ? See previous code in wrapper ?
     }
+}
+
+EventAttr eventAttr;
+if (ceventAttrInfo == null) {
+    eventAttr = new EventAttr();
+    cevent.getEventAttrs().add(eventAttr);
+    eventAttr.setCollectionEvent(cevent);
+    eventAttr.setStudyEventAttr(sAttr);
+} else {
+    eventAttr = ceventAttrInfo.attr;
+}
+eventAttr.setValue(attrInfo.value);
+
+// FIXME need to remove attributes ? when they don't exist
+// anymore
+// in study maybe ? See previous code in wrapper ?
+}
     }
 
     private void saveComment(ActionContext context, CollectionEvent ceventToSave) {
