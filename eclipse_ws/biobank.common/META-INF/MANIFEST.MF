@@ -45,8 +45,8 @@ Bundle-ClassPath: conf/,
  lib/client/ognl-2.6.7.jar,
  lib/client/jta-1.1.jar,
  lib/client/gettext-commons-0.9.6.jar,
- lib/client/spiffy-all-0.05.jar,
- lib/client/SuperCSV-1.52.jar
+ lib/server/spiffy-all-0.05.jar,
+ lib/server/SuperCSV-1.52.jar
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,

@@ -105,9 +105,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         "productBarcode-binding";
 
     @SuppressWarnings("nls")
-    private static final String LABEL_BINDING = "label-binding";
-
-    @SuppressWarnings("nls")
     private static final String PALLET_TYPES_BINDING = "palletType-binding";
 
     protected static boolean useScanner = true;
