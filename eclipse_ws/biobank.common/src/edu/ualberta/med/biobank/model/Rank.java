@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 // TODO: consider making Rank an @Embeddable with an isManager and an isAllPermissions components, perhaps serialized to an int? a bit array?
-@Deprecated
+//@Deprecated
 @SuppressWarnings("nls")
 public enum Rank {
     NORMAL(0, "Normal"),
