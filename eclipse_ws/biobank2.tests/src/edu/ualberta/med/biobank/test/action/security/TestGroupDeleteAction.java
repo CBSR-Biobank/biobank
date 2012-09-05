@@ -61,46 +61,41 @@ public class TestGroupDeleteAction extends TestAction {
     public void asGlobalAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        // Membership userMembership =
-        // factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
+        Membership userMembership =
+            factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user).allDomains();
 
-        ADMIN.run(b.ranks(Rank.NORMAL, Rank.MANAGER), true);
-        ADMIN.run(b.ranks(Rank.ADMINISTRATOR), false);
+        ADMIN.run(b.allRanks(), true);
     }
 
     @Test
     public void asCenterAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        // Membership userMembership =
-        // factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
+        Membership userMembership =
+            factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
         tx.commit();
 
-        Scenario.Builder b = new Scenario.Builder().user(user)
-            .ranks(Rank.NORMAL, Rank.MANAGER);
+        Scenario.Builder b = new Scenario.Builder().user(user).allRanks();
 
         ADMIN.run(b.domains(Domain.CENTER, Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.STUDY, Domain.GLOBAL), false);
-        ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
     }
 
     @Test
     public void asStudyAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        // Membership userMembership =
-        // factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
+        Membership userMembership =
+            factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
-        Scenario.Builder b = new Scenario.Builder().user(user)
-            .ranks(Rank.NORMAL, Rank.MANAGER);
+        Scenario.Builder b = new Scenario.Builder().user(user).allRanks();
 
         ADMIN.run(b.domains(Domain.STUDY, Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.CENTER, Domain.GLOBAL), false);
-        ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
     }
 
     @Test
@@ -113,12 +108,10 @@ public class TestGroupDeleteAction extends TestAction {
             factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
-        Scenario.Builder b = new Scenario.Builder().user(user)
-            .ranks(Rank.NORMAL, Rank.MANAGER);
+        Scenario.Builder b = new Scenario.Builder().user(user).allRanks();
 
         ADMIN.run(b.domains(Domain.CENTER_STUDY), true);
         ADMIN.run(b.domains(Domain.CENTER, Domain.STUDY, Domain.GLOBAL), false);
-        ADMIN.run(b.allDomains().ranks(Rank.ADMINISTRATOR), false);
     }
 
     @Test
@@ -141,7 +134,7 @@ public class TestGroupDeleteAction extends TestAction {
         Transaction tx = session.beginTransaction();
         Group group = factory.createGroup();
         User user = factory.createUser();
-        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
+        factory.createMembership(Domain.GLOBAL, Rank.MANAGER);
         tx.commit();
 
         execAs(user, new GroupDeleteAction(new GroupDeleteInput(group)));

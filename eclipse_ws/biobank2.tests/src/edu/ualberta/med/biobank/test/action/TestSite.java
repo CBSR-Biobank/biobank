@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.validation.ConstraintViolationException;
 
 import org.hibernate.Query;
+import org.hibernate.Transaction;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
@@ -148,7 +149,7 @@ public class TestSite extends TestAction {
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
+                provisioning.patientIds.get(0), provisioning.siteId);
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
@@ -170,7 +171,8 @@ public class TestSite extends TestAction {
             siteInfo.getSite().getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.getPatientCount());
         Assert.assertEquals(new Long(1), siteInfo.getProcessingEventCount());
-        Assert.assertEquals(new Long(1), siteInfo.getSpecimenCount());
+        Assert.assertEquals(new Long(sourceSpecs.size() - 1),
+            siteInfo.getSpecimenCount());
     }
 
     @Test
@@ -606,6 +608,18 @@ public class TestSite extends TestAction {
         DispatchReadInfo dispatchInfo =
             exec(new DispatchGetInfoAction(dispatchId));
         exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+
+        // TODO: delete specimens
+        Transaction tx = session.beginTransaction();
+        Query q = session.createQuery("from " + Specimen.class.getName()
+            + " where currentCenter.id = ?")
+            .setParameter(0, provisioning.siteId);
+        for (Specimen s : (List<Specimen>) q.list()) {
+            session.delete(s);
+        }
+
+        tx.commit();
+
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 

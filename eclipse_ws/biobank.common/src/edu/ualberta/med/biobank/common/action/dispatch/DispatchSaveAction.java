@@ -109,8 +109,11 @@ public class DispatchSaveAction implements Action<IdResult> {
                     new DispatchSpecimen());
             Specimen spec = context.load(Specimen.class,
                 dsInfo.specimenId);
-            spec.setCurrentCenter(context.get(Center.class, dInfo.receiverId));
-            context.getSession().saveOrUpdate(spec);
+            if (spec != null) {
+                spec.setCurrentCenter(context.get(Center.class,
+                    dInfo.receiverId));
+                context.getSession().saveOrUpdate(spec);
+            }
             dspec.setSpecimen(spec);
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);

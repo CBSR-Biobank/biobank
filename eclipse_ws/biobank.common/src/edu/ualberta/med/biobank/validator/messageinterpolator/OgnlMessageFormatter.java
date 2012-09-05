@@ -117,7 +117,7 @@ public class OgnlMessageFormatter {
         String result = null;
         try {
             Object value = Ognl.getValue(expr, root);
-            result = value.toString();
+            result = String.valueOf(value);
         } catch (OgnlException e) {
             // TODO: something better?
             throw new RuntimeException(e);

@@ -58,7 +58,7 @@ public class TestUserSaveAction extends TestAction {
             new MembershipContextGetInput())).getContext();
 
         UserSaveOutput result =
-            exec(new UserSaveAction(new UserSaveInput(user, context)));
+            exec(new UserSaveAction(new UserSaveInput(user, context, "badpassword")));
 
         Object o = session.createCriteria(User.class)
             .add(Restrictions.idEq(result.getUserId()))
@@ -93,7 +93,7 @@ public class TestUserSaveAction extends TestAction {
         Assert.assertEquals("membership roles",
             membership.getRoles(), savedMembership.getRoles());
 
-        Assert.assertEquals("membership domain not inserted properly",
+        Assert.assertTrue("membership domain not inserted properly",
             domain.isEquivalent(savedMembership.getDomain()));
 
         Set<Group> savedGroups = user.getGroups();

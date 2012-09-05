@@ -162,7 +162,7 @@ public class TestProcessingEvent extends TestAction {
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
             Assert.assertEquals(
-                sourceSpecs.get(0).specimen.getActivityStatus(),
+                ActivityStatus.CLOSED,
                 specimenInfo.specimen.getActivityStatus());
 
             Assert.assertEquals(clinicInfo.clinic.getName(),
