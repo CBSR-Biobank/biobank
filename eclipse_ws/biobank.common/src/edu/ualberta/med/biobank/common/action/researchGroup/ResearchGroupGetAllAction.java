@@ -16,12 +16,11 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 
 public class ResearchGroupGetAllAction implements
     Action<MapResult<Integer, ResearchGroupAdapterInfo>> {
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
     public static final String ALL_RG = "from "
         + ResearchGroup.class.getName();
-
-    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
