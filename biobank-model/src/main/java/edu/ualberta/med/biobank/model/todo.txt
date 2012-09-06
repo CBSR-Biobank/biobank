@@ -3,6 +3,11 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Q: should SpecimenProcessingLink be between two SpecimenProcessingNode-s
+    so that extra information can be stored on the nodes, not just the link?
+    so that processing events can have nodes added to them first with the links
+    added later?
+    A: ?
 [ ] Q: consider having only SpecimenProcessingLink and not SpecimenProcessing
 	Because why bother with two types of definitions when both can be represented
 	by one class?
