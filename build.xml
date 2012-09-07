@@ -39,47 +39,6 @@ End:
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
 
-  <!-- TODO: someday, does client need all keystores? -->
-  <condition property="isHostAicmlMed">
-    <equals arg1="${host.name}"
-            arg2="aicml-med"
-            casesensitive="true"
-            trim="true" />
-  </condition>
-  <condition property="isHostAicml5">
-    <equals arg1="${host.name}"
-            arg2="aicml5"
-            casesensitive="true"
-            trim="true" />
-  </condition>
-  <condition property="isHostCbsr">
-    <equals arg1="${host.name}"
-            arg2="cbsr.med.ualberta.ca"
-            casesensitive="true"
-            trim="true" />
-  </condition>
-  <condition property="isHostCbsrTraining">
-    <equals arg1="${host.name}"
-            arg2="cbsr-training"
-            casesensitive="true"
-            trim="true" />
-  </condition>
-  <condition property="isHostBiobankAict">
-    <equals arg1="${host.name}"
-            arg2="biobank.cbsr.ualberta.ca"
-            casesensitive="true"
-            trim="true" />
-  </condition>
-  <condition property="isHostLocal">
-    <and>
-      <isfalse value="${isHostAicmlMed}" />
-      <isfalse value="${isHostAicml5}" />
-      <isfalse value="${isHostCbsr}" />
-      <isfalse value="${isHostCbsrTraining}" />
-      <isfalse value="${isHostBiobankAict}" />
-    </and>
-  </condition>
-
   <path id="biobank.common.build.classpath">
     <fileset dir="${req.jars.dir}">
       <include name="*.jar" />
@@ -274,39 +233,28 @@ End:
               srcfile="${war.file}" />
   </target>
 
-  <!-- TODO: require as a single target to update the keyfile -->
-  <target name="hostAicmlMed" if="isHostAicmlMed">
-    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
+  <target name="keystore-gen">
+    <echo message="Helping you to generate a mediocre key..." />
+    <input message="Enter an alias:" 
+           addproperty="keystore.alias"
+           defaultValue="localhost" />
+    <input message="Enter dname:" 
+           addproperty="keystore.dname"
+           defaultValue="CN=${keystore.alias}, OU=Explosives Devision, O=acme.org, C=US" />
+    <genkey alias="${keystore.alias}"
+            dname="${keystore.dname}"
+            storepass="biobank2"
+            keystore="${secu-log.dir}/jboss/biobank.keystore" /> 
   </target>
-  <target name="hostAicml5" if="isHostAicml5">
-    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
+
+  <target name="keystore-check">
+    <available file="${secu-log.dir}/jboss/biobank.keystore" property="keystore.available" />
   </target>
-  <target name="hostCbsr" if="isHostCbsr">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
-  </target>
-  <target name="HostBiobank1" if="isHostBiobank1">
+
+  <target name="keystore-copy" depends="keystore-check">
+    <fail unless="keystore.available"
+          message="${secu-log.dir}/jboss/biobank.keystore not found. Use target 'keystore-gen' to generate a temporary key or create your own manually." />
     <copy file="${secu-log.dir}/jboss/biobank.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
-  </target>
-  <target name="hostCbsrTraining" if="isHostCbsrTraining">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
-  </target>
-  <target name="hostBiobankAict" if="isHostBiobankAict">
-    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
-          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
-          overwrite="true" />
-  </target>
-  <target name="hostLocal" if="isHostLocal">
-    <copy file="${secu-log.dir}/jboss/localhost.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
@@ -334,7 +282,7 @@ End:
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostBiobankAict,hostLocal"
+          depends="jboss.home.env,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"

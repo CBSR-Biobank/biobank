@@ -186,16 +186,21 @@ public final class TrustStore {
 
     private void verifyHost(SSLSocket socket, String host)
         throws IOException {
-        socket.startHandshake();
+        try {
+            socket.startHandshake();
 
-        SSLSession session = socket.getSession();
-        if (session == null) {
-            throw new SSLException("Cannot verify SSL socket without session");
-        }
+            SSLSession session = socket.getSession();
+            if (session == null) {
+                throw new SSLException(
+                    "Cannot verify SSL socket without session");
+            }
 
-        if (!HOSTNAME_VERIFIER.verify(host, session)) {
-            throw new SSLPeerUnverifiedException(
-                "Unable to verify host: " + host);
+            if (!HOSTNAME_VERIFIER.verify(host, session)) {
+                throw new SSLPeerUnverifiedException(
+                    "Unable to verify host: " + host);
+            }
+        } finally {
+            socket.close();
         }
     }
 
@@ -227,7 +232,8 @@ public final class TrustStore {
         }
 
         public List<X509Certificate> getRejectedIssuers() {
-            List<X509Certificate> list = new ArrayList<X509Certificate>(Arrays.asList(chain));
+            List<X509Certificate> list =
+                new ArrayList<X509Certificate>(Arrays.asList(chain));
             list.removeAll(Arrays.asList(getAcceptedIssuers()));
             return list;
         }
