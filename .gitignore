@@ -1,5 +1,6 @@
 po/output
 .options
+.settings
 *.jasper
 backup/
 docs/doxygen

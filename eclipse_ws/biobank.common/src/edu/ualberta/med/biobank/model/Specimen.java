@@ -105,6 +105,8 @@ public class Specimen extends AbstractBiobankModel {
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private ProcessingEvent processingEvent;
     private Specimen parentSpecimen;
+    private String plateErrors;
+    private String sampleErrors;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -280,5 +282,23 @@ public class Specimen extends AbstractBiobankModel {
 
     public void setParentSpecimen(Specimen parentSpecimen) {
         this.parentSpecimen = parentSpecimen;
+    }
+
+    @Column(name = "PLATE_ERRORS", length = 100)
+    public String getPlateErrors() {
+        return plateErrors;
+    }
+
+    public void setPlateErrors(String plateErrors) {
+        this.plateErrors = plateErrors;
+    }
+
+    @Column(name = "SAMPLE_ERRORS", length = 100)
+    public String getSampleErrors() {
+        return sampleErrors;
+    }
+
+    public void setSampleErrors(String sampleErrors) {
+        this.sampleErrors = sampleErrors;
     }
 }

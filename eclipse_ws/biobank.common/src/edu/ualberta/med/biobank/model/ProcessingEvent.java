@@ -59,6 +59,8 @@ public class ProcessingEvent extends AbstractBiobankModel {
     private String worksheet;
     private Date createdAt;
     private Center center;
+    private String user;
+    private String scriptName;
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
@@ -92,6 +94,26 @@ public class ProcessingEvent extends AbstractBiobankModel {
 
     public void setCenter(Center center) {
         this.center = center;
+    }
+
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.TecanProcessingEvent.user.NotEmpty}")
+    @Column(name = "USER", length = 100)
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    @NotEmpty(message = "{edu.ualberta.med.biobank.model.TecanProcessingEvent.scriptName.NotEmpty}")
+    @Column(name = "SCRIPT_NAME", length = 256)
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent")
