@@ -234,17 +234,43 @@ End:
   </target>
 
   <target name="keystore-gen">
-    <echo message="Helping you to generate a mediocre key..." />
+    <hostinfo prefix="local" />
+
+    <echo message="Helping you to generate a TEMPORARY TRHOW-AWAY TEST key..." />
+    <input message="Enter CN:"
+           addproperty="dName.CN"
+           defaultValue="localhost" />
+    <input message="Enter subjectAltName:" 
+           addproperty="subjectAltName"
+           defaultValue="IP:${local.ADDR4},DNS:localhost" />
     <input message="Enter an alias:" 
            addproperty="keystore.alias"
-           defaultValue="localhost" />
-    <input message="Enter dname:" 
-           addproperty="keystore.dname"
-           defaultValue="CN=${keystore.alias}, OU=Explosives Devision, O=acme.org, C=US" />
-    <genkey alias="${keystore.alias}"
-            dname="${keystore.dname}"
-            storepass="biobank2"
-            keystore="${secu-log.dir}/jboss/biobank.keystore" /> 
+           defaultValue="${dName.CN}" />
+
+    <copy file="scripts/ssl/cert.cnf.template"
+          tofile="scripts/ssl/cert.cnf" />
+    <replace file="scripts/ssl/cert.cnf">
+      <replacefilter token="@@dName.CN@@" value="${dName.CN}" />
+      <replacefilter token="@@subjectAltName@@" value="${subjectAltName}" />
+    </replace>
+
+    <exec executable="openssl" dir="scripts/ssl">
+      <arg line="req -newkey rsa:1024 -x509 -outform DER -out cert.der -days 3650 -config cert.cnf" />
+    </exec>
+    <exec executable="openssl" dir="scripts/ssl">
+      <arg line="pkcs8 -topk8 -nocrypt -in key.pem -inform PEM -out key.der -outform DER" />
+    </exec>
+    <exec executable="java" dir="scripts/ssl">
+      <arg line="-Dkeystore=biobank.keystore ImportKey key.der cert.der ${keystore.alias}" />
+    </exec>
+    <exec executable="keytool" dir="scripts/ssl">
+      <arg line="-keystore biobank.keystore -alias ${keystore.alias} -storepass importkey -keypasswd -keypass importkey -new biobank2" />
+    </exec>
+    <exec executable="keytool" dir="scripts/ssl">
+      <arg line="-keystore biobank.keystore -storepasswd -storepass importkey -new biobank2" />
+    </exec>
+    <copy file="scripts/ssl/biobank.keystore"
+          tofile="${secu-log.dir}/jboss/biobank.keystore" />
   </target>
 
   <target name="keystore-check">

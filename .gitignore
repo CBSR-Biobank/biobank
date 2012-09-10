@@ -1,5 +1,6 @@
 security-logs/jboss/biobank.keystore
 po/output
+/scripts/ssl
 .options
 .settings
 *.jasper
