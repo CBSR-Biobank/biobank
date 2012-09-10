@@ -152,7 +152,7 @@ public class TecanScriptPostProcessAction implements Action<BooleanResult> {
             "rackId",
             "cavityId",
             "position",
-            "sampleId",
+            "sourceId",
             "concentration",
             "concentrationUnit",
             "volume",
@@ -164,7 +164,7 @@ public class TecanScriptPostProcessAction implements Action<BooleanResult> {
             "plateErrors",
             "samplEerrors",
             "sampleInstanceId",
-            "sampleId2",
+            "sampleId",
         };
 
         try {

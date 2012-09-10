@@ -23,7 +23,7 @@ public class CbsrTecanCsvRow implements ICsvRow {
     private String plateErrors;
     private String samplEerrors;
     private Integer sampleInstanceId;
-    private Integer sampleId2;
+    private Integer sampleId;
 
     @Override
     public int getLineNumber() {
@@ -155,12 +155,12 @@ public class CbsrTecanCsvRow implements ICsvRow {
         this.sampleInstanceId = sampleInstanceId;
     }
 
-    public Integer getSampleId2() {
-        return sampleId2;
+    public Integer getSampleId() {
+        return sampleId;
     }
 
-    public void setSampleId2(Integer sampleId2) {
-        this.sampleId2 = sampleId2;
+    public void setSampleId(Integer sampleId) {
+        this.sampleId = sampleId;
     }
 
 }
