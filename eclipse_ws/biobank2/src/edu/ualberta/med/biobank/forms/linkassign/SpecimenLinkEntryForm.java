@@ -74,6 +74,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
 
+    @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
 
     @SuppressWarnings("nls")

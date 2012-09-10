@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="conf"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/spiffy-all-0.05.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/SuperCSV-1.52.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security-1.0.4.jar" sourcepath="/home/jferland/.m2/repository/org/acegisecurity/acegi-security/1.0.4/acegi-security-1.0.4-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/antlr-2.7.6.jar"/>
@@ -43,5 +43,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/messages.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/ognl-2.6.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12-1.6.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -13,6 +13,7 @@ public class TestSpecimenGetPossibleTypes extends ActionTest {
     public void test() {
         SpecimenGetPossibleTypesAction action =
             new SpecimenGetPossibleTypesAction(4);
+        @SuppressWarnings("unused")
         List<AbstractBiobankModel> list = exec(action).getList();
     }
 }

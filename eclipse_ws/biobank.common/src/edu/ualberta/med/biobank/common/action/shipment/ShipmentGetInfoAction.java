@@ -48,7 +48,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
         OriginInfo oi = (OriginInfo) query.uniqueResult();
         if (oi == null) {
-            throw new ActionException("No origin info found with id: " + oiId);
+            throw new ActionException("No origin info found with id: " + oiId); //$NON-NLS-1$
         }
 
         sInfo.originInfo = oi;
