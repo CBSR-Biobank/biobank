@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
@@ -136,7 +137,7 @@ class SpecimenCsvHelper {
                 SpecimenCsvInfo specimenInfo =
                     aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
                         as.getSpecimenType().getName(),
-                        parentSpecimenInfo.getValue());
+                        parentSpecimenInfo.getValue(), 1);
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -145,25 +146,26 @@ class SpecimenCsvHelper {
     }
 
     private SpecimenCsvInfo sourceSpecimenCreate(
-        String specimenTypeName,
-        String patientNumber, String waybill) {
+        String specimenTypeName, String patientNumber, String waybill) {
         SpecimenCsvInfo specimenInfo = aliquotedSpecimenCreate(
-            null, specimenTypeName, patientNumber);
+            null, specimenTypeName, patientNumber, 1);
         specimenInfo.setWaybill(waybill);
-        specimenInfo.setWorksheet(nameGenerator.next(String.class));
+        specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
         specimenInfo.setSourceSpecimen(true);
         return specimenInfo;
     }
 
-    private SpecimenCsvInfo aliquotedSpecimenCreate(
-        String parentInventoryId, String specimenTypeName, String patientNumber) {
+    public SpecimenCsvInfo aliquotedSpecimenCreate(
+        String parentInventoryId, String specimenTypeName,
+        String patientNumber,
+        int visitNumber) {
         SpecimenCsvInfo specimenInfo = new SpecimenCsvInfo();
-        specimenInfo.setInventoryId(nameGenerator.next(String.class));
+        specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
         specimenInfo.setPatientNumber(patientNumber);
-        specimenInfo.setVisitNumber(1);
+        specimenInfo.setVisitNumber(visitNumber);
         return specimenInfo;
     }
 }

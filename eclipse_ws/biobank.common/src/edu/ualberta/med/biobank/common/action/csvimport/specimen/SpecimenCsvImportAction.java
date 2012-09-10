@@ -95,6 +95,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     public static final Tr CSV_PATIENT_ERROR =
         bundle.tr("patient in CSV file with number \"{0}\" not exist");
 
+    public static final Tr CSV_CEVENT_ERROR =
+        bundle.tr("collection event with visit number \"{0}\" does not exist");
+
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
         bundle
             .tr("parent specimen in CSV file with inventory id \"{0}\" does not exist");
@@ -192,26 +195,24 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                     if ((csvInfo.getParentInventoryId() != null)
                         && !csvInfo.getParentInventoryId().isEmpty()) {
                         errorList.addError(reader.getLineNumber(),
-                            CSV_ALIQUOTED_SPC_ERROR);
+                            CSV_PARENT_SPC_ERROR);
                     }
                     parentSpcMap.put(csvInfo.getInventoryId(), csvInfo);
                 } else {
-                    if ((csvInfo.getParentInventoryId() == null)
-                        || csvInfo.getParentInventoryId().isEmpty()) {
-                        errorList.addError(reader.getLineNumber(),
-                            CSV_ALIQUOTED_SPC_ERROR);
-                    }
+                    if ((csvInfo.getParentInventoryId() != null)
+                        && csvInfo.getParentInventoryId().isEmpty()) {
 
-                    // check that parent and child specimens have the same
-                    // patient number
-                    SpecimenCsvInfo parentCsvInfo =
-                        parentSpcMap.get(csvInfo.getParentInventoryId());
+                        // check that parent and child specimens have the same
+                        // patient number
+                        SpecimenCsvInfo parentCsvInfo =
+                            parentSpcMap.get(csvInfo.getParentInventoryId());
 
-                    if ((parentCsvInfo != null)
-                        && !csvInfo.getPatientNumber().equals(
-                            parentCsvInfo.getPatientNumber())) {
-                        errorList.addError(reader.getLineNumber(),
-                            CSV_SPC_PATIENT_ERROR);
+                        if ((parentCsvInfo != null)
+                            && !csvInfo.getPatientNumber().equals(
+                                parentCsvInfo.getPatientNumber())) {
+                            errorList.addError(reader.getLineNumber(),
+                                CSV_SPC_PATIENT_ERROR);
+                        }
                     }
                 }
 
@@ -339,19 +340,25 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         Patient patient = loadPatient(context, csvInfo.getPatientNumber());
         info.setPatient(patient);
 
-        if (info.isSourceSpecimen()) {
-            // find the collection event for this specimen
-            for (CollectionEvent ce : patient.getCollectionEvents()) {
-                if (ce.getVisitNumber().equals(csvInfo.getVisitNumber())) {
-                    log.debug("setting collection event: pt={} numCevents={}",
-                        csvInfo.getPatientNumber(), patient
-                            .getCollectionEvents()
-                            .size());
-                    info.setCevent(ce);
-                    break;
-                }
+        CollectionEvent cevent = null;
+
+        // find the collection event for this specimen
+        for (CollectionEvent ce : patient.getCollectionEvents()) {
+            if (ce.getVisitNumber().equals(csvInfo.getVisitNumber())) {
+                cevent = ce;
+                break;
             }
-        } else {
+        }
+
+        if ((cevent == null) && info.isAliquotedSpecimen()
+            && !info.hasParentInventoryId()) {
+            errorList.addError(csvInfo.getLineNumber(),
+                CSV_CEVENT_ERROR.format(csvInfo.getVisitNumber()));
+        }
+
+        info.setCevent(cevent);
+
+        if (info.isAliquotedSpecimen()) {
             Specimen parentSpecimen = CsvActionUtil.getSpecimen(context,
                 csvInfo.getParentInventoryId());
             if (parentSpecimen != null) {
