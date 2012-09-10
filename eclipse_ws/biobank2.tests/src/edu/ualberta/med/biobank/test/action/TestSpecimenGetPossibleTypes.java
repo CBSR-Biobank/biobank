@@ -9,11 +9,11 @@ import edu.ualberta.med.biobank.model.AbstractBiobankModel;
 
 public class TestSpecimenGetPossibleTypes extends ActionTest {
 
-    @SuppressWarnings("unused")
     @Test
     public void test() {
         SpecimenGetPossibleTypesAction action =
             new SpecimenGetPossibleTypesAction(4);
+        @SuppressWarnings("unused")
         List<AbstractBiobankModel> list = exec(action).getList();
     }
 }

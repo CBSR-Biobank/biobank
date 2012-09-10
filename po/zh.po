@@ -3574,7 +3574,7 @@ msgstr "患者访问必须是活动状态"
 msgid ""
 "Time drawn to use \n"
 "on new specimens"
-msgstr "" 
+msgstr ""
 "时间表使用 \n"
 "无新样本"
 
@@ -8065,7 +8065,7 @@ msgid ""
 msgstr "自定义2包含一个空名字，请禁用名字字段或输入一些文本"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1253
-msgid 
+msgid
 "Custom field 2 contains an empty value. Please disable the value field or "
 "enter some text."
 msgstr "自定义2包含一个空值，请禁用数值字段或输入一些文本"

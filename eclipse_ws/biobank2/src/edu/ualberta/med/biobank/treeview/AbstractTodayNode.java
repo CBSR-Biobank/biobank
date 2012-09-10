@@ -67,7 +67,7 @@ public abstract class AbstractTodayNode<E extends IBiobankModel> extends
         return null;
     }
 
-    @SuppressWarnings({ "nls", "unchecked" })
+    @SuppressWarnings("unchecked")
     @Override
     public void performExpand() {
         try {
@@ -108,7 +108,7 @@ public abstract class AbstractTodayNode<E extends IBiobankModel> extends
         } catch (final RemoteAccessException exp) {
             BgcPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while getting " + getLabel(), e);
+            logger.error("Error while getting " + getLabel(), e); //$NON-NLS-1$
         }
     }
 

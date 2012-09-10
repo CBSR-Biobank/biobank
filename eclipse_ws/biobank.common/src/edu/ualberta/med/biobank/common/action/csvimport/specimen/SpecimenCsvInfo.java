@@ -27,6 +27,7 @@ public class SpecimenCsvInfo implements ICsvInfo {
     private String rootContainerType;
     private String palletLabel;
     private String palletPosition;
+    private String comment;
 
     @Override
     public int getLineNumber() {
@@ -140,6 +141,14 @@ public class SpecimenCsvInfo implements ICsvInfo {
 
     public void setPalletPosition(String palletPosition) {
         this.palletPosition = palletPosition;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

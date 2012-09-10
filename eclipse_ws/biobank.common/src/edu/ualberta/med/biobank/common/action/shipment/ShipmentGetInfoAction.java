@@ -19,10 +19,10 @@ import edu.ualberta.med.biobank.model.OriginInfo;
  * @author aaron
  * 
  */
-@SuppressWarnings("nls")
 public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("nls")
     private static final String ORIGIN_INFO_HQL =
         "SELECT DISTINCT oi FROM " + OriginInfo.class.getName() + " oi"
             + " WHERE oi.id=?";
@@ -48,7 +48,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
         OriginInfo oi = (OriginInfo) query.uniqueResult();
         if (oi == null) {
-            throw new ActionException("No origin info found with id: " + oiId);
+            throw new ActionException("No origin info found with id: " + oiId); //$NON-NLS-1$
         }
 
         sInfo.originInfo = oi;
@@ -70,4 +70,5 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
 
         return sInfo;
     }
+
 }

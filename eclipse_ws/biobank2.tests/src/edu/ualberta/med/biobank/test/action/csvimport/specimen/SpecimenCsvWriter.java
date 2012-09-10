@@ -46,13 +46,15 @@ class SpecimenCsvWriter {
             "palletProductBarcode",
             "rootContainerType",
             "palletLabel",
-            "palletPosition"
+            "palletPosition",
+            "comment"
         };
 
         ICsvMapWriter writer = new CsvMapWriter(new FileWriter(filename),
             CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processing = new CellProcessor[] {
+            new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
             new ConvertNullTo(""),
@@ -88,6 +90,7 @@ class SpecimenCsvWriter {
                 data.put(header[10], info.getRootContainerType());
                 data.put(header[11], info.getPalletLabel());
                 data.put(header[12], info.getPalletPosition());
+                data.put(header[13], info.getComment());
                 writer.write(data, header, processing);
             }
         } finally {
