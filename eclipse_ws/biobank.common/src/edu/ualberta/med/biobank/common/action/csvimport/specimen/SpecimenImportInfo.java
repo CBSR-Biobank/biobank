@@ -147,6 +147,11 @@ public class SpecimenImportInfo implements IImportInfo {
         return !csvInfo.getSourceSpecimen();
     }
 
+    boolean hasParentInventoryId() {
+        return (csvInfo.getParentInventoryId() != null)
+            && !csvInfo.getParentInventoryId().isEmpty();
+    }
+
     public User getUser() {
         return user;
     }
