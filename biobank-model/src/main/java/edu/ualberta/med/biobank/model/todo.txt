@@ -3,6 +3,9 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Seriously consider override the equals and hashcode methods of model objects
+    to be based on the natural id (e.g. collection event uses patient & visit
+    number).
 [ ] Q: should SpecimenProcessingLink be between two SpecimenProcessingNode-s
     so that extra information can be stored on the nodes, not just the link?
     so that processing events can have nodes added to them first with the links
