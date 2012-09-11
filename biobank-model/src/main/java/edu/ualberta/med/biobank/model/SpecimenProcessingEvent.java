@@ -5,9 +5,13 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
+
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Associates a {@link Specimen} with a {@link ProcessingEvent} and is an anchor
@@ -17,7 +21,11 @@ import org.hibernate.envers.Audited;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_PROCESSING_EVENT")
+@Table(name = "SPECIMEN_PROCESSING_EVENT",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "SPECIMEN_ID", "PROCESSING_EVENT_ID" })
+    })
+@Unique(properties = { "specimen", "processingEvent" }, groups = PrePersist.class)
 public class SpecimenProcessingEvent
     extends AbstractModel {
     private static final long serialVersionUID = 1L;

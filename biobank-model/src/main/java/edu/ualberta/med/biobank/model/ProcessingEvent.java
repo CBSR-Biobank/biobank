@@ -13,9 +13,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -25,37 +22,30 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PROCESSING_EVENT")
 @NotUsed.List({
-    @NotUsed(by = Specimen.class, property = "processingEvent", groups = PreDelete.class),
-    @NotUsed(by = Specimen.class, property = "parentSpecimen.processingEvent", groups = PreDelete.class)
+    @NotUsed(by = SpecimenProcessingEvent.class, property = "processingEvent", groups = PreDelete.class)
 })
-@Unique(properties = "worksheet", groups = PrePersist.class)
+@Unique(properties = { "center", "worksheet" }, groups = PrePersist.class)
 public class ProcessingEvent
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Processing Event",
-        "Processing Events");
-
-    @SuppressWarnings("nls")
-    public static class PropertyName {
-        public static final LString CREATED_AT = bundle.trc(
-            "model",
-            "Created At").format();
-        public static final LString WORKSHEET = bundle.trc(
-            "model",
-            "Worksheet").format();
-    }
-
+    private Center center;
     private String worksheet;
     private Date timeDone;
-    private Center center;
+
+    @NotNull(message = "{ProcessingEvent.center.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CENTER_ID", nullable = false)
+    public Center getCenter() {
+        return this.center;
+    }
+
+    public void setCenter(Center center) {
+        this.center = center;
+    }
 
     @NotEmpty(message = "{ProcessingEvent.worksheet.NotEmpty}")
-    @Column(name = "WORKSHEET", length = 150, unique = true)
+    @Column(name = "WORKSHEET", length = 100)
     public String getWorksheet() {
         return this.worksheet;
     }
@@ -72,16 +62,5 @@ public class ProcessingEvent
 
     public void setTimeDone(Date timeDone) {
         this.timeDone = timeDone;
-    }
-
-    @NotNull(message = "{ProcessingEvent.center.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CENTER_ID", nullable = false)
-    public Center getCenter() {
-        return this.center;
-    }
-
-    public void setCenter(Center center) {
-        this.center = center;
     }
 }

@@ -47,6 +47,7 @@ public class SpecimenProcessingLink
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
+    // TODO: check that input and output have the same processingEvent?
     private SpecimenProcessingEvent input;
     private SpecimenProcessingEvent output;
     private SpecimenProcessingLinkType type;
