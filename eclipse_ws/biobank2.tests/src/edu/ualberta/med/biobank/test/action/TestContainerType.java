@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 
-public class TestContainerType extends ActionTest {
+public class TestContainerType extends TestAction {
 
     private String name;
 

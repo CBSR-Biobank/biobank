@@ -15,14 +15,16 @@ import edu.ualberta.med.biobank.common.action.security.GroupGetAllOutput;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.Factory.Domain;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestGroupGetAllAction extends ActionTest {
+public class TestGroupGetAllAction extends TestAction {
     @Test
     public void superAdminAccess() {
         exec(new GroupGetAllAction(new GroupGetAllInput()));
@@ -32,7 +34,7 @@ public class TestGroupGetAllAction extends ActionTest {
     public void adminAccess() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        factory.buildMembership().setUserManager(true).create();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
@@ -55,7 +57,7 @@ public class TestGroupGetAllAction extends ActionTest {
     public void managerAccess() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        factory.buildMembership().setUserManager(true).create();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
 
         execAs(user, new GroupGetAllAction(new GroupGetAllInput()));
@@ -151,7 +153,7 @@ public class TestGroupGetAllAction extends ActionTest {
         Group group1A = factory.createGroup();
         factory.createMembership();
         User man1A = factory.createUser();
-        factory.buildMembership().setUserManager(true).create();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
 
         Membership man1Amembership = man1A.getMemberships().iterator().next();
         man1Amembership.getPermissions().add(PermissionEnum.CLINIC_READ);
@@ -161,7 +163,7 @@ public class TestGroupGetAllAction extends ActionTest {
         Group group2B = factory.createGroup();
         factory.createMembership();
         User man2B = factory.createUser();
-        factory.buildMembership().setUserManager(true).create();
+        factory.createMembership(Domain.CENTER_STUDY, Rank.MANAGER);
         tx.commit();
 
         GroupGetAllOutput actual;
@@ -171,13 +173,13 @@ public class TestGroupGetAllAction extends ActionTest {
         expected.add(group1A);
         actual = execAs(man1A, new GroupGetAllAction(new GroupGetAllInput()));
 
-        Assert.assertTrue("wrong groups",
-            actual.getAllManageableGroups().containsAll(expected));
+        Assert.assertEquals("wrong groups",
+            expected, actual.getAllManageableGroups());
 
         expected.clear();
         actual = execAs(man2B, new GroupGetAllAction(new GroupGetAllInput()));
 
         Assert.assertTrue("wrong groups",
-            actual.getAllManageableGroups().containsAll(expected));
+            !actual.getAllManageableGroups().contains(group1A));
     }
 }

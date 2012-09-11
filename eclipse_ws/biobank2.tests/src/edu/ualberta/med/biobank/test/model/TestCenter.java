@@ -10,11 +10,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 
-public class TestCenter extends DbTest {
+public class TestCenter extends TestDb {
     @Test
     public void emptyName() {
         HasXHelper.checkEmptyName(session, factory.createSite());

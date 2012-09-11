@@ -14,9 +14,9 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestEquals extends ActionTest {
+public class TestEquals extends TestAction {
     @Test
     public void testEquals() {
         Transaction tx = session.beginTransaction();

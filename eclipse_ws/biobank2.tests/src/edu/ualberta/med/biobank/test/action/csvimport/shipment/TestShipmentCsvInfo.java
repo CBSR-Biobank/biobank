@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.csvimport.AssertCsvImportException;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.test.action.csvimport.specimen.TestSpecimenCsvImport;
@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.test.action.csvimport.specimen.TestSpecimenCsvIm
  * @author loyola
  * 
  */
-public class TestShipmentCsvInfo extends ActionTest {
+public class TestShipmentCsvInfo extends TestAction {
 
     private static Logger log = LoggerFactory
         .getLogger(TestSpecimenCsvImport.class.getName());

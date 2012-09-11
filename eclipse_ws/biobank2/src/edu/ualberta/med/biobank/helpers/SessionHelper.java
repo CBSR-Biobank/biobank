@@ -1,7 +1,16 @@
 package edu.ualberta.med.biobank.helpers;
 
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URI;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.text.MessageFormat;
+import java.util.List;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
@@ -11,6 +20,8 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.client.util.TrustStore;
+import edu.ualberta.med.biobank.client.util.TrustStore.Cert;
 import edu.ualberta.med.biobank.common.wrappers.UserWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -70,10 +81,65 @@ public class SessionHelper implements Runnable {
         appService = null;
     }
 
+    private static final String UNTRUSTED_CERT_MESSAGE =
+        "The authenticity of host ''{0}'' can''t be established."
+            + "\nSHA1 fingerprint is {1}"
+            + "\nMD5 fingerprint is {2}"
+            + "\nAre you sure you want to continue?"
+            + "\n(Choosing yes will trust this certificate as "
+            + "long as this program is open)";
+
+    private void checkCertificates(String serverUrl)
+        throws KeyManagementException, NoSuchAlgorithmException,
+        KeyStoreException, UnknownHostException, IOException,
+        CertificateException {
+        TrustStore ts = TrustStore.getInstance();
+        List<Cert> untrustedCerts = ts.getUntrustedCerts(serverUrl);
+
+        if (!untrustedCerts.isEmpty()) {
+            MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+
+            for (Cert untrustedCert : untrustedCerts) {
+                byte[] encoded = untrustedCert.getCertificate().getEncoded();
+                String host = untrustedCert.getUrl().getHost();
+                String sha1Hash = toHexString(sha1.digest(encoded));
+                String md5Hash = toHexString(md5.digest(encoded));
+
+                String message = MessageFormat.format(
+                    UNTRUSTED_CERT_MESSAGE, host, sha1Hash, md5Hash);
+
+                boolean trustCert =
+                    BgcPlugin.openConfirm("Untrusted SSL Certificate", message);
+
+                if (trustCert) {
+                    untrustedCert.trust();
+                } else {
+                    throw new RuntimeException("Untrusted SSL certificate.");
+                }
+            }
+        }
+    }
+
+    private static final char[] HEXDIGITS = "0123456789abcdef".toCharArray();
+
+    private static String toHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 3);
+        for (int b : bytes) {
+            b &= 0xff;
+            sb.append(HEXDIGITS[b >> 4]);
+            sb.append(HEXDIGITS[b & 15]);
+            sb.append(':');
+        }
+        return sb.toString();
+    }
+
     @SuppressWarnings("nls")
     @Override
     public void run() {
         try {
+            checkCertificates(serverUrl);
+
             if (userName.length() == 0) {
                 if (BiobankPlugin.getDefault().isDebugging()) {
                     userName = DEFAULT_TEST_USER;

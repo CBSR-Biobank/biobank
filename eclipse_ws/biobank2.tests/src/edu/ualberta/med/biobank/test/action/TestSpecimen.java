@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestSpecimen extends ActionTest {
+public class TestSpecimen extends TestAction {
 
     private String name;
 

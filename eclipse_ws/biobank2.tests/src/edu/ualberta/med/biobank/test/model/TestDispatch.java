@@ -9,10 +9,10 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.type.DispatchState;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HibernateHelper;
 
-public class TestDispatch extends DbTest {
+public class TestDispatch extends TestDb {
     // TODO: Still need to check validation tests for the following classes:
     // Dispatch.java
     // DispatchSpecimen.java

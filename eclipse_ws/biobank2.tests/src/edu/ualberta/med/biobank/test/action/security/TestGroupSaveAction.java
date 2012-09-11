@@ -18,9 +18,9 @@ import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestGroupSaveAction extends ActionTest {
+public class TestGroupSaveAction extends TestAction {
     @Test
     public void insert() {
         Transaction tx = session.beginTransaction();

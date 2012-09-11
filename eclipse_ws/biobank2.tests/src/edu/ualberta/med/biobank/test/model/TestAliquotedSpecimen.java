@@ -10,10 +10,10 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 
-public class TestAliquotedSpecimen extends DbTest {
+public class TestAliquotedSpecimen extends TestDb {
     @Test
     public void nullActivityStatus() {
         HasXHelper.checkNullActivityStatus(session,

@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestClinic extends ActionTest {
+public class TestClinic extends TestAction {
 
     @Rule
     public TestName testname = new TestName();

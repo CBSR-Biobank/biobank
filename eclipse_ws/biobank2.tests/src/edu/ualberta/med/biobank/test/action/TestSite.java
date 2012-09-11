@@ -1,44 +1,69 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.validation.ConstraintViolationException;
+
 import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
+import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
+import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteDeleteAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetContainerTypeInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
+import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
+import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestSite extends ActionTest {
+public class TestSite extends TestAction {
 
     private String name;
 
@@ -56,24 +81,49 @@ public class TestSite extends ActionTest {
 
     @Test
     public void saveNew() throws Exception {
-        siteSaveAction.setName(name);
-        siteSaveAction.setNameShort(name);
-        siteSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-
-        Address address = new Address();
-        address.setCity(name);
-        siteSaveAction.setAddress(address);
-        Set<Integer> studyIds = new HashSet<Integer>();
-        studyIds.add(null);
-        siteSaveAction.setStudyIds(studyIds);
+        // null name
+        siteSaveAction.setName(null);
         try {
             exec(siteSaveAction);
-            Assert.fail(
-                "should not be allowed to add site with a null study id");
-        } catch (ModelNotFoundException e) {
+            Assert.fail("should not be allowed to add site with no name");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(TestAction.contains(e, NotEmpty.class,
+                Site.class, "getName"));
             Assert.assertTrue(true);
         }
 
+        // null short name
+        siteSaveAction.setName(name);
+        siteSaveAction.setNameShort(null);
+        try {
+            exec(siteSaveAction);
+            Assert.fail(
+                "should not be allowed to add site with no short name");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        siteSaveAction.setNameShort(name);
+        siteSaveAction.setActivityStatus(null);
+        try {
+            exec(siteSaveAction);
+            Assert.fail(
+                "should not be allowed to add Site with no activity status");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        siteSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
+        siteSaveAction.setAddress(null);
+        try {
+            exec(siteSaveAction);
+            Assert.fail(
+                "should not be allowed to add site with no address");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        Set<Integer> studyIds = new HashSet<Integer>();
         studyIds.clear();
         studyIds.add(-1);
         siteSaveAction.setStudyIds(studyIds);
@@ -86,7 +136,10 @@ public class TestSite extends ActionTest {
         }
 
         // success path
+        Address address = new Address();
+        address.setCity(Utils.getRandomString(5, 10));
         siteSaveAction.setStudyIds(new HashSet<Integer>());
+        siteSaveAction.setAddress(address);
         exec(siteSaveAction);
     }
 
@@ -136,6 +189,28 @@ public class TestSite extends ActionTest {
         siteInfo.getSite().setNameShort(name + "_2");
         siteSaveAction = SiteHelper.getSaveAction(siteInfo);
         exec(siteSaveAction);
+
+        // test for duplicate name
+        SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
+            ActivityStatus.ACTIVE);
+        try {
+            exec(saveSite);
+            Assert.fail("should not be allowed to add site with same name");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test for duplicate name short
+        saveSite.setName(Utils.getRandomString(5, 10));
+        saveSite.setNameShort(name + "_2");
+
+        try {
+            exec(saveSite);
+            Assert.fail(
+                "should not be allowed to add site with same name short");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test
@@ -346,6 +421,205 @@ public class TestSite extends ActionTest {
 
         Assert.assertEquals(1L, ctypeInfo.get(0).getContainerCount()
             .longValue());
+    }
+
+    @Test
+    public void deleteWithContainerTypes() {
+        Provisioning provisioning = createSiteWithContainerType();
+        SiteInfo siteInfo =
+            exec(new SiteGetInfoAction(provisioning.siteId));
+        try {
+            exec(new SiteDeleteAction(siteInfo.getSite()));
+            Assert
+                .fail(
+                "should not be allowed to delete a site with container types");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete container type followed by site - should work now
+        ContainerTypeInfo containerTypeInfo =
+            exec(new ContainerTypeGetInfoAction(
+                provisioning.containerTypeIds.get(0)));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo
+            .getContainerType()));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
+    }
+
+    @Test
+    public void deleteWithContainers() {
+        Provisioning provisioning = createSiteWithContainerType();
+        Integer containerTypeId = provisioning.containerTypeIds.get(0);
+        Integer containerId =
+            provisioning.addContainer(getExecutor(), containerTypeId, "01");
+
+        SiteInfo siteInfo =
+            exec(new SiteGetInfoAction(provisioning.siteId));
+        try {
+            exec(new SiteDeleteAction(siteInfo.getSite()));
+            Assert
+                .fail(
+                "should not be allowed to delete a site with containers");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        List<Container> topContainers =
+            exec(new SiteGetTopContainersAction(provisioning.siteId))
+                .getList();
+        Assert.assertEquals(1, topContainers.size());
+
+        // delete container followed by site - should work now
+        ContainerInfo containerInfo =
+            exec(new ContainerGetInfoAction(containerId));
+        exec(new ContainerDeleteAction(containerInfo.container));
+        ContainerTypeInfo containerTypeInfo =
+            exec(new ContainerTypeGetInfoAction(containerTypeId));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo
+            .getContainerType()));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
+    }
+
+    @Test
+    public void deleteWithProcessingEvents() throws Exception {
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+
+        // create a collection event
+        Integer ceventId = CollectionEventHelper
+            .createCEventWithSourceSpecimens(getExecutor(),
+                provisioning.patientIds.get(0), provisioning.clinicId);
+        CEventInfo ceventInfo =
+            exec(new CollectionEventGetInfoAction(ceventId));
+        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
+
+        // create a processing event with one of the collection event source
+        // specimens
+        Integer peventId =
+            exec(
+                new ProcessingEventSaveAction(
+                    null, provisioning.siteId, Utils.getRandomDate(), Utils
+                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
+                    new HashSet<Integer>(
+                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+                    new HashSet<Integer>()))
+                .getId();
+
+        SiteInfo siteInfo =
+            exec(new SiteGetInfoAction(provisioning.siteId));
+        try {
+            exec(new SiteDeleteAction(siteInfo.getSite()));
+            Assert
+                .fail(
+                "should not be allowed to delete a site with processing events");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete the processing event
+        PEventInfo peventInfo =
+            exec(new ProcessingEventGetInfoAction(peventId));
+        exec(new ProcessingEventDeleteAction(peventInfo.pevent));
+        exec(new SiteDeleteAction(siteInfo.getSite()));
+    }
+
+    @Test
+    public void deleteWithSrcDispatch() throws Exception {
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+
+        Integer dispatchId1 =
+            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
+                provisioning.siteId,
+                provisioning.patientIds.get(0));
+
+        // create a second site to dispatch to
+        Integer siteId2 = exec(
+            SiteHelper.getSaveAction(name + "_site2", name + "_site2",
+                ActivityStatus.ACTIVE)).getId();
+
+        Integer dispatchId2 =
+            DispatchHelper.createDispatch(getExecutor(), provisioning.siteId,
+                siteId2, provisioning.patientIds.get(0));
+
+        SiteInfo siteInfo =
+            exec(new SiteGetInfoAction(provisioning.siteId));
+        try {
+            exec(new SiteDeleteAction(siteInfo.getSite()));
+            Assert
+                .fail(
+                "should not be allowed to delete a site which is a source of dispatches");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete the dispatch and then the site
+        Set<Specimen> specimens = new HashSet<Specimen>();
+        SetResult<DispatchSpecimen> dispatchSpecimens =
+            getExecutor()
+                .exec(new DispatchGetSpecimenInfosAction(dispatchId1));
+        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
+            specimens.add(dspec.getSpecimen());
+        }
+
+        dispatchSpecimens =
+            getExecutor()
+                .exec(new DispatchGetSpecimenInfosAction(dispatchId2));
+        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
+            specimens.add(dspec.getSpecimen());
+        }
+
+        DispatchReadInfo dispatchInfo =
+            exec(new DispatchGetInfoAction(dispatchId2));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+        dispatchInfo =
+            exec(new DispatchGetInfoAction(dispatchId1));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+
+        for (Specimen specimen : specimens) {
+            exec(new SpecimenDeleteAction(specimen));
+        }
+
+        deleteOriginInfos(provisioning.siteId);
+        exec(new SiteDeleteAction(siteInfo.getSite()));
+    }
+
+    @Test
+    public void deleteWithDstDispatch() throws Exception {
+        Provisioning provisioning = new Provisioning(getExecutor(), name);
+
+        Integer dispatchId =
+            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
+                provisioning.siteId,
+                provisioning.patientIds.get(0));
+
+        SiteInfo siteInfo =
+            exec(new SiteGetInfoAction(provisioning.siteId));
+        try {
+            exec(new SiteDeleteAction(siteInfo.getSite()));
+            Assert
+                .fail(
+                "should not be allowed to delete a site which is a destination for dispatches");
+        } catch (ConstraintViolationException e) {
+            Assert.assertTrue(true);
+        }
+
+        // delete the dispatch and then the site - no need to delete dispatch
+        // specimens
+        DispatchReadInfo dispatchInfo =
+            exec(new DispatchGetInfoAction(dispatchId));
+        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+
+        // TODO: delete specimens
+        Transaction tx = session.beginTransaction();
+        Query q = session.createQuery("from " + Specimen.class.getName()
+            + " where currentCenter.id = ?")
+            .setParameter(0, provisioning.siteId);
+        for (Specimen s : (List<Specimen>) q.list()) {
+            session.delete(s);
+        }
+
+        tx.commit();
+
+        exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
     @Test

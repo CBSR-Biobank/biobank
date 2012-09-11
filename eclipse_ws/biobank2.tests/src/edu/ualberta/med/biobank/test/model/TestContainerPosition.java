@@ -9,10 +9,10 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
-public class TestContainerPosition extends DbTest {
+public class TestContainerPosition extends TestDb {
     @Test
     public void nullParentContainer() {
         factory.createTopContainer();

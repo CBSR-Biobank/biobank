@@ -12,10 +12,10 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 
-public class TestSite extends DbTest {
+public class TestSite extends TestDb {
     @Test
     public void deleteWithContainers() {
         Transaction tx = session.beginTransaction();

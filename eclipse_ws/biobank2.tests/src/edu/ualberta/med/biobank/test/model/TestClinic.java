@@ -10,10 +10,10 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 
-public class TestClinic extends DbTest {
+public class TestClinic extends TestDb {
     @Ignore
     @Test
     public void deleteWithContactWithoutStudies() {

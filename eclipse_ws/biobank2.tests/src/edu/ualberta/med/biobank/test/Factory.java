@@ -27,8 +27,10 @@ import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Principal;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Rank;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -1018,8 +1020,47 @@ public class Factory {
         return group;
     }
 
+    public enum Domain {
+        GLOBAL,
+        CENTER,
+        STUDY,
+        CENTER_STUDY;
+    }
+
     public Membership createMembership() {
         return buildMembership().create();
+    }
+    
+    public Membership createMembership(Domain domain, Rank rank) {
+Membership membership = new Membership();
+        
+        membership.getDomain().setAllCenters(true);
+        membership.getDomain().setAllStudies(true);
+
+        if (domain == Domain.CENTER || domain == Domain.CENTER_STUDY) {
+            membership.getDomain().getCenters().add(getDefaultCenter());
+            membership.getDomain().setAllCenters(false);
+        }
+        if (domain == Domain.STUDY || domain == Domain.CENTER_STUDY) {
+            membership.getDomain().getStudies().add(getDefaultStudy());
+            membership.getDomain().setAllStudies(false);
+        }
+
+        Principal p = getDefaultPrincipal();
+        p.getMemberships().add(membership);
+        membership.setPrincipal(p);
+
+        membership.setUserManager(rank.isGe(Rank.MANAGER) ? true : false);
+
+        if (Rank.MANAGER.equals(rank)) {
+            // needs at least one permission or role to manage
+            membership.getPermissions().add(PermissionEnum.CLINIC_READ);
+        }
+
+        setDefaultMembership(membership);
+        session.save(membership);
+        session.flush();
+        return membership;
     }
 
     public static class MembershipBuilder {

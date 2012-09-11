@@ -13,11 +13,11 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.model.InBounds;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.InBoundsValidator;
 
-public class TestAbstractPosition extends DbTest {
+public class TestAbstractPosition extends TestDb {
     @Test
     public void nullRow() {
         Specimen specimen = factory.createPositionedSpecimen();

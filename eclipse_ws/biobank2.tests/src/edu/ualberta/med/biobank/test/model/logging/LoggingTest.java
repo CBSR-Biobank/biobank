@@ -5,9 +5,9 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.junit.After;
 import org.junit.Before;
 
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 
-public class LoggingTest extends DbTest {
+public class LoggingTest extends TestDb {
     protected AuditReader auditReader;
 
     @Override

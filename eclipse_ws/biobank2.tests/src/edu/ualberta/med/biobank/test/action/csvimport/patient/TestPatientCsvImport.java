@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvImport
 import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 
 /**
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
  * 
  */
 @SuppressWarnings("nls")
-public class TestPatientCsvImport extends ActionTest {
+public class TestPatientCsvImport extends TestAction {
 
     private static Logger log = LoggerFactory
         .getLogger(TestPatientCsvImport.class.getName());

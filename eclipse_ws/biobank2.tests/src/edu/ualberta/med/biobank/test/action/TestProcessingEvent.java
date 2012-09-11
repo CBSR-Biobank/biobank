@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
-public class TestProcessingEvent extends ActionTest {
+public class TestProcessingEvent extends TestAction {
 
     @Rule
     public TestName testname = new TestName();
@@ -163,7 +163,7 @@ public class TestProcessingEvent extends ActionTest {
                 .getName(), specimenInfo.specimen.getSpecimenType().getName());
 
             Assert.assertEquals(
-                sourceSpecs.get(0).specimen.getActivityStatus(),
+                ActivityStatus.CLOSED,
                 specimenInfo.specimen.getActivityStatus());
 
             Assert.assertEquals(clinicInfo.clinic.getName(),

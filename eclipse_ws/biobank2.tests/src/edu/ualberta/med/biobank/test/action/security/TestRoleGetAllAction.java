@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.common.action.security.RoleGetAllOutput;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestRoleGetAllAction extends ActionTest {
+public class TestRoleGetAllAction extends TestAction {
     @Test
     public void superAdminAccess() {
         exec(new RoleGetAllAction(new RoleGetAllInput()));

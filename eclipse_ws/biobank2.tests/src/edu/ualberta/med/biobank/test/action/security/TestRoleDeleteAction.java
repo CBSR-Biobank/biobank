@@ -14,9 +14,9 @@ import edu.ualberta.med.biobank.common.action.security.RoleDeleteAction;
 import edu.ualberta.med.biobank.common.action.security.RoleDeleteInput;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestRoleDeleteAction extends ActionTest {
+public class TestRoleDeleteAction extends TestAction {
     @Test
     public void superAdminAccess() {
         Transaction tx = session.beginTransaction();

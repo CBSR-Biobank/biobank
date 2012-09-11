@@ -9,11 +9,11 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
-public class TestPatient extends DbTest {
+public class TestPatient extends TestDb {
     @Test
     public void duplicatePnumber() {
         Patient p1 = factory.createPatient();

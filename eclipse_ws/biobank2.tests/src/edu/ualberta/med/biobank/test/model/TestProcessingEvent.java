@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
-public class TestProcessingEvent extends DbTest {
+public class TestProcessingEvent extends TestDb {
     @Test
     public void expectedActivityStatusIds() {
         HasXHelper.checkExpectedActivityStatusIds(session,

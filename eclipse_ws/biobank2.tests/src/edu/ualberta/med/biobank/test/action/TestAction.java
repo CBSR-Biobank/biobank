@@ -24,13 +24,13 @@ import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 
-public class ActionTest extends DbTest {
+public class TestAction extends TestDb {
     private static final LocalActionExecutor EXECUTOR;
 
     static {
-        EXECUTOR = new LocalActionExecutor(DbTest.getSessionProvider());
+        EXECUTOR = new LocalActionExecutor(TestDb.getSessionProvider());
         EXECUTOR.setUserId(getGlobalAdmin().getId());
     }
 

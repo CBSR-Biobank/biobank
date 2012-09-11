@@ -10,10 +10,10 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 
-public class TestComment extends DbTest {
+public class TestComment extends TestDb {
     @Test
     public void nullMessage() {
         Comment comment = factory.createComment();

@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.common.action.security.RoleSaveInput;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestRoleSaveAction extends ActionTest {
+public class TestRoleSaveAction extends TestAction {
     @Test
     public void superAdminAccess() {
         Transaction tx = session.beginTransaction();

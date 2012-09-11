@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
 import edu.ualberta.med.biobank.test.AssertMore;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.constraint.model.impl.ValidContainerTypeValidator;
 
-public class TestContainerType extends DbTest {
+public class TestContainerType extends TestDb {
     @Test
     public void emptyName() {
         HasXHelper.checkEmptyName(session, factory.createContainerType());

@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
-public class TestDispatch extends ActionTest {
+public class TestDispatch extends TestAction {
 
     @Rule
     public TestName testname = new TestName();

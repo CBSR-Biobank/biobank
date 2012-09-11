@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Role;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.action.ActionTest;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
-public class TestUserSaveAction extends ActionTest {
+public class TestUserSaveAction extends TestAction {
     @Test
     public void insert() {
         Transaction tx = session.beginTransaction();
@@ -58,7 +58,7 @@ public class TestUserSaveAction extends ActionTest {
             new MembershipContextGetInput())).getContext();
 
         UserSaveOutput result =
-            exec(new UserSaveAction(new UserSaveInput(user, context, "asdfa")));
+            exec(new UserSaveAction(new UserSaveInput(user, context, "badpassword")));
 
         Object o = session.createCriteria(User.class)
             .add(Restrictions.idEq(result.getUserId()))
@@ -93,7 +93,7 @@ public class TestUserSaveAction extends ActionTest {
         Assert.assertEquals("membership roles",
             membership.getRoles(), savedMembership.getRoles());
 
-        Assert.assertTrue("membership domain not inserted properly",
+        Assert.assertEquals("membership domain not inserted properly",
             domain.isEquivalent(savedMembership.getDomain()));
 
         Set<Group> savedGroups = user.getGroups();

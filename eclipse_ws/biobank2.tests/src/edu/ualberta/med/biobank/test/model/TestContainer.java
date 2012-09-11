@@ -10,12 +10,12 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.AssertConstraintViolation;
-import edu.ualberta.med.biobank.test.DbTest;
+import edu.ualberta.med.biobank.test.TestDb;
 import edu.ualberta.med.biobank.test.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
-public class TestContainer extends DbTest {
+public class TestContainer extends TestDb {
     @Test
     public void nullLabel() {
         Container c = factory.createContainer();

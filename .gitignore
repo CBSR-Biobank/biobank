@@ -1,7 +1,10 @@
+security-logs/jboss/biobank.keystore
 po/output
+/scripts/ssl
 *sublime*
 .settings
 .options
+.settings
 *.jasper
 backup/
 docs/doxygen
