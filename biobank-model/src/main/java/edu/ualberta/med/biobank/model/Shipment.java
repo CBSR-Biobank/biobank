@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
@@ -59,7 +60,7 @@ public class Shipment
 
     @NotNull(message = "{Shipment.fromLocation.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "FROM_CENTER_LOCATION_ID", nullable = false)
+    @JoinColumn(name = "FROM_CENTER_LOCATION_ID", nullable = false)
     public CenterLocation getFromLocation() {
         return fromLocation;
     }
@@ -70,7 +71,7 @@ public class Shipment
 
     @NotNull(message = "{Shipment.toLocation.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "TO_CENTER_LOCATION_ID", nullable = false)
+    @JoinColumn(name = "TO_CENTER_LOCATION_ID", nullable = false)
     public CenterLocation getToLocation() {
         return toLocation;
     }

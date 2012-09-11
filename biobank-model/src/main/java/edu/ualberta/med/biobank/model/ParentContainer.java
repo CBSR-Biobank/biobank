@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "PARENT_CONTAINER",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {
-            "CONTAINER_ID",
+            "PARENT_CONTAINER_ID",
             "CONTAINER_SCHEMA_POSITION_ID" })
     })
 @Unique(properties = { "container", "position" }, groups = PrePersist.class)

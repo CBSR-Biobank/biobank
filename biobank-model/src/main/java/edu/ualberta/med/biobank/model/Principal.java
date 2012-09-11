@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
@@ -20,10 +21,12 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
 @Entity
+@DiscriminatorValue("P")
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.CHAR)
-public class Principal extends AbstractModel {
+public abstract class Principal
+    extends AbstractModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

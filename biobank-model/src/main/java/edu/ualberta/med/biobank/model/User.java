@@ -25,7 +25,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Unique(properties = "email", groups = PrePersist.class),
     @Unique(properties = "login", groups = PrePersist.class)
 })
-public class User extends Principal {
+public class User
+    extends Principal {
     private static final long serialVersionUID = 1L;
 
     // TODO: when a user registers, check existing UserContacts and update them

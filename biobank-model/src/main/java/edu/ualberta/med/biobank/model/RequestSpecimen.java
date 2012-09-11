@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
@@ -57,8 +58,9 @@ public class RequestSpecimen extends AbstractModel {
         this.state = state;
     }
 
+    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "CLAIMED_BY_USER_ID")
+    @JoinColumn(name = "CLAIMED_BY_USER_ID")
     public User getClaimedBy() {
         return this.claimedBy;
     }
