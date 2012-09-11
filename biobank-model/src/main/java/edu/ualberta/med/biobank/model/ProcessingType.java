@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "PROCESSING_TYPE",
     uniqueConstraints = { @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" }) })
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
-@NotUsed(by = SpecimenProcessingType.class, property = "type", groups = PreDelete.class)
+@NotUsed(by = SpecimenProcessingLinkType.class, property = "type", groups = PreDelete.class)
 public class ProcessingType
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;

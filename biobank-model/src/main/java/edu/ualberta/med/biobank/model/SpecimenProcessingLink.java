@@ -47,25 +47,24 @@ public class SpecimenProcessingLink
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private Specimen input;
-    private Specimen output;
+    private SpecimenProcessingEvent input;
+    private SpecimenProcessingEvent output;
     private SpecimenProcessingLinkType type;
     private Date timeDone;
     private Decimal actualInputAmountChange;
     private Decimal actualOutputAmountChange;
-    private ProcessingEvent processingEvent;
 
     /**
      * @return the {@link Specimen} that was processed.
      */
     @NotNull(message = "{SpecimenProcessingLink.input.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "INPUT_SPECIMEN_ID", nullable = false)
-    public Specimen getInput() {
+    @JoinColumn(name = "INPUT_SPECIMEN_PROCESSING_EVENT_ID", nullable = false)
+    public SpecimenProcessingEvent getInput() {
         return input;
     }
 
-    public void setInput(Specimen input) {
+    public void setInput(SpecimenProcessingEvent input) {
         this.input = input;
     }
 
@@ -74,12 +73,12 @@ public class SpecimenProcessingLink
      */
     @NotNull(message = "{SpecimenProcessingLink.output.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OUTPUT_SPECIMEN_ID", nullable = false)
-    public Specimen getOutput() {
+    @JoinColumn(name = "OUTPUT_SPECIMEN_PROCESSING_EVENT_ID", nullable = false)
+    public SpecimenProcessingEvent getOutput() {
         return output;
     }
 
-    public void setOutput(Specimen output) {
+    public void setOutput(SpecimenProcessingEvent output) {
         this.output = output;
     }
 
@@ -142,19 +141,5 @@ public class SpecimenProcessingLink
 
     public void setActualOutputAmountChange(Decimal actualOutputAmountChange) {
         this.actualOutputAmountChange = actualOutputAmountChange;
-    }
-
-    /**
-     * @return the {@link ProcessingEvent} that this process was carried out in,
-     *         or null if none or if unknown.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PROCESSING_EVENT_ID")
-    public ProcessingEvent getProcessingEvent() {
-        return processingEvent;
-    }
-
-    public void setProcessingEvent(ProcessingEvent processingEvent) {
-        this.processingEvent = processingEvent;
     }
 }

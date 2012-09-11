@@ -6,15 +6,18 @@
 [ ] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).
-[ ] Q: should SpecimenProcessingLink be between two SpecimenProcessingNode-s
+[ ] Make the combination of PE (worksheet, center) or (worksheet, study) unique?
+    A: ?
+[v] Q: should SpecimenProcessingLink be between two SpecimenProcessingNode-s
     so that extra information can be stored on the nodes, not just the link?
     so that processing events can have nodes added to them first with the links
     added later?
-    A: ?
-[ ] Q: consider having only SpecimenProcessingLink and not SpecimenProcessing
+    A: Yes. Done as 'SpecimenProcessingEvent' and added a 
+    'SpecimenProcessingEventAnnotation' object as well.
+[v] Q: consider having only SpecimenProcessingLink and not SpecimenProcessing
 	Because why bother with two types of definitions when both can be represented
 	by one class?
-	A: ??
+	A: Yes. Done.
 [ ] Reports should be global or center-, study-, or center-study-specific.
 [ ] Prefix all report objects with "Report" so it's more clear what objects
  	are involved?
