@@ -1,5 +1,5 @@
 package edu.ualberta.med.biobank.action.center;
 
-public class CenterReadStudies {
+public class CenterPageComments {
 
 }
