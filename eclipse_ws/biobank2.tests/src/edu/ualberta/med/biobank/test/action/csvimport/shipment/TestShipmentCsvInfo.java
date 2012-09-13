@@ -171,8 +171,6 @@ public class TestShipmentCsvInfo extends TestAction {
     }
 
     private void checkCsvInfoAgainstDb(Set<ShipmentCsvInfo> csvInfos) {
-        // TODO Auto-generated method stub
-
         for (ShipmentCsvInfo csvInfo : csvInfos) {
             Criteria c = session.createCriteria(OriginInfo.class, "oi")
                 .createAlias("oi.shipmentInfo", "si", Criteria.LEFT_JOIN)
@@ -195,6 +193,5 @@ public class TestShipmentCsvInfo extends TestAction {
                 .getComments().iterator().next().getMessage());
 
         }
-
     }
 }

@@ -15,7 +15,7 @@ public class SpecimenCsvInfo implements ICsvInfo {
 
     private int lineNumber;
     private String inventoryId;
-    private String parentInventoryID;
+    private String parentInventoryId;
     private String specimenType;
     private Date createdAt;
     private String patientNumber;
@@ -48,11 +48,11 @@ public class SpecimenCsvInfo implements ICsvInfo {
     }
 
     public String getParentInventoryId() {
-        return parentInventoryID;
+        return parentInventoryId;
     }
 
     public void setParentInventoryId(String parentInventoryID) {
-        this.parentInventoryID = parentInventoryID;
+        this.parentInventoryId = parentInventoryID;
     }
 
     public String getSpecimenType() {
@@ -149,6 +149,26 @@ public class SpecimenCsvInfo implements ICsvInfo {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public boolean hasParentInventoryId() {
+        return (parentInventoryId != null) && !parentInventoryId.isEmpty();
+    }
+
+    public boolean hasProductBarcodeAndPosition() {
+        return (palletProductBarcode != null) && !parentInventoryId.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
+    }
+
+    public boolean hasLabelAndPosition() {
+        return (rootContainerType != null) && !rootContainerType.isEmpty()
+            && (palletLabel != null) && !palletLabel.isEmpty()
+            && (palletPosition != null) && !palletPosition.isEmpty();
+    }
+
+    public boolean hasProductBarcodeAndLabel() {
+        return (palletProductBarcode != null) && !parentInventoryId.isEmpty()
+            && (palletLabel != null) && !palletLabel.isEmpty();
     }
 
 }

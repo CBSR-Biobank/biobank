@@ -98,8 +98,7 @@ End:
     </manifest>
     <fixcrlf srcdir="${eclipse.proj.dir}/META-INF"
              eol="lf"
-             eof="asis"
-             encoding="ISO-8859-1">
+             eof="asis">
       <include name="**/*.MF" />
     </fixcrlf>
     <propertyfile file="eclipse_ws/biobank2/about.mappings">
@@ -292,8 +291,7 @@ End:
     </manifest>
     <fixcrlf srcdir="${eclipse.proj.dir.common}/META-INF"
              eol="lf"
-             eof="asis"
-             encoding="ISO-8859-1">
+             eof="asis">
       <include name="**/*.MF" />
     </fixcrlf>
     <propertyfile file="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/server/applicationservice/version.properties">

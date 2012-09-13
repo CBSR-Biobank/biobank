@@ -81,13 +81,20 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             + "inventory ID is not present").format();
 
     public static final LString CSV_PALLET_POS_ERROR =
-        bundle.tr("pallet label defined but not position").format();
+        bundle.tr("pallet position defined but not product barcode or label")
+            .format();
 
-    public static final LString CSV_PALLET_LABEL_ERROR =
-        bundle.tr("pallet position defined but not label").format();
+    public static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
+        bundle.tr("pallet product barcode defined but not position").format();
+
+    public static final LString CSV_PALLET_LABEL_NO_POS_ERROR =
+        bundle.tr("pallet label defined but not position").format();
 
     public static final LString CSV_UNCOMPRESS_ERROR =
         bundle.tr("CVS file could not be uncompressed").format();
+
+    public static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
+        bundle.tr("pallet label defined but not position").format();
 
     public static final Tr CSV_PATIENT_ERROR =
         bundle.tr("patient in CSV file with number \"{0}\" not exist");
@@ -192,16 +199,13 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                 reader.read(SpecimenCsvInfo.class, header, PROCESSORS)) != null) {
 
                 if (csvInfo.getSourceSpecimen()) {
-                    if ((csvInfo.getParentInventoryId() != null)
-                        && !csvInfo.getParentInventoryId().isEmpty()) {
+                    if (csvInfo.hasParentInventoryId()) {
                         errorList.addError(reader.getLineNumber(),
                             CSV_PARENT_SPC_ERROR);
                     }
                     parentSpcMap.put(csvInfo.getInventoryId(), csvInfo);
                 } else {
-                    if ((csvInfo.getParentInventoryId() != null)
-                        && csvInfo.getParentInventoryId().isEmpty()) {
-
+                    if (csvInfo.hasParentInventoryId()) {
                         // check that parent and child specimens have the same
                         // patient number
                         SpecimenCsvInfo parentCsvInfo =
@@ -216,16 +220,32 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                     }
                 }
 
+                // check if only position defined and no label and no product
+                // barcode
+                if ((csvInfo.getPalletProductBarcode() == null)
+                    && (csvInfo.getPalletLabel() == null)
+                    && (csvInfo.getPalletPosition() != null)) {
+                    errorList.addError(reader.getLineNumber(),
+                        CSV_PALLET_POS_ERROR);
+                }
+
+                //
+                if ((csvInfo.getPalletProductBarcode() != null)
+                    && (csvInfo.getPalletPosition() == null)) {
+                    errorList.addError(reader.getLineNumber(),
+                        CSV_PROD_BARCODE_NO_POS_ERROR);
+                }
+
                 if ((csvInfo.getPalletLabel() != null)
                     && (csvInfo.getPalletPosition() == null)) {
                     errorList.addError(reader.getLineNumber(),
                         CSV_PALLET_POS_ERROR);
                 }
 
-                if ((csvInfo.getPalletLabel() == null)
-                    && (csvInfo.getPalletPosition() != null)) {
+                if ((csvInfo.getPalletLabel() != null)
+                    && (csvInfo.getRootContainerType() == null)) {
                     errorList.addError(reader.getLineNumber(),
-                        CSV_PALLET_LABEL_ERROR);
+                        CSV_PALLET_LABEL_NO_CTYPE_ERROR);
                 }
 
                 csvInfo.setLineNumber(reader.getLineNumber());
