@@ -3,6 +3,12 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Change annotations so that they use InheritanceType.JOINED, only for the
+    annotation id (so unique across all sub-types), but put the type, data, and
+    options in a separate (joined) table.
+    A: DO IT! Most efficient, Maybe have the ID come from another table in a
+    Has-a relationship so we don't HAVE to join but can use a shared globally
+    unique PK. And it shall be called... AnnotationAnchor?
 [ ] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).
