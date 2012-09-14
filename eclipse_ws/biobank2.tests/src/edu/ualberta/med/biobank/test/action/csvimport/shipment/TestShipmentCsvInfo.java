@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.csvimport.shipment.ShipmentCsvImportAction;
-import edu.ualberta.med.biobank.common.action.csvimport.shipment.ShipmentCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.shipment.ShipmentBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.shipment.ShipmentBatchOpInputRow;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.Center;
@@ -67,14 +67,14 @@ public class TestShipmentCsvInfo extends TestAction {
 
         Assert.assertTrue(shippingMethods.size() > 0);
 
-        Set<ShipmentCsvInfo> csvInfos =
+        Set<ShipmentBatchOpInputRow> csvInfos =
             shipmentCsvHelper.createShipments(factory.getDefaultClinic(),
                 factory.getDefaultSite(), shippingMethods, 10);
         ShipmentCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            ShipmentCsvImportAction importAction =
-                new ShipmentCsvImportAction(CSV_NAME);
+            ShipmentBatchOpAction importAction =
+                new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -97,18 +97,18 @@ public class TestShipmentCsvInfo extends TestAction {
         Clinic badClinic = new Clinic();
         badClinic.setNameShort(factory.getNameGenerator().next(Center.class));
 
-        Set<ShipmentCsvInfo> csvInfos = shipmentCsvHelper.createShipments(
+        Set<ShipmentBatchOpInputRow> csvInfos = shipmentCsvHelper.createShipments(
             badClinic, factory.getDefaultSite(), shippingMethods, 1);
         ShipmentCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            ShipmentCsvImportAction importAction =
-                new ShipmentCsvImportAction(CSV_NAME);
+            ShipmentBatchOpAction importAction =
+                new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
         } catch (CsvImportException e) {
             new AssertCsvImportException()
-                .withMessage(ShipmentCsvImportAction.CSV_SENDING_CENTER_ERROR
+                .withMessage(ShipmentBatchOpAction.CSV_SENDING_CENTER_ERROR
                     .format(badClinic.getNameShort()));
         }
     }
@@ -126,18 +126,18 @@ public class TestShipmentCsvInfo extends TestAction {
         Site badSite = new Site();
         badSite.setNameShort(factory.getNameGenerator().next(Center.class));
 
-        Set<ShipmentCsvInfo> csvInfos = shipmentCsvHelper.createShipments(
+        Set<ShipmentBatchOpInputRow> csvInfos = shipmentCsvHelper.createShipments(
             factory.getDefaultClinic(), badSite, shippingMethods, 1);
         ShipmentCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            ShipmentCsvImportAction importAction =
-                new ShipmentCsvImportAction(CSV_NAME);
+            ShipmentBatchOpAction importAction =
+                new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
         } catch (CsvImportException e) {
             new AssertCsvImportException()
-                .withMessage(ShipmentCsvImportAction.CSV_RECEIVING_CENTER_ERROR
+                .withMessage(ShipmentBatchOpAction.CSV_RECEIVING_CENTER_ERROR
                     .format(badSite.getNameShort()));
         }
     }
@@ -153,25 +153,25 @@ public class TestShipmentCsvInfo extends TestAction {
         Set<ShippingMethod> shippingMethods = new HashSet<ShippingMethod>();
         shippingMethods.add(badShippingMethod);
 
-        Set<ShipmentCsvInfo> csvInfos =
+        Set<ShipmentBatchOpInputRow> csvInfos =
             shipmentCsvHelper.createShipments(factory.getDefaultClinic(),
                 factory.getDefaultSite(), shippingMethods, 1);
         ShipmentCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            ShipmentCsvImportAction importAction =
-                new ShipmentCsvImportAction(CSV_NAME);
+            ShipmentBatchOpAction importAction =
+                new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
         } catch (CsvImportException e) {
             new AssertCsvImportException()
-                .withMessage(ShipmentCsvImportAction.CSV_SHIPPING_METHOD_ERROR
+                .withMessage(ShipmentBatchOpAction.CSV_SHIPPING_METHOD_ERROR
                     .format(badShippingMethod.getName())).assertIn(e);
         }
     }
 
-    private void checkCsvInfoAgainstDb(Set<ShipmentCsvInfo> csvInfos) {
-        for (ShipmentCsvInfo csvInfo : csvInfos) {
+    private void checkCsvInfoAgainstDb(Set<ShipmentBatchOpInputRow> csvInfos) {
+        for (ShipmentBatchOpInputRow csvInfo : csvInfos) {
             Criteria c = session.createCriteria(OriginInfo.class, "oi")
                 .createAlias("oi.shipmentInfo", "si", Criteria.LEFT_JOIN)
                 .add(Restrictions.eq("si.waybill", csvInfo.getWaybill()));

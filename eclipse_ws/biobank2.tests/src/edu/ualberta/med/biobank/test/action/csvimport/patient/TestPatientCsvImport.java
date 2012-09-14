@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvImportAction;
-import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputRow;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.action.TestAction;
@@ -48,13 +48,13 @@ public class TestPatientCsvImport extends TestAction {
         factory.createStudy();
         tx.commit();
 
-        Set<PatientCsvInfo> csvInfos = patientCsvHelper.createPatients(
+        Set<PatientBatchOpInputRow> csvInfos = patientCsvHelper.createPatients(
             factory.getDefaultStudy().getNameShort(), 100);
         PatientCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
-            PatientCsvImportAction importAction =
-                new PatientCsvImportAction(CSV_NAME);
+            PatientBatchOpAction importAction =
+                new PatientBatchOpAction(CSV_NAME);
             exec(importAction);
         } catch (CsvImportException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -66,14 +66,14 @@ public class TestPatientCsvImport extends TestAction {
 
     @Test
     public void badStudyName() throws IOException {
-        Set<PatientCsvInfo> patientInfos = patientCsvHelper.createPatients(
+        Set<PatientBatchOpInputRow> patientInfos = patientCsvHelper.createPatients(
             "badStudyName", 100);
         PatientCsvWriter.write(CSV_NAME, patientInfos);
 
         // try with a study that does not exist
         try {
-            PatientCsvImportAction importAction =
-                new PatientCsvImportAction(CSV_NAME);
+            PatientBatchOpAction importAction =
+                new PatientBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert
                 .fail("should not be allowed to import with a study name that does not exist");
@@ -82,8 +82,8 @@ public class TestPatientCsvImport extends TestAction {
         }
     }
 
-    private void checkCsvInfoAgainstDb(Set<PatientCsvInfo> csvInfos) {
-        for (PatientCsvInfo csvInfo : csvInfos) {
+    private void checkCsvInfoAgainstDb(Set<PatientBatchOpInputRow> csvInfos) {
+        for (PatientBatchOpInputRow csvInfo : csvInfos) {
             Criteria c = session.createCriteria(Patient.class, "p")
                 .add(Restrictions.eq("pnumber",
                     csvInfo.getPatientNumber()));

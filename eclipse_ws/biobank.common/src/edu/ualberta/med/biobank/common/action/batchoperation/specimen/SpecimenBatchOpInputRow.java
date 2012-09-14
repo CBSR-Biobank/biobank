@@ -1,21 +1,28 @@
-package edu.ualberta.med.biobank.common.action.csvimport.specimen;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputRow;
 
 /**
- * POJO used by SuperCSV for CSV import feature.
+ * POJO used by the Specimen Batch Operation feature to import specimen
+ * information. The information can come from the following sources:
+ * 
+ * <ol>
+ * <li>A legacy import of specimen data</li>
+ * <li>A TECAN output file. This can be a TECAN output file from OHS or CBSR.</li>
+ * </ol>
  * 
  * @author loyola
  * 
  */
-public class SpecimenCsvInfo implements ICsvInfo {
+public class SpecimenBatchOpInputRow implements IBatchOpInputRow {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
     private String inventoryId;
     private String parentInventoryId;
+    private Integer volume;
     private String specimenType;
     private Date createdAt;
     private String patientNumber;
@@ -28,6 +35,8 @@ public class SpecimenCsvInfo implements ICsvInfo {
     private String palletLabel;
     private String palletPosition;
     private String comment;
+    private String plateErrors;
+    private String samplEerrors;
 
     @Override
     public int getLineNumber() {
@@ -53,6 +62,14 @@ public class SpecimenCsvInfo implements ICsvInfo {
 
     public void setParentInventoryId(String parentInventoryID) {
         this.parentInventoryId = parentInventoryID;
+    }
+
+    public Integer getVolume() {
+        return volume;
+    }
+
+    public void setVolume(Integer volume) {
+        this.volume = volume;
     }
 
     public String getSpecimenType() {
@@ -149,6 +166,22 @@ public class SpecimenCsvInfo implements ICsvInfo {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getPlateErrors() {
+        return plateErrors;
+    }
+
+    public void setPlateErrors(String plateErrors) {
+        this.plateErrors = plateErrors;
+    }
+
+    public String getSamplEerrors() {
+        return samplEerrors;
+    }
+
+    public void setSamplEerrors(String samplEerrors) {
+        this.samplEerrors = samplEerrors;
     }
 
     public boolean hasParentInventoryId() {

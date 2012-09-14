@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csvimport.patient;
+package edu.ualberta.med.biobank.common.action.batchoperation.patient;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,9 +21,9 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
-import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -41,13 +41,13 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class PatientCsvImportAction implements Action<BooleanResult> {
+public class PatientBatchOpAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
 
     private static final Bundle bundle = new CommonBundle();
 
     private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenCsvImportAction.class);
+        .getI18n(SpecimenBatchOpAction.class);
 
     public static final LString CSV_FILE_ERROR =
         bundle.tr("CVS file not loaded").format();
@@ -63,15 +63,15 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
     };
     // @formatter:on    
 
-    private final CsvErrorList csvErrorList = new CsvErrorList();
+    private final BatchOpInputErrorList csvErrorList = new BatchOpInputErrorList();
 
-    private CompressedReference<ArrayList<PatientCsvInfo>> compressedList =
+    private CompressedReference<ArrayList<PatientBatchOpInputRow>> compressedList =
         null;
 
-    private final Set<PatientImportInfo> patientImportInfos =
-        new HashSet<PatientImportInfo>(0);
+    private final Set<PatientBatchOpHelper> patientImportInfos =
+        new HashSet<PatientBatchOpHelper>(0);
 
-    public PatientCsvImportAction(String filename) throws IOException {
+    public PatientBatchOpAction(String filename) throws IOException {
         setCsvFile(filename);
     }
 
@@ -86,23 +86,23 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
         };
 
         try {
-            ArrayList<PatientCsvInfo> patientCsvInfos =
-                new ArrayList<PatientCsvInfo>(0);
+            ArrayList<PatientBatchOpInputRow> patientCsvInfos =
+                new ArrayList<PatientBatchOpInputRow>(0);
 
-            PatientCsvInfo patientCsvInfo;
+            PatientBatchOpInputRow patientCsvInfo;
             reader.getCSVHeader(true);
             while ((patientCsvInfo =
-                reader.read(PatientCsvInfo.class, header, PROCESSORS)) != null) {
+                reader.read(PatientBatchOpInputRow.class, header, PROCESSORS)) != null) {
                 patientCsvInfos.add(patientCsvInfo);
             }
 
             compressedList =
-                new CompressedReference<ArrayList<PatientCsvInfo>>(
+                new CompressedReference<ArrayList<PatientBatchOpInputRow>>(
                     patientCsvInfos);
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
-                i18n.tr(CsvActionUtil.CSV_PARSE_ERROR, e.getMessage(),
+                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
                     e.getCsvContext()));
         } finally {
             reader.close();
@@ -111,7 +111,7 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.LEGACY_IMPORT_CSV.isAllowed(context.getUser());
+        return PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
     }
 
     @Override
@@ -122,10 +122,10 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<PatientCsvInfo> patientCsvInfos = compressedList.get();
-        for (PatientCsvInfo csvInfo : patientCsvInfos) {
+        ArrayList<PatientBatchOpInputRow> patientCsvInfos = compressedList.get();
+        for (PatientBatchOpInputRow csvInfo : patientCsvInfos) {
             Study study =
-                CsvActionUtil.getStudy(context, csvInfo.getStudyName());
+                BatchOpActionUtil.getStudy(context, csvInfo.getStudyName());
 
             if (study == null) {
                 csvErrorList.addError(csvInfo.getLineNumber(),
@@ -133,7 +133,7 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
                 continue;
             }
 
-            PatientImportInfo importInfo = new PatientImportInfo(csvInfo);
+            PatientBatchOpHelper importInfo = new PatientBatchOpHelper(csvInfo);
             importInfo.setStudy(study);
             patientImportInfos.add(importInfo);
         }
@@ -142,14 +142,14 @@ public class PatientCsvImportAction implements Action<BooleanResult> {
             throw new CsvImportException(csvErrorList.getErrors());
         }
 
-        for (PatientImportInfo importInfo : patientImportInfos) {
+        for (PatientBatchOpHelper importInfo : patientImportInfos) {
             addPatient(context, importInfo);
         }
 
         return new BooleanResult(result);
     }
 
-    private void addPatient(ActionContext context, PatientImportInfo importInfo) {
+    private void addPatient(ActionContext context, PatientBatchOpHelper importInfo) {
         Patient patient = importInfo.getNewPatient();
         context.getSession().saveOrUpdate(patient);
     }

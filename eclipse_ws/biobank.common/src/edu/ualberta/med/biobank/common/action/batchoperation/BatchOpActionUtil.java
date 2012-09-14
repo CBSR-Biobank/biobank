@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csv;
+package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
@@ -18,12 +18,12 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 
 /**
- * Helper methods used by actions that read CSV files.
  * 
  * @author loyola
  * 
  */
-public class CsvActionUtil {
+@SuppressWarnings("nls")
+public class BatchOpActionUtil {
 
     private static final Bundle bundle = new CommonBundle();
 

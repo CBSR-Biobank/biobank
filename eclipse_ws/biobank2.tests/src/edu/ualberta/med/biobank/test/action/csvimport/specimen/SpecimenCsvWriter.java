@@ -11,7 +11,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputRow;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
@@ -31,7 +31,7 @@ class SpecimenCsvWriter {
      * @throws IOException If the file could not be saved.
      */
     @SuppressWarnings("nls")
-    static void write(String filename, Set<SpecimenCsvInfo> specimenInfos)
+    static void write(String filename, Set<SpecimenBatchOpInputRow> specimenInfos)
         throws IOException {
         final String[] header = new String[] {
             "inventoryId",
@@ -73,7 +73,7 @@ class SpecimenCsvWriter {
         try {
             writer.writeHeader(header);
 
-            for (SpecimenCsvInfo info : specimenInfos) {
+            for (SpecimenBatchOpInputRow info : specimenInfos) {
                 final HashMap<String, ? super Object> data =
                     new HashMap<String, Object>();
                 data.put(header[0], info.getInventoryId());

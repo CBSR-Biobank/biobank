@@ -1,8 +1,8 @@
-package edu.ualberta.med.biobank.common.action.csvimport.shipment;
+package edu.ualberta.med.biobank.common.action.batchoperation.shipment;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.csvimport.IImportInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -19,9 +19,9 @@ import edu.ualberta.med.biobank.model.User;
  * 
  */
 @SuppressWarnings("nls")
-public class ShipmentImportInfo implements IImportInfo {
+public class ShipmentBatchOpHelper implements IBatchOpHelper {
 
-    private final ShipmentCsvInfo csvInfo;
+    private final ShipmentBatchOpInputRow csvInfo;
     private ShippingMethod shippingMethod;
     private Center originCenter;
     private Site currentSite;
@@ -30,7 +30,7 @@ public class ShipmentImportInfo implements IImportInfo {
     private Specimen specimen;
     private User user;
 
-    ShipmentImportInfo(ShipmentCsvInfo csvInfo) {
+    ShipmentBatchOpHelper(ShipmentBatchOpInputRow csvInfo) {
         this.csvInfo = csvInfo;
     }
 

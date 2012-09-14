@@ -9,7 +9,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputRow;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
@@ -28,7 +28,7 @@ class PatientCsvWriter {
      * @param patientInfos set of beans containing the information for each row.
      * @throws IOException If the file could not be saved.
      */
-    static void write(String filename, Set<PatientCsvInfo> patientInfos)
+    static void write(String filename, Set<PatientBatchOpInputRow> patientInfos)
         throws IOException {
         final String[] header = new String[] {
             "Study", "Patient Number", "Created At"
@@ -41,7 +41,7 @@ class PatientCsvWriter {
         try {
             writer.writeHeader(header);
 
-            for (PatientCsvInfo info : patientInfos) {
+            for (PatientBatchOpInputRow info : patientInfos) {
                 final HashMap<String, ? super Object> data =
                     new HashMap<String, Object>();
                 data.put(header[0], info.getStudyName());

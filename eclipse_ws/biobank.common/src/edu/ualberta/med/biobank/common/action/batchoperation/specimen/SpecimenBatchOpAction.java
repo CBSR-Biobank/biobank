@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csvimport.specimen;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,8 +28,8 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -57,16 +57,16 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenCsvImportAction implements Action<BooleanResult> {
+public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
 
     private static final Bundle bundle = new CommonBundle();
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenCsvImportAction.class.getName());
+        .getLogger(SpecimenBatchOpAction.class.getName());
 
     private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenCsvImportAction.class);
+        .getI18n(SpecimenBatchOpAction.class);
 
     public static final LString CSV_SPC_PATIENT_ERROR =
         bundle.tr("parent specimen and child specimen "
@@ -145,21 +145,21 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
     private final Center workingCenter;
 
-    private final CsvErrorList errorList = new CsvErrorList();
+    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
-    private CompressedReference<ArrayList<SpecimenCsvInfo>> compressedList =
+    private CompressedReference<ArrayList<SpecimenBatchOpInputRow>> compressedList =
         null;
 
-    private final Set<SpecimenImportInfo> specimenImportInfos =
-        new HashSet<SpecimenImportInfo>(0);
+    private final Set<SpecimenBatchOpHelper> specimenImportInfos =
+        new HashSet<SpecimenBatchOpHelper>(0);
 
-    private final Map<String, SpecimenImportInfo> parentSpcInvIds =
-        new HashMap<String, SpecimenImportInfo>(0);
+    private final Map<String, SpecimenBatchOpHelper> parentSpcInvIds =
+        new HashMap<String, SpecimenBatchOpHelper>(0);
 
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
 
-    public SpecimenCsvImportAction(Center workingCenter, String filename)
+    public SpecimenBatchOpAction(Center workingCenter, String filename)
         throws IOException {
         this.workingCenter = workingCenter;
         setCsvFile(filename);
@@ -187,16 +187,16 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         };
 
         try {
-            ArrayList<SpecimenCsvInfo> csvInfos =
-                new ArrayList<SpecimenCsvInfo>(0);
+            ArrayList<SpecimenBatchOpInputRow> csvInfos =
+                new ArrayList<SpecimenBatchOpInputRow>(0);
 
-            Map<String, SpecimenCsvInfo> parentSpcMap =
-                new HashMap<String, SpecimenCsvInfo>();
+            Map<String, SpecimenBatchOpInputRow> parentSpcMap =
+                new HashMap<String, SpecimenBatchOpInputRow>();
 
-            SpecimenCsvInfo csvInfo;
+            SpecimenBatchOpInputRow csvInfo;
             reader.getCSVHeader(true);
             while ((csvInfo =
-                reader.read(SpecimenCsvInfo.class, header, PROCESSORS)) != null) {
+                reader.read(SpecimenBatchOpInputRow.class, header, PROCESSORS)) != null) {
 
                 if (csvInfo.getSourceSpecimen()) {
                     if (csvInfo.hasParentInventoryId()) {
@@ -208,7 +208,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
                     if (csvInfo.hasParentInventoryId()) {
                         // check that parent and child specimens have the same
                         // patient number
-                        SpecimenCsvInfo parentCsvInfo =
+                        SpecimenBatchOpInputRow parentCsvInfo =
                             parentSpcMap.get(csvInfo.getParentInventoryId());
 
                         if ((parentCsvInfo != null)
@@ -257,12 +257,12 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
             }
 
             compressedList =
-                new CompressedReference<ArrayList<SpecimenCsvInfo>>(
+                new CompressedReference<ArrayList<SpecimenBatchOpInputRow>>(
                     csvInfos);
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
-                i18n.tr(CsvActionUtil.CSV_PARSE_ERROR, e.getMessage(),
+                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
                     e.getCsvContext()));
         } finally {
             reader.close();
@@ -271,22 +271,22 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.LEGACY_IMPORT_CSV.isAllowed(context.getUser());
+        return PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
     }
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new LocalizedException(CsvActionUtil.CSV_FILE_ERROR);
+            throw new LocalizedException(BatchOpActionUtil.CSV_FILE_ERROR);
         }
 
         boolean result = false;
 
-        ArrayList<SpecimenCsvInfo> specimenCsvInfos = compressedList.get();
+        ArrayList<SpecimenBatchOpInputRow> specimenCsvInfos = compressedList.get();
         context.getSession().getTransaction();
 
-        for (SpecimenCsvInfo csvInfo : specimenCsvInfos) {
-            SpecimenImportInfo info = getDbInfo(context, csvInfo);
+        for (SpecimenBatchOpInputRow csvInfo : specimenCsvInfos) {
+            SpecimenBatchOpHelper info = getDbInfo(context, csvInfo);
             specimenImportInfos.add(info);
 
             if (info.isSourceSpecimen()) {
@@ -296,10 +296,10 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
 
         // find aliquoted specimens and ensure the source specimen is listed in
         // the CSV file
-        for (SpecimenImportInfo info : specimenImportInfos) {
+        for (SpecimenBatchOpHelper info : specimenImportInfos) {
             if (info.isSourceSpecimen()) continue;
 
-            SpecimenImportInfo parentInfo =
+            SpecimenBatchOpHelper parentInfo =
                 parentSpcInvIds.get(info.getParentInventoryId());
 
             if (parentInfo == null) {
@@ -321,7 +321,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         // add all source specimens first
-        for (SpecimenImportInfo info : specimenImportInfos) {
+        for (SpecimenBatchOpHelper info : specimenImportInfos) {
             if (info.isAliquotedSpecimen()) continue;
 
             Specimen spc = addSpecimen(context, info);
@@ -337,7 +337,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         // now add aliquoted specimens
-        for (SpecimenImportInfo info : specimenImportInfos) {
+        for (SpecimenBatchOpHelper info : specimenImportInfos) {
             if (info.isSourceSpecimen()) continue;
 
             if (info.getParentSpecimen() == null) {
@@ -353,9 +353,9 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
     }
 
     // get referenced items that exist in the database
-    private SpecimenImportInfo getDbInfo(ActionContext context,
-        SpecimenCsvInfo csvInfo) {
-        SpecimenImportInfo info = new SpecimenImportInfo(csvInfo);
+    private SpecimenBatchOpHelper getDbInfo(ActionContext context,
+        SpecimenBatchOpInputRow csvInfo) {
+        SpecimenBatchOpHelper info = new SpecimenBatchOpHelper(csvInfo);
         info.setUser(context.getUser());
 
         Patient patient = loadPatient(context, csvInfo.getPatientNumber());
@@ -380,7 +380,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         info.setCevent(cevent);
 
         if (info.isAliquotedSpecimen()) {
-            Specimen parentSpecimen = CsvActionUtil.getSpecimen(context,
+            Specimen parentSpecimen = BatchOpActionUtil.getSpecimen(context,
                 csvInfo.getParentInventoryId());
             if (parentSpecimen != null) {
                 if (parentSpecimen.getProcessingEvent() == null) {
@@ -397,7 +397,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         if ((csvInfo.getWaybill() != null)
             && !csvInfo.getWaybill().isEmpty()) {
             OriginInfo originInfo =
-                CsvActionUtil.getOriginInfo(context, csvInfo.getWaybill());
+                BatchOpActionUtil.getOriginInfo(context, csvInfo.getWaybill());
             if (originInfo == null) {
                 errorList.addError(csvInfo.getLineNumber(),
                     CSV_WAYBILL_ERROR.format(csvInfo.getWaybill()));
@@ -407,7 +407,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         }
 
         SpecimenType spcType =
-            CsvActionUtil.getSpecimenType(context, csvInfo.getSpecimenType());
+            BatchOpActionUtil.getSpecimenType(context, csvInfo.getSpecimenType());
         if (spcType == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_SPECIMEN_TYPE_ERROR.format(csvInfo.getSpecimenType()));
@@ -418,7 +418,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         // only get container information if defined for this row
         if (info.hasPosition()) {
             Container container =
-                CsvActionUtil.getContainer(context, csvInfo.getPalletLabel());
+                BatchOpActionUtil.getContainer(context, csvInfo.getPalletLabel());
             if (container == null) {
                 errorList.addError(csvInfo.getLineNumber(),
                     CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
@@ -439,7 +439,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
         return info;
     }
 
-    private Specimen addSpecimen(ActionContext context, SpecimenImportInfo info) {
+    private Specimen addSpecimen(ActionContext context, SpecimenBatchOpHelper info) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -495,7 +495,7 @@ public class SpecimenCsvImportAction implements Action<BooleanResult> {
      */
     private Patient loadPatient(ActionContext context, String pnumber) {
         // make sure patient exists
-        Patient p = CsvActionUtil.getPatient(context, pnumber);
+        Patient p = BatchOpActionUtil.getPatient(context, pnumber);
         if (p == null) {
             throw new LocalizedException(CSV_PATIENT_ERROR.format(pnumber));
         }

@@ -1,8 +1,8 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.io.Serializable;
 
-public interface ICsvInfo extends Serializable {
+public interface IBatchOpInputRow extends Serializable {
 
     public abstract int getLineNumber();
 

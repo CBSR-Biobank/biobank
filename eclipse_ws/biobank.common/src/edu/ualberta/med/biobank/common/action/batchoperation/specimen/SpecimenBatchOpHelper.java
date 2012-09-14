@@ -1,11 +1,11 @@
-package edu.ualberta.med.biobank.common.action.csvimport.specimen;
+package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.action.csvimport.IImportInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -26,13 +26,13 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenImportInfo implements IImportInfo {
+public class SpecimenBatchOpHelper implements IBatchOpHelper {
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenImportInfo.class.getName());
+        .getLogger(SpecimenBatchOpHelper.class.getName());
 
-    private final SpecimenCsvInfo csvInfo;
-    private SpecimenImportInfo parentInfo;
+    private final SpecimenBatchOpInputRow csvInfo;
+    private SpecimenBatchOpHelper parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
@@ -44,7 +44,7 @@ public class SpecimenImportInfo implements IImportInfo {
     private Specimen specimen;
     private User user;
 
-    SpecimenImportInfo(SpecimenCsvInfo csvInfo) {
+    SpecimenBatchOpHelper(SpecimenBatchOpInputRow csvInfo) {
         this.csvInfo = csvInfo;
     }
 
@@ -53,15 +53,15 @@ public class SpecimenImportInfo implements IImportInfo {
         return csvInfo.getLineNumber();
     }
 
-    public SpecimenCsvInfo getCsvInfo() {
+    public SpecimenBatchOpInputRow getCsvInfo() {
         return csvInfo;
     }
 
-    SpecimenImportInfo getParentInfo() {
+    SpecimenBatchOpHelper getParentInfo() {
         return parentInfo;
     }
 
-    void setParentInfo(SpecimenImportInfo parentInfo) {
+    void setParentInfo(SpecimenBatchOpHelper parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }

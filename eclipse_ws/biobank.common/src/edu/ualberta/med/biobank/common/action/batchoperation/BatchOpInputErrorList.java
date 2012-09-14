@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csvimport;
+package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.i18n.LString;
  * @author loyola
  * 
  */
-public class CsvErrorList implements Serializable {
+public class BatchOpInputErrorList implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static final int MAX_ERRORS_TO_REPORT = 50;

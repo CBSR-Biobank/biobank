@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.csvimport.shipment;
+package edu.ualberta.med.biobank.common.action.batchoperation.shipment;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvActionUtil;
-import edu.ualberta.med.biobank.common.action.csvimport.CsvErrorList;
-import edu.ualberta.med.biobank.common.action.csvimport.specimen.SpecimenCsvImportAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -41,13 +41,13 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class ShipmentCsvImportAction implements Action<BooleanResult> {
+public class ShipmentBatchOpAction implements Action<BooleanResult> {
     private static final long serialVersionUID = 1L;
 
     private static final Bundle bundle = new CommonBundle();
 
     private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenCsvImportAction.class);
+        .getI18n(SpecimenBatchOpAction.class);
 
     public static final Tr CSV_SENDING_CENTER_ERROR =
         bundle.tr("sending center with name \"{0}\" does not exist");
@@ -75,15 +75,15 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
     }; 
     // @formatter:on    
 
-    private final CsvErrorList errorList = new CsvErrorList();
+    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
-    private CompressedReference<ArrayList<ShipmentCsvInfo>> compressedList =
+    private CompressedReference<ArrayList<ShipmentBatchOpInputRow>> compressedList =
         null;
 
-    private final Set<ShipmentImportInfo> shipmentImportInfos =
-        new HashSet<ShipmentImportInfo>(0);
+    private final Set<ShipmentBatchOpHelper> shipmentImportInfos =
+        new HashSet<ShipmentBatchOpHelper>(0);
 
-    public ShipmentCsvImportAction(String filename) throws IOException {
+    public ShipmentBatchOpAction(String filename) throws IOException {
         setCsvFile(filename);
     }
 
@@ -101,13 +101,13 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         };
 
         try {
-            ArrayList<ShipmentCsvInfo> csvInfos =
-                new ArrayList<ShipmentCsvInfo>(0);
+            ArrayList<ShipmentBatchOpInputRow> csvInfos =
+                new ArrayList<ShipmentBatchOpInputRow>(0);
 
-            ShipmentCsvInfo csvInfo;
+            ShipmentBatchOpInputRow csvInfo;
             reader.getCSVHeader(true);
             while ((csvInfo =
-                reader.read(ShipmentCsvInfo.class, header, PROCESSORS)) != null) {
+                reader.read(ShipmentBatchOpInputRow.class, header, PROCESSORS)) != null) {
 
                 csvInfo.setLineNumber(reader.getLineNumber());
                 csvInfos.add(csvInfo);
@@ -118,12 +118,12 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             }
 
             compressedList =
-                new CompressedReference<ArrayList<ShipmentCsvInfo>>(
+                new CompressedReference<ArrayList<ShipmentBatchOpInputRow>>(
                     csvInfos);
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(
-                i18n.tr(CsvActionUtil.CSV_PARSE_ERROR, e.getMessage(),
+                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
                     e.getCsvContext()));
         } finally {
             reader.close();
@@ -132,22 +132,22 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.LEGACY_IMPORT_CSV.isAllowed(context.getUser());
+        return PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
     }
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new LocalizedException(CsvActionUtil.CSV_FILE_ERROR);
+            throw new LocalizedException(BatchOpActionUtil.CSV_FILE_ERROR);
         }
 
         boolean result = false;
 
-        ArrayList<ShipmentCsvInfo> csvInfos = compressedList.get();
+        ArrayList<ShipmentBatchOpInputRow> csvInfos = compressedList.get();
         context.getSession().getTransaction();
 
-        for (ShipmentCsvInfo csvInfo : csvInfos) {
-            ShipmentImportInfo info = getDbInfo(context, csvInfo);
+        for (ShipmentBatchOpInputRow csvInfo : csvInfos) {
+            ShipmentBatchOpHelper info = getDbInfo(context, csvInfo);
             shipmentImportInfos.add(info);
         }
 
@@ -155,7 +155,7 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
             throw new CsvImportException(errorList.getErrors());
         }
 
-        for (ShipmentImportInfo info : shipmentImportInfos) {
+        for (ShipmentBatchOpHelper info : shipmentImportInfos) {
             OriginInfo originInfo = info.getNewOriginInfo();
 
             context.getSession().save(
@@ -168,14 +168,14 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         return new BooleanResult(result);
     }
 
-    private ShipmentImportInfo getDbInfo(ActionContext context,
-        ShipmentCsvInfo csvInfo) {
-        ShipmentImportInfo info = new ShipmentImportInfo(csvInfo);
+    private ShipmentBatchOpHelper getDbInfo(ActionContext context,
+        ShipmentBatchOpInputRow csvInfo) {
+        ShipmentBatchOpHelper info = new ShipmentBatchOpHelper(csvInfo);
 
         info.setUser(context.getUser());
 
         Center sendingCenter =
-            CsvActionUtil.getCenter(context, csvInfo.getSendingCenter());
+            BatchOpActionUtil.getCenter(context, csvInfo.getSendingCenter());
         if (sendingCenter == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_SENDING_CENTER_ERROR.format(csvInfo.getSendingCenter()));
@@ -184,7 +184,7 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         }
 
         Site receivingSite =
-            CsvActionUtil.getSite(context, csvInfo.getReceivingCenter());
+            BatchOpActionUtil.getSite(context, csvInfo.getReceivingCenter());
         if (receivingSite == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_RECEIVING_CENTER_ERROR.format(csvInfo
@@ -194,7 +194,7 @@ public class ShipmentCsvImportAction implements Action<BooleanResult> {
         }
 
         ShippingMethod shippingMethod =
-            CsvActionUtil.getShippingMethod(context,
+            BatchOpActionUtil.getShippingMethod(context,
                 csvInfo.getShippingMethod());
         if (shippingMethod == null) {
             errorList.addError(csvInfo.getLineNumber(),

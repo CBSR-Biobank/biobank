@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.test.action.csvimport.patient;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.csvimport.patient.PatientCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputRow;
 import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 
@@ -19,10 +19,10 @@ class PatientCsvHelper {
         this.nameGenerator = nameGenerator;
     }
 
-    Set<PatientCsvInfo> createPatients(String studyName, int maxPatients) {
-        Set<PatientCsvInfo> csvInfos = new HashSet<PatientCsvInfo>();
+    Set<PatientBatchOpInputRow> createPatients(String studyName, int maxPatients) {
+        Set<PatientBatchOpInputRow> csvInfos = new HashSet<PatientBatchOpInputRow>();
         for (int i = 0; i < maxPatients; ++i) {
-            PatientCsvInfo patientInfo = new PatientCsvInfo();
+            PatientBatchOpInputRow patientInfo = new PatientBatchOpInputRow();
             patientInfo.setStudyName(studyName);
             patientInfo.setPatientNumber(nameGenerator.next(String.class));
             patientInfo.setCreatedAt(Utils.getRandomDate());

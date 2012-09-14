@@ -9,7 +9,7 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.csvimport.shipment.ShipmentCsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.shipment.ShipmentBatchOpInputRow;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 @SuppressWarnings("nls")
 class ShipmentCsvWriter {
 
-    public static void write(String filename, Set<ShipmentCsvInfo> shipmentInfos)
+    public static void write(String filename, Set<ShipmentBatchOpInputRow> shipmentInfos)
         throws IOException {
         final String[] header = new String[] {
             "Received date time", "Sending center", "Receiving center",
@@ -35,7 +35,7 @@ class ShipmentCsvWriter {
         try {
             writer.writeHeader(header);
 
-            for (ShipmentCsvInfo info : shipmentInfos) {
+            for (ShipmentBatchOpInputRow info : shipmentInfos) {
                 final HashMap<String, ? super Object> data =
                     new HashMap<String, Object>();
                 data.put(header[0],

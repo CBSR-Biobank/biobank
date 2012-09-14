@@ -1,6 +1,6 @@
-package edu.ualberta.med.biobank.common.action.csvimport.patient;
+package edu.ualberta.med.biobank.common.action.batchoperation.patient;
 
-import edu.ualberta.med.biobank.common.action.csvimport.IImportInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
@@ -9,12 +9,12 @@ import edu.ualberta.med.biobank.model.Study;
  * @author loyola
  * 
  */
-public class PatientImportInfo implements IImportInfo {
+public class PatientBatchOpHelper implements IBatchOpHelper {
 
-    private final PatientCsvInfo csvInfo;
+    private final PatientBatchOpInputRow csvInfo;
     private Study study;
 
-    PatientImportInfo(PatientCsvInfo csvInfo) {
+    PatientBatchOpHelper(PatientBatchOpInputRow csvInfo) {
         this.csvInfo = csvInfo;
     }
 

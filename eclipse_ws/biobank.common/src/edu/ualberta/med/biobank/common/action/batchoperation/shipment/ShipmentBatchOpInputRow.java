@@ -1,15 +1,15 @@
-package edu.ualberta.med.biobank.common.action.csvimport.shipment;
+package edu.ualberta.med.biobank.common.action.batchoperation.shipment;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.csvimport.ICsvInfo;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputRow;
 
 /**
  * 
  * @author loyola
  * 
  */
-public class ShipmentCsvInfo implements ICsvInfo {
+public class ShipmentBatchOpInputRow implements IBatchOpInputRow {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;
