@@ -63,7 +63,8 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
     };
     // @formatter:on    
 
-    private final BatchOpInputErrorList csvErrorList = new BatchOpInputErrorList();
+    private final BatchOpInputErrorList csvErrorList =
+        new BatchOpInputErrorList();
 
     private CompressedReference<ArrayList<PatientBatchOpInputRow>> compressedList =
         null;
@@ -122,7 +123,16 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<PatientBatchOpInputRow> patientCsvInfos = compressedList.get();
+        ArrayList<PatientBatchOpInputRow> patientCsvInfos;
+
+        try {
+            patientCsvInfos = compressedList.get();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
         for (PatientBatchOpInputRow csvInfo : patientCsvInfos) {
             Study study =
                 BatchOpActionUtil.getStudy(context, csvInfo.getStudyName());
@@ -149,7 +159,8 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
         return new BooleanResult(result);
     }
 
-    private void addPatient(ActionContext context, PatientBatchOpHelper importInfo) {
+    private void addPatient(ActionContext context,
+        PatientBatchOpHelper importInfo) {
         Patient patient = importInfo.getNewPatient();
         context.getSession().saveOrUpdate(patient);
     }

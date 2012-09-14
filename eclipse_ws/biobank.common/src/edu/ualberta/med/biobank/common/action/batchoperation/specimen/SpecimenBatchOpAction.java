@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -175,8 +176,16 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens =
-            compressedList.get();
+        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens;
+
+        try {
+            batchOpSpecimens = compressedList.get();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
         context.getSession().getTransaction();
 
         for (SpecimenBatchOpInputRow batchOpSpecimen : batchOpSpecimens) {

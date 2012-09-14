@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.test.action.csvimport.specimen;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,7 +47,7 @@ class SpecimenCsvHelper {
      * @param patients the patients that these specimens will belong to.
      * @throws IOException
      */
-    Set<SpecimenBatchOpInputRow> createAllSpecimens(Study study,
+    ArrayList<SpecimenBatchOpInputRow> createAllSpecimens(Study study,
         Set<OriginInfo> originInfos, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -59,8 +59,9 @@ class SpecimenCsvHelper {
                 "study does not have any source specimens");
         }
 
-        Set<SpecimenBatchOpInputRow> specimenInfos = sourceSpecimensCreate(
-            originInfos, patients, study.getSourceSpecimens());
+        ArrayList<SpecimenBatchOpInputRow> specimenInfos =
+            sourceSpecimensCreate(
+                originInfos, patients, study.getSourceSpecimens());
 
         Map<String, String> parentSpecimenInfoMap =
             new HashMap<String, String>();
@@ -75,11 +76,11 @@ class SpecimenCsvHelper {
         return specimenInfos;
     }
 
-    Set<SpecimenBatchOpInputRow> sourceSpecimensCreate(
+    ArrayList<SpecimenBatchOpInputRow> sourceSpecimensCreate(
         Set<OriginInfo> originInfos,
         Set<Patient> patients, Set<SourceSpecimen> sourceSpecimens) {
-        Set<SpecimenBatchOpInputRow> specimenInfos =
-            new LinkedHashSet<SpecimenBatchOpInputRow>();
+        ArrayList<SpecimenBatchOpInputRow> specimenInfos =
+            new ArrayList<SpecimenBatchOpInputRow>();
 
         // add parent specimens first
         for (SourceSpecimen ss : sourceSpecimens) {
@@ -108,7 +109,7 @@ class SpecimenCsvHelper {
      * Creates CSV specimens with only aliquoted specimens. Note that parent
      * specimens must already be present in the database.
      */
-    Set<SpecimenBatchOpInputRow> createAliquotedSpecimens(Study study,
+    ArrayList<SpecimenBatchOpInputRow> createAliquotedSpecimens(Study study,
         Set<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -131,11 +132,11 @@ class SpecimenCsvHelper {
      * 
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
-    private Set<SpecimenBatchOpInputRow> aliquotedSpecimensCreate(
+    private ArrayList<SpecimenBatchOpInputRow> aliquotedSpecimensCreate(
         Map<String, String> parentSpecimenInfoMap,
         Set<AliquotedSpecimen> aliquotedSpecimens) {
-        Set<SpecimenBatchOpInputRow> specimenInfos =
-            new LinkedHashSet<SpecimenBatchOpInputRow>();
+        ArrayList<SpecimenBatchOpInputRow> specimenInfos =
+            new ArrayList<SpecimenBatchOpInputRow>();
 
         for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap
             .entrySet()) {
@@ -176,7 +177,8 @@ class SpecimenCsvHelper {
     }
 
     public void fillContainersWithSpecimenFromCsv(
-        List<SpecimenBatchOpInputRow> specimenCsvInfos, Set<Container> containers) {
+        List<SpecimenBatchOpInputRow> specimenCsvInfos,
+        Set<Container> containers) {
 
         // fill as many containers as space will allow
         int count = 0;
@@ -192,7 +194,8 @@ class SpecimenCsvHelper {
                 for (int c = 0; c < maxCols; ++c) {
                     if (count >= specimenCsvInfos.size()) break;
 
-                    SpecimenBatchOpInputRow csvInfo = specimenCsvInfos.get(count);
+                    SpecimenBatchOpInputRow csvInfo =
+                        specimenCsvInfos.get(count);
                     RowColPos pos = new RowColPos(r, c);
                     csvInfo.setPalletPosition(ctype.getPositionString(pos));
                     csvInfo.setPalletLabel(container.getLabel());
@@ -206,7 +209,7 @@ class SpecimenCsvHelper {
         }
     }
 
-    public void addComments(Set<SpecimenBatchOpInputRow> specimenCsvInfos) {
+    public void addComments(ArrayList<SpecimenBatchOpInputRow> specimenCsvInfos) {
         for (SpecimenBatchOpInputRow specimenCsvInfo : specimenCsvInfos) {
             specimenCsvInfo.setComment(nameGenerator.next(String.class));
         }

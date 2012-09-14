@@ -143,7 +143,16 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<ShipmentBatchOpInputRow> csvInfos = compressedList.get();
+        ArrayList<ShipmentBatchOpInputRow> csvInfos;
+
+        try {
+            csvInfos = compressedList.get();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
         context.getSession().getTransaction();
 
         for (ShipmentBatchOpInputRow csvInfo : csvInfos) {
