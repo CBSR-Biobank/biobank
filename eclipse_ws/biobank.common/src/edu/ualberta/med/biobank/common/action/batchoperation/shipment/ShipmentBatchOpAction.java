@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -114,7 +114,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
             }
 
             if (!errorList.isEmpty()) {
-                throw new CsvImportException(errorList.getErrors());
+                throw new BatchOpErrorsException(errorList.getErrors());
             }
 
             compressedList =
@@ -152,7 +152,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         }
 
         if (!errorList.isEmpty()) {
-            throw new CsvImportException(errorList.getErrors());
+            throw new BatchOpErrorsException(errorList.getErrors());
         }
 
         for (ShipmentBatchOpHelper info : shipmentImportInfos) {

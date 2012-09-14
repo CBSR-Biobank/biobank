@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputRow;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
@@ -102,7 +102,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -148,7 +148,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -200,7 +200,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -231,7 +231,7 @@ public class TestSpecimenCsvImport extends TestAction {
             exec(importAction);
             Assert
                 .fail("should not be allowed to create aliquot specimens with no collection events");
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             new AssertCsvImportException()
                 .withMessage(SpecimenBatchOpAction.CSV_CEVENT_ERROR
                     .format());
@@ -313,7 +313,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -369,7 +369,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -410,7 +410,7 @@ public class TestSpecimenCsvImport extends TestAction {
             SpecimenBatchOpAction importAction =
                 new SpecimenBatchOpAction(factory.getDefaultSite(), CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }

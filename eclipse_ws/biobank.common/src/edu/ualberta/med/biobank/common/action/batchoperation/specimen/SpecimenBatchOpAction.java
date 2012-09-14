@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,19 +8,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseBool;
-import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
-import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
-import org.supercsv.cellprocessor.constraint.Unique;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.exception.SuperCSVException;
-import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.prefs.CsvPreference;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -31,7 +16,7 @@ import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -50,10 +35,10 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
- * This action takes a CSV file as input and import the specimens contained in
- * the file.
+ * This action takes a list of Specimen Batch Operation beans as input, verifies
+ * that the data is valid, and if valid saves the data to the database.
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")
@@ -65,42 +50,9 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpAction.class.getName());
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenBatchOpAction.class);
-
-    public static final LString CSV_SPC_PATIENT_ERROR =
-        bundle.tr("parent specimen and child specimen "
-            + "do not have the same patient number").format();
-
-    public static final LString CSV_PARENT_SPC_ERROR =
-        bundle.tr("specimen is a source specimen but parent " +
-            "inventory ID present").format();
-
     public static final LString CSV_ALIQUOTED_SPC_ERROR =
         bundle.tr("specimen is not a source specimen but parent "
             + "inventory ID is not present").format();
-
-    public static final LString CSV_PALLET_POS_ERROR =
-        bundle.tr("pallet position defined but not product barcode or label")
-            .format();
-
-    public static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
-        bundle.tr("pallet product barcode defined but not position").format();
-
-    public static final LString CSV_PALLET_LABEL_NO_POS_ERROR =
-        bundle.tr("pallet label defined but not position").format();
-
-    public static final LString CSV_UNCOMPRESS_ERROR =
-        bundle.tr("CVS file could not be uncompressed").format();
-
-    public static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
-        bundle.tr("pallet label defined but not position").format();
-
-    public static final Tr CSV_PATIENT_ERROR =
-        bundle.tr("patient in CSV file with number \"{0}\" not exist");
-
-    public static final Tr CSV_CEVENT_ERROR =
-        bundle.tr("collection event with visit number \"{0}\" does not exist");
 
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
         bundle.tr("parent specimen in CSV file with inventory id " +
@@ -124,28 +76,69 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         bundle
             .tr("specimen position in CSV file with label \"{0}\" is invalid");
 
-    // @formatter:off
-    private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        new Unique(),                       // inventoryId,
-        new Optional(),                     // parentInventoryID,
-        new StrNotNullOrEmpty(),            // specimenType,
-        new ParseDate("yyyy-MM-dd HH:mm"),  // createdAt,
-        new StrNotNullOrEmpty(),            // patientNumber,
-        new ParseInt(),                     // visitNumber,
-        new Optional(),                     // waybill,
-        new ParseBool(),                    // sourceSpecimen,
-        new Optional(new Unique()),         // worksheet,
-        new Optional(),                     // palletProductBarcode,
-        new Optional(),                     // rootContainerType,
-        new Optional(),                     // palletLabel,
-        new Optional(),                     // palletPosition,
-        new Optional()                      // comment
-    }; 
-    // @formatter:on    
+    public static final Tr CSV_PATIENT_ERROR =
+        bundle.tr("patient in CSV file with number \"{0}\" not exist");
+
+    public static final Tr CSV_CEVENT_ERROR =
+        bundle.tr("collection event with visit number \"{0}\" does not exist");
+
+    // private static final CsvReaderParams CBSR_TECAN_IMPORT =
+    // new CsvReaderParams(
+    // "Rack ID",
+    // new String[] {
+    // "rackId",
+    // "cavityId",
+    // "position",
+    // "sourceId",
+    // "concentration",
+    // "concentrationUnit",
+    // "volume",
+    // "userDefined1",
+    // "userDefined2",
+    // "userDefined3",
+    // "userDefined4",
+    // "userDefined5",
+    // "plateErrors",
+    // "samplEerrors",
+    // "sampleInstanceId",
+    // "sampleId"
+    // },
+    //
+//            // @formatter:off
+//            new CellProcessor[] {
+//                new StrNotNullOrEmpty(),            // rackId          
+//                new StrNotNullOrEmpty(),            // cavityId        
+//                new StrNotNullOrEmpty(),            // position        
+//                new Unique(),                       // sampleId        
+//                new ParseInt(),                     // concentration   
+//                new StrNotNullOrEmpty(),            // concentrationUnit
+//                new ParseInt(),                     // volume          
+//                new StrNotNullOrEmpty(),            // userDefined1    
+//                new StrNotNullOrEmpty(),            // userDefined2    
+//                new StrNotNullOrEmpty(),            // userDefined3    
+//                new StrNotNullOrEmpty(),            // userDefined4    
+//                new StrNotNullOrEmpty(),            // userDefined5    
+//                new StrNotNullOrEmpty(),            // plateErrors     
+//                new StrNotNullOrEmpty(),            // samplEerrors    
+//                new ParseInt(),                     // sampleInstanceId
+//                new ParseInt()                      // sampleId2
+//            }
+//            // @formatter:on    
+    // );
+    //
+    // private static final CsvReaderParams OHS_TECAN_IMPORT =
+    // new CsvReaderParams(
+    // "TECAN_Rack ID",
+    // new String[] {
+    // },
+    //
+//            // @formatter:off
+//            new CellProcessor[] {
+//            }
+//            // @formatter:on    
+    // );
 
     private final Center workingCenter;
-
-    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
     private CompressedReference<ArrayList<SpecimenBatchOpInputRow>> compressedList =
         null;
@@ -159,114 +152,14 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
 
-    public SpecimenBatchOpAction(Center workingCenter, String filename)
-        throws IOException {
+    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
+
+    public SpecimenBatchOpAction(Center workingCenter,
+        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens) {
         this.workingCenter = workingCenter;
-        setCsvFile(filename);
-    }
-
-    private void setCsvFile(String filename) throws IOException {
-        ICsvBeanReader reader = new CsvBeanReader(
-            new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
-
-        final String[] header = new String[] {
-            "inventoryId",
-            "parentInventoryId",
-            "specimenType",
-            "createdAt",
-            "patientNumber",
-            "visitNumber",
-            "waybill",
-            "sourceSpecimen",
-            "worksheet",
-            "palletProductBarcode",
-            "rootContainerType",
-            "palletLabel",
-            "palletPosition",
-            "comment"
-        };
-
-        try {
-            ArrayList<SpecimenBatchOpInputRow> csvInfos =
-                new ArrayList<SpecimenBatchOpInputRow>(0);
-
-            Map<String, SpecimenBatchOpInputRow> parentSpcMap =
-                new HashMap<String, SpecimenBatchOpInputRow>();
-
-            SpecimenBatchOpInputRow csvInfo;
-            reader.getCSVHeader(true);
-            while ((csvInfo =
-                reader.read(SpecimenBatchOpInputRow.class, header, PROCESSORS)) != null) {
-
-                if (csvInfo.getSourceSpecimen()) {
-                    if (csvInfo.hasParentInventoryId()) {
-                        errorList.addError(reader.getLineNumber(),
-                            CSV_PARENT_SPC_ERROR);
-                    }
-                    parentSpcMap.put(csvInfo.getInventoryId(), csvInfo);
-                } else {
-                    if (csvInfo.hasParentInventoryId()) {
-                        // check that parent and child specimens have the same
-                        // patient number
-                        SpecimenBatchOpInputRow parentCsvInfo =
-                            parentSpcMap.get(csvInfo.getParentInventoryId());
-
-                        if ((parentCsvInfo != null)
-                            && !csvInfo.getPatientNumber().equals(
-                                parentCsvInfo.getPatientNumber())) {
-                            errorList.addError(reader.getLineNumber(),
-                                CSV_SPC_PATIENT_ERROR);
-                        }
-                    }
-                }
-
-                // check if only position defined and no label and no product
-                // barcode
-                if ((csvInfo.getPalletProductBarcode() == null)
-                    && (csvInfo.getPalletLabel() == null)
-                    && (csvInfo.getPalletPosition() != null)) {
-                    errorList.addError(reader.getLineNumber(),
-                        CSV_PALLET_POS_ERROR);
-                }
-
-                //
-                if ((csvInfo.getPalletProductBarcode() != null)
-                    && (csvInfo.getPalletPosition() == null)) {
-                    errorList.addError(reader.getLineNumber(),
-                        CSV_PROD_BARCODE_NO_POS_ERROR);
-                }
-
-                if ((csvInfo.getPalletLabel() != null)
-                    && (csvInfo.getPalletPosition() == null)) {
-                    errorList.addError(reader.getLineNumber(),
-                        CSV_PALLET_POS_ERROR);
-                }
-
-                if ((csvInfo.getPalletLabel() != null)
-                    && (csvInfo.getRootContainerType() == null)) {
-                    errorList.addError(reader.getLineNumber(),
-                        CSV_PALLET_LABEL_NO_CTYPE_ERROR);
-                }
-
-                csvInfo.setLineNumber(reader.getLineNumber());
-                csvInfos.add(csvInfo);
-            }
-
-            if (!errorList.isEmpty()) {
-                throw new CsvImportException(errorList.getErrors());
-            }
-
-            compressedList =
-                new CompressedReference<ArrayList<SpecimenBatchOpInputRow>>(
-                    csvInfos);
-
-        } catch (SuperCSVException e) {
-            throw new IllegalStateException(
-                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
-                    e.getCsvContext()));
-        } finally {
-            reader.close();
-        }
+        compressedList =
+            new CompressedReference<ArrayList<SpecimenBatchOpInputRow>>(
+                batchOpSpecimens);
     }
 
     @Override
@@ -277,20 +170,21 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         if (compressedList == null) {
-            throw new LocalizedException(BatchOpActionUtil.CSV_FILE_ERROR);
+            throw new IllegalStateException("compressed list is null");
         }
 
         boolean result = false;
 
-        ArrayList<SpecimenBatchOpInputRow> specimenCsvInfos = compressedList.get();
+        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens =
+            compressedList.get();
         context.getSession().getTransaction();
 
-        for (SpecimenBatchOpInputRow csvInfo : specimenCsvInfos) {
-            SpecimenBatchOpHelper info = getDbInfo(context, csvInfo);
+        for (SpecimenBatchOpInputRow batchOpSpecimen : batchOpSpecimens) {
+            SpecimenBatchOpHelper info = getDbInfo(context, batchOpSpecimen);
             specimenImportInfos.add(info);
 
             if (info.isSourceSpecimen()) {
-                parentSpcInvIds.put(csvInfo.getInventoryId(), info);
+                parentSpcInvIds.put(batchOpSpecimen.getInventoryId(), info);
             }
         }
 
@@ -317,7 +211,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         if (!errorList.isEmpty()) {
-            throw new CsvImportException(errorList.getErrors());
+            throw new BatchOpErrorsException(errorList.getErrors());
         }
 
         // add all source specimens first
@@ -407,7 +301,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         SpecimenType spcType =
-            BatchOpActionUtil.getSpecimenType(context, csvInfo.getSpecimenType());
+            BatchOpActionUtil.getSpecimenType(context,
+                csvInfo.getSpecimenType());
         if (spcType == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_SPECIMEN_TYPE_ERROR.format(csvInfo.getSpecimenType()));
@@ -418,7 +313,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         // only get container information if defined for this row
         if (info.hasPosition()) {
             Container container =
-                BatchOpActionUtil.getContainer(context, csvInfo.getPalletLabel());
+                BatchOpActionUtil.getContainer(context,
+                    csvInfo.getPalletLabel());
             if (container == null) {
                 errorList.addError(csvInfo.getLineNumber(),
                     CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
@@ -439,7 +335,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         return info;
     }
 
-    private Specimen addSpecimen(ActionContext context, SpecimenBatchOpHelper info) {
+    private Specimen addSpecimen(ActionContext context,
+        SpecimenBatchOpHelper info) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }

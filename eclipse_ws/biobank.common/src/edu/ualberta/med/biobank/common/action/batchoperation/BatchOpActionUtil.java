@@ -30,6 +30,9 @@ public class BatchOpActionUtil {
     public static final LString CSV_FILE_ERROR =
         bundle.tr("CVS file not loaded").format();
 
+    public static final LString CSV_HEADER_ERROR =
+        bundle.tr("invalid headers in CSV file").format();
+
     public static final String CSV_PARSE_ERROR =
         "Parse error at line {0}\n{1}";
 

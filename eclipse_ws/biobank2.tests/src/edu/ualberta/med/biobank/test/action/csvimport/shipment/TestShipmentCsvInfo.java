@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.shipment.ShipmentBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.shipment.ShipmentBatchOpInputRow;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -76,7 +76,7 @@ public class TestShipmentCsvInfo extends TestAction {
             ShipmentBatchOpAction importAction =
                 new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -106,7 +106,7 @@ public class TestShipmentCsvInfo extends TestAction {
                 new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             new AssertCsvImportException()
                 .withMessage(ShipmentBatchOpAction.CSV_SENDING_CENTER_ERROR
                     .format(badClinic.getNameShort()));
@@ -135,7 +135,7 @@ public class TestShipmentCsvInfo extends TestAction {
                 new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             new AssertCsvImportException()
                 .withMessage(ShipmentBatchOpAction.CSV_RECEIVING_CENTER_ERROR
                     .format(badSite.getNameShort()));
@@ -163,7 +163,7 @@ public class TestShipmentCsvInfo extends TestAction {
                 new ShipmentBatchOpAction(CSV_NAME);
             exec(importAction);
             Assert.fail("errors should have been reported in CVS data");
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             new AssertCsvImportException()
                 .withMessage(ShipmentBatchOpAction.CSV_SHIPPING_METHOD_ERROR
                     .format(badShippingMethod.getName())).assertIn(e);

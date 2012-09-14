@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.TreeSet;
 
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.i18n.LString;
 
 /**
@@ -18,14 +18,16 @@ public class BatchOpInputErrorList implements Serializable {
 
     static final int MAX_ERRORS_TO_REPORT = 50;
 
-    final Set<ImportError> errors = new TreeSet<ImportError>();
+    final Set<BatchOpException<LString>> errors =
+        new TreeSet<BatchOpException<LString>>();
 
     public void addError(int lineNumber, LString message)
-        throws CsvImportException {
-        ImportError importError = new ImportError(lineNumber, message);
+        throws BatchOpErrorsException {
+        BatchOpException<LString> importError =
+            new BatchOpException<LString>(lineNumber, message);
         errors.add(importError);
         if (errors.size() > MAX_ERRORS_TO_REPORT) {
-            throw new CsvImportException(errors);
+            throw new BatchOpErrorsException(errors);
         }
     }
 
@@ -33,7 +35,7 @@ public class BatchOpInputErrorList implements Serializable {
         return errors.isEmpty();
     }
 
-    public Set<ImportError> getErrors() {
+    public Set<BatchOpException<LString>> getErrors() {
         return errors;
     }
 

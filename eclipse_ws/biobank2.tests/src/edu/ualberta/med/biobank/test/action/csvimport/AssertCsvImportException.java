@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.junit.Assert;
 
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.LString;
 
@@ -21,16 +21,16 @@ public class AssertCsvImportException {
         return this;
     }
 
-    public void assertIn(CsvImportException e) {
-        for (ImportError ie : e.getErrors()) {
+    public void assertIn(BatchOpErrorsException e) {
+        for (BatchOpException<LString> ie : e.getErrors()) {
             errorMessages.add(ie.getMessage().toString());
         }
         assertIn(e.getErrors());
     }
 
-    private void assertIn(Set<ImportError> errors) {
+    private void assertIn(Set<BatchOpException<LString>> errors) {
         boolean found = false;
-        for (ImportError error : errors) {
+        for (BatchOpException<LString> error : errors) {
             found |= containsExpectedMessage(error.getMessage());
         }
         if (!found) {

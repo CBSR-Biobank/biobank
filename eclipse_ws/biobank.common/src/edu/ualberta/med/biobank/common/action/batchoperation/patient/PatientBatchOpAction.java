@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -139,7 +139,7 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
         }
 
         if (!csvErrorList.isEmpty()) {
-            throw new CsvImportException(csvErrorList.getErrors());
+            throw new BatchOpErrorsException(csvErrorList.getErrors());
         }
 
         for (PatientBatchOpHelper importInfo : patientImportInfos) {

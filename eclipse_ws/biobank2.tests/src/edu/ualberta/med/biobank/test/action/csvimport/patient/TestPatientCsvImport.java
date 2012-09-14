@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputRow;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
@@ -56,7 +56,7 @@ public class TestPatientCsvImport extends TestAction {
             PatientBatchOpAction importAction =
                 new PatientBatchOpAction(CSV_NAME);
             exec(importAction);
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
@@ -77,7 +77,7 @@ public class TestPatientCsvImport extends TestAction {
             exec(importAction);
             Assert
                 .fail("should not be allowed to import with a study name that does not exist");
-        } catch (CsvImportException e) {
+        } catch (BatchOpErrorsException e) {
             Assert.assertTrue(true);
         }
     }

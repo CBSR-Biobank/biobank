@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.test.action.csvimport;
 
 import org.slf4j.Logger;
 
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.common.action.exception.CsvImportException.ImportError;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException.ImportError;
 
 /**
  * 
@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.action.exception.CsvImportException.Impor
  */
 public class CsvUtil {
 
-    public static void showErrorsInLog(Logger log, CsvImportException e) {
+    public static void showErrorsInLog(Logger log, BatchOpErrorsException e) {
         for (ImportError ie : e.getErrors()) {
             log.error("ERROR: line no {}: {}", ie.getLineNumber(),
                 ie.getMessage());
