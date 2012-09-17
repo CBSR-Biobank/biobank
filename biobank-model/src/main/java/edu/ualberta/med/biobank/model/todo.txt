@@ -3,6 +3,8 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Also record the user that inserted the object and the last user to modify
+    object?
 [ ] Change annotations so that they use InheritanceType.JOINED, only for the
     annotation id (so unique across all sub-types), but put the type, data, and
     options in a separate (joined) table.
