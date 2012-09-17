@@ -56,10 +56,10 @@ public class SpecimenBatchOpInterpreter {
 
             String[] csvHeaders = reader.getCSVHeader(true);
 
-            if (LegacyImportSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-                LegacyImportSpecimenPojoReader beanReader =
-                    new LegacyImportSpecimenPojoReader();
-                csvInfos = beanReader.getBeans(reader);
+            if (SpecimenBatchOpPojoReader.isHeaderValid(csvHeaders)) {
+                SpecimenBatchOpPojoReader beanReader =
+                    new SpecimenBatchOpPojoReader();
+                csvInfos = beanReader.getPojos(reader);
                 errorList = beanReader.getErrorList();
 
             } else if (CbsrTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {

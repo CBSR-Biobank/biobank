@@ -19,12 +19,21 @@ import org.supercsv.io.ICsvBeanReader;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
+import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
-import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 
-public class LegacyImportSpecimenPojoReader {
+/**
+ * Reads a CSV file containing specimen information and returns the file as a
+ * list of SpecimenBatchOpInputPojo.
+ * 
+ * @author Nelson Loyola
+ * 
+ */
+public class SpecimenBatchOpPojoReader implements
+    IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
     private static final I18n i18n = I18nFactory
         .getI18n(DecodeImageForm.class);
 
@@ -98,70 +107,77 @@ public class LegacyImportSpecimenPojoReader {
             && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
-    public List<SpecimenBatchOpInputPojo> getBeans(ICsvBeanReader reader)
-        throws SuperCSVReflectionException, BatchOpErrorsException,
-        SuperCSVException, IOException {
+    public List<SpecimenBatchOpInputPojo> getPojos(ICsvBeanReader reader)
+        throws ClientBatchOpErrorsException {
         final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
             new HashMap<String, SpecimenBatchOpInputPojo>();
 
         SpecimenBatchOpInputPojo csvPojos;
 
-        while ((csvPojos =
-            reader.read(SpecimenBatchOpInputPojo.class,
-                NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
+        try {
+            while ((csvPojos =
+                reader.read(SpecimenBatchOpInputPojo.class,
+                    NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
-            if (csvPojos.getSourceSpecimen()) {
-                if (csvPojos.hasParentInventoryId()) {
-                    getErrorList().addError(reader.getLineNumber(),
-                        CSV_PARENT_SPC_ERROR);
-                }
-                parentSpcMap.put(csvPojos.getInventoryId(), csvPojos);
-            } else {
-                if (csvPojos.hasParentInventoryId()) {
-                    // check that parent and child specimens have the same
-                    // patient number
-                    SpecimenBatchOpInputPojo parentCsvInfo =
-                        parentSpcMap.get(csvPojos.getParentInventoryId());
-
-                    if ((parentCsvInfo != null)
-                        && !csvPojos.getPatientNumber().equals(
-                            parentCsvInfo.getPatientNumber())) {
+                if (csvPojos.getSourceSpecimen()) {
+                    if (csvPojos.hasParentInventoryId()) {
                         getErrorList().addError(reader.getLineNumber(),
-                            CSV_SPC_PATIENT_ERROR);
+                            CSV_PARENT_SPC_ERROR);
+                    }
+                    parentSpcMap.put(csvPojos.getInventoryId(), csvPojos);
+                } else {
+                    if (csvPojos.hasParentInventoryId()) {
+                        // check that parent and child specimens have the same
+                        // patient number
+                        SpecimenBatchOpInputPojo parentCsvInfo =
+                            parentSpcMap.get(csvPojos.getParentInventoryId());
+
+                        if ((parentCsvInfo != null)
+                            && !csvPojos.getPatientNumber().equals(
+                                parentCsvInfo.getPatientNumber())) {
+                            getErrorList().addError(reader.getLineNumber(),
+                                CSV_SPC_PATIENT_ERROR);
+                        }
                     }
                 }
-            }
 
-            // check if only position defined and no label and no product
-            // barcode
-            if ((csvPojos.getPalletProductBarcode() == null)
-                && (csvPojos.getPalletLabel() == null)
-                && (csvPojos.getPalletPosition() != null)) {
-                getErrorList().addError(reader.getLineNumber(),
-                    CSV_PALLET_POS_ERROR);
-            }
+                // check if only position defined and no label and no product
+                // barcode
+                if ((csvPojos.getPalletProductBarcode() == null)
+                    && (csvPojos.getPalletLabel() == null)
+                    && (csvPojos.getPalletPosition() != null)) {
+                    getErrorList().addError(reader.getLineNumber(),
+                        CSV_PALLET_POS_ERROR);
+                }
 
-            //
-            if ((csvPojos.getPalletProductBarcode() != null)
-                && (csvPojos.getPalletPosition() == null)) {
-                getErrorList().addError(reader.getLineNumber(),
-                    CSV_PROD_BARCODE_NO_POS_ERROR);
-            }
+                //
+                if ((csvPojos.getPalletProductBarcode() != null)
+                    && (csvPojos.getPalletPosition() == null)) {
+                    getErrorList().addError(reader.getLineNumber(),
+                        CSV_PROD_BARCODE_NO_POS_ERROR);
+                }
 
-            if ((csvPojos.getPalletLabel() != null)
-                && (csvPojos.getPalletPosition() == null)) {
-                getErrorList().addError(reader.getLineNumber(),
-                    CSV_PALLET_POS_ERROR);
-            }
+                if ((csvPojos.getPalletLabel() != null)
+                    && (csvPojos.getPalletPosition() == null)) {
+                    getErrorList().addError(reader.getLineNumber(),
+                        CSV_PALLET_POS_ERROR);
+                }
 
-            if ((csvPojos.getPalletLabel() != null)
-                && (csvPojos.getRootContainerType() == null)) {
-                getErrorList().addError(reader.getLineNumber(),
-                    CSV_PALLET_LABEL_NO_CTYPE_ERROR);
-            }
+                if ((csvPojos.getPalletLabel() != null)
+                    && (csvPojos.getRootContainerType() == null)) {
+                    getErrorList().addError(reader.getLineNumber(),
+                        CSV_PALLET_LABEL_NO_CTYPE_ERROR);
+                }
 
-            csvPojos.setLineNumber(reader.getLineNumber());
-            csvInfos.add(csvPojos);
+                csvPojos.setLineNumber(reader.getLineNumber());
+                csvInfos.add(csvPojos);
+            }
+        } catch (SuperCSVReflectionException e) {
+            throw new ClientBatchOpErrorsException(e);
+        } catch (SuperCSVException e) {
+            throw new ClientBatchOpErrorsException(e);
+        } catch (IOException e) {
+            throw new ClientBatchOpErrorsException(e);
         }
 
         return csvInfos;

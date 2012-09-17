@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**
+ * Helper class to aid in saving specimens via Specimen BatchOp.
  * 
  * @author loyola
  * 
