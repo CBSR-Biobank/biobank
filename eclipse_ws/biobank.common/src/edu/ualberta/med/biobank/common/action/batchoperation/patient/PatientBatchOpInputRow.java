@@ -2,14 +2,14 @@ package edu.ualberta.med.biobank.common.action.batchoperation.patient;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputRow;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 
 /**
  * 
  * @author loyola
  * 
  */
-public class PatientBatchOpInputRow implements IBatchOpInputRow {
+public class PatientBatchOpInputRow implements IBatchOpInputPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;

@@ -20,11 +20,11 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputRow;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 
-public class LegacyImportBeanReader {
+public class LegacyImportSpecimenPojoReader {
     private static final I18n i18n = I18nFactory
         .getI18n(DecodeImageForm.class);
 
@@ -90,43 +90,41 @@ public class LegacyImportBeanReader {
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    private final List<SpecimenBatchOpInputRow> csvInfos =
-        new ArrayList<SpecimenBatchOpInputRow>(0);
+    private final List<SpecimenBatchOpInputPojo> csvInfos =
+        new ArrayList<SpecimenBatchOpInputPojo>(0);
 
-    public static boolean isHeaderValid(ICsvBeanReader reader)
-        throws IOException {
-        String[] csvHeader = reader.getCSVHeader(true);
-        return csvHeader[0].equals(CSV_FIRST_HEADER)
-            && (csvHeader.length == NAME_MAPPINGS.length);
+    public static boolean isHeaderValid(String[] csvHeaders) {
+        return csvHeaders[0].equals(CSV_FIRST_HEADER)
+            && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
-    public List<SpecimenBatchOpInputRow> getBeans(ICsvBeanReader reader)
+    public List<SpecimenBatchOpInputPojo> getBeans(ICsvBeanReader reader)
         throws SuperCSVReflectionException, BatchOpErrorsException,
         SuperCSVException, IOException {
-        final Map<String, SpecimenBatchOpInputRow> parentSpcMap =
-            new HashMap<String, SpecimenBatchOpInputRow>();
+        final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
+            new HashMap<String, SpecimenBatchOpInputPojo>();
 
-        SpecimenBatchOpInputRow csvInfo;
+        SpecimenBatchOpInputPojo csvPojos;
 
-        while ((csvInfo =
-            reader.read(SpecimenBatchOpInputRow.class,
+        while ((csvPojos =
+            reader.read(SpecimenBatchOpInputPojo.class,
                 NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
-            if (csvInfo.getSourceSpecimen()) {
-                if (csvInfo.hasParentInventoryId()) {
+            if (csvPojos.getSourceSpecimen()) {
+                if (csvPojos.hasParentInventoryId()) {
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_PARENT_SPC_ERROR);
                 }
-                parentSpcMap.put(csvInfo.getInventoryId(), csvInfo);
+                parentSpcMap.put(csvPojos.getInventoryId(), csvPojos);
             } else {
-                if (csvInfo.hasParentInventoryId()) {
+                if (csvPojos.hasParentInventoryId()) {
                     // check that parent and child specimens have the same
                     // patient number
-                    SpecimenBatchOpInputRow parentCsvInfo =
-                        parentSpcMap.get(csvInfo.getParentInventoryId());
+                    SpecimenBatchOpInputPojo parentCsvInfo =
+                        parentSpcMap.get(csvPojos.getParentInventoryId());
 
                     if ((parentCsvInfo != null)
-                        && !csvInfo.getPatientNumber().equals(
+                        && !csvPojos.getPatientNumber().equals(
                             parentCsvInfo.getPatientNumber())) {
                         getErrorList().addError(reader.getLineNumber(),
                             CSV_SPC_PATIENT_ERROR);
@@ -136,34 +134,34 @@ public class LegacyImportBeanReader {
 
             // check if only position defined and no label and no product
             // barcode
-            if ((csvInfo.getPalletProductBarcode() == null)
-                && (csvInfo.getPalletLabel() == null)
-                && (csvInfo.getPalletPosition() != null)) {
+            if ((csvPojos.getPalletProductBarcode() == null)
+                && (csvPojos.getPalletLabel() == null)
+                && (csvPojos.getPalletPosition() != null)) {
                 getErrorList().addError(reader.getLineNumber(),
                     CSV_PALLET_POS_ERROR);
             }
 
             //
-            if ((csvInfo.getPalletProductBarcode() != null)
-                && (csvInfo.getPalletPosition() == null)) {
+            if ((csvPojos.getPalletProductBarcode() != null)
+                && (csvPojos.getPalletPosition() == null)) {
                 getErrorList().addError(reader.getLineNumber(),
                     CSV_PROD_BARCODE_NO_POS_ERROR);
             }
 
-            if ((csvInfo.getPalletLabel() != null)
-                && (csvInfo.getPalletPosition() == null)) {
+            if ((csvPojos.getPalletLabel() != null)
+                && (csvPojos.getPalletPosition() == null)) {
                 getErrorList().addError(reader.getLineNumber(),
                     CSV_PALLET_POS_ERROR);
             }
 
-            if ((csvInfo.getPalletLabel() != null)
-                && (csvInfo.getRootContainerType() == null)) {
+            if ((csvPojos.getPalletLabel() != null)
+                && (csvPojos.getRootContainerType() == null)) {
                 getErrorList().addError(reader.getLineNumber(),
                     CSV_PALLET_LABEL_NO_CTYPE_ERROR);
             }
 
-            csvInfo.setLineNumber(reader.getLineNumber());
-            csvInfos.add(csvInfo);
+            csvPojos.setLineNumber(reader.getLineNumber());
+            csvInfos.add(csvPojos);
         }
 
         return csvInfos;

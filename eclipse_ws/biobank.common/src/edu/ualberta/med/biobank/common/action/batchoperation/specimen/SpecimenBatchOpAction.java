@@ -141,7 +141,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
     private final Center workingCenter;
 
-    private CompressedReference<ArrayList<SpecimenBatchOpInputRow>> compressedList =
+    private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
 
     private final Set<SpecimenBatchOpHelper> specimenImportInfos =
@@ -156,10 +156,10 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
     public SpecimenBatchOpAction(Center workingCenter,
-        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens) {
+        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens) {
         this.workingCenter = workingCenter;
         compressedList =
-            new CompressedReference<ArrayList<SpecimenBatchOpInputRow>>(
+            new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
                 batchOpSpecimens);
     }
 
@@ -176,7 +176,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<SpecimenBatchOpInputRow> batchOpSpecimens;
+        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens;
 
         try {
             batchOpSpecimens = compressedList.get();
@@ -188,7 +188,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         context.getSession().getTransaction();
 
-        for (SpecimenBatchOpInputRow batchOpSpecimen : batchOpSpecimens) {
+        for (SpecimenBatchOpInputPojo batchOpSpecimen : batchOpSpecimens) {
             SpecimenBatchOpHelper info = getDbInfo(context, batchOpSpecimen);
             specimenImportInfos.add(info);
 
@@ -257,7 +257,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
     // get referenced items that exist in the database
     private SpecimenBatchOpHelper getDbInfo(ActionContext context,
-        SpecimenBatchOpInputRow csvInfo) {
+        SpecimenBatchOpInputPojo csvInfo) {
         SpecimenBatchOpHelper info = new SpecimenBatchOpHelper(csvInfo);
         info.setUser(context.getUser());
 

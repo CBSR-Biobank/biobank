@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputRow;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -94,7 +94,7 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAllSpecimens(
                 factory.getDefaultStudy(), originInfos, patients);
 
@@ -130,14 +130,14 @@ public class TestSpecimenCsvImport extends TestAction {
         tx.commit();
 
         // make sure you can add parent specimens without a worksheet #
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
         // remove the worksheet # for the last half
         int half = csvInfos.size() / 2;
         int count = 0;
-        for (SpecimenBatchOpInputRow csvInfo : csvInfos) {
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             if (count > half) {
                 csvInfo.setWorksheet(null);
             }
@@ -192,7 +192,7 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), parentSpecimens);
 
@@ -220,8 +220,8 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
-            new ArrayList<SpecimenBatchOpInputRow>();
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            new ArrayList<SpecimenBatchOpInputPojo>();
         csvInfos.add(
             specimenCsvHelper.aliquotedSpecimenCreate(null,
                 aliquotedSpecimen.getSpecimenType().getName(),
@@ -256,11 +256,11 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
                 originInfos, patients);
         // set all patient numbers to null
-        for (SpecimenBatchOpInputRow csvInfo : csvInfos) {
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             csvInfo.setPatientNumber("");
         }
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
@@ -306,7 +306,7 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), parentSpecimens);
         specimenCsvHelper.addComments(csvInfos);
@@ -350,16 +350,16 @@ public class TestSpecimenCsvImport extends TestAction {
 
         tx.commit();
 
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
-            new ArrayList<SpecimenBatchOpInputRow>();
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            new ArrayList<SpecimenBatchOpInputPojo>();
         csvInfos = specimenCsvHelper.createAllSpecimens(
             factory.getDefaultStudy(), originInfos, patients);
 
         // only the aliquoted specimens will have a position
-        List<SpecimenBatchOpInputRow> aliquotedSpecimensCsvInfos =
-            new ArrayList<SpecimenBatchOpInputRow>();
+        List<SpecimenBatchOpInputPojo> aliquotedSpecimensCsvInfos =
+            new ArrayList<SpecimenBatchOpInputPojo>();
 
-        for (SpecimenBatchOpInputRow csvInfo : csvInfos) {
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             if (csvInfo.getSourceSpecimen()) continue;
             aliquotedSpecimensCsvInfos.add(csvInfo);
         }
@@ -401,13 +401,13 @@ public class TestSpecimenCsvImport extends TestAction {
         tx.commit();
 
         // make sure you can add parent specimens without a worksheet #
-        ArrayList<SpecimenBatchOpInputRow> csvInfos =
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
                 factory.getDefaultStudy().getSourceSpecimens());
 
         specimenCsvHelper
             .fillContainersWithSpecimenFromCsv(
-                new ArrayList<SpecimenBatchOpInputRow>(csvInfos),
+                new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
                 childL2Containers);
 
         SpecimenCsvWriter.write(CSV_NAME, csvInfos);
@@ -425,8 +425,8 @@ public class TestSpecimenCsvImport extends TestAction {
     }
 
     private void checkCsvInfoAgainstDb(
-        ArrayList<SpecimenBatchOpInputRow> csvInfos) {
-        for (SpecimenBatchOpInputRow csvInfo : csvInfos) {
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos) {
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             Criteria c = session.createCriteria(Specimen.class, "s")
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()));
 

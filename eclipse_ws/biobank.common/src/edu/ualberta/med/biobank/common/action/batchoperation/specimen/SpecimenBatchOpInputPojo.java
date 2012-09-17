@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputRow;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 
 /**
  * POJO used by the Specimen Batch Operation feature to import specimen
@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputRow;
  * @author loyola
  * 
  */
-public class SpecimenBatchOpInputRow implements IBatchOpInputRow {
+public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     private static final long serialVersionUID = 1L;
 
     private int lineNumber;

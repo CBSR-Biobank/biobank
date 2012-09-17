@@ -31,7 +31,7 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpHelper.class.getName());
 
-    private final SpecimenBatchOpInputRow csvInfo;
+    private final SpecimenBatchOpInputPojo csvInfo;
     private SpecimenBatchOpHelper parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
@@ -44,7 +44,7 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
     private Specimen specimen;
     private User user;
 
-    SpecimenBatchOpHelper(SpecimenBatchOpInputRow csvInfo) {
+    SpecimenBatchOpHelper(SpecimenBatchOpInputPojo csvInfo) {
         this.csvInfo = csvInfo;
     }
 
@@ -53,7 +53,7 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
         return csvInfo.getLineNumber();
     }
 
-    public SpecimenBatchOpInputRow getCsvInfo() {
+    public SpecimenBatchOpInputPojo getCsvInfo() {
         return csvInfo;
     }
 
