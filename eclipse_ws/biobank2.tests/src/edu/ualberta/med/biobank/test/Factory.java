@@ -108,7 +108,7 @@ public class Factory {
 
     /**
      * Made this public so that it can be used by other helpers. For example
-     * {@link SpecimenCsvHelper} uses this to generate strings used as values
+     * {@link SpecimenBatchOpPojoHelper} uses this to generate strings used as values
      * for attributes.
      */
     public NameGenerator getNameGenerator() {

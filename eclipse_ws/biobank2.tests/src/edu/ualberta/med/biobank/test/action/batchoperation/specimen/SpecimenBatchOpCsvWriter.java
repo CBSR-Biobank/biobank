@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.specimen;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,12 +15,12 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 /**
- * Used for testing the Specimen CSV file Legacy Import feature.
+ * Used for writing SpecimenBatchOpInputPojo to CSV files.
  * 
  * @author Nelson Loyola
  * 
  */
-class SpecimenCsvWriter {
+class SpecimenBatchOpCsvWriter {
 
     /**
      * Generates a Patient CSV file with random patient numbers.

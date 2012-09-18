@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport;
+package edu.ualberta.med.biobank.test.action.batchoperation;
 
 import org.slf4j.Logger;
 

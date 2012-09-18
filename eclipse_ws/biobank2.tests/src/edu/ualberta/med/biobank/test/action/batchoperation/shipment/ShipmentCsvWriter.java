@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.shipment;
+package edu.ualberta.med.biobank.test.action.batchoperation.shipment;
 
 import java.io.FileWriter;
 import java.io.IOException;

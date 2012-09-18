@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.patient;
+package edu.ualberta.med.biobank.test.action.batchoperation.patient;
 
 import java.io.IOException;
 import java.util.Set;
@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatc
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.action.TestAction;
-import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
+import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
 /**
  * 

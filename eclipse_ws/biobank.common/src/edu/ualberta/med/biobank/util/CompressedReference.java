@@ -55,7 +55,7 @@ public class CompressedReference<T extends Serializable>
         try {
             ObjectOutputStream oos;
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            out = new GZIPOutputStream(out);
+            out = new GZIPOutputStream(bos);
             out = oos = new ObjectOutputStream(out);
 
             oos.writeObject(referent);

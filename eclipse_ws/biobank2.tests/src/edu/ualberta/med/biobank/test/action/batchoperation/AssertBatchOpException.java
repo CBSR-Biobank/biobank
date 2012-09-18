@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport;
+package edu.ualberta.med.biobank.test.action.batchoperation;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,13 +10,13 @@ import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.LString;
 
-public class AssertCsvImportException {
+public class AssertBatchOpException {
 
     private final Set<LString> expectedMessages = new HashSet<LString>(0);
 
     private final Set<String> errorMessages = new HashSet<String>(0);
 
-    public AssertCsvImportException withMessage(LString message) {
+    public AssertBatchOpException withMessage(LString message) {
         expectedMessages.add(message);
         return this;
     }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.specimen;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,15 +28,16 @@ import edu.ualberta.med.biobank.test.Utils;
  * 
  */
 @SuppressWarnings("nls")
-class SpecimenCsvHelper {
+class SpecimenBatchOpPojoHelper {
     private final NameGenerator nameGenerator;
 
-    SpecimenCsvHelper(NameGenerator nameGenerator) {
+    SpecimenBatchOpPojoHelper(NameGenerator nameGenerator) {
         this.nameGenerator = nameGenerator;
     }
 
     /**
-     * Creates a CSV with source specimens and aliquoted specimens.
+     * Creates specimen BatchOp pojos with source specimens and aliquoted
+     * specimens.
      * 
      * @param csvname the file name to save the data to.
      * @param study the study the the patients belong to. Note that the study
@@ -176,7 +177,7 @@ class SpecimenCsvHelper {
         return specimenInfo;
     }
 
-    public void fillContainersWithSpecimenFromCsv(
+    public void fillContainersWithSpecimenBatchOpPojos(
         List<SpecimenBatchOpInputPojo> specimenCsvInfos,
         Set<Container> containers) {
 

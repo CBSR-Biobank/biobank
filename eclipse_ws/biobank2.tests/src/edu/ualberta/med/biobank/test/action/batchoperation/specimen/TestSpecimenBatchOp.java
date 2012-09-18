@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.specimen;
+package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.action.TestAction;
-import edu.ualberta.med.biobank.test.action.csvimport.AssertCsvImportException;
-import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
+import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpException;
+import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
 /**
  * 
@@ -37,14 +37,14 @@ import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
  * 
  */
 @SuppressWarnings("nls")
-public class TestSpecimenCsvImport extends TestAction {
+public class TestSpecimenBatchOp extends TestAction {
 
     private static Logger log = LoggerFactory
-        .getLogger(TestSpecimenCsvImport.class.getName());
+        .getLogger(TestSpecimenBatchOp.class.getName());
 
     private static final String CSV_NAME = "import_specimens.csv";
 
-    private SpecimenCsvHelper specimenCsvHelper;
+    private SpecimenBatchOpPojoHelper specimenCsvHelper;
 
     private final Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
 
@@ -54,7 +54,7 @@ public class TestSpecimenCsvImport extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        specimenCsvHelper = new SpecimenCsvHelper(factory.getNameGenerator());
+        specimenCsvHelper = new SpecimenBatchOpPojoHelper(factory.getNameGenerator());
 
         tx = session.beginTransaction();
         factory.createSite();
@@ -99,7 +99,7 @@ public class TestSpecimenCsvImport extends TestAction {
                 factory.getDefaultStudy(), originInfos, patients);
 
         // write out to CSV file so we can view data
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -196,7 +196,7 @@ public class TestSpecimenCsvImport extends TestAction {
             specimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), parentSpecimens);
 
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -226,7 +226,7 @@ public class TestSpecimenCsvImport extends TestAction {
             specimenCsvHelper.aliquotedSpecimenCreate(null,
                 aliquotedSpecimen.getSpecimenType().getName(),
                 patient.getPnumber(), 1));
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -235,7 +235,7 @@ public class TestSpecimenCsvImport extends TestAction {
             Assert
                 .fail("should not be allowed to create aliquot specimens with no collection events");
         } catch (BatchOpErrorsException e) {
-            new AssertCsvImportException()
+            new AssertBatchOpException()
                 .withMessage(SpecimenBatchOpAction.CSV_CEVENT_ERROR
                     .format());
         }
@@ -263,7 +263,7 @@ public class TestSpecimenCsvImport extends TestAction {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             csvInfo.setPatientNumber("");
         }
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -310,7 +310,7 @@ public class TestSpecimenCsvImport extends TestAction {
             specimenCsvHelper.createAliquotedSpecimens(
                 factory.getDefaultStudy(), parentSpecimens);
         specimenCsvHelper.addComments(csvInfos);
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -364,10 +364,10 @@ public class TestSpecimenCsvImport extends TestAction {
             aliquotedSpecimensCsvInfos.add(csvInfo);
         }
 
-        specimenCsvHelper.fillContainersWithSpecimenFromCsv(
+        specimenCsvHelper.fillContainersWithSpecimenBatchOpPojos(
             aliquotedSpecimensCsvInfos, childL2Containers);
 
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =
@@ -406,11 +406,11 @@ public class TestSpecimenCsvImport extends TestAction {
                 factory.getDefaultStudy().getSourceSpecimens());
 
         specimenCsvHelper
-            .fillContainersWithSpecimenFromCsv(
+            .fillContainersWithSpecimenBatchOpPojos(
                 new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
                 childL2Containers);
 
-        SpecimenCsvWriter.write(CSV_NAME, csvInfos);
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
             SpecimenBatchOpAction importAction =

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.csvimport.shipment;
+package edu.ualberta.med.biobank.test.action.batchoperation.shipment;
 
 import java.util.Date;
 import java.util.HashSet;
