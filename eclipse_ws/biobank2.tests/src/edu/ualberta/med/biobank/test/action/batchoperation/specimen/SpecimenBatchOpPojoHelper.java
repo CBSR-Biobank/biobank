@@ -31,8 +31,11 @@ import edu.ualberta.med.biobank.test.Utils;
 class SpecimenBatchOpPojoHelper {
     private final NameGenerator nameGenerator;
 
+    private int lineNumber;
+
     SpecimenBatchOpPojoHelper(NameGenerator nameGenerator) {
         this.nameGenerator = nameGenerator;
+        this.lineNumber = 0;
     }
 
     /**
@@ -166,7 +169,10 @@ class SpecimenBatchOpPojoHelper {
 
     public SpecimenBatchOpInputPojo aliquotedSpecimenCreate(
         String parentInventoryId, String specimenTypeName) {
+        ++lineNumber;
+
         SpecimenBatchOpInputPojo specimenInfo = new SpecimenBatchOpInputPojo();
+        specimenInfo.setLineNumber(lineNumber);
         specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
