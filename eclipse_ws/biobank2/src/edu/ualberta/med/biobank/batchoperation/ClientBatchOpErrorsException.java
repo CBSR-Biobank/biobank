@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.batchoperation;
 
+import java.io.IOException;
 import java.util.Set;
+
+import org.supercsv.exception.SuperCSVException;
 
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 
@@ -11,6 +14,14 @@ public class ClientBatchOpErrorsException extends RuntimeException {
 
     public ClientBatchOpErrorsException(Set<BatchOpException<String>> errors) {
         addErrors(errors);
+    }
+
+    public ClientBatchOpErrorsException(SuperCSVException e) {
+        super(e);
+    }
+
+    public ClientBatchOpErrorsException(IOException e) {
+        super(e);
     }
 
     public void addErrors(Set<BatchOpException<String>> errors) {

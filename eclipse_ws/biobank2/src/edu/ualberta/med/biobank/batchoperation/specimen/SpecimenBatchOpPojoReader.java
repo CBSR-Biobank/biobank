@@ -96,6 +96,8 @@ public class SpecimenBatchOpPojoReader implements
         };
     // @formatter:on
 
+    private ICsvBeanReader reader;
+
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
@@ -107,7 +109,8 @@ public class SpecimenBatchOpPojoReader implements
             && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
-    public List<SpecimenBatchOpInputPojo> getPojos(ICsvBeanReader reader)
+    @Override
+    public List<SpecimenBatchOpInputPojo> getPojos()
         throws ClientBatchOpErrorsException {
         final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
             new HashMap<String, SpecimenBatchOpInputPojo>();
@@ -172,6 +175,8 @@ public class SpecimenBatchOpPojoReader implements
                 csvPojos.setLineNumber(reader.getLineNumber());
                 csvInfos.add(csvPojos);
             }
+
+            return csvInfos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
@@ -179,11 +184,25 @@ public class SpecimenBatchOpPojoReader implements
         } catch (IOException e) {
             throw new ClientBatchOpErrorsException(e);
         }
-
-        return csvInfos;
     }
 
+    @Override
+    public void setReader(ICsvBeanReader reader) {
+        this.reader = reader;
+    }
+
+    @Override
     public ClientBatchOpInputErrorList getErrorList() {
         return errorList;
+    }
+
+    @Override
+    public void preExecution() {
+        // does nothing
+    }
+
+    @Override
+    public void postExecution() {
+        // does nothing
     }
 }

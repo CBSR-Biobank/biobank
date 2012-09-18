@@ -14,10 +14,13 @@ import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
 import org.supercsv.io.ICsvBeanReader;
 
+import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
+import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 
-public class CbsrTecanSpecimenPojoReader {
+public class CbsrTecanSpecimenPojoReader implements
+    IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
@@ -63,11 +66,23 @@ public class CbsrTecanSpecimenPojoReader {
         };
     // @formatter:on
 
+    private ICsvBeanReader reader;
+
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
     private final List<SpecimenBatchOpInputPojo> csvInfos =
         new ArrayList<SpecimenBatchOpInputPojo>(0);
+
+    @Override
+    public void setReader(ICsvBeanReader reader) {
+        this.reader = reader;
+    }
+
+    @Override
+    public ClientBatchOpInputErrorList getErrorList() {
+        return errorList;
+    }
 
     public static boolean isHeaderValid(String[] csvHeaders) {
         if (csvHeaders == null) {
@@ -77,24 +92,40 @@ public class CbsrTecanSpecimenPojoReader {
             && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
-    public List<SpecimenBatchOpInputPojo> getBeans(ICsvBeanReader reader)
-        throws SuperCSVReflectionException, SuperCSVException, IOException {
+    @Override
+    public List<SpecimenBatchOpInputPojo> getPojos()
+        throws ClientBatchOpErrorsException {
         final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
             new HashMap<String, SpecimenBatchOpInputPojo>();
 
         SpecimenBatchOpInputPojo csvPojos;
 
-        while ((csvPojos =
-            reader.read(SpecimenBatchOpInputPojo.class,
-                NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
+        try {
+            while ((csvPojos =
+                reader.read(SpecimenBatchOpInputPojo.class,
+                    NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
+            }
+            return csvInfos;
+        } catch (SuperCSVReflectionException e) {
+            throw new ClientBatchOpErrorsException(e);
+        } catch (SuperCSVException e) {
+            throw new ClientBatchOpErrorsException(e);
+        } catch (IOException e) {
+            throw new ClientBatchOpErrorsException(e);
         }
-        return csvInfos;
     }
 
-    public ClientBatchOpInputErrorList getErrorList() {
+    @Override
+    public void preExecution() {
         // TODO Auto-generated method stub
-        return null;
+
+    }
+
+    @Override
+    public void postExecution() {
+        // TODO Auto-generated method stub
+
     }
 
 }
