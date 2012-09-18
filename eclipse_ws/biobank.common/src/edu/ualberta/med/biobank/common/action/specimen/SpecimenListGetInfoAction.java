@@ -67,6 +67,9 @@ public abstract class SpecimenListGetInfoAction implements
             specInfo.positionString = (String) row[2];
             specInfo.topContainerTypeNameShort = (String) row[3];
             infos.add(specInfo);
+
+            // load required information
+            specInfo.specimen.getOriginInfo().getCenter().getNameShort();
         }
 
         for (SpecimenInfo info : infos) {
