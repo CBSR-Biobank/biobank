@@ -9,6 +9,9 @@ import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
  * Interface used by classes that record errors in information originating from
  * CSV files.
  * 
+ * T is either an LString or a String. LString is used on the server and String
+ * is used in the client.
+ * 
  * @author Nelson Loyola
  * 
  */
