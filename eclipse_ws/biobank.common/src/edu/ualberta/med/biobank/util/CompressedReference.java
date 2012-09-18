@@ -48,18 +48,20 @@ public class CompressedReference<T extends Serializable>
         return decompress();
     }
 
-    @SuppressWarnings("resource")
     private byte[] compress(T referent) throws IOException {
         OutputStream out = null;
 
         try {
             ObjectOutputStream oos;
+            GZIPOutputStream zos;
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            out = new GZIPOutputStream(out);
+            out = zos = new GZIPOutputStream(bos);
             out = oos = new ObjectOutputStream(out);
 
             oos.writeObject(referent);
-            oos.flush();
+            
+            zos.finish();
+            bos.flush();
 
             byte[] compressed = bos.toByteArray();
             return compressed;
