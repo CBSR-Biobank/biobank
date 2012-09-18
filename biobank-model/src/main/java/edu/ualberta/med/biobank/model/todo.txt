@@ -3,6 +3,10 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[ ] Group models and actions into domains, such as, user, report, center, shipping,
+    etc. and actions/ services into those groups so that there are not so many
+    classes per package.
+    A: sure?
 [ ] Also record the user that inserted the object and the last user to modify
     object?
 [ ] Change annotations so that they use InheritanceType.JOINED, only for the
