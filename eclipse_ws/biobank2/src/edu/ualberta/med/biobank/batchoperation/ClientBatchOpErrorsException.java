@@ -7,6 +7,12 @@ import org.supercsv.exception.SuperCSVException;
 
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 
+/**
+ * Client side exception that can be thrown by a IBatchOpPojoReader.
+ * 
+ * @author Nelson Loyola
+ * 
+ */
 public class ClientBatchOpErrorsException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 

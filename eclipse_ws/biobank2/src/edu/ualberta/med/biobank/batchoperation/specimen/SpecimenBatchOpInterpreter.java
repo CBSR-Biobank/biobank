@@ -51,28 +51,18 @@ public class SpecimenBatchOpInterpreter {
                 throw new LocalizedException(BatchOpActionUtil.CSV_HEADER_ERROR);
             }
 
-            String[] csvHeaders = reader.getCSVHeader(true);
-
-            IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader = null;
-
-            if (SpecimenBatchOpPojoReader.isHeaderValid(csvHeaders)) {
-                pojoReader = new SpecimenBatchOpPojoReader();
-            } else if (CbsrTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-                pojoReader = new CbsrTecanSpecimenPojoReader();
-            } else if (false /* check for OHS TECAN file */) {
-
-            } else {
-                throw new IllegalStateException("no batchOp pojo reader found");
-            }
-
+            IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader =
+                SpecimenPojoReaderFactory.createPojoReader(
+                    reader.getCSVHeader(true));
             pojoReader.setReader(reader);
+            List<SpecimenBatchOpInputPojo> pojos = pojoReader.getPojos();
             errorList = pojoReader.getErrorList();
 
             if (!errorList.isEmpty()) {
                 throw new ClientBatchOpErrorsException(errorList.getErrors());
             }
 
-            return pojoReader.getPojos();
+            return pojos;
 
         } catch (SuperCSVException e) {
             throw new IllegalStateException(

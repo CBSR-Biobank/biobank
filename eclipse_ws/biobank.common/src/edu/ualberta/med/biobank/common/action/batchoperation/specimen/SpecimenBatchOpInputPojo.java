@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
  * <li>A TECAN output file. This can be a TECAN output file from OHS or CBSR.</li>
  * </ol>
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {

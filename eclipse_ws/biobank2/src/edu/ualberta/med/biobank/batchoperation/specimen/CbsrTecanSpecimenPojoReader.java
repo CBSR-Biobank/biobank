@@ -19,6 +19,13 @@ import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 
+/**
+ * Reads a TECAN CSV file containing specimen information and returns the file
+ * as a list of SpecimenBatchOpInputPojo.
+ * 
+ * @author Nelson Loyola
+ * 
+ */
 public class CbsrTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 

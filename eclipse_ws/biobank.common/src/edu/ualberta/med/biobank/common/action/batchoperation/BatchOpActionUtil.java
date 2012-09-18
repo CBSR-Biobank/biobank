@@ -18,8 +18,12 @@ import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 
 /**
+ * Server side utility functions that load model objects from the database.
+ * <p>
+ * <strong>These methods should eventually be moved to DAO classes for the
+ * individual model objects.</strong>
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")
