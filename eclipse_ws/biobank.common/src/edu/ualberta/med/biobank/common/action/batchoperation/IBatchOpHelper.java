@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.batchoperation;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public interface IBatchOpHelper {

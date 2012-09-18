@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.test.action.csvimport.specimen.TestSpecimenCsvIm
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public class TestShipmentCsvInfo extends TestAction {

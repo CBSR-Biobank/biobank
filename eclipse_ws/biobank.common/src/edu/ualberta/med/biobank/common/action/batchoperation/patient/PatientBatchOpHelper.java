@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.model.Study;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public class PatientBatchOpHelper implements IBatchOpHelper {

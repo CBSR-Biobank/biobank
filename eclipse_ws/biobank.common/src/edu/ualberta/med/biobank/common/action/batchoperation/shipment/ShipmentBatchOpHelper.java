@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.model.User;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")

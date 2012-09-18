@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")

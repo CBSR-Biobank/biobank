@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public class ShipmentBatchOpInputRow implements IBatchOpInputPojo {

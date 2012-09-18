@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 /**
  * Used for testing the Specimen CSV file Legacy Import feature.
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 class SpecimenCsvWriter {

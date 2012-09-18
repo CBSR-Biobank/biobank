@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 /**
  * Used for testing the Shipment CSV file Legacy Import feature.
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")

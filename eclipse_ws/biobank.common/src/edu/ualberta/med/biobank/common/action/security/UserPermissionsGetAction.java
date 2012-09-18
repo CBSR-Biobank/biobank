@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
  * Note: center ID can be null and the permissions that require a working center
  * will be left as false.
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 public class UserPermissionsGetAction implements Action<UserCreatePermissions> {

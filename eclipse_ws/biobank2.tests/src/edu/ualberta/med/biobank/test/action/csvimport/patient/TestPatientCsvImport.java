@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.test.action.csvimport.CsvUtil;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 @SuppressWarnings("nls")

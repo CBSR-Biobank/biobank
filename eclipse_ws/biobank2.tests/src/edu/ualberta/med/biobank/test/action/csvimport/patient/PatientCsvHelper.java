@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.test.Utils;
 
 /**
  * 
- * @author loyola
+ * @author Nelson Loyola
  * 
  */
 class PatientCsvHelper {
