@@ -56,7 +56,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             + "inventory ID is not present").format();
 
     public static final Tr CSV_PARENT_SPECIMEN_ERROR =
-        bundle.tr("parent specimen in CSV file with inventory id " +
+        bundle.tr("parent specimen with inventory id " +
             "\"{0}\" does not exist");
 
     public static final Tr CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR =
@@ -68,76 +68,31 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         bundle.tr("waybill \"{0}\" does not exist");
 
     public static final Tr CSV_SPECIMEN_TYPE_ERROR =
-        bundle.tr("specimen type in CSV file with name \"{0}\" does not exist");
+        bundle.tr("specimen type with name \"{0}\" does not exist");
 
     public static final Tr CSV_CONTAINER_LABEL_ERROR =
-        bundle.tr("container in CSV file with label \"{0}\" does not exist");
+        bundle.tr("container with label \"{0}\" does not exist");
 
     public static final Tr CSV_SPECIMEN_LABEL_ERROR =
         bundle
-            .tr("specimen position in CSV file with label \"{0}\" is invalid");
+            .tr("specimen position with label \"{0}\" is invalid");
 
     public static final Tr CSV_PATIENT_ERROR =
-        bundle.tr("patient in CSV file with number \"{0}\" not exist");
+        bundle.tr("patient number is missing");
+
+    public static final Tr CSV_PATIENT_DOES_NOT_EXIST_ERROR =
+        bundle.tr("patient with number \"{0}\" not exist");
+
+    public static final Tr CSV_PATIENT_MATCH_ERROR =
+        bundle.tr("patient with number \"{0}\" "
+            + "does not match the source specimen's patient");
 
     public static final Tr CSV_CEVENT_ERROR =
         bundle.tr("collection event with visit number \"{0}\" does not exist");
 
-    // private static final CsvReaderParams CBSR_TECAN_IMPORT =
-    // new CsvReaderParams(
-    // "Rack ID",
-    // new String[] {
-    // "rackId",
-    // "cavityId",
-    // "position",
-    // "sourceId",
-    // "concentration",
-    // "concentrationUnit",
-    // "volume",
-    // "userDefined1",
-    // "userDefined2",
-    // "userDefined3",
-    // "userDefined4",
-    // "userDefined5",
-    // "plateErrors",
-    // "samplEerrors",
-    // "sampleInstanceId",
-    // "sampleId"
-    // },
-    //
-//            // @formatter:off
-//            new CellProcessor[] {
-//                new StrNotNullOrEmpty(),            // rackId          
-//                new StrNotNullOrEmpty(),            // cavityId        
-//                new StrNotNullOrEmpty(),            // position        
-//                new Unique(),                       // sampleId        
-//                new ParseInt(),                     // concentration   
-//                new StrNotNullOrEmpty(),            // concentrationUnit
-//                new ParseInt(),                     // volume          
-//                new StrNotNullOrEmpty(),            // userDefined1    
-//                new StrNotNullOrEmpty(),            // userDefined2    
-//                new StrNotNullOrEmpty(),            // userDefined3    
-//                new StrNotNullOrEmpty(),            // userDefined4    
-//                new StrNotNullOrEmpty(),            // userDefined5    
-//                new StrNotNullOrEmpty(),            // plateErrors     
-//                new StrNotNullOrEmpty(),            // samplEerrors    
-//                new ParseInt(),                     // sampleInstanceId
-//                new ParseInt()                      // sampleId2
-//            }
-//            // @formatter:on    
-    // );
-    //
-    // private static final CsvReaderParams OHS_TECAN_IMPORT =
-    // new CsvReaderParams(
-    // "TECAN_Rack ID",
-    // new String[] {
-    // },
-    //
-//            // @formatter:off
-//            new CellProcessor[] {
-//            }
-//            // @formatter:on    
-    // );
+    public static final Tr CSV_CEVENT_MATCH_ERROR =
+        bundle.tr("collection event with visit number \"{0}\" "
+            + "does match the source specimen's collection event");
 
     private final Center workingCenter;
 
@@ -190,10 +145,12 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         for (SpecimenBatchOpInputPojo batchOpSpecimen : batchOpSpecimens) {
             SpecimenBatchOpHelper info = getDbInfo(context, batchOpSpecimen);
-            specimenImportInfos.add(info);
+            if (info != null) {
+                specimenImportInfos.add(info);
 
-            if (info.isSourceSpecimen()) {
-                parentSpcInvIds.put(batchOpSpecimen.getInventoryId(), info);
+                if (info.isSourceSpecimen()) {
+                    parentSpcInvIds.put(batchOpSpecimen.getInventoryId(), info);
+                }
             }
         }
 
@@ -216,6 +173,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
                 }
             } else {
                 info.setParentInfo(parentInfo);
+                info.setPatient(parentInfo.getPatient());
             }
         }
 
@@ -261,16 +219,66 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         SpecimenBatchOpHelper info = new SpecimenBatchOpHelper(csvInfo);
         info.setUser(context.getUser());
 
-        Patient patient = loadPatient(context, csvInfo.getPatientNumber());
-        info.setPatient(patient);
-
+        Specimen parentSpecimen = null;
+        Patient patient = null;
         CollectionEvent cevent = null;
 
-        // find the collection event for this specimen
-        for (CollectionEvent ce : patient.getCollectionEvents()) {
-            if (ce.getVisitNumber().equals(csvInfo.getVisitNumber())) {
-                cevent = ce;
-                break;
+        if (info.isSourceSpecimen()) {
+            patient = BatchOpActionUtil.getPatient(context,
+                csvInfo.getPatientNumber());
+            if (patient == null) {
+                errorList.addError(csvInfo.getLineNumber(),
+                    CSV_PATIENT_ERROR.format());
+                return null;
+            }
+            info.setPatient(patient);
+
+            cevent = findCeventByVisitNumber(csvInfo.getVisitNumber(),
+                patient.getCollectionEvents());
+        } else {
+            // get the patient and collection event from the source specimen
+            parentSpecimen = BatchOpActionUtil.getSpecimen(context,
+                csvInfo.getParentInventoryId());
+
+            if (parentSpecimen != null) {
+                if (parentSpecimen.getProcessingEvent() == null) {
+                    errorList.addError(csvInfo.getLineNumber(),
+                        CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(
+                            csvInfo.getInventoryId(),
+                            parentSpecimen.getInventoryId()));
+                }
+
+                cevent = parentSpecimen.getCollectionEvent();
+                patient = cevent.getPatient();
+
+                info.setParentSpecimen(parentSpecimen);
+                info.setPatient(patient);
+
+                log.debug(
+                    "setting patient on aliquoted specimen: invId={} pnumber={}",
+                    new Object[] {
+                        info.getPojo().getInventoryId(),
+                        info.getPojo().getPatientNumber()
+                    });
+
+                // if patient number and visit number present in the pojo
+                // ensure they match with the cevent and patient
+                if (csvInfo.hasPatientAndCollectionEvent()) {
+                    if (!csvInfo.getPatientNumber()
+                        .equals(patient.getPnumber())) {
+                        errorList.addError(csvInfo.getLineNumber(),
+                            CSV_PATIENT_MATCH_ERROR.format(
+                                csvInfo.getPatientNumber()));
+                    }
+
+                    if (!csvInfo.getVisitNumber().equals(
+                        cevent.getVisitNumber())) {
+                        errorList.addError(csvInfo.getLineNumber(),
+                            CSV_CEVENT_MATCH_ERROR.format(
+                                csvInfo.getVisitNumber()));
+                    }
+
+                }
             }
         }
 
@@ -281,21 +289,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         info.setCevent(cevent);
-
-        if (info.isAliquotedSpecimen()) {
-            Specimen parentSpecimen = BatchOpActionUtil.getSpecimen(context,
-                csvInfo.getParentInventoryId());
-            if (parentSpecimen != null) {
-                if (parentSpecimen.getProcessingEvent() == null) {
-                    errorList.addError(csvInfo.getLineNumber(),
-                        CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(csvInfo
-                            .getInventoryId(),
-                            parentSpecimen.getInventoryId()));
-
-                }
-                info.setParentSpecimen(parentSpecimen);
-            }
-        }
 
         if ((csvInfo.getWaybill() != null)
             && !csvInfo.getWaybill().isEmpty()) {
@@ -321,9 +314,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         // only get container information if defined for this row
         if (info.hasPosition()) {
-            Container container =
-                BatchOpActionUtil.getContainer(context,
-                    csvInfo.getPalletLabel());
+            Container container = BatchOpActionUtil.getContainer(context,
+                csvInfo.getPalletLabel());
             if (container == null) {
                 errorList.addError(csvInfo.getLineNumber(),
                     CSV_CONTAINER_LABEL_ERROR.format(csvInfo.getPalletLabel()));
@@ -357,23 +349,32 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         CollectionEvent cevent = info.getCevent();
         if (cevent == null) {
-            // see if this collection event was created for a previous specimen
-            for (CollectionEvent patientCevent : info.getPatient()
-                .getCollectionEvents()) {
-                if (patientCevent.getVisitNumber().equals(
-                    info.getCsvInfo().getVisitNumber())) {
-                    cevent = patientCevent;
+            // if this is a source specimen then see if the patient has the
+            // collection event
+            if (info.getPojo().getSourceSpecimen()) {
+                for (CollectionEvent patientCevent : info.getPatient()
+                    .getCollectionEvents()) {
+                    if (patientCevent.getVisitNumber().equals(
+                        info.getPojo().getVisitNumber())) {
+                        cevent = patientCevent;
 
-                    log.debug("collection event found: pt={} v#={} invId={}",
-                        new Object[] {
-                            info.getCsvInfo().getPatientNumber(),
-                            info.getCsvInfo().getVisitNumber(),
-                            info.getCsvInfo().getInventoryId()
-                        });
+                        log.debug(
+                            "collection event found: pt={} v#={} invId={}",
+                            new Object[] {
+                                info.getPojo().getPatientNumber(),
+                                info.getPojo().getVisitNumber(),
+                                info.getPojo().getInventoryId()
+                            });
 
-                    info.setCevent(cevent);
+                    }
                 }
+            } else {
+                // if this is an aliquoted specimen, then get the collection
+                // event from the source specimen
+                cevent = info.getParentSpecimen().getCollectionEvent();
             }
+
+            info.setCevent(cevent);
 
             // if still not found create one
             if (cevent == null) {
@@ -396,6 +397,17 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         return spc;
     }
 
+    // find the collection event for this specimen
+    private CollectionEvent findCeventByVisitNumber(Integer visitNumber,
+        Set<CollectionEvent> cevents) {
+        for (CollectionEvent ce : cevents) {
+            if (ce.getVisitNumber().equals(visitNumber)) {
+                return ce;
+            }
+        }
+        return null;
+    }
+
     /*
      * Generates an action exception if patient does not exist.
      */
@@ -403,7 +415,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         // make sure patient exists
         Patient p = BatchOpActionUtil.getPatient(context, pnumber);
         if (p == null) {
-            throw new LocalizedException(CSV_PATIENT_ERROR.format(pnumber));
+            throw new LocalizedException(
+                CSV_PATIENT_DOES_NOT_EXIST_ERROR.format(pnumber));
         }
         return p;
     }

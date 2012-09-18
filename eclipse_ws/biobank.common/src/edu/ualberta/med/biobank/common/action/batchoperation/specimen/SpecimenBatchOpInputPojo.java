@@ -188,6 +188,11 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
         return (parentInventoryId != null) && !parentInventoryId.isEmpty();
     }
 
+    public boolean hasPatientAndCollectionEvent() {
+        return (patientNumber != null) && !patientNumber.isEmpty()
+            && (visitNumber != null);
+    }
+
     public boolean hasProductBarcodeAndPosition() {
         return (palletProductBarcode != null) && !parentInventoryId.isEmpty()
             && (palletPosition != null) && !palletPosition.isEmpty();

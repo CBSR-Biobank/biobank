@@ -234,14 +234,14 @@ End:
   <target name="keystore-gen">
     <hostinfo prefix="local" />
 
-    <echo message="Helping you to generate a TEMPORARY TRHOW-AWAY TEST key..." />
+    <echo message="Helping you to generate a TEMPORARY THROW-AWAY TEST key..." />
     <input message="Enter CN:"
            addproperty="dName.CN"
            defaultValue="localhost" />
-    <input message="Enter subjectAltName:" 
+    <input message="Enter subjectAltName:"
            addproperty="subjectAltName"
            defaultValue="IP:${local.ADDR4},DNS:localhost" />
-    <input message="Enter an alias:" 
+    <input message="Enter an alias:"
            addproperty="keystore.alias"
            defaultValue="${dName.CN}" />
 

@@ -144,8 +144,7 @@ class SpecimenBatchOpPojoHelper {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
                 SpecimenBatchOpInputPojo specimenInfo =
                     aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
-                        as.getSpecimenType().getName(),
-                        parentSpecimenInfo.getValue(), 1);
+                        as.getSpecimenType().getName());
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -156,7 +155,9 @@ class SpecimenBatchOpPojoHelper {
     private SpecimenBatchOpInputPojo sourceSpecimenCreate(
         String specimenTypeName, String patientNumber, String waybill) {
         SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
-            null, specimenTypeName, patientNumber, 1);
+            null, specimenTypeName);
+        specimenInfo.setPatientNumber(patientNumber);
+        specimenInfo.setVisitNumber(1);
         specimenInfo.setWaybill(waybill);
         specimenInfo.setWorksheet(nameGenerator.next(ProcessingEvent.class));
         specimenInfo.setSourceSpecimen(true);
@@ -164,16 +165,12 @@ class SpecimenBatchOpPojoHelper {
     }
 
     public SpecimenBatchOpInputPojo aliquotedSpecimenCreate(
-        String parentInventoryId, String specimenTypeName,
-        String patientNumber,
-        int visitNumber) {
+        String parentInventoryId, String specimenTypeName) {
         SpecimenBatchOpInputPojo specimenInfo = new SpecimenBatchOpInputPojo();
         specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
         specimenInfo.setParentInventoryId(parentInventoryId);
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
-        specimenInfo.setPatientNumber(patientNumber);
-        specimenInfo.setVisitNumber(visitNumber);
         return specimenInfo;
     }
 

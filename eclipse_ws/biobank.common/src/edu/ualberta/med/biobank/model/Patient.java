@@ -118,7 +118,7 @@ public class Patient extends AbstractBiobankModel
     }
 
     @Override
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name = "PATIENT_COMMENT",
         joinColumns = { @JoinColumn(name = "PATIENT_ID", nullable = false, updatable = false) },
         inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })

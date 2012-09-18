@@ -54,7 +54,8 @@ public class TestSpecimenBatchOp extends TestAction {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        specimenCsvHelper = new SpecimenBatchOpPojoHelper(factory.getNameGenerator());
+        specimenCsvHelper =
+            new SpecimenBatchOpPojoHelper(factory.getNameGenerator());
 
         tx = session.beginTransaction();
         factory.createSite();
@@ -212,8 +213,6 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void onlyChildSpecimensNoCollectionEvent() throws Exception {
-        Patient patient = factory.createPatient();
-
         factory.createSpecimenType();
         AliquotedSpecimen aliquotedSpecimen =
             factory.createAliquotedSpecimen();
@@ -224,8 +223,7 @@ public class TestSpecimenBatchOp extends TestAction {
             new ArrayList<SpecimenBatchOpInputPojo>();
         csvInfos.add(
             specimenCsvHelper.aliquotedSpecimenCreate(null,
-                aliquotedSpecimen.getSpecimenType().getName(),
-                patient.getPnumber(), 1));
+                aliquotedSpecimen.getSpecimenType().getName()));
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
         try {
@@ -271,8 +269,8 @@ public class TestSpecimenBatchOp extends TestAction {
             exec(importAction);
             Assert
                 .fail("should not be allowed to import spcecimens when patient number is missing");
-        } catch (IllegalStateException e) {
-
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
         }
     }
 
@@ -435,12 +433,18 @@ public class TestSpecimenBatchOp extends TestAction {
                 specimen.getSpecimenType().getName());
             Assert.assertEquals(0, DateCompare.compare(csvInfo.getCreatedAt(),
                 specimen.getCreatedAt()));
-            Assert.assertEquals(csvInfo.getPatientNumber(), specimen
-                .getCollectionEvent().getPatient().getPnumber());
+
+            if (csvInfo.getPatientNumber() != null) {
+                Assert.assertEquals(csvInfo.getPatientNumber(), specimen
+                    .getCollectionEvent().getPatient().getPnumber());
+            }
 
             Assert.assertNotNull(specimen.getCollectionEvent());
-            Assert.assertEquals(csvInfo.getVisitNumber(), specimen
-                .getCollectionEvent().getVisitNumber());
+
+            if (csvInfo.getVisitNumber() != null) {
+                Assert.assertEquals(csvInfo.getVisitNumber(), specimen
+                    .getCollectionEvent().getVisitNumber());
+            }
 
             if (specimen.getOriginInfo().getShipmentInfo() != null) {
                 Assert.assertEquals(csvInfo.getWaybill(), specimen

@@ -38,12 +38,19 @@ public class SpecimenBatchOpPojoReader implements
         .getI18n(DecodeImageForm.class);
 
     public static final String CSV_PARENT_SPC_ERROR =
-        i18n.tr("specimen is a source specimen but parent " +
+        i18n.tr("specimen declared a source specimen but parent " +
             "inventory ID present");
 
     public static final String CSV_SPC_PATIENT_ERROR =
         i18n.tr("parent specimen and child specimen "
             + "do not have the same patient number");
+
+    public static final String CSV_SRC_SPC_PATIENT_CEVENT_MISSING_ERROR =
+        i18n.tr("the following must be specified: patient number and visit number");
+
+    public static final String CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
+        i18n.tr("one of the following must be specified: parent inventory id "
+            + "or patient number and visit number");
 
     public static final String CSV_PALLET_POS_ERROR =
         i18n.tr("pallet position defined but not product barcode or label");
@@ -115,65 +122,74 @@ public class SpecimenBatchOpPojoReader implements
         final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
             new HashMap<String, SpecimenBatchOpInputPojo>();
 
-        SpecimenBatchOpInputPojo csvPojos;
+        SpecimenBatchOpInputPojo csvPojo;
 
         try {
-            while ((csvPojos =
+            while ((csvPojo =
                 reader.read(SpecimenBatchOpInputPojo.class,
                     NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
-                if (csvPojos.getSourceSpecimen()) {
-                    if (csvPojos.hasParentInventoryId()) {
+                if (csvPojo.getSourceSpecimen()) {
+                    if (csvPojo.hasParentInventoryId()) {
                         getErrorList().addError(reader.getLineNumber(),
                             CSV_PARENT_SPC_ERROR);
+                    } else if (!csvPojo.hasPatientAndCollectionEvent()) {
+                        // does not have patient number and visit number
+                        getErrorList().addError(reader.getLineNumber(),
+                            CSV_SRC_SPC_PATIENT_CEVENT_MISSING_ERROR);
                     }
-                    parentSpcMap.put(csvPojos.getInventoryId(), csvPojos);
+                    parentSpcMap.put(csvPojo.getInventoryId(), csvPojo);
                 } else {
-                    if (csvPojos.hasParentInventoryId()) {
+                    if (csvPojo.hasParentInventoryId()) {
                         // check that parent and child specimens have the same
                         // patient number
                         SpecimenBatchOpInputPojo parentCsvInfo =
-                            parentSpcMap.get(csvPojos.getParentInventoryId());
+                            parentSpcMap.get(csvPojo.getParentInventoryId());
 
                         if ((parentCsvInfo != null)
-                            && !csvPojos.getPatientNumber().equals(
+                            && !csvPojo.getPatientNumber().equals(
                                 parentCsvInfo.getPatientNumber())) {
                             getErrorList().addError(reader.getLineNumber(),
                                 CSV_SPC_PATIENT_ERROR);
                         }
+                    } else if (!csvPojo.hasPatientAndCollectionEvent()) {
+                        // no parent inventory id and does not have patient
+                        // number and visit number
+                        getErrorList().addError(reader.getLineNumber(),
+                            CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR);
                     }
                 }
 
                 // check if only position defined and no label and no product
                 // barcode
-                if ((csvPojos.getPalletProductBarcode() == null)
-                    && (csvPojos.getPalletLabel() == null)
-                    && (csvPojos.getPalletPosition() != null)) {
+                if ((csvPojo.getPalletProductBarcode() == null)
+                    && (csvPojo.getPalletLabel() == null)
+                    && (csvPojo.getPalletPosition() != null)) {
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_PALLET_POS_ERROR);
                 }
 
                 //
-                if ((csvPojos.getPalletProductBarcode() != null)
-                    && (csvPojos.getPalletPosition() == null)) {
+                if ((csvPojo.getPalletProductBarcode() != null)
+                    && (csvPojo.getPalletPosition() == null)) {
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_PROD_BARCODE_NO_POS_ERROR);
                 }
 
-                if ((csvPojos.getPalletLabel() != null)
-                    && (csvPojos.getPalletPosition() == null)) {
+                if ((csvPojo.getPalletLabel() != null)
+                    && (csvPojo.getPalletPosition() == null)) {
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_PALLET_POS_ERROR);
                 }
 
-                if ((csvPojos.getPalletLabel() != null)
-                    && (csvPojos.getRootContainerType() == null)) {
+                if ((csvPojo.getPalletLabel() != null)
+                    && (csvPojo.getRootContainerType() == null)) {
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_PALLET_LABEL_NO_CTYPE_ERROR);
                 }
 
-                csvPojos.setLineNumber(reader.getLineNumber());
-                csvInfos.add(csvPojos);
+                csvPojo.setLineNumber(reader.getLineNumber());
+                csvInfos.add(csvPojo);
             }
 
             return csvInfos;

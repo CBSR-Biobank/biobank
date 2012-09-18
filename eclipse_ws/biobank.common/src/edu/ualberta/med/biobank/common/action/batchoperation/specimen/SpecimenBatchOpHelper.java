@@ -54,7 +54,7 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
         return csvInfo.getLineNumber();
     }
 
-    public SpecimenBatchOpInputPojo getCsvInfo() {
+    public SpecimenBatchOpInputPojo getPojo() {
         return csvInfo;
     }
 
