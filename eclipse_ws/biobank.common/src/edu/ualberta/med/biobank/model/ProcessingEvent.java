@@ -4,7 +4,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -13,6 +16,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
@@ -25,6 +29,7 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.Person;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -62,9 +67,8 @@ public class ProcessingEvent extends AbstractBiobankModel
     private String worksheet;
     private Date createdAt;
     private Center center;
-    private String user;
-    private String scriptName;
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
+    private Person processedBy;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
     private Set<Comment> comments = new HashSet<Comment>(0);
 
@@ -101,26 +105,6 @@ public class ProcessingEvent extends AbstractBiobankModel
         this.center = center;
     }
 
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.TecanProcessingEvent.user.NotEmpty}")
-    @Column(name = "USER", length = 100)
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    @NotEmpty(message = "{edu.ualberta.med.biobank.model.TecanProcessingEvent.scriptName.NotEmpty}")
-    @Column(name = "SCRIPT_NAME", length = 256)
-    public String getScriptName() {
-        return scriptName;
-    }
-
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-    }
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "processingEvent")
     @Cascade({ CascadeType.SAVE_UPDATE })
     public Set<Specimen> getSpecimens() {
@@ -129,6 +113,20 @@ public class ProcessingEvent extends AbstractBiobankModel
 
     public void setSpecimens(Set<Specimen> specimens) {
         this.specimens = specimens;
+    }
+
+    @AttributeOverrides({
+        @AttributeOverride(name = "name", column = @Column(name = "PROCESSED_BY")),
+        @AttributeOverride(name = "user", column = @Column(name = "PROCESSED_BY_USER_ID"))
+    })
+    @Valid
+    @Embedded
+    public Person getProcessedBy() {
+        return processedBy;
+    }
+
+    public void setProcessedBy(Person processedBy) {
+        this.processedBy = processedBy;
     }
 
     @Override
