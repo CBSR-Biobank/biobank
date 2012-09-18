@@ -55,9 +55,8 @@ public class Attachment
         this.insertedBy = insertedBy;
     }
 
-    @NotNull(message = "{Attachment.description.NotNull}")
     @Length(max = 255, message = "{Attachment.description.Length}")
-    @Column(name = "DESCRIPTION", nullable = false, length = 255)
+    @Column(name = "DESCRIPTION", length = 255)
     public String getDescription() {
         return description;
     }
