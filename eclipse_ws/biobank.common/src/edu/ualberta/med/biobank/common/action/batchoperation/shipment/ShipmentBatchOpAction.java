@@ -64,6 +64,9 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
     public static final Tr CSV_SHIPPING_METHOD_ERROR =
         bundle.tr("shipping method \"{0}\" does not exist");
 
+    public static final Tr CSV_DATA_DECOMPRESSION_ERROR =
+        bundle.tr("Unable to decompress CSV data: {0}");
+
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
         new ParseDate("yyyy-MM-dd HH:mm"), // dateReceived
@@ -143,7 +146,13 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<ShipmentBatchOpInputRow> csvInfos = compressedList.get();
+        ArrayList<ShipmentBatchOpInputRow> csvInfos;
+        try {
+            csvInfos = compressedList.get();
+        } catch (Exception e) {
+            throw new LocalizedException(CSV_DATA_DECOMPRESSION_ERROR.format(e
+                .getMessage()));
+        }
         context.getSession().getTransaction();
 
         for (ShipmentBatchOpInputRow csvInfo : csvInfos) {

@@ -123,6 +123,9 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     public static final Tr CSV_SPECIMEN_LABEL_ERROR =
         bundle
             .tr("specimen position in CSV file with label \"{0}\" is invalid");
+    
+    public static final Tr CSV_DATA_DECOMPRESSION_ERROR =
+        bundle.tr("Unable to decompress CSV data: {0}");
 
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
@@ -282,7 +285,12 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         boolean result = false;
 
-        ArrayList<SpecimenBatchOpInputRow> specimenCsvInfos = compressedList.get();
+        ArrayList<SpecimenBatchOpInputRow> specimenCsvInfos;
+        try {
+            specimenCsvInfos = compressedList.get();
+        } catch (Exception e) {
+            throw new LocalizedException(CSV_DATA_DECOMPRESSION_ERROR.format(e.getMessage()));
+        }
         context.getSession().getTransaction();
 
         for (SpecimenBatchOpInputRow csvInfo : specimenCsvInfos) {
