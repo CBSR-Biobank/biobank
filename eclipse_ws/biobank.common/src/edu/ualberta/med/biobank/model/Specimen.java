@@ -86,6 +86,12 @@ public class Specimen extends AbstractBiobankModel
         public static final LString TOP_SPECIMEN = bundle.trc(
             "model",
             "Top Specimen").format();
+        public static final LString PLATE_ERRORS = bundle.trc(
+            "model",
+            "Plate Errors").format();
+        public static final LString SAMPLE_ERRORS = bundle.trc(
+            "model",
+            "Sample Errors").format();
     }
 
     private String inventoryId;

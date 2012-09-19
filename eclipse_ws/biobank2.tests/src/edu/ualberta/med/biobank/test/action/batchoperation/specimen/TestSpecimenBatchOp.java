@@ -114,6 +114,50 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
+    // test with 1000 patients
+    @Test
+    public void manyPatients() throws Exception {
+        final int numPatients = 1000;
+
+        Set<Patient> patients = new HashSet<Patient>();
+
+        for (int i = 0; i < numPatients; i++) {
+            patients.add(factory.createPatient());
+        }
+
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSpecimenType();
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        Set<OriginInfo> testOriginInfos = new HashSet<OriginInfo>();
+
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.createAllSpecimens(
+                factory.getDefaultStudy(), testOriginInfos, patients);
+
+        // write out to CSV file so we can view data
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
+    }
+
     @Test
     public void onlyParentSpecimensInCsv() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();

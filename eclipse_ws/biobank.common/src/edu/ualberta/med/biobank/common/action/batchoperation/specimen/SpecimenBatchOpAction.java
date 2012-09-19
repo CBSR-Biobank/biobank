@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
+import edu.ualberta.med.biobank.model.Attachment;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -96,6 +97,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
     private final Center workingCenter;
 
+    private Attachment attachment;
+
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
 
@@ -113,9 +116,11 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     public SpecimenBatchOpAction(Center workingCenter,
         ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens) {
         this.workingCenter = workingCenter;
+        // this.attachment = attachment;
         compressedList =
             new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
                 batchOpSpecimens);
+        log.debug("SpecimenBatchOpAction: constructor");
     }
 
     @Override
@@ -125,16 +130,18 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
+        log.debug("SpecimenBatchOpAction:run");
+
         if (compressedList == null) {
             throw new IllegalStateException("compressed list is null");
         }
 
         boolean result = false;
 
-        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens;
+        ArrayList<SpecimenBatchOpInputPojo> pojos;
 
         try {
-            batchOpSpecimens = compressedList.get();
+            pojos = compressedList.get();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         } catch (ClassNotFoundException e) {
@@ -143,13 +150,18 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         context.getSession().getTransaction();
 
-        for (SpecimenBatchOpInputPojo batchOpSpecimen : batchOpSpecimens) {
-            SpecimenBatchOpHelper info = getDbInfo(context, batchOpSpecimen);
+        // for improved performance, model objects of the same type are loaded
+        // sequentially
+        // getModelObjects(context, pojos);
+
+        log.debug("SpecimenBatchOpAction: getting DB info");
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            SpecimenBatchOpHelper info = getDbInfo(context, pojo);
             if (info != null) {
                 specimenImportInfos.add(info);
 
                 if (info.isSourceSpecimen()) {
-                    parentSpcInvIds.put(batchOpSpecimen.getInventoryId(), info);
+                    parentSpcInvIds.put(pojo.getInventoryId(), info);
                 }
             }
         }
@@ -182,6 +194,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         // add all source specimens first
+        log.debug("SpecimenBatchOpAction: adding source specimens");
         for (SpecimenBatchOpHelper info : specimenImportInfos) {
             if (info.isAliquotedSpecimen()) continue;
 
@@ -198,6 +211,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         // now add aliquoted specimens
+        log.debug("SpecimenBatchOpAction: adding aliquot specimens");
         for (SpecimenBatchOpHelper info : specimenImportInfos) {
             if (info.isSourceSpecimen()) continue;
 
@@ -210,12 +224,14 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         }
 
         result = true;
+        log.debug("SpecimenBatchOpAction:end");
         return new BooleanResult(result);
     }
 
     // get referenced items that exist in the database
     private SpecimenBatchOpHelper getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo csvInfo) {
+
         SpecimenBatchOpHelper info = new SpecimenBatchOpHelper(csvInfo);
         info.setUser(context.getUser());
 
@@ -421,4 +437,15 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         return p;
     }
 
+    private void getModelObjects(ActionContext context,
+        ArrayList<SpecimenBatchOpInputPojo> pojos) {
+        Set<String> patientNumbers = new HashSet<String>();
+        Set<String> parentInventoryIds = new HashSet<String>();
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            patientNumbers.add(pojo.getPatientNumber());
+            parentInventoryIds.add(pojo.getParentInventoryId());
+        }
+
+    }
 }
