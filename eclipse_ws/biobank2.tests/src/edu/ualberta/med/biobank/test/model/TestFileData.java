@@ -40,7 +40,26 @@ public class TestFileData extends TestDb {
                 new FileInputStream(copy)));
     }
 
-    public static boolean isContentEqual(InputStream in1, InputStream in2)
+    @Test
+    public void fromFileCheckCompression()
+        throws IOException, NoSuchAlgorithmException {
+        File original = File.createTempFile("original", ".tmp");
+        original.deleteOnExit();
+
+        FileWriter fw = new FileWriter(original, true);
+        for (int i = 0; i < 100; i++) {
+            fw.append("hello! ");
+        }
+        fw.close();
+
+        FileData data = FileData.fromFile(original);
+        Assert.assertEquals(new Long(data.getBytes().length),
+            data.getMetaData().getSize());
+        Assert.assertTrue(
+            data.getBytes().length > data.getCompressedBytes().length);
+    }
+
+    private static boolean isContentEqual(InputStream in1, InputStream in2)
         throws IOException {
         if (!(in1 instanceof BufferedInputStream)) {
             in1 = new BufferedInputStream(in1);
