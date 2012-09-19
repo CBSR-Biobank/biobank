@@ -20,7 +20,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -37,7 +36,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * location, or repository site. See \ref Clinic, \ref Site and \ref
  * ResearchGroup.
  */
-@Audited
 @Entity
 @Table(name = "CENTER")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

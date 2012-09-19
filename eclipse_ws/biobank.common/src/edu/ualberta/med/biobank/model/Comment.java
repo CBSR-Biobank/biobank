@@ -10,8 +10,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -19,7 +17,6 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
-@Audited
 @Entity
 @Table(name = "COMMENT")
 public class Comment extends AbstractBiobankModel
@@ -70,7 +67,6 @@ public class Comment extends AbstractBiobankModel
     }
 
     // TODO: stop this property from being updated, and test that!
-    @NotAudited
     @NotNull(message = "{edu.ualberta.med.biobank.model.Comment.user.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID", nullable = false)

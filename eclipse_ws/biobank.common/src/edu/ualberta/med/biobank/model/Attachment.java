@@ -9,13 +9,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
 
 import edu.ualberta.med.biobank.model.type.Hash.MD5Hash;
 import edu.ualberta.med.biobank.model.type.Hash.SHA1Hash;
 
-@Audited
 @Entity
 @Table(name = "ATTACHMENT")
 public class Attachment

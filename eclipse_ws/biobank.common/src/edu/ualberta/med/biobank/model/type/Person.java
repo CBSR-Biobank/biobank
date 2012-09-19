@@ -8,7 +8,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.Length;
 
 import edu.ualberta.med.biobank.model.User;
@@ -31,7 +30,6 @@ public class Person
         this.name = name;
     }
 
-    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PERSON_USER_ID")
     public User getUser() {

@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * describe how a biospecimen is collected.
  * 
  */
-@Audited
 @Entity
 @Table(name = "STUDY")
 @Unique.List({

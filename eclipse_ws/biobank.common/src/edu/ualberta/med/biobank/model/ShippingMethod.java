@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -17,7 +16,6 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 // TODO: test name uniqueness? Rethink design regarding localization?
-@Audited
 @Entity
 @Table(name = "SHIPPING_METHOD")
 @Unique(properties = "name", groups = PrePersist.class)

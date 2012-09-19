@@ -22,6 +22,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -150,6 +152,7 @@ public class Specimen extends AbstractBiobankModel
         this.topSpecimen = topSpecimen;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.collectionEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
@@ -161,6 +164,7 @@ public class Specimen extends AbstractBiobankModel
         this.collectionEvent = collectionEvent;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.currentCenter.NotNull}")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CURRENT_CENTER_ID", nullable = false)
@@ -172,6 +176,7 @@ public class Specimen extends AbstractBiobankModel
         this.currentCenter = currentCenter;
     }
 
+    @NotAudited
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "specimen")
     public Set<DispatchSpecimen> getDispatchSpecimens() {
         return this.dispatchSpecimens;
@@ -181,6 +186,7 @@ public class Specimen extends AbstractBiobankModel
         this.dispatchSpecimens = dispatchSpecimens;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORIGINAL_COLLECTION_EVENT_ID")
     public CollectionEvent getOriginalCollectionEvent() {
@@ -192,6 +198,7 @@ public class Specimen extends AbstractBiobankModel
         this.originalCollectionEvent = originalCollectionEvent;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.specimenType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)
@@ -222,6 +229,7 @@ public class Specimen extends AbstractBiobankModel
         this.childSpecimens = childSpecimens;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
@@ -236,6 +244,7 @@ public class Specimen extends AbstractBiobankModel
         this.comments = comments;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", updatable = false)
     public Set<RequestSpecimen> getRequestSpecimens() {
@@ -246,6 +255,7 @@ public class Specimen extends AbstractBiobankModel
         this.requestSpecimens = requestSpecimens;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @NotNull(message = "{edu.ualberta.med.biobank.model.Specimen.originInfo.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ORIGIN_INFO_ID", nullable = false)
@@ -270,6 +280,7 @@ public class Specimen extends AbstractBiobankModel
         this.activityStatus = activityStatus;
     }
 
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROCESSING_EVENT_ID")
     public ProcessingEvent getProcessingEvent() {

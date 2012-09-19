@@ -15,13 +15,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cascade;
-import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
-@Audited
 @Entity
 @Table(name = "ORIGIN_INFO")
 public class OriginInfo extends AbstractBiobankModel

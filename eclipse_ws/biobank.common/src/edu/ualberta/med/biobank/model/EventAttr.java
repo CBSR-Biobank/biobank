@@ -8,9 +8,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
-
-@Audited
 @Entity
 @Table(name = "EVENT_ATTR")
 public class EventAttr extends AbstractBiobankModel {

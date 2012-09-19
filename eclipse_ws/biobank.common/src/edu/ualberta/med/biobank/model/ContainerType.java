@@ -20,8 +20,6 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -45,7 +43,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * types are used to build a container.
  * 
  */
-@Audited
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
@@ -230,7 +227,6 @@ public class ContainerType extends AbstractBiobankModel
         this.site = site;
     }
 
-    @NotAudited
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerType.childLabelingScheme.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CHILD_LABELING_SCHEME_ID", nullable = false)

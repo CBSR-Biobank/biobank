@@ -10,14 +10,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
-
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 
-@Audited
 @Entity
 @Table(name = "SHIPMENT_INFO")
 public class ShipmentInfo extends AbstractBiobankModel {

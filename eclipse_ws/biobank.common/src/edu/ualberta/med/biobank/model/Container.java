@@ -20,7 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -39,7 +38,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * contained in a parent container.
  * 
  */
-@Audited
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
