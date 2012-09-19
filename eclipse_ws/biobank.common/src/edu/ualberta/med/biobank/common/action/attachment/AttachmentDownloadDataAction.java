@@ -6,18 +6,18 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.SimpleResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Attachment;
-import edu.ualberta.med.biobank.model.AttachmentData;
+import edu.ualberta.med.biobank.model.FileMetaData;
+import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.type.Hash.SHA1Hash;
 
 public class AttachmentDownloadDataAction
-    implements Action<SimpleResult<AttachmentData>> {
+    implements Action<SimpleResult<FileData>> {
     private static final long serialVersionUID = 1L;
 
     private final Integer attachmentId;
     private final SHA1Hash sha1Hash;
 
-    public AttachmentDownloadDataAction(Attachment attachment) {
+    public AttachmentDownloadDataAction(FileMetaData attachment) {
         this.attachmentId = attachment.getId();
         this.sha1Hash = attachment.getSha1Hash();
     }
@@ -28,16 +28,16 @@ public class AttachmentDownloadDataAction
     }
 
     @Override
-    public SimpleResult<AttachmentData> run(ActionContext context)
+    public SimpleResult<FileData> run(ActionContext context)
         throws ActionException {
 
-        AttachmentData data = (AttachmentData) context.getSession()
-            .createCriteria(AttachmentData.class)
+        FileData data = (FileData) context.getSession()
+            .createCriteria(FileData.class)
             .createCriteria("attachment")
             .add(Restrictions.idEq(attachmentId))
             .add(Restrictions.eq("sha1Hash", sha1Hash))
             .uniqueResult();
 
-        return new SimpleResult<AttachmentData>(data);
+        return new SimpleResult<FileData>(data);
     }
 }

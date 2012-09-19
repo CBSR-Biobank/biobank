@@ -9,51 +9,42 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Immutable;
 import org.hibernate.validator.constraints.Length;
 
 import edu.ualberta.med.biobank.model.type.Hash.MD5Hash;
 import edu.ualberta.med.biobank.model.type.Hash.SHA1Hash;
 
+@Immutable
 @Entity
-@Table(name = "ATTACHMENT")
-public class Attachment
+@Table(name = "FILE_META_DATA")
+public class FileMetaData
     extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
     // TODO: randomly generated file ids so people can't just read anyone's
     // file. OR, require the hash with the file.
 
-    private String fileName;
-    private User insertedBy;
+    private String name;
     private String description;
-    private Date timeInserted;
+    private Date createdAt;
     private String contentType;
     private Long size;
     private SHA1Hash sha1Hash;
     private MD5Hash md5Hash;
 
-    @NotNull(message = "{Attachment.fileName.NotNull}")
-    @Length(max = 255, message = "{Attachment.fileName.Length}")
-    @Column(name = "FILE_NAME", nullable = false, length = 255)
-    public String getFileName() {
-        return fileName;
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.name.NotNull}")
+    @Length(max = 255, message = "{FileMetaData.name.Length}")
+    @Column(name = "NAME", nullable = false, length = 255)
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @NotNull(message = "{Attachment.insertedBy.NotNull}")
-    @Column(name = "INSERTED_BY_USER_ID", nullable = false)
-    public User getInsertedBy() {
-        return insertedBy;
-    }
-
-    public void setInsertedBy(User insertedBy) {
-        this.insertedBy = insertedBy;
-    }
-
-    @Length(max = 255, message = "{Attachment.description.Length}")
+    @Length(max = 255, message = "{edu.ualberta.med.biobank.model.FileMetaData.description.Length}")
     @Column(name = "DESCRIPTION", length = 255)
     public String getDescription() {
         return description;
@@ -63,14 +54,14 @@ public class Attachment
         this.description = description;
     }
 
-    @NotNull(message = "{Attachment.timeInserted.NotNull}")
-    @Column(name = "TIME_INSERTED", nullable = false)
-    public Date getTimeInserted() {
-        return timeInserted;
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.createdAt.NotNull}")
+    @Column(name = "CREATED_AT", nullable = false)
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTimeInserted(Date timeInserted) {
-        this.timeInserted = timeInserted;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     /**
@@ -78,8 +69,8 @@ public class Attachment
      *         "&lt;type&gt;/&lt;subtype&gt;").
      * @see http://tools.ietf.org/html/rfc4288#section-4.2
      */
-    @NotNull(message = "{Attachment.contentType.NotNull}")
-    @Length(max = 255, message = "{Attachment.contentType.Length}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.contentType.NotNull}")
+    @Length(max = 255, message = "{FileMetaData.contentType.Length}")
     @Column(name = "CONTENT_TYPE", nullable = false, length = 255)
     public String getContentType() {
         return contentType;
@@ -89,8 +80,8 @@ public class Attachment
         this.contentType = contentType;
     }
 
-    @NotNull(message = "{Attachment.size.NotNull}")
-    @Min(value = 0, message = "{Attachment.size.Min}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.size.NotNull}")
+    @Min(value = 0, message = "{FileMetaData.size.Min}")
     @Column(name = "SIZE", nullable = false)
     public Long getSize() {
         return size;
@@ -100,7 +91,7 @@ public class Attachment
         this.size = size;
     }
 
-    @NotNull(message = "{Attachment.sha1Hash.NotNull}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.sha1Hash.NotNull}")
     @Embedded
     public SHA1Hash getSha1Hash() {
         return sha1Hash;
@@ -110,7 +101,7 @@ public class Attachment
         this.sha1Hash = sha1Hash;
     }
 
-    @NotNull(message = "{Attachment.md5Hash.NotNull}")
+    @NotNull(message = "{edu.ualberta.med.biobank.model.FileMetaData.md5Hash.NotNull}")
     @Embedded
     public MD5Hash getMd5Hash() {
         return md5Hash;

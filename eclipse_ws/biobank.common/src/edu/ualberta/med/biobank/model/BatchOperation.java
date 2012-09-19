@@ -19,18 +19,18 @@ public class BatchOperation
     extends AbstractBiobankModel {
     private static final long serialVersionUID = 1L;
 
-    private Attachment input;
+    private FileData input;
     private User executedBy;
     private BatchInputType inputType;
     private BatchAction action;
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "INPUT_ATTACHMENT_ID")
-    public Attachment getInput() {
+    @JoinColumn(name = "FILE_DATA_ID")
+    public FileData getInput() {
         return input;
     }
 
-    public void setInput(Attachment input) {
+    public void setInput(FileData input) {
         this.input = input;
     }
 
