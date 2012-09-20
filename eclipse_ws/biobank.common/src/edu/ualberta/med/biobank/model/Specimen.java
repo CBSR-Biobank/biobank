@@ -235,7 +235,7 @@ public class Specimen extends AbstractBiobankModel
         this.childSpecimens = childSpecimens;
     }
 
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    @NotAudited
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
@@ -250,7 +250,7 @@ public class Specimen extends AbstractBiobankModel
         this.comments = comments;
     }
 
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    @NotAudited
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", updatable = false)
     public Set<RequestSpecimen> getRequestSpecimens() {

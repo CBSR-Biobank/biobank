@@ -16,6 +16,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventCreatePermission;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
@@ -26,15 +27,19 @@ public class ProcessingEventGroup extends AdapterBase {
     private static final I18n i18n = I18nFactory
         .getI18n(ProcessingEventGroup.class);
 
-    private final boolean createAllowed;
+    private boolean createAllowed;
 
     public ProcessingEventGroup(AdapterBase parent, int id, String name) {
         super(parent, id, name, true);
 
-        this.createAllowed = isAllowed(
-            new ProcessingEventCreatePermission(SessionManager
-                .getUser()
-                .getCurrentWorkingCenter().getId()));
+        this.createAllowed = false;
+
+        CenterWrapper<?> center =
+            SessionManager.getUser().getCurrentWorkingCenter();
+        if (center != null) {
+            this.createAllowed = isAllowed(
+                new ProcessingEventCreatePermission(center.getId()));
+        }
     }
 
     @Override
