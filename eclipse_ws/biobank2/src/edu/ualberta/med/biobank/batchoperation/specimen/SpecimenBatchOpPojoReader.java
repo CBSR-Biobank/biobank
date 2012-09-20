@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
-import edu.ualberta.med.biobank.forms.DecodeImageForm;
 
 /**
  * Reads a CSV file containing specimen information and returns the file as a
@@ -37,7 +36,7 @@ import edu.ualberta.med.biobank.forms.DecodeImageForm;
 public class SpecimenBatchOpPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
     private static final I18n i18n = I18nFactory
-        .getI18n(DecodeImageForm.class);
+        .getI18n(SpecimenBatchOpPojoReader.class);
 
     public static final String CSV_PARENT_SPC_ERROR =
         i18n.tr("specimen declared a source specimen but parent " +

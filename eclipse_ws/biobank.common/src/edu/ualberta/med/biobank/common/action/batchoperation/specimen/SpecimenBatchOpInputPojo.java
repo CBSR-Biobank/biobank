@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
@@ -22,7 +23,7 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     private int lineNumber;
     private String inventoryId;
     private String parentInventoryId;
-    private Integer volume;
+    private BigDecimal volume;
     private String specimenType;
     private Date createdAt;
     private String patientNumber;
@@ -64,11 +65,11 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
         this.parentInventoryId = parentInventoryID;
     }
 
-    public Integer getVolume() {
+    public BigDecimal getVolume() {
         return volume;
     }
 
-    public void setVolume(Integer volume) {
+    public void setVolume(BigDecimal volume) {
         this.volume = volume;
     }
 

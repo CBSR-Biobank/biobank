@@ -11,8 +11,8 @@ import java.io.Serializable;
  */
 public interface IBatchOpInputPojo extends Serializable {
 
-    public abstract int getLineNumber();
+    public int getLineNumber();
 
-    public abstract void setLineNumber(int lineNumber);
+    public void setLineNumber(int lineNumber);
 
 }
