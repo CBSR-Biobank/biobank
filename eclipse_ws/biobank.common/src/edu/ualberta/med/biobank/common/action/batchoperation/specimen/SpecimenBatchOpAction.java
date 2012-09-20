@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
-import edu.ualberta.med.biobank.model.Attachment;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
@@ -96,8 +95,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             + "does match the source specimen's collection event");
 
     private final Center workingCenter;
-
-    private Attachment attachment;
 
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
