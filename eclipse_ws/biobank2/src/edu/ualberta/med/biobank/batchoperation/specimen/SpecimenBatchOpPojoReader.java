@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseBigDecimal;
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
 import org.supercsv.cellprocessor.ParseInt;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.forms.DecodeImageForm;
  * @author Nelson Loyola
  * 
  */
+@SuppressWarnings("nls")
 public class SpecimenBatchOpPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
     private static final I18n i18n = I18nFactory
@@ -88,6 +90,7 @@ public class SpecimenBatchOpPojoReader implements
     private static final CellProcessor[] CELL_PROCESSORS =  new CellProcessor[] {
         new Unique(),                       // inventoryId,
         new Optional(),                     // parentInventoryID,
+        new ParseBigDecimal(),              // volume
         new StrNotNullOrEmpty(),            // specimenType,
         new ParseDate("yyyy-MM-dd HH:mm"),  // createdAt,
         new StrNotNullOrEmpty(),            // patientNumber,

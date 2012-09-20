@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.ParseBigDecimal;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
  * @author Nelson Loyola
  * 
  */
+@SuppressWarnings("nls")
 public class CbsrTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 
@@ -60,7 +61,7 @@ public class CbsrTecanSpecimenPojoReader implements
         new StrNotNullOrEmpty(),            // sourceId        
         null,                               // concentration   
         null,                               // concentrationUnit
-        new ParseInt(),                     // volume          
+        new ParseBigDecimal(),              // volume          
         new StrNotNullOrEmpty(),            // userDefined1    
         new StrNotNullOrEmpty(),            // userDefined2    
         new StrNotNullOrEmpty(),            // userDefined3    
@@ -102,18 +103,23 @@ public class CbsrTecanSpecimenPojoReader implements
     @Override
     public List<SpecimenBatchOpInputPojo> getPojos()
         throws ClientBatchOpErrorsException {
+        List<SpecimenBatchOpInputPojo> result =
+            new ArrayList<SpecimenBatchOpInputPojo>();
+
         final Map<String, SpecimenBatchOpInputPojo> parentSpcMap =
             new HashMap<String, SpecimenBatchOpInputPojo>();
 
-        SpecimenBatchOpInputPojo csvPojos;
+        SpecimenBatchOpInputPojo csvPojo;
 
         try {
-            while ((csvPojos =
+            while ((csvPojo =
                 reader.read(SpecimenBatchOpInputPojo.class,
                     NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
+                result.add(csvPojo);
+
             }
-            return csvInfos;
+            return result;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
