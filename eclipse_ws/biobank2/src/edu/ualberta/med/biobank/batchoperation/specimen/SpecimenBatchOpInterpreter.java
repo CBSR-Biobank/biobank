@@ -45,15 +45,14 @@ public class SpecimenBatchOpInterpreter {
             new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
 
         try {
-            String[] csvHeader = reader.getCSVHeader(true);
+            String[] csvHeaders = reader.getCSVHeader(true);
 
-            if (csvHeader.length < 1) {
+            if (csvHeaders.length < 1) {
                 throw new LocalizedException(BatchOpActionUtil.CSV_HEADER_ERROR);
             }
 
             IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader =
-                SpecimenPojoReaderFactory.createPojoReader(
-                    reader.getCSVHeader(true));
+                SpecimenPojoReaderFactory.createPojoReader(csvHeaders);
             pojoReader.setReader(reader);
             List<SpecimenBatchOpInputPojo> pojos = pojoReader.getPojos();
             errorList = pojoReader.getErrorList();

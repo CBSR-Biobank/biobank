@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
  * @author Nelson Loyola
  * 
  */
-@SuppressWarnings("nls")
 public class TestSpecimenBatchOp extends TestAction {
 
     private static Logger log = LoggerFactory

@@ -6,12 +6,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.supercsv.cellprocessor.ParseBigDecimal;
-import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
+import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -39,18 +38,19 @@ public class CbsrTecanSpecimenPojoReader implements
     private static final I18n i18n = I18nFactory
         .getI18n(CbsrTecanSpecimenPojoReader.class);
 
+    private static final String CSV_FIRST_HEADER = "Rack ID";
+
     public static final String CSV_PROCESSED_DATE_TIME_PARSE_ERROR =
         i18n.tr("invalid date and time format");
 
     private static final String INVALID_TUBE_1D_BC = "NoReadBC1";
 
-    private static final String CSV_FIRST_HEADER = "Inventory ID";
-
     private static final String PROCESSED_DATE_TIME_PREFIX = "Processed_";
 
     private static final String PROCESSED_DATE_TIME_FORMAT = "ddMMyyy_HHmmss";
 
-    private static class TecanCsvRowPojo implements IBatchOpInputPojo {
+    @SuppressWarnings("unused")
+    public static class TecanCsvRowPojo implements IBatchOpInputPojo {
         private static final long serialVersionUID = 1L;
 
         int lineNumber;
@@ -60,7 +60,7 @@ public class CbsrTecanSpecimenPojoReader implements
         String sourceId;
         String concentration;
         String concentrationUnit;
-        BigDecimal volume;
+        Integer volume;
         String tube1dBarcode;
         String processedDateTime;
         String scriptNameAndUser;
@@ -129,11 +129,11 @@ public class CbsrTecanSpecimenPojoReader implements
             this.concentrationUnit = concentrationUnit;
         }
 
-        public BigDecimal getVolume() {
+        public Integer getVolume() {
             return volume;
         }
 
-        public void setVolume(BigDecimal volume) {
+        public void setVolume(Integer volume) {
             this.volume = volume;
         }
 
@@ -215,7 +215,8 @@ public class CbsrTecanSpecimenPojoReader implements
     private final static CellProcessor[] CELL_PROCESSORS;
 
     static {
-        Map<String, CellProcessor> aMap = new HashMap<String, CellProcessor>();
+        Map<String, CellProcessor> aMap =
+            new LinkedHashMap<String, CellProcessor>();
 
         aMap.put("rackId", null);
         aMap.put("cavityId", new Unique());
@@ -223,28 +224,25 @@ public class CbsrTecanSpecimenPojoReader implements
         aMap.put("sourceId", null);
         aMap.put("concentration", null);
         aMap.put("concentrationUnit", null);
-        aMap.put("volume", new ParseBigDecimal());
-        aMap.put("tube1dBarcode", new StrNotNullOrEmpty());
-        aMap.put("processedDateTime", new StrNotNullOrEmpty());
-        aMap.put("scriptNameAndUser", new StrNotNullOrEmpty());
-        aMap.put("sampleType", new StrNotNullOrEmpty());
-        aMap.put("worksheet", new StrNotNullOrEmpty());
-        aMap.put("plateErrors", new StrNotNullOrEmpty());
-        aMap.put("sampleErrors", new StrNotNullOrEmpty());
+        aMap.put("volume", new ParseInt());
+        aMap.put("tube1dBarcode", null);
+        aMap.put("processedDateTime", null);
+        aMap.put("scriptNameAndUser", null);
+        aMap.put("sampleType", null);
+        aMap.put("worksheet", null);
+        aMap.put("plateErrors", null);
+        aMap.put("sampleErrors", null);
         aMap.put("sampelInstanceId", null);
         aMap.put("sampleId", null);
 
         NAME_MAPPINGS = aMap.keySet().toArray(new String[0]);
-        CELL_PROCESSORS = aMap.keySet().toArray(new CellProcessor[0]);
+        CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
     }
 
     private ICsvBeanReader reader;
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
-
-    private final List<SpecimenBatchOpInputPojo> csvInfos =
-        new ArrayList<SpecimenBatchOpInputPojo>(0);
 
     @Override
     public void setReader(ICsvBeanReader reader) {
@@ -267,6 +265,10 @@ public class CbsrTecanSpecimenPojoReader implements
     @Override
     public List<SpecimenBatchOpInputPojo> getPojos()
         throws ClientBatchOpErrorsException {
+        if (reader == null) {
+            throw new IllegalStateException("CSV reader is null");
+        }
+
         List<SpecimenBatchOpInputPojo> result =
             new ArrayList<SpecimenBatchOpInputPojo>();
 
@@ -326,7 +328,8 @@ public class CbsrTecanSpecimenPojoReader implements
         batchOpPojo.setInventoryId(csvPojo.getCavityId());
         batchOpPojo.setParentInventoryId(csvPojo.getSourceId());
         batchOpPojo.setSpecimenType(csvPojo.getSampleType());
-        batchOpPojo.setVolume(csvPojo.getVolume());
+        batchOpPojo.setVolume(new BigDecimal(
+            (double) csvPojo.getVolume() / 1000.0));
         batchOpPojo.setPatientNumber(csvPojo.getTube1dBarcode());
         batchOpPojo.setCreatedAt(createdAt);
         batchOpPojo.setWorksheet(csvPojo.getWorksheet());
