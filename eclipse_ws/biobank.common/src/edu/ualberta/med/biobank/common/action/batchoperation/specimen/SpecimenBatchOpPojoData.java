@@ -27,13 +27,13 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpHelper implements IBatchOpHelper {
+public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenBatchOpHelper.class.getName());
+        .getLogger(SpecimenBatchOpPojoData.class.getName());
 
     private final SpecimenBatchOpInputPojo csvInfo;
-    private SpecimenBatchOpHelper parentInfo;
+    private SpecimenBatchOpPojoData parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
@@ -45,7 +45,7 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
     private Specimen specimen;
     private User user;
 
-    SpecimenBatchOpHelper(SpecimenBatchOpInputPojo csvInfo) {
+    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo csvInfo) {
         this.csvInfo = csvInfo;
     }
 
@@ -58,11 +58,11 @@ public class SpecimenBatchOpHelper implements IBatchOpHelper {
         return csvInfo;
     }
 
-    SpecimenBatchOpHelper getParentInfo() {
+    SpecimenBatchOpPojoData getParentInfo() {
         return parentInfo;
     }
 
-    void setParentInfo(SpecimenBatchOpHelper parentInfo) {
+    void setParentInfo(SpecimenBatchOpPojoData parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }

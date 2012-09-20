@@ -12,13 +12,14 @@ import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.batchoperation.specimen.CbsrTecanSpecimenPojoReader;
 import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenPojoReaderFactory;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.test.action.TestAction;
 
 /**
  * 
  * @author Nelson Loyola
  * 
  */
-public class TestCbsrTecanSpecimenPojoReader {
+public class TestCbsrTecanSpecimenPojoReader extends TestAction {
 
     @Test
     public void parseTestFile() throws Exception {
@@ -43,8 +44,8 @@ public class TestCbsrTecanSpecimenPojoReader {
         }
 
         pojoReader.setReader(reader);
+        // List<SpecimenBatchOpInputPojo> batchOpPojos =
         pojoReader.getPojos();
-
     }
 
 }

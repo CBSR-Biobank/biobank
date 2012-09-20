@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -103,7 +103,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -147,7 +148,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -191,7 +193,8 @@ public class TestSpecimenBatchOp extends TestAction {
         try {
 
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -244,7 +247,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -271,7 +275,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
             Assert
                 .fail("should not be allowed to create aliquot specimens with no collection events");
@@ -283,7 +288,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void missingPatient() throws IOException {
+    public void missingPatient() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         Patient patient = factory.createPatient();
         patients.add(patient);
@@ -308,7 +313,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
             Assert
                 .fail("should not be allowed to import spcecimens when patient number is missing");
@@ -318,7 +324,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void withComments() throws IOException {
+    public void withComments() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
@@ -355,7 +361,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -412,7 +419,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
@@ -455,7 +463,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         try {
             SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos);
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
             exec(importAction);
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);

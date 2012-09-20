@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,14 +24,18 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
+import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.BatchOperation.BatchAction;
+import edu.ualberta.med.biobank.model.BatchOperation.BatchInputType;
+import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -99,11 +105,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
 
-    private final Set<SpecimenBatchOpHelper> specimenImportInfos =
-        new HashSet<SpecimenBatchOpHelper>(0);
-
-    private final Map<String, SpecimenBatchOpHelper> parentSpcInvIds =
-        new HashMap<String, SpecimenBatchOpHelper>(0);
+    private FileData fileData = null;
 
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
@@ -111,9 +113,11 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
     public SpecimenBatchOpAction(Center workingCenter,
-        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens) {
+        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
+        throws NoSuchAlgorithmException, IOException {
         this.workingCenter = workingCenter;
-        // this.attachment = attachment;
+        this.fileData = FileData.fromFile(inputFile);
+
         compressedList =
             new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
                 batchOpSpecimens);
@@ -128,6 +132,10 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
         log.debug("SpecimenBatchOpAction:run");
+
+        if (fileData == null) {
+            throw new IllegalStateException("file data is null");
+        }
 
         if (compressedList == null) {
             throw new IllegalStateException("compressed list is null");
@@ -151,25 +159,30 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         // sequentially
         // getModelObjects(context, pojos);
 
+        // split pojos into source and aliquoted specimens
+        Map<String, SpecimenBatchOpPojoData> sourcePojoDataMap =
+            new HashMap<String, SpecimenBatchOpPojoData>(0);
+
+        Set<SpecimenBatchOpPojoData> aliquotSpcPojoData =
+            new HashSet<SpecimenBatchOpPojoData>();
+
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            SpecimenBatchOpHelper info = getDbInfo(context, pojo);
-            if (info != null) {
-                specimenImportInfos.add(info);
-
-                if (info.isSourceSpecimen()) {
-                    parentSpcInvIds.put(pojo.getInventoryId(), info);
+            SpecimenBatchOpPojoData pojoData = getDbInfo(context, pojo);
+            if (pojoData != null) {
+                if (pojoData.isSourceSpecimen()) {
+                    sourcePojoDataMap.put(pojo.getInventoryId(), pojoData);
+                } else {
+                    aliquotSpcPojoData.add(pojoData);
                 }
             }
         }
 
         // find aliquoted specimens and ensure the source specimen is listed in
         // the CSV file
-        for (SpecimenBatchOpHelper info : specimenImportInfos) {
-            if (info.isSourceSpecimen()) continue;
-
-            SpecimenBatchOpHelper parentInfo =
-                parentSpcInvIds.get(info.getParentInventoryId());
+        for (SpecimenBatchOpPojoData info : aliquotSpcPojoData) {
+            SpecimenBatchOpPojoData parentInfo =
+                sourcePojoDataMap.get(info.getParentInventoryId());
 
             if (parentInfo == null) {
                 // if this specimen has a parent specimen that is not in DB,
@@ -190,34 +203,35 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             throw new BatchOpErrorsException(errorList.getErrors());
         }
 
+        BatchOperation batchOp = createBatchOperation(context);
+
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
-        for (SpecimenBatchOpHelper info : specimenImportInfos) {
-            if (info.isAliquotedSpecimen()) continue;
-
-            Specimen spc = addSpecimen(context, info);
+        for (SpecimenBatchOpPojoData info : sourcePojoDataMap.values()) {
+            Specimen spc = addSpecimen(context, batchOp, info);
             parentSpecimens.put(spc.getInventoryId(), spc);
-
-            // add the processing event for this source specimen
-            if (info.hasWorksheet()) {
-                ProcessingEvent pevent = info.getNewProcessingEvent();
-                context.getSession().saveOrUpdate(pevent);
-
-                // TODO: set activity status to closed?
-            }
         }
 
         // now add aliquoted specimens
         log.debug("SpecimenBatchOpAction: adding aliquot specimens");
-        for (SpecimenBatchOpHelper info : specimenImportInfos) {
-            if (info.isSourceSpecimen()) continue;
-
+        for (SpecimenBatchOpPojoData info : aliquotSpcPojoData) {
             if (info.getParentSpecimen() == null) {
                 Specimen parentSpc =
                     parentSpecimens.get(info.getParentInventoryId());
                 info.setParentSpecimen(parentSpc);
             }
-            addSpecimen(context, info);
+
+            // TODO: fix this
+            //
+            // add the processing event for this source specimen
+            // if (info.hasWorksheet()) {
+            // ProcessingEvent pevent = info.getNewProcessingEvent();
+            // context.getSession().saveOrUpdate(pevent);
+            //
+            // // TODO: set activity status to closed?
+            // }
+
+            addSpecimen(context, batchOp, info);
         }
 
         result = true;
@@ -225,11 +239,23 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         return new BooleanResult(result);
     }
 
+    private BatchOperation createBatchOperation(ActionContext context) {
+        BatchOperation batchOperation = new BatchOperation();
+
+        batchOperation.setInput(fileData);
+        batchOperation.setExecutedBy(context.getUser());
+        batchOperation.setInputType(BatchInputType.SPECIMEN);
+        batchOperation.setAction(BatchAction.INSERT);
+
+        context.getSession().saveOrUpdate(batchOperation);
+        return batchOperation;
+    }
+
     // get referenced items that exist in the database
-    private SpecimenBatchOpHelper getDbInfo(ActionContext context,
+    private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo csvInfo) {
 
-        SpecimenBatchOpHelper info = new SpecimenBatchOpHelper(csvInfo);
+        SpecimenBatchOpPojoData info = new SpecimenBatchOpPojoData(csvInfo);
         info.setUser(context.getUser());
 
         Specimen parentSpecimen = null;
@@ -350,7 +376,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     }
 
     private Specimen addSpecimen(ActionContext context,
-        SpecimenBatchOpHelper info) {
+        BatchOperation batchOp, SpecimenBatchOpPojoData info) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -406,6 +432,11 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         context.getSession().save(spc.getOriginInfo());
         context.getSession().save(spc);
+
+        BatchOperationSpecimen batchOpSpc = new BatchOperationSpecimen();
+        batchOpSpc.setBatch(batchOp);
+        batchOpSpc.setSpecimen(spc);
+        context.getSession().save(batchOpSpc);
 
         return spc;
     }

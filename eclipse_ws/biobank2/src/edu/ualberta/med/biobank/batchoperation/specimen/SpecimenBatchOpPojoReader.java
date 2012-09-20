@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.batchoperation.specimen;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class SpecimenBatchOpPojoReader implements
             + "do not have the same patient number");
 
     public static final String CSV_SRC_SPC_PATIENT_CEVENT_MISSING_ERROR =
-        i18n.tr("the following must be specified: patient number and visit number");
+        i18n.tr("both patient number and visit number must be specified");
 
     public static final String CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
         i18n.tr("one of the following must be specified: parent inventory id "
@@ -65,45 +66,38 @@ public class SpecimenBatchOpPojoReader implements
     public static final String CSV_PALLET_LABEL_NO_CTYPE_ERROR =
         i18n.tr("pallet label defined but not position");
 
+    public static final String CSV_SRC_SPECIMEN_WORKSHEET_ERROR =
+        i18n.tr("worksheet should not be specified for a source specimen");
+
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
-    private static final String[] NAME_MAPPINGS = new String[] {
-        "inventoryId",
-        "parentInventoryId",
-        "volume",
-        "specimenType",
-        "createdAt",
-        "patientNumber",
-        "visitNumber",
-        "waybill",
-        "sourceSpecimen",
-        "worksheet",
-        "palletProductBarcode",
-        "rootContainerType",
-        "palletLabel",
-        "palletPosition",
-        "comment"
-    };
+    private static final String[] NAME_MAPPINGS;
 
-    // @formatter:off
-    private static final CellProcessor[] CELL_PROCESSORS =  new CellProcessor[] {
-        new Unique(),                       // inventoryId,
-        new Optional(),                     // parentInventoryID,
-        new ParseBigDecimal(),              // volume
-        new StrNotNullOrEmpty(),            // specimenType,
-        new ParseDate("yyyy-MM-dd HH:mm"),  // createdAt,
-        new StrNotNullOrEmpty(),            // patientNumber,
-        new ParseInt(),                     // visitNumber,
-        new Optional(),                     // waybill,
-        new ParseBool(),                    // sourceSpecimen,
-        new Optional(new Unique()),         // worksheet,
-        new Optional(),                     // palletProductBarcode,
-        new Optional(),                     // rootContainerType,
-        new Optional(),                     // palletLabel,
-        new Optional(),                     // palletPosition,
-        new Optional()                      // comment
-        };
-    // @formatter:on
+    private static final CellProcessor[] CELL_PROCESSORS;
+
+    static {
+        Map<String, CellProcessor> aMap =
+            new LinkedHashMap<String, CellProcessor>();
+
+        aMap.put("inventoryId", new Unique());
+        aMap.put("parentInventoryId", new Optional());
+        aMap.put("volume", new ParseBigDecimal());
+        aMap.put("specimenType", new StrNotNullOrEmpty());
+        aMap.put("createdAt", new ParseDate("yyyy-MM-dd HH:mm"));
+        aMap.put("patientNumber", new StrNotNullOrEmpty());
+        aMap.put("visitNumber", new Optional(new ParseInt()));
+        aMap.put("waybill", new Optional());
+        aMap.put("sourceSpecimen", new ParseBool());
+        aMap.put("worksheet", new Optional(new Unique()));
+        aMap.put("palletProductBarcode", new Optional());
+        aMap.put("rootContainerType", new Optional());
+        aMap.put("palletLabel", new Optional());
+        aMap.put("palletPosition", new Optional());
+        aMap.put("comment", new Optional());
+
+        NAME_MAPPINGS = aMap.keySet().toArray(new String[0]);
+        CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
+    }
 
     private ICsvBeanReader reader;
 
@@ -132,17 +126,25 @@ public class SpecimenBatchOpPojoReader implements
                     NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
 
                 if (csvPojo.getSourceSpecimen()) {
-                    if (csvPojo.hasParentInventoryId()) {
+                    if (csvPojo.getParentInventoryId().isEmpty()) {
                         getErrorList().addError(reader.getLineNumber(),
                             CSV_PARENT_SPC_ERROR);
-                    } else if (!csvPojo.hasPatientAndCollectionEvent()) {
-                        // does not have patient number and visit number
+                    } else if (csvPojo.hasPatientAndCollectionEvent()) {
+                        // does not have patient number
                         getErrorList().addError(reader.getLineNumber(),
                             CSV_SRC_SPC_PATIENT_CEVENT_MISSING_ERROR);
                     }
+
+                    if (!csvPojo.getWorksheet().isEmpty()) {
+                        getErrorList().addError(reader.getLineNumber(),
+                            CSV_SRC_SPECIMEN_WORKSHEET_ERROR);
+                    }
+
                     parentSpcMap.put(csvPojo.getInventoryId(), csvPojo);
                 } else {
-                    if (csvPojo.hasParentInventoryId()) {
+                    // this is an aliquoted specimen
+
+                    if (csvPojo.getParentInventoryId().isEmpty()) {
                         // check that parent and child specimens have the same
                         // patient number
                         SpecimenBatchOpInputPojo parentCsvInfo =
