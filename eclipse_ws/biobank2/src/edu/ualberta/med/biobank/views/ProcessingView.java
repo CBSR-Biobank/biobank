@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -165,9 +166,13 @@ public class ProcessingView extends AbstractAdministrationView {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
         try {
-            setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new ProcessingEventReadPermission(SessionManager
-                    .getUser().getCurrentWorkingCenter().getWrappedObject())));
+            CenterWrapper<?> center = SessionManager
+                .getUser().getCurrentWorkingCenter();
+            if (center != null) {
+                setSearchFieldsEnablement(SessionManager.getAppService()
+                    .isAllowed(new ProcessingEventReadPermission(center
+                        .getWrappedObject())));
+            }
         } catch (ApplicationException e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
