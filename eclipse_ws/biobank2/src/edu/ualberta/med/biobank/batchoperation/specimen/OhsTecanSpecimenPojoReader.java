@@ -409,19 +409,6 @@ public class OhsTecanSpecimenPojoReader implements
                     }
                 }
             }
-            int errCount = getErrorList().getErrors().size();
-            edu.ualberta.med.biobank.common.action.exception.BatchOpException<String> boe;
-            int line;
-            String msg;
-            boe = getErrorList().getErrors().iterator().next();
-            line = boe.getLineNumber();
-            msg = boe.getMessage();
-            boe = getErrorList().getErrors().iterator().next();
-            line = boe.getLineNumber();
-            msg = boe.getMessage();
-            boe = getErrorList().getErrors().iterator().next();
-            line = boe.getLineNumber();
-            msg = boe.getMessage();
                 
             return result;
         } catch (SuperCSVReflectionException e) {
