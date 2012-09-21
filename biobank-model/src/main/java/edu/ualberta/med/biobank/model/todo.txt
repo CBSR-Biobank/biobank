@@ -2,7 +2,16 @@
 [v] Make a StudyCenter object
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
-[v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
+[v] SendsShipments on clinic was to be replaced with what on ShippingMethod?\
+[ ] Make sure that a Specimen parent/child or from/to relationship can exist
+    without a processing event. Maybe this could be done by:
+    (1) Having one SpecimenProcessingLink table with:
+        FROM_SPC_ID, TO_SPC_ID, PE_ID, AMOUNTS, ETC. - all optional
+        UNIUQUE(FROM_SPC_ID, TO_SPC_ID, PE_ID)
+        Only problem: how to add "inputs" to a PE to select from. How about just
+        SpecimenProcessingEventInput class/ relationship. DONE
+    (2) Something else (more?) complicated?
+[ ] Call property 'isDerived'?
 [ ] Group models and actions into domains, such as, user, report, center, shipping,
     etc. and actions/ services into those groups so that there are not so many
     classes per package.
