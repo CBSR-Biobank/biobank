@@ -186,21 +186,21 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     }
 
     public boolean hasPatientAndCollectionEvent() {
-        return !patientNumber.isEmpty() && (visitNumber != null);
+        return (patientNumber != null) && (visitNumber != null);
     }
 
     public boolean hasProductBarcodeAndPosition() {
-        return !parentInventoryId.isEmpty() && !palletPosition.isEmpty();
+        return (palletProductBarcode != null) && (palletPosition != null);
     }
 
     public boolean hasLabelAndPosition() {
-        return !rootContainerType.isEmpty()
-            && !palletLabel.isEmpty()
-            && !palletPosition.isEmpty();
+        return (rootContainerType != null)
+            && (palletLabel != null)
+            && (palletPosition != null);
     }
 
     public boolean hasProductBarcodeAndLabel() {
-        return !parentInventoryId.isEmpty() && !palletLabel.isEmpty();
+        return (parentInventoryId != null) && (palletLabel != null);
     }
 
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -8,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
@@ -46,8 +48,7 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession()
-            .createCriteria(Patient.class, "p")
+        Criteria c = context.getSession().createCriteria(Patient.class)
             .add(Restrictions.eq("pnumber", pnumber));
 
         return (Patient) c.uniqueResult();
@@ -63,10 +64,8 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession()
-            .createCriteria(Specimen.class, "s")
-            .add(Restrictions.eq("inventoryId",
-                inventoryId));
+        Criteria c = context.getSession().createCriteria(Specimen.class)
+            .add(Restrictions.eq("inventoryId", inventoryId));
 
         return (Specimen) c.uniqueResult();
     }
@@ -81,8 +80,7 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession()
-            .createCriteria(SpecimenType.class, "st")
+        Criteria c = context.getSession().createCriteria(SpecimenType.class)
             .add(Restrictions.eq("name", name));
 
         return (SpecimenType) c.uniqueResult();
@@ -96,8 +94,7 @@ public class BatchOpActionUtil {
             throw new NullPointerException(
                 "should only be called once the context is initialized");
         }
-        Criteria c = context.getSession()
-            .createCriteria(Study.class, "st")
+        Criteria c = context.getSession().createCriteria(Study.class)
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Study) c.uniqueResult();
@@ -112,8 +109,7 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession()
-            .createCriteria(Center.class, "c")
+        Criteria c = context.getSession().createCriteria(Center.class)
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Center) c.uniqueResult();
@@ -160,7 +156,7 @@ public class BatchOpActionUtil {
 
         Criteria c = context.getSession()
             .createCriteria(OriginInfo.class, "oi")
-            .createAlias("oi.shipmentInfo", "si", Criteria.LEFT_JOIN)
+            .createAlias("oi.shipmentInfo", "si")
             .add(Restrictions.eq("si.waybill", waybill));
 
         return (OriginInfo) c.uniqueResult();
@@ -183,4 +179,19 @@ public class BatchOpActionUtil {
         return (ShippingMethod) c.uniqueResult();
     }
 
+    public static CollectionEvent getCollectionEvent(ActionContext context,
+        String patientNumber, Integer visitNumber) {
+
+        CollectionEvent ce = new CollectionEvent();
+        ce.setVisitNumber(visitNumber);
+
+        Patient p = new Patient();
+        p.setPnumber(patientNumber);
+        ce.setPatient(p);
+
+        Example e = Example.create(ce);
+
+        return (CollectionEvent) context.getSession()
+            .createCriteria(CollectionEvent.class).add(e).uniqueResult();
+    }
 }

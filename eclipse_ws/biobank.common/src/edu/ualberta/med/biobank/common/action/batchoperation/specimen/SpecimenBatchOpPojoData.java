@@ -32,7 +32,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpPojoData.class.getName());
 
-    private final SpecimenBatchOpInputPojo csvInfo;
+    private final SpecimenBatchOpInputPojo pojo;
     private SpecimenBatchOpPojoData parentInfo;
     private Patient patient;
     private CollectionEvent cevent;
@@ -45,30 +45,30 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     private Specimen specimen;
     private User user;
 
-    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo csvInfo) {
-        this.csvInfo = csvInfo;
+    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo pojo) {
+        this.pojo = pojo;
     }
 
     @Override
     public int getCsvLineNumber() {
-        return csvInfo.getLineNumber();
+        return pojo.getLineNumber();
     }
 
     public SpecimenBatchOpInputPojo getPojo() {
-        return csvInfo;
+        return pojo;
     }
 
     SpecimenBatchOpPojoData getParentInfo() {
         return parentInfo;
     }
 
-    void setParentInfo(SpecimenBatchOpPojoData parentInfo) {
+    void setParentPojoData(SpecimenBatchOpPojoData parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }
         this.parentInfo = parentInfo;
         log.trace("setting parent info for specimen {} to {}",
-            csvInfo.getInventoryId(), parentInfo.csvInfo.getInventoryId());
+            pojo.getInventoryId(), parentInfo.pojo.getInventoryId());
     }
 
     Patient getPatient() {
@@ -105,7 +105,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     }
 
     String getParentInventoryId() {
-        return csvInfo.getParentInventoryId();
+        return pojo.getParentInventoryId();
     }
 
     OriginInfo getOriginInfo() {
@@ -141,16 +141,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     }
 
     boolean isSourceSpecimen() {
-        return csvInfo.getSourceSpecimen();
+        return pojo.getSourceSpecimen();
     }
 
     boolean isAliquotedSpecimen() {
-        return !csvInfo.getSourceSpecimen();
-    }
-
-    boolean hasParentInventoryId() {
-        return (csvInfo.getParentInventoryId() != null)
-            && !csvInfo.getParentInventoryId().isEmpty();
+        return !pojo.getSourceSpecimen();
     }
 
     public User getUser() {
@@ -161,17 +156,16 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         this.user = user;
     }
 
-    boolean hasWorksheet() {
-        return (csvInfo.getWorksheet() != null)
-            && !csvInfo.getWorksheet().isEmpty();
-    }
-
     boolean hasPosition() {
-        return (csvInfo.getPalletLabel() != null)
-            && !csvInfo.getPalletLabel().isEmpty()
-            && (csvInfo.getPalletPosition() != null)
-            && !csvInfo.getPalletPosition().isEmpty();
+        // FIXME:
+        // To specify a specimen position the following are possible:
+        // - columns 11 and 14 are filled in
+        // - columns 12, 13, and 14 are filled in
+        // - columns 11, 12, 13, and 14 are filled in, but is not recommended
+        // since it is redundant
 
+        return (pojo.getPalletLabel() != null)
+            && (pojo.getPalletPosition() != null);
     }
 
     public OriginInfo getNewOriginInfo(Center center) {
@@ -183,15 +177,15 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     CollectionEvent getNewCollectionEvent() {
         cevent = new CollectionEvent();
         cevent.setPatient(patient);
-        cevent.setVisitNumber(csvInfo.getVisitNumber());
+        cevent.setVisitNumber(pojo.getVisitNumber());
         cevent.setActivityStatus(ActivityStatus.ACTIVE);
         patient.getCollectionEvents().add(cevent);
 
         log.trace("created collection event: pt={} v#={} invId={}",
             new Object[] {
-                csvInfo.getPatientNumber(),
-                csvInfo.getVisitNumber(),
-                csvInfo.getInventoryId()
+                pojo.getPatientNumber(),
+                pojo.getVisitNumber(),
+                pojo.getInventoryId()
             });
 
         return cevent;
@@ -203,14 +197,14 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
                 "this specimen has a parent specimen and cannot have a processing event");
         }
         pevent = new ProcessingEvent();
-        pevent.setWorksheet(csvInfo.getWorksheet());
+        pevent.setWorksheet(pojo.getWorksheet());
         pevent.setCreatedAt(new Date());
         pevent.setCenter(originInfo.getCenter());
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
 
         log.trace("created processing event: worksheet={} parentSpc={}",
-            csvInfo.getWorksheet(), csvInfo.getInventoryId());
+            pojo.getWorksheet(), pojo.getInventoryId());
 
         return getPevent();
     }
@@ -221,16 +215,15 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
                 "specimen does not have a collection event");
         }
 
-        if ((csvInfo.getParentInventoryId() != null)
-            && !csvInfo.getParentInventoryId().isEmpty()
+        if ((pojo.getParentInventoryId() != null)
             && (parentSpecimen == null)) {
             throw new IllegalStateException(
-                "parent specimen for specimen with " + csvInfo.getInventoryId()
+                "parent specimen for specimen with " + pojo.getInventoryId()
                     + " has not be created yet");
         }
 
         specimen = new Specimen();
-        specimen.setInventoryId(csvInfo.getInventoryId());
+        specimen.setInventoryId(pojo.getInventoryId());
         specimen.setSpecimenType(specimenType);
 
         if (originInfo.getReceiverSite() == null) {
@@ -240,18 +233,18 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         }
         specimen.setCollectionEvent(cevent);
         specimen.setOriginInfo(originInfo);
-        specimen.setCreatedAt(csvInfo.getCreatedAt());
+        specimen.setCreatedAt(pojo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
-        if ((csvInfo.getComment() != null)
-            && !csvInfo.getComment().isEmpty()) {
+        if ((pojo.getComment() != null)
+            && !pojo.getComment().isEmpty()) {
             if (user == null) {
                 throw new IllegalStateException(
                     "user is null, cannot add comment");
             }
 
             Comment comment = new Comment();
-            comment.setMessage(csvInfo.getComment());
+            comment.setMessage(pojo.getComment());
             comment.setUser(user);
             comment.setCreatedAt(new Date());
             specimen.getComments().add(comment);
@@ -262,6 +255,8 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             cevent.getOriginalSpecimens().add(specimen);
         } else {
             ProcessingEvent pevent;
+
+            // TODO: allow child specimens with no processing event
 
             if (parentSpecimen != null) {
                 pevent = parentSpecimen.getProcessingEvent();
@@ -274,7 +269,12 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             }
             pevent.getSpecimens().add(specimen);
             SpecimenActionHelper.setParent(specimen, parentSpecimen);
-            SpecimenActionHelper.setQuantityFromType(specimen);
+
+            if (pojo.getVolume() != null) {
+                specimen.setQuantity(pojo.getVolume());
+            } else {
+                SpecimenActionHelper.setQuantityFromType(specimen);
+            }
         }
         cevent.getAllSpecimens().add(specimen);
 
@@ -285,9 +285,9 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
         log.trace("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
-                csvInfo.getPatientNumber(),
-                csvInfo.getVisitNumber(),
-                csvInfo.getInventoryId(),
+                pojo.getPatientNumber(),
+                pojo.getVisitNumber(),
+                pojo.getInventoryId(),
                 specimen.getOriginalCollectionEvent() != null
             });
 
