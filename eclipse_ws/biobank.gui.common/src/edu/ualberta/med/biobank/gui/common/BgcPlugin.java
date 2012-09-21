@@ -23,6 +23,7 @@ import org.xnap.commons.i18n.I18nFactory;
 @SuppressWarnings("nls")
 public class BgcPlugin extends AbstractUIPlugin {
 
+    public static final String IMG_DATABASE_GO = "database_go";
     public static final String IMG_DIALOGS = "dialogs";
     public static final String IMG_ADD = "add";
     public static final String IMG_ARROW_LEFT = "arrow_left";
@@ -138,6 +139,7 @@ public class BgcPlugin extends AbstractUIPlugin {
 
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
+        registerImage(registry, IMG_DATABASE_GO, "database_go.png");
         registerImage(registry, IMG_DIALOGS, "dialogs.png");
         registerImage(registry, IMG_ADD, "add.png");
         registerImage(registry, IMG_ARROW_LEFT, "arrow_left.png");

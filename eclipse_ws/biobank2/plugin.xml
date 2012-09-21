@@ -270,6 +270,11 @@
              name="%SpecimenLink.command">
        </command>
        <command
+             categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.specimen.import"
+             name="%SpecimenImport.command">
+       </command>
+       <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.researchGroupAdd"
              name="Add Research Group">
@@ -754,6 +759,25 @@
          </enabledWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.SpecimenImportHandler"
+            commandId="edu.ualberta.med.biobank.commands.specimen.import">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.ResearchGroupAddHandler"
             commandId="edu.ualberta.med.biobank.commands.researchGroupAdd">
          <activeWhen>
@@ -908,6 +932,15 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
                   icon="icons/shipment_add.png"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank.separator3"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.specimen.import"
+                  icon="icons/database_go.png"
                   style="push">
             </command>
             <separator
@@ -1714,6 +1747,12 @@
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm"
       name="%SpecimenLink.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.SpecimenImportForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.SpecimenImportForm"
+      name="%SpecimenImport.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
