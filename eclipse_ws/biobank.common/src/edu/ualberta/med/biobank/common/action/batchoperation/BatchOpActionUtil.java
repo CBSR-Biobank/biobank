@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -171,11 +172,9 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession()
-            .createCriteria(ShippingMethod.class, "sm")
-            .add(Restrictions.eq("name", name));
-
-        return (ShippingMethod) c.uniqueResult();
+        return (ShippingMethod) context.getSession()
+            .createCriteria(ShippingMethod.class)
+            .add(Restrictions.eq("name", name)).uniqueResult();
     }
 
     public static CollectionEvent getCollectionEvent(ActionContext context,
@@ -186,6 +185,15 @@ public class BatchOpActionUtil {
             .createAlias("ce.patient", "pt")
             .add(Restrictions.eq("ce.visitNumber", visitNumber))
             .add(Restrictions.eq("pt.pnumber", patientNumber))
+            .uniqueResult();
+    }
+
+    public static ProcessingEvent getProcessingEvent(ActionContext context,
+        String worksheetNumber) {
+
+        return (ProcessingEvent) context.getSession()
+            .createCriteria(ProcessingEvent.class)
+            .add(Restrictions.eq("worksheet", worksheetNumber))
             .uniqueResult();
     }
 }

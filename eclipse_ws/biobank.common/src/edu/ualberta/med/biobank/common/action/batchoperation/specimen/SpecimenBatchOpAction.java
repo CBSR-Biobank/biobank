@@ -87,10 +87,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     public static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
         bundle.tr("pallet label defined but not container type").format();
 
-    public static final LString CSV_SRC_SPECIMEN_WORKSHEET_ERROR =
-        bundle.tr("worksheet should not be specified for a source specimen")
-            .format();
-
     public static final LString CSV_ALIQUOTED_SPC_ERROR =
         bundle.tr("specimen is not a source specimen but parent "
             + "inventory ID is not present").format();
@@ -242,11 +238,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             Specimen spc = addSpecimen(context, batchOp, info);
             parentSpecimens.put(spc.getInventoryId(), spc);
 
-            // add the processing event for this source specimen
-            if (info.getPojo().getWorksheet() != null) {
-                ProcessingEvent pevent = info.getNewProcessingEvent();
-                context.getSession().saveOrUpdate(pevent);
-            }
+            createProcessignEventIfRequired(context, info);
 
             // TODO: set activity status to closed?
         }
@@ -260,6 +252,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
                 info.setParentSpecimen(parentSpc);
             }
 
+            createProcessignEventIfRequired(context, info);
             addSpecimen(context, batchOp, info);
         }
 
@@ -288,12 +281,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             }
 
             checkForPatientAndCollectionEvent(pojo);
-
-            if (pojo.getWorksheet() == null) {
-                errorList.addError(pojo.getLineNumber(),
-                    CSV_SRC_SPECIMEN_WORKSHEET_ERROR);
-            }
-
         } else {
             // this is an aliquoted specimen
 
@@ -388,6 +375,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             getAndVerifyCollectionEvent(context, inputPojo, parentSpecimen);
 
         if (cevent == null) {
+            // only aliquoted specimens with no parent require a collection
+            // event
             if (pojoData.isAliquotedSpecimen()
                 && (pojoData.getParentInventoryId() == null)) {
                 errorList.addError(inputPojo.getLineNumber(),
@@ -407,6 +396,15 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
                     CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
             } else {
                 pojoData.setOriginInfo(originInfo);
+            }
+        }
+
+        if (inputPojo.getWorksheet() != null) {
+            ProcessingEvent pevent =
+                BatchOpActionUtil.getProcessingEvent(context,
+                    inputPojo.getWorksheet());
+            if (pevent != null) {
+                pojoData.setPevent(pevent);
             }
         }
 
@@ -534,14 +532,16 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
             // if patient number and visit number present in the pojo
             // ensure they match with the cevent and patient
-            if (!cevent.getPatient().getPnumber()
-                .equals(inputPojo.getPatientNumber())) {
+            if ((inputPojo.getPatientNumber() != null)
+                && !cevent.getPatient().getPnumber()
+                    .equals(inputPojo.getPatientNumber())) {
                 errorList.addError(inputPojo.getLineNumber(),
                     CSV_PATIENT_MATCH_ERROR.format(
                         inputPojo.getPatientNumber()));
             }
 
-            if (!cevent.getVisitNumber().equals(inputPojo.getVisitNumber())) {
+            if ((inputPojo.getVisitNumber() != null)
+                && !cevent.getVisitNumber().equals(inputPojo.getVisitNumber())) {
                 errorList.addError(inputPojo.getLineNumber(),
                     CSV_CEVENT_MATCH_ERROR.format(
                         inputPojo.getVisitNumber()));
@@ -550,6 +550,20 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         // if parentSpecimen is null, then it comes from the CSV file
         return cevent;
+    }
+
+    private ProcessingEvent createProcessignEventIfRequired(
+        ActionContext context,
+        SpecimenBatchOpPojoData pojoData) {
+        ProcessingEvent pevent = null;
+
+        // add the processing event for this source specimen
+        if ((pojoData.getPojo().getWorksheet() != null)
+            && (pojoData.getPevent() == null)) {
+            pevent = pojoData.getNewProcessingEvent();
+            context.getSession().saveOrUpdate(pevent);
+        }
+        return pevent;
     }
 
     /*

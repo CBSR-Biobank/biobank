@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     // test with 1000 patients
+    @Ignore
     @Test
     public void manyPatients() throws Exception {
         final int numPatients = 1000;
@@ -473,10 +475,20 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
+    @Test
+    public void withExistingPevents() {
+        // TODO
+    }
+
+    @Test
+    public void aliquotsWithNoParentSpc() {
+        // TODO
+    }
+
     private void checkCsvInfoAgainstDb(
         ArrayList<SpecimenBatchOpInputPojo> csvInfos) {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            log.debug("checking specimen against db: inventory id {}",
+            log.trace("checking specimen against db: inventory id {}",
                 csvInfo.getInventoryId());
 
             Specimen specimen = (Specimen) session
