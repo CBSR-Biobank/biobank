@@ -22,8 +22,8 @@ public class SpecimenPojoReaderFactory {
             pojoReader = new SpecimenBatchOpPojoReader();
         } else if (CbsrTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
             pojoReader = new CbsrTecanSpecimenPojoReader();
-        } else if (false /* check for OHS TECAN file */) {
-
+        } else if (OhsTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
+            pojoReader = new OhsTecanSpecimenPojoReader();
         } else {
             throw new IllegalStateException("no batchOp pojo reader found");
         }
