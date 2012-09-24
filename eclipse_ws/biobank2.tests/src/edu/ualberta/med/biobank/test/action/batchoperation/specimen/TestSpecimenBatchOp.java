@@ -1,9 +1,13 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Transaction;
@@ -24,9 +28,11 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.batchoperation.AssertBatchOpException;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
@@ -54,7 +60,8 @@ public class TestSpecimenBatchOp extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         specimenCsvHelper =
-            new SpecimenBatchOpPojoHelper(factory.getNameGenerator());
+            new SpecimenBatchOpPojoHelper(new NameGenerator("test_"
+                + getMethodNameR()));
 
         tx = session.beginTransaction();
         factory.createSite();
@@ -476,8 +483,65 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void withExistingPevents() {
-        // TODO
+    public void withExistingPevents() throws IOException,
+        NoSuchAlgorithmException {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        Map<String, ProcessingEvent> peventMap =
+            new HashMap<String, ProcessingEvent>();
+
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+
+            // create 3 source specimens and parent specimens
+            for (int j = 0; j < 3; j++) {
+                factory.createSourceSpecimen();
+                Specimen parentSpecimen = factory.createParentSpecimen();
+                ProcessingEvent pevent = factory.createProcessingEvent();
+                parentSpecimen.setProcessingEvent(pevent);
+                parentSpecimens.add(parentSpecimen);
+
+                peventMap.put(parentSpecimen.getInventoryId(), pevent);
+                log.debug("added processing event: invId={} worsheet={}",
+                    parentSpecimen.getInventoryId(), pevent.getWorksheet());
+            }
+        }
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.createAliquotedSpecimens(
+                factory.getDefaultStudy(), parentSpecimens);
+
+        // add the worksheet number to the csvInfos
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
+            csvInfo.setWorksheet(peventMap.get(csvInfo.getParentInventoryId())
+                .getWorksheet());
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     @Test
@@ -533,6 +597,12 @@ public class TestSpecimenBatchOp extends TestAction {
                 Assert.assertNull(specimen.getOriginalCollectionEvent());
                 Assert.assertNotNull(specimen.getParentSpecimen()
                     .getProcessingEvent());
+
+                if (csvInfo.getWorksheet() != null) {
+                    Assert.assertEquals(csvInfo.getWorksheet(), specimen
+                        .getParentSpecimen().getProcessingEvent()
+                        .getWorksheet());
+                }
             }
 
             if ((csvInfo.getPalletPosition() != null)

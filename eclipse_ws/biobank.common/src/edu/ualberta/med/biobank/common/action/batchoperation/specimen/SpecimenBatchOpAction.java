@@ -399,11 +399,12 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         if (inputPojo.getWorksheet() != null) {
-            ProcessingEvent pevent =
-                BatchOpActionUtil.getProcessingEvent(context,
-                    inputPojo.getWorksheet());
+            ProcessingEvent pevent = BatchOpActionUtil.getProcessingEvent(
+                context, inputPojo.getWorksheet());
             if (pevent != null) {
                 pojoData.setPevent(pevent);
+                log.trace("found processing event: invId={} worksheet={}",
+                    inputPojo.getInventoryId(), inputPojo.getWorksheet());
             }
         }
 
