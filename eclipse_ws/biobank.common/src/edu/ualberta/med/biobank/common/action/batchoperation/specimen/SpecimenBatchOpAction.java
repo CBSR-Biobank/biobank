@@ -249,7 +249,9 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         batchOperation.setExecutedBy(context.getUser());
         batchOperation.setInputType(BatchInputType.SPECIMEN);
         batchOperation.setAction(BatchAction.INSERT);
+        batchOperation.setInput(fileData);
 
+        context.getSession().saveOrUpdate(fileData);
         context.getSession().saveOrUpdate(batchOperation);
         return batchOperation;
     }
