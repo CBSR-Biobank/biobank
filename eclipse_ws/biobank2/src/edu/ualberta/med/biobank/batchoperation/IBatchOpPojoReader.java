@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.batchoperation;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.supercsv.io.ICsvBeanReader;
@@ -10,7 +11,7 @@ public interface IBatchOpPojoReader<T extends IBatchOpInputPojo> {
 
     public void setReader(ICsvBeanReader reader);
 
-    public List<T> getPojos() throws ClientBatchOpErrorsException;
+    public List<T> getPojos() throws ClientBatchOpErrorsException, IOException;
 
     public ClientBatchOpInputErrorList getErrorList();
 

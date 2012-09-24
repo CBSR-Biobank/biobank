@@ -38,7 +38,10 @@ public class FileBrowser extends BgcBaseWidget {
         this.filterExtensions = extensions;
 
         setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-        setLayout(new GridLayout(2, false));
+        
+        GridLayout gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        setLayout(gl);
         textfield = new BgcBaseText(this, SWT.NONE);
         textfield.setEditable(false);
         textfield.setLayoutData(new GridData(GridData.FILL, GridData.FILL,

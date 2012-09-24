@@ -264,7 +264,7 @@ public class CbsrTecanSpecimenPojoReader implements
 
     @Override
     public List<SpecimenBatchOpInputPojo> getPojos()
-        throws ClientBatchOpErrorsException {
+        throws ClientBatchOpErrorsException, IOException {
         if (reader == null) {
             throw new IllegalStateException("CSV reader is null");
         }
@@ -300,8 +300,6 @@ public class CbsrTecanSpecimenPojoReader implements
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
-            throw new ClientBatchOpErrorsException(e);
-        } catch (IOException e) {
             throw new ClientBatchOpErrorsException(e);
         }
     }

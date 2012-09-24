@@ -1,6 +1,11 @@
 package edu.ualberta.med.biobank.common.action.exception;
 
-public class BatchOpException<T> implements Comparable<BatchOpException<T>> {
+import java.io.Serializable;
+
+public class BatchOpException<T> implements Serializable,
+    Comparable<BatchOpException<T>> {
+    private static final long serialVersionUID = 1L;
+
     private final int lineNumber;
     private final T message;
 

@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
@@ -49,7 +51,7 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpAction implements Action<BooleanResult> {
+public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
     private static final Bundle bundle = new CommonBundle();
@@ -131,7 +133,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         bundle.tr("collection event with visit number \"{0}\" "
             + "does match the source specimen's collection event");
 
-    private final Center workingCenter;
+    private final Integer workingCenterId;
 
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
@@ -144,14 +146,14 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
 
     public SpecimenBatchOpAction(Center workingCenter,
-        ArrayList<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
+        List<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
         throws NoSuchAlgorithmException, IOException {
-        this.workingCenter = workingCenter;
+        this.workingCenterId = workingCenter.getId();
         this.fileData = FileData.fromFile(inputFile);
 
         compressedList =
             new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
-                batchOpSpecimens);
+                new ArrayList<SpecimenBatchOpInputPojo>(batchOpSpecimens));
         log.debug("SpecimenBatchOpAction: constructor");
     }
 
@@ -161,7 +163,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
     }
 
     @Override
-    public BooleanResult run(ActionContext context) throws ActionException {
+    public IdResult run(ActionContext context) throws ActionException {
         log.debug("SpecimenBatchOpAction:run");
 
         if (fileData == null) {
@@ -171,8 +173,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         if (compressedList == null) {
             throw new IllegalStateException("compressed list is null");
         }
-
-        boolean result = false;
 
         ArrayList<SpecimenBatchOpInputPojo> pojos;
 
@@ -256,9 +256,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             addSpecimen(context, batchOp, info);
         }
 
-        result = true;
         log.debug("SpecimenBatchOpAction:end");
-        return new BooleanResult(result);
+        return new IdResult(batchOp.getId());
     }
 
     private BatchOperation createBatchOperation(ActionContext context) {
@@ -456,7 +455,9 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
         OriginInfo originInfo = info.getOriginInfo();
         if (originInfo == null) {
-            originInfo = info.getNewOriginInfo(workingCenter);
+            Center center = (Center) context.getSession()
+                .load(Center.class, workingCenterId);
+            originInfo = info.getNewOriginInfo(center);
         }
 
         CollectionEvent cevent = info.getCevent();
