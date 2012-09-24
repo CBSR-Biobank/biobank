@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
@@ -477,10 +476,14 @@ public class TestSpecimenBatchOp extends TestAction {
     private void checkCsvInfoAgainstDb(
         ArrayList<SpecimenBatchOpInputPojo> csvInfos) {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
-            Criteria c = session.createCriteria(Specimen.class, "s")
-                .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()));
+            log.debug("checking specimen against db: inventory id {}",
+                csvInfo.getInventoryId());
 
-            Specimen specimen = (Specimen) c.uniqueResult();
+            Specimen specimen = (Specimen) session
+                .createCriteria(Specimen.class)
+                .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()))
+                .uniqueResult();
+
             Assert.assertEquals(csvInfo.getSpecimenType(),
                 specimen.getSpecimenType().getName());
             Assert.assertEquals(0, DateCompare.compare(csvInfo.getCreatedAt(),

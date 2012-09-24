@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
@@ -182,16 +181,11 @@ public class BatchOpActionUtil {
     public static CollectionEvent getCollectionEvent(ActionContext context,
         String patientNumber, Integer visitNumber) {
 
-        CollectionEvent ce = new CollectionEvent();
-        ce.setVisitNumber(visitNumber);
-
-        Patient p = new Patient();
-        p.setPnumber(patientNumber);
-        ce.setPatient(p);
-
-        Example e = Example.create(ce);
-
         return (CollectionEvent) context.getSession()
-            .createCriteria(CollectionEvent.class).add(e).uniqueResult();
+            .createCriteria(CollectionEvent.class, "ce")
+            .createAlias("ce.patient", "pt")
+            .add(Restrictions.eq("ce.visitNumber", visitNumber))
+            .add(Restrictions.eq("pt.pnumber", patientNumber))
+            .uniqueResult();
     }
 }

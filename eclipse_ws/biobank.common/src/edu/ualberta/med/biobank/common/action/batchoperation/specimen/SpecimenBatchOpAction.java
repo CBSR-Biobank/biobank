@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -236,6 +237,8 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
         for (SpecimenBatchOpPojoData info : pojoDataMap.values()) {
+            if (!info.getPojo().getSourceSpecimen()) continue;
+
             Specimen spc = addSpecimen(context, batchOp, info);
             parentSpecimens.put(spc.getInventoryId(), spc);
 
@@ -366,9 +369,35 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             }
         }
 
+        Patient patient = null;
+
+        if (pojoData.isSourceSpecimen()) {
+            patient = BatchOpActionUtil.getPatient(context,
+                inputPojo.getPatientNumber());
+            if (patient == null) {
+                errorList.addError(inputPojo.getLineNumber(),
+                    CSV_PATIENT_ERROR.format());
+                return null;
+            }
+            log.debug("retrieving patient for specimen: invId={} pnumber={}",
+                inputPojo.getInventoryId(), inputPojo.getPatientNumber());
+            pojoData.setPatient(patient);
+        }
+
         CollectionEvent cevent =
             getAndVerifyCollectionEvent(context, inputPojo, parentSpecimen);
-        pojoData.setCevent(cevent);
+
+        if (cevent == null) {
+            if (pojoData.isAliquotedSpecimen()
+                && (pojoData.getParentInventoryId() == null)) {
+                errorList.addError(inputPojo.getLineNumber(),
+                    CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
+                        inputPojo.getVisitNumber()));
+            }
+        } else {
+            pojoData.setCevent(cevent);
+            pojoData.setPatient(cevent.getPatient());
+        }
 
         if (inputPojo.getWaybill() != null) {
             OriginInfo originInfo = BatchOpActionUtil.getOriginInfo(context,
@@ -438,7 +467,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             // collection event
             if (info.getPojo().getSourceSpecimen()) {
                 cevent = BatchOpActionUtil.getCollectionEvent(context,
-                    info.getPatient().getPnumber(),
+                    info.getPojo().getPatientNumber(),
                     info.getPojo().getVisitNumber());
 
                 log.debug(
@@ -461,6 +490,7 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
             }
 
             info.setCevent(cevent);
+            info.setPatient(cevent.getPatient());
         }
 
         Specimen spc = info.getNewSpecimen();
@@ -496,12 +526,6 @@ public class SpecimenBatchOpAction implements Action<BooleanResult> {
 
             cevent = BatchOpActionUtil.getCollectionEvent(context,
                 inputPojo.getPatientNumber(), inputPojo.getVisitNumber());
-
-            if (cevent == null) {
-                errorList.addError(inputPojo.getLineNumber(),
-                    CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
-                        inputPojo.getVisitNumber()));
-            }
             return cevent;
         }
 
