@@ -485,7 +485,7 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void onlyParentSpecimensInCsvWithPositions() throws Exception {
+    public void onlyParentSpecimensWithPositions() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
 
         for (int i = 0; i < 3; i++) {

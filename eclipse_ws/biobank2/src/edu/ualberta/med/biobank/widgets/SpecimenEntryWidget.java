@@ -164,26 +164,28 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                         SessionManager.getUser().getCurrentWorkingCenter()
                             .getId())).getList().get(0);
                 bspecimen =
-                    appService.doAction(
-                        new SpecimenGetInfoAction(specId));
+                    appService.doAction(new SpecimenGetInfoAction(specId));
+
                 // Need to convert to table type
-                SpecimenInfo ispecimen =
-                    new SpecimenInfo();
-                ispecimen.specimen = bspecimen.getSpecimen();
-                ispecimen.parentLabel =
-                    bspecimen.getParents().size() > 0 ? bspecimen.getParents()
-                        .pop().getLabel() : StringUtil.EMPTY_STRING;
-                ispecimen.positionString =
-                    bspecimen.getSpecimen().getSpecimenPosition() != null ?
-                        bspecimen.getSpecimen().getSpecimenPosition()
-                            .getPositionString() : null;
-                ispecimen.comment =
-                    bspecimen.getSpecimen().getComments().size() == 0
+                SpecimenInfo spcInfo = new SpecimenInfo();
+                spcInfo.specimen = bspecimen.getSpecimen();
+                spcInfo.parentLabel = (bspecimen.getParents().size() > 0)
+                    ? bspecimen.getParents().pop().getLabel()
+                    : StringUtil.EMPTY_STRING;
+
+                spcInfo.positionString =
+                    (bspecimen.getSpecimen().getSpecimenPosition() != null)
+                        ? bspecimen.getSpecimen().getSpecimenPosition()
+                            .getPositionString()
+                        : null;
+
+                spcInfo.comment =
+                    (bspecimen.getSpecimen().getComments().size() == 0)
                         ? i18n.trc("no abbeviation", "N")
                         : i18n.trc("yes abbeviation", "Y");
 
                 try {
-                    addSpecimen(ispecimen);
+                    addSpecimen(spcInfo);
                 } catch (VetoException e) {
                     BgcPlugin.openAsyncError(
                         e.getMessage());
@@ -207,21 +209,21 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
             return;
         }
 
-        SpecimenWrapper wrap =
-            new SpecimenWrapper(SessionManager.getAppService(),
-                specimen.specimen);
+        SpecimenWrapper wrap = new SpecimenWrapper(
+            SessionManager.getAppService(), specimen.specimen);
 
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> preAdd =
-            VetoListenerSupport.Event
-                .newEvent(ItemAction.PRE_ADD, wrap);
+            VetoListenerSupport.Event.newEvent(ItemAction.PRE_ADD, wrap);
 
         VetoListenerSupport.Event<ItemAction, SpecimenWrapper> postAdd =
-            VetoListenerSupport.Event
-                .newEvent(ItemAction.POST_ADD, wrap);
+            VetoListenerSupport.Event.newEvent(ItemAction.POST_ADD, wrap);
 
         vetoListenerSupport.notifyListeners(preAdd);
 
         specimens.add(specimen);
+        // FIXME: sorting? Collections.sort(specimens);
+        specTable.getList().clear();
+        specTable.getList().addAll(specimens);
         addedSpecimens.add(specimen);
         removedSpecimens.remove(specimen);
 
@@ -235,8 +237,8 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
         if (!editable)
             return;
 
-        specTable
-            .addDeleteItemListener(new IInfoTableDeleteItemListener<SpecimenInfo>() {
+        specTable.addDeleteItemListener(
+            new IInfoTableDeleteItemListener<SpecimenInfo>() {
                 @SuppressWarnings("nls")
                 @Override
                 public void deleteItem(InfoTableEvent<SpecimenInfo> event) {
