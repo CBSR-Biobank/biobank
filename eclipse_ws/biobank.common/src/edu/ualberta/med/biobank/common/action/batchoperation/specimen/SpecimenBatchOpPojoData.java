@@ -254,20 +254,19 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             specimen.setOriginalCollectionEvent(cevent);
             cevent.getOriginalSpecimens().add(specimen);
         } else {
-            ProcessingEvent pevent;
+            ProcessingEvent pevent = null;
 
             // TODO: allow child specimens with no processing event
 
             if (parentSpecimen != null) {
                 pevent = parentSpecimen.getProcessingEvent();
-            } else {
-                if (parentInfo.pevent == null) {
-                    throw new IllegalStateException(
-                        "parent specimen pevent is null");
-                }
+            } else if ((parentInfo != null) && (parentInfo.pevent != null)) {
                 pevent = parentInfo.pevent;
             }
-            pevent.getSpecimens().add(specimen);
+
+            if (pevent != null) {
+                pevent.getSpecimens().add(specimen);
+            }
             SpecimenActionHelper.setParent(specimen, parentSpecimen);
 
             if (pojo.getVolume() != null) {

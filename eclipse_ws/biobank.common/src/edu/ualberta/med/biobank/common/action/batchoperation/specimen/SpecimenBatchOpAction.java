@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
@@ -246,7 +245,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         // now add aliquoted specimens
         log.debug("SpecimenBatchOpAction: adding aliquot specimens");
         for (SpecimenBatchOpPojoData info : aliquotSpcPojoData) {
-            if (info.getParentSpecimen() == null) {
+            if ((info.getParentInventoryId() != null)
+                && (info.getParentSpecimen() == null)) {
                 Specimen parentSpc =
                     parentSpecimens.get(info.getParentInventoryId());
                 info.setParentSpecimen(parentSpc);

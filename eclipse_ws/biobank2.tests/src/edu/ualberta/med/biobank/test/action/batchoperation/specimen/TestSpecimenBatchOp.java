@@ -545,8 +545,43 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void aliquotsWithNoParentSpc() {
-        // TODO
+    public void aliquotsWithNoParentSpc() throws IOException,
+        NoSuchAlgorithmException {
+        Set<Patient> patients = new HashSet<Patient>();
+
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+        }
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.aliquotedSpecimensCreate(patients,
+                aliquotedSpecimens);
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
     }
 
     private void checkCsvInfoAgainstDb(
@@ -592,16 +627,25 @@ public class TestSpecimenBatchOp extends TestAction {
                         .getProcessingEvent().getWorksheet());
                 }
             } else {
-                Assert.assertEquals(csvInfo.getParentInventoryId(),
-                    specimen.getParentSpecimen().getInventoryId());
                 Assert.assertNull(specimen.getOriginalCollectionEvent());
-                Assert.assertNotNull(specimen.getParentSpecimen()
-                    .getProcessingEvent());
 
-                if (csvInfo.getWorksheet() != null) {
-                    Assert.assertEquals(csvInfo.getWorksheet(), specimen
-                        .getParentSpecimen().getProcessingEvent()
-                        .getWorksheet());
+                if (csvInfo.getParentInventoryId() != null) {
+                    Assert.assertEquals(csvInfo.getParentInventoryId(),
+                        specimen.getParentSpecimen().getInventoryId());
+
+                    Assert.assertNotNull(specimen.getParentSpecimen()
+                        .getProcessingEvent());
+
+                    if (csvInfo.getWorksheet() != null) {
+                        Assert.assertEquals(csvInfo.getWorksheet(), specimen
+                            .getParentSpecimen().getProcessingEvent()
+                            .getWorksheet());
+                    }
+                } else {
+                    if (csvInfo.getWorksheet() != null) {
+                        Assert.assertEquals(csvInfo.getWorksheet(), specimen
+                            .getProcessingEvent().getWorksheet());
+                    }
                 }
             }
 

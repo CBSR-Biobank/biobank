@@ -10,6 +10,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -155,6 +156,28 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfos;
     }
 
+    public ArrayList<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
+        Set<Patient> patients, Set<AliquotedSpecimen> aliquotedSpecimens) {
+        ArrayList<SpecimenBatchOpInputPojo> specimenInfos =
+            new ArrayList<SpecimenBatchOpInputPojo>();
+
+        for (AliquotedSpecimen as : aliquotedSpecimens) {
+            for (Patient patient : patients) {
+                for (CollectionEvent ce : patient.getCollectionEvents()) {
+                    SpecimenBatchOpInputPojo specimenInfo =
+                        aliquotedSpecimenCreate(null, as.getSpecimenType()
+                            .getName());
+                    specimenInfo.setPatientNumber(patient.getPnumber());
+                    specimenInfo.setVisitNumber(ce.getVisitNumber());
+
+                    specimenInfos.add(specimenInfo);
+                }
+            }
+        }
+
+        return specimenInfos;
+    }
+
     private SpecimenBatchOpInputPojo sourceSpecimenCreate(
         String specimenTypeName, String patientNumber, String waybill) {
         SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
@@ -174,7 +197,10 @@ class SpecimenBatchOpPojoHelper {
         SpecimenBatchOpInputPojo specimenInfo = new SpecimenBatchOpInputPojo();
         specimenInfo.setLineNumber(lineNumber);
         specimenInfo.setInventoryId(nameGenerator.next(Specimen.class));
-        specimenInfo.setParentInventoryId(parentInventoryId);
+
+        if (parentInventoryId != null) {
+            specimenInfo.setParentInventoryId(parentInventoryId);
+        }
         specimenInfo.setSpecimenType(specimenTypeName);
         specimenInfo.setCreatedAt(Utils.getRandomDate());
         return specimenInfo;
