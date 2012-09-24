@@ -97,6 +97,8 @@ public class SpecimenImportForm extends BiobankViewForm {
         }
         if (errors == null || errors.isEmpty()) return;
 
+        // TODO: add a label saying there were errors
+        
         errorsTable = new BatchOpExceptionTable(parent, errors);
         GridData gd = (GridData) errorsTable.getLayoutData();
         gd.horizontalSpan = 2;
