@@ -54,8 +54,6 @@ public class SpecimenBatchOpPojoReader implements
         "comment"
     };
 
-    private CellProcessor[] cellProcessors;
-
     private ICsvBeanReader reader;
 
     private final ClientBatchOpInputErrorList errorList =
@@ -67,10 +65,13 @@ public class SpecimenBatchOpPojoReader implements
     @Override
     public void setReader(ICsvBeanReader reader) {
         this.reader = reader;
+    }
+
+    // cell processors have to be recreated every time the file is read
+    public CellProcessor[] getCellProcessors() {
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
-        // cell processors have to be recreated every time the file is read
         aMap.put("inventoryId", new Unique());
         aMap.put("parentInventoryId", new Optional());
         aMap.put("volume", new Optional(new ParseBigDecimal()));
@@ -92,7 +93,7 @@ public class SpecimenBatchOpPojoReader implements
                 "the number of name mappings do match the cell processors");
         }
 
-        cellProcessors = aMap.values().toArray(new CellProcessor[0]);
+        return aMap.values().toArray(new CellProcessor[0]);
     }
 
     public static boolean isHeaderValid(String[] csvHeaders) {
@@ -105,6 +106,8 @@ public class SpecimenBatchOpPojoReader implements
         throws ClientBatchOpErrorsException {
 
         SpecimenBatchOpInputPojo csvPojo;
+
+        CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
             while ((csvPojo =

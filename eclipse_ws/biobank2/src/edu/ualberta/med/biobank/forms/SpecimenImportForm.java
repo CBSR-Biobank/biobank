@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +8,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -25,32 +18,17 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
-import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.prefs.CsvPreference;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
-import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
-import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenBatchOpInterpreter;
-import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenPojoReaderFactory;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
-import edu.ualberta.med.biobank.common.util.ReportListProxy;
-import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.FileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
-import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.widgets.infotables.BatchOpExceptionTable;
-import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenImportForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory

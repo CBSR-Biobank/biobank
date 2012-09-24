@@ -229,8 +229,6 @@ public class CbsrTecanSpecimenPojoReader implements
         "sampleId"
     };
 
-    private CellProcessor[] CELL_PROCESSORS;
-
     private ICsvBeanReader reader;
 
     private final ClientBatchOpInputErrorList errorList =
@@ -243,8 +241,11 @@ public class CbsrTecanSpecimenPojoReader implements
     @Override
     public void setReader(ICsvBeanReader reader) {
         this.reader = reader;
+    }
 
-        // cell processors have to be recreated every time the file is read
+    // cell processors have to be recreated every time the file is read
+    public CellProcessor[] getCellProcessors() {
+
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
@@ -270,7 +271,7 @@ public class CbsrTecanSpecimenPojoReader implements
                 "the number of name mappings do match the cell processors");
         }
 
-        CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
+        return aMap.values().toArray(new CellProcessor[0]);
     }
 
     @Override
@@ -293,6 +294,8 @@ public class CbsrTecanSpecimenPojoReader implements
             throw new IllegalStateException("CSV reader is null");
         }
 
+        CellProcessor[] cellProcessors = getCellProcessors();
+
         List<SpecimenBatchOpInputPojo> result =
             new ArrayList<SpecimenBatchOpInputPojo>();
 
@@ -301,7 +304,7 @@ public class CbsrTecanSpecimenPojoReader implements
         try {
             while ((csvPojo =
                 reader.read(TecanCsvRowPojo.class,
-                    NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
+                    NAME_MAPPINGS, cellProcessors)) != null) {
 
                 if (csvPojo.getSourceId().isEmpty()) {
                     // this row not processed by TECAN robot
