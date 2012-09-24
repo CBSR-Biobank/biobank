@@ -210,11 +210,41 @@ public class CbsrTecanSpecimenPojoReader implements
         }
     }
 
-    private static final String[] NAME_MAPPINGS;
+    private static final String[] NAME_MAPPINGS = new String[] {
+        "rackId",
+        "cavityId",
+        "position",
+        "sourceId",
+        "concentration",
+        "concentrationUnit",
+        "volume",
+        "tube1dBarcode",
+        "processedDateTime",
+        "scriptNameAndUser",
+        "sampleType",
+        "worksheet",
+        "plateErrors",
+        "sampleErrors",
+        "sampelInstanceId",
+        "sampleId"
+    };
 
-    private final static CellProcessor[] CELL_PROCESSORS;
+    private CellProcessor[] CELL_PROCESSORS;
 
-    static {
+    private ICsvBeanReader reader;
+
+    private final ClientBatchOpInputErrorList errorList =
+        new ClientBatchOpInputErrorList();
+
+    public CbsrTecanSpecimenPojoReader() {
+
+    }
+
+    @Override
+    public void setReader(ICsvBeanReader reader) {
+        this.reader = reader;
+
+        // cell processors have to be recreated every time the file is read
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
@@ -235,18 +265,12 @@ public class CbsrTecanSpecimenPojoReader implements
         aMap.put("sampelInstanceId", null);
         aMap.put("sampleId", null);
 
-        NAME_MAPPINGS = aMap.keySet().toArray(new String[0]);
+        if (aMap.size() != NAME_MAPPINGS.length) {
+            throw new IllegalStateException(
+                "the number of name mappings do match the cell processors");
+        }
+
         CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
-    }
-
-    private ICsvBeanReader reader;
-
-    private final ClientBatchOpInputErrorList errorList =
-        new ClientBatchOpInputErrorList();
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
     }
 
     @Override

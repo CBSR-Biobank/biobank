@@ -36,14 +36,41 @@ public class SpecimenBatchOpPojoReader implements
 
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
-    private static final String[] NAME_MAPPINGS;
+    private static final String[] NAME_MAPPINGS = new String[] {
+        "inventoryId",
+        "parentInventoryId",
+        "volume",
+        "specimenType",
+        "createdAt",
+        "patientNumber",
+        "visitNumber",
+        "waybill",
+        "sourceSpecimen",
+        "worksheet",
+        "palletProductBarcode",
+        "rootContainerType",
+        "palletLabel",
+        "palletPosition",
+        "comment"
+    };
 
-    private static final CellProcessor[] CELL_PROCESSORS;
+    private CellProcessor[] cellProcessors;
 
-    static {
+    private ICsvBeanReader reader;
+
+    private final ClientBatchOpInputErrorList errorList =
+        new ClientBatchOpInputErrorList();
+
+    private final List<SpecimenBatchOpInputPojo> csvInfos =
+        new ArrayList<SpecimenBatchOpInputPojo>(0);
+
+    @Override
+    public void setReader(ICsvBeanReader reader) {
+        this.reader = reader;
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
+        // cell processors have to be recreated every time the file is read
         aMap.put("inventoryId", new Unique());
         aMap.put("parentInventoryId", new Optional());
         aMap.put("volume", new Optional(new ParseBigDecimal()));
@@ -60,17 +87,13 @@ public class SpecimenBatchOpPojoReader implements
         aMap.put("palletPosition", new Optional());
         aMap.put("comment", new Optional());
 
-        NAME_MAPPINGS = aMap.keySet().toArray(new String[0]);
-        CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
+        if (aMap.size() != NAME_MAPPINGS.length) {
+            throw new IllegalStateException(
+                "the number of name mappings do match the cell processors");
+        }
+
+        cellProcessors = aMap.values().toArray(new CellProcessor[0]);
     }
-
-    private ICsvBeanReader reader;
-
-    private final ClientBatchOpInputErrorList errorList =
-        new ClientBatchOpInputErrorList();
-
-    private final List<SpecimenBatchOpInputPojo> csvInfos =
-        new ArrayList<SpecimenBatchOpInputPojo>(0);
 
     public static boolean isHeaderValid(String[] csvHeaders) {
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
@@ -86,7 +109,7 @@ public class SpecimenBatchOpPojoReader implements
         try {
             while ((csvPojo =
                 reader.read(SpecimenBatchOpInputPojo.class,
-                    NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
+                    NAME_MAPPINGS, cellProcessors)) != null) {
 
                 csvPojo.setLineNumber(reader.getLineNumber());
                 csvInfos.add(csvPojo);
@@ -100,11 +123,6 @@ public class SpecimenBatchOpPojoReader implements
         } catch (IOException e) {
             throw new ClientBatchOpErrorsException(e);
         }
-    }
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
     }
 
     @Override
