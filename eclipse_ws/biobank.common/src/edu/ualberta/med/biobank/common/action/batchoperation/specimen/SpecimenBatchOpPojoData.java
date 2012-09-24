@@ -100,6 +100,9 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     }
 
     void setParentSpecimen(Specimen parentSpecimen) {
+        if (parentSpecimen == null) {
+            throw new NullPointerException("parentSpecimen is null");
+        }
         this.parentSpecimen = parentSpecimen;
         this.pevent = parentSpecimen.getProcessingEvent();
     }
@@ -255,8 +258,6 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             cevent.getOriginalSpecimens().add(specimen);
         } else {
             ProcessingEvent pevent = null;
-
-            // TODO: allow child specimens with no processing event
 
             if (parentSpecimen != null) {
                 pevent = parentSpecimen.getProcessingEvent();

@@ -212,13 +212,59 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
+    @Test
+    public void onlyChildSpecimensNoPevents() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        for (int i = 0; i < 3; i++) {
+            Patient patient = factory.createPatient();
+            patients.add(patient);
+            factory.createCollectionEvent();
+
+            // create 3 source specimens and parent specimens
+            for (int j = 0; j < 3; j++) {
+                factory.createSourceSpecimen();
+                parentSpecimens.add(factory.createParentSpecimen());
+            }
+        }
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens =
+            new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        tx.commit();
+
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.createAliquotedSpecimens(
+                factory.getDefaultStudy(), parentSpecimens);
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
+            exec(importAction);
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+            Assert.fail("errors in CVS data: " + e.getMessage());
+        }
+
+        checkCsvInfoAgainstDb(csvInfos);
+    }
+
     /*
      * Test if we can import aliquoted specimens only.
      * 
      * The CSV file has no positions here.
      */
     @Test
-    public void onlyChildSpecimensInCsv() throws Exception {
+    public void onlyChildSpecimensWithPevents() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
@@ -633,10 +679,10 @@ public class TestSpecimenBatchOp extends TestAction {
                     Assert.assertEquals(csvInfo.getParentInventoryId(),
                         specimen.getParentSpecimen().getInventoryId());
 
-                    Assert.assertNotNull(specimen.getParentSpecimen()
-                        .getProcessingEvent());
-
                     if (csvInfo.getWorksheet() != null) {
+                        Assert.assertNotNull(specimen.getParentSpecimen()
+                            .getProcessingEvent());
+
                         Assert.assertEquals(csvInfo.getWorksheet(), specimen
                             .getParentSpecimen().getProcessingEvent()
                             .getWorksheet());

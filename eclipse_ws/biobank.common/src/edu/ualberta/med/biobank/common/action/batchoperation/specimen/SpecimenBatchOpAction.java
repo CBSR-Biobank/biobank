@@ -58,77 +58,53 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpAction.class.getName());
 
-    public static final LString CSV_PARENT_SPC_ERROR =
+    public static final Tr CSV_CEVENT_ERROR =
+        bundle.tr("collection event for patient {0} with "
+            + "visit number \"{1}\" does not exist");
+
+    private static final LString CSV_PARENT_SPC_ERROR =
         bundle.tr("specimen declared a source specimen but parent " +
             "inventory ID present").format();
 
-    public static final LString CSV_SPC_PATIENT_ERROR =
-        bundle.tr("parent specimen and child specimen "
-            + "do not have the same patient number").format();
+    private static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
+        bundle.tr("parent inventory id does not exist: {}");
 
-    public static final LString CSV_SRC_SPC_PATIENT_CEVENT_MISSING_ERROR =
-        bundle.tr("both patient number and visit number must be specified")
-            .format();
-
-    public static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_WORKSHEET_MISSING_ERROR =
+    private static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
         bundle.tr("when parent inventory id is not specified, "
-            + "patient number, visit number, and worksheet are required")
+            + "patient number, and visit number are required")
             .format();
 
-    public static final LString CSV_PALLET_POS_ERROR =
+    private static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet position defined but not product barcode or label")
             .format();
 
-    public static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
+    private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
         bundle.tr("pallet product barcode defined but not position").format();
 
-    public static final LString CSV_PALLET_LABEL_NO_POS_ERROR =
-        bundle.tr("pallet label defined but not position").format();
-
-    public static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
+    private static final LString CSV_PALLET_LABEL_NO_CTYPE_ERROR =
         bundle.tr("pallet label defined but not container type").format();
 
-    public static final LString CSV_ALIQUOTED_SPC_ERROR =
-        bundle.tr("specimen is not a source specimen but parent "
-            + "inventory ID is not present").format();
-
-    public static final Tr CSV_PARENT_SPECIMEN_ERROR =
-        bundle.tr("parent specimen in CSV file with inventory id " +
-            "\"{0}\" does not exist");
-
-    public static final Tr CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR =
-        bundle.tr("the parent specimen of specimen with "
-            + "inventory id \"{0}\", parent specimen with "
-            + "inventory id \"{0}\", does not have a processing event");
-
-    public static final Tr CSV_WAYBILL_ERROR =
+    private static final Tr CSV_WAYBILL_ERROR =
         bundle.tr("waybill \"{0}\" does not exist");
 
-    public static final Tr CSV_SPECIMEN_TYPE_ERROR =
+    private static final Tr CSV_SPECIMEN_TYPE_ERROR =
         bundle.tr("specimen type with name \"{0}\" does not exist");
 
-    public static final Tr CSV_CONTAINER_LABEL_ERROR =
+    private static final Tr CSV_CONTAINER_LABEL_ERROR =
         bundle.tr("container with label \"{0}\" does not exist");
 
-    public static final Tr CSV_SPECIMEN_LABEL_ERROR =
+    private static final Tr CSV_SPECIMEN_LABEL_ERROR =
         bundle
             .tr("specimen position with label \"{0}\" is invalid");
 
-    public static final Tr CSV_PATIENT_ERROR =
+    private static final Tr CSV_PATIENT_ERROR =
         bundle.tr("patient number is missing");
 
-    public static final Tr CSV_PATIENT_DOES_NOT_EXIST_ERROR =
-        bundle.tr("patient with number \"{0}\" not exist");
-
-    public static final Tr CSV_PATIENT_MATCH_ERROR =
+    private static final Tr CSV_PATIENT_MATCH_ERROR =
         bundle.tr("patient with number \"{0}\" "
             + "does not match the source specimen's patient");
 
-    public static final Tr CSV_CEVENT_ERROR =
-        bundle
-            .tr("collection event for patient {0} with visit number \"{1}\" does not exist");
-
-    public static final Tr CSV_CEVENT_MATCH_ERROR =
+    private static final Tr CSV_CEVENT_MATCH_ERROR =
         bundle.tr("collection event with visit number \"{0}\" "
             + "does match the source specimen's collection event");
 
@@ -249,7 +225,13 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 && (info.getParentSpecimen() == null)) {
                 Specimen parentSpc =
                     parentSpecimens.get(info.getParentInventoryId());
-                info.setParentSpecimen(parentSpc);
+                if (parentSpc == null) {
+                    errorList.addError(info.getPojo().getLineNumber(),
+                        CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo()
+                            .getParentInventoryId()));
+                } else {
+                    info.setParentSpecimen(parentSpc);
+                }
             }
 
             createProcessignEventIfRequired(context, info);
@@ -326,7 +308,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // no parent inventory id and does not have patient number and visit
             // number
             errorList.addError(csvPojo.getLineNumber(),
-                CSV_ALIQ_SPC_PATIENT_CEVENT_WORKSHEET_MISSING_ERROR);
+                CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR);
         }
     }
 
@@ -345,12 +327,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 inputPojo.getParentInventoryId());
 
             if (parentSpecimen != null) {
-                if (parentSpecimen.getProcessingEvent() == null) {
-                    errorList.addError(inputPojo.getLineNumber(),
-                        CSV_PARENT_SPECIMEN_NO_PEVENT_ERROR.format(
-                            inputPojo.getInventoryId(),
-                            parentSpecimen.getInventoryId()));
-                }
                 pojoData.setParentSpecimen(parentSpecimen);
             }
         }
