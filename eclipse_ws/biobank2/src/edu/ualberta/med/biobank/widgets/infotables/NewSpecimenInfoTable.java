@@ -173,6 +173,11 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 case 2:
                     return row.getPositionString(true, true);
                 case 3:
+                    // aliquoted specimens, with parent specimens, and no
+                    // processing event are allowed
+                    if (row.specimen.getParentSpecimen().getProcessingEvent() == null) {
+                        return StringUtil.EMPTY_STRING;
+                    }
                     return row.specimen.getParentSpecimen()
                         .getProcessingEvent().getWorksheet();
                 case 4:
