@@ -90,7 +90,7 @@ public class SpecimenBatchOpPojoReader implements
 
         if (aMap.size() != NAME_MAPPINGS.length) {
             throw new IllegalStateException(
-                "the number of name mappings do match the cell processors");
+                "the number of name mappings do not match the cell processors");
         }
 
         return aMap.values().toArray(new CellProcessor[0]);
