@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +18,17 @@ import org.supercsv.io.ICsvBeanReader;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 /**
  * Reads an OHS TECAN CSV file containing specimen information and returns the
@@ -547,8 +553,20 @@ public class OhsTecanSpecimenPojoReader implements
 
     @Override
     public void postExecution() {
-        // TODO Auto-generated method stub
-
+        try {
+        Center currentWorkingCenter = SessionManager.getUser()
+            .getCurrentWorkingCenter().getWrappedObject();
+        BiobankApplicationService service = SessionManager.getAppService();
+        BooleanResult result = service.doAction(
+            new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
+                sourceSpecimens,
+                "worksheett", //fix this - just testing
+                new Date(),  // fix this - just testing
+                "techniciann"));  // fix this - just testing
+        }
+        catch (Exception ee) {
+        }
+        
     }
 
 }
