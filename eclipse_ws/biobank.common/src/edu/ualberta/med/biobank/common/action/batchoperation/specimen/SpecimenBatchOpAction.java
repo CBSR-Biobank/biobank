@@ -61,6 +61,9 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     public static final int SIZE_LIMIT = 1000;
 
+    private static final LString SPC_ALREADY_EXISTS_ERROR =
+        bundle.tr("specimen already exists").format();
+
     public static final Tr CSV_CEVENT_ERROR =
         bundle.tr("collection event for patient {0} with "
             + "visit number \"{1}\" does not exist");
@@ -359,6 +362,13 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     // get referenced items that exist in the database
     private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo inputPojo) {
+        Specimen spc =
+            BatchOpActionUtil.getSpecimen(context, inputPojo.getInventoryId());
+        if (spc != null) {
+            errorList.addError(inputPojo.getLineNumber(),
+                SPC_ALREADY_EXISTS_ERROR);
+            return null;
+        }
 
         SpecimenBatchOpPojoData pojoData =
             new SpecimenBatchOpPojoData(inputPojo);
