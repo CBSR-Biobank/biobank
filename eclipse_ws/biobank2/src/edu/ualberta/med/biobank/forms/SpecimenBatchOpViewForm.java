@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.forms;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.MessageFormat;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -117,11 +119,26 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                     FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
                     fd.setText(i18n.tr("Download the file to..."));
+                    fd.setFileName(result.getInput().getName());
+
                     final String path = fd.open();
+                    if (path == null || path.isEmpty()) return;
 
                     // create output file.
                     File file = new File(path);
-                    if (!file.exists()) file.createNewFile();
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    } else {
+                        boolean overwrite =
+                            MessageDialog.openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                i18n.tr("File Already Exists"),
+                                MessageFormat.format(
+                                    i18n.tr("The file {0} already exists. Would you like to overwrite it?"),
+                                    path));
+                        if (!overwrite) return;
+                    }
 
                     // download file
                     SimpleResult<FileData> dataResult =
@@ -136,7 +153,9 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                     bos.flush();
                     bos.close();
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    MessageDialog.openError(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        i18n.tr("Problem downloading file"), e.getMessage());
                 }
             }
 
@@ -154,7 +173,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
 
         specimenTable = new SimpleSpecimenTable(client, result.getSpecimens());
         specimenTable.layout(true, true);
-        
+
         section.layout(true, true);
     }
 
