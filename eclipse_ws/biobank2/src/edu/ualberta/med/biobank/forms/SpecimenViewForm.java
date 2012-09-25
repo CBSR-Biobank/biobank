@@ -81,7 +81,11 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BgcBaseText sourceInvIdLabel;
 
+    private BgcBaseText parentInvIdLabel;
+
     private BgcBaseText sourcePeventLabel;
+
+    private BgcBaseText parentPeventLabel;
 
     private BgcBaseText peventLabel;
 
@@ -192,15 +196,18 @@ public class SpecimenViewForm extends BiobankViewForm {
             SWT.NONE, SourceSpecimen.NAME.singular().toString());
         if (!specimenWrapper.getTopSpecimen().equals(specimenWrapper)) {
             sourceInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Source Inventory ID"));
+                i18n.tr("Originating Specimen"));
         }
+
+        parentInvIdLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Parent Specimen"));
 
         ceventLabel = createReadOnlyLabelledField(client, SWT.NONE,
             CollectionEvent.NAME.singular().toString());
 
         if (!specimenWrapper.getTopSpecimen().equals(specimenWrapper)) {
             sourcePeventLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Source Processing Event"));
+                i18n.tr("Created in Processing Event"));
         }
 
         if (specimenWrapper.getProcessingEvent() != null) {
@@ -297,7 +304,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(ceventLabel, specimenWrapper.getCollectionInfo());
 
         boolean isSourceSpc =
-            specimenWrapper.getTopSpecimen().equals(specimenWrapper);
+            (specimenWrapper.getOriginalCollectionEvent() != null);
 
         setCheckBoxValue(isSourceSpcButton, isSourceSpc);
 
@@ -305,16 +312,18 @@ public class SpecimenViewForm extends BiobankViewForm {
             setTextValue(sourceInvIdLabel, specimenWrapper.getTopSpecimen()
                 .getInventoryId());
 
-            ProcessingEventWrapper topPevent = specimenWrapper.getTopSpecimen()
+            setTextValue(parentInvIdLabel, specimenWrapper.getParentSpecimen()
+                .getInventoryId());
+
+            ProcessingEventWrapper pevent = specimenWrapper.getParentSpecimen()
                 .getProcessingEvent();
 
-            setTextValue(
-                sourcePeventLabel,
-                new StringBuilder(topPevent.getFormattedCreatedAt())
-                    .append(" (")
-                    .append(
-                        i18n.tr("worksheet: {0}",
-                            topPevent.getWorksheet())).append(")").toString());
+            if (pevent != null) {
+                setTextValue(sourcePeventLabel,
+                    new StringBuilder(pevent.getFormattedCreatedAt())
+                        .append(" (").append(i18n.tr("worksheet: {0}",
+                            pevent.getWorksheet())).append(")").toString());
+            }
         }
 
         ProcessingEventWrapper pevent = specimenWrapper.getProcessingEvent();

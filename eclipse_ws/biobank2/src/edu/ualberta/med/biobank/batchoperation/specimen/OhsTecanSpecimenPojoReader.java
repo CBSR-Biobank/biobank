@@ -513,8 +513,8 @@ public class OhsTecanSpecimenPojoReader implements
         batchOpPojo.setParentInventoryId(csvPojo.sourceId);
 
         // deal with aliquot volume
-        batchOpPojo.setVolume(new BigDecimal(Double
-            .parseDouble(csvPojo.aliquotVolume) / 1000.0));
+        batchOpPojo.setVolume(new BigDecimal(csvPojo.aliquotVolume)
+            .divide(new BigDecimal(1000)));
 
         // deal with timestamp
         String timeStamp = csvPojo.timeStamp;

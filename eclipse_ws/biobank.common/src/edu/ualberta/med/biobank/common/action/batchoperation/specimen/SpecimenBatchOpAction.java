@@ -59,6 +59,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpAction.class.getName());
 
+    public static final int SIZE_LIMIT = 1000;
+
     public static final Tr CSV_CEVENT_ERROR =
         bundle.tr("collection event for patient {0} with "
             + "visit number \"{1}\" does not exist");
@@ -124,6 +126,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     public SpecimenBatchOpAction(Center workingCenter,
         List<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
         throws NoSuchAlgorithmException, IOException {
+        if (batchOpSpecimens.isEmpty()) {
+            throw new IllegalArgumentException("pojo list is empty");
+        }
+
+        if (batchOpSpecimens.size() > SIZE_LIMIT) {
+            throw new IllegalArgumentException("pojo list size exceeds maximum");
+        }
+
         this.workingCenterId = workingCenter.getId();
         this.fileData = FileData.fromFile(inputFile);
 
@@ -158,6 +168,10 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new IllegalStateException(e);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
+        }
+
+        if (pojos.isEmpty()) {
+            throw new IllegalStateException("pojo list is empty");
         }
 
         for (SpecimenBatchOpInputPojo pojo : pojos) {
@@ -252,6 +266,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         batchOperation.setInputType(BatchInputType.SPECIMEN);
         batchOperation.setAction(BatchAction.INSERT);
         batchOperation.setInput(fileData);
+        batchOperation.setTimeExecuted(new Date());
 
         context.getSession().saveOrUpdate(fileData);
         context.getSession().saveOrUpdate(batchOperation);

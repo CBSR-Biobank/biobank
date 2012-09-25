@@ -47,7 +47,8 @@ public class CbsrTecanSpecimenPojoReader implements
 
     private static final String PROCESSED_DATE_TIME_PREFIX = "Processed_";
 
-    private static final String PROCESSED_DATE_TIME_FORMAT = "ddMMyyy_HHmmss";
+    private static final SimpleDateFormat PROCESSED_DATE_TIME_FORMAT =
+        new SimpleDateFormat("ddMMyyy_HHmmss");
 
     @SuppressWarnings("unused")
     public static class TecanCsvRowPojo implements IBatchOpInputPojo {
@@ -334,13 +335,10 @@ public class CbsrTecanSpecimenPojoReader implements
     private SpecimenBatchOpInputPojo convertToSpecimenBatchOpInputPojo(
         TecanCsvRowPojo csvPojo) {
         Date createdAt;
-        String processedDateTime =
-            csvPojo.getProcessedDateTime().replace(PROCESSED_DATE_TIME_PREFIX,
-                "");
-        SimpleDateFormat sdf = new SimpleDateFormat(PROCESSED_DATE_TIME_FORMAT);
-
+        String processedDateTime = csvPojo.getProcessedDateTime().replace(
+            PROCESSED_DATE_TIME_PREFIX, "");
         try {
-            createdAt = sdf.parse(processedDateTime);
+            createdAt = PROCESSED_DATE_TIME_FORMAT.parse(processedDateTime);
         } catch (ParseException e) {
             getErrorList().addError(csvPojo.getLineNumber(),
                 CSV_PROCESSED_DATE_TIME_PARSE_ERROR);
@@ -353,11 +351,10 @@ public class CbsrTecanSpecimenPojoReader implements
         batchOpPojo.setInventoryId(csvPojo.getCavityId());
         batchOpPojo.setParentInventoryId(csvPojo.getSourceId());
         batchOpPojo.setSpecimenType(csvPojo.getSampleType());
-        batchOpPojo.setVolume(new BigDecimal(
-            (double) csvPojo.getVolume() / 1000.0));
+        batchOpPojo.setVolume(new BigDecimal(csvPojo.getVolume())
+            .divide(new BigDecimal(1000)));
         batchOpPojo.setPatientNumber(csvPojo.getTube1dBarcode());
         batchOpPojo.setCreatedAt(createdAt);
-        batchOpPojo.setWorksheet(csvPojo.getWorksheet());
         batchOpPojo.setPlateErrors(csvPojo.getPlateErrors());
         batchOpPojo.setSamplEerrors(csvPojo.getSampleErrors());
 
@@ -370,14 +367,13 @@ public class CbsrTecanSpecimenPojoReader implements
 
     @Override
     public void preExecution() {
-        // TODO Auto-generated method stub
-
+        // TODO validate worksheet against source specimens
+        // verify that parent inventory id's have processing events
     }
 
     @Override
     public void postExecution() {
-        // TODO Auto-generated method stub
-
+        // intentionally empty
     }
 
 }
