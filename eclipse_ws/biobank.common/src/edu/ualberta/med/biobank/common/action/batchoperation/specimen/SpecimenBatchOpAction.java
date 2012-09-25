@@ -97,15 +97,17 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("container with label \"{0}\" does not exist");
 
     private static final Tr CSV_SPECIMEN_LABEL_ERROR =
-        bundle
-            .tr("specimen position with label \"{0}\" is invalid");
+        bundle.tr("specimen position with label \"{0}\" is invalid");
 
     private static final Tr CSV_PATIENT_ERROR =
         bundle.tr("patient number is missing");
 
+    private static final Tr CSV_NO_PATIENT_ERROR =
+        bundle.tr("specimen has no patient");
+
     private static final Tr CSV_PATIENT_MATCH_ERROR =
-        bundle.tr("patient with number \"{0}\" "
-            + "does not match the source specimen's patient");
+        bundle.tr("patient number \"{0}\" does not match "
+            + "the patient on the source specimen \"{1}\"");
 
     private static final Tr CSV_CEVENT_MATCH_ERROR =
         bundle.tr("collection event with visit number \"{0}\" "
@@ -186,7 +188,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         // sequentially
         // getModelObjects(context, pojos);
 
-        // split pojos into source and aliquoted specimens
         Map<String, SpecimenBatchOpPojoData> pojoDataMap =
             new HashMap<String, SpecimenBatchOpPojoData>(0);
 
@@ -205,12 +206,36 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         // assign the parent specimen for child specimens
-        for (SpecimenBatchOpPojoData info : aliquotSpcPojoData) {
+        for (SpecimenBatchOpPojoData pojoData : aliquotSpcPojoData) {
             SpecimenBatchOpPojoData parentPojoData =
-                pojoDataMap.get(info.getParentInventoryId());
+                pojoDataMap.get(pojoData.getParentInventoryId());
 
             if (parentPojoData != null) {
-                info.setParentPojoData(parentPojoData);
+                pojoData.setParentPojoData(parentPojoData);
+            }
+        }
+
+        for (SpecimenBatchOpPojoData pojoData : pojoDataMap.values()) {
+            if (pojoData.getParentInventoryId() != null) {
+                SpecimenBatchOpInputPojo pojo = pojoData.getPojo();
+
+                // ensure that aliquoted specimens with parent specimens already
+                // in the database have a patient
+                if ((pojoData.getPatient() == null)
+                    && !pojoDataMap
+                        .containsKey(pojoData.getParentInventoryId())) {
+                    errorList.addError(pojo.getLineNumber(),
+                        CSV_NO_PATIENT_ERROR.format());
+                }
+
+                // ensure that aliquoted specimens with parent specimens already
+                // in the database have a collection event
+                if ((pojoData.getParentSpecimen() != null)
+                    && (pojoData.getParentSpecimen().getCollectionEvent() == null)) {
+                    errorList.addError(pojo.getLineNumber(),
+                        CSV_CEVENT_ERROR.format(pojo.getPatientNumber(),
+                            pojo.getVisitNumber()));
+                }
             }
         }
 
@@ -341,16 +366,17 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         Specimen parentSpecimen = null;
 
+        Patient patient = null;
+
         if (inputPojo.getParentInventoryId() != null) {
             parentSpecimen = BatchOpActionUtil.getSpecimen(context,
                 inputPojo.getParentInventoryId());
 
             if (parentSpecimen != null) {
                 pojoData.setParentSpecimen(parentSpecimen);
+                patient = parentSpecimen.getCollectionEvent().getPatient();
             }
         }
-
-        Patient patient = null;
 
         if (pojoData.isSourceSpecimen()) {
             patient = BatchOpActionUtil.getPatient(context,
@@ -371,11 +397,12 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         if (cevent == null) {
             // only aliquoted specimens with no parent require a collection
             // event
-            if (pojoData.isAliquotedSpecimen()
-                && (pojoData.getParentInventoryId() == null)) {
-                errorList.addError(inputPojo.getLineNumber(),
-                    CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
-                        inputPojo.getVisitNumber()));
+            if (pojoData.isAliquotedSpecimen()) {
+                if (pojoData.getParentInventoryId() == null) {
+                    errorList.addError(inputPojo.getLineNumber(),
+                        CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
+                            inputPojo.getVisitNumber()));
+                }
             }
         } else {
             pojoData.setCevent(cevent);
@@ -444,51 +471,51 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     }
 
     private Specimen addSpecimen(ActionContext context,
-        BatchOperation batchOp, SpecimenBatchOpPojoData info) {
+        BatchOperation batchOp, SpecimenBatchOpPojoData pojoData) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
 
-        OriginInfo originInfo = info.getOriginInfo();
+        OriginInfo originInfo = pojoData.getOriginInfo();
         if (originInfo == null) {
             Center center = (Center) context.getSession()
                 .load(Center.class, workingCenterId);
-            originInfo = info.getNewOriginInfo(center);
+            originInfo = pojoData.getNewOriginInfo(center);
         }
 
-        CollectionEvent cevent = info.getCevent();
+        CollectionEvent cevent = pojoData.getCevent();
         if (cevent == null) {
             // if this is a source specimen then see if the patient has the
             // collection event
-            if (info.getPojo().getSourceSpecimen()) {
+            if (pojoData.getPojo().getSourceSpecimen()) {
                 cevent = BatchOpActionUtil.getCollectionEvent(context,
-                    info.getPojo().getPatientNumber(),
-                    info.getPojo().getVisitNumber());
+                    pojoData.getPojo().getPatientNumber(),
+                    pojoData.getPojo().getVisitNumber());
 
                 log.debug(
                     "collection event found: pt={} v#={} invId={}",
                     new Object[] {
-                        info.getPojo().getPatientNumber(),
-                        info.getPojo().getVisitNumber(),
-                        info.getPojo().getInventoryId()
+                        pojoData.getPojo().getPatientNumber(),
+                        pojoData.getPojo().getVisitNumber(),
+                        pojoData.getPojo().getInventoryId()
                     });
-            } else {
+            } else if (pojoData.getParentSpecimen() != null) {
                 // if this is an aliquoted specimen, then get the collection
                 // event from the source specimen
-                cevent = info.getParentSpecimen().getCollectionEvent();
+                cevent = pojoData.getParentSpecimen().getCollectionEvent();
             }
 
             // if still not found create one
             if (cevent == null) {
-                cevent = info.getNewCollectionEvent();
+                cevent = pojoData.getNewCollectionEvent();
                 context.getSession().saveOrUpdate(cevent);
             }
 
-            info.setCevent(cevent);
-            info.setPatient(cevent.getPatient());
+            pojoData.setCevent(cevent);
+            pojoData.setPatient(cevent.getPatient());
         }
 
-        Specimen spc = info.getNewSpecimen();
+        Specimen spc = pojoData.getNewSpecimen();
 
         // check if this specimen has a comment and if so save it to DB
         if (!spc.getComments().isEmpty()) {
@@ -534,7 +561,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                     .equals(inputPojo.getPatientNumber())) {
                 errorList.addError(inputPojo.getLineNumber(),
                     CSV_PATIENT_MATCH_ERROR.format(
-                        inputPojo.getPatientNumber()));
+                        inputPojo.getPatientNumber(),
+                        cevent.getPatient().getPnumber()));
             }
 
             if ((inputPojo.getVisitNumber() != null)

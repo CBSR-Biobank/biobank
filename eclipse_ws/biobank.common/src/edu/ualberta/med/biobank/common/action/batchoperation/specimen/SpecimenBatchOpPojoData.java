@@ -182,6 +182,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         cevent.setPatient(patient);
         cevent.setVisitNumber(pojo.getVisitNumber());
         cevent.setActivityStatus(ActivityStatus.ACTIVE);
+
+        if (patient == null) {
+            throw new IllegalStateException("patient is null");
+        }
+
         patient.getCollectionEvents().add(cevent);
 
         log.trace("created collection event: pt={} v#={} invId={}",

@@ -2,9 +2,7 @@ package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -107,7 +105,7 @@ public class TestOhsTecanSpecimenPojoReader extends TestAction {
                 .add(Restrictions.eq("inventoryId", spcInventoryId))
                 .uniqueResult();
         if (parentSpecimen != null) {
-            deleteSpecimen(parentSpecimen);
+            CsvUtil.deleteSpecimen(session, parentSpecimen);
         }
 
         parentSpecimen = factory.createParentSpecimen();
@@ -115,31 +113,5 @@ public class TestOhsTecanSpecimenPojoReader extends TestAction {
         session.save(parentSpecimen);
 
         tx.commit();
-    }
-
-    public void deleteSpecimen(Specimen parent) {
-        Set<Specimen> parents = new HashSet<Specimen>();
-        parents.add(parent);
-        deleteSpecimens(parents);
-    }
-
-    public void deleteSpecimens(Set<Specimen> parents) {
-        Set<Specimen> children = new HashSet<Specimen>();
-        for (Specimen parent : parents) {
-            for (Specimen child : parent.getChildSpecimens()) {
-                children.add(child);
-            }
-        }
-        if (!children.isEmpty()) {
-            deleteSpecimens(children);
-        }
-        for (Specimen parent : parents) {
-            Specimen grandparent = parent.getParentSpecimen();
-            if (grandparent != null) {
-                grandparent.getChildSpecimens().remove(parent);
-            }
-            session.delete(parent);
-        }
-        session.flush();
     }
 }
