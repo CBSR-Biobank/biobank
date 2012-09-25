@@ -267,14 +267,45 @@ public class OhsTecanSpecimenPojoReader implements
         }
     }
 
-    private static final String[] NAME_MAPPINGS;
+    private static final String[] NAME_MAPPINGS = new String[] {
+        "tecanRackId",
+        "inventoryId",
+        "dontCare2",
+        "sourceId",
+        "dontCare4",
+        "dontCare5",
+        "aliquotVolume",
+        "sourceVolume",
+        "timeStamp",
+        "technicianId",
+        "dontCare10",
+        "dontCare11",
+        "plateErrors",
+        "sampleErrors",
+        "dontCare14",
+        "dontCare15"
+    };
+    
+    private ICsvBeanReader reader;
 
-    private final static CellProcessor[] CELL_PROCESSORS;
+    private final ClientBatchOpInputErrorList errorList =
+        new ClientBatchOpInputErrorList();
 
-    static {
+    public OhsTecanSpecimenPojoReader() {
+
+    }
+
+    @Override
+    public void setReader(ICsvBeanReader reader) {
+        this.reader = reader;
+    }
+
+    // cell processors have to be recreated every time the file is read
+    public CellProcessor[] getCellProcessors() {
+
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
-
+        
         aMap.put("tecanRackId", new StrNotNullOrEmpty());
         aMap.put("inventoryId", null);
         aMap.put("dontCare2", null);
@@ -292,18 +323,12 @@ public class OhsTecanSpecimenPojoReader implements
         aMap.put("dontCare14", null);
         aMap.put("dontCare15", null);
 
-        NAME_MAPPINGS = aMap.keySet().toArray(new String[0]);
-        CELL_PROCESSORS = aMap.values().toArray(new CellProcessor[0]);
-    }
+        if (aMap.size() != NAME_MAPPINGS.length) {
+            throw new IllegalStateException(
+                "the number of name mappings do not match the cell processors");
+        }
 
-    private ICsvBeanReader reader;
-
-    private final ClientBatchOpInputErrorList errorList =
-        new ClientBatchOpInputErrorList();
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
+        return aMap.values().toArray(new CellProcessor[0]);
     }
 
     @Override
@@ -322,10 +347,12 @@ public class OhsTecanSpecimenPojoReader implements
 
     @Override
     public List<SpecimenBatchOpInputPojo> getPojos()
-        throws ClientBatchOpErrorsException {
+        throws ClientBatchOpErrorsException, IOException {
         if (reader == null) {
             throw new IllegalStateException("CSV reader is null");
         }
+
+        CellProcessor[] cellProcessors = getCellProcessors();
 
         List<SpecimenBatchOpInputPojo> result =
             new ArrayList<SpecimenBatchOpInputPojo>();
@@ -337,7 +364,7 @@ public class OhsTecanSpecimenPojoReader implements
             String technicianId = null;
             while ((csvPojo =
                 reader.read(TecanCsvRowPojo.class,
-                    NAME_MAPPINGS, CELL_PROCESSORS)) != null) {
+                    NAME_MAPPINGS, cellProcessors)) != null) {
                 
                 // skip certain rows
                 if (csvPojo.getSourceId().isEmpty()) continue;
@@ -414,8 +441,6 @@ public class OhsTecanSpecimenPojoReader implements
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
-            throw new ClientBatchOpErrorsException(e);
-        } catch (IOException e) {
             throw new ClientBatchOpErrorsException(e);
         }
     }
