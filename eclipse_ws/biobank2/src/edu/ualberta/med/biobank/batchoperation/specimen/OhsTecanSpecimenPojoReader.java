@@ -341,8 +341,7 @@ public class OhsTecanSpecimenPojoReader implements
             throw new NullPointerException("csvHeaders is null");
         }
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
-            // last 2 columns have no column name
-            && (csvHeaders.length + 2 == NAME_MAPPINGS.length);
+            && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
     @Override
