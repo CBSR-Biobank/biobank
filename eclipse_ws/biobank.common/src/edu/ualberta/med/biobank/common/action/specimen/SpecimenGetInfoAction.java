@@ -10,6 +10,8 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
+import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -44,13 +46,16 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
         private Specimen specimen;
         private Stack<Container> parents = new Stack<Container>();
+        private BatchOperation batch;
 
         public SpecimenBriefInfo() {
         }
 
-        public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents) {
+        public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents,
+            BatchOperation batch) {
             this.specimen = specimen;
             this.parents = parents;
+            this.batch = batch;
         }
 
         public Specimen getSpecimen() {
@@ -59,6 +64,10 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
         public Stack<Container> getParents() {
             return parents;
+        }
+
+        public BatchOperation getBatch() {
+            return batch;
         }
     }
 
@@ -107,7 +116,15 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
                 container = container.getParentContainer();
             }
         }
-        return new SpecimenBriefInfo(specimen, parents);
+
+        BatchOperation batch = (BatchOperation) context.getSession()
+            .createQuery("select bos.batch " +
+                " from " + BatchOperationSpecimen.class.getName() + " bos" +
+                " where bos.specimen.id = ?")
+            .setParameter(0, specimenId)
+            .uniqueResult();
+
+        return new SpecimenBriefInfo(specimen, parents, batch);
     }
 
 }

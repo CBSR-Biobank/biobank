@@ -2,12 +2,19 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Stack;
 
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Section;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -17,13 +24,19 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesActi
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -42,6 +55,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
+import edu.ualberta.med.biobank.wizards.ReparentingWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenViewForm extends BiobankViewForm {
@@ -90,6 +104,14 @@ public class SpecimenViewForm extends BiobankViewForm {
     private BgcBaseText peventLabel;
 
     private BgcBaseText childrenLabel;
+
+    private BgcBaseText plateErrorsLabel;
+
+    private BgcBaseText sampleErrorsLabel;
+
+    private BgcBaseText batchOpLabel;
+
+    private Button openBatchOpButton;
 
     private Button isSourceSpcButton;
 
@@ -219,6 +241,50 @@ public class SpecimenViewForm extends BiobankViewForm {
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             ActivityStatus.NAME.singular().toString());
 
+        plateErrorsLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Plate Errors"));
+        sampleErrorsLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Sample Errors"));
+
+        createSpecimenImportField(client);
+    }
+
+    private void createSpecimenImportField(Composite parent) {
+        Label label = widgetCreator.createLabel(parent, "Imported");
+
+        Composite c = new Composite(parent, SWT.NONE);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        c.setLayoutData(gd);
+        GridLayout gl = new GridLayout(2, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        c.setLayout(gl);
+        label.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
+
+        batchOpLabel = (BgcBaseText) widgetCreator
+            .createWidget(c, BgcBaseText.class, SWT.READ_ONLY, null);
+        batchOpLabel.setBackground(BgcWidgetCreator.READ_ONLY_TEXT_BGR);
+
+        openBatchOpButton = new Button(c, SWT.NONE);
+        openBatchOpButton.setText(i18n.tr("View Import"));
+
+        toolkit.adapt(c);
+
+        openBatchOpButton.addListener(SWT.MouseUp, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (specimenBriefInfo.getBatch() != null) {
+                    Integer batchOpId = specimenBriefInfo.getBatch().getId();
+                    try {
+                        SpecimenBatchOpViewForm.openForm(batchOpId, true);
+                    } catch (PartInitException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
     }
 
     private void createCommentsSection() {
@@ -302,6 +368,16 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(positionLabel,
             specimenWrapper.getPositionString(true, false));
         setTextValue(ceventLabel, specimenWrapper.getCollectionInfo());
+
+        setTextValue(plateErrorsLabel, specimenWrapper.getWrappedObject()
+            .getPlateErrors());
+        setTextValue(sampleErrorsLabel, specimenWrapper.getWrappedObject()
+            .getSampleErrors());
+
+        setTextValue(batchOpLabel, specimenBriefInfo.getBatch() != null
+            ? i18n.tr("Yes")
+            : i18n.tr("No"));
+        openBatchOpButton.setEnabled(specimenBriefInfo.getBatch() != null);
 
         boolean isSourceSpc =
             (specimenWrapper.getOriginalCollectionEvent() != null);

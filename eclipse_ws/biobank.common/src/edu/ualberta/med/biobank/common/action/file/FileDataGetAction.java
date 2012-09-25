@@ -1,6 +1,4 @@
-package edu.ualberta.med.biobank.common.action.attachment;
-
-import org.hibernate.criterion.Restrictions;
+package edu.ualberta.med.biobank.common.action.file;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -10,16 +8,16 @@ import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.type.Hash.SHA1Hash;
 
-public class AttachmentDownloadDataAction
+public class FileDataGetAction
     implements Action<SimpleResult<FileData>> {
     private static final long serialVersionUID = 1L;
 
-    private final Integer attachmentId;
+    private final Integer metaDataId;
     private final SHA1Hash sha1Hash;
 
-    public AttachmentDownloadDataAction(FileMetaData attachment) {
-        this.attachmentId = attachment.getId();
-        this.sha1Hash = attachment.getSha1Hash();
+    public FileDataGetAction(FileMetaData metaData) {
+        this.metaDataId = metaData.getId();
+        this.sha1Hash = metaData.getSha1Hash();
     }
 
     @Override
@@ -32,10 +30,11 @@ public class AttachmentDownloadDataAction
         throws ActionException {
 
         FileData data = (FileData) context.getSession()
-            .createCriteria(FileData.class)
-            .createCriteria("attachment")
-            .add(Restrictions.idEq(attachmentId))
-            .add(Restrictions.eq("sha1Hash", sha1Hash))
+            .createQuery("select data " +
+                " from " + FileData.class.getName() + " data" +
+                " where data.metaData.id = ? and data.metaData.sha1Hash = ?")
+            .setParameter(0, metaDataId)
+            .setParameter(1, sha1Hash)
             .uniqueResult();
 
         return new SimpleResult<FileData>(data);

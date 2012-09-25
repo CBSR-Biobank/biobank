@@ -1755,6 +1755,12 @@
       name="%SpecimenImport.editor">
 </editor>
 <editor
+      class="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
+      name="%SpecimenImport.editor">
+</editor>
+<editor
       class="edu.ualberta.med.biobank.forms.linkassign.SpecimenAssignEntryForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm"

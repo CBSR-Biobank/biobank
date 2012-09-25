@@ -3,7 +3,9 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
@@ -17,6 +19,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -141,6 +144,20 @@ public class TestSite extends TestAction {
         siteSaveAction.setStudyIds(new HashSet<Integer>());
         siteSaveAction.setAddress(address);
         exec(siteSaveAction);
+    }
+
+    public void deleteSpecimens(Set<Specimen> parents) {
+        Set<Specimen> children = new HashSet<Specimen>();
+        for (Specimen parent : parents) {
+            for (Specimen child : parent.getChildSpecimens()) {
+                children.add(child);
+            }
+        }
+        deleteSpecimens(children);
+        for (Specimen parent : parents) {
+            session.delete(parent);
+        }
+        session.flush();
     }
 
     @Test

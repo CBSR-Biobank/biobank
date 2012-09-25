@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -25,9 +26,12 @@ import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenBatchOpInterpreter;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
+import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.FileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.BatchOpExceptionTable;
 
 public class SpecimenImportForm extends BiobankViewForm {
@@ -40,6 +44,7 @@ public class SpecimenImportForm extends BiobankViewForm {
     private FileBrowser fileBrowser;
     private Button importButton;
     private BatchOpExceptionTable errorsTable;
+    private Label errorsLabel;
     private Composite client;
 
     @Override
@@ -92,15 +97,23 @@ public class SpecimenImportForm extends BiobankViewForm {
 
     private void createErrorsTable(Composite parent,
         List<BatchOpException<?>> errors) {
-        if (errorsTable != null) {
-            errorsTable.dispose();
-        }
+        if (errorsTable != null) errorsTable.dispose();
+        if (errorsLabel != null) errorsLabel.dispose();
         if (errors == null || errors.isEmpty()) return;
 
         // TODO: add a label saying there were errors
+
+        errorsLabel = new Label(parent, SWT.NONE);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.horizontalSpan = 2;
+        errorsLabel.setLayoutData(gd);
         
+        errorsLabel.setText(i18n
+            .tr("The following errors occurred when attempting to import:"));
+        errorsLabel.setBackground(toolkit.getColors().getBackground());
+
         errorsTable = new BatchOpExceptionTable(parent, errors);
-        GridData gd = (GridData) errorsTable.getLayoutData();
+        gd = (GridData) errorsTable.getLayoutData();
         gd.horizontalSpan = 2;
 
         toolkit.adapt(errorsTable);
@@ -140,6 +153,8 @@ public class SpecimenImportForm extends BiobankViewForm {
 
                 final List<BatchOpException<?>> errors =
                     new ArrayList<BatchOpException<?>>();
+                final Holder<Boolean> success = new Holder<Boolean>(false);
+                final Holder<Integer> batchOpId = new Holder<Integer>(null);
 
                 try {
                     SpecimenBatchOpInterpreter interpreter =
@@ -151,9 +166,9 @@ public class SpecimenImportForm extends BiobankViewForm {
 
                     monitor.beginTask(i18n.tr("Saving data..."),
                         IProgressMonitor.UNKNOWN);
-                    Integer batchOpId = interpreter.savePojos();
+                    batchOpId.setValue(interpreter.savePojos());
 
-                    // TODO: close this form and open the new other form
+                    success.setValue(true);
                 } catch (ClientBatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
                 } catch (BatchOpErrorsException e) {
@@ -164,7 +179,18 @@ public class SpecimenImportForm extends BiobankViewForm {
                     fileBrowser.getDisplay().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            updateErrorsTable(errors);
+                            if (success.getValue()) {
+                                AdapterBase
+                                    .closeEditor((FormInput) getEditorInput());
+                                try {
+                                    SpecimenBatchOpViewForm.openForm(
+                                        batchOpId.getValue(), true);
+                                } catch (PartInitException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else {
+                                updateErrorsTable(errors);
+                            }
                         }
                     });
                 }

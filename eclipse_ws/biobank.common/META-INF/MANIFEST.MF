@@ -69,6 +69,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.action.containerType,
  edu.ualberta.med.biobank.common.action.dispatch,
  edu.ualberta.med.biobank.common.action.exception,
+ edu.ualberta.med.biobank.common.action.file,
  edu.ualberta.med.biobank.common.action.info,
  edu.ualberta.med.biobank.common.action.labelPrinter,
  edu.ualberta.med.biobank.common.action.logging,
