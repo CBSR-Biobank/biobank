@@ -5,16 +5,11 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
-import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
@@ -25,21 +20,20 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
-import edu.ualberta.med.biobank.batchoperation.specimen.CbsrTecanSpecimenPojoReader.TecanCsvRowPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 
 /**
- * Reads an OHS TECAN CSV file containing specimen information and returns the file
- * as a list of SpecimenBatchOpInputPojo.
+ * Reads an OHS TECAN CSV file containing specimen information and returns the
+ * file as a list of SpecimenBatchOpInputPojo.
  * 
  * @author Brian Allen
  * 
  */
 public class OhsTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
-    
+
     private static final I18n i18n = I18nFactory
         .getI18n(DecodeImageForm.class);
 
@@ -99,10 +93,10 @@ public class OhsTecanSpecimenPojoReader implements
         TYPE_PRIMARY_MATRIX,
         TYPE_SECONDARY_MATRIX
     };
-    
+
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
         new SimpleDateFormat("yyyyMMdd_HHmmss");
-    
+
     private final List<SpecimenBatchOpInputPojo> sourceSpecimens =
         new ArrayList<SpecimenBatchOpInputPojo>(0);
 
@@ -285,7 +279,7 @@ public class OhsTecanSpecimenPojoReader implements
         "dontCare14",
         "dontCare15"
     };
-    
+
     private ICsvBeanReader reader;
 
     private final ClientBatchOpInputErrorList errorList =
@@ -305,7 +299,7 @@ public class OhsTecanSpecimenPojoReader implements
 
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
-        
+
         aMap.put("tecanRackId", new StrNotNullOrEmpty());
         aMap.put("inventoryId", null);
         aMap.put("dontCare2", null);
@@ -341,6 +335,7 @@ public class OhsTecanSpecimenPojoReader implements
             throw new NullPointerException("csvHeaders is null");
         }
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
+            // last 2 columns have no column name
             && (csvHeaders.length == NAME_MAPPINGS.length);
     }
 
@@ -364,11 +359,12 @@ public class OhsTecanSpecimenPojoReader implements
             while ((csvPojo =
                 reader.read(TecanCsvRowPojo.class,
                     NAME_MAPPINGS, cellProcessors)) != null) {
-                
+
                 // skip certain rows
                 if (csvPojo.getSourceId().isEmpty()) continue;
                 if (csvPojo.getAliquotVolume().isEmpty()) continue;
-                if (Double.parseDouble(csvPojo.aliquotVolume)/1000.0 <= 0.0) continue;
+                if (Double.parseDouble(csvPojo.aliquotVolume) / 1000.0 <= 0.0)
+                    continue;
 
                 csvPojo.setLineNumber(reader.getLineNumber());
 
@@ -379,11 +375,11 @@ public class OhsTecanSpecimenPojoReader implements
                     // pojo could not be converted, ignore this row
                     continue;
                 }
-                
+
                 if (batchOpPojo.getSpecimenType().equals(TYPE_BUFFY)) {
                     hasBuffy = true;
                 }
-                
+
                 // technician ID for processing event
                 if (technicianId == null) {
                     technicianId = csvPojo.technicianId;
@@ -392,12 +388,14 @@ public class OhsTecanSpecimenPojoReader implements
                     getErrorList().addError(reader.getLineNumber(),
                         CSV_MULTIPLE_TECHNICIANS_ERROR);
                 }
-                
+
                 // deal with source specimens
                 // urine source volume missing by design
                 BigDecimal sourceVolume = null;
                 if (!csvPojo.sourceVolume.isEmpty()) {
-                    sourceVolume = new BigDecimal(Double.parseDouble(csvPojo.sourceVolume)/1000.0);
+                    sourceVolume =
+                        new BigDecimal(
+                            Double.parseDouble(csvPojo.sourceVolume) / 1000.0);
                 }
 
                 boolean sourceSpecimenAlreadyEncountered = false;
@@ -406,7 +404,7 @@ public class OhsTecanSpecimenPojoReader implements
                         if ((sPojo.getVolume() == null && sourceVolume != null)
                             || (sPojo.getVolume() != null && sourceVolume == null)
                             || ((sPojo.getVolume() != null && sourceVolume != null)
-                                && (sPojo.getVolume().compareTo(sourceVolume) != 0))) {
+                            && (sPojo.getVolume().compareTo(sourceVolume) != 0))) {
                             getErrorList().addError(reader.getLineNumber(),
                                 CSV_MULTIPLE_SOURCE_VOLUMES_ERROR);
                         }
@@ -415,7 +413,8 @@ public class OhsTecanSpecimenPojoReader implements
                     }
                 }
                 if (!sourceSpecimenAlreadyEncountered) {
-                    SpecimenBatchOpInputPojo sourcePojo = new SpecimenBatchOpInputPojo();
+                    SpecimenBatchOpInputPojo sourcePojo =
+                        new SpecimenBatchOpInputPojo();
                     sourcePojo.setInventoryId(csvPojo.sourceId);
                     sourcePojo.setVolume(sourceVolume);
                     sourceSpecimens.add(sourcePojo);
@@ -423,7 +422,7 @@ public class OhsTecanSpecimenPojoReader implements
 
                 result.add(batchOpPojo);
             }
-            
+
             // fix specimen type for certain csv files
             if (hasBuffy) {
                 for (SpecimenBatchOpInputPojo pojo : result) {
@@ -435,7 +434,7 @@ public class OhsTecanSpecimenPojoReader implements
                     }
                 }
             }
-                
+
             return result;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
@@ -448,7 +447,7 @@ public class OhsTecanSpecimenPojoReader implements
         TecanCsvRowPojo csvPojo) {
         SpecimenBatchOpInputPojo batchOpPojo = new SpecimenBatchOpInputPojo();
         batchOpPojo.setLineNumber(csvPojo.getLineNumber());
-        
+
         // check for missing column values
         if (csvPojo.tecanRackId == null) {
             getErrorList().addError(reader.getLineNumber(),
@@ -470,9 +469,9 @@ public class OhsTecanSpecimenPojoReader implements
                 CSV_TECHNICIAN_ID_MISSING_ERROR);
             return null;
         }
-        
+
         // process other columns
-        
+
         // deal with specimen type
         String specimenType = null;
         for (String sType : ALIQUOT_TYPES) {
@@ -506,16 +505,17 @@ public class OhsTecanSpecimenPojoReader implements
             return null;
         }
         batchOpPojo.setSpecimenType(specimenType);
-        
+
         // deal with inventory ID
         batchOpPojo.setInventoryId(csvPojo.inventoryId);
-        
+
         // deal with source ID
         batchOpPojo.setParentInventoryId(csvPojo.sourceId);
-        
+
         // deal with aliquot volume
-        batchOpPojo.setVolume(new BigDecimal(Double.parseDouble(csvPojo.aliquotVolume)/1000.0));
-        
+        batchOpPojo.setVolume(new BigDecimal(Double
+            .parseDouble(csvPojo.aliquotVolume) / 1000.0));
+
         // deal with timestamp
         String timeStamp = csvPojo.timeStamp;
         // at one point, timestamps were being prefixed with an underscore
@@ -524,21 +524,20 @@ public class OhsTecanSpecimenPojoReader implements
         }
         try {
             batchOpPojo.setCreatedAt(TIME_STAMP_FORMAT.parse(timeStamp));
-        }
-        catch (ParseException pe) {
+        } catch (ParseException pe) {
             getErrorList().addError(reader.getLineNumber(),
                 CSV_TIME_STAMP_PARSE_ERROR);
             return null;
         }
-        
+
         // deal with plate errors
         batchOpPojo.setPlateErrors(csvPojo.plateErrors);
-        
+
         // deal with sample errors
         batchOpPojo.setSamplEerrors(csvPojo.sampleErrors);
-        
+
         return batchOpPojo;
-    }     
+    }
 
     @Override
     public void preExecution() {

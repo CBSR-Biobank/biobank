@@ -315,8 +315,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public boolean hasSpecimens() {
-        return !getContainerType().getSpecimenTypeCollection().isEmpty()
-            && !getSpecimens().isEmpty();
+        // take care with null pointers here
+        ContainerTypeWrapper ctype = getContainerType();
+        if (ctype != null) {
+            return !ctype.getSpecimenTypeCollection().isEmpty()
+                && !getSpecimens().isEmpty();
+        }
+        return false;
     }
 
     public SpecimenWrapper getSpecimen(Integer row, Integer col)

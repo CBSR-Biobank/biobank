@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.test.action.TestAction;
 public class TestCbsrTecanSpecimenPojoReader extends TestAction {
 
     @Test
-    public void parseTestFile() throws Exception {
+    public void parseTecanFile() throws Exception {
         ICsvBeanReader reader =
-            new CsvBeanReader(new FileReader("tecan_test.csv"),
+            new CsvBeanReader(new FileReader("tecan/cbsr_tecan.csv"),
                 CsvPreference.EXCEL_PREFERENCE);
 
         String[] csvHeaders = reader.getCSVHeader(true);
