@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.model;
 
+import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -21,6 +24,7 @@ public class BatchOperation
 
     private FileData input;
     private User executedBy;
+    private Date timeExecuted;
     private BatchInputType inputType;
     private BatchAction action;
 
@@ -43,6 +47,16 @@ public class BatchOperation
 
     public void setExecutedBy(User executedBy) {
         this.executedBy = executedBy;
+    }
+
+    @NotNull(message = "{edu.ualberta.med.biobank.model.BatchOperation.timeExecuted.NotNull}")
+    @Column(name = "TIME_EXECUTED", nullable = false)
+    public Date getTimeExecuted() {
+        return timeExecuted;
+    }
+
+    public void setTimeExecuted(Date timeExecuted) {
+        this.timeExecuted = timeExecuted;
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.BatchOperation.inputType.NotNull}")

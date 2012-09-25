@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -247,6 +248,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         batchOperation.setInput(fileData);
         batchOperation.setExecutedBy(context.getUser());
+        batchOperation.setTimeExecuted(new Date());
         batchOperation.setInputType(BatchInputType.SPECIMEN);
         batchOperation.setAction(BatchAction.INSERT);
         batchOperation.setInput(fileData);
