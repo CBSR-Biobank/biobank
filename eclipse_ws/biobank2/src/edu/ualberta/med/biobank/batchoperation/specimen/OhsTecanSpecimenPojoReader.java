@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.batchoperation.specimen;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -565,7 +566,7 @@ public class OhsTecanSpecimenPojoReader implements
             BooleanResult result = service.doAction(
                 new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
                     sourceSpecimens,
-                    "worksheett", // fix this - just testing
+                    new File(filename).getName(),
                     new Date(), // fix this - just testing
                     "techniciann")); // fix this - just testing
         } catch (Exception ee) {
