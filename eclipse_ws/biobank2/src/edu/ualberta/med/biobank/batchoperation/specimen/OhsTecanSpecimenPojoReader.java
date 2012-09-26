@@ -72,6 +72,9 @@ public class OhsTecanSpecimenPojoReader implements
     public static final String CSV_MULTIPLE_SOURCE_VOLUMES_ERROR =
         i18n.tr("multiple source volumes for same specimen");
 
+    public static final String CSV_NO_ALIQUOTS_ERROR =
+        i18n.tr("no aliquot specimens");
+
     private static final String CSV_FIRST_HEADER = "TECAN_Rack_ID";
 
     private static final String TYPE_URINE_PRIMARY = "Urine-Primary";
@@ -441,6 +444,11 @@ public class OhsTecanSpecimenPojoReader implements
                         pojo.setSpecimenType(TYPE_PLASMA_SECONDARY);
                     }
                 }
+            }
+            
+            if (result.size() == 0) {
+                getErrorList().addError(reader.getLineNumber(),
+                    CSV_NO_ALIQUOTS_ERROR);
             }
 
             return result;
