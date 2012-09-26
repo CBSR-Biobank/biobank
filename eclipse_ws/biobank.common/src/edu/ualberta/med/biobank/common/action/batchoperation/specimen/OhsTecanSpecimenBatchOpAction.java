@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -24,26 +21,10 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.i18n.Tr;
-import edu.ualberta.med.biobank.model.BatchOperation;
-import edu.ualberta.med.biobank.model.BatchOperation.BatchAction;
-import edu.ualberta.med.biobank.model.BatchOperation.BatchInputType;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.FileData;
-import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**

@@ -26,8 +26,6 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.BatchOperation;
-import edu.ualberta.med.biobank.model.BatchOperation.BatchAction;
-import edu.ualberta.med.biobank.model.BatchOperation.BatchInputType;
 import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -293,8 +291,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         batchOperation.setInput(fileData);
         batchOperation.setExecutedBy(context.getUser());
         batchOperation.setTimeExecuted(new Date());
-        batchOperation.setInputType(BatchInputType.SPECIMEN);
-        batchOperation.setAction(BatchAction.INSERT);
         batchOperation.setInput(fileData);
         batchOperation.setTimeExecuted(new Date());
 

@@ -25,8 +25,6 @@ public class BatchOperation
     private FileData input;
     private User executedBy;
     private Date timeExecuted;
-    private BatchInputType inputType;
-    private BatchAction action;
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "FILE_DATA_ID")
@@ -57,75 +55,5 @@ public class BatchOperation
 
     public void setTimeExecuted(Date timeExecuted) {
         this.timeExecuted = timeExecuted;
-    }
-
-    @NotNull(message = "{edu.ualberta.med.biobank.model.BatchOperation.inputType.NotNull}")
-    @Type(type = "edu.ualberta.med.biobank.model.BatchOperation$BatchInputType",
-        parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.BatchOperation$BatchInputType")
-        })
-    public BatchInputType getInputType() {
-        return inputType;
-    }
-
-    public void setInputType(BatchInputType inputType) {
-        this.inputType = inputType;
-    }
-
-    @NotNull(message = "{edu.ualberta.med.biobank.model.BatchOperation.action.NotNull}")
-    @Type(type = "edu.ualberta.med.biobank.model.BatchOperation$BatchAction",
-        parameters = {
-            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.BatchOperation$BatchAction")
-        })
-    public BatchAction getAction() {
-        return action;
-    }
-
-    public void setAction(BatchAction action) {
-        this.action = action;
-    }
-
-    public enum BatchInputType {
-        SPECIMEN("SP");
-
-        private String id;
-
-        private BatchInputType(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public static BatchInputType fromId(Integer id) {
-            for (BatchInputType item : values()) {
-                if (item.id.equals(id)) return item;
-            }
-            return null;
-        }
-    }
-
-    public enum BatchAction {
-        INSERT("INS"),
-        UPDATE("UPD"),
-        DELETE("DEL");
-
-        private String id;
-
-        private BatchAction(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public static BatchAction fromId(Integer id) {
-            for (BatchAction item : values()) {
-                if (item.id.equals(id)) return item;
-            }
-            return null;
-        }
     }
 }
