@@ -107,8 +107,8 @@ public class OhsTecanSpecimenPojoReader implements
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
         new SimpleDateFormat("yyyyMMdd_HHmmss");
 
-    private final List<SpecimenBatchOpInputPojo> sourceSpecimens =
-        new ArrayList<SpecimenBatchOpInputPojo>(0);
+    private List<SpecimenBatchOpInputPojo> sourceSpecimens;
+    private Date timestamp;
 
     public static class TecanCsvRowPojo implements IBatchOpInputPojo {
         private static final long serialVersionUID = 1L;
@@ -354,6 +354,11 @@ public class OhsTecanSpecimenPojoReader implements
     @Override
     public List<SpecimenBatchOpInputPojo> getPojos()
         throws ClientBatchOpErrorsException, IOException {
+
+        sourceSpecimens =
+            new ArrayList<SpecimenBatchOpInputPojo>(0);
+        timestamp = new Date();
+        
         if (reader == null) {
             throw new IllegalStateException("CSV reader is null");
         }
@@ -429,6 +434,10 @@ public class OhsTecanSpecimenPojoReader implements
                     sourcePojo.setInventoryId(csvPojo.sourceId);
                     sourcePojo.setVolume(sourceVolume);
                     sourceSpecimens.add(sourcePojo);
+                }
+                
+                if (batchOpPojo.getCreatedAt().before(timestamp)) {
+                    timestamp = batchOpPojo.getCreatedAt();
                 }
 
                 result.add(batchOpPojo);
@@ -575,7 +584,7 @@ public class OhsTecanSpecimenPojoReader implements
                 new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
                     sourceSpecimens,
                     new File(filename).getName(),
-                    new Date(), // fix this - just testing
+                    timestamp,
                     "techniciann")); // fix this - just testing
         } catch (Exception ee) {
         }
