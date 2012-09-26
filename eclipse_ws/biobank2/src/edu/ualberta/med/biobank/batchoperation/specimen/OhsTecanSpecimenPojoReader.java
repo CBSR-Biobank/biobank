@@ -106,7 +106,6 @@ public class OhsTecanSpecimenPojoReader implements
     private final List<SpecimenBatchOpInputPojo> sourceSpecimens =
         new ArrayList<SpecimenBatchOpInputPojo>(0);
 
-    @SuppressWarnings("unused")
     public static class TecanCsvRowPojo implements IBatchOpInputPojo {
         private static final long serialVersionUID = 1L;
 
@@ -286,13 +285,16 @@ public class OhsTecanSpecimenPojoReader implements
         "dontCare15"
     };
 
+    private String filename;
+
     private ICsvBeanReader reader;
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    public OhsTecanSpecimenPojoReader() {
-
+    @Override
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     @Override
@@ -400,7 +402,7 @@ public class OhsTecanSpecimenPojoReader implements
                 BigDecimal sourceVolume = null;
                 if (!csvPojo.sourceVolume.isEmpty()) {
                     sourceVolume = new BigDecimal(csvPojo.sourceVolume)
-                    .divide(new BigDecimal(1000));
+                        .divide(new BigDecimal(1000));
                 }
 
                 boolean sourceSpecimenAlreadyEncountered = false;
@@ -552,20 +554,23 @@ public class OhsTecanSpecimenPojoReader implements
 
     @Override
     public void postExecution() {
+        if (filename == null) {
+            throw new IllegalStateException("filename has not been set");
+        }
+
         try {
-        Center currentWorkingCenter = SessionManager.getUser()
-            .getCurrentWorkingCenter().getWrappedObject();
-        BiobankApplicationService service = SessionManager.getAppService();
-        BooleanResult result = service.doAction(
-            new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
-                sourceSpecimens,
-                "worksheett", //fix this - just testing
-                new Date(),  // fix this - just testing
-                "techniciann"));  // fix this - just testing
+            Center currentWorkingCenter = SessionManager.getUser()
+                .getCurrentWorkingCenter().getWrappedObject();
+            BiobankApplicationService service = SessionManager.getAppService();
+            BooleanResult result = service.doAction(
+                new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
+                    sourceSpecimens,
+                    "worksheett", // fix this - just testing
+                    new Date(), // fix this - just testing
+                    "techniciann")); // fix this - just testing
+        } catch (Exception ee) {
         }
-        catch (Exception ee) {
-        }
-        
+
     }
 
 }

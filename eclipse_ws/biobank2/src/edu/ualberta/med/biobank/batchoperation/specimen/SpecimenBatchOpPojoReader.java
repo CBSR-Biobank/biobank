@@ -63,6 +63,11 @@ public class SpecimenBatchOpPojoReader implements
         new ArrayList<SpecimenBatchOpInputPojo>(0);
 
     @Override
+    public void setFilename(String filename) {
+        // not used in this implementation
+    }
+
+    @Override
     public void setReader(ICsvBeanReader reader) {
         this.reader = reader;
     }

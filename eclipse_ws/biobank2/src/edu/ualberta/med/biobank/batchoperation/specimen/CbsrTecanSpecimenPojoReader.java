@@ -235,8 +235,9 @@ public class CbsrTecanSpecimenPojoReader implements
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    public CbsrTecanSpecimenPojoReader() {
-
+    @Override
+    public void setFilename(String filename) {
+        // not used in this implementation
     }
 
     @Override

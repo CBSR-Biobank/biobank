@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.supercsv.exception.SuperCSVException;
@@ -59,6 +58,7 @@ public class SpecimenBatchOpInterpreter {
             }
 
             pojoReader = SpecimenPojoReaderFactory.createPojoReader(csvHeaders);
+            pojoReader.setFilename(filename);
             pojoReader.setReader(reader);
             pojos = pojoReader.getPojos();
             ClientBatchOpInputErrorList errorList = pojoReader.getErrorList();
