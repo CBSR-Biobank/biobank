@@ -3,9 +3,15 @@ package edu.ualberta.med.biobank.forms;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -27,15 +33,21 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
+import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenBatchOpInterpreter;
 import edu.ualberta.med.biobank.common.action.SimpleResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetResult;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.common.action.file.FileDataGetAction;
+import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.SimpleSpecimenTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -141,15 +153,38 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                     }
 
                     // download file
-                    SimpleResult<FileData> dataResult =
-                        SessionManager.getAppService().doAction(
-                            new FileDataGetAction(result.getInput()));
-                    FileData data = dataResult.getResult();
+                    final Holder<FileData> data = new Holder<FileData>(null);
+                    IRunnableWithProgress op = new IRunnableWithProgress() {
+                        @SuppressWarnings("nls")
+                        @Override
+                        public void run(IProgressMonitor monitor) {
+                            monitor.beginTask(i18n.tr("Downloading file..."),
+                                IProgressMonitor.UNKNOWN);
+
+                            SimpleResult<FileData> dataResult;
+                            try {
+                                dataResult =
+                                    SessionManager.getAppService()
+                                        .doAction(
+                                            new FileDataGetAction(result
+                                                .getInput()));
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                            data.setValue(dataResult.getResult());
+
+                            monitor.done();
+                        }
+                    };
+
+                    new ProgressMonitorDialog(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell()).run(true, false,
+                        op);
 
                     // write data to file.
                     BufferedOutputStream bos =
                         new BufferedOutputStream(new FileOutputStream(file));
-                    bos.write(data.getBytes());
+                    bos.write(data.getValue().getBytes());
                     bos.flush();
                     bos.close();
                 } catch (Exception e) {
