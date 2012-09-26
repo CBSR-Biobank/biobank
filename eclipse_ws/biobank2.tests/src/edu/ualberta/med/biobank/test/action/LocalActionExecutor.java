@@ -57,10 +57,10 @@ public class LocalActionExecutor implements IActionExecutor {
                 .add(Restrictions.idEq(userId))
                 .uniqueResult();
 
-            AuditReader auditReader = AuditReaderFactory.get(session);
-            Revision revision =
-                auditReader.getCurrentRevision(Revision.class, false);
-            revision.setUser(user);
+//            AuditReader auditReader = AuditReaderFactory.get(session);
+//            Revision revision =
+//                auditReader.getCurrentRevision(Revision.class, false);
+//            revision.setUser(user);
 
             ActionContext context = new ActionContext(user, session, null);
 

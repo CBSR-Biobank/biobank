@@ -11,13 +11,10 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ForeignKey;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.RelationTargetAuditMode;
 
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
-@Audited
 @Entity
 @Table(name = "SPECIMEN_POSITION",
     uniqueConstraints = {
@@ -30,7 +27,6 @@ public class SpecimenPosition extends AbstractPosition {
     private Specimen specimen;
     private String positionString;
 
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @NotNull(message = "{edu.ualberta.med.biobank.model.SpecimenPosition.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @ForeignKey(name = "FK_SpecimenPosition_container")
@@ -51,7 +47,6 @@ public class SpecimenPosition extends AbstractPosition {
      * 
      * @return
      */
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne
     @ForeignKey(name = "none")
     @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false)
@@ -95,7 +90,6 @@ public class SpecimenPosition extends AbstractPosition {
      * 
      * @return
      */
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne
     @ForeignKey(name = "none")
     @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false)

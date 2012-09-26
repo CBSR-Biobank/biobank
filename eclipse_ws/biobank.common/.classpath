@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="conf"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/Downloads/hibernate-distribution-3.6.9.Final/project/hibernate-merged/src/main/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security-1.0.4.jar" sourcepath="/home/jferland/.m2/repository/org/acegisecurity/acegi-security/1.0.4/acegi-security-1.0.4-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/antlr-2.7.6.jar"/>
