@@ -5,8 +5,12 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
+import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -32,8 +36,16 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpPojoData.class.getName());
 
+    private static final Bundle bundle = new CommonBundle();
+
+    public static final Tr CSV_NO_PATIENT_ERROR =
+        bundle.tr("specimen has no patient");
+
+    private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
+
     private final SpecimenBatchOpInputPojo pojo;
-    private SpecimenBatchOpPojoData parentInfo;
+    private final SpecimenBatchOpInputPojo parentPojo;
+    private SpecimenBatchOpPojoData parentPojoData;
     private Patient patient;
     private CollectionEvent cevent;
     private ProcessingEvent pevent;
@@ -45,8 +57,10 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     private Specimen specimen;
     private User user;
 
-    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo pojo) {
+    SpecimenBatchOpPojoData(SpecimenBatchOpInputPojo pojo,
+        SpecimenBatchOpInputPojo parentPojo) {
         this.pojo = pojo;
+        this.parentPojo = parentPojo;
     }
 
     @Override
@@ -59,14 +73,14 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
     }
 
     SpecimenBatchOpPojoData getParentInfo() {
-        return parentInfo;
+        return parentPojoData;
     }
 
     void setParentPojoData(SpecimenBatchOpPojoData parentInfo) {
         if (parentInfo == null) {
             throw new IllegalStateException("parentInfo is null");
         }
-        this.parentInfo = parentInfo;
+        this.parentPojoData = parentInfo;
         log.trace("setting parent info for specimen {} to {}",
             pojo.getInventoryId(), parentInfo.pojo.getInventoryId());
     }
@@ -171,6 +185,24 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             && (pojo.getPalletPosition() != null);
     }
 
+    boolean validate() {
+        boolean result = true;
+
+        // ensure that aliquoted specimens with parent specimens already
+        // in the database have a patient
+        if ((parentSpecimen != null) && (patient == null)
+            && (parentPojo == null)) {
+            errorSet.addError(pojo.getLineNumber(),
+                CSV_NO_PATIENT_ERROR.format());
+        }
+
+        return result;
+    }
+
+    public BatchOpInputErrorSet getErrorList() {
+        return errorSet;
+    }
+
     public OriginInfo getNewOriginInfo(Center center) {
         originInfo = new OriginInfo();
         originInfo.setCenter(center);
@@ -266,8 +298,9 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
             if (parentSpecimen != null) {
                 pevent = parentSpecimen.getProcessingEvent();
-            } else if ((parentInfo != null) && (parentInfo.pevent != null)) {
-                pevent = parentInfo.pevent;
+            } else if ((parentPojoData != null)
+                && (parentPojoData.pevent != null)) {
+                pevent = parentPojoData.pevent;
             }
 
             if (pevent != null) {

@@ -342,7 +342,43 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
-    public void missingPatient() throws Exception {
+    public void invalidPatientNumber() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        Patient patient = factory.createPatient();
+        patients.add(patient);
+        factory.createSourceSpecimen();
+
+        tx.commit();
+
+        // make sure you can add parent specimens without a worksheet #
+        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
+            specimenCsvHelper.sourceSpecimensCreate(originInfos, patients,
+                factory.getDefaultStudy().getSourceSpecimens());
+
+        // change the patient number to something invalid
+        for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
+            if (csvInfo.getPatientNumber() != null) {
+                csvInfo.setPatientNumber(csvInfo.getPatientNumber() + "_2");
+            }
+        }
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                    new File(CSV_NAME));
+            exec(importAction);
+            Assert
+                .fail("should not be allowed to create aliquot specimens with invalid patients");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException()
+                .withMessage(SpecimenBatchOpAction.CSV_PATIENT_NUMBER_INVALID_ERROR
+                    .format());
+        }
+    }
+
+    @Test
+    public void missingPatientNumber() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         Patient patient = factory.createPatient();
         patients.add(patient);

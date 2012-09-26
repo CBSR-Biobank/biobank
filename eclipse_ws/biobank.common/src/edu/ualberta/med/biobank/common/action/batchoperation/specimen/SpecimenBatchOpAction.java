@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
-import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -102,11 +102,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Tr CSV_SPECIMEN_LABEL_ERROR =
         bundle.tr("specimen position with label \"{0}\" is invalid");
 
-    private static final Tr CSV_PATIENT_ERROR =
-        bundle.tr("patient number is missing");
-
-    private static final Tr CSV_NO_PATIENT_ERROR =
-        bundle.tr("specimen has no patient");
+    public static final Tr CSV_PATIENT_NUMBER_INVALID_ERROR =
+        bundle.tr("patient number is invalid");
 
     private static final Tr CSV_PATIENT_MATCH_ERROR =
         bundle.tr("patient number \"{0}\" does not match "
@@ -126,7 +123,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
 
-    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
+    private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
     public SpecimenBatchOpAction(Center workingCenter,
         List<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
@@ -183,13 +180,16 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             validatePojo(pojo);
         }
 
-        if (!errorList.isEmpty()) {
-            throw new BatchOpErrorsException(errorList.getErrors());
+        if (!errorSet.isEmpty()) {
+            throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
         // for improved performance, model objects of the same type are loaded
         // sequentially
         // getModelObjects(context, pojos);
+
+        Map<String, SpecimenBatchOpInputPojo> pojoMap =
+            new HashMap<String, SpecimenBatchOpInputPojo>(0);
 
         Map<String, SpecimenBatchOpPojoData> pojoDataMap =
             new HashMap<String, SpecimenBatchOpPojoData>(0);
@@ -199,12 +199,18 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         log.debug("SpecimenBatchOpAction: getting DB info");
         for (SpecimenBatchOpInputPojo pojo : pojos) {
-            SpecimenBatchOpPojoData pojoData = getDbInfo(context, pojo);
+            pojoMap.put(pojo.getInventoryId(), pojo);
+        }
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            SpecimenBatchOpPojoData pojoData = getDbInfo(context, pojo,
+                pojoMap.get(pojo.getParentInventoryId()));
+
             if (pojoData != null) {
-                pojoDataMap.put(pojo.getInventoryId(), pojoData);
                 if (pojoData.isAliquotedSpecimen()) {
                     aliquotSpcPojoData.add(pojoData);
                 }
+                pojoDataMap.put(pojo.getInventoryId(), pojoData);
             }
         }
 
@@ -219,31 +225,27 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         for (SpecimenBatchOpPojoData pojoData : pojoDataMap.values()) {
+            boolean valid = pojoData.validate();
+            if (!valid) {
+                errorSet.addAll(pojoData.getErrorList());
+            }
+
             if (pojoData.getParentInventoryId() != null) {
                 SpecimenBatchOpInputPojo pojo = pojoData.getPojo();
-
-                // ensure that aliquoted specimens with parent specimens already
-                // in the database have a patient
-                if ((pojoData.getPatient() == null)
-                    && !pojoDataMap
-                        .containsKey(pojoData.getParentInventoryId())) {
-                    errorList.addError(pojo.getLineNumber(),
-                        CSV_NO_PATIENT_ERROR.format());
-                }
 
                 // ensure that aliquoted specimens with parent specimens already
                 // in the database have a collection event
                 if ((pojoData.getParentSpecimen() != null)
                     && (pojoData.getParentSpecimen().getCollectionEvent() == null)) {
-                    errorList.addError(pojo.getLineNumber(),
+                    errorSet.addError(pojo.getLineNumber(),
                         CSV_CEVENT_ERROR.format(pojo.getPatientNumber(),
                             pojo.getVisitNumber()));
                 }
             }
         }
 
-        if (!errorList.isEmpty()) {
-            throw new BatchOpErrorsException(errorList.getErrors());
+        if (!errorSet.isEmpty()) {
+            throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
         BatchOperation batchOp = createBatchOperation(context);
@@ -269,7 +271,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 Specimen parentSpc =
                     parentSpecimens.get(info.getParentInventoryId());
                 if (parentSpc == null) {
-                    errorList.addError(info.getPojo().getLineNumber(),
+                    errorSet.addError(info.getPojo().getLineNumber(),
                         CSV_PARENT_SPC_INV_ID_ERROR.format(info.getPojo()
                             .getParentInventoryId()));
                 } else {
@@ -304,7 +306,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private void validatePojo(SpecimenBatchOpInputPojo pojo) {
         if (pojo.getSourceSpecimen()) {
             if ((pojo.getParentInventoryId() != null)) {
-                errorList.addError(pojo.getLineNumber(),
+                errorSet.addError(pojo.getLineNumber(),
                     CSV_PARENT_SPC_ERROR);
             }
 
@@ -322,27 +324,27 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         if ((pojo.getPalletProductBarcode() == null)
             && (pojo.getPalletLabel() == null)
             && (pojo.getPalletPosition() != null)) {
-            errorList.addError(pojo.getLineNumber(),
+            errorSet.addError(pojo.getLineNumber(),
                 CSV_PALLET_POS_ERROR);
         }
 
         //
         if ((pojo.getPalletProductBarcode() != null)
             && (pojo.getPalletPosition() == null)) {
-            errorList.addError(pojo.getLineNumber(),
+            errorSet.addError(pojo.getLineNumber(),
                 CSV_PROD_BARCODE_NO_POS_ERROR);
         }
 
         if ((pojo.getPalletLabel() != null)
             && (pojo.getPalletPosition() == null)) {
-            errorList.addError(pojo.getLineNumber(),
+            errorSet.addError(pojo.getLineNumber(),
                 CSV_PALLET_POS_ERROR);
         }
 
         if ((pojo.getPalletLabel() == null)
             && (pojo.getRootContainerType() == null)
             && (pojo.getPalletPosition() != null)) {
-            errorList.addError(pojo.getLineNumber(),
+            errorSet.addError(pojo.getLineNumber(),
                 CSV_PALLET_LABEL_NO_CTYPE_ERROR);
         }
 
@@ -354,24 +356,25 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         if (!csvPojo.hasPatientAndCollectionEvent()) {
             // no parent inventory id and does not have patient number and visit
             // number
-            errorList.addError(csvPojo.getLineNumber(),
+            errorSet.addError(csvPojo.getLineNumber(),
                 CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR);
         }
     }
 
     // get referenced items that exist in the database
     private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
-        SpecimenBatchOpInputPojo inputPojo) {
+        SpecimenBatchOpInputPojo inputPojo,
+        SpecimenBatchOpInputPojo parentInputPojo) {
         Specimen spc =
             BatchOpActionUtil.getSpecimen(context, inputPojo.getInventoryId());
         if (spc != null) {
-            errorList.addError(inputPojo.getLineNumber(),
+            errorSet.addError(inputPojo.getLineNumber(),
                 SPC_ALREADY_EXISTS_ERROR);
             return null;
         }
 
         SpecimenBatchOpPojoData pojoData =
-            new SpecimenBatchOpPojoData(inputPojo);
+            new SpecimenBatchOpPojoData(inputPojo, parentInputPojo);
         pojoData.setUser(context.getUser());
 
         Specimen parentSpecimen = null;
@@ -392,8 +395,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             patient = BatchOpActionUtil.getPatient(context,
                 inputPojo.getPatientNumber());
             if (patient == null) {
-                errorList.addError(inputPojo.getLineNumber(),
-                    CSV_PATIENT_ERROR.format());
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
             log.debug("retrieving patient for specimen: invId={} pnumber={}",
@@ -409,7 +412,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // event
             if (pojoData.isAliquotedSpecimen()) {
                 if (pojoData.getParentInventoryId() == null) {
-                    errorList.addError(inputPojo.getLineNumber(),
+                    errorSet.addError(inputPojo.getLineNumber(),
                         CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
                             inputPojo.getVisitNumber()));
                 }
@@ -423,7 +426,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             OriginInfo originInfo = BatchOpActionUtil.getOriginInfo(context,
                 inputPojo.getWaybill());
             if (originInfo == null) {
-                errorList.addError(inputPojo.getLineNumber(),
+                errorSet.addError(inputPojo.getLineNumber(),
                     CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
             } else {
                 pojoData.setOriginInfo(originInfo);
@@ -443,7 +446,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         SpecimenType spcType = BatchOpActionUtil.getSpecimenType(context,
             inputPojo.getSpecimenType());
         if (spcType == null) {
-            errorList.addError(inputPojo.getLineNumber(),
+            errorSet.addError(inputPojo.getLineNumber(),
                 CSV_SPECIMEN_TYPE_ERROR.format(inputPojo.getSpecimenType()));
         } else {
             pojoData.setSpecimenType(spcType);
@@ -456,7 +459,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             Container container = BatchOpActionUtil.getContainer(context,
                 inputPojo.getPalletLabel());
             if (container == null) {
-                errorList
+                errorSet
                     .addError(inputPojo.getLineNumber(),
                         CSV_CONTAINER_LABEL_ERROR.format(inputPojo
                             .getPalletLabel()));
@@ -470,7 +473,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                         .getPalletPosition());
                 pojoData.setSpecimenPos(pos);
             } catch (Exception e) {
-                errorList
+                errorSet
                     .addError(inputPojo.getLineNumber(),
                         CSV_SPECIMEN_LABEL_ERROR.format(inputPojo
                             .getPalletLabel()));
@@ -551,8 +554,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         if (inputPojo.getParentInventoryId() == null) {
             if (inputPojo.getPatientNumber() == null) {
-                errorList.addError(inputPojo.getLineNumber(),
-                    CSV_PATIENT_ERROR.format());
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_PATIENT_NUMBER_INVALID_ERROR.format());
                 return null;
             }
 
@@ -569,7 +572,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             if ((inputPojo.getPatientNumber() != null)
                 && !cevent.getPatient().getPnumber()
                     .equals(inputPojo.getPatientNumber())) {
-                errorList.addError(inputPojo.getLineNumber(),
+                errorSet.addError(inputPojo.getLineNumber(),
                     CSV_PATIENT_MATCH_ERROR.format(
                         inputPojo.getPatientNumber(),
                         cevent.getPatient().getPnumber()));
@@ -577,7 +580,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
             if ((inputPojo.getVisitNumber() != null)
                 && !cevent.getVisitNumber().equals(inputPojo.getVisitNumber())) {
-                errorList.addError(inputPojo.getLineNumber(),
+                errorSet.addError(inputPojo.getLineNumber(),
                     CSV_CEVENT_MATCH_ERROR.format(
                         inputPojo.getVisitNumber()));
             }

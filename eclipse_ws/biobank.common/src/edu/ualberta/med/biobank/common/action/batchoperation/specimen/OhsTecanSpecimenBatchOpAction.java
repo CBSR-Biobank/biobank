@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
-import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
@@ -74,7 +74,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
 
-    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
+    private final BatchOpInputErrorSet errorList = new BatchOpInputErrorSet();
 
     public OhsTecanSpecimenBatchOpAction(Center workingCenter,
         List<SpecimenBatchOpInputPojo> batchOpSpecimens,

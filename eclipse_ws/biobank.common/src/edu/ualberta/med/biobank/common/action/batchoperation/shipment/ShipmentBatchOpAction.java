@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
-import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
@@ -75,7 +75,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
     }; 
     // @formatter:on    
 
-    private final BatchOpInputErrorList errorList = new BatchOpInputErrorList();
+    private final BatchOpInputErrorSet errorList = new BatchOpInputErrorSet();
 
     private CompressedReference<ArrayList<ShipmentBatchOpInputRow>> compressedList =
         null;

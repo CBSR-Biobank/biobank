@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
-import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorList;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
@@ -63,8 +63,8 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
     };
     // @formatter:on    
 
-    private final BatchOpInputErrorList csvErrorList =
-        new BatchOpInputErrorList();
+    private final BatchOpInputErrorSet csvErrorList =
+        new BatchOpInputErrorSet();
 
     private CompressedReference<ArrayList<PatientBatchOpInputRow>> compressedList =
         null;

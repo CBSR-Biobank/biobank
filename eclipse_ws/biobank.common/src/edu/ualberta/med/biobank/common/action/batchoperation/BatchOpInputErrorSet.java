@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.i18n.LString;
  * @author Nelson Loyola
  * 
  */
-public class BatchOpInputErrorList implements IBatchOpInputErrorList<LString>,
+public class BatchOpInputErrorSet implements IBatchOpInputErrorList<LString>,
     Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -42,6 +42,10 @@ public class BatchOpInputErrorList implements IBatchOpInputErrorList<LString>,
         if (errors.size() > MAX_ERRORS_TO_REPORT) {
             throw new BatchOpErrorsException(errors);
         }
+    }
+
+    public void addAll(BatchOpInputErrorSet subset) {
+        errors.addAll(subset.errors);
     }
 
     @Override
