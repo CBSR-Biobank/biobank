@@ -122,6 +122,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
         //context.getSession().getTransaction();
 
         Set<Integer> addedSpecimenIds = new HashSet<Integer>();
+        Set<Integer> removedSpecimenIds = new HashSet<Integer>();
         for (SpecimenBatchOpInputPojo pojo : pojos) {
             Specimen specimen =
                 BatchOpActionUtil.getSpecimen(context, pojo.getInventoryId());
@@ -134,7 +135,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
         ProcessingEventSaveAction peventSaveAction =
             new ProcessingEventSaveAction(null, workingCenterId,
                 timestamp, worksheet, ActivityStatus.ACTIVE,
-                null, addedSpecimenIds, null);
+                null, addedSpecimenIds, removedSpecimenIds);
         peventSaveAction.run(context);
         
         if (!errorList.isEmpty()) {
