@@ -399,9 +399,8 @@ public class OhsTecanSpecimenPojoReader implements
                 // urine source volume missing by design
                 BigDecimal sourceVolume = null;
                 if (!csvPojo.sourceVolume.isEmpty()) {
-                    sourceVolume =
-                        new BigDecimal(
-                            Double.parseDouble(csvPojo.sourceVolume) / 1000.0);
+                    sourceVolume = new BigDecimal(csvPojo.sourceVolume)
+                    .divide(new BigDecimal(1000));
                 }
 
                 boolean sourceSpecimenAlreadyEncountered = false;
