@@ -109,6 +109,7 @@ public class OhsTecanSpecimenPojoReader implements
 
     private List<SpecimenBatchOpInputPojo> sourceSpecimens;
     private Date timestamp;
+    private String technicianId;
 
     public static class TecanCsvRowPojo implements IBatchOpInputPojo {
         private static final long serialVersionUID = 1L;
@@ -358,6 +359,7 @@ public class OhsTecanSpecimenPojoReader implements
         sourceSpecimens =
             new ArrayList<SpecimenBatchOpInputPojo>(0);
         timestamp = new Date();
+        technicianId = null;
         
         if (reader == null) {
             throw new IllegalStateException("CSV reader is null");
@@ -372,7 +374,6 @@ public class OhsTecanSpecimenPojoReader implements
 
         try {
             boolean hasBuffy = false;
-            String technicianId = null;
             while ((csvPojo =
                 reader.read(TecanCsvRowPojo.class,
                     NAME_MAPPINGS, cellProcessors)) != null) {
@@ -585,8 +586,9 @@ public class OhsTecanSpecimenPojoReader implements
                     sourceSpecimens,
                     new File(filename).getName(),
                     timestamp,
-                    "techniciann")); // fix this - just testing
-        } catch (Exception ee) {
+                    technicianId));
+        } catch (Exception e) {
+            throw new IllegalStateException("OHS TECAN post-execution error");
         }
 
     }

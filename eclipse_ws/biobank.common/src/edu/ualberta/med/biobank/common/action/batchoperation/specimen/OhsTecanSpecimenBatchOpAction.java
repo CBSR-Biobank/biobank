@@ -116,7 +116,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
         ProcessingEventSaveAction peventSaveAction =
             new ProcessingEventSaveAction(null, workingCenterId,
                 timestamp, worksheet, ActivityStatus.ACTIVE,
-                null, addedSpecimenIds, removedSpecimenIds);
+                null, addedSpecimenIds, removedSpecimenIds, technician);
         peventSaveAction.run(context);
         
         if (!errorList.isEmpty()) {

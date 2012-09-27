@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.type.Person;
 
 public class ProcessingEventSaveAction implements Action<IdResult> {
 
@@ -37,6 +38,8 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private Set<Integer> removedSpecimenIds;
 
+    private String technician;
+
     public ProcessingEventSaveAction(Integer peventId, Integer centerId,
         Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> addedSpecimenIds,
@@ -49,6 +52,22 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         this.commentText = commentText;
         this.addedSpecimenIds = addedSpecimenIds;
         this.removedSpecimenIds = removedSpecimenIds;
+        this.technician = null;
+    }
+
+    public ProcessingEventSaveAction(Integer peventId, Integer centerId,
+        Date createdAt, String worksheet, ActivityStatus activityStatus,
+        String commentText, Set<Integer> addedSpecimenIds,
+        Set<Integer> removedSpecimenIds, String technician) {
+        this.peventId = peventId;
+        this.centerId = centerId;
+        this.createdAt = createdAt;
+        this.worksheet = worksheet;
+        this.activityStatus = activityStatus;
+        this.commentText = commentText;
+        this.addedSpecimenIds = addedSpecimenIds;
+        this.removedSpecimenIds = removedSpecimenIds;
+        this.technician = technician;
     }
 
     @Override
@@ -80,6 +99,9 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         setComments(context, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);
+        Person technicianPerson = new Person();
+        technicianPerson.setName(technician);
+        peventToSave.setProcessedBy(technicianPerson);
 
         // set processing event on added specimens
         for (Integer specimen : addedSpecimenIds) {
