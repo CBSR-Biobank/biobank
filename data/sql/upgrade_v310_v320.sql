@@ -823,14 +823,14 @@ ALTER TABLE container_type
       DROP INDEX FKB2C878581764E225,
       DROP KEY CAPACITY_ID, DROP COLUMN CAPACITY_ID;
 
+ALTER TABLE container ADD INDEX ID (ID, CONTAINER_TYPE_ID),
+      ADD INDEX FK_Container_containerType (CONTAINER_TYPE_ID, SITE_ID);
+
 ALTER TABLE container
       ADD CONSTRAINT FK_Container_containerType
           FOREIGN KEY FK_Container_containerType (CONTAINER_TYPE_ID, SITE_ID)
           REFERENCES container_type (ID, SITE_ID)
           ON UPDATE NO ACTION ON DELETE NO ACTION;
-
-ALTER TABLE container ADD INDEX ID (ID, CONTAINER_TYPE_ID),
-      ADD INDEX FK_Container_containerType (CONTAINER_TYPE_ID, SITE_ID);
 
 --
 -- this section deals with container_position changes
