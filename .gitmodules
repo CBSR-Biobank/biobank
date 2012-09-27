@@ -1,6 +1,6 @@
 [submodule "eclipse_ws/scannerConfig"]
 	path = eclipse_ws/scannerConfig
-	url = ssh://biobank@amber-rv.cs.ualberta.ca/compsci/abee13/cshome/biobank/gitrepo/scannerConfig.git
+	url = https://github.com/cbsrbiobank/scannerConfig.git
 [submodule "eclipse_ws/sampleProcessingRobot"]
 	path = eclipse_ws/sampleProcessingRobot
-	url = ssh://biobank@amber-rv.cs.ualberta.ca/compsci/abee13/cshome/biobank/gitrepo/sampleProcessingRobot.git
+	url = https://github.com/cbsrbiobank/sampleProcessingRobot.git
