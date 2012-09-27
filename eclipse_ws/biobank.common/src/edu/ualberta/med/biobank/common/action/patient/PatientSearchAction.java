@@ -4,25 +4,17 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientReadPermission;
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
 
 public class PatientSearchAction implements Action<SearchedPatientInfo> {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
-
-    @SuppressWarnings("nls")
-    public static final Tr MULTIPLE_PATIENTS_FOUND =
-        bundle.tr("More than one patient found with pnumber \"{0}\".");
 
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_QRY =
@@ -72,7 +64,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
         Patient patient = (Patient) criteria.uniqueResult();
 
         if (patient == null) {
-            throw new NullPointerException("patient not found in query result"); //$NON-NLS-1$
+            return null;
         }
 
         Query query = context.getSession().createQuery(PATIENT_INFO_QRY);

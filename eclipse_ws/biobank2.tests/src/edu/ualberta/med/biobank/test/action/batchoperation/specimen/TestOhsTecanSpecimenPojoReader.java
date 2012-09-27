@@ -57,6 +57,7 @@ public class TestOhsTecanSpecimenPojoReader extends TestAction {
 
         createDbConfiguration();
 
+        pojoReader.setFilename(CSV_NAME);
         pojoReader.setReader(reader);
         pojoReader.preExecution();
 

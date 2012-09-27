@@ -78,7 +78,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private PatientInfo p;
 
-    private CommentWrapper comment = new CommentWrapper(
+    private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
     @SuppressWarnings("nls")
