@@ -247,7 +247,7 @@ End:
            defaultValue="${dName.CN}" />
 
     <copy file="scripts/ssl/cert.cnf.template"
-          tofile="scripts/ssl/cert.cnf" />
+          tofile="scripts/ssl/cert.cnf" overwrite="true" />
     <replace file="scripts/ssl/cert.cnf">
       <replacefilter token="@@dName.CN@@" value="${dName.CN}" />
       <replacefilter token="@@subjectAltName@@" value="${subjectAltName}" />
