@@ -1,4 +1,5 @@
 security-logs/jboss/biobank.keystore
+scripts/ssl/biobank.keystore
 po/output
 /scripts/ssl
 *sublime*
