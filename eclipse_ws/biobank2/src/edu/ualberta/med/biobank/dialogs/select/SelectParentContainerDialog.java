@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.model.Container;
@@ -76,10 +77,13 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
             // parent container required validation message
             i18n.tr("A container should be selected"),
             null, new BiobankLabelProvider());
+
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ContainerWrapper container = (ContainerWrapper) element;
+                ContainerWrapper container =
+                    new ContainerWrapper(SessionManager.getAppService(),
+                        (Container) element);
                 StringBuffer text = new StringBuffer();
                 text.append(container.getFullInfoLabel());
                 ContainerWrapper parent = container.getParentContainer();

@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**
@@ -25,6 +26,10 @@ public class ContainerCreateChildrenAction extends ContainerChildAction {
 
     protected Map<RowColPos, Container> children;
     protected Integer siteId;
+
+    public ContainerCreateChildrenAction(Site site) {
+        this.siteId = site.getId();
+    }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
