@@ -22,9 +22,7 @@ public class ContainerGetInfoByLabelAction implements
     @SuppressWarnings("nls")
     private static final String CONTAINER_INFO_HQL =
         "SELECT DISTINCT container"
-            + " FROM "
-            + Container.class.getName()
-            + " container"
+            + " FROM " + Container.class.getName() + " container"
             + " INNER JOIN FETCH container.containerType ctype"
             + " LEFT JOIN FETCH ctype.childContainerTypes"
             + " LEFT JOIN FETCH ctype.childLabelingScheme"
@@ -53,7 +51,8 @@ public class ContainerGetInfoByLabelAction implements
             + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
             + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
             + " LEFT JOIN FETCH parentCtype.childContainerTypes"
-            + " WHERE container.label = ? or container.label = ? or container.label = ? and container.site.id=?";
+            + " WHERE (container.label = ? OR container.label = ?"
+            + " OR container.label = ?) AND container.site.id=?";
 
     private final String label;
 
