@@ -708,6 +708,21 @@ public abstract class AbstractLinkAssignEntryForm extends
                                 positionString.replace(container.getLabel(),
                                     StringUtil.EMPTY_STRING));
 
+                    if (position == null) {
+                        BgcPlugin.openError(
+                            // TR: dialog title
+                            i18n.tr("Position error"),
+                            // TR: dialog message
+                            i18n.tr(
+                                "Position {0} is invalid: no specimen position found that matches this label",
+                                positionString));
+                        appendLog(NLS
+                            .bind(
+                                "ERROR: Position {0} is invalid: no specimen position found that matches this label",
+                                positionString));
+                        return;
+                    }
+
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);
                         displaySinglePositions(true);
