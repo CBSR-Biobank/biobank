@@ -128,3 +128,11 @@ ALTER TABLE revision_entity_type
       ADD CONSTRAINT FK74D6F3B29D2D0285 FOREIGN KEY (REVISION_ID)
       REFERENCES revision (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
+-- fix incorrect entity properties
+UPDATE `entity_property`
+      SET property = REPLACE(property, 'containerPath.', '')
+      WHERE property LIKE '%containerPath.%';
+
+UPDATE `entity_property`
+      SET property = REPLACE(property, 'sentAt', 'packedAt')
+      WHERE property LIKE '%sentAt%';
