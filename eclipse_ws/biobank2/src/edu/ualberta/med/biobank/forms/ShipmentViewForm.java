@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -218,8 +219,8 @@ public class ShipmentViewForm extends BiobankViewForm {
 
         setTextValue(senderLabel, originInfo.getCenter().getName());
 
-        SiteWrapper rcvSite = originInfo.getReceiverSite();
-        setTextValue(receiverLabel, rcvSite != null ? rcvSite.getName()
+        CenterWrapper<?> rcvCenter = originInfo.getReceiverCenter();
+        setTextValue(receiverLabel, rcvCenter != null ? rcvCenter.getName()
             : StringUtil.EMPTY_STRING);
 
         setTextValue(waybillLabel, originInfo.getShipmentInfo().getWaybill());

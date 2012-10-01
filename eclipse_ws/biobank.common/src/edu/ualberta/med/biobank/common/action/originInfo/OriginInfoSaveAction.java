@@ -59,7 +59,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
         OriginInfo oi =
             context.get(OriginInfo.class, oiInfo.oiId, new OriginInfo());
 
-        oi.setReceiverSite(context.get(Site.class, oiInfo.siteId));
+        oi.setReceiverCenter(context.get(Center.class, oiInfo.siteId));
         oi.setCenter(context.get(Center.class, oiInfo.centerId));
 
         ShipmentInfo si =
@@ -116,7 +116,7 @@ public class OriginInfoSaveAction implements Action<IdResult> {
                 Specimen spec =
                     context.load(Specimen.class, specId);
                 spec.setOriginInfo(oi);
-                spec.setCurrentCenter(oi.getReceiverSite());
+                spec.setCurrentCenter(oi.getReceiverCenter());
                 context.getSession().saveOrUpdate(spec);
             }
 

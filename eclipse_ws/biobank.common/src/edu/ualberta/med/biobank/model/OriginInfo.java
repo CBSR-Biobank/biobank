@@ -37,7 +37,7 @@ public class OriginInfo extends AbstractBiobankModel
     private Set<Specimen> specimens = new HashSet<Specimen>(0);
     private ShipmentInfo shipmentInfo;
     private Center center;
-    private Site receiverSite;
+    private Center receiverCenter;
 
     @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
@@ -86,11 +86,11 @@ public class OriginInfo extends AbstractBiobankModel
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECEIVER_SITE_ID")
-    public Site getReceiverSite() {
-        return this.receiverSite;
+    public Center getReceiverCenter() {
+        return this.receiverCenter;
     }
 
-    public void setReceiverSite(Site receiverSite) {
-        this.receiverSite = receiverSite;
+    public void setReceiverCenter(Center receiverCenter) {
+        this.receiverCenter = receiverCenter;
     }
 }

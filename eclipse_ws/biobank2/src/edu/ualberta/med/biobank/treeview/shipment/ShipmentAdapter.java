@@ -61,7 +61,7 @@ public class ShipmentAdapter extends AdapterBase {
         this.isEditable = isAllowed(
             new OriginInfoUpdatePermission(
                 ((OriginInfoWrapper) getModelObject())
-                    .getReceiverSite()
+                    .getReceiverCenter()
                     .getId()));
     }
 

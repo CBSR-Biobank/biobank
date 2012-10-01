@@ -308,7 +308,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     protected <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<T> input, T selection,
+        String fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, ComboSelectionUpdate csu) {
         return widgetCreator.createComboViewer(parent, fieldLabel, input,
             selection, errorMessage, csu, new BiobankLabelProvider());

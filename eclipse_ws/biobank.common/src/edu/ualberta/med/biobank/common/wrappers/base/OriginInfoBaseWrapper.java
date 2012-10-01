@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -116,17 +115,18 @@ public class OriginInfoBaseWrapper extends ModelWrapper<OriginInfo> {
         removeFromWrapperCollectionWithCheck(OriginInfoPeer.COMMENTS, commentCollection);
     }
 
-    public SiteWrapper getReceiverSite() {
-        SiteWrapper receiverSite = getWrappedProperty(OriginInfoPeer.RECEIVER_SITE, SiteWrapper.class);
-        return receiverSite;
+    public CenterWrapper<?> getReceiverCenter() {
+        @SuppressWarnings("unchecked")
+        CenterWrapper<?> receiverCenter = getWrappedProperty(OriginInfoPeer.RECEIVER_CENTER, CenterWrapper.class);
+        return receiverCenter;
     }
 
-    public void setReceiverSite(SiteBaseWrapper receiverSite) {
-        setWrappedProperty(OriginInfoPeer.RECEIVER_SITE, receiverSite);
+    public void setReceiverCenter(CenterBaseWrapper<?> receiverCenter) {
+        setWrappedProperty(OriginInfoPeer.RECEIVER_CENTER, receiverCenter);
     }
 
-    void setReceiverSiteInternal(SiteBaseWrapper receiverSite) {
-        setWrappedProperty(OriginInfoPeer.RECEIVER_SITE, receiverSite);
+    void setReceiverCenterInternal(SiteBaseWrapper receiverCenter) {
+        setWrappedProperty(OriginInfoPeer.RECEIVER_CENTER, receiverCenter);
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {

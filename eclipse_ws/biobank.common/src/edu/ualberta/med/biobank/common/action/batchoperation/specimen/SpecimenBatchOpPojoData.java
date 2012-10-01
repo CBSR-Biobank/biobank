@@ -268,10 +268,10 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         specimen.setPlateErrors(pojo.getPlateErrors());
         specimen.setSampleErrors(pojo.getSamplEerrors());
 
-        if (originInfo.getReceiverSite() == null) {
+        if (originInfo.getReceiverCenter() == null) {
             specimen.setCurrentCenter(originInfo.getCenter());
         } else {
-            specimen.setCurrentCenter(originInfo.getReceiverSite());
+            specimen.setCurrentCenter(originInfo.getReceiverCenter());
         }
         specimen.setCollectionEvent(cevent);
         specimen.setOriginInfo(originInfo);

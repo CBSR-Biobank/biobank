@@ -185,7 +185,7 @@ public class TestShipmentCsvInfo extends TestAction {
             Assert.assertEquals(csvInfo.getSendingCenter(), originInfo
                 .getCenter().getNameShort());
             Assert.assertEquals(csvInfo.getReceivingCenter(), originInfo
-                .getReceiverSite().getNameShort());
+                .getReceiverCenter().getNameShort());
             Assert.assertEquals(csvInfo.getShippingMethod(), originInfo
                 .getShipmentInfo().getShippingMethod().getName());
             Assert.assertTrue(originInfo.getComments().size() > 0);

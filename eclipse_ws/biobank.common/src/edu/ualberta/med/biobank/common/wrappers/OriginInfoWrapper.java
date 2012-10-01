@@ -49,8 +49,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         List<CenterWrapper<?>> centers = new ArrayList<CenterWrapper<?>>();
         if (getCenter() != null)
             centers.add(getCenter());
-        if (getReceiverSite() != null)
-            centers.add(getReceiverSite());
+        if (getReceiverCenter() != null)
+            centers.add(getReceiverCenter());
         return centers;
     }
 

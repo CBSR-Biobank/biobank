@@ -402,7 +402,7 @@ public class BgcWidgetCreator {
      * errorMessage and using the default comparator.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<T> input, T selection,
+        String fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, final ComboSelectionUpdate csu,
         IBaseLabelProvider labelProvider) {
         return createComboViewer(parent, fieldLabel, input, selection,
@@ -415,7 +415,7 @@ public class BgcWidgetCreator {
      * set to true.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<T> input, T selection,
+        String fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, boolean useDefaultComparator,
         final ComboSelectionUpdate csu, IBaseLabelProvider labelProvider) {
         return createComboViewer(parent, fieldLabel, input, selection,
@@ -423,7 +423,7 @@ public class BgcWidgetCreator {
     }
 
     public <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<T> input, T selection,
+        String fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu, IBaseLabelProvider labelProvider) {
         Label label = null;
@@ -439,7 +439,7 @@ public class BgcWidgetCreator {
      * comboViewer.getSelection() to update datas.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
-        Label fieldLabel, Collection<T> input, T selection,
+        Label fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu, IBaseLabelProvider labelProvider) {
         Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);

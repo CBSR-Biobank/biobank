@@ -231,15 +231,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             createComboViewer(client,
                 Dispatch.PropertyName.RECEIVER_CENTER.toString(),
                 Arrays.asList(SessionManager.getUser()
-                    .getCurrentWorkingSite()),
-                originInfo.getReceiverSite(),
+                    .getCurrentWorkingCenter()),
+                originInfo.getReceiverCenter(),
                 // validation error message.
                 i18n.tr("A receiving site should be selected"),
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         originInfo
-                            .setReceiverSite((SiteWrapper) selectedObject);
+                            .setReceiverCenter((CenterWrapper<?>) selectedObject);
                     }
                 });
 
@@ -531,7 +531,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         OriginInfoSaveInfo oiInfo =
             new OriginInfoSaveInfo(originInfo.getId(), originInfo
-                .getReceiverSite().getId(), originInfo.getCenter().getId(),
+                .getReceiverCenter().getId(), originInfo.getCenter().getId(),
                 comment.getMessage() == null ? StringUtil.EMPTY_STRING
                     : comment.getMessage(), addedSpecimenIds,
                 removedSpecimenIds);
@@ -572,7 +572,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         setDefaultValues();
         GuiUtil.reset(senderComboViewer, originInfo.getCenter());
-        GuiUtil.reset(receiverComboViewer, originInfo.getReceiverSite());
+        GuiUtil.reset(receiverComboViewer, originInfo.getReceiverCenter());
         GuiUtil.reset(shippingMethodComboViewer,
             shipmentInfo.getShippingMethod());
     }
@@ -582,7 +582,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             CenterWrapper<?> userCenter =
                 SessionManager.getUser().getCurrentWorkingCenter();
             if (userCenter instanceof SiteWrapper) {
-                originInfo.setReceiverSite((SiteWrapper) userCenter);
+                originInfo.setReceiverCenter((SiteWrapper) userCenter);
             }
             Date receivedAt = Calendar.getInstance().getTime();
             shipmentInfo.setReceivedAt(receivedAt);

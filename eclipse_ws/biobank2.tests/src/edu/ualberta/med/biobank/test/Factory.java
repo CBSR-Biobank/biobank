@@ -920,7 +920,7 @@ public class Factory {
         ShipmentInfo shipmentInfo = getDefaultShipmentInfo();
         if (shipmentInfo != null) {
             originInfo.setShipmentInfo(shipmentInfo);
-            originInfo.setReceiverSite(getDefaultSite());
+            originInfo.setReceiverCenter(getDefaultSite());
         }
 
         setDefaultOriginInfo(originInfo);

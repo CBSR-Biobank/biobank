@@ -37,7 +37,7 @@ public class SpecimenTransitSearchAction implements
     private static final String SHIPMENT_HQL_STRING = "from "
         + OriginInfo.class.getName() + " as o inner join fetch o."
         + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s "
-        + " inner join fetch o.center inner join fetch o.receiverSite";
+        + " inner join fetch o.center inner join fetch o.receiverCenter";
 
     @SuppressWarnings("nls")
     private static final String DISPATCH_HQL_STRING = "from "
@@ -63,7 +63,7 @@ public class SpecimenTransitSearchAction implements
             + " < ? and (o."
             + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
             + "= ? or o."
-            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + Property.concatNames(OriginInfoPeer.RECEIVER_CENTER, CenterPeer.ID)
             + " = ?)";
 
     @SuppressWarnings("nls")
@@ -90,7 +90,7 @@ public class SpecimenTransitSearchAction implements
             + " < ? and (o."
             + Property.concatNames(OriginInfoPeer.CENTER, CenterPeer.ID)
             + "= ? or o."
-            + Property.concatNames(OriginInfoPeer.RECEIVER_SITE, CenterPeer.ID)
+            + Property.concatNames(OriginInfoPeer.RECEIVER_CENTER, CenterPeer.ID)
             + " = ?)";
 
     @SuppressWarnings("nls")

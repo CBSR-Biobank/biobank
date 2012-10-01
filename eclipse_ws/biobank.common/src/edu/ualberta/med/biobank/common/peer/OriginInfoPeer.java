@@ -76,18 +76,18 @@ public class OriginInfoPeer {
 			}
 		});
 
-	public static final Property<Site, OriginInfo> RECEIVER_SITE = Property.create(
-		"receiverSite" //$NON-NLS-1$
+	public static final Property<Center, OriginInfo> RECEIVER_CENTER = Property.create(
+		"receiverCenter" //$NON-NLS-1$
 		, OriginInfo.class
-		, new TypeReference<Site>() {}
-		, new Property.Accessor<Site, OriginInfo>() { private static final long serialVersionUID = 1L;
+		, new TypeReference<Center>() {}
+		, new Property.Accessor<Center, OriginInfo>() { private static final long serialVersionUID = 1L;
 			@Override
-			public Site get(OriginInfo model) {
-				return model.getReceiverSite();
+			public Center get(OriginInfo model) {
+				return model.getReceiverCenter();
 			}
 			@Override
-			public void set(OriginInfo model, Site value) {
-				model.setReceiverSite(value);
+			public void set(OriginInfo model, Center value) {
+				model.setReceiverCenter(value);
 			}
 		});
 
@@ -114,7 +114,7 @@ public class OriginInfoPeer {
       aList.add(CENTER);
       aList.add(SHIPMENT_INFO);
       aList.add(COMMENTS);
-      aList.add(RECEIVER_SITE);
+      aList.add(RECEIVER_CENTER);
       aList.add(SPECIMENS);
       PROPERTIES = Collections.unmodifiableList(aList);
    };

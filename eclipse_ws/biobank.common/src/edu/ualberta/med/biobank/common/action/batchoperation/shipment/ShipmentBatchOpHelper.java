@@ -94,7 +94,7 @@ public class ShipmentBatchOpHelper implements IBatchOpHelper {
 
         originInfo = new OriginInfo();
         originInfo.setCenter(originCenter);
-        originInfo.setReceiverSite(currentSite);
+        originInfo.setReceiverCenter(currentSite);
 
         Date timeNow = new Date();
 

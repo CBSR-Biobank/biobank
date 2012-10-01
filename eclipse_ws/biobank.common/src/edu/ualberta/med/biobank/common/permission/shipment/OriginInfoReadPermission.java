@@ -29,7 +29,7 @@ public class OriginInfoReadPermission implements Permission {
         if (oiId != null) {
             OriginInfo oi = context.load(OriginInfo.class, oiId);
             return PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
-                oi.getReceiverSite())
+                oi.getReceiverCenter())
                 || PermissionEnum.ORIGIN_INFO_READ.isAllowed(user,
                     oi.getCenter());
         }

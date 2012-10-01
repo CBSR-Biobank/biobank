@@ -54,7 +54,7 @@ public class ShipmentGetInfoAction implements Action<ShipmentReadInfo> {
         sInfo.originInfo = oi;
 
         oi.getCenter().getName();
-        oi.getReceiverSite().getName();
+        oi.getReceiverCenter().getName();
 
         if (oi.getShipmentInfo() != null) {
             oi.getShipmentInfo().getShippingMethod().getName();
