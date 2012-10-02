@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -702,11 +703,60 @@ public abstract class AbstractLinkAssignEntryForm extends
 
                     appendLog(NLS.bind("Checking position {0}", positionString));
                     ContainerWrapper container = parentContainers.get(0);
-                    RowColPos position =
+                    RowColPos position = container.getContainerType()
+                        .getRowColFromPositionString(
+                            positionString.replace(container.getLabel(),
+                                StringUtil.EMPTY_STRING));
+
+                    if (position == null) {
+                        BgcPlugin.openError(
+                            // TR: dialog title
+                            i18n.tr("Position error"),
+                            // TR: dialog message
+                            i18n.tr(
+                                "Position {0} is invalid: no specimen position found that matches this label",
+                                positionString));
+                        appendLog(NLS
+                            .bind(
+                                "ERROR: Position {0} is invalid: no specimen position found that matches this label",
+                                positionString));
+                        return;
+                    }
+
+                    List<SpecimenTypeWrapper> specimenTypeCollection =
                         container.getContainerType()
-                            .getRowColFromPositionString(
-                                positionString.replace(container.getLabel(),
-                                    StringUtil.EMPTY_STRING));
+                            .getSpecimenTypeCollection();
+
+                    if (specimenTypeCollection.isEmpty()) {
+                        BgcPlugin.openError(
+                            // TR: dialog title
+                            i18n.tr("Container error"),
+                            // TR: dialog message
+                            i18n.tr("Container cannot hold specimens: {0}",
+                                positionString));
+                        appendLog(NLS.bind(
+                            "ERROR: Container cannot hold specimens: {0}",
+                            positionString));
+                        focusControl(positionField);
+                        return;
+                    } else if (!specimenTypeCollection.contains(singleSpecimen
+                        .getSpecimenType())) {
+                        BgcPlugin.openError(
+                            // TR: dialog title
+                            i18n.tr("Container error"),
+                            // TR: dialog message
+                            i18n.tr(
+                                "Container {0} cannot hold specimens of type \"{1}\"",
+                                positionString,
+                                singleSpecimen.getSpecimenType()));
+                        appendLog(NLS
+                            .bind(
+                                "ERROR: Container {0} cannot hold specimens of type \"{1}\"",
+                                positionString,
+                                singleSpecimen.getSpecimenType()));
+                        focusControl(positionField);
+                        return;
+                    }
 
                     if (container.isPositionFree(position)) {
                         singleSpecimen.setParent(container, position);

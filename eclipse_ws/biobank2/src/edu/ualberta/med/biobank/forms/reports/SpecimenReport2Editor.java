@@ -36,24 +36,28 @@ public class SpecimenReport2Editor extends ReportsEditor {
     public static String ID =
         "edu.ualberta.med.biobank.editors.SpecimenReport2Editor";
 
-    private DateTimeWidget start;
-    private DateTimeWidget end;
-    private ComboViewer typesViewer;
+    private DateTimeWidget startDateWidget;
+    private DateTimeWidget endDateWidget;
+    private ComboViewer spcTypesViewer;
     private IObservableValue numSpecimens;
 
     private final IObservableValue listStatus = new WritableValue(Boolean.TRUE,
         Boolean.class);
+
     private TopContainerListWidget topContainers;
     private BgcBaseText numSpecimensText;
 
     @SuppressWarnings("nls")
     // label
     private static final String START_DATE = i18n.tr("Start Date (Linked)");
+
     @SuppressWarnings("nls")
     // label
     private static final String END_DATE = i18n.tr("End Date (Linked)");
+
     private static final String SPECIMEN_TYPE = SpecimenType.NAME.format(1)
         .toString();
+
     @SuppressWarnings("nls")
     // label
     private static final String NUMBER_OF_SPECIMENS = i18n.tr("# Specimens");
@@ -61,13 +65,14 @@ public class SpecimenReport2Editor extends ReportsEditor {
     @SuppressWarnings("nls")
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        start = widgetCreator.createDateTimeWidget(parent,
+        startDateWidget = widgetCreator.createDateTimeWidget(parent,
             START_DATE, null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent,
+        endDateWidget = widgetCreator.createDateTimeWidget(parent,
             END_DATE, null, null, null, SWT.DATE);
         topContainers = new TopContainerListWidget(parent, toolkit);
-        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), listStatus,
+        listStatus.setValue(topContainers.getEnabled());
+        widgetCreator.addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class), listStatus,
             // validation error message
             i18n.tr("Top Container List Empty"));
         topContainers.addSelectionChangedListener(new SelectionListener() {
@@ -80,19 +85,18 @@ public class SpecimenReport2Editor extends ReportsEditor {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        typesViewer = createSpecimenTypeComboOption(
-            SPECIMEN_TYPE, parent);
-        createValidatedIntegerText(NUMBER_OF_SPECIMENS,
-            parent);
+        spcTypesViewer = createSpecimenTypeComboOption(SPECIMEN_TYPE, parent);
+        createValidatedIntegerText(NUMBER_OF_SPECIMENS, parent);
     }
 
     @Override
     protected void initReport() throws Exception {
         List<Object> params = new ArrayList<Object>();
-        params.add(ReportsEditor.processDate(start.getDate(), true));
-        params.add(ReportsEditor.processDate(end.getDate(), false));
-        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) typesViewer
-            .getSelection()).getFirstElement()).getNameShort());
+        params.add(ReportsEditor.processDate(startDateWidget.getDate(), true));
+        params.add(ReportsEditor.processDate(endDateWidget.getDate(), false));
+        params
+            .add(((SpecimenTypeWrapper) ((IStructuredSelection) spcTypesViewer
+                .getSelection()).getFirstElement()).getNameShort());
         report.setContainerList(ReportsEditor
             .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(Integer.parseInt((String) numSpecimens.getValue()));
@@ -102,11 +106,12 @@ public class SpecimenReport2Editor extends ReportsEditor {
     @Override
     protected List<Object> getPrintParams() {
         List<Object> params = new ArrayList<Object>();
-        params.add(ReportsEditor.processDate(start.getDate(), true));
-        params.add(ReportsEditor.processDate(end.getDate(), false));
+        params.add(ReportsEditor.processDate(startDateWidget.getDate(), true));
+        params.add(ReportsEditor.processDate(endDateWidget.getDate(), false));
         params.add(topContainers.getSelectedContainerNames());
-        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) typesViewer
-            .getSelection()).getFirstElement()).getNameShort());
+        params
+            .add(((SpecimenTypeWrapper) ((IStructuredSelection) spcTypesViewer
+                .getSelection()).getFirstElement()).getNameShort());
         params.add(Integer.parseInt((String) numSpecimens.getValue()));
         return params;
     }
@@ -175,10 +180,10 @@ public class SpecimenReport2Editor extends ReportsEditor {
 
     @Override
     public void setValues() throws Exception {
-        start.setDate(null);
-        end.setDate(null);
+        startDateWidget.setDate(null);
+        endDateWidget.setDate(null);
         topContainers.reset();
-        typesViewer.getCombo().deselectAll();
+        spcTypesViewer.getCombo().deselectAll();
         numSpecimensText.setText(StringUtil.EMPTY_STRING);
         super.setValues();
     }

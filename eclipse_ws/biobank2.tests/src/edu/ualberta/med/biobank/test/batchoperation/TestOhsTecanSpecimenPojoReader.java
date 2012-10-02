@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
+package edu.ualberta.med.biobank.test.batchoperation;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
+import edu.ualberta.med.biobank.test.action.batchoperation.specimen.TestSpecimenBatchOp;
 
 public class TestOhsTecanSpecimenPojoReader extends TestAction {
 

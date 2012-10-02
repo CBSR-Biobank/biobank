@@ -93,7 +93,7 @@ public class LoginDialog extends TitleAreaDialog {
     private static final String LAST_USER_NAME = "lastUserName";
 
     @SuppressWarnings("nls")
-    private static final String DEFAULT_SECURE_PORT = "8443";
+    private static final String DEFAULT_NON_SECURE_PORT = "8080";
 
     @SuppressWarnings("nls")
     private static final String DEFAULT_UNSECURE_PREFIX = "http://";
@@ -204,15 +204,15 @@ public class LoginDialog extends TitleAreaDialog {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
             secureConnectionButton.setText("Use secure connection");
-            secureConnectionButton.setSelection(lastServer
-                .contains(DEFAULT_SECURE_PORT));
+            secureConnectionButton.setSelection(!lastServer
+                .contains(DEFAULT_NON_SECURE_PORT));
 
             serverWidget.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     String lastServer = serverWidget.getText();
-                    secureConnectionButton.setSelection(lastServer
-                        .contains(DEFAULT_SECURE_PORT));
+                    secureConnectionButton.setSelection(!lastServer
+                        .contains(DEFAULT_NON_SECURE_PORT));
                 }
             });
         } else {

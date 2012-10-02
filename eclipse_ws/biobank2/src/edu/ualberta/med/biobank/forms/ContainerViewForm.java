@@ -144,11 +144,9 @@ public class ContainerViewForm extends BiobankViewForm {
             containerInfo.container.getLabel(), containerInfo.container
                 .getContainerType().getNameShort()));
         initCells();
-        canCreate =
-            SessionManager.getAppService().isAllowed(
-                new
-                ContainerCreatePermission(((ContainerWrapper) containerAdapter
-                    .getModelObject()).getSite().getId()));
+        canCreate = SessionManager.getAppService().isAllowed(
+            new ContainerCreatePermission(((ContainerWrapper) containerAdapter
+                .getModelObject()).getSite().getId()));
         canDelete = SessionManager.getAppService().isAllowed(new
             ContainerDeletePermission());
     }
@@ -157,12 +155,9 @@ public class ContainerViewForm extends BiobankViewForm {
         Assert.isNotNull(adapter.getId());
         containerInfo = SessionManager.getAppService().doAction(
             new ContainerGetInfoAction(adapter.getId()));
-        specInfo =
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new ContainerGetSpecimenListInfoAction(
-                        containerInfo.container.getId())).getList();
+        specInfo = SessionManager.getAppService().doAction(
+            new ContainerGetSpecimenListInfoAction(
+                containerInfo.container.getId())).getList();
         Assert.isNotNull(containerInfo);
         Assert.isNotNull(containerInfo.container);
     }
@@ -507,7 +502,7 @@ public class ContainerViewForm extends BiobankViewForm {
     public boolean initChildrenWithType(ContainerTypeWrapper type,
         Set<RowColPos> positions) throws Exception {
         ContainerCreateChildrenAction containerCreateChildrenAction =
-            new ContainerCreateChildrenAction();
+            new ContainerCreateChildrenAction(containerInfo.container.getSite());
         containerCreateChildrenAction
             .setParentContainerId(containerInfo.container.getId());
         containerCreateChildrenAction.setContainerTypeId(type.getId());
