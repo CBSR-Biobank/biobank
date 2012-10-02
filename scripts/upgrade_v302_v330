@@ -58,7 +58,7 @@ mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank2
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
 mysql -h$DBHOST -u$DBUSER -p$DBPWD  biobank -e "grant all privileges on biobank.* to 'dummy'@'localhost' with grant option"
-if [ $OSTYPE == 'linux' ]; then
+if [ -s /usr/bin/pv ]; then
     pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 else
     gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
