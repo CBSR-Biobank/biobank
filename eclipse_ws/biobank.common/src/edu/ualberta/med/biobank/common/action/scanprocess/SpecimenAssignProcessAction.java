@@ -361,7 +361,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             .format(palletType, sampleType));
         appendNewLog(MessageFormat
             .format(
-                "ERROR in {0}: this pallet type {1} can''t hold a specimen of type {2}",
+                "ERROR in {0}: pallet type \"{1}\" can''t hold a specimen of type \"{2}\"",
                 position, palletType, sampleType));
     }
 
