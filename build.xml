@@ -317,8 +317,14 @@ End:
           overwrite="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
+    <copy file="${lib.dir}/mysql-connector-java-5.1.15-bin.jar"
+          tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15-bin.jar"
+          overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
+          overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
+          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
           overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
