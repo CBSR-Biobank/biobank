@@ -8,6 +8,7 @@ use strict;
 use Getopt::Long;
 use File::Basename;
 use Pod::Usage;
+use Term::ReadKey;
 
 my $SCRIPTNAME = basename ($0);
 
@@ -25,8 +26,8 @@ my $help = 0;
 my $man = 0;
 
 GetOptions ('host=s' => \$DBHOST,
-            'u=s' => \$DBUSER,
-            'p=s' => \$DBPWD,
+            'user=s' => \$DBUSER,
+            'password=s' => \$DBPWD,
             'man' => \$man,
             'help|?'   => \$help) or pod2usage(2);
 
@@ -38,28 +39,68 @@ if ($DBUSER eq "") {
 }
 
 if ($DBPWD eq "") {
+    print "Enter the MySQL password for user $DBUSER: ";
+    ReadMode 'noecho';
+    $DBPWD = ReadLine 0;
+    chomp $DBPWD;
+    ReadMode 'normal';
+    print "\n";
+}
+
+if ($DBPWD eq "") {
     die "ERROR: database user password not specified\n";
 }
 
 sub checkMysqlInnoDB {
-    my $chk_innodb=`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
-        $GREP -e "^storage_engine"`;
-    print "$chk_innodb";
-    my $result = ($chk_innodb =~ /InnoDB/) ? "enabled" :  "not enabled";
-    print "checking MySQL for InnoDB...$result\n";
-    return ($result eq "enabled");
+    my $chk_innodb = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
+        $GREP -e "^storage_engine"`  =~ /InnoDB/);
+
+    print "checking MySQL for InnoDB..."
+        . ($chk_innodb ? "enabled" :  "not enabled") . "\n";
+    return $chk_innodb;
 }
 
 sub checkMysqlLowerCaseTableNames {
-    my $lcnames=`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
-        $GREP -e "^lower_case_table_names"`;
-    my $result = ($lcnames =~ /1$/) ? "enabled" : "not enabled";
-    print "checking MySQL for lower cae table names...$result\n";
-    return ($result eq "enabled");
+    my $lcnames = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
+        $GREP -e "^lower_case_table_names"` =~ /1$/);
+    print "checking MySQL for lower case table names..."
+        . ($lcnames ? "enabled" : "not enabled") . "\n";
+    return $lcnames;
 }
 
-$RESULT &= checkMysqlInnoDB();
-$RESULT &= checkMysqlLowerCaseTableNames();
+sub checkJbossHomeEnv {
+    my $env = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
+    print "checking if JBOSS_HOME environment variable defined and valid..."
+        . ($env ? "defined" : "undefined") . "\n";
+    return $env;
+}
+
+sub checkEclipseHomeEnv {
+    my $env = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
+    print "checking if ECLIPSE_HOME environment variable defined and valid..."
+        . ($env ? "defined" : "undefined") . "\n";
+    return $env;
+}
+
+sub checkEclipseDeltaPack {
+    my $present = 0;
+    if (defined($ENV{'ECLIPSE_HOME'})) {
+        my $path = $ENV{'ECLIPSE_HOME'}
+            . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
+        $present = 1 if (-f "$path");
+    }
+    print "checking for Eclipse delta pack..."
+        . ($present ? "found" : "unavailable") . "\n";
+    return $present;
+}
+
+$RESULT &&= checkMysqlInnoDB();
+$RESULT &&= checkMysqlLowerCaseTableNames();
+$RESULT &&= checkJbossHomeEnv();
+
+# optional
+checkEclipseHomeEnv();
+checkEclipseDeltaPack();
 
 exit !$RESULT;
 
@@ -67,16 +108,21 @@ __END__
 
 =head1 NAME
 
-Usage: $SCRIPTNAME [OPTIONS]
-
-This scripts checks for a valid deployment configuration environment for a
+chkconfig - Checks for a valid deployment configuration environment for a
 Biobank server.
 
-OPTIONS
+=head1 USAGE
+
+chkconfig [OPTIONS]
+
+=head1 OPTIONS
+
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
   -u DBUSER   The user to use on the MySQL server.
-  -p PWD      The password to use on the MySQL server.
-  -h          Help text.
+  -p PWD      The password to use on the MySQL server. If not specified the
+              user will be prompted to enter it.
+  -help       Help text.
+  -man        Full documentation.
 
 =cut
