@@ -7,14 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -47,14 +45,12 @@ public final class TrustStore {
     private static final String DEFAULT_KEYSTORE_PATH =
         new File(System.getProperty("java.home"), "lib/security/cacerts")
             .getAbsolutePath();
+    private static final String CUSTOM_TRUST_STORE_PATH = "cacerts";
     private static final String DEFAULT_KEYSTORE_PW = "changeit";
     private static final String TRUST_STORE_PROPERTY_NAME =
         "javax.net.ssl.trustStore";
-    private static final String TRUST_STORE_PW_PROPERTY_NAME =
-        "javax.net.ssl.trustStorePassword";
     private static final TrustStore instance = new TrustStore();
 
-    private final SecureRandom random = new SecureRandom();
     private KeyStore ks;
 
     public static TrustStore getInstance() {
@@ -150,21 +146,23 @@ public final class TrustStore {
         }
     }
 
-    private String getPassword() {
-        return new BigInteger(130, random).toString(32);
-    }
-
     private void initKeyStore(KeyStore ks)
         throws IOException, NoSuchAlgorithmException, CertificateException,
         KeyStoreException {
-        File tmp = File.createTempFile("biobank", ".keystore");
-        tmp.deleteOnExit();
+        File file = new File(CUSTOM_TRUST_STORE_PATH);
 
-        InputStream in = new FileInputStream(DEFAULT_KEYSTORE_PATH);
+        String inputFile = null;
+        if (!file.exists()) {
+            inputFile = DEFAULT_KEYSTORE_PATH;
+        } else {
+            inputFile = CUSTOM_TRUST_STORE_PATH;
+        }
+        
+        InputStream in = new FileInputStream(inputFile);
         ks.load(in, DEFAULT_KEYSTORE_PW.toCharArray());
         in.close();
 
-        System.setProperty(TRUST_STORE_PROPERTY_NAME, tmp.getAbsolutePath());
+        System.setProperty(TRUST_STORE_PROPERTY_NAME, file.getAbsolutePath());
 
         flush();
     }
@@ -174,13 +172,10 @@ public final class TrustStore {
         CertificateException, IOException {
         String file = System.getProperty(TRUST_STORE_PROPERTY_NAME);
 
-        String randPw = getPassword();
-        System.setProperty(TRUST_STORE_PW_PROPERTY_NAME, randPw);
-
         OutputStream out = new FileOutputStream(file);
         out = new BufferedOutputStream(out);
 
-        ks.store(out, randPw.toCharArray());
+        ks.store(out, DEFAULT_KEYSTORE_PW.toCharArray());
         out.close();
     }
 
