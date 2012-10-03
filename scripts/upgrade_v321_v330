@@ -8,11 +8,10 @@ USAGE="
 Usage: $SCRIPT [OPTIONS]
 
 OPTIONS
-  -d DUMP     The original biobank database dump file name.
+  -d DUMP     The original biobank database dump file name compressed with gzip. Optional.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
-  -u DBUSER   The user to use on the MySQL server.
-  -p PWD      The password to use on the MySQL server.
+  -u DBUSER   The user to use on the MySQL server. Optional.
   -h          Help text.
 "
 
@@ -41,21 +40,37 @@ do
     esac
 done
 
-if [ -z "$DBDUMP" ]; then
-    echo "ERROR: old database dump not specified"
-    echo "$USAGE"
-    exit
+
+if [ -z "$DBUSER" ]; then
+    read -p "MySQL user on host $DBHOST: " DBUSER
 fi
 
 if [ -z "$DBUSER" ]; then
     echo "ERROR: user not specified"
-    echo "$USAGE"
     exit
 fi
 
+read -s -p "MySQL Password for user $DBUSER: " DBPWD
+echo ""
+
 if [ -z "$DBPWD" ]; then
     echo "ERROR: password not specified"
-    echo "$USAGE"
+    exit
+fi
+
+if [ -z "$DBDUMP" ]; then
+    read -p "MySQL database dump (gzipped): " DBDUMP
+fi
+
+
+
+if [ -z "$DBDUMP" ]; then
+    echo "ERROR: old database dump not specified"
+    exit
+fi
+
+if [ ! -f "$DBDUMP" ]; then
+    echo "ERROR: database dump file does not exist"
     exit
 fi
 
