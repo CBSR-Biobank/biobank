@@ -62,7 +62,7 @@ if [ -z "$DBDUMP" ]; then
     read -p "MySQL database dump (gzipped): " DBDUMP
 fi
 
-
+eval DBDUMP=$DBDUMP
 
 if [ -z "$DBDUMP" ]; then
     echo "ERROR: old database dump not specified"
