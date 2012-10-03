@@ -1,0 +1,82 @@
+#!/usr/bin/perl -w
+
+#
+# For a description of what this script does see $USAGE below.
+#
+
+use strict;
+use Getopt::Long;
+use File::Basename;
+use Pod::Usage;
+
+my $SCRIPTNAME = basename ($0);
+
+my $USAGE = <<USAGE_END;
+USAGE_END
+
+my $MYSQL = "/usr/bin/mysql";
+my $GREP = "/bin/grep";
+my $SED = "/bin/sed";
+my $DBHOST = "localhost";
+my $DBUSER = "";
+my $DBPWD = "";
+my $RESULT = "1";
+my $help = 0;
+my $man = 0;
+
+GetOptions ('host=s' => \$DBHOST,
+            'u=s' => \$DBUSER,
+            'p=s' => \$DBPWD,
+            'man' => \$man,
+            'help|?'   => \$help) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+if ($DBUSER eq "") {
+    die "ERROR: database user name not specified\n";
+}
+
+if ($DBPWD eq "") {
+    die "ERROR: database user password not specified\n";
+}
+
+sub checkMysqlInnoDB {
+    my $chk_innodb=`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
+        $GREP -e "^storage_engine"`;
+    print "$chk_innodb";
+    my $result = ($chk_innodb =~ /InnoDB/) ? "enabled" :  "not enabled";
+    print "checking MySQL for InnoDB...$result\n";
+    return ($result eq "enabled");
+}
+
+sub checkMysqlLowerCaseTableNames {
+    my $lcnames=`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
+        $GREP -e "^lower_case_table_names"`;
+    my $result = ($lcnames =~ /1$/) ? "enabled" : "not enabled";
+    print "checking MySQL for lower cae table names...$result\n";
+    return ($result eq "enabled");
+}
+
+$RESULT &= checkMysqlInnoDB();
+$RESULT &= checkMysqlLowerCaseTableNames();
+
+exit !$RESULT;
+
+__END__
+
+=head1 NAME
+
+Usage: $SCRIPTNAME [OPTIONS]
+
+This scripts checks for a valid deployment configuration environment for a
+Biobank server.
+
+OPTIONS
+  -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
+              localhost if not specified.
+  -u DBUSER   The user to use on the MySQL server.
+  -p PWD      The password to use on the MySQL server.
+  -h          Help text.
+
+=cut
