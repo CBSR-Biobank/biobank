@@ -123,6 +123,14 @@ sub checkDbTablesInnoDb() {
 
     my $valid = (cmpStr(\@tables, \@innoTables) == 0);
 
+    if (! $valid) {
+        #report the bad tables
+        foreach (grep { not $_ ~~ @innoTables } @tables) {
+            chomp($_);
+            print "\ttable \"$_\" is not InnoDB\n";
+        }
+    }
+
     print "checking if databse tables are InnoDB..."
         . ($valid ? "PASS" : "FAIL") . "\n";
     return $valid;
