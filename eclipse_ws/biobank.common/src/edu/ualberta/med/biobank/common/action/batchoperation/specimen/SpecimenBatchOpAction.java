@@ -70,7 +70,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("specimen declared a source specimen but parent " +
             "inventory ID present").format();
 
-    private static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
+    public static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
         bundle.tr("parent inventory id does not exist: {0}");
 
     private static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =

@@ -181,6 +181,10 @@ public class SpecimenImportForm extends BiobankViewForm {
                             // dialog error message
                             i18n.tr("The file is not a CSV file or has the wrong content."));
                 } catch (Exception e) {
+                    BgcPlugin.openAsyncError(
+                        // dialog title.
+                        i18n.tr("File parsing error"),
+                        e);
                     throw new RuntimeException(e);
                 } finally {
                     fileBrowser.getDisplay().asyncExec(new Runnable() {
