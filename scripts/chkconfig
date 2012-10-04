@@ -9,6 +9,8 @@ use Getopt::Long;
 use File::Basename;
 use Pod::Usage;
 use Term::ReadKey;
+use Data::Dumper;
+use FreezeThaw qw(cmpStr);
 
 my $SCRIPTNAME = basename ($0);
 
@@ -56,7 +58,7 @@ sub checkMysqlInnoDB {
         $GREP -e "^storage_engine"`  =~ /InnoDB/);
 
     print "checking MySQL for InnoDB..."
-        . ($chk_innodb ? "enabled" :  "not enabled") . "\n";
+        . ($chk_innodb ? "PASS" :  "FAIL") . "\n";
     return $chk_innodb;
 }
 
@@ -64,21 +66,21 @@ sub checkMysqlLowerCaseTableNames {
     my $lcnames = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
         $GREP -e "^lower_case_table_names"` =~ /1$/);
     print "checking MySQL for lower case table names..."
-        . ($lcnames ? "enabled" : "not enabled") . "\n";
+        . ($lcnames ? "PASS" : "FAIL") . "\n";
     return $lcnames;
 }
 
 sub checkJbossHomeEnv {
     my $env = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
     print "checking if JBOSS_HOME environment variable defined and valid..."
-        . ($env ? "defined" : "undefined") . "\n";
+        . ($env ? "PASS" : "FAIL") . "\n";
     return $env;
 }
 
 sub checkEclipseHomeEnv {
     my $env = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
     print "checking if ECLIPSE_HOME environment variable defined and valid..."
-        . ($env ? "defined" : "undefined") . "\n";
+        . ($env ? "PASS" : "FAIL") . "\n";
     return $env;
 }
 
@@ -90,9 +92,42 @@ sub checkEclipseDeltaPack {
         $present = 1 if (-f "$path");
     }
     print "checking for Eclipse delta pack..."
-        . ($present ? "found" : "unavailable") . "\n";
+        . ($present ? "PASS" : "FAIL") . "\n";
     return $present;
 }
+
+sub mysqlCmd {
+    my $dbname = shift;
+    my $cmd = shift;
+
+    if (! defined($cmd)) { die "command is empty"; }
+    if (! defined($dbname)) { die "database name not specified"; }
+    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" biobank`;
+}
+
+sub checkDbExists() {
+    my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
+        . "WHERE SCHEMA_NAME = 'biobank'";
+    my $present = (mysqlCmd('biobank', $cmd) =~ /^biobank$/);
+    print "checking for databse biobank..."
+        . ($present ? "PASS" : "FAIL") . "\n";
+    return $present;
+}
+
+sub checkDbTablesInnoDb() {
+    my $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
+        . "WHERE TABLE_SCHEMA = 'biobank' AND engine = 'InnoDB'";
+
+    my @innoTables = mysqlCmd('biobank', $cmd);
+    my @tables = mysqlCmd('biobank', 'SHOW TABLES');
+
+    my $valid = (cmpStr(\@tables, \@innoTables) == 0);
+
+    print "checking if databse tables are InnoDB..."
+        . ($valid ? "PASS" : "FAIL") . "\n";
+    return $valid;
+}
+
 
 $RESULT &&= checkMysqlInnoDB();
 $RESULT &&= checkMysqlLowerCaseTableNames();
@@ -101,6 +136,10 @@ $RESULT &&= checkJbossHomeEnv();
 # optional
 if (checkEclipseHomeEnv()) {
     checkEclipseDeltaPack();
+}
+
+if (checkDbExists()) {
+    checkDbTablesInnoDb();
 }
 
 exit !$RESULT;
