@@ -36,6 +36,8 @@
     <path location="${lib.dir}/gettext-commons-0.9.6.jar" />
     <path location="${lib.dir}/messages.jar" />
     <path location="${lib.dir}/${jdbc.driver.jar}" />
+    <!-- uncomment following line for debug output -->
+    <!--<path location="${lib.dir}/slf4j-simple-1.7.1.jar" />-->
   </path>
 
   <!-- hibernatetool is much faster and more powerful than schemaexport and
@@ -57,12 +59,29 @@
   <target name="schemaupdate"
           depends="build-common-project">
     <echo message="classpath:${model.classpath}" />
-    <hibernatetool destdir="." classpath="${model.classpath}">
+    <echo message="configurationfile:${eclipse.proj.dir.common}/output/hibernate.cfg.xml" />
+    <tempfile property="temp.sql.path"
+              deleteonexit="false"
+              prefix="schema-export"
+              suffix=".sql"
+              createfile="true" />
+    <basename property="temp.sql.file" file="${temp.sql.path}" />
+    <echo message="tempfile:${temp.sql.file}"/>
+    <input message="pause" addProperty="asdf" defaultValue="nope" />
+    <hibernatetool destdir="." classpath="${model.classpath}" >
       <annotationconfiguration configurationfile="${eclipse.proj.dir.common}/output/hibernate.cfg.xml"/>
-      <hbm2ddl export="true"
-               drop="true"
-               create="true" />
+      <hbm2ddl export="false"
+               drop="false"
+               create="true"
+               outputfilename="${temp.sql.file}" />
     </hibernatetool>
+    <sql driver="${database.driver}"
+         url="${database.url}"
+         userid="${database.username}"
+         password="${database.password}"
+         classpathref="sql.classpath">
+      <transaction src="${temp.sql.file}" />
+    </sql>
   </target>
 
   <target name="dbcreate-add-tables">
