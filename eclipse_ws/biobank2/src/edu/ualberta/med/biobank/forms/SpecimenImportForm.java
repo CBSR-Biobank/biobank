@@ -107,7 +107,7 @@ public class SpecimenImportForm extends BiobankViewForm {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         errorsLabel.setLayoutData(gd);
-        
+
         errorsLabel.setText(i18n
             .tr("The following errors occurred when attempting to import:"));
         errorsLabel.setBackground(toolkit.getColors().getBackground());
@@ -173,6 +173,13 @@ public class SpecimenImportForm extends BiobankViewForm {
                     errors.addAll(e.getErrors());
                 } catch (BatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
+                } catch (IllegalStateException e) {
+                    BgcPlugin
+                        .openAsyncError(
+                            // dialog title
+                            i18n.tr("File Format Error"),
+                            // dialog error message
+                            i18n.tr("The file is not a CSV file or has the wrong content."));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 } finally {

@@ -99,8 +99,9 @@ $RESULT &&= checkMysqlLowerCaseTableNames();
 $RESULT &&= checkJbossHomeEnv();
 
 # optional
-checkEclipseHomeEnv();
-checkEclipseDeltaPack();
+if (checkEclipseHomeEnv()) {
+    checkEclipseDeltaPack();
+}
 
 exit !$RESULT;
 
