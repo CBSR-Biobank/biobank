@@ -269,7 +269,7 @@ End:
       <arg line="-keystore biobank.keystore -storepasswd -storepass importkey -new biobank2" />
     </exec>
     <copy file="scripts/ssl/biobank.keystore"
-          tofile="${secu-log.dir}/jboss/biobank.keystore" />
+          tofile="${secu-log.dir}/jboss/biobank.keystore"  overwrite="true" />
   </target>
 
   <target name="keystore-check">

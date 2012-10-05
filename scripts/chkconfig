@@ -10,7 +10,7 @@ use File::Basename;
 use Pod::Usage;
 use Term::ReadKey;
 use Data::Dumper;
-use FreezeThaw qw(cmpStr);
+#use FreezeThaw qw(cmpStr);
 
 my $SCRIPTNAME = basename ($0);
 
@@ -51,6 +51,15 @@ if ($DBPWD eq "") {
 
 if ($DBPWD eq "") {
     die "ERROR: database user password not specified\n";
+}
+
+sub mysqlCmd {
+    my $dbname = shift;
+    my $cmd = shift;
+
+    if (! defined($cmd)) { die "command is empty"; }
+    if (! defined($dbname)) { die "database name not specified"; }
+    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" biobank`;
 }
 
 sub checkMysqlInnoDB {
@@ -96,13 +105,11 @@ sub checkEclipseDeltaPack {
     return $present;
 }
 
-sub mysqlCmd {
-    my $dbname = shift;
-    my $cmd = shift;
-
-    if (! defined($cmd)) { die "command is empty"; }
-    if (! defined($dbname)) { die "database name not specified"; }
-    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" biobank`;
+sub checkKeystoreFile {
+    my $present = 1 if (-f "security-logs/jboss/biobank.keystore");
+    print "checking for SSL certificate file..."
+        . ($present ? "PASS" : "FAIL") . "\n";
+    return $present;
 }
 
 sub checkDbExists() {
@@ -120,34 +127,39 @@ sub checkDbTablesInnoDb() {
 
     my @innoTables = mysqlCmd('biobank', $cmd);
     my @tables = mysqlCmd('biobank', 'SHOW TABLES');
+    my @nonInnoDbTables = ();
 
-    my $valid = (cmpStr(\@tables, \@innoTables) == 0);
-
-    if (! $valid) {
-        #report the bad tables
-        foreach (grep { not $_ ~~ @innoTables } @tables) {
-            chomp($_);
-            print "\ttable \"$_\" is not InnoDB\n";
-        }
+    #report the bad tables
+    foreach (grep { not $_ ~~ @innoTables } @tables) {
+        chomp($_);
+        push (@nonInnoDbTables, $_);
     }
 
-    print "checking if databse tables are InnoDB..."
+    my $valid = ($#nonInnoDbTables < 0);
+
+    print "checking if database tables are InnoDB..."
         . ($valid ? "PASS" : "FAIL") . "\n";
+
+    foreach (@nonInnoDbTables)  {
+        print "\ttable \"$_\" is not InnoDB\n";
+    }
     return $valid;
 }
 
 
 $RESULT &&= checkMysqlInnoDB();
 $RESULT &&= checkMysqlLowerCaseTableNames();
+
+if (checkDbExists()) {
+    checkDbTablesInnoDb();
+}
+
 $RESULT &&= checkJbossHomeEnv();
+$RESULT &&= checkKeystoreFile;
 
 # optional
 if (checkEclipseHomeEnv()) {
     checkEclipseDeltaPack();
-}
-
-if (checkDbExists()) {
-    checkDbTablesInnoDb();
 }
 
 exit !$RESULT;
@@ -174,3 +186,7 @@ chkconfig [OPTIONS]
   -man        Full documentation.
 
 =cut
+
+# Local Variables:
+# compile-command: "cd ~/proj/cbsr/biobank && scripts/chkconfig"
+# End:
