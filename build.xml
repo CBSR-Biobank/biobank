@@ -22,6 +22,7 @@ End:
   <!-- TODO: create a cacore directory with all the cacore stuff in it
        that we can throw into the war file and use to create the database -->
   <property file="build.properties" />
+  <property file="db.properties" />
 
   <!-- must use a property with a LOCATION attribute because it is converted
        to be an absolute value, which the product builder seems to require in
@@ -305,8 +306,22 @@ End:
           message="JBOSS_HOME environment variable not defined" />
   </target>
 
+  <target name="update-db-config"
+          description="copies db configuration information from db.properties to various config files">
+    <copy todir="${secu-log.dir}/jboss" overwrite="true">
+      <fileset dir="${secu-log.dir}/jboss"/>
+      <globmapper from="*.template" to="*"/>
+      <filterset>
+        <filter token="database.url" value="${database.url}"/>
+        <filter token="database.driver" value="${database.driver}"/>
+        <filter token="database.username" value="${database.username}"/>
+        <filter token="database.password" value="${database.password}"/>
+      </filterset>
+    </copy> 
+  </target>
+
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="jboss.home.env,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
