@@ -314,11 +314,13 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void onlyChildSpecimensNoParents() throws Exception {
+        // the parent specimens will not exist in this test
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
 
         patients.add(factory.createPatient());
         factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
         parentSpecimens.add(factory.createParentSpecimen());
 
         tx.commit();
@@ -347,8 +349,6 @@ public class TestSpecimenBatchOp extends TestAction {
                 .withMessage(SpecimenBatchOpAction.CSV_PARENT_SPC_INV_ID_ERROR
                     .format());
         }
-
-        checkCsvInfoAgainstDb(inputPojos);
     }
 
     @Test
@@ -715,6 +715,8 @@ public class TestSpecimenBatchOp extends TestAction {
                 .createCriteria(Specimen.class)
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()))
                 .uniqueResult();
+
+            Assert.assertNotNull(specimen);
 
             Assert.assertEquals(csvInfo.getSpecimenType(),
                 specimen.getSpecimenType().getName());

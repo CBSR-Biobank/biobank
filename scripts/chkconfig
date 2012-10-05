@@ -32,7 +32,6 @@ chkconfig [OPTIONS]
 =cut
 
 no strict 'refs';
-
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
 my $SED = "/bin/sed";
@@ -164,13 +163,12 @@ foreach (@checkFuncs) {
 
     foreach ( @{ $test->{extraMsgs} } ) {
         print $_, "\n";
-    }
+}
 
     ($test->{required}) && ($RESULT &= $test->{result});
 }
 
 (! $RESULT) && print "tests FAILED\n";
-
 exit !$RESULT;
 
 
@@ -194,4 +192,3 @@ sub new {
 # Local Variables:
 # compile-command: "cd $HOME/proj/cbsr/biobank && scripts/chkconfig"
 # End:
-

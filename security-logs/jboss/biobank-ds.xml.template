@@ -9,10 +9,10 @@
 <datasources>
   <local-tx-datasource>
     <jndi-name>biobank</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/biobank</connection-url>
-    <user-name>dummy</user-name>
-    <password>ozzy498</password>
-    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <connection-url>@database.url@</connection-url>
+    <user-name>@database.username@</user-name>
+    <password>@database.password@</password>
+    <driver-class>@database.driver@</driver-class>
     <min-pool-size>2</min-pool-size>
     <max-pool-size>10</max-pool-size>    
   </local-tx-datasource>

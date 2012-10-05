@@ -56,18 +56,39 @@
   </target>
 -->
 
+  <target name="get-db-executor">
+    <input message="Enter database executor's username (to execute database commands)"
+           addProperty="database.exec.username"
+           defaultValue="root" />
+    <input message="Enter password"
+           addProperty="database.exec.password"
+           defaultValue="">
+      <handler type="secure" />
+    </input>
+  </target>
+
+  <target name="check-db"
+          depends="get-db-executor">
+  </target>
+
+  <target name="create-db" if="db.missing">
+  </target>
+
+  <target name="check-db-user"
+          depends="check-db">
+  </target>
+
+  <target name="create-db-user">
+  </target>
+
   <target name="schemaupdate"
-          depends="build-common-project">
-    <echo message="classpath:${model.classpath}" />
-    <echo message="configurationfile:${eclipse.proj.dir.common}/output/hibernate.cfg.xml" />
+          depends="check-db,build-common-project">
     <tempfile property="temp.sql.path"
               deleteonexit="false"
               prefix="schema-export"
               suffix=".sql"
               createfile="true" />
     <basename property="temp.sql.file" file="${temp.sql.path}" />
-    <echo message="tempfile:${temp.sql.file}"/>
-    <input message="pause" addProperty="asdf" defaultValue="nope" />
     <hibernatetool destdir="." classpath="${model.classpath}" >
       <annotationconfiguration configurationfile="${eclipse.proj.dir.common}/output/hibernate.cfg.xml"/>
       <hbm2ddl export="false"
@@ -77,18 +98,19 @@
     </hibernatetool>
     <sql driver="${database.driver}"
          url="${database.url}"
-         userid="${database.username}"
-         password="${database.password}"
+         userid="${database.exec.username}"
+         password="${database.exec.password}"
          classpathref="sql.classpath">
       <transaction src="${temp.sql.file}" />
     </sql>
   </target>
 
-  <target name="dbcreate-add-tables">
+  <target name="dbcreate-add-tables"
+          depends="check-db">
     <sql driver="${database.driver}"
          url="${database.url}"
-         userid="${database.username}"
-         password="${database.password}"
+         userid="${database.exec.username}"
+         password="${database.exec.password}"
          classpathref="sql.classpath">
       DROP DATABASE IF EXISTS ${database.name};
       CREATE DATABASE ${database.name};
@@ -97,8 +119,8 @@
     <antcall target="schemaupdate" />
     <sql driver="${database.driver}"
          url="${database.url}"
-         userid="${database.username}"
-         password="${database.password}"
+         userid="${database.exec.username}"
+         password="${database.exec.password}"
          classpathref="sql.classpath">
       <path>
         <fileset dir="${db.import.dir}">
@@ -109,11 +131,13 @@
     </sql>
   </target>
 
-  <target name="dbcreate-add-testuser" if="debug">
+  <target name="dbcreate-add-testuser"
+          depends="check-db"
+          if="debug">
     <sql driver="${database.driver}"
          url="${database.url}"
-         userid="${database.username}"
-         password="${database.password}"
+         userid="${database.exec.username}"
+         password="${database.exec.password}"
          classpathref="sql.classpath">
       <transaction src="${secu-log.dir}/addTestUser.sql" />
     </sql>
@@ -125,11 +149,12 @@
   </target>
 
   <target name="dbbackup"
-          description="exports the current database to a file">
+          description="exports the current database to a file"
+          depends="check-db">
     <echo message="running scripts/dbbackup..." />
     <exec executable="scripts/dbbackup"
           failonerror="true">
-      <arg line="${database.host} ${database.username} ${database.password} ${database.name}" />
+      <arg line="${database.host} ${database.exec.username} ${database.exec.password} ${database.name}" />
     </exec>
   </target>
 </project>
