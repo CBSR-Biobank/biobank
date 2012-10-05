@@ -12,17 +12,21 @@ use Pod::Usage;
 use Term::ReadKey;
 use Data::Dumper;
 
+no strict 'refs';
+
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
 my $SED = "/bin/sed";
 my $DBHOST = "localhost";
+my $DBNAME = "biobank";
 my $DBUSER = "";
 my $DBPWD = "";
-my $RESULT = "1";
+my $RESULT = 1;
 my $help = 0;
 my $man = 0;
 
-GetOptions ('host=s' => \$DBHOST,
+GetOptions ('database=s' => \$DBNAME,
+            'host=s' => \$DBHOST,
             'user=s' => \$DBUSER,
             'password=s' => \$DBPWD,
             'man' => \$man,
@@ -54,38 +58,30 @@ sub mysqlCmd {
 
     if (! defined($cmd)) { die "command is empty"; }
     if (! defined($dbname)) { die "database name not specified"; }
-    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" biobank`;
+    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" $DBNAME`;
 }
 
 sub checkMysqlInnoDB {
     my $chk_innodb = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
         $GREP -e "^storage_engine"`  =~ /InnoDB/);
 
-    print "checking MySQL for InnoDB..."
-        . ($chk_innodb ? "PASS" :  "FAIL") . "\n";
-    return $chk_innodb;
+    return ("checking MySQL for InnoDB...", 1, $chk_innodb);
 }
 
 sub checkMysqlLowerCaseTableNames {
     my $lcnames = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
         $GREP -e "^lower_case_table_names"` =~ /1$/);
-    print "checking MySQL for lower case table names..."
-        . ($lcnames ? "PASS" : "FAIL") . "\n";
-    return $lcnames;
+    return ("checking MySQL for lower case table names...", 1, $lcnames);
 }
 
 sub checkJbossHomeEnv {
     my $env = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
-    print "checking if JBOSS_HOME environment variable defined and valid..."
-        . ($env ? "PASS" : "FAIL") . "\n";
-    return $env;
+    return ("checking if JBOSS_HOME environment variable defined and valid...", 1, $env);
 }
 
 sub checkEclipseHomeEnv {
     my $env = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
-    print "checking if ECLIPSE_HOME environment variable defined and valid..."
-        . ($env ? "PASS" : "FAIL") . "\n";
-    return $env;
+    return ("checking if ECLIPSE_HOME environment variable defined and valid...", 0, $env);
 }
 
 sub checkEclipseDeltaPack {
@@ -95,33 +91,27 @@ sub checkEclipseDeltaPack {
             . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
         $present = 1 if (-f "$path");
     }
-    print "checking for Eclipse delta pack..."
-        . ($present ? "PASS" : "FAIL") . "\n";
-    return $present;
+    return ("checking for Eclipse delta pack...",  0, $present);
 }
 
 sub checkKeystoreFile {
     my $present = 1 if (-f "security-logs/jboss/biobank.keystore");
-    print "checking for SSL certificate file..."
-        . ($present ? "PASS" : "FAIL") . "\n";
-    return $present;
+    return ("checking for SSL certificate file...", 1, $present);
 }
 
 sub checkDbExists() {
     my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
-        . "WHERE SCHEMA_NAME = 'biobank'";
-    my $present = (mysqlCmd('biobank', $cmd) =~ /^biobank$/);
-    print "checking for databse biobank..."
-        . ($present ? "PASS" : "FAIL") . "\n";
-    return $present;
+        . "WHERE SCHEMA_NAME = '$DBNAME'";
+    my $present = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
+    return ("checking for databse $DBNAME...", 0, $present);
 }
 
 sub checkDbTablesInnoDb() {
     my $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
-        . "WHERE TABLE_SCHEMA = 'biobank' AND engine = 'InnoDB'";
+        . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
 
-    my @innoTables = mysqlCmd('biobank', $cmd);
-    my @tables = mysqlCmd('biobank', 'SHOW TABLES');
+    my @innoTables = mysqlCmd($DBNAME, $cmd);
+    my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
     my @nonInnoDbTables = ();
 
     #report the bad tables
@@ -132,30 +122,40 @@ sub checkDbTablesInnoDb() {
 
     my $valid = ($#nonInnoDbTables < 0);
 
-    print "checking if database tables are InnoDB..."
-        . ($valid ? "PASS" : "FAIL") . "\n";
-
+    my @extraMsgs = ();
     foreach (@nonInnoDbTables)  {
-        print "\ttable \"$_\" is not InnoDB\n";
+        push(@extraMsgs, "\ttable \"$_\" is not InnoDB");
     }
-    return $valid;
+    return ("checking if database tables are InnoDB...", 0, $valid, @extraMsgs);
 }
 
+my @checkFuncs = ('checkMysqlInnoDB',
+                  'checkMysqlLowerCaseTableNames',
+                  'checkDbExists',
+                  'checkDbTablesInnoDb',
+                  'checkJbossHomeEnv',
+                  'checkKeystoreFile',
+                  'checkEclipseDeltaPack');
 
-$RESULT &&= checkMysqlInnoDB();
-$RESULT &&= checkMysqlLowerCaseTableNames();
+my %results = ();
 
-if (checkDbExists()) {
-    checkDbTablesInnoDb();
+foreach (@checkFuncs) {
+    push(@{$results{$_}}, &$_);
 }
 
-$RESULT &&= checkJbossHomeEnv();
-$RESULT &&= checkKeystoreFile;
+foreach my $key (keys %results) {
+    my ($msg, $optional, $thisResult, @extraMsgs) = @{$results{$key}};
 
-# optional
-if (checkEclipseHomeEnv()) {
-    checkEclipseDeltaPack();
+    print $msg, "\n", ($thisResult ? "[PASS]" : "[FAIL]"), "\n";
+    foreach (@extraMsgs) {
+        print $_, "\n";
+    }
+    if (! $optional) {
+        $RESULT &= $thisResult;
+    }
 }
+
+(! $RESULT) && print "tests FAILED\n";
 
 exit !$RESULT;
 
@@ -172,13 +172,15 @@ chkconfig [OPTIONS]
 
 =head1 OPTIONS
 
-  -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
-              localhost if not specified.
-  -u DBUSER   The user to use on the MySQL server.
-  -p PWD      The password to use on the MySQL server. If not specified the
-              user will be prompted to enter it.
-  -help       Help text.
-  -man        Full documentation.
+  --database DBNAME  The name of the dataabse used by the Biobank applicatiion. Defaults
+                     to "biobank".
+  --host DBHOST      The hostname of the machine running the MySQL server. Defaults to
+                     localhost if not specified.
+  --user DBUSER      The user to use on the MySQL server.
+  --passwrd PWD      The password to use on the MySQL server. If not specified the
+                     user will be prompted to enter it.
+  --help             Help text.
+  --man              Full documentation.
 
 =cut
 

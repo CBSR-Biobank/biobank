@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="biobank" basedir="." default="deploy">
-  <!--
-      Overall build file
-      use command "ant -projecthelp" to display the targets.
-
-Local Variables:
-compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
-End:
-  -->
-
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
   </exec>
@@ -302,11 +293,6 @@ End:
     </propertyfile>
   </target>
 
-  <target name="jboss.home.env">
-    <fail unless="env.JBOSS_HOME"
-          message="JBOSS_HOME environment variable not defined" />
-  </target>
-
   <target name="update-db-config"
           description="copies db configuration information from db.properties to various config files">
     <copy todir="${secu-log.dir}/jboss" overwrite="true">
@@ -318,11 +304,17 @@ End:
         <filter token="database.username" value="${database.username}"/>
         <filter token="database.password" value="${database.password}"/>
       </filterset>
-    </copy> 
+    </copy>
+  </target>
+
+  <target name="check-deploy-jboss">
+    <exec dir="" executable="perl" failonerror="true">
+      <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
+    </exec>
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
+          depends="check-deploy-jboss,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -495,18 +487,14 @@ End:
 
   <property name="doxygen.output" location="docs/doxygen" />
 
-  <target name="eclipse.home.env">
-    <fail unless="env.ECLIPSE_HOME"
-          message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
-  </target>
-
 
   <target name="clean-product">
     <delete dir="${buildDirectory}" />
   </target>
 
-
-  <target name="product" depends="clean-product,biobank-version-modify,eclipse.home.env,deploy" description="build the product">
+  <target name="product"
+	  depends="clean-product,biobank-version-modify,deploy"
+	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
@@ -575,7 +563,8 @@ End:
   </target>
 
 
-  <target name="updateSiteMetadata" depends="eclipse.home.env" description="Build the update site folder">
+  <target name="updateSiteMetadata"
+	  description="Build the update site folder">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <property name="updateSiteFolder" value="${buildDirectory}/updateSite" />
     <copy todir="${updateSiteFolder}/features/">
@@ -646,3 +635,12 @@ End:
 
 
 </project>
+
+<!--
+    Overall build file
+    use command "ant -projecthelp" to display the targets.
+
+    Local Variables:
+    compile-command: "ant"
+    End:
+-->
