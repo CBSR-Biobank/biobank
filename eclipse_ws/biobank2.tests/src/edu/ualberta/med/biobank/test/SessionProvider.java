@@ -10,6 +10,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
 import com.mchange.v2.c3p0.mbean.C3P0PooledDataSource;
+import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 public class SessionProvider {
     public enum Mode {
@@ -50,30 +51,18 @@ public class SessionProvider {
         try {
             // Create initial context
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
-                "com.sun.jndi.fscontext.RefFSContextFactory");
-            System.setProperty(Context.PROVIDER_URL,
-                "file:///");
+                "org.apache.naming.java.javaURLContextFactory");
+            System.setProperty(Context.URL_PKG_PREFIXES,
+                "org.apache.naming");
             InitialContext ic = new InitialContext();
 
             ic.createSubcontext("java:");
 
             // Construct DataSource
-            C3P0PooledDataSource ds = new C3P0PooledDataSource();
-            ds.setJdbcUrl("jdbc:mysql://localhost:3306/biobank");
+            MysqlConnectionPoolDataSource ds = new MysqlConnectionPoolDataSource();
+            ds.setUrl("jdbc:mysql://localhost:3306/biobank");
             ds.setUser("dummy");
             ds.setPassword("ozzy498");
-
-            /**
-             * ZERO because when hibernate calls `result =
-             * conn.prepareStatement( sql );` (in AbstractBatcher) a
-             * PreparedStatement is returned by c3p0 that already has batches in
-             * it, so, if it was executed immediately, it would already insert
-             * rows, even though we never told it to add any, see this bug:
-             * http://sourceforge.net/tracker/?func=detail&aid=3019762&group_id=
-             * 25357&atid=383690 Possible fixes are for us to call clearBatch()
-             * on the ps, or to use another connection pooler
-             */
-            ds.setMaxStatements(0);
 
             ic.bind("java:/biobank", ds);
         } catch (NamingException ex) {
