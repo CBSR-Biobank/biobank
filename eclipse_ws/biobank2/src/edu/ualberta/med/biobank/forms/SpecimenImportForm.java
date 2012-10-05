@@ -172,11 +172,8 @@ public class SpecimenImportForm extends BiobankViewForm {
                     errors.addAll(e.getErrors());
                 } catch (BatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
-                } catch (IllegalStateException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                    // i18n.tr("The file is not a CSV file or has the wrong content."));
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage(), e);
                 } finally {
                     fileBrowser.getDisplay().asyncExec(new Runnable() {
                         @Override
