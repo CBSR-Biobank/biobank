@@ -118,7 +118,7 @@ class SpecimenBatchOpPojoHelper {
         Set<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException(
-                "study does not have any source specimens");
+                "study does not have any aliquoted specimens");
         }
 
         Map<String, String> parentSpecimenInfoMap =
