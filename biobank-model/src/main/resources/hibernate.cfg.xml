@@ -107,6 +107,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.RequestSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Revision" />
 		<mapping class="edu.ualberta.med.biobank.model.Role" />
+		<mapping class="edu.ualberta.med.biobank.model.Setting" />
 		<mapping class="edu.ualberta.med.biobank.model.Shipment" />
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentComment" />
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentContainer" />
