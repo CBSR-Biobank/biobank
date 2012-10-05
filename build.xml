@@ -479,18 +479,6 @@ End:
 
   <property name="doxygen.output" location="docs/doxygen" />
 
-  <path id="common.class.path">
-    <fileset dir="${eclipse.proj.dir.common}/lib/client">
-      <include name="*.jar" />
-    </fileset>
-    <fileset dir="${eclipse.proj.dir.common}/lib/server">
-      <include name="*.jar" />
-    </fileset>
-  </path>
-  <path id="test.class.path">
-    <pathelement location="${test.build.dir}" />
-  </path>
-
   <target name="eclipse.home.env">
     <fail unless="env.ECLIPSE_HOME"
           message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
