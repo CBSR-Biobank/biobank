@@ -6,6 +6,7 @@
 #
 
 use strict;
+#use Pod::usage;
 use Getopt::Long;
 use File::Basename;
 
@@ -15,6 +16,7 @@ sub getVersion {
     my $version;
     my $line;
 
+    #print "$seven_zip e $export_dir/plugins/biobank_*.jar META-INF/MANIFEST.MF -otmp\n";
     `$seven_zip e $export_dir/plugins/biobank_*.jar META-INF/MANIFEST.MF -otmp`;
     -e "tmp/MANIFEST.MF" or die "failed to extract manifest file";
 
@@ -42,11 +44,11 @@ sub makeNsis {
     my $INSTALLER_DIR = dirname($BIOBANK_PATH);
     my $line;
 
-    -d "$BIOBANK_PATH" or die "could not create biobank directory";
 
     print "Copying the biobank app folder to $BIOBANK_PATH\n";
     mkdir($INSTALLER_DIR, 0777);
     `cp -R $export_dir $BIOBANK_PATH`;
+    (-d "$BIOBANK_PATH") or die "could not create biobank directory";
 
     if ($HAS_BUNDLED_JRE == 1) {
         `cp -R jre $BIOBANK_PATH`;
@@ -60,7 +62,7 @@ sub makeNsis {
     open(FH, "$TMP_NSIS_DIR/BioBank.nsi") or die "failed to open $TMP_NSIS_DIR/Biobank.nsi";
     open(FHA, ">$TMP_NSIS_DIR/BiobankTMP.nsi") or die "failed to create $TMP_NSIS_DIR/BiobankTMP.nsi";
     while ($line = <FH>) {
-        if ($line =~ m/define version_STR/ ) {
+        if ($line =~ m/define VERSION_STR/ ) {
             $line =~ s/".*?"/"$version"/;
             print "Modified nsis script line: $line";
         }
@@ -73,11 +75,12 @@ sub makeNsis {
     }
     close(FHA);
     close(FH);
-    -e "$TMP_NSIS_DIR/BiobankTMP.nsi" or die "could not create customized nsis script";
+    (-e "$TMP_NSIS_DIR/BiobankTMP.nsi") or die "could not create customized nsis script";
 
     print "Compiling nsis script...\n";
+	#print "\"$NSIS_PROGRAM\" $TMP_NSIS_DIR/BiobankTMP.nsi\n";
     `\"$NSIS_PROGRAM\" $TMP_NSIS_DIR/BiobankTMP.nsi`;
-    -e "$INSTALLER_DIR/BioBankInstaller-${version}.exe"
+    (-e "$INSTALLER_DIR/BioBankInstaller-${version}.exe")
         or die "nsis could not create installer: $INSTALLER_DIR/BioBankInstaller-${version}.exe";
 
     my $INSTALLER_NAME =($HAS_BUNDLED_JRE == 1)
@@ -122,27 +125,25 @@ my $NSIS_PROGRAM = "$NSIS_PATH/makensis";
 my $SEVEN_ZIP = "./7zip/7z.exe";
 
 #check for 7zip
-(! -e "$SEVEN_ZIP") or
+(-e "$SEVEN_ZIP") or
     die "7zip not found where expected: $SEVEN_ZIP\n";
 
 
 # a version of the JRE is required for the bundled version
-(! -d "jre") or
+(-d "jre") or
     die "JRE folder not present in current directory\n";
 
-#make temp directory
-(-d "tmp" ) or `rm -rf tmp`;
-
+# remove old tmp directory if it exists	
+(-d "tmp" ) and `rm -rf tmp`;
 
 my $VERSION = getVersion($SEVEN_ZIP, $EXPORT_DIR);
 my $BIOBANK_FOLDER = "BioBank_v${VERSION}_win32";
 
-
-
+#make temp directory
 mkdir "tmp";
--d "tmp" or die "could not create temp directory";
+(-d "tmp") or die "could not create temp directory";
 
-makeNsis($NSIS_PROGRAM, $NSIS_PATH, "tmp/with_jre/$BIOBANK_FOLDER", 1, $EXPORT_DIR, $VERSION);
+makeNsis($NSIS_PROGRAM, $NSIS_DIR, "tmp/with_jre/$BIOBANK_FOLDER", 1, $EXPORT_DIR, $VERSION);
 
 print "Cleaning up....\n";
 `rm -rf tmp`;
