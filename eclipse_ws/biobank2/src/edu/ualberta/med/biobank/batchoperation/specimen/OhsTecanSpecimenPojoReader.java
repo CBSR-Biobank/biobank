@@ -349,7 +349,7 @@ public class OhsTecanSpecimenPojoReader implements
         }
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
             // last 2 columns have no column name
-            && (csvHeaders.length == NAME_MAPPINGS.length);
+            && (csvHeaders.length + 2 == NAME_MAPPINGS.length);
     }
 
     @Override
