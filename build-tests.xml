@@ -12,6 +12,7 @@
       <include name="*.jar" />
     </fileset>
   </path>
+
   <path id="test.class.path">
     <pathelement location="${test.build.dir}" />
   </path>
