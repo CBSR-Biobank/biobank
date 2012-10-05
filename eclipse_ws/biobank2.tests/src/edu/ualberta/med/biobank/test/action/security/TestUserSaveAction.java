@@ -93,7 +93,7 @@ public class TestUserSaveAction extends TestAction {
         Assert.assertEquals("membership roles",
             membership.getRoles(), savedMembership.getRoles());
 
-        Assert.assertEquals("membership domain not inserted properly",
+        Assert.assertTrue("membership domain not inserted properly",
             domain.isEquivalent(savedMembership.getDomain()));
 
         Set<Group> savedGroups = user.getGroups();
