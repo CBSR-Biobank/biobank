@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 
 #
-# For a description of what this script does see $USAGE below.
+# For a description of what this script does see documentation at the
+# end of this file.
 #
 
 use strict;
@@ -10,12 +11,6 @@ use File::Basename;
 use Pod::Usage;
 use Term::ReadKey;
 use Data::Dumper;
-#use FreezeThaw qw(cmpStr);
-
-my $SCRIPTNAME = basename ($0);
-
-my $USAGE = <<USAGE_END;
-USAGE_END
 
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
@@ -188,5 +183,5 @@ chkconfig [OPTIONS]
 =cut
 
 # Local Variables:
-# compile-command: "cd ~/proj/cbsr/biobank && scripts/chkconfig"
+# compile-command: "cd $HOME/proj/cbsr/biobank && scripts/chkconfig"
 # End:
