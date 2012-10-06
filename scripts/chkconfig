@@ -81,9 +81,7 @@ sub mysqlCmd {
 }
 
 sub createTestResult {
-    my $msg = shift;
-    my $required = shift;
-    my $t = new TestResult->new($msg, $required);
+    my $t = new TestResult->new(shift, shift);
     push @tests, $t;
     return $t;
 }
@@ -129,23 +127,32 @@ my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
 $tr->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
 
 # checkDbTablesInnoDb and report the bad tables
-$cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
-    . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
+sub getNonInnoDbTables() {
+    $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
+        . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
 
-my @innoTables = mysqlCmd($DBNAME, $cmd);
-my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
-my @nonInnoDbTables = ();
+    my @innoTables = mysqlCmd($DBNAME, $cmd);
+    my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
+    my @nonInnoDbTables = ();
 
-foreach (grep { not $_ ~~ @innoTables } @tables) {
-    chomp($_);
-    push (@nonInnoDbTables, $_);
+    foreach (grep { not $_ ~~ @innoTables } @tables) {
+        chomp($_);
+        push (@nonInnoDbTables, $_);
+    }
+
+    return @nonInnoDbTables;
 }
 
+my @nonInnoDbTables = getNonInnoDbTables();
 $tr = createTestResult("checking if database tables are InnoDB...", 1);
 $tr->{result} =($#nonInnoDbTables < 0);
 foreach (@nonInnoDbTables)  {
     push(@ {$tr->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
 }
+
+#
+# display results
+#
 
 foreach (@tests) {
     my $tr = $_;
