@@ -42,6 +42,7 @@ my $DBPWD = "";
 my $RESULT = 1;
 my $help = 0;
 my $man = 0;
+my @tests = ();
 
 GetOptions ('database=s' => \$DBNAME,
             'host=s' => \$DBHOST,
@@ -79,98 +80,88 @@ sub mysqlCmd {
     return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" $DBNAME`;
 }
 
-sub checkMysqlInnoDB {
-    my $chk_innodb = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
-        $GREP -e "^storage_engine"`  =~ /InnoDB/);
-
-    return new TestResult->new("checking MySQL for InnoDB...", $chk_innodb, 1);
+sub createTestResult {
+    my $msg = shift;
+    my $required = shift;
+    my $t = new TestResult->new($msg, $required);
+    push @tests, $t;
+    return $t;
 }
 
-sub checkMysqlLowerCaseTableNames {
-    my $lcnames = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" mysql |
+# check for InnoDB
+my $tr = createTestResult("checking MySQL for InnoDB...", 1);
+$tr->{'result'} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" $DBNAME |
+        $GREP -e "^storage_engine"` =~ /InnoDB/);
+
+# checkMysqlLowerCaseTableNames
+$tr = createTestResult("checking MySQL for lower case table names...", 1);
+$tr->{result} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" $DBNAME |
         $GREP -e "^lower_case_table_names"` =~ /1$/);
-    return new TestResult->new("checking MySQL for lower case table names...", $lcnames, 1);
+
+# checkJbossHomeEnv
+$tr = createTestResult("checking if JBOSS_HOME environment variable defined and valid...", 1);
+$tr->{result} = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
+
+
+# checkEclipseHomeEnv
+$tr = createTestResult("checking if ECLIPSE_HOME environment variable defined and valid...", 0);
+$tr->{result} = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
+
+
+# checkEclipseDeltaPack
+$tr = createTestResult("checking for Eclipse delta pack...",  0);
+my $present = 0;
+if (defined($ENV{'ECLIPSE_HOME'})) {
+    my $path = $ENV{'ECLIPSE_HOME'}
+        . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
+    $present = 1 if (-f "$path");
+}
+$tr->{result} = $present;
+
+# checkKeystoreFile
+$tr = createTestResult("checking for SSL certificate file...", 1);
+$tr->{result} = (-f "security-logs/jboss/biobank.keystore");
+
+# checkDbExists()
+$tr = createTestResult("checking for databse $DBNAME...", $present, 1);
+my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
+    . "WHERE SCHEMA_NAME = '$DBNAME'";
+$tr->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
+
+# checkDbTablesInnoDb and report the bad tables
+$cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
+    . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
+
+my @innoTables = mysqlCmd($DBNAME, $cmd);
+my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
+my @nonInnoDbTables = ();
+
+foreach (grep { not $_ ~~ @innoTables } @tables) {
+    chomp($_);
+    push (@nonInnoDbTables, $_);
 }
 
-sub checkJbossHomeEnv {
-    my $env = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
-    return new TestResult->new("checking if JBOSS_HOME environment variable defined and valid...", $env, 1);
+$tr = createTestResult("checking if database tables are InnoDB...", 1);
+$tr->{result} =($#nonInnoDbTables < 0);
+foreach (@nonInnoDbTables)  {
+    push(@ {$tr->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
 }
 
-sub checkEclipseHomeEnv {
-    my $env = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
-    return new TestResult->new("checking if ECLIPSE_HOME environment variable defined and valid...", $env, 1);
-}
+foreach (@tests) {
+    my $tr = $_;
 
-sub checkEclipseDeltaPack {
-    my $present = 0;
-    if (defined($ENV{'ECLIPSE_HOME'})) {
-        my $path = $ENV{'ECLIPSE_HOME'}
-            . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
-        $present = 1 if (-f "$path");
-    }
-    return new TestResult->new("checking for Eclipse delta pack...",  $present, 1);
-}
+    (! $tr->{required}) && print "OPTIONAL ";
+    print $tr->{msg}, "\n", ($tr->{result} ? "[PASS]" : "[FAIL]"), "\n";
 
-sub checkKeystoreFile {
-    my $present = 1 if (-f "security-logs/jboss/biobank.keystore");
-    return new TestResult->new("checking for SSL certificate file...", $present, 1);
-}
-
-sub checkDbExists() {
-    my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
-        . "WHERE SCHEMA_NAME = '$DBNAME'";
-    my $present = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
-    return new TestResult->new("checking for databse $DBNAME...", $present, 0);
-}
-
-sub checkDbTablesInnoDb() {
-    my $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
-        . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
-
-    my @innoTables = mysqlCmd($DBNAME, $cmd);
-    my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
-    my @nonInnoDbTables = ();
-
-    #report the bad tables
-    foreach (grep { not $_ ~~ @innoTables } @tables) {
-        chomp($_);
-        push (@nonInnoDbTables, $_);
-    }
-
-    my $result = new TestResult->new("checking if database tables are InnoDB...",
-                                     ($#nonInnoDbTables < 0), 0);
-
-    foreach (@nonInnoDbTables)  {
-        push(@ {$result->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
-    }
-    return $result;
-}
-
-my @checkFuncs = ('checkMysqlInnoDB',
-                  'checkMysqlLowerCaseTableNames',
-                  'checkDbExists',
-                  'checkDbTablesInnoDb',
-                  'checkJbossHomeEnv',
-                  'checkKeystoreFile',
-                  'checkEclipseDeltaPack');
-
-foreach (@checkFuncs) {
-    my $test = &$_;
-
-    (! $test->{required}) && print "OPTIONAL ";
-    print $test->{msg}, "\n", ($test->{result} ? "[PASS]" : "[FAIL]"), "\n";
-
-    foreach ( @{ $test->{extraMsgs} } ) {
+    foreach ( @{ $tr->{extraMsgs} } ) {
         print $_, "\n";
-}
+    }
 
-    ($test->{required}) && ($RESULT &= $test->{result});
+    ($tr->{required}) && ($RESULT &= $tr->{result});
 }
 
 (! $RESULT) && print "tests FAILED\n";
 exit !$RESULT;
-
 
 package TestResult;
 
@@ -179,8 +170,8 @@ sub new {
     my $class = ref $proto || $proto;
     my $self = {
                 msg => shift,
-                result => shift,
                 required => shift,
+                result => undef,
                 extraMsgs => [ ],
                 };
     $self = bless $self, $class;
