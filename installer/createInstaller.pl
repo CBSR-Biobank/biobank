@@ -6,9 +6,59 @@
 #
 
 use strict;
-#use Pod::usage;
+
 use Getopt::Long;
 use File::Basename;
+
+=head1 NAME
+
+createInstaller.pl - compiles the exported biobank folder into two executables:
+
+   - BioBankInstaller-<VERSION>_with_jre.exe: has JAVA JRE bundled with app
+
+ Please note that createInstaller.pl expects 7zip directory to be in the same
+ location as this script.
+
+ File structure:
+  .
+  ..
+  7zip
+       |
+       7-zip.dll
+       7z.dll
+       7z.exe
+       7z.sfx
+       7zCon.sfx
+
+  jre
+       |
+       ... ETC
+
+  nsis
+       |
+       Biobank.nsi
+       biobank.ico
+       ...ETC
+
+  biobank_exported
+       |
+       biobank.exe
+       biobank.ini
+       ..ETC
+
+  createInstaller.pl
+
+ Example:
+       ./createInstaller.pl biobank_exported nsis
+
+ This will create:
+       BioBankInstaller-$VERSION.exe
+
+=head1 USAGE
+
+createInstaller EXPORT_DIR NSIS_DIR
+
+=cut
 
 sub getVersion {
     my $seven_zip = shift;
@@ -97,10 +147,16 @@ sub makeNsis {
 my $help;
 my $man;
 
-GetOptions ('man' => \$man, 'help|?' => \$help) or pod2usage(2);
+my $havePodUsage = eval { require Pod::Usage };
 
-pod2usage(1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+my $parseCmdLine = GetOptions ('man' => \$man, 'help|?' => \$help);
+
+if ($havePodUsage) {
+    Pod::Usage->import();
+    $parseCmdLine or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+}
 
 my $EXPORT_DIR = "";
 my $NSIS_DIR = "";
@@ -133,7 +189,7 @@ my $SEVEN_ZIP = "./7zip/7z.exe";
 (-d "jre") or
     die "JRE folder not present in current directory\n";
 
-# remove old tmp directory if it exists	
+# remove old tmp directory if it exists
 (-d "tmp" ) and `rm -rf tmp`;
 
 my $VERSION = getVersion($SEVEN_ZIP, $EXPORT_DIR);
@@ -149,55 +205,4 @@ print "Cleaning up....\n";
 `rm -rf tmp`;
 (! -d "tmp") or die "temp directory could not be removed";
 
-__END__
-
-=head1 NAME
-
-createInstaller.pl - compiles the exported biobank folder into two executables:
-
-   - BioBankInstaller-<VERSION>_with_jre.exe: has JAVA JRE bundled with app
-
- Please note that createInstaller.pl expects 7zip directory to be in the same
- location as this script.
-
- File structure:
-  .
-  ..
-  7zip
-       |
-       7-zip.dll
-       7z.dll
-       7z.exe
-       7z.sfx
-       7zCon.sfx
-
-  jre
-       |
-       ... ETC
-
-  nsis
-       |
-       Biobank.nsi
-       biobank.ico
-       ...ETC
-
-  biobank_exported
-       |
-       biobank.exe
-       biobank.ini
-       ..ETC
-
-  createInstaller.pl
-
- Example:
-       ./createInstaller.pl biobank_exported nsis
-
- This will create:
-       BioBankInstaller-$VERSION.exe
-
-=head1 USAGE
-
-createInstaller EXPORT_DIR NSIS_DIR
-
-=cut
 

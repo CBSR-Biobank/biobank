@@ -96,12 +96,12 @@ sub getNonInnoDbTables() {
         . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
 
     my @innoTables = mysqlCmd($DBNAME, $cmd);
-	my %innoTableMap = map {$_ => 1} @innoTables;
-
     my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
-    my @nonInnoDbTables = grep (! defined $innoTableMap{$_}, @tables );
 
-    foreach (@nonInnoDbTables) {
+    my %inInnoTables = map { $_ => 1 } @innoTables;
+    my @nonInnoDbTables;
+
+    foreach (grep { not $inInnoTables{$_} } @tables ) {
         chomp($_);
         push (@nonInnoDbTables, $_);
     }
