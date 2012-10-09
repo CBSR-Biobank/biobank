@@ -31,7 +31,6 @@ chkconfig [OPTIONS]
 =cut
 
 my $havePodUsage = eval { require Pod::Usage };
-printf "havePodUsage: %d\n", $havePodUsage;
 
 no strict 'refs';
 my $MYSQL = "/usr/bin/mysql";
@@ -54,7 +53,7 @@ my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
             'help|?'   => \$help);
 
 if ($havePodUsage) {
-    use Pod::Usage;
+    Pod::Usage->import();
     $parseCmdLine or pod2usage(2);
     pod2usage(1) if $help;
     pod2usage(-exitstatus => 0, -verbose => 2) if $man;
