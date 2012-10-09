@@ -59,15 +59,16 @@
 		<mapping package="edu.ualberta.med.biobank.model" />
 		<!-- Mapped classes -->
 		<mapping class="edu.ualberta.med.biobank.model.AbstractAnnotation" />
+		<mapping class="edu.ualberta.med.biobank.model.AbstractAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.AnatomicalSource" />
 		<mapping class="edu.ualberta.med.biobank.model.AnnotationOption" />
-		<mapping class="edu.ualberta.med.biobank.model.AnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.Group" />
 		<mapping class="edu.ualberta.med.biobank.model.Center" />
 		<mapping class="edu.ualberta.med.biobank.model.CenterComment" />
 		<mapping class="edu.ualberta.med.biobank.model.CenterLocation" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEvent" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEventAnnotation" />
+		<mapping class="edu.ualberta.med.biobank.model.CollectionEventAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEventComment" />
 		<mapping class="edu.ualberta.med.biobank.model.CollectionEventType" />
 		<mapping class="edu.ualberta.med.biobank.model.Comment" />
@@ -90,6 +91,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.Patient" />
 		<mapping class="edu.ualberta.med.biobank.model.PatientComment" />
 		<mapping class="edu.ualberta.med.biobank.model.PatientAnnotation" />
+		<mapping class="edu.ualberta.med.biobank.model.PatientAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.PreservationType" />
 		<mapping class="edu.ualberta.med.biobank.model.Principal" />
 		<mapping class="edu.ualberta.med.biobank.model.PrintedSsInvItem" />
@@ -118,6 +120,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotation" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenComment" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenGroup" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingEvent" />

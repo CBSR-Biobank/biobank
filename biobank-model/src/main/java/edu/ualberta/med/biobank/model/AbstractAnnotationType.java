@@ -25,9 +25,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * various entities, such as {@link Specimen}s, {@link Patient}s, and
  * {@link CollectionEvent}s.
  * <p>
- * To support the use of a shared single {@link AnnotationOption} table,
- * {@link InheritanceType#SINGLE_TABLE} is used, so that
- * {@link AnnotationOption#getType()} has a unique id across all subclasses.
+ * {@link InheritanceType#SINGLE_TABLE} is used ...
+ * <ol>
+ * <li>so only one {@link AnnotationOption} table is needed, not one for every
+ * type, as {@link AnnotationOption#getType()} will have a unique id across all
+ * {@link AbstractAnnotationType} subclasses</li>
+ * <li>because there are a relatively small number of these compared to
+ * {@link AbstractAnnotation}s</li>
+ * </ol>
  * 
  * @author Jonathan Ferland
  */
