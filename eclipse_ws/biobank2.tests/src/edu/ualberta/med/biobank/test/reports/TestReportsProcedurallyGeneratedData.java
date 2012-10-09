@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.math.BigInteger;
@@ -484,7 +483,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
     private static List<CollectionEventWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
-        throws ApplicationException, Exception {
+        throws Exception {
         // FIXME
         // List<CollectionEventWrapper> shipments = new
         // ArrayList<CollectionEventWrapper>();

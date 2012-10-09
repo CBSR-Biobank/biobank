@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public class GlobalPvAttrWrapper {
     }
 
     public static List<GlobalPvAttrWrapper> getAllGlobalPvAttrs(
-        WritableApplicationService appService) throws ApplicationException {
+        WritableApplicationService appService) {
         return null;
     }
 
