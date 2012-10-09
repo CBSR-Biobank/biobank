@@ -25,10 +25,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * various entities, such as {@link Specimen}s, {@link Patient}s, and
  * {@link CollectionEvent}s.
  * <p>
- * {@link InheritanceType#SINGLE_TABLE} is used ...
+ * {@link InheritanceType#TABLE_PER_CLASS} is <em>not</em> used ...
  * <ol>
- * <li>so only one {@link AnnotationOption} table is needed, not one for every
- * type, as {@link AnnotationOption#getType()} will have a unique id across all
+ * <li>to prevent duplicate ids between subclasses, so only one
+ * {@link AnnotationOption} table is needed, not one for every type, as
+ * {@link AnnotationOption#getType()} will have a unique id across all
  * {@link AbstractAnnotationType} subclasses</li>
  * <li>because there are a relatively small number of these compared to
  * {@link AbstractAnnotation}s</li>
@@ -52,6 +53,7 @@ public abstract class AbstractAnnotationType
     private Study study;
     private String name;
     private String description;
+    private Boolean enabled;
     private Boolean multiValue;
 
     /**
@@ -98,12 +100,27 @@ public abstract class AbstractAnnotationType
     }
 
     /**
+     * @return true if this {@link AbstractAnnotationType} is still used to
+     *         collect <em>new</em> values (of {@link AbstractAnnotation}s),
+     *         otherwise false if it is kept only for existing values.
+     */
+    @NotNull(message = "{AnnotationType.enabled.NotNull}")
+    @Column(name = "IS_ENABLED", nullable = false)
+    public Boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
      * @return true if there can be more than one value, otherwise false for at
      *         most one value.
      */
     @NotNull(message = "{AnnotationType.multiValue.NotNull}")
     @Column(name = "IS_MULTI_VALUE", nullable = false)
-    public Boolean getMultiValue() {
+    public Boolean isMultiValue() {
         return multiValue;
     }
 

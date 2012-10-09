@@ -26,7 +26,7 @@
     A: sure?
 [ ] Also record the user that inserted the object and the last user to modify
     object?
-[ ] Change annotations so that they use InheritanceType.JOINED, only for the
+[v] Change annotations so that they use InheritanceType.JOINED, only for the
     annotation id (so unique across all sub-types), but put the type, data, and
     options in a separate (joined) table.
     A: DO IT! Most efficient, Maybe have the ID come from another table in a
