@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -34,7 +33,7 @@ public class SimpleSpecimenTable
     private static final String[] HEADINGS = new String[] {
         i18n.tr("Inventory ID") };
 
-    public SimpleSpecimenTable(Composite parent,        List<Specimen> specimens) {
+    public SimpleSpecimenTable(Composite parent, List<Specimen> specimens) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
         setList(specimens);

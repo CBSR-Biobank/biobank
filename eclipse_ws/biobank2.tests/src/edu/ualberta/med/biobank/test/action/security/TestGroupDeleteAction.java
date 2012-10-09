@@ -61,8 +61,7 @@ public class TestGroupDeleteAction extends TestAction {
     public void asGlobalAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
+        factory.createMembership(Domain.GLOBAL, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user).allDomains();
@@ -74,8 +73,7 @@ public class TestGroupDeleteAction extends TestAction {
     public void asCenterAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
+        factory.createMembership(Domain.CENTER, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user).allRanks();
@@ -88,8 +86,7 @@ public class TestGroupDeleteAction extends TestAction {
     public void asStudyAdmin() {
         Transaction tx = session.beginTransaction();
         User user = factory.createUser();
-        Membership userMembership =
-            factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
+        factory.createMembership(Domain.STUDY, Rank.ADMINISTRATOR);
         tx.commit();
 
         Scenario.Builder b = new Scenario.Builder().user(user).allRanks();
@@ -186,8 +183,8 @@ public class TestGroupDeleteAction extends TestAction {
 
         public static class Builder implements IIterableBuilder<Scenario> {
             private User user;
-            private Set<Domain> domains = new HashSet<Domain>();
-            private Set<Rank> ranks = new HashSet<Rank>();
+            private final Set<Domain> domains = new HashSet<Domain>();
+            private final Set<Rank> ranks = new HashSet<Rank>();
 
             Builder user(User user) {
                 this.user = user;

@@ -54,7 +54,6 @@ public abstract class Hash
         return getClass().getName() + "{bytes=" + bytesToHex(getBytes()) + "}";
     }
 
-    @SuppressWarnings("resource")
     protected static <T extends Hash> T setBytes(T hash,
         MessageDigest algorithm, File file)
         throws IOException {

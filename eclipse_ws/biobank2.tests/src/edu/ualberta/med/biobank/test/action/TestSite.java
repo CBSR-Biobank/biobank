@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
@@ -19,7 +17,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -599,6 +596,7 @@ public class TestSite extends TestAction {
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void deleteWithDstDispatch() throws Exception {
         Provisioning provisioning = new Provisioning(getExecutor(), name);

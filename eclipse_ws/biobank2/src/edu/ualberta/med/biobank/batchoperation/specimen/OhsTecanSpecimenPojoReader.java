@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
-import edu.ualberta.med.biobank.common.action.BooleanResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
@@ -360,7 +359,7 @@ public class OhsTecanSpecimenPojoReader implements
             new ArrayList<SpecimenBatchOpInputPojo>(0);
         timestamp = new Date();
         technicianId = null;
-        
+
         if (reader == null) {
             throw new IllegalStateException("CSV reader is null");
         }
@@ -436,7 +435,7 @@ public class OhsTecanSpecimenPojoReader implements
                     sourcePojo.setVolume(sourceVolume);
                     sourceSpecimens.add(sourcePojo);
                 }
-                
+
                 if (batchOpPojo.getCreatedAt().before(timestamp)) {
                     timestamp = batchOpPojo.getCreatedAt();
                 }
@@ -455,7 +454,7 @@ public class OhsTecanSpecimenPojoReader implements
                     }
                 }
             }
-            
+
             if (result.size() == 0) {
                 getErrorList().addError(reader.getLineNumber(),
                     CSV_NO_ALIQUOTS_ERROR);
@@ -581,12 +580,12 @@ public class OhsTecanSpecimenPojoReader implements
             Center currentWorkingCenter = SessionManager.getUser()
                 .getCurrentWorkingCenter().getWrappedObject();
             BiobankApplicationService service = SessionManager.getAppService();
-            BooleanResult result = service.doAction(
-                new OhsTecanSpecimenBatchOpAction(currentWorkingCenter,
-                    sourceSpecimens,
-                    new File(filename).getName(),
-                    timestamp,
-                    technicianId));
+            service.doAction(new OhsTecanSpecimenBatchOpAction(
+                currentWorkingCenter,
+                sourceSpecimens,
+                new File(filename).getName(),
+                timestamp,
+                technicianId));
         } catch (Exception e) {
             throw new IllegalStateException("OHS TECAN post-execution error");
         }

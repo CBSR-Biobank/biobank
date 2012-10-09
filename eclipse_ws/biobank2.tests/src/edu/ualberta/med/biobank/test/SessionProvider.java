@@ -9,7 +9,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
-import com.mchange.v2.c3p0.mbean.C3P0PooledDataSource;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
 public class SessionProvider {
@@ -59,7 +58,8 @@ public class SessionProvider {
             ic.createSubcontext("java:");
 
             // Construct DataSource
-            MysqlConnectionPoolDataSource ds = new MysqlConnectionPoolDataSource();
+            MysqlConnectionPoolDataSource ds =
+                new MysqlConnectionPoolDataSource();
             ds.setUrl("jdbc:mysql://localhost:3306/biobank");
             ds.setUser("dummy");
             ds.setPassword("ozzy498");
