@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+Overall build file
+use command "ant -projecthelp" to display the targets.
+
+-->
+<project name="biobank-eclipse" basedir=".">
+  <target name="java-client-manifest">
+    <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
+      <attribute name="Bundle-Version" value="${java.client.version.num}" />
+    </manifest>
+    <fixcrlf srcdir="${eclipse.proj.dir}/META-INF"
+             eol="lf"
+             eof="asis">
+      <include name="**/*.MF" />
+    </fixcrlf>
+    <propertyfile file="eclipse_ws/biobank2/about.mappings">
+      <entry key="0" value="${java.client.version.num}" />
+    </propertyfile>
+  </target>
+
+
+  <target name="biobank-product-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+              prefix="biobank2.product" />
+    <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
+          style="scripts/biobank-product.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
+          overwrite="true"/>
+  </target>
+
+  <target name="biobank-feature-core-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+              prefix="biobank2.feature.core" />
+    <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
+          style="scripts/biobank-feature.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
+          overwrite="true"/>
+  </target>
+
+  <target name="biobank-feature-platform-version-modify">
+    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
+              prefix="biobank2.feature.platform" />
+    <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
+          style="scripts/biobank-feature.xsl">
+      <param name="version" expression="${java.client.version.num}" />
+    </xslt>
+    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
+          overwrite="true"/>
+  </target>
+
+  <target name="biobank-version-modify">
+    <antcall target="biobank-product-version-modify" />
+    <antcall target="biobank-feature-core-version-modify" />
+    <antcall target="biobank-feature-platform-version-modify" />
+  </target>
+
+  <target name="deploy-eclipse"
+          depends="java-client-manifest,biobank-version-modify"
+          description="deploys the caCORE SDK beans to the eclipse project">
+    <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="acegi-security-1.0.4.jar" />
+        <include name="antlr-2.7.6.jar" />
+        <include name="asm.jar" />
+        <include name="axis.jar" />
+        <include name="caGrid-CQL-cql.1.0-1.2.jar" />
+        <include name="castor-1.0.2.jar" />
+        <include name="cglib-2.1.3.jar" />
+        <include name="cog-jglobus.jar" />
+        <include name="commons-codec-1.3.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-discovery-0.2.jar" />
+        <include name="commons-lang-2.4.jar" />
+        <include name="commons-logging-1.1.jar" />
+        <include name="dom4j-1.6.1.jar" />
+        <include name="gettext-commons-0.9.6.jar" />
+        <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+        <include name="hibernate-validator-4.2.0.Final.jar" />
+        <include name="hibernate3.jar" />
+        <include name="javassist-3.12.0.GA.jar" />
+        <include name="jaxrpc.jar" />
+        <include name="jta-1.1.jar" />
+        <include name="log4j-1.2.14.jar" />
+        <include name="messages.jar" />
+        <include name="mysql-connector-java-5.1.15-bin.jar" />
+	<include name="ognl-2.6.7.jar" />
+        <include name="saaj.jar" />
+        <include name="sdk-client-framework.jar" />
+        <include name="sdk-grid-remoting.jar" />
+        <include name="sdk-security.jar" />
+        <include name="sdk-writable-client-framework.jar" />
+        <include name="slf4j-api-1.6.1.jar" />
+        <include name="slf4j-log4j12-1.6.4.jar" />
+        <include name="spring.jar" />
+        <include name="validation-api-1.0.0.GA.jar" />
+        <include name="wsdl4j-1.5.1.jar" />
+        <include name="xercesImpl.jar" />
+        <include name="xpp3-1.1.3.4.C.jar" />
+        <include name="xstream-1.3.1.jar" />
+        <include name="jsse.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="csmapi-4.1.jar" />
+        <include name="jta-1.1.jar" />
+        <include name="sdk-core.jar" />
+        <include name="sdk-writable-core.jar" />
+        <include name="SuperCSV-1.52.jar" />
+        <include name="spiffy-all-0.05.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="commons-beanutils-1.8.0.jar" />
+        <include name="commons-collections-3.2.jar" />
+        <include name="commons-io-1.4.jar" />
+        <include name="commons-digester-1.7.jar" />
+        <include name="commons-javaflow-20060411.jar" />
+        <include name="commons-logging-1.1.jar" />
+        <include name="iText-2.1.7.jar" />
+        <include name="jasperreports-4.0.1.jar" />
+        <include name="jdt-compiler-3.1.1.jar" />
+        <include name="messages.jar" />
+        <include name="DynamicJasper-3.0.14.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="aopalliance.jar" />
+        <include name="guice-3.0.jar" />
+        <include name="gwt-pectin-0.8.1.jar" />
+        <include name="gwt-user.jar" />
+        <include name="javax.inject.jar" />
+        <include name="peaberry-1.2.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="gluegen.jar" />
+        <include name="jdom.jar" />
+        <include name="mailapi.jar" />
+        <include name="messages.jar" />
+        <include name="smtp.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="commons-io-1.4.jar" />
+        <include name="jargs.jar" />
+        <include name="mysql-connector-java-5.1.15-bin.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">
+      <!-- File needed in the test project to call csm api methods -->
+      <fileset file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" />
+    </copy>
+    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="c3p0-0.9.0.jar" />
+        <include name="clm-4.1.jar" />
+	<include name="dom4j-1.4.jar" />
+	<include name="ehcache-1.2.2.jar" />
+	<include name="jta-1.1.jar" />
+        <include name="mockito-all-1.9.0-rc1.jar" />
+        <include name="naming-common-4.1.31.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
+      <fileset dir="${req.jars.dir}">
+        <include name="log4j-1.2.14.jar" />
+      </fileset>
+    </copy>
+  </target>
+
+  <path id="eclipse-jars">
+    <fileset dir="${env.ECLIPSE_HOME}/plugins">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <path id="biobank-common-client-jars">
+    <fileset dir="${eclipse.proj.dir.common}/lib/client">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <path id="biobank-common-server-jars">
+    <fileset dir="${eclipse.proj.dir.common}/lib/server">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <path id="biobank-common-gui-common-jars">
+    <fileset dir="${eclipse.proj.dir.gui.common}/lib">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <target name="eclipse-biobank-common">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.proj.dir.common}/src"
+	destdir="${eclipse.proj.dir.common}/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <!-- compilerarg value="-Xlint:all"/ -->
+      <!-- compilerarg value="-Xlint:unchecked"/ -->
+      <!-- compilerarg value="-Werror"/ -->
+      <classpath refid="biobank-common-client-jars" />
+      <classpath refid="biobank-common-server-jars" />
+    </javac>
+  </target>
+
+  <target name="eclipse-biobank-gui-common" depends="eclipse-biobank-common">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.proj.dir.gui.common}/src"
+	destdir="${eclipse.proj.dir.gui.common}/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <compilerarg value="-Werror"/>
+      <classpath refid="eclipse-jars" />
+      <classpath refid="biobank-common-client-jars" />
+      <classpath>
+	<pathelement path="${eclipse.proj.dir.common}/bin" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="eclipse-biobank-mvp" depends="eclipse-biobank-common">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.proj.dir.mvp}/src"
+	destdir="${eclipse.proj.dir.mvp}/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <compilerarg value="-Werror"/>
+      <classpath refid="eclipse-jars" />
+      <classpath refid="biobank-common-client-jars" />
+      <classpath>
+	<pathelement path="${eclipse.proj.dir.common}/bin" />
+	<fileset dir="${eclipse.proj.dir.mvp}/lib">
+	  <include name="*.jar" />
+	</fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="eclipse-scanner-config" depends="eclipse-biobank-common">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.workspace.dir}/scannerConfig/src"
+	destdir="${eclipse.workspace.dir}/scannerConfig/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <compilerarg value="-Werror"/>
+      <classpath refid="eclipse-jars" />
+      <classpath refid="biobank-common-client-jars" />
+      <classpath>
+	<fileset dir="${eclipse.workspace.dir}/scannerConfig/lib">
+	  <include name="*.jar" />
+	</fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="eclipse-biobank2"
+	  depends="deploy-eclipse,eclipse-biobank-common,eclipse-biobank-gui-common,eclipse-biobank-mvp,eclipse-scanner-config">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.proj.dir}/src"
+	destdir="${eclipse.proj.dir}/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <compilerarg value="-Werror"/>
+      <classpath refid="biobank-common-client-jars" />
+      <classpath refid="biobank-common-server-jars" />
+      <classpath>
+	<pathelement path="${eclipse.proj.dir.common}/bin" />
+	<pathelement path="${eclipse.proj.dir.gui.common}/bin" />
+	<pathelement path="${eclipse.proj.dir.mvp}/bin" />
+	<pathelement path="${eclipse.workspace.dir}/scannerConfig/bin" />
+	<pathelement path="${eclipse.workspace.dir}/labelPrinter/bin" />
+	<fileset dir="${eclipse.proj.dir}/lib">
+	  <include name="*.jar" />
+	</fileset>
+	<fileset dir="${eclipse.proj.dir.mvp}/lib">
+	  <include name="*.jar" />
+	</fileset>
+	<fileset dir="${eclipse.proj.dir.gui.common}/lib">
+	  <include name="*.jar" />
+	</fileset>
+      </classpath>
+      <classpath refid="eclipse-jars" />
+    </javac>
+  </target>
+
+  <target name="eclipse-label-printer" depends="eclipse-biobank2">
+    <javac
+	includeantruntime="false"
+	srcdir="${eclipse.workspace.dir}/labelPrinter/src"
+	destdir="${eclipse.workspace.dir}/labelPrinter/bin">
+      <compilerarg
+          compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
+          line="-warn:+unused -Xemacs"/>
+      <compilerarg value="-Werror"/>
+      <classpath refid="eclipse-jars" />
+      <classpath refid="biobank-common-client-jars" />
+      <classpath refid="biobank-common-gui-common-jars" />
+      <classpath>
+	<pathelement path="${eclipse.proj.dir.common}/bin" />
+	<pathelement path="${eclipse.proj.dir.gui.common}/bin" />
+	<pathelement path="${eclipse.proj.dir}/bin" />
+	<fileset dir="${eclipse.workspace.dir}/labelPrinter/lib">
+	  <include name="*.jar" />
+	</fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="eclipse-projects" depends="eclipse-label-printer" />
+
+</project>
