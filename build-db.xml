@@ -2,6 +2,13 @@
 <project name="db" basedir=".">
   <property file="build.properties" />
 
+  <condition property="databse.exec.haveUserAndPassword">
+    <and>
+      <isset property="database.exec.username" />
+      <isset property="database.exec.password" />
+    </and>
+  </condition>
+
   <path id="schemaupdate.classpath">
       <pathelement location="${schema.dir}/log4j.properties" />
       <pathelement location="${codegen.biobank.src}" />
@@ -56,7 +63,7 @@
   </target>
 -->
 
-  <target name="get-db-executor">
+  <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
     <input message="Enter database executor's username (to execute database commands)"
            addProperty="database.exec.username"
            defaultValue="root" />

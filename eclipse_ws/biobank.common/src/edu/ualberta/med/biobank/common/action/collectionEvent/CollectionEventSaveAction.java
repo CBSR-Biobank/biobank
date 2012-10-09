@@ -209,6 +209,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
+                specimen.setPlateErrors("");
+                specimen.setSampleErrors("");
                 specimen.setSpecimenType(context.load(SpecimenType.class,
                     specInfo.specimenTypeId));
 

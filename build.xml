@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Overall build file
+    use command "ant -projecthelp" to display the targets.
+
+-->
 <project name="biobank" basedir="." default="deploy">
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
@@ -308,7 +314,7 @@
   </target>
 
   <target name="check-deploy-jboss">
-    <exec dir="" executable="perl" failonerror="true">
+    <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
     </exec>
   </target>
@@ -637,9 +643,6 @@
 </project>
 
 <!--
-    Overall build file
-    use command "ant -projecthelp" to display the targets.
-
     Local Variables:
     compile-command: "ant"
     End:
