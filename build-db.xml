@@ -91,7 +91,7 @@
   <target name="schemaupdate"
           depends="check-db,build-common-project">
     <tempfile property="temp.sql.path"
-              deleteonexit="false"
+              deleteonexit="true"
               prefix="schema-export"
               suffix=".sql"
               createfile="true" />
