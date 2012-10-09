@@ -1,32 +1,22 @@
 package edu.ualberta.med.biobank.model;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PrePersist;
-
 @Audited
 @Entity
-@DiscriminatorValue("SPPE")
-@Table(uniqueConstraints = {
-    @UniqueConstraint(columnNames = {
-        "SPECIMEN_PROCESSING_EVENT_ID",
-        "ANNOTATION_TYPE_ID" })
-})
-@Unique(properties = { "specimenProcessingEvent", "type" }, groups = PrePersist.class)
+@Table(name = "SPECIMEN_PROCESSING_EVENT_ANNOTATION")
 public class SpecimenProcessingEventAnnotation
-    extends AbstractAnnotation {
+    extends AbstractAnnotation<SpecimenProcessingEventAnnotationType> {
     private static final long serialVersionUID = 1L;
 
+    // TODO: split into separate Specimen and ProcessingEvent fields
     private SpecimenProcessingEvent specimenProcessingEvent;
 
     @NotNull(message = "{SpecimenProcessingEventAnnotation.specimenProcessingEvent.NotNull}")

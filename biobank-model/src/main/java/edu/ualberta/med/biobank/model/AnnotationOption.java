@@ -22,23 +22,25 @@ public class AnnotationOption
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private AnnotationType type;
+    public static final int VALUE_MAX_LENGTH = 50;
+
+    private AbstractAnnotationType type;
     private String value;
 
     @NotNull(message = "{AnnotationOption.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ANNOTATION_TYPE_ID", nullable = false)
-    public AnnotationType getType() {
+    public AbstractAnnotationType getType() {
         return type;
     }
 
-    public void setType(AnnotationType type) {
+    public void setType(AbstractAnnotationType type) {
         this.type = type;
     }
 
     @NotNull(message = "{AnnotationOption.value.NotNull}")
-    @Size(max = 50, message = "{AnnotationOption.value.Size}")
-    @Column(name = "VALUE", nullable = false, length = 50)
+    @Size(max = VALUE_MAX_LENGTH, message = "{AnnotationOption.value.Size}")
+    @Column(name = "VALUE", nullable = false, length = VALUE_MAX_LENGTH)
     public String getValue() {
         return value;
     }

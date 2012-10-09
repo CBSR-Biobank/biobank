@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.model;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
@@ -13,23 +11,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.model.type.DecimalRange;
-import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Allow a {@link Study} to collect custom named and defined pieces of data on
  * various entities, such as {@link Specimen}s, {@link Patient}s, and
  * {@link CollectionEvent}s.
+ * <p>
+ * To support the use of a shared single {@link AnnotationOption} table,
+ * {@link InheritanceType#SINGLE_TABLE} is used, so that
+ * {@link AnnotationOption#getType()} has a unique id across all subclasses.
  * 
  * @author Jonathan Ferland
  */
@@ -42,19 +40,18 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
-@NotUsed.List({
-    @NotUsed(by = AbstractAnnotation.class, property = "type", groups = PreDelete.class)
-})
-public abstract class AnnotationType
+public abstract class AbstractAnnotationType
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;
     private String name;
     private String description;
+    private Boolean multiValue;
 
     /**
-     * @return the {@link Study} that this {@link AnnotationType} belongs to.
+     * @return the {@link Study} that this {@link AbstractAnnotationType}
+     *         belongs to.
      */
     @NotNull(message = "{AnnotationType.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -69,7 +66,7 @@ public abstract class AnnotationType
 
     /**
      * @return a short identifying name. The name is unique within the
-     *         {@link AnnotationType}'s {@link #getStudy()}.
+     *         {@link AbstractAnnotationType}'s {@link #getStudy()}.
      */
     @Size(max = 50, message = "{AnnotationType.name.Size}")
     @NotEmpty(message = "{AnnotationType.name.NotEmpty}")
@@ -95,54 +92,17 @@ public abstract class AnnotationType
         this.description = description;
     }
 
-    @DiscriminatorValue("STR")
-    public static class StringAnnotationType
-        extends AnnotationType {
-        private static final long serialVersionUID = 1L;
+    /**
+     * @return true if there can be more than one value, otherwise false for at
+     *         most one value.
+     */
+    @NotNull(message = "{AnnotationType.multiValue.NotNull}")
+    @Column(name = "IS_MULTI_VALUE", nullable = false)
+    public Boolean getMultiValue() {
+        return multiValue;
     }
 
-    @DiscriminatorValue("NUM")
-    public static class NumberAnnotationType
-        extends AnnotationType {
-        private static final long serialVersionUID = 1L;
-
-        private DecimalRange range;
-
-        @Valid
-        @Embedded
-        public DecimalRange getRange() {
-            return range;
-        }
-
-        public void setRange(DecimalRange range) {
-            this.range = range;
-        }
-    }
-
-    @DiscriminatorValue("DAT")
-    public static class DateAnnotationType
-        extends AnnotationType {
-        private static final long serialVersionUID = 1L;
-    }
-
-    @DiscriminatorValue("SEL")
-    public static class SelectionAnnotationType
-        extends AnnotationType {
-        private static final long serialVersionUID = 1L;
-
-        private Boolean multiValue;
-
-        /**
-         * @return true if multiple options can be selected, otherwise false.
-         */
-        @NotNull(message = "{AnnotationType.multiValue.NotNull}")
-        @Column(name = "IS_MULTI_VALUE", nullable = false)
-        public Boolean isMultiValue() {
-            return multiValue;
-        }
-
-        public void setMultiValue(Boolean multiValue) {
-            this.multiValue = multiValue;
-        }
+    public void setMultiValue(Boolean multiValue) {
+        this.multiValue = multiValue;
     }
 }
