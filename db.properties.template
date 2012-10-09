@@ -3,8 +3,8 @@
 #
 database.host=localhost
 database.name=biobank
-database.username=dummy
-database.password=ozzy498
+database.username=XXXXX
+database.password=ZZZZZ
 database.driver=com.mysql.jdbc.Driver
 database.url=jdbc:mysql://${database.host}:3306/${database.name}
 jdbc.driver.jar=mysql-connector-java-5.1.15-bin.jar

@@ -313,7 +313,20 @@
     </copy>
   </target>
 
-  <target name="check-deploy-jboss">
+  <target name="check-db-properties">
+    <available file="db.properties" property="db.properties.available" />
+  </target>
+
+  <target name="db-properties-copy" depends="check-db-properties">
+    <fail unless="db.properties.available"
+          message="File 'db.properties' not found in project's root directory. Copy 'db.properties.template' to 'db.properties' and modify accordingly." />
+    <copy file="db.properties.template"
+          tofile="db.properties"
+          overwrite="false" />
+  </target>
+
+  <target name="check-deploy-jboss"
+	  depends="db-properties-copy">
     <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
     </exec>
