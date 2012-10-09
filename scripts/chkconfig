@@ -30,7 +30,8 @@ chkconfig [OPTIONS]
 
 =cut
 
-my $havePodUsage = 	eval { require Pod::Usage };
+my $havePodUsage = eval { require Pod::Usage };
+printf "havePodUsage: %d\n", $havePodUsage;
 
 no strict 'refs';
 my $MYSQL = "/usr/bin/mysql";
@@ -52,10 +53,11 @@ my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
             'man' => \$man,
             'help|?'   => \$help);
 
-if ($havePodUsage) {			
-	$parseCmdLine or pod2usage(2);
-	pod2usage(1) if $help;
-	pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+if ($havePodUsage) {
+    use Pod::Usage;
+    $parseCmdLine or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 }
 
 if ($DBUSER eq "") {
@@ -96,10 +98,10 @@ sub getNonInnoDbTables() {
 
     my @innoTables = mysqlCmd($DBNAME, $cmd);
 	my %innoTableMap = map {$_ => 1} @innoTables;
-	
+
     my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
     my @nonInnoDbTables = grep (! defined $innoTableMap{$_}, @tables );
-	
+
     foreach (@nonInnoDbTables) {
         chomp($_);
         push (@nonInnoDbTables, $_);
