@@ -4,7 +4,6 @@ use warnings;
 use strict;
 use Getopt::Long;
 use File::Basename;
-use Pod::Usage;
 use Term::ReadKey;
 use Data::Dumper;
 
@@ -31,6 +30,8 @@ chkconfig [OPTIONS]
 
 =cut
 
+my $havePodUsage = eval { require Pod::Usage };
+
 no strict 'refs';
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
@@ -44,15 +45,19 @@ my $help = 0;
 my $man = 0;
 my @tests = ();
 
-GetOptions ('database=s' => \$DBNAME,
+my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
             'host=s' => \$DBHOST,
             'user=s' => \$DBUSER,
             'password=s' => \$DBPWD,
             'man' => \$man,
-            'help|?'   => \$help) or pod2usage(2);
+            'help|?'   => \$help);
 
-pod2usage(1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+if ($havePodUsage) {
+    Pod::Usage->import();
+    $parseCmdLine or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+}
 
 if ($DBUSER eq "") {
     die "ERROR: database user name not specified\n";
@@ -92,9 +97,11 @@ sub getNonInnoDbTables() {
 
     my @innoTables = mysqlCmd($DBNAME, $cmd);
     my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
-    my @nonInnoDbTables = ();
 
-    foreach (grep { not $_ ~~ @innoTables } @tables) {
+    my %inInnoTables = map { $_ => 1 } @innoTables;
+    my @nonInnoDbTables;
+
+    foreach (grep { not $inInnoTables{$_} } @tables ) {
         chomp($_);
         push (@nonInnoDbTables, $_);
     }
@@ -155,7 +162,7 @@ foreach (@nonInnoDbTables)  {
 #
 
 foreach (@tests) {
-    my $tr = $_;
+    $tr = $_;
 
     (! $tr->{required}) && print "OPTIONAL ";
     print $tr->{msg}, "\n", ($tr->{result} ? "[PASS]" : "[FAIL]"), "\n";
