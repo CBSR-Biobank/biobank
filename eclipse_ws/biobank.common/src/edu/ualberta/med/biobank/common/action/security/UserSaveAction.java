@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.transaction.Synchronization;
 
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
@@ -30,6 +32,9 @@ import edu.ualberta.med.biobank.util.SetDiff.Pair;
 
 public class UserSaveAction implements Action<UserSaveOutput> {
     private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory.getLogger(UserSaveAction.class);
+
     private static final Bundle bundle = new CommonBundle();
     private static final Permission PERMISSION = new UserManagerPermission();
 
@@ -52,7 +57,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
             " modifying this user. Please start over and try again.").format();
     @SuppressWarnings("nls")
     public static final LString CSM_MODIFICATION_FAILURE_ERRMSG =
-        bundle.tr("Problem modify associated CSM user properties").format();
+        bundle.tr("Problem modifying associated CSM user properties").format();
     @SuppressWarnings("nls")
     public static final LString STALE_MANAGEABLE_MEMBERSHIPS_ERRMSG =
         bundle.tr("Your manageable memberships have changed since you began" +
@@ -142,6 +147,7 @@ public class UserSaveAction implements Action<UserSaveOutput> {
                     oldUserData, oldPw));
             }
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new LocalizedException(CSM_MODIFICATION_FAILURE_ERRMSG, e);
         }
     }
@@ -283,7 +289,8 @@ public class UserSaveAction implements Action<UserSaveOutput> {
         Set<Group> groups = context.load(Group.class, contextGroupIds);
         for (Group group : groups) {
             if (!group.isFullyManageable(executingUser)) {
-                throw new LocalizedException(CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG);
+                throw new LocalizedException(
+                    CANNOT_ADD_UNMANAGEABLE_GROUPS_ERRMSG);
             }
 
             if (input.getGroupIds().contains(group.getId())) {

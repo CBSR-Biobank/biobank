@@ -2,8 +2,11 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
+import edu.ualberta.med.biobank.common.action.security.UserSaveAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -17,6 +20,8 @@ import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 
 public class BiobankCSMSecurityUtil {
     private static final Bundle bundle = new CommonBundle();
+
+    private static Logger log = LoggerFactory.getLogger(UserSaveAction.class);
 
     @SuppressWarnings("nls")
     public static final String APPLICATION_CONTEXT_NAME = "biobank";
@@ -143,6 +148,7 @@ public class BiobankCSMSecurityUtil {
 
             return serverUser.getUserId();
         } catch (CSException e) {
+            log.error(e.getMessage(), e);
             throw new LocalizedException(UNEXPECTED_PROBLEM, e);
         }
     }

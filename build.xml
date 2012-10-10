@@ -207,9 +207,8 @@
 
   <target name="build-common-project"
           depends="server-manifest">
-    <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">
       <fileset dir="${eclipse.proj.dir.common}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -217,11 +216,11 @@
     </copy>
     <javac debug="true"
            debuglevel="source,lines,vars"
+           srcdir="${eclipse.proj.dir.common}/src"
            destdir="${eclipse.proj.dir.common}/output"
            source="1.6"
            target="1.6"
            includeantruntime="false">
-      <src path="${eclipse.proj.dir.common}/src" />
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>

@@ -174,7 +174,7 @@ public class TestGroupGetAllAction extends TestAction {
         actual = execAs(man1A, new GroupGetAllAction(new GroupGetAllInput()));
 
         Assert.assertTrue("wrong groups",
-            actual.getAllManageableGroups().contains(expected));
+            actual.getAllManageableGroups().containsAll(expected));
 
         expected.clear();
         actual = execAs(man2B, new GroupGetAllAction(new GroupGetAllInput()));

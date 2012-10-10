@@ -39,10 +39,6 @@
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
       </fileset>
-      <fileset dir="${eclipse.proj.dir.tools}/src">
-    	<exclude name="**/*.launch" />
-    	<exclude name="**/*.java" />
-      </fileset>
     </copy>
     <javac destdir="${test.build.dir}"
            debug="true"

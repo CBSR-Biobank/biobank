@@ -55,7 +55,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Bundle bundle = new CommonBundle();
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenBatchOpAction.class.getName());
+        .getLogger(SpecimenBatchOpAction.class);
 
     public static final int SIZE_LIMIT = 1000;
 

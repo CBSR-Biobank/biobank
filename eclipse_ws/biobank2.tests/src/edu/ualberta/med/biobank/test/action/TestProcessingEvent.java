@@ -49,15 +49,15 @@ public class TestProcessingEvent extends TestAction {
     @Rule
     public TestName testname = new TestName();
 
-    private String name;
     private Provisioning provisioning;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = getMethodNameR();
-        provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
     }
 
     @Test
@@ -305,7 +305,7 @@ public class TestProcessingEvent extends TestAction {
     }
 
     @Test
-    public void processingEventGetBriefInfoAction() {
+    public void peventGetBriefInfoAction() {
         Transaction tx = session.beginTransaction();
         factory.createProcessingEvent();
         Specimen alqSpecimen = factory.createChildSpecimen();

@@ -5,17 +5,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import org.hibernate.Session;
+
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
-import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
@@ -93,43 +96,35 @@ public class SiteHelper extends Helper {
      * Study is linked to Site.
      */
     public static class Provisioning {
+
         public Integer siteId;
         public Integer studyId;
         public Integer clinicId;
         public List<Integer> patientIds;
         public List<Integer> containerTypeIds;
 
-        public Provisioning(IActionExecutor actionExecutor, String basename) {
+        private final Site site;
+        private final Clinic clinic;
+        private final Study study;
+
+        public Provisioning(Session session, Factory factory) {
             patientIds = new ArrayList<Integer>();
             containerTypeIds = new ArrayList<Integer>();
 
-            clinicId = ClinicHelper.createClinicWithContacts(actionExecutor,
-                basename + "_clinic", 1);
-            ClinicInfo clinicInfo =
-                actionExecutor.exec(new ClinicGetInfoAction(clinicId));
-            StudySaveAction studySaveAction =
-                StudyHelper.getSaveAction(basename + "_study", basename
-                    + "_study",
-                    ActivityStatus.ACTIVE);
-            HashSet<Integer> ids = new HashSet<Integer>();
-            ids.add(clinicInfo.contacts.get(0).getId());
-            studySaveAction.setContactIds(ids);
-            studyId = actionExecutor.exec(studySaveAction).getId();
+            study = factory.createStudy();
+            site = factory.createSite();
+            clinic = factory.createClinic();
+            study.getContacts().add(factory.createContact());
+            site.getStudies().add(study);
+            study.getPatients().add(factory.createPatient());
+            session.flush();
 
-            SiteSaveAction siteSaveAction =
-                SiteHelper.getSaveAction(basename + "_site",
-                    basename + "_site",
-                    ActivityStatus.ACTIVE);
-            ids = new HashSet<Integer>();
-            ids.add(studyId);
-            siteSaveAction.setStudyIds(ids);
-            siteId = actionExecutor.exec(siteSaveAction).getId();
-
-            PatientSaveAction patientSaveAction =
-                new PatientSaveAction(null, studyId,
-                    basename + "_patient1", Utils.getRandomDate(), null);
-            patientIds.add(actionExecutor.exec(patientSaveAction)
-                .getId());
+            siteId = site.getId();
+            studyId = study.getId();
+            clinicId = clinic.getId();
+            for (Patient p : study.getPatients()) {
+                patientIds.add(p.getId());
+            }
         }
 
         public Integer addContainerType(IActionExecutor executor,
