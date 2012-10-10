@@ -37,7 +37,7 @@
 [ ] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).
-[ ] Bring over the Sha1Hash and Md5Hash objects
+[v] Bring over the Sha1Hash and Md5Hash objects
 [ ] For unique strings, hash the string instead.
 [v] Make the combination of PE (worksheet, center) or (worksheet, study) unique?
     A: Yes. Done.
