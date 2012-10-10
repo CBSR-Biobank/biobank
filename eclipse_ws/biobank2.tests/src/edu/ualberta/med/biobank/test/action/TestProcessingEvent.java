@@ -8,6 +8,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.hibernate.Transaction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -26,7 +27,9 @@ import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventBriefInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventDeleteAction;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetBriefInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
@@ -299,5 +302,25 @@ public class TestProcessingEvent extends TestAction {
             (ProcessingEvent) session.load(ProcessingEvent.class,
                 pEventId);
         Assert.assertNotNull(pe);
+    }
+
+    @Test
+    public void processingEventGetBriefInfoAction() {
+        Transaction tx = session.beginTransaction();
+        factory.createProcessingEvent();
+        Specimen alqSpecimen = factory.createChildSpecimen();
+        factory.getDefaultParentSpecimen().getChildSpecimens().add(alqSpecimen);
+        tx.commit();
+
+        ProcessingEventBriefInfo peventBriefInfo =
+            exec(new ProcessingEventGetBriefInfoAction(factory
+                .getDefaultProcessingEvent().getId()));
+
+        Assert.assertEquals(factory
+            .getDefaultProcessingEvent(), peventBriefInfo.pevent);
+        Assert.assertEquals(factory.getDefaultStudy().getNameShort(),
+            peventBriefInfo.studyNameShort);
+        Assert.assertEquals(new Long(1), peventBriefInfo.sourceSpcCount);
+        Assert.assertEquals(new Long(1), peventBriefInfo.aliquotSpcCount);
     }
 }

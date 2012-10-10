@@ -89,10 +89,10 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
         TableRowData info = new TableRowData();
         info.pe = (ProcessingEventBriefInfo) o;
         info.startDate =
-            DateFormatter.formatAsDateTime(info.pe.e.getCreatedAt());
-        info.studyNameShort = info.pe.study;
-        info.numSVs = info.pe.svs;
-        info.numAliquots = info.pe.aliquots;
+            DateFormatter.formatAsDateTime(info.pe.pevent.getCreatedAt());
+        info.studyNameShort = info.pe.studyNameShort;
+        info.numSVs = info.pe.sourceSpcCount;
+        info.numAliquots = info.pe.aliquotSpcCount;
         return info;
     }
 
@@ -124,20 +124,20 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
     protected Boolean canEdit(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventUpdatePermission(target.e.getId()));
+            new ProcessingEventUpdatePermission(target.pevent.getId()));
     }
 
     @Override
     protected Boolean canDelete(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventDeletePermission(target.e.getId()));
+            new ProcessingEventDeletePermission(target.pevent.getId()));
     }
 
     @Override
     protected Boolean canView(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventReadPermission(target.e.getId()));
+            new ProcessingEventReadPermission(target.pevent.getId()));
     }
 }

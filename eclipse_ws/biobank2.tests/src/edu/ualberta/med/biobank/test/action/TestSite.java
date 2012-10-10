@@ -159,33 +159,24 @@ public class TestSite extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        Transaction tx = session.beginTransaction();
+        factory.createProcessingEvent();
+        Specimen alqSpecimen = factory.createChildSpecimen();
+        factory.getDefaultParentSpecimen().getChildSpecimens().add(alqSpecimen);
+        tx.commit();
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        CEventInfo ceventInfo =
-            exec(new CollectionEventGetInfoAction(ceventId));
-        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
-        HashSet<Integer> added = new HashSet<Integer>();
-        added.add(sourceSpecs.get(0).specimen.getId());
-
-        exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, Utils.getRandomDate(), Utils
-                .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-            added, new HashSet<Integer>())).getId();
+        Site site = factory.getDefaultSite();
 
         SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(factory.getDefaultSite().getId()));
 
-        Assert.assertEquals(name + "_site_city", siteInfo.getSite()
-            .getAddress()
-            .getCity());
+        Assert.assertEquals(site.getAddress().getCity(), siteInfo.getSite()
+            .getAddress().getCity());
         Assert.assertEquals(ActivityStatus.ACTIVE,
             siteInfo.getSite().getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.getPatientCount());
         Assert.assertEquals(new Long(1), siteInfo.getProcessingEventCount());
-        Assert.assertEquals(new Long(1), siteInfo.getSpecimenCount());
+        Assert.assertEquals(new Long(2), siteInfo.getSpecimenCount());
     }
 
     @Test
@@ -660,17 +651,13 @@ public class TestSite extends TestAction {
                     getExecutor(),
                     patient, siteId);
         }
-        SiteGetStudyInfoAction action = new SiteGetStudyInfoAction(siteId);
-        ListResult<StudyCountInfo> studies = exec(action);
+        ListResult<StudyCountInfo> studies =
+            exec(new SiteGetStudyInfoAction(siteId));
 
-        Assert
-            .assertTrue(studies.getList().get(0).getCollectionEventCount()
-                .intValue()
-            == (collectionEvents * patients));
-        Assert
-            .assertTrue(studies.getList().get(0).getCollectionEventCount()
-                .intValue()
-            == (patients));
+        Assert.assertEquals(collectionEvents * patients,
+            studies.getList().get(0).getCollectionEventCount().intValue());
+        Assert.assertEquals(patients.intValue(), studies.getList().get(0)
+            .getCollectionEventCount().intValue());
         Assert.assertTrue(studies.getList().get(0).getStudy().getId()
             .equals(studyIds.iterator().next()));
     }
