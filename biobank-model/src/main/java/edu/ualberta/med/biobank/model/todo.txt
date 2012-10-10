@@ -21,7 +21,9 @@
     (2) Something else (more?) complicated?
     A: made a ProcessingEventInputSpecimen class and have the SpecimenProcessingLink
     class use the (input, output, timeDone) as the natural id
-[ ] Call property 'isDerived'?
+[x] Call property 'isDerived'?
+    A: called it "isDerivative()" and put it on Specimen, since this property does
+    not change depending on its study.
 [ ] Group models and actions into domains, such as, user, report, center, shipping,
     etc. and actions/ services into those groups so that there are not so many
     classes per package.

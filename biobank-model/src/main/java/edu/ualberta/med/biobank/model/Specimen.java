@@ -55,6 +55,7 @@ public class Specimen
     private CenterLocation originLocation;
     private CenterLocation location;
     private Boolean usable;
+    private Boolean derivative;
 
     @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -145,12 +146,28 @@ public class Specimen
     }
 
     @NotNull(message = "{Specimen.usable.NotNull}")
-    @Column(name = "IS_USABLE")
+    @Column(name = "IS_USABLE", nullable = false)
     public Boolean isUsable() {
         return usable;
     }
 
     public void setUsable(Boolean usable) {
         this.usable = usable;
+    }
+
+    /**
+     * @return true if this {@link Specimen} was <em>not</em> directly drawn or
+     *         collected from a {@link Patient}, false if it was created by
+     *         aliquoting, sectioning, punching, etc. an existing
+     *         {@link Specimen}.
+     */
+    @NotNull(message = "{Specimen.derivative.NotNull}")
+    @Column(name = "IS_DERIVATIVE", nullable = false)
+    public Boolean isDerivative() {
+        return derivative;
+    }
+
+    public void setDerivative(Boolean derivative) {
+        this.derivative = derivative;
     }
 }

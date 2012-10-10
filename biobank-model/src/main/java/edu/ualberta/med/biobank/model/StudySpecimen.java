@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -20,13 +19,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 /**
  * Joins {@link Specimen}s to {@link CollectionEvent}s, which provides
  * generalised parentage information about where {@link Specimen}s came from (
- * {@link SpecimenProcessingLink} provides much more specific information). The
- * {@link #isOriginalSpecimen()} value is used to determine whether the
- * {@link #getSpecimen()} truly was directly collected from the {@link Patient}
- * (e.g. blood directly drawn or urine directly collected).
- * <p>
- * It is possible for {@link Specimen}s to have at most one
- * {@link CollectionEvent} per {@link Study}.
+ * {@link SpecimenProcessingLink} provides much more specific information). It
+ * is possible for {@link Specimen}s to have at most one {@link CollectionEvent}
+ * per {@link Study}.
  * 
  * @author Jonathan Ferland
  * @see SpecimenProcessingLink
@@ -44,7 +39,6 @@ public class StudySpecimen
     private Study study;
     private Specimen specimen;
     private CollectionEvent collectionEvent;
-    private Boolean originalSpecimen;
 
     @NaturalId
     @NotNull(message = "{StudySpecimen.study.NotNull}")
@@ -79,21 +73,6 @@ public class StudySpecimen
 
     public void setCollectionEvent(CollectionEvent collectionEvent) {
         this.collectionEvent = collectionEvent;
-    }
-
-    /**
-     * @return true if the {@link #specimen} was collected <em>directly</em>
-     *         from the {@link #collectionEvent}'s
-     *         {@link CollectionEvent#getPatient()}, otherwise return false.
-     */
-    @NotNull(message = "{StudySpecimen.originalSpecimen.NotNull}")
-    @Column(name = "IS_ORIGINAL_SPECIMEN", nullable = false)
-    public Boolean isOriginalSpecimen() {
-        return originalSpecimen;
-    }
-
-    public void setOriginalSpecimen(Boolean originalSpecimen) {
-        this.originalSpecimen = originalSpecimen;
     }
 
     @Override
