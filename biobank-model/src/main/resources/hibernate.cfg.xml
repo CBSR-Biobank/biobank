@@ -129,6 +129,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyCenter" />
+		<mapping class="edu.ualberta.med.biobank.model.StudySpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.User" />
 		<mapping class="edu.ualberta.med.biobank.model.Vessel" />
 

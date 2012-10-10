@@ -22,6 +22,8 @@ import org.hibernate.envers.Audited;
 import edu.ualberta.med.biobank.model.type.Decimal;
 import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
 import edu.ualberta.med.biobank.model.util.ProxyUtil;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
@@ -32,8 +34,8 @@ import edu.ualberta.med.biobank.model.util.ProxyUtil;
  * considered a parent-child relationship. This is opposed to
  * {@link CollectionEvent}s, which provide much more general heritage
  * information. So, special care must be taken to ensure that
- * {@link SpecimenCollectionEvent} and {@link SpecimenProcessingLink} entities
- * are consistent. The {@link #output} must be in all the same
+ * {@link StudySpecimen} and {@link SpecimenProcessingLink} entities are
+ * consistent. The {@link #output} must be in all the same
  * {@link CollectionEvent}s as the {@link #input}, but if two {@link Specimen}s
  * are in the same {@link CollectionEvent} they do <em>not</em> need to be
  * associated (directly or transitively) through a
@@ -47,6 +49,7 @@ import edu.ualberta.med.biobank.model.util.ProxyUtil;
 @Audited
 @Entity
 @Table(name = "SPECIMEN_PROCESSING_LINK")
+@Unique(properties = { "input", "output", "timeDone" }, groups = PrePersist.class)
 public class SpecimenProcessingLink
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;

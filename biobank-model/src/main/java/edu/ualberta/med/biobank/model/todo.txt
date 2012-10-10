@@ -3,9 +3,9 @@
 [v] Make (pnumber, study) unique instead of just pnumber
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
-[ ] Include version table and value in it to check for automatic updating
+[~] Include version table and value in it to check for automatic updating
 [ ] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
-[ ] Specimens should never have more than one CollectionEvent or Patient
+[v] Specimens should never have more than one CollectionEvent or Patient
     (per Study).
 [ ] Have custom Id objects and rename getId() to getInternalId() and add a
     @Transient getId() method that returns typed ids. setInternalId() can then
