@@ -11,6 +11,8 @@
     @Transient getId() method that returns typed ids. setInternalId() can then
     be overridden to also call setId(new TypedId(id)) and setId() can be overridden
     to also call setInternalId(getId().id), avoiding recursion, of course.
+[ ] Make sure exceptions are being logged!
+    A: sir, yes sir!
 [v] Make sure that a Specimen parent/child or from/to relationship can exist
     without a processing event. Maybe this could be done by:
     (1) Having one SpecimenProcessingLink table with:

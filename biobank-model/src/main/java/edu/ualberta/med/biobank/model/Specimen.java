@@ -54,8 +54,7 @@ public class Specimen
     private Vessel vessel;
     private CenterLocation originLocation;
     private CenterLocation location;
-    private Boolean usable;
-    private Boolean derivative;
+    private Boolean usable; // TODO: rename to 'exists' ?
 
     @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -153,21 +152,5 @@ public class Specimen
 
     public void setUsable(Boolean usable) {
         this.usable = usable;
-    }
-
-    /**
-     * @return true if this {@link Specimen} was <em>not</em> directly drawn or
-     *         collected from a {@link Patient}, false if it was created by
-     *         aliquoting, sectioning, punching, etc. an existing
-     *         {@link Specimen}.
-     */
-    @NotNull(message = "{Specimen.derivative.NotNull}")
-    @Column(name = "IS_DERIVATIVE", nullable = false)
-    public Boolean isDerivative() {
-        return derivative;
-    }
-
-    public void setDerivative(Boolean derivative) {
-        this.derivative = derivative;
     }
 }
