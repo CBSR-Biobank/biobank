@@ -7,10 +7,12 @@
 [ ] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
 [v] Specimens should never have more than one CollectionEvent or Patient
     (per Study).
-[ ] Have custom Id objects and rename getId() to getInternalId() and add a
+[x] Have custom Id objects and rename getId() to getInternalId() and add a
     @Transient getId() method that returns typed ids. setInternalId() can then
     be overridden to also call setId(new TypedId(id)) and setId() can be overridden
     to also call setInternalId(getId().id), avoiding recursion, of course.
+    A: NOOOOOOOOOOOOPE! Information like this (a typed id) should just be another
+    class outside of the models (e.g. at the DTO layer) that holds only an id.
 [ ] Make sure exceptions are being logged!
     A: sir, yes sir!
 [v] Make sure that a Specimen parent/child or from/to relationship can exist
