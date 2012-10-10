@@ -313,27 +313,13 @@
     </war>
   </target>
 
-  <target name="clean-jars" description="deletes jars from eclipse projects">
-    <delete>
-      <!-- TODO: add lib folders from other projects? -->
-      <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
-    </delete>
-  </target>
-
   <target name="clean"
           depends="clean-tests,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
-    <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
+    <antcall target="clean-eclipse-projects" />
   </target>
-
-  <!-- JUnit -->
 
   <property name="doxygen.output" location="docs/doxygen" />
 

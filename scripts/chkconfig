@@ -31,7 +31,6 @@ chkconfig [OPTIONS]
 =cut
 
 my $havePodUsage = eval { require Pod::Usage };
-
 no strict 'refs';
 my $MYSQL = "/usr/bin/mysql";
 my $GREP = "/bin/grep";
@@ -39,7 +38,7 @@ my $SED = "/bin/sed";
 my $DBHOST = "localhost";
 my $DBNAME = "biobank";
 my $DBUSER = "";
-my $DBPWD = "";
+my $DBPASSWORD = "";
 my $RESULT = 1;
 my $help = 0;
 my $man = 0;
@@ -48,31 +47,31 @@ my @tests = ();
 my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
             'host=s' => \$DBHOST,
             'user=s' => \$DBUSER,
-            'password=s' => \$DBPWD,
+            'password=s' => \$DBPASSWORD,
             'man' => \$man,
             'help|?'   => \$help);
 
 if ($havePodUsage) {
     Pod::Usage->import();
     $parseCmdLine or pod2usage(2);
-    pod2usage(1) if $help;
-    pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 }
 
 if ($DBUSER eq "") {
     die "ERROR: database user name not specified\n";
 }
 
-if ($DBPWD eq "") {
+if ($DBPASSWORD eq "") {
     print "Enter the MySQL password for user $DBUSER: ";
     ReadMode 'noecho';
-    $DBPWD = ReadLine 0;
-    chomp $DBPWD;
+    $DBPASSWORD = ReadLine 0;
+    chomp $DBPASSWORD;
     ReadMode 'normal';
     print "\n";
 }
 
-if ($DBPWD eq "") {
+if ($DBPASSWORD eq "") {
     die "ERROR: database user password not specified\n";
 }
 
@@ -88,7 +87,7 @@ sub mysqlCmd {
 
     if (! defined($cmd)) { die "command is empty"; }
     if (! defined($dbname)) { die "database name not specified"; }
-    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -B --skip-column-names -e \"$cmd\" $DBNAME`;
+    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -B --skip-column-names -e \"$cmd\" $DBNAME`;
 }
 
 sub getNonInnoDbTables() {
@@ -110,51 +109,51 @@ sub getNonInnoDbTables() {
 }
 
 # check for InnoDB
-my $tr = createTestResult("checking MySQL for InnoDB...", 1);
-$tr->{'result'} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" $DBNAME |
+my $testResult = createTestResult("checking MySQL for InnoDB...", 1);
+$testResult->{'result'} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
         $GREP -e "^storage_engine"` =~ /InnoDB/);
 
 # checkMysqlLowerCaseTableNames
-$tr = createTestResult("checking MySQL for lower case table names...", 1);
-$tr->{result} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD -e "show variables" $DBNAME |
+$testResult = createTestResult("checking MySQL for lower case table names...", 1);
+$testResult->{result} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
         $GREP -e "^lower_case_table_names"` =~ /1$/);
 
 # checkJbossHomeEnv
-$tr = createTestResult("checking if JBOSS_HOME environment variable defined and valid...", 1);
-$tr->{result} = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
+$testResult = createTestResult("checking if JBOSS_HOME environment variable defined and valid...", 1);
+$testResult->{result} = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
 
 
 # checkEclipseHomeEnv
-$tr = createTestResult("checking if ECLIPSE_HOME environment variable defined and valid...", 0);
-$tr->{result} = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
+$testResult = createTestResult("checking if ECLIPSE_HOME environment variable defined and valid...", 0);
+$testResult->{result} = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
 
 
 # checkEclipseDeltaPack
-$tr = createTestResult("checking for Eclipse delta pack...",  0);
+$testResult = createTestResult("checking for Eclipse delta pack...",  0);
 my $present = 0;
 if (defined($ENV{'ECLIPSE_HOME'})) {
     my $path = $ENV{'ECLIPSE_HOME'}
         . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
     $present = 1 if (-f "$path");
 }
-$tr->{result} = $present;
+$testResult->{result} = $present;
 
 # checkKeystoreFile
-$tr = createTestResult("checking for SSL certificate file...", 1);
-$tr->{result} = (-f "security-logs/jboss/biobank.keystore");
+$testResult = createTestResult("checking for SSL certificate file...", 1);
+$testResult->{result} = (-f "security-logs/jboss/biobank.keystore");
 
 # checkDbExists()
-$tr = createTestResult("checking for databse $DBNAME...", $present, 1);
+$testResult = createTestResult("checking for databse $DBNAME...", $present, 1);
 my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
     . "WHERE SCHEMA_NAME = '$DBNAME'";
-$tr->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
+$testResult->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
 
 # checkDbTablesInnoDb and report the bad tables
 my @nonInnoDbTables = getNonInnoDbTables();
-$tr = createTestResult("checking if database tables are InnoDB...", 1);
-$tr->{result} =($#nonInnoDbTables < 0);
+$testResult = createTestResult("checking if database tables are InnoDB...", 1);
+$testResult->{result} =($#nonInnoDbTables < 0);
 foreach (@nonInnoDbTables)  {
-    push(@ {$tr->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
+    push(@ {$testResult->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
 }
 
 #
@@ -162,16 +161,16 @@ foreach (@nonInnoDbTables)  {
 #
 
 foreach (@tests) {
-    $tr = $_;
+    my $testResult = $_;
 
-    (! $tr->{required}) && print "OPTIONAL ";
-    print $tr->{msg}, "\n", ($tr->{result} ? "[PASS]" : "[FAIL]"), "\n";
+    (! $testResult->{required}) && print "OPTIONAL ";
+    print $testResult->{msg}, "\n", ($testResult->{result} ? "[PASS]" : "[FAIL]"), "\n";
 
-    foreach ( @{ $tr->{extraMsgs} } ) {
+    foreach ( @{ $testResult->{extraMsgs} } ) {
         print $_, "\n";
     }
 
-    ($tr->{required}) && ($RESULT &= $tr->{result});
+    ($testResult->{required}) && ($RESULT &= $testResult->{result});
 }
 
 (! $RESULT) && print "tests FAILED\n";
