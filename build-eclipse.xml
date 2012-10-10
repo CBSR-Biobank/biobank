@@ -210,10 +210,9 @@ use command "ant -projecthelp" to display the targets.
     </fileset>
   </path>
 
-
-
   <target name="eclipse-biobank-common" depends="deploy-eclipse">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.common}/src"
 	destdir="${eclipse.proj.dir.common}/bin">
@@ -231,6 +230,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-biobank-gui-common" depends="eclipse-biobank-common">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.gui.common}/src"
 	destdir="${eclipse.proj.dir.gui.common}/bin">
@@ -248,6 +248,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-biobank-mvp" depends="eclipse-biobank-common">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.mvp}/src"
 	destdir="${eclipse.proj.dir.mvp}/bin">
@@ -266,6 +267,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-scanner-config" depends="eclipse-biobank-common">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.workspace.dir}/scannerConfig/src"
 	destdir="${eclipse.workspace.dir}/scannerConfig/bin">
@@ -286,6 +288,7 @@ use command "ant -projecthelp" to display the targets.
   <target name="eclipse-biobank2"
 	  depends="deploy-eclipse,eclipse-biobank-common,eclipse-biobank-gui-common,eclipse-biobank-mvp,eclipse-scanner-config">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir}/src"
 	destdir="${eclipse.proj.dir}/bin">
@@ -315,6 +318,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-label-printer" depends="eclipse-biobank2">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.workspace.dir}/labelPrinter/src"
 	destdir="${eclipse.workspace.dir}/labelPrinter/bin">
@@ -338,6 +342,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-biobank-tools" depends="eclipse-biobank2">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.tools}/src"
 	destdir="${eclipse.proj.dir.tools}/bin">
@@ -358,6 +363,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-biobank-tests" depends="eclipse-biobank2">
     <javac
+	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.tests}/src"
 	destdir="${eclipse.proj.dir.tests}/bin">

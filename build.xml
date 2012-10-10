@@ -194,7 +194,8 @@
           overwrite="true" />
   </target>
 
-  <target name="build-eclipse-projects" description="builds the Biobank client Eipse projects">
+  <target name="build-eclipse-projects"
+	  description="builds the Biobank client Eipse projects">
     <antcall target="eclipse-projects" />
   </target>
 
