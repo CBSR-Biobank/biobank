@@ -22,6 +22,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * {@link SpecimenProcessingLink} provides much more specific information). It
  * is possible for {@link Specimen}s to have at most one {@link CollectionEvent}
  * per {@link Study}.
+ * <p>
+ * Having one {@link CollectionEvent} per {@link Study} instead of one total
+ * allows each {@link Study} to have their own metadata on a {@link Specimen}.
+ * This allows for cases where one {@link Study} collects and transfers
+ * {@link Specimens} to another {@link Study}.
  * 
  * @author Jonathan Ferland
  * @see SpecimenProcessingLink
