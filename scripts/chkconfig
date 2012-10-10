@@ -1,0 +1,198 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Getopt::Long;
+use File::Basename;
+use Term::ReadKey;
+use Data::Dumper;
+
+=head1 NAME
+
+chkconfig - Checks for a valid deployment configuration environment for a
+Biobank server.
+
+=head1 USAGE
+
+chkconfig [OPTIONS]
+
+=head1 OPTIONS
+
+  --database DBNAME  The name of the dataabse used by the Biobank applicatiion. Defaults
+                     to "biobank".
+  --host DBHOST      The hostname of the machine running the MySQL server. Defaults to
+                     localhost if not specified.
+  --user DBUSER      The user to use on the MySQL server.
+  --passwrd PWD      The password to use on the MySQL server. If not specified the
+                     user will be prompted to enter it.
+  --help             Help text.
+  --man              Full documentation.
+
+=cut
+
+my $havePodUsage = eval { require Pod::Usage };
+no strict 'refs';
+my $MYSQL = "/usr/bin/mysql";
+my $GREP = "/bin/grep";
+my $SED = "/bin/sed";
+my $DBHOST = "localhost";
+my $DBNAME = "biobank";
+my $DBUSER = "";
+my $DBPASSWORD = "";
+my $RESULT = 1;
+my $help = 0;
+my $man = 0;
+my @tests = ();
+
+my $parseCmdLine = GetOptions ('database=s' => \$DBNAME,
+            'host=s' => \$DBHOST,
+            'user=s' => \$DBUSER,
+            'password=s' => \$DBPASSWORD,
+            'man' => \$man,
+            'help|?'   => \$help);
+
+if ($havePodUsage) {
+    Pod::Usage->import();
+    $parseCmdLine or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+}
+
+if ($DBUSER eq "") {
+    die "ERROR: database user name not specified\n";
+}
+
+if ($DBPASSWORD eq "") {
+    print "Enter the MySQL password for user $DBUSER: ";
+    ReadMode 'noecho';
+    $DBPASSWORD = ReadLine 0;
+    chomp $DBPASSWORD;
+    ReadMode 'normal';
+    print "\n";
+}
+
+if ($DBPASSWORD eq "") {
+    die "ERROR: database user password not specified\n";
+}
+
+sub createTestResult {
+    my $t = new TestResult->new(shift, shift);
+    push @tests, $t;
+    return $t;
+}
+
+sub mysqlCmd {
+    my $dbname = shift;
+    my $cmd = shift;
+
+    if (! defined($cmd)) { die "command is empty"; }
+    if (! defined($dbname)) { die "database name not specified"; }
+    return `$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -B --skip-column-names -e \"$cmd\" $DBNAME`;
+}
+
+sub getNonInnoDbTables() {
+    my $cmd = "SELECT TABLE_NAME FROM information_schema.TABLES "
+        . "WHERE TABLE_SCHEMA = '$DBNAME' AND engine = 'InnoDB'";
+
+    my @innoTables = mysqlCmd($DBNAME, $cmd);
+    my @tables = mysqlCmd($DBNAME, 'SHOW TABLES');
+
+    my %inInnoTables = map { $_ => 1 } @innoTables;
+    my @nonInnoDbTables;
+
+    foreach (grep { not $inInnoTables{$_} } @tables ) {
+        chomp($_);
+        push (@nonInnoDbTables, $_);
+    }
+
+    return @nonInnoDbTables;
+}
+
+# check for InnoDB
+my $testResult = createTestResult("checking MySQL for InnoDB...", 1);
+$testResult->{'result'} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
+        $GREP -e "^storage_engine"` =~ /InnoDB/);
+
+# checkMysqlLowerCaseTableNames
+$testResult = createTestResult("checking MySQL for lower case table names...", 1);
+$testResult->{result} = (`$MYSQL -h$DBHOST -u$DBUSER -p$DBPASSWORD -e "show variables" $DBNAME |
+        $GREP -e "^lower_case_table_names"` =~ /1$/);
+
+# checkJbossHomeEnv
+$testResult = createTestResult("checking if JBOSS_HOME environment variable defined and valid...", 1);
+$testResult->{result} = defined($ENV{'JBOSS_HOME'}) && (-d "$ENV{'JBOSS_HOME'}");
+
+
+# checkEclipseHomeEnv
+$testResult = createTestResult("checking if ECLIPSE_HOME environment variable defined and valid...", 0);
+$testResult->{result} = defined($ENV{'ECLIPSE_HOME'}) && (-d "$ENV{'ECLIPSE_HOME'}");
+
+
+# checkEclipseDeltaPack
+$testResult = createTestResult("checking for Eclipse delta pack...",  0);
+my $present = 0;
+if (defined($ENV{'ECLIPSE_HOME'})) {
+    my $path = $ENV{'ECLIPSE_HOME'}
+        . "/plugins/org.eclipse.swt.win32.win32.x86.source_3.7.2.v3740f.jar";
+    $present = 1 if (-f "$path");
+}
+$testResult->{result} = $present;
+
+# checkKeystoreFile
+$testResult = createTestResult("checking for SSL certificate file...", 1);
+$testResult->{result} = (-f "security-logs/jboss/biobank.keystore");
+
+# checkDbExists()
+$testResult = createTestResult("checking for databse $DBNAME...", $present, 1);
+my $cmd = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
+    . "WHERE SCHEMA_NAME = '$DBNAME'";
+$testResult->{result} = (mysqlCmd('biobank', $cmd) =~ /^$DBNAME$/);
+
+# checkDbTablesInnoDb and report the bad tables
+my @nonInnoDbTables = getNonInnoDbTables();
+$testResult = createTestResult("checking if database tables are InnoDB...", 1);
+$testResult->{result} =($#nonInnoDbTables < 0);
+foreach (@nonInnoDbTables)  {
+    push(@ {$testResult->{extraMsgs} }, "\ttable \"$_\" is not InnoDB");
+}
+
+#
+# display results
+#
+
+foreach (@tests) {
+    my $testResult = $_;
+
+    (! $testResult->{required}) && print "OPTIONAL ";
+    print $testResult->{msg}, "\n", ($testResult->{result} ? "[PASS]" : "[FAIL]"), "\n";
+
+    foreach ( @{ $testResult->{extraMsgs} } ) {
+        print $_, "\n";
+    }
+
+    ($testResult->{required}) && ($RESULT &= $testResult->{result});
+}
+
+(! $RESULT) && print "tests FAILED\n";
+exit !$RESULT;
+
+package TestResult;
+
+sub new {
+    my $proto = shift;
+    my $class = ref $proto || $proto;
+    my $self = {
+                msg => shift,
+                required => shift,
+                result => undef,
+                extraMsgs => [ ],
+                };
+    $self = bless $self, $class;
+
+    return $self;
+}
+
+
+# Local Variables:
+# compile-command: "cd $HOME/proj/cbsr/biobank && scripts/chkconfig"
+# End:

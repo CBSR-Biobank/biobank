@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.model.Log;
 public class LogQueryAction implements Action<ListResult<Log>> {
     private static final long serialVersionUID = 8892328030007487709L;
 
+    public static final int MAX_RESULTS = 10000;
+
     private String center;
     private String username;
     private Date startDate;
@@ -105,6 +107,8 @@ public class LogQueryAction implements Action<ListResult<Log>> {
         for (int i = 0, n = parametersArgs.size(); i < n; i++) {
             query.setParameter(i, parametersArgs.get(i));
         }
+
+        query.setMaxResults(MAX_RESULTS);
 
         List<Log> rows = query.list();
 

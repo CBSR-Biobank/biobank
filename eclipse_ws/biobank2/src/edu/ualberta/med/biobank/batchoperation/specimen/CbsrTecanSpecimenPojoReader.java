@@ -50,7 +50,6 @@ public class CbsrTecanSpecimenPojoReader implements
     private static final SimpleDateFormat PROCESSED_DATE_TIME_FORMAT =
         new SimpleDateFormat("ddMMyyy_HHmmss");
 
-    @SuppressWarnings("unused")
     public static class TecanCsvRowPojo implements IBatchOpInputPojo {
         private static final long serialVersionUID = 1L;
 

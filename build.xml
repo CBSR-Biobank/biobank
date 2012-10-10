@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Overall build file
+    use command "ant -projecthelp" to display the targets.
+
+-->
 <project name="biobank" basedir="." default="deploy">
-  <!--
-      Overall build file
-      use command "ant -projecthelp" to display the targets.
-
-Local Variables:
-compile-command: "export JBOSS_HOME=$HOME/apps/jboss-4.0.5.GA"
-End:
-  -->
-
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
   </exec>
@@ -22,6 +19,7 @@ End:
   <!-- TODO: create a cacore directory with all the cacore stuff in it
        that we can throw into the war file and use to create the database -->
   <property file="build.properties" />
+  <property file="db.properties" />
 
   <!-- must use a property with a LOCATION attribute because it is converted
        to be an absolute value, which the product builder seems to require in
@@ -31,6 +29,7 @@ End:
 
   <import file="build-db.xml"/>
   <import file="build-i18n.xml"/>
+  <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>
 
   <condition property="perl" value="perl" else="/usr/bin/perl">
@@ -51,179 +50,6 @@ End:
     <path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
-
-  <!-- Eclipse -->
-  <target name="biobank-product-version-modify">
-    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-              prefix="biobank2.product" />
-    <xslt in="${eclipse.proj.dir}/biobank2.product" out="${tmp.file}"
-          style="scripts/biobank-product.xsl">
-      <param name="version" expression="${java.client.version.num}" />
-    </xslt>
-    <copy file="${tmp.file}" tofile="${eclipse.proj.dir}/biobank2.product"
-          overwrite="true"/>
-  </target>
-
-  <target name="biobank-feature-core-version-modify">
-    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-              prefix="biobank2.feature.core" />
-    <xslt in="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml" out="${tmp.file}"
-          style="scripts/biobank-feature.xsl">
-      <param name="version" expression="${java.client.version.num}" />
-    </xslt>
-    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.core/feature.xml"
-          overwrite="true"/>
-  </target>
-
-  <target name="biobank-feature-platform-version-modify">
-    <tempfile property="tmp.file" destdir="${java.io.tmpdir}"
-              prefix="biobank2.feature.platform" />
-    <xslt in="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml" out="${tmp.file}"
-          style="scripts/biobank-feature.xsl">
-      <param name="version" expression="${java.client.version.num}" />
-    </xslt>
-    <copy file="${tmp.file}" tofile="${eclipse.workspace.dir}/biobank2.feature.platform/feature.xml"
-          overwrite="true"/>
-  </target>
-
-  <target name="biobank-version-modify">
-    <antcall target="biobank-product-version-modify" />
-    <antcall target="biobank-feature-core-version-modify" />
-    <antcall target="biobank-feature-platform-version-modify" />
-  </target>
-
-  <target name="java-client-manifest">
-    <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
-      <attribute name="Bundle-Version" value="${java.client.version.num}" />
-    </manifest>
-    <fixcrlf srcdir="${eclipse.proj.dir}/META-INF"
-             eol="lf"
-             eof="asis">
-      <include name="**/*.MF" />
-    </fixcrlf>
-    <propertyfile file="eclipse_ws/biobank2/about.mappings">
-      <entry key="0" value="${java.client.version.num}" />
-    </propertyfile>
-  </target>
-
-  <target name="deploy-eclipse"
-          depends="java-client-manifest,biobank-version-modify"
-          description="deploys the caCORE SDK beans to the eclipse project">
-    <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="acegi-security-1.0.4.jar" />
-        <include name="antlr-2.7.6.jar" />
-        <include name="asm.jar" />
-        <include name="axis.jar" />
-        <include name="caGrid-CQL-cql.1.0-1.2.jar" />
-        <include name="castor-1.0.2.jar" />
-        <include name="cglib-2.1.3.jar" />
-        <include name="cog-jglobus.jar" />
-        <include name="commons-codec-1.3.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-discovery-0.2.jar" />
-        <include name="commons-lang-2.4.jar" />
-        <include name="commons-logging-1.1.jar" />
-        <include name="dom4j-1.6.1.jar" />
-        <include name="gettext-commons-0.9.6.jar" />
-        <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
-        <include name="hibernate-validator-4.2.0.Final.jar" />
-        <include name="hibernate3.jar" />
-        <include name="javassist-3.12.0.GA.jar" />
-        <include name="jaxrpc.jar" />
-        <include name="jta-1.1.jar" />
-        <include name="log4j-1.2.14.jar" />
-        <include name="messages.jar" />
-        <include name="mysql-connector-java-5.1.15-bin.jar" />
-	<include name="ognl-2.6.7.jar" />
-        <include name="saaj.jar" />
-        <include name="sdk-client-framework.jar" />
-        <include name="sdk-grid-remoting.jar" />
-        <include name="sdk-security.jar" />
-        <include name="sdk-writable-client-framework.jar" />
-        <include name="slf4j-api-1.6.1.jar" />
-        <include name="slf4j-log4j12-1.6.4.jar" />
-        <include name="spring.jar" />
-        <include name="validation-api-1.0.0.GA.jar" />
-        <include name="wsdl4j-1.5.1.jar" />
-        <include name="xercesImpl.jar" />
-        <include name="xpp3-1.1.3.4.C.jar" />
-        <include name="xstream-1.3.1.jar" />
-        <include name="jsse.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="csmapi-4.1.jar" />
-        <include name="jta-1.1.jar" />
-        <include name="sdk-core.jar" />
-        <include name="sdk-writable-core.jar" />
-        <include name="SuperCSV-1.52.jar" />
-        <include name="spiffy-all-0.05.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-beanutils-1.8.0.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-io-1.4.jar" />
-        <include name="commons-digester-1.7.jar" />
-        <include name="commons-javaflow-20060411.jar" />
-        <include name="commons-logging-1.1.jar" />
-        <include name="iText-2.1.7.jar" />
-        <include name="jasperreports-4.0.1.jar" />
-        <include name="jdt-compiler-3.1.1.jar" />
-        <include name="messages.jar" />
-        <include name="DynamicJasper-3.0.14.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="aopalliance.jar" />
-        <include name="guice-3.0.jar" />
-        <include name="gwt-pectin-0.8.1.jar" />
-        <include name="gwt-user.jar" />
-        <include name="javax.inject.jar" />
-        <include name="peaberry-1.2.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="gluegen.jar" />
-        <include name="jdom.jar" />
-        <include name="mailapi.jar" />
-        <include name="messages.jar" />
-        <include name="smtp.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-io-1.4.jar" />
-        <include name="jargs.jar" />
-        <include name="mysql-connector-java-5.1.15-bin.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tests}/src" overwrite="true">
-      <!-- File needed in the test project to call csm api methods -->
-      <fileset file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="c3p0-0.9.0.jar" />
-        <include name="clm-4.1.jar" />
-	<include name="dom4j-1.4.jar" />
-	<include name="ehcache-1.2.2.jar" />
-	<include name="jta-1.1.jar" />
-        <include name="mockito-all-1.9.0-rc1.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
-      <fileset dir="${req.jars.dir}">
-        <include name="log4j-1.2.14.jar" />
-      </fileset>
-    </copy>
-  </target>
 
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
@@ -269,7 +95,7 @@ End:
       <arg line="-keystore biobank.keystore -storepasswd -storepass importkey -new biobank2" />
     </exec>
     <copy file="scripts/ssl/biobank.keystore"
-          tofile="${secu-log.dir}/jboss/biobank.keystore" />
+          tofile="${secu-log.dir}/jboss/biobank.keystore"  overwrite="true" />
   </target>
 
   <target name="keystore-check">
@@ -300,13 +126,41 @@ End:
     </propertyfile>
   </target>
 
-  <target name="jboss.home.env">
-    <fail unless="env.JBOSS_HOME"
-          message="JBOSS_HOME environment variable not defined" />
+  <target name="update-db-config"
+          description="copies db configuration information from db.properties to various config files">
+    <copy todir="${secu-log.dir}/jboss" overwrite="true">
+      <fileset dir="${secu-log.dir}/jboss"/>
+      <globmapper from="*.template" to="*"/>
+      <filterset>
+        <filter token="database.url" value="${database.url}"/>
+        <filter token="database.driver" value="${database.driver}"/>
+        <filter token="database.username" value="${database.username}"/>
+        <filter token="database.password" value="${database.password}"/>
+      </filterset>
+    </copy>
+  </target>
+
+  <target name="check-db-properties">
+    <available file="db.properties" property="db.properties.available" />
+  </target>
+
+  <target name="db-properties-copy" depends="check-db-properties">
+    <fail unless="db.properties.available"
+          message="File 'db.properties' not found in project's root directory. Copy 'db.properties.template' to 'db.properties' and modify accordingly." />
+    <copy file="db.properties.template"
+          tofile="db.properties"
+          overwrite="false" />
+  </target>
+
+  <target name="check-deploy-jboss"
+	  depends="db-properties-copy">
+    <exec dir="" executable="${perl}" failonerror="true">
+      <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
+    </exec>
   </target>
 
   <target name="deploy-jboss"
-          depends="jboss.home.env,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="check-deploy-jboss,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -317,8 +171,14 @@ End:
           overwrite="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
+    <copy file="${lib.dir}/mysql-connector-java-5.1.15-bin.jar"
+          tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15-bin.jar"
+          overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
+          overwrite="true" />
+    <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
+          tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
           overwrite="true" />
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
@@ -334,6 +194,11 @@ End:
           overwrite="true" />
   </target>
 
+  <target name="build-eclipse-projects"
+	  description="builds the Biobank client Eipse projects">
+    <antcall target="eclipse-projects" />
+  </target>
+
   <target name="deploy" description="deploys to JBoss and Eclipse project">
     <!-- the order these are called in is important for now -->
     <antcall target="deploy-jboss" />
@@ -342,9 +207,8 @@ End:
 
   <target name="build-common-project"
           depends="server-manifest">
-    <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="true">
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">
       <fileset dir="${eclipse.proj.dir.common}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -352,11 +216,11 @@ End:
     </copy>
     <javac debug="true"
            debuglevel="source,lines,vars"
+           srcdir="${eclipse.proj.dir.common}/src"
            destdir="${eclipse.proj.dir.common}/output"
            source="1.6"
            target="1.6"
            includeantruntime="false">
-      <src path="${eclipse.proj.dir.common}/src" />
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
@@ -449,69 +313,24 @@ End:
     </war>
   </target>
 
-  <target name="clean-jars" description="deletes jars from eclipse projects">
-    <delete>
-      <!-- TODO: add lib folders from other projects? -->
-      <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
-    </delete>
-  </target>
-
   <target name="clean"
           depends="clean-tests,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
-    <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
+    <antcall target="clean-eclipse-projects" />
   </target>
-
-  <!-- JUnit -->
 
   <property name="doxygen.output" location="docs/doxygen" />
-  <property name="test.output" location="testing" />
-  <property name="test.output.raw" value="${test.output}/raw" />
-  <property name="test.build.dir" value="${eclipse.proj.dir.tests}/output" />
-
-  <path id="common.class.path">
-    <fileset dir="${eclipse.proj.dir.common}/lib/client">
-      <include name="*.jar" />
-    </fileset>
-  </path>
-  <path id="test.class.path">
-    <pathelement location="${test.build.dir}" />
-  </path>
-
-  <target name="clean-test-results">
-    <delete dir="${test.output}" />
-  </target>
-
-  <target name="clean-tests" depends="clean-test-results">
-    <delete dir="${test.build.dir}" />
-  </target>
-
-  <target name="test-prepare">
-    <mkdir dir="${test.build.dir}" />
-    <mkdir dir="${test.output}" />
-    <mkdir dir="${test.output.raw}" />
-  </target>
-
-
-  <target name="eclipse.home.env">
-    <fail unless="env.ECLIPSE_HOME"
-          message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
-  </target>
 
 
   <target name="clean-product">
     <delete dir="${buildDirectory}" />
   </target>
 
-
-  <target name="product" depends="clean-product,biobank-version-modify,eclipse.home.env,deploy" description="build the product">
+  <target name="product"
+	  depends="clean-product,biobank-version-modify,deploy"
+	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
     <copy todir="${buildDirectory}/plugins/biobank2">
@@ -580,7 +399,8 @@ End:
   </target>
 
 
-  <target name="updateSiteMetadata" depends="eclipse.home.env" description="Build the update site folder">
+  <target name="updateSiteMetadata"
+	  description="Build the update site folder">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <property name="updateSiteFolder" value="${buildDirectory}/updateSite" />
     <copy todir="${updateSiteFolder}/features/">
@@ -646,8 +466,10 @@ End:
     <delete dir="docs/doxygen/html" />
     <delete dir="docs/doxygen/xml" />
   </target>
-
-<!-- (setq nxml-slash-auto-complete-flag t) -->
-
-
 </project>
+
+<!--
+    Local Variables:
+    compile-command: "ant"
+    End:
+-->

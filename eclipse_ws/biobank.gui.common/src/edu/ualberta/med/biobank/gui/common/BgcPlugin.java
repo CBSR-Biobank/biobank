@@ -321,7 +321,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     /**
      * Display an error message with exception message and log the exception
      */
-    public static void openError(String title, String message, Exception e,
+    public static void openError(String title, String message, Throwable e,
         String secondMessage) {
         String msg = message;
         if ((msg == null) && (e != null)) {
@@ -349,7 +349,7 @@ public class BgcPlugin extends AbstractUIPlugin {
      * Display an error message asynchronously
      */
     public static void openAsyncError(final String title, final String message,
-        final Exception e, final String secondMessage) {
+        final Throwable e, final String secondMessage) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -374,12 +374,12 @@ public class BgcPlugin extends AbstractUIPlugin {
         openAsyncError(title, message, e, null);
     }
 
-    public static void openAsyncError(String title, Exception e,
+    public static void openAsyncError(String title, Throwable e,
         String secondMessage) {
         openAsyncError(title, null, e, secondMessage);
     }
 
-    public static void openAsyncError(String title, Exception e) {
+    public static void openAsyncError(String title, Throwable e) {
         openAsyncError(title, null, e, null);
     }
 

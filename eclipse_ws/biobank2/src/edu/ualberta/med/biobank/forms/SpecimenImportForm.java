@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
@@ -107,7 +106,7 @@ public class SpecimenImportForm extends BiobankViewForm {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.horizontalSpan = 2;
         errorsLabel.setLayoutData(gd);
-        
+
         errorsLabel.setText(i18n
             .tr("The following errors occurred when attempting to import:"));
         errorsLabel.setBackground(toolkit.getColors().getBackground());
@@ -174,7 +173,7 @@ public class SpecimenImportForm extends BiobankViewForm {
                 } catch (BatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage(), e);
                 } finally {
                     fileBrowser.getDisplay().asyncExec(new Runnable() {
                         @Override
@@ -203,13 +202,15 @@ public class SpecimenImportForm extends BiobankViewForm {
             new ProgressMonitorDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell()).run(true, true, op);
         } catch (InvocationTargetException e) {
-            MessageDialog.openError(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(),
-                i18n.tr("Import Error"), e.getTargetException().getMessage());
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Import Error"),
+                e.getTargetException());
         } catch (InterruptedException e) {
-            MessageDialog.openError(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(),
-                i18n.tr("Import Error"), e.getMessage());
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("Import Error"),
+                e);
         }
     }
 

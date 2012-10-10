@@ -21,16 +21,15 @@ import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestSpecimen extends TestAction {
 
-    private String name;
-
     private Provisioning provisioning;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = getMethodNameR();
-        provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
     }
 
     @Test

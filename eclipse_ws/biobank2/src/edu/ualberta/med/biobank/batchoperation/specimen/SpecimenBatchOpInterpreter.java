@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
-import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -53,8 +52,9 @@ public class SpecimenBatchOpInterpreter {
         try {
             String[] csvHeaders = reader.getCSVHeader(true);
 
-            if (csvHeaders.length < 1) {
-                throw new LocalizedException(BatchOpActionUtil.CSV_HEADER_ERROR);
+            if ((csvHeaders == null) || (csvHeaders.length < 1)) {
+                throw new IllegalStateException(
+                    i18n.tr("Invalid headers in CSV file."));
             }
 
             pojoReader = SpecimenPojoReaderFactory.createPojoReader(csvHeaders);

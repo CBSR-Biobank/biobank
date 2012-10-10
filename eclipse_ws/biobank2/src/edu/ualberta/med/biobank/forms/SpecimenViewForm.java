@@ -2,10 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.Stack;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,14 +21,9 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesActi
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
@@ -55,7 +47,6 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
-import edu.ualberta.med.biobank.wizards.ReparentingWizard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenViewForm extends BiobankViewForm {
@@ -98,8 +89,6 @@ public class SpecimenViewForm extends BiobankViewForm {
     private BgcBaseText parentInvIdLabel;
 
     private BgcBaseText sourcePeventLabel;
-
-    private BgcBaseText parentPeventLabel;
 
     private BgcBaseText peventLabel;
 

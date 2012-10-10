@@ -122,6 +122,14 @@ public class LogQuery {
                         user, startDate, endDate, action, patientNumber,
                         inventoryId,
                         location, details, type));
+            if (dbResults.getList().size() >= LogQueryAction.MAX_RESULTS) {
+                BgcPlugin
+                    .openInformation(
+                        i18n.tr("Truncated Result"),
+                        i18n.tr(
+                            "The number of logs returned is equal to or greater than {0}, and may have been truncated. Only {0} results will be shown.",
+                            LogQueryAction.MAX_RESULTS));
+            }
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 // TR: error dialog title

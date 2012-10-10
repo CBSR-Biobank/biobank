@@ -58,7 +58,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void saveNew() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         final Integer id = exec(new PatientSaveAction(null,
@@ -73,7 +76,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void update() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -94,7 +100,9 @@ public class TestPatient extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
@@ -135,7 +143,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void delete() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         // create a new patient
@@ -152,8 +163,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void merge() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
         final String string = name;
+        session.getTransaction().commit();
 
         // add specimen type
         final Integer typeId =
@@ -166,10 +179,9 @@ public class TestPatient extends TestAction {
         createCEventWithSpecimens(provisioning, patientId1, 2, typeId, 2);
 
         // create a new patient 2
-        final Integer patientId2 = exec(
-            new PatientSaveAction(
-                null, provisioning.studyId, string + "2", Utils
-                    .getRandomDate(), null)).getId();
+        final Integer patientId2 = exec(new PatientSaveAction(
+            null, provisioning.studyId, string + "2", Utils
+                .getRandomDate(), null)).getId();
         // create cevents in patient2
         createCEventWithSpecimens(provisioning, patientId2, 1, typeId, 5);
         createCEventWithSpecimens(provisioning, patientId2, 3, typeId, 7);
@@ -177,25 +189,25 @@ public class TestPatient extends TestAction {
         // merge patient1 into patient2
         exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
 
+        session.clear();
+
         Patient p1 = (Patient) session.get(Patient.class, patientId1);
         Assert.assertNotNull(p1);
         Patient p2 = (Patient) session.get(Patient.class, patientId2);
         Assert.assertNull(p2);
         Collection<CollectionEvent> cevents = p1.getCollectionEvents();
         Assert.assertEquals(3, cevents.size());
+
         for (CollectionEvent cevent : cevents) {
             switch (cevent.getVisitNumber()) {
             case 1:
-                Assert
-                    .assertEquals(9, cevent.getAllSpecimens().size());
+                Assert.assertEquals(9, cevent.getAllSpecimens().size());
                 break;
             case 2:
-                Assert
-                    .assertEquals(2, cevent.getAllSpecimens().size());
+                Assert.assertEquals(2, cevent.getAllSpecimens().size());
                 break;
             case 3:
-                Assert
-                    .assertEquals(7, cevent.getAllSpecimens().size());
+                Assert.assertEquals(7, cevent.getAllSpecimens().size());
                 break;
             default:
                 Assert.fail("wrong visit number");
@@ -205,7 +217,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void mergeDifferentStudies() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         // add specimen type
         final Integer typeId =
             exec(new SpecimenTypeSaveAction(name, name)).getId();
@@ -250,7 +265,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void patientGetSimpleCEventInfoAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
@@ -289,7 +307,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void patientGetCEventInfoAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final Integer patientId = provisioning.patientIds.get(0);
 
         // add specimen type
@@ -329,7 +350,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void nextVisitNumber() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final Integer patientId = provisioning.patientIds.get(0);
 
         Integer visitNumber = getR().nextInt(20) + 1;
@@ -343,7 +367,10 @@ public class TestPatient extends TestAction {
 
     @Test
     public void search() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         final String pnumber = name;
         final Date date = Utils.getRandomDate();
         final Integer patientId = exec(new PatientSaveAction(

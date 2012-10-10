@@ -59,7 +59,9 @@ public class AbstractReport {
         return results;
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * @throws ApplicationException
+     */
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
         if (report.getOp() != null)

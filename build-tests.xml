@@ -12,6 +12,7 @@
       <include name="*.jar" />
     </fileset>
   </path>
+
   <path id="test.class.path">
     <pathelement location="${test.build.dir}" />
   </path>
@@ -37,10 +38,6 @@
       <fileset dir="${eclipse.proj.dir.tests}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
-      </fileset>
-      <fileset dir="${eclipse.proj.dir.tools}/src">
-    	<exclude name="**/*.launch" />
-    	<exclude name="**/*.java" />
       </fileset>
     </copy>
     <javac destdir="${test.build.dir}"

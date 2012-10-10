@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.List;
@@ -26,23 +23,21 @@ public class SourceVesselTypeWrapper {
         return 0;
     }
 
-    protected void deleteChecks() throws BiobankException, ApplicationException {
+    protected void deleteChecks() {
     }
 
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
+    protected void persistChecks() {
     }
 
-    public void checkUnique() throws ApplicationException, BiobankException {
+    public void checkUnique() {
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankException {
+    public boolean isUsed() {
         return false;
     }
 
     public static void persistSourceVesselTypes(
         List<SourceVesselTypeWrapper> addedOrModifiedTypes,
-        List<SourceVesselTypeWrapper> typesToDelete)
-        throws BiobankCheckException, Exception {
+        List<SourceVesselTypeWrapper> typesToDelete) throws Exception {
     }
 }

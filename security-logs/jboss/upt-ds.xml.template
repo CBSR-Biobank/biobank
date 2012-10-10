@@ -15,9 +15,9 @@
 <datasources>
   <local-tx-datasource>
     <jndi-name>csmupt</jndi-name>
-    <connection-url>jdbc:mysql://localhost:3306/biobank</connection-url>
-    <user-name>dummy</user-name>
-    <password>ozzy498</password>
-    <driver-class>com.mysql.jdbc.Driver</driver-class>
+    <connection-url>@database.url@</connection-url>
+    <user-name>@database.username@</user-name>
+    <password>@database.password@</password>
+    <driver-class>@database.driver@</driver-class>
   </local-tx-datasource>
 </datasources>

@@ -56,7 +56,9 @@ public class TestCollectionEvent extends TestAction {
     public void setUp() throws Exception {
         super.setUp();
         name = getMethodNameR();
-        provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
     }
 
     @Test

@@ -55,7 +55,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private static final Bundle bundle = new CommonBundle();
 
     private static Logger log = LoggerFactory
-        .getLogger(SpecimenBatchOpAction.class.getName());
+        .getLogger(SpecimenBatchOpAction.class);
 
     public static final int SIZE_LIMIT = 1000;
 
@@ -70,8 +70,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         bundle.tr("specimen declared a source specimen but parent " +
             "inventory ID present").format();
 
-    private static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
-        bundle.tr("parent inventory id does not exist: {}");
+    public static final Tr CSV_PARENT_SPC_INV_ID_ERROR =
+        bundle.tr("parent inventory id does not exist: {0}");
 
     private static final LString CSV_ALIQ_SPC_PATIENT_CEVENT_MISSING_ERROR =
         bundle.tr("when parent inventory id is not specified, "
@@ -277,8 +277,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 }
             }
 
-            createProcessignEventIfRequired(context, info);
-            addSpecimen(context, batchOp, info);
+            if (errorSet.isEmpty()) {
+                createProcessignEventIfRequired(context, info);
+                addSpecimen(context, batchOp, info);
+            }
+        }
+
+        if (!errorSet.isEmpty()) {
+            throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
         log.debug("SpecimenBatchOpAction:end");

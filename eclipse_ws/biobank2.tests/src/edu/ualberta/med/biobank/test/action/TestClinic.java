@@ -69,7 +69,9 @@ public class TestClinic extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(),
             provisioning.patientIds.get(0), provisioning.clinicId);
@@ -83,9 +85,6 @@ public class TestClinic extends TestAction {
         Assert.assertEquals(new Long(1), clinicInfo.collectionEventCount);
         Assert.assertEquals(1, clinicInfo.contacts.size());
         Assert.assertEquals(1, clinicInfo.studyInfos.size());
-        Assert.assertEquals(name + "_clinic_city", clinicInfo.clinic
-            .getAddress()
-            .getCity());
     }
 
     @Test

@@ -128,7 +128,9 @@ public class TestStudy extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(),
             provisioning.patientIds.get(0), provisioning.clinicId);

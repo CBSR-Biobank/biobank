@@ -139,14 +139,10 @@ $Revision: 43749 $
       <login-module
         code="gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule"
         flag="sufficient">
-        <module-option name="driver">
-          com.mysql.jdbc.Driver
-        </module-option>
-        <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank
-        </module-option>
-        <module-option name="user">dummy</module-option>
-        <module-option name="passwd">ozzy498</module-option>
+        <module-option name="driver">@database.driver@</module-option>
+        <module-option name="url">@database.url@</module-option>
+        <module-option name="user">@database.username@</module-option>
+        <module-option name="passwd">@database.password@</module-option>
         <module-option name="query">
           SELECT * from csm_user WHERE login_name=? and password=?
         </module-option>
@@ -160,14 +156,10 @@ $Revision: 43749 $
       <login-module
         code="gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule"
         flag="sufficient">
-        <module-option name="driver">
-          com.mysql.jdbc.Driver
-        </module-option>
-        <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank
-        </module-option>
-        <module-option name="user">dummy</module-option>
-        <module-option name="passwd">ozzy498</module-option>
+        <module-option name="driver">@database.driver@</module-option>
+        <module-option name="url">@database.url@</module-option>
+        <module-option name="user">@database.username@</module-option>
+        <module-option name="passwd">@database.password@</module-option>
         <module-option name="query">
           SELECT * from csm_user WHERE login_name=? and password=?
         </module-option>
@@ -181,14 +173,10 @@ $Revision: 43749 $
       <login-module
         code="gov.nih.nci.security.authentication.loginmodules.RDBMSLoginModule"
         flag="sufficient">
-        <module-option name="driver">
-          com.mysql.jdbc.Driver
-        </module-option>
-        <module-option name="url">
-          jdbc:mysql://localhost:3306/biobank
-        </module-option>
-        <module-option name="user">dummy</module-option>
-        <module-option name="passwd">ozzy498</module-option>
+        <module-option name="driver">@database.driver@</module-option>
+        <module-option name="url">@database.url@</module-option>
+        <module-option name="user">@database.username@</module-option>
+        <module-option name="passwd">@database.password@</module-option>
         <module-option name="query">
           SELECT * from csm_user WHERE login_name=? and password=?
         </module-option>

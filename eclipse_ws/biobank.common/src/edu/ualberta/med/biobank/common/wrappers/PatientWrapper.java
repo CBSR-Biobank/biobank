@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.loggers.PatientLogProvider;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.util.NullUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -156,7 +157,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         if (wrapper instanceof PatientWrapper) {
             String number1 = getPnumber();
             String number2 = wrapper.wrappedObject.getPnumber();
-            return number1.compareTo(number2);
+            return NullUtil.cmp(number1, number2);
         }
         return 0;
     }

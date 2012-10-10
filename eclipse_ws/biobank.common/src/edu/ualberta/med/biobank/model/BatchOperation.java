@@ -12,8 +12,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.Parameter;
-import org.hibernate.annotations.Type;
 
 @Immutable
 @Entity

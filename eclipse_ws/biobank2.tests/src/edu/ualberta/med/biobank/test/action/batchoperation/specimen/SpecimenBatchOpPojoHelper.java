@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +49,6 @@ class SpecimenBatchOpPojoHelper {
      * @param originCenter the center where the specimens came from.
      * @param currentCenter the center where the specimens are stored.
      * @param patients the patients that these specimens will belong to.
-     * @throws IOException
      */
     ArrayList<SpecimenBatchOpInputPojo> createAllSpecimens(Study study,
         Set<OriginInfo> originInfos, Set<Patient> patients) {
@@ -118,7 +116,7 @@ class SpecimenBatchOpPojoHelper {
         Set<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException(
-                "study does not have any source specimens");
+                "study does not have any aliquoted specimens");
         }
 
         Map<String, String> parentSpecimenInfoMap =

@@ -3,9 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
@@ -17,9 +15,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.SetResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -52,16 +48,17 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
-import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
@@ -162,33 +159,24 @@ public class TestSite extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        Transaction tx = session.beginTransaction();
+        factory.createProcessingEvent();
+        Specimen alqSpecimen = factory.createChildSpecimen();
+        factory.getDefaultParentSpecimen().getChildSpecimens().add(alqSpecimen);
+        tx.commit();
 
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
-        CEventInfo ceventInfo =
-            exec(new CollectionEventGetInfoAction(ceventId));
-        List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
-        HashSet<Integer> added = new HashSet<Integer>();
-        added.add(sourceSpecs.get(0).specimen.getId());
-
-        exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, Utils.getRandomDate(), Utils
-                .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-            added, new HashSet<Integer>())).getId();
+        Site site = factory.getDefaultSite();
 
         SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
+            exec(new SiteGetInfoAction(factory.getDefaultSite().getId()));
 
-        Assert.assertEquals(name + "_site_city", siteInfo.getSite()
-            .getAddress()
-            .getCity());
+        Assert.assertEquals(site.getAddress().getCity(), siteInfo.getSite()
+            .getAddress().getCity());
         Assert.assertEquals(ActivityStatus.ACTIVE,
             siteInfo.getSite().getActivityStatus());
         Assert.assertEquals(new Long(1), siteInfo.getPatientCount());
         Assert.assertEquals(new Long(1), siteInfo.getProcessingEventCount());
-        Assert.assertEquals(new Long(1), siteInfo.getSpecimenCount());
+        Assert.assertEquals(new Long(2), siteInfo.getSpecimenCount());
     }
 
     @Test
@@ -411,7 +399,10 @@ public class TestSite extends TestAction {
     }
 
     private Provisioning createSiteWithContainerType() {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
+
         provisioning.addContainerType(getExecutor(), name,
             getContainerLabelingSchemes().values().iterator().next()
                 .getId(), getR().nextDouble());
@@ -426,6 +417,7 @@ public class TestSite extends TestAction {
             new SiteGetContainerTypeInfoAction(provisioning.siteId))
             .getList();
 
+        Assert.assertEquals(1, ctypeInfo.size());
         Assert.assertEquals(0L, ctypeInfo.get(0).getContainerCount()
             .longValue());
 
@@ -499,7 +491,9 @@ public class TestSite extends TestAction {
 
     @Test
     public void deleteWithProcessingEvents() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         // create a collection event
         Integer ceventId = CollectionEventHelper
@@ -541,7 +535,9 @@ public class TestSite extends TestAction {
 
     @Test
     public void deleteWithSrcDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         Integer dispatchId1 =
             DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
@@ -599,9 +595,12 @@ public class TestSite extends TestAction {
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void deleteWithDstDispatch() throws Exception {
-        Provisioning provisioning = new Provisioning(getExecutor(), name);
+        session.beginTransaction();
+        Provisioning provisioning = new Provisioning(session, factory);
+        session.getTransaction().commit();
 
         Integer dispatchId =
             DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
@@ -641,39 +640,32 @@ public class TestSite extends TestAction {
 
     @Test
     public void getStudyInfo() throws Exception {
-        Set<Integer> studyIds = new HashSet<Integer>();
-        studyIds.add(StudyHelper.createStudy(getExecutor(),
-            name + Utils.getRandomString(5), ActivityStatus.ACTIVE));
-        Integer siteId =
-            SiteHelper.createSite(getExecutor(),
-                name + Utils.getRandomString(5),
-                "Edmo", ActivityStatus.ACTIVE, studyIds);
+        Transaction tx = session.beginTransaction();
+        factory.createSite();
+        factory.getDefaultSite().getStudies().add(factory.createStudy());
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<CollectionEvent> cevents = new HashSet<CollectionEvent>();
 
-        Integer patients = getR().nextInt(5);
-        Integer collectionEvents = getR().nextInt(5);
-
-        for (int i = 0; i < patients; i++) {
-            Integer patient =
-                PatientHelper.createPatient(getExecutor(),
-                    name + Utils.getRandomString(5), studyIds.iterator()
-                        .next());
-            for (int j = 0; j < collectionEvents; j++)
-                CollectionEventHelper.createCEventWithSourceSpecimens(
-                    getExecutor(),
-                    patient, siteId);
+        for (int i = 0; i < 5; i++) {
+            patients.add(factory.createPatient());
+            for (int j = 0; j < 5; j++) {
+                cevents.add(factory.createCollectionEvent());
+            }
         }
-        SiteGetStudyInfoAction action = new SiteGetStudyInfoAction(siteId);
-        ListResult<StudyCountInfo> studies = exec(action);
+        tx.commit();
 
-        Assert
-            .assertTrue(studies.getList().get(0).getCollectionEventCount()
-                .intValue()
-            == (collectionEvents * patients));
-        Assert
-            .assertTrue(studies.getList().get(0).getCollectionEventCount()
-                .intValue()
-            == (patients));
-        Assert.assertTrue(studies.getList().get(0).getStudy().getId()
-            .equals(studyIds.iterator().next()));
+        List<StudyCountInfo> studyCountInfos =
+            exec(new SiteGetStudyInfoAction(factory.getDefaultSite().getId()))
+                .getList();
+        Assert.assertEquals(1, studyCountInfos.size());
+
+        StudyCountInfo studyCountInfo = studyCountInfos.get(0);
+
+        Assert.assertEquals(factory.getDefaultStudy(),
+            studyCountInfo.getStudy());
+        Assert.assertEquals(cevents.size(), studyCountInfo
+            .getCollectionEventCount().intValue());
+        Assert.assertEquals(patients.size(), studyCountInfo.getPatientCount()
+            .intValue());
     }
 }

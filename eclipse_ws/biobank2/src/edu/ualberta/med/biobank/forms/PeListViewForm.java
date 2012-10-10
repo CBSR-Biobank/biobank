@@ -65,7 +65,7 @@ public class PeListViewForm extends BiobankViewForm {
                     InfoTableEvent<ProcessingEventBriefInfo> event) {
                     ProcessingEvent pe =
                         ((ProcessingEventBriefInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).e;
+                            .getSelection()).getObject()).pevent;
                     AdapterBase.openForm(
                         new FormInput(
                             new ProcessingEventAdapter(null,
@@ -82,7 +82,7 @@ public class PeListViewForm extends BiobankViewForm {
                     InfoTableEvent<ProcessingEventBriefInfo> event) {
                     ProcessingEvent pe =
                         ((ProcessingEventBriefInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).e;
+                            .getSelection()).getObject()).pevent;
                     AdapterBase.openForm(
                         new FormInput(
                             new ProcessingEventAdapter(null,

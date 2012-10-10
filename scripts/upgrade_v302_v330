@@ -8,11 +8,12 @@ USAGE="
 Usage: $SCRIPT [OPTIONS]
 
 OPTIONS
-  -d DUMP     The original biobank2 database dump file name.
+  -d DUMP     The original biobank2 database dump file name compressed with gzip.
+              If not specified, the script prompts the user to enter it.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
   -u DBUSER   The user to use on the MySQL server.
-  -p PWD      The password to use on the MySQL server.
+              If not specified, the script prompts the user to enter it.
   -h          Help text.
 "
 
@@ -22,32 +23,46 @@ SED=/bin/sed
 DBHOST="localhost"
 DBNAME=biobank2
 
-while getopts "e:d:hH:u:p:o:" OPTION
+while getopts "d:hH:u:" OPTION
 do
   case $OPTION in
         d) DBDUMP=$OPTARG;;
         H) DBHOST=$OPTARG;;
         u) DBUSER=$OPTARG;;
-        p) DBPWD=$OPTARG;;
         h) echo "$USAGE"; exit;;
   esac
 done
 
-if [ -z "$DBDUMP" ]; then
-    echo "ERROR: old database dump not specified"
-    echo "$USAGE"
-    exit
+if [ -z "$DBUSER" ]; then
+    read -p "MySQL user on host $DBHOST: " DBUSER
 fi
 
 if [ -z "$DBUSER" ]; then
     echo "ERROR: user not specified"
-    echo "$USAGE"
     exit
 fi
 
+read -s -p "MySQL Password for user $DBUSER: " DBPWD
+echo ""
+
 if [ -z "$DBPWD" ]; then
     echo "ERROR: password not specified"
-    echo "$USAGE"
+    exit
+fi
+
+if [ -z "$DBDUMP" ]; then
+    read -p "MySQL database dump (gzipped): " DBDUMP
+fi
+
+eval DBDUMP=$DBDUMP
+
+if [ -z "$DBDUMP" ]; then
+    echo "ERROR: old database dump not specified"
+    exit
+fi
+
+if [ ! -f "$DBDUMP" ]; then
+    echo "ERROR: database dump file does not exist"
     exit
 fi
 
@@ -58,11 +73,13 @@ mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank2
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
 mysql -h$DBHOST -u$DBUSER -p$DBPWD  biobank -e "grant all privileges on biobank.* to 'dummy'@'localhost' with grant option"
-if [ $OSTYPE == 'linux' ]; then
+
+if [ -s /usr/bin/pv ]; then
     pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 else
     gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
 fi
+
 echo "upgrading database from v3.0.2 to v3.1.0 ..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v302_v310.sql
 echo "upgrading database from v3.1.0 to v3.2.0 ..."

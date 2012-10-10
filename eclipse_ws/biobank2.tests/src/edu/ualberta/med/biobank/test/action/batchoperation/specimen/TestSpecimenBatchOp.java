@@ -313,6 +313,45 @@ public class TestSpecimenBatchOp extends TestAction {
     }
 
     @Test
+    public void onlyChildSpecimensNoParents() throws Exception {
+        // the parent specimens will not exist in this test
+        Set<Patient> patients = new HashSet<Patient>();
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+
+        patients.add(factory.createPatient());
+        factory.createSourceSpecimen();
+        factory.createAliquotedSpecimen();
+        parentSpecimens.add(factory.createParentSpecimen());
+
+        tx.commit();
+
+        ArrayList<SpecimenBatchOpInputPojo> inputPojos =
+            specimenCsvHelper.createAliquotedSpecimens(
+                factory.getDefaultStudy(), parentSpecimens);
+
+        // change the parent's inventory id to something that does not exist
+        for (SpecimenBatchOpInputPojo inputPojo : inputPojos) {
+            inputPojo.setParentInventoryId(inputPojo.getParentInventoryId()
+                + "_1");
+        }
+
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, inputPojos);
+
+        try {
+            SpecimenBatchOpAction importAction =
+                new SpecimenBatchOpAction(factory.getDefaultSite(), inputPojos,
+                    new File(CSV_NAME));
+            exec(importAction);
+            Assert
+                .fail("should not be allowed to create aliquot specimens with no parent specimens");
+        } catch (BatchOpErrorsException e) {
+            new AssertBatchOpException()
+                .withMessage(SpecimenBatchOpAction.CSV_PARENT_SPC_INV_ID_ERROR
+                    .format());
+        }
+    }
+
+    @Test
     public void onlyChildSpecimensNoCollectionEvent() throws Exception {
         factory.createSpecimenType();
         AliquotedSpecimen aliquotedSpecimen =
@@ -676,6 +715,8 @@ public class TestSpecimenBatchOp extends TestAction {
                 .createCriteria(Specimen.class)
                 .add(Restrictions.eq("inventoryId", csvInfo.getInventoryId()))
                 .uniqueResult();
+
+            Assert.assertNotNull(specimen);
 
             Assert.assertEquals(csvInfo.getSpecimenType(),
                 specimen.getSpecimenType().getName());
