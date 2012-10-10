@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PROCESSING_EVENT")
 @NotUsed.List({
-    @NotUsed(by = SpecimenProcessingEvent.class, property = "processingEvent", groups = PreDelete.class)
+    @NotUsed(by = ProcessingEventInputSpecimen.class, property = "processingEvent", groups = PreDelete.class)
 })
 @Unique(properties = { "center", "worksheet" }, groups = PrePersist.class)
 public class ProcessingEvent

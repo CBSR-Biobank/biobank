@@ -10,13 +10,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.Length;
 
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
+import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
 import edu.ualberta.med.biobank.model.util.ProxyUtil;
 
 /**
@@ -29,6 +29,8 @@ import edu.ualberta.med.biobank.model.util.ProxyUtil;
 @Table(name = "SETTING")
 public class Setting implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
+        new HashCodeBuilderProvider(Setting.class, 11, 13);
 
     public static final int MAX_VALUE_LENGTH = 1000;
 
@@ -106,8 +108,8 @@ public class Setting implements Serializable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(11, 37)
-            .append(key)
+        return hashCodeBuilderProvider.get()
+            .append(getKey())
             .toHashCode();
     }
 
@@ -117,7 +119,7 @@ public class Setting implements Serializable {
         if (!ProxyUtil.sameClass(this, obj)) return false;
         Setting rhs = (Setting) obj;
         return new EqualsBuilder()
-            .append(key, rhs.key)
+            .append(getKey(), rhs.getKey())
             .isEquals();
     }
 }

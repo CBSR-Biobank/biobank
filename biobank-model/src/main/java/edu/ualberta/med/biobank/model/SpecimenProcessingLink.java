@@ -15,9 +15,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
+import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
+import edu.ualberta.med.biobank.model.util.ProxyUtil;
 
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
@@ -46,41 +50,60 @@ import edu.ualberta.med.biobank.model.type.Decimal;
 public class SpecimenProcessingLink
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
+    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
+        new HashCodeBuilderProvider(SpecimenProcessingLink.class, 17, 19);
 
-    // TODO: check that input and output have the same processingEvent?
-    private SpecimenProcessingEvent input;
-    private SpecimenProcessingEvent output;
-    private SpecimenProcessingLinkType type;
+    private Specimen input;
+    private Specimen output;
     private Date timeDone;
+    private SpecimenProcessingLinkType type;
+    private ProcessingEvent processingEvent;
     private Decimal actualInputAmountChange;
     private Decimal actualOutputAmountChange;
 
     /**
      * @return the {@link Specimen} that was processed.
      */
+    @NaturalId
     @NotNull(message = "{SpecimenProcessingLink.input.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "INPUT_SPECIMEN_PROCESSING_EVENT_ID", nullable = false)
-    public SpecimenProcessingEvent getInput() {
+    @JoinColumn(name = "INPUT_SPECIMEN_ID", nullable = false)
+    public Specimen getInput() {
         return input;
     }
 
-    public void setInput(SpecimenProcessingEvent input) {
+    public void setInput(Specimen input) {
         this.input = input;
     }
 
     /**
      * @return the {@link Specimen} that resulted from the process.
      */
+    @NaturalId
     @NotNull(message = "{SpecimenProcessingLink.output.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OUTPUT_SPECIMEN_PROCESSING_EVENT_ID", nullable = false)
-    public SpecimenProcessingEvent getOutput() {
+    @JoinColumn(name = "OUTPUT_SPECIMEN_ID", nullable = false)
+    public Specimen getOutput() {
         return output;
     }
 
-    public void setOutput(SpecimenProcessingEvent output) {
+    public void setOutput(Specimen output) {
         this.output = output;
+    }
+
+    /**
+     * @return when the processing happened.
+     */
+    @NaturalId(mutable = false)
+    @NotNull(message = "{SpecimenProcessingLink.timeDone.NotNull}")
+    @Past
+    @Column(name = "TIME_DONE", nullable = false)
+    public Date getTimeDone() {
+        return timeDone;
+    }
+
+    public void setTimeDone(Date timeDone) {
+        this.timeDone = timeDone;
     }
 
     /**
@@ -88,7 +111,7 @@ public class SpecimenProcessingLink
      *         underwent, or null if unspecified.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_PROCESSING_LINK_TYPE_ID", nullable = false)
+    @JoinColumn(name = "SPECIMEN_PROCESSING_LINK_TYPE_ID")
     public SpecimenProcessingLinkType getType() {
         return type;
     }
@@ -98,16 +121,17 @@ public class SpecimenProcessingLink
     }
 
     /**
-     * @return when the processing happened, or null if unspecified.
+     * @return the {@link ProcessingEvent} this {@link SpecimenProcessingLink}
+     *         was established in, or null if unspecified.
      */
-    @Past
-    @Column(name = "TIME_DONE")
-    public Date getTimeDone() {
-        return timeDone;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PROCESSING_EVENT_ID")
+    public ProcessingEvent getProcessingEvent() {
+        return processingEvent;
     }
 
-    public void setTimeDone(Date timeDone) {
-        this.timeDone = timeDone;
+    public void setProcessingEvent(ProcessingEvent processingEvent) {
+        this.processingEvent = processingEvent;
     }
 
     /**
@@ -142,5 +166,26 @@ public class SpecimenProcessingLink
 
     public void setActualOutputAmountChange(Decimal actualOutputAmountChange) {
         this.actualOutputAmountChange = actualOutputAmountChange;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCodeBuilderProvider.get()
+            .append(getInput())
+            .append(getOutput())
+            .append(getTimeDone())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!ProxyUtil.sameClass(this, obj)) return false;
+        SpecimenProcessingLink rhs = (SpecimenProcessingLink) obj;
+        return new EqualsBuilder()
+            .append(getInput(), rhs.getInput())
+            .append(getOutput(), rhs.getOutput())
+            .append(getTimeDone(), rhs.getTimeDone())
+            .isEquals();
     }
 }

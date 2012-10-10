@@ -11,7 +11,7 @@
     @Transient getId() method that returns typed ids. setInternalId() can then
     be overridden to also call setId(new TypedId(id)) and setId() can be overridden
     to also call setInternalId(getId().id), avoiding recursion, of course.
-[ ] Make sure that a Specimen parent/child or from/to relationship can exist
+[v] Make sure that a Specimen parent/child or from/to relationship can exist
     without a processing event. Maybe this could be done by:
     (1) Having one SpecimenProcessingLink table with:
         FROM_SPC_ID, TO_SPC_ID, PE_ID, AMOUNTS, ETC. - all optional
@@ -19,6 +19,8 @@
         Only problem: how to add "inputs" to a PE to select from. How about just
         SpecimenProcessingEventInput class/ relationship. DONE
     (2) Something else (more?) complicated?
+    A: made a ProcessingEventInputSpecimen class and have the SpecimenProcessingLink
+    class use the (input, output, timeDone) as the natural id
 [ ] Call property 'isDerived'?
 [ ] Group models and actions into domains, such as, user, report, center, shipping,
     etc. and actions/ services into those groups so that there are not so many
@@ -35,6 +37,7 @@
 [ ] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).
+[ ] Bring over the Sha1Hash and Md5Hash objects
 [ ] For unique strings, hash the string instead.
 [v] Make the combination of PE (worksheet, center) or (worksheet, study) unique?
     A: Yes. Done.

@@ -98,6 +98,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.PrinterLabelTemplate" />
 		<mapping class="edu.ualberta.med.biobank.model.ProcessingEvent" />
 		<mapping class="edu.ualberta.med.biobank.model.ProcessingEventComment" />
+		<mapping class="edu.ualberta.med.biobank.model.ProcessingEventInputSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.ProcessingType" />
 		<mapping class="edu.ualberta.med.biobank.model.PropertyModifier" />
 		<mapping class="edu.ualberta.med.biobank.model.PropertyType" />
@@ -123,7 +124,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenComment" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenGroup" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingEvent" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLink" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLinkType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
