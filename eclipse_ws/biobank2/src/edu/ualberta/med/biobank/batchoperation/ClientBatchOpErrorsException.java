@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.batchoperation;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.util.CSVContext;
@@ -19,7 +19,7 @@ public class ClientBatchOpErrorsException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private final Set<BatchOpException<String>> errors =
-        new HashSet<BatchOpException<String>>(0);
+        new TreeSet<BatchOpException<String>>();
 
     public ClientBatchOpErrorsException(Set<BatchOpException<String>> errors) {
         addErrors(errors);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feature id="biobank2.feature.core" label="BioBank Core Feature" version="3.3.0.rc11" provider-name="AICML" plugin="biobank">
+<feature id="biobank2.feature.core" label="BioBank Core Feature" version="3.3.0" provider-name="AICML" plugin="biobank">
 
    <description>
       This feature contains all plugins developped by AICML for the BioBank application
