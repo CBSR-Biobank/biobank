@@ -26,8 +26,8 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     private Integer centerId;
 
-    public RequestRetrievalAction(Integer centerId) {
-        this.centerId = centerId;
+    public RequestRetrievalAction(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override

@@ -23,15 +23,16 @@ public class PEventByWSSearchAction implements
     private static final long serialVersionUID = 1L;
     private String worksheet;
 
-    private Center center;
+    private Integer centerId;
 
     public PEventByWSSearchAction(String worksheet, Center center) {
         this.worksheet = worksheet;
-        this.center = center;
+        this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
+        Center center = context.load(Center.class, centerId);
         return new ProcessingEventReadPermissionByCenter(center)
             .isAllowed(context);
     }
@@ -42,7 +43,7 @@ public class PEventByWSSearchAction implements
         Query q =
             context.getSession().createQuery(PEVENT_BASE_QRY);
         q.setParameter(0, worksheet);
-        q.setParameter(1, center.getId());
+        q.setParameter(1, centerId);
         @SuppressWarnings("unchecked")
         List<Integer> rows = q.list();
         return new ListResult<Integer>(rows);

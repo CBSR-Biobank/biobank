@@ -336,4 +336,10 @@ public class TestProcessingEvent extends TestAction {
         Assert.assertEquals(new Long(1), peventBriefInfo.sourceSpcCount);
         Assert.assertEquals(new Long(1), peventBriefInfo.aliquotSpcCount);
     }
+
+    @Test
+    public void peventWorksheetSearch() {
+        // must test action PEventByWSSearchAction
+        Assert.fail("method needs to be implemented");
+    }
 }

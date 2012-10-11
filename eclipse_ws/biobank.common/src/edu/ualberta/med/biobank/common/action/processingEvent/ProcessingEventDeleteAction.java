@@ -22,29 +22,29 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
         bundle.tr("Delete failed. There are child specimens linked through" +
             " this processing event").format();
 
-    private final ProcessingEvent pevent;
+    private final Integer peventId;
 
     public ProcessingEventDeleteAction(ProcessingEvent pevent) {
         if (pevent == null) {
             throw new IllegalArgumentException();
         }
-        this.pevent = pevent;
+        this.peventId = pevent.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
         return new ProcessingEventDeletePermission(pevent).isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        ProcessingEvent peventToDelete =
-            context.load(ProcessingEvent.class, pevent.getId());
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
 
         // if no aliquoted specimen, then ok to remove the specimens and to
         // delete the processing event
 
-        for (Specimen sp : peventToDelete.getSpecimens()) {
+        for (Specimen sp : pevent.getSpecimens()) {
             if (sp.getChildSpecimens().size() != 0)
                 throw new LocalizedException(HAS_CHILD_SPECIMENS_ERRMSG);
             sp.setActivityStatus(ActivityStatus.ACTIVE);
@@ -52,8 +52,8 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
             context.getSession().saveOrUpdate(sp);
         }
 
-        context.getSession().delete(peventToDelete);
+        context.getSession().delete(pevent);
 
-        return new IdResult(pevent.getId());
+        return new IdResult(peventId);
     }
 }

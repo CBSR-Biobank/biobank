@@ -39,7 +39,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
     private static Logger log = LoggerFactory
         .getLogger(OhsTecanSpecimenBatchOpAction.class.getName());
 
-    private final Center workingCenter;
+    private final Integer workingCenterId;
 
     private final String worksheet;
 
@@ -61,7 +61,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
         this.timestamp = timestamp;
         this.technician = technician;
 
-        this.workingCenter = workingCenter;
+        this.workingCenterId = workingCenter.getId();
 
         compressedList =
             new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
@@ -106,6 +106,8 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
             context.getSession().saveOrUpdate(specimen);
             addedSpecimenIds.add(specimen.getId());
         }
+
+        Center workingCenter = context.load(Center.class, workingCenterId);
 
         ProcessingEventSaveAction peventSaveAction =
             new ProcessingEventSaveAction(null, workingCenter,

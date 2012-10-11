@@ -25,11 +25,9 @@ public class ReceivingRequestGroup extends AbstractRequestGroup {
         throws Exception {
         return ModelWrapper.wrapModelCollection(
             SessionManager.getAppService(),
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new RequestRetrievalAction(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId())).getList(),
+            SessionManager.getAppService().doAction(
+                new RequestRetrievalAction(SessionManager.getUser()
+                    .getCurrentWorkingCenter().getWrappedObject())).getList(),
             RequestWrapper.class);
     }
 
