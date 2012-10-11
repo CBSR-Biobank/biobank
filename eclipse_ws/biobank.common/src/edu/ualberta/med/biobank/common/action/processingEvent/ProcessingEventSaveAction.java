@@ -22,9 +22,9 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private ProcessingEvent pevent;
+    private Integer peventId;
 
-    private Center center;
+    private Integer centerId;
 
     private Date createdAt;
 
@@ -44,8 +44,10 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> addedSpecimenIds,
         Set<Integer> removedSpecimenIds) {
-        this.pevent = pevent;
-        this.center = center;
+        if (pevent != null) {
+            this.peventId = pevent.getId();
+        }
+        this.centerId = center.getId();
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.activityStatus = activityStatus;
@@ -59,8 +61,10 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> addedSpecimenIds,
         Set<Integer> removedSpecimenIds, String technician) {
-        this.pevent = pevent;
-        this.center = center;
+        if (pevent != null) {
+            this.peventId = pevent.getId();
+        }
+        this.centerId = center.getId();
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.activityStatus = activityStatus;
@@ -73,10 +77,13 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     @Override
     public boolean isAllowed(ActionContext context) {
         Permission permission;
-        if (pevent == null) {
+        if (peventId == null) {
+            Center center = context.load(Center.class, centerId);
             permission =
                 new ProcessingEventCreatePermission(center);
         } else {
+            ProcessingEvent pevent =
+                context.load(ProcessingEvent.class, peventId);
             permission = new ProcessingEventUpdatePermission(pevent);
         }
         return permission.isAllowed(context);
@@ -86,14 +93,15 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         ProcessingEvent peventToSave;
 
-        if (pevent == null) {
+        if (peventId == null) {
             peventToSave = new ProcessingEvent();
         } else {
-            peventToSave = context.load(ProcessingEvent.class, pevent.getId());
+            peventToSave =
+                context.load(ProcessingEvent.class, peventId);
         }
 
         peventToSave.setActivityStatus(activityStatus);
-        peventToSave.setCenter(context.load(Center.class, center.getId()));
+        peventToSave.setCenter(context.load(Center.class, centerId));
         setComments(context, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);

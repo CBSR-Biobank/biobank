@@ -135,9 +135,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         } else {
             PEventInfo read =
                 SessionManager.getAppService().doAction(
-                    new ProcessingEventGetInfoAction(
-                        (ProcessingEvent) pEventAdapter
-                            .getModelObject().getWrappedObject()));
+                    new ProcessingEventGetInfoAction(adapter.getId()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
             SessionManager.logLookup(read.pevent);
@@ -296,13 +294,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                         .getWorksheet(), specimen
                                         .getProcessingEvent()
                                         .getFormattedCreatedAt()));
-                        } else if (!specimen.isActive())
+                        } else if (!specimen.isActive()) {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr(
                                     "This specimen has status ''{0}''. Only ''Active'' specimens can be added to a processing event.",
                                     specimen.getActivityStatus().getName()));
-                        else if (specimen.isUsedInDispatch()) {
+                        } else if (specimen.isUsedInDispatch()) {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr("Specimen is currently listed in a dispatch."));
@@ -311,8 +309,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr("Specimen is currently listed as stored in a container."));
-                        }
-                        else if (!SessionManager.getUser()
+                        } else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter().getStudyCollection()
                             .contains(
                                 specimen.getCollectionEvent().getPatient()
@@ -323,8 +320,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     "This specimen is from study ''{0}''. This study is not linked to your current working center. Processing is not allowed.",
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        }
-                        else if (study == null) {
+                        } else if (study == null) {
                             if (specimens.size() == 0) {
                                 study =
                                     specimen.getCollectionEvent().getPatient()
@@ -345,6 +341,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                 }
                             }
                         }
+
                         if (!specimen.getCollectionEvent().getPatient()
                             .getStudy().getWrappedObject().equals(study)) {
                             throw new VetoException(

@@ -32,8 +32,7 @@ public class SpecimenBatchOpGetAction
         throws ActionException {
         Session session = context.getSession();
 
-        BatchOperation batch = (BatchOperation) session
-            .load(BatchOperation.class, id);
+        BatchOperation batch = context.load(BatchOperation.class, id);
 
         FileMetaData meta = (FileMetaData) session
             .createQuery("select bo.input.metaData " +

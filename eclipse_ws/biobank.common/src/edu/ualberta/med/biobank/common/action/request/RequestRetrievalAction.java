@@ -33,7 +33,7 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return PermissionEnum.REQUEST_READ.isAllowed(context.getUser(),
-            (Center) context.getSession().load(Center.class, centerId));
+            context.load(Center.class, centerId));
     }
 
     @Override

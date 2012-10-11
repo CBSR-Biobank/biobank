@@ -33,10 +33,10 @@ import edu.ualberta.med.biobank.model.Center;
 public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
     private static final long serialVersionUID = 1L;
 
-    private final Center center;
+    private final Integer centerId;
 
     public UserPermissionsGetAction(Center center) {
-        this.center = center;
+        this.centerId = center.getId();
     }
 
     @Override
@@ -67,25 +67,29 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         p.patientCreatePermission =
             new PatientCreatePermission(null).isAllowed(context);
 
-        if (center != null) {
+        if (centerId != null) {
+            Center center = context.load(Center.class, centerId);
+
             p.containerCreatePermission =
-                new ContainerCreatePermission(center.getId())
+                new ContainerCreatePermission(centerId)
                     .isAllowed(context);
             p.containerTypeCreatePermission =
-                new ContainerTypeCreatePermission(center.getId())
+                new ContainerTypeCreatePermission(centerId)
                     .isAllowed(context);
             p.dispatchCreatePermission =
-                new DispatchCreatePermission(center.getId()).isAllowed(context);
+                new DispatchCreatePermission(centerId)
+                    .isAllowed(context);
             p.originInfoUpdatePermission =
-                new OriginInfoUpdatePermission(center.getId())
+                new OriginInfoUpdatePermission(centerId)
                     .isAllowed(context);
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(center)
                     .isAllowed(context);
             p.specimenAssignPermission =
-                new SpecimenAssignPermission(center.getId()).isAllowed(context);
+                new SpecimenAssignPermission(centerId)
+                    .isAllowed(context);
             p.specimenLinkPermission =
-                new SpecimenLinkPermission(center.getId(), null)
+                new SpecimenLinkPermission(centerId, null)
                     .isAllowed(context);
         }
 

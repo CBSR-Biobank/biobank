@@ -33,14 +33,19 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
         public List<SpecimenInfo> sourceSpecimenInfos;
     }
 
-    private final ProcessingEvent pevent;
+    private final Integer peventId;
 
     public ProcessingEventGetInfoAction(ProcessingEvent pevent) {
-        this.pevent = pevent;
+        this.peventId = pevent.getId();
+    }
+
+    public ProcessingEventGetInfoAction(Integer peventId) {
+        this.peventId = peventId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
         return new ProcessingEventReadPermission(pevent).isAllowed(context);
     }
 
@@ -49,19 +54,18 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
         PEventInfo peventInfo = new PEventInfo();
 
         Query query = context.getSession().createQuery(PEVENT_INFO_QRY);
-        query.setParameter(0, pevent.getId());
+        query.setParameter(0, peventId);
 
         @SuppressWarnings("unchecked")
         List<ProcessingEvent> rows = query.list();
         if (rows.size() != 1) {
-            throw new ModelNotFoundException(ProcessingEvent.class, pevent);
+            throw new ModelNotFoundException(ProcessingEvent.class, peventId);
         }
 
         peventInfo.pevent = rows.get(0);
         peventInfo.sourceSpecimenInfos =
-            new ProcessingEventGetSourceSpecimenListInfoAction(pevent.getId())
-                .run(
-                    context).getList();
+            new ProcessingEventGetSourceSpecimenListInfoAction(peventId)
+                .run(context).getList();
 
         return peventInfo;
     }
