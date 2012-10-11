@@ -129,13 +129,15 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             ProcessingEvent p = new ProcessingEvent();
             p.setActivityStatus(ActivityStatus.ACTIVE);
             pevent.setWrappedObject(p);
-            pevent
-                .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
+            pevent.setCenter(SessionManager.getUser()
+                .getCurrentWorkingCenter());
             specimens = new ArrayList<SpecimenInfo>();
         } else {
             PEventInfo read =
                 SessionManager.getAppService().doAction(
-                    new ProcessingEventGetInfoAction(adapter.getId()));
+                    new ProcessingEventGetInfoAction(
+                        (ProcessingEvent) pEventAdapter
+                            .getModelObject().getWrappedObject()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
             SessionManager.logLookup(read.pevent);
@@ -391,15 +393,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         for (SpecimenInfo spec : specimenEntryWidget.getRemovedSpecimens())
             removed.add(spec.specimen.getId());
 
-        Integer peventId =
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new ProcessingEventSaveAction(pevent.getId(), pevent
-                        .getCenter().getId(), pevent.getCreatedAt(), pevent
-                        .getWorksheet(), pevent.getActivityStatus(), comment
-                        .getMessage(),
-                        added, removed)).getId();
+        Integer peventId = SessionManager.getAppService().doAction(
+            new ProcessingEventSaveAction(pevent.getWrappedObject(), pevent
+                .getCenter().getWrappedObject(), pevent.getCreatedAt(),
+                pevent.getWorksheet(), pevent.getActivityStatus(),
+                comment.getMessage(), added, removed)).getId();
         pevent.setId(peventId);
         ((AdapterBase) adapter).setModelObject(pevent);
     }

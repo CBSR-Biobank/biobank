@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
@@ -65,20 +66,25 @@ public class TestProcessingEvent extends TestAction {
         String worksheet = Utils.getRandomString(20, 50);
         String commentText = Utils.getRandomString(20, 30);
         Date date = Utils.getRandomDate();
-        Integer pEventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, date, worksheet,
-                    ActivityStatus.ACTIVE, commentText,
-                    new HashSet<Integer>(), new HashSet<Integer>())).getId();
+
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+
+        Integer pEventId = exec(new ProcessingEventSaveAction(
+            null, site, date, worksheet, ActivityStatus.ACTIVE, commentText,
+            new HashSet<Integer>(), new HashSet<Integer>())).getId();
 
         // Check ProcessingEvent is in database with correct values
-        PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pEventId));
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, pEventId);
 
-        Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
+        PEventInfo peventInfo =
+            exec(new ProcessingEventGetInfoAction(pevent));
+
+        Assert.assertEquals(pevent.getWorksheet(),
+            peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
-        Assert.assertEquals(date, peventInfo.pevent.getCreatedAt());
+        Assert.assertEquals(pevent.getCreatedAt(),
+            peventInfo.pevent.getCreatedAt());
         Assert
             .assertEquals(0, peventInfo.sourceSpecimenInfos.size());
     }
@@ -110,15 +116,12 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen
-        Integer pEventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, date, worksheet,
-                    ActivityStatus.ACTIVE, commentText,
-                    new HashSet<Integer>(
-                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
-                    new HashSet<Integer>()))
-                .getId();
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+        Integer pEventId = exec(new ProcessingEventSaveAction(
+            null, site, date, worksheet, ActivityStatus.ACTIVE,
+            commentText, new HashSet<Integer>(
+                Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+            new HashSet<Integer>())).getId();
 
         // sourceSpecs.get(0) will have its activity status set to closed now
         sourceSpecs.get(0).specimen.setActivityStatus(ActivityStatus.CLOSED);
@@ -142,9 +145,12 @@ public class TestProcessingEvent extends TestAction {
         exec(new SpecimenLinkSaveAction(provisioning.siteId,
             provisioning.studyId, aliquotedSpecimenInfos));
 
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, pEventId);
+
         // Check ProcessingEvent is in database with correct values
         PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
 
         Assert.assertEquals(worksheet, peventInfo.pevent.getWorksheet());
         Assert.assertEquals(1, peventInfo.pevent.getComments().size());
@@ -188,17 +194,21 @@ public class TestProcessingEvent extends TestAction {
 
     @Test
     public void delete() throws Exception {
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+
         Integer pEventId = exec(new ProcessingEventSaveAction(
-            null, provisioning.siteId, Utils.getRandomDate(), Utils
+            null, site, Utils.getRandomDate(), Utils
                 .getRandomString(50), ActivityStatus.ACTIVE, null,
             new HashSet<Integer>(), new HashSet<Integer>())).getId();
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, pEventId);
 
         PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
         exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
             Assert
                 .fail("one of the source specimen of this pevent has children. "
                     + "Can't delete the processing event");
@@ -220,13 +230,12 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, Utils.getRandomDate(), Utils
-                        .getRandomString(50), ActivityStatus.ACTIVE, null,
-                    new HashSet<Integer>(Arrays.asList(spcId)),
-                    new HashSet<Integer>())).getId();
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+        Integer pEventId = exec(new ProcessingEventSaveAction(
+            null, site, Utils.getRandomDate(), Utils
+                .getRandomString(50), ActivityStatus.ACTIVE, null,
+            new HashSet<Integer>(Arrays.asList(spcId)),
+            new HashSet<Integer>())).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
@@ -235,12 +244,15 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, pEventId);
+
         PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
         exec(new ProcessingEventDeleteAction(peventInfo.pevent));
 
         try {
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
             Assert.fail("processing event still exists");
         } catch (ModelNotFoundException e) {
             Assert.assertTrue(true);
@@ -272,13 +284,12 @@ public class TestProcessingEvent extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimen.
-        Integer pEventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, Utils.getRandomDate(),
-                    Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
-                    new HashSet<Integer>(Arrays.asList(spcId)),
-                    new HashSet<Integer>())).getId();
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+        Integer pEventId = exec(new ProcessingEventSaveAction(
+            null, site, Utils.getRandomDate(),
+            Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
+            new HashSet<Integer>(Arrays.asList(spcId)),
+            new HashSet<Integer>())).getId();
 
         Specimen spc = (Specimen) session.load(Specimen.class, spcId);
         Assert.assertNotNull(spc);
@@ -287,8 +298,10 @@ public class TestProcessingEvent extends TestAction {
 
         // delete this processing event. Can do it since the specimen has no
         // children
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, pEventId);
         PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pEventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
         try {
             exec(new ProcessingEventDeleteAction(peventInfo.pevent));
             Assert
@@ -314,7 +327,7 @@ public class TestProcessingEvent extends TestAction {
 
         ProcessingEventBriefInfo peventBriefInfo =
             exec(new ProcessingEventGetBriefInfoAction(factory
-                .getDefaultProcessingEvent().getId()));
+                .getDefaultProcessingEvent()));
 
         Assert.assertEquals(factory
             .getDefaultProcessingEvent(), peventBriefInfo.pevent);

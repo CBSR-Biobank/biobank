@@ -22,9 +22,9 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer peventId;
+    private ProcessingEvent pevent;
 
-    private Integer centerId;
+    private Center center;
 
     private Date createdAt;
 
@@ -40,12 +40,12 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
 
     private String technician;
 
-    public ProcessingEventSaveAction(Integer peventId, Integer centerId,
+    public ProcessingEventSaveAction(ProcessingEvent pevent, Center center,
         Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> addedSpecimenIds,
         Set<Integer> removedSpecimenIds) {
-        this.peventId = peventId;
-        this.centerId = centerId;
+        this.pevent = pevent;
+        this.center = center;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.activityStatus = activityStatus;
@@ -55,12 +55,12 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
         this.technician = null;
     }
 
-    public ProcessingEventSaveAction(Integer peventId, Integer centerId,
+    public ProcessingEventSaveAction(ProcessingEvent pevent, Center center,
         Date createdAt, String worksheet, ActivityStatus activityStatus,
         String commentText, Set<Integer> addedSpecimenIds,
         Set<Integer> removedSpecimenIds, String technician) {
-        this.peventId = peventId;
-        this.centerId = centerId;
+        this.pevent = pevent;
+        this.center = center;
         this.createdAt = createdAt;
         this.worksheet = worksheet;
         this.activityStatus = activityStatus;
@@ -73,11 +73,11 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     @Override
     public boolean isAllowed(ActionContext context) {
         Permission permission;
-        if (peventId == null) {
+        if (pevent == null) {
             permission =
-                new ProcessingEventCreatePermission(centerId);
+                new ProcessingEventCreatePermission(center);
         } else {
-            permission = new ProcessingEventUpdatePermission(peventId);
+            permission = new ProcessingEventUpdatePermission(pevent);
         }
         return permission.isAllowed(context);
     }
@@ -86,16 +86,14 @@ public class ProcessingEventSaveAction implements Action<IdResult> {
     public IdResult run(ActionContext context) throws ActionException {
         ProcessingEvent peventToSave;
 
-        if (peventId == null) {
+        if (pevent == null) {
             peventToSave = new ProcessingEvent();
         } else {
-            peventToSave = context.load(ProcessingEvent.class, peventId);
+            peventToSave = context.load(ProcessingEvent.class, pevent.getId());
         }
 
-        // FIXME Version check?
-
         peventToSave.setActivityStatus(activityStatus);
-        peventToSave.setCenter(context.load(Center.class, centerId));
+        peventToSave.setCenter(context.load(Center.class, center.getId()));
         setComments(context, peventToSave);
         peventToSave.setCreatedAt(createdAt);
         peventToSave.setWorksheet(worksheet);

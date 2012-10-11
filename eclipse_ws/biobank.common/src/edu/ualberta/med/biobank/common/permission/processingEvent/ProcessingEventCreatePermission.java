@@ -7,10 +7,11 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 
 public class ProcessingEventCreatePermission implements Permission {
     private static final long serialVersionUID = 1L;
+
     private Integer centerId;
 
-    public ProcessingEventCreatePermission(Integer centerId) {
-        this.centerId = centerId;
+    public ProcessingEventCreatePermission(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override

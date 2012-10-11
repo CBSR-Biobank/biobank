@@ -53,6 +53,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
@@ -505,15 +506,14 @@ public class TestSite extends TestAction {
 
         // create a processing event with one of the collection event source
         // specimens
-        Integer peventId =
-            exec(
-                new ProcessingEventSaveAction(
-                    null, provisioning.siteId, Utils.getRandomDate(), Utils
-                        .getRandomString(5, 8), ActivityStatus.ACTIVE, null,
-                    new HashSet<Integer>(
-                        Arrays.asList(sourceSpecs.get(0).specimen.getId())),
-                    new HashSet<Integer>()))
-                .getId();
+        Site site = (Site) session.load(Site.class, provisioning.siteId);
+        Integer peventId = exec(new ProcessingEventSaveAction(
+            null, site, Utils.getRandomDate(), Utils.getRandomString(5,
+                8), ActivityStatus.ACTIVE, null,
+            new HashSet<Integer>(
+                Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+            new HashSet<Integer>()))
+            .getId();
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
@@ -527,8 +527,10 @@ public class TestSite extends TestAction {
         }
 
         // delete the processing event
+        ProcessingEvent pevent = (ProcessingEvent)
+            session.get(ProcessingEvent.class, peventId);
         PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(peventId));
+            exec(new ProcessingEventGetInfoAction(pevent));
         exec(new ProcessingEventDeleteAction(peventInfo.pevent));
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }

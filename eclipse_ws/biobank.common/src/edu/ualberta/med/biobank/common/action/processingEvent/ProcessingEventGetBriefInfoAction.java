@@ -21,22 +21,22 @@ public class ProcessingEventGetBriefInfoAction implements
             + " LEFT JOIN sourceSpecs.collectionEvent.patient.study study"
             + " WHERE pe.id=?";
 
-    private final Integer id;
+    private final ProcessingEvent pevent;
 
-    public ProcessingEventGetBriefInfoAction(Integer id) {
-        this.id = id;
+    public ProcessingEventGetBriefInfoAction(ProcessingEvent pevent) {
+        this.pevent = pevent;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(id).isAllowed(context);
+        return new ProcessingEventReadPermission(pevent).isAllowed(context);
     }
 
     @Override
     public ProcessingEventBriefInfo run(ActionContext context)
         throws ActionException {
         Query q = context.getSession().createQuery(QRY);
-        q.setParameter(0, id);
+        q.setParameter(0, pevent.getId());
         Object[] values = (Object[]) q.list().get(0);
         return new ProcessingEventBriefInfo((ProcessingEvent) values[0],
             (String) values[1], (Long) values[2],

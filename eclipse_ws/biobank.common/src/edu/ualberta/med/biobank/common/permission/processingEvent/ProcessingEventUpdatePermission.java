@@ -9,8 +9,8 @@ public class ProcessingEventUpdatePermission implements Permission {
     private static final long serialVersionUID = 1L;
     private Integer peId;
 
-    public ProcessingEventUpdatePermission(Integer peId) {
-        this.peId = peId;
+    public ProcessingEventUpdatePermission(ProcessingEvent pevent) {
+        this.peId = pevent.getId();
     }
 
     @Override

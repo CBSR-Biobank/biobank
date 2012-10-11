@@ -114,7 +114,7 @@ public enum SearchType {
             CenterWrapper<?> center) throws Exception {
             PEventByWSSearchAction action =
                 new PEventByWSSearchAction(searchString,
-                    center.getId());
+                    center.getWrappedObject());
             return wrapIds(SessionManager.getAppService()
                 .doAction(action).getList(), ProcessingEventWrapper.class);
         }

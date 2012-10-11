@@ -9,8 +9,8 @@ public class ProcessingEventDeletePermission implements Permission {
     private static final long serialVersionUID = 1L;
     private Integer peId;
 
-    public ProcessingEventDeletePermission(Integer peId) {
-        this.peId = peId;
+    public ProcessingEventDeletePermission(ProcessingEvent pevent) {
+        this.peId = pevent.getId();
     }
 
     @Override

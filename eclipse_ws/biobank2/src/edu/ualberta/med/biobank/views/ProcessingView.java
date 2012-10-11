@@ -16,7 +16,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermissionByCenter;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -159,9 +159,8 @@ public class ProcessingView extends AbstractAdministrationView {
                 ((AdapterBase) adaper).resetObject();
             }
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new ProcessingEventReadPermission(SessionManager
-                    .getUser()
-                    .getCurrentWorkingCenter().getWrappedObject())));
+                new ProcessingEventReadPermissionByCenter(SessionManager
+                    .getUser().getCurrentWorkingCenter().getWrappedObject())));
         } catch (Exception e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }
@@ -170,7 +169,7 @@ public class ProcessingView extends AbstractAdministrationView {
                 .getUser().getCurrentWorkingCenter();
             if (center != null) {
                 setSearchFieldsEnablement(SessionManager.getAppService()
-                    .isAllowed(new ProcessingEventReadPermission(center
+                    .isAllowed(new ProcessingEventReadPermissionByCenter(center
                         .getWrappedObject())));
             }
         } catch (ApplicationException e) {

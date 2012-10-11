@@ -8,7 +8,8 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermissionByCenter;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 public class PEventByWSSearchAction implements
@@ -16,25 +17,23 @@ public class PEventByWSSearchAction implements
 
     @SuppressWarnings("nls")
     protected static final String PEVENT_BASE_QRY =
-        "SELECT pe.id FROM "
-            + ProcessingEvent.class.getName()
-            + " pe"
-            + " where pe.worksheet=? and pe.center.id=?";
+        "SELECT id FROM " + ProcessingEvent.class.getName()
+            + " WHERE worksheet=? AND center.id=?";
 
     private static final long serialVersionUID = 1L;
     private String worksheet;
 
-    private Integer site;
+    private Center center;
 
-    public PEventByWSSearchAction(String worksheet,
-        Integer currentCenter) {
+    public PEventByWSSearchAction(String worksheet, Center center) {
         this.worksheet = worksheet;
-        this.site = currentCenter;
+        this.center = center;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(site).isAllowed(context);
+        return new ProcessingEventReadPermissionByCenter(center)
+            .isAllowed(context);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class PEventByWSSearchAction implements
         Query q =
             context.getSession().createQuery(PEVENT_BASE_QRY);
         q.setParameter(0, worksheet);
-        q.setParameter(1, site);
+        q.setParameter(1, center.getId());
         @SuppressWarnings("unchecked")
         List<Integer> rows = q.list();
         return new ListResult<Integer>(rows);
