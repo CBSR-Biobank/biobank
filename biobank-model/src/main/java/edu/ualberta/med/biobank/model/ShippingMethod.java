@@ -18,7 +18,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SHIPPING_METHOD")
 @Unique(properties = "name", groups = PrePersist.class)
 @NotUsed(by = Shipment.class, property = "data.shippingMethod", groups = PreDelete.class)
-public class ShippingMethod extends AbstractModel
+public class ShippingMethod
+    extends AbstractVersionedModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 
@@ -37,8 +38,8 @@ public class ShippingMethod extends AbstractModel
         this.name = name;
     }
 
-    @NotNull(message = "{ShippingMethod.waybillRequired.NotEmpty}")
-    @Column(name = "WAYBILL_REQUIRED")
+    @NotNull(message = "{ShippingMethod.waybillRequired.NotNull}")
+    @Column(name = "IS_WAYBILL_REQUIRED")
     public Boolean isWaybillRequired() {
         return waybillRequired;
     }
@@ -46,5 +47,4 @@ public class ShippingMethod extends AbstractModel
     public void setWaybillRequired(Boolean waybillRequired) {
         this.waybillRequired = waybillRequired;
     }
-
 }

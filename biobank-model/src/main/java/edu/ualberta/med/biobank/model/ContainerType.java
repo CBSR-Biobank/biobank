@@ -51,7 +51,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @Empty(property = "childVessels", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType extends AbstractModel
+public class ContainerType
+    extends AbstractVersionedModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 
