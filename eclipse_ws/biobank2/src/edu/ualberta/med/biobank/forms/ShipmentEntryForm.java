@@ -194,7 +194,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createSpecimensSection();
     }
 
-    @SuppressWarnings("nls")
+    @SuppressWarnings({ "nls", "unchecked" })
     private void createMainSection() throws Exception, ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -582,7 +582,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             CenterWrapper<?> userCenter =
                 SessionManager.getUser().getCurrentWorkingCenter();
             if (userCenter instanceof SiteWrapper) {
-                originInfo.setReceiverCenter((SiteWrapper) userCenter);
+                originInfo.setReceiverCenter(userCenter);
             }
             Date receivedAt = Calendar.getInstance().getTime();
             shipmentInfo.setReceivedAt(receivedAt);

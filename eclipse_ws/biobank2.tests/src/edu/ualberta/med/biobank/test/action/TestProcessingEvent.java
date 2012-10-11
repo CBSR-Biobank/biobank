@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGet
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.search.PEventByWSSearchAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
@@ -41,6 +42,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -356,8 +358,8 @@ public class TestProcessingEvent extends TestAction {
 
         String worksheet = pevent.getWorksheet();
 
-        List<Integer> peventIds = exec(new PEventByWSSearchAction(
-            worksheet, site.getId())).getList();
+        List<Integer> peventIds =
+            exec(new PEventByWSSearchAction(worksheet, site)).getList();
 
         Assert.assertEquals(1, peventIds.size());
         Assert.assertEquals(pevent.getId(), peventIds.get(0));
@@ -371,8 +373,7 @@ public class TestProcessingEvent extends TestAction {
 
         session.getTransaction().commit();
 
-        peventIds = exec(new PEventByWSSearchAction(worksheet,
-            site.getId())).getList();
+        peventIds = exec(new PEventByWSSearchAction(worksheet, site)).getList();
         Assert.assertEquals(0, peventIds.size());
     }
 }
