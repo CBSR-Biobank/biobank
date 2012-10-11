@@ -35,13 +35,18 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
     private final Integer peventId;
 
+    public ProcessingEventGetInfoAction(ProcessingEvent pevent) {
+        this.peventId = pevent.getId();
+    }
+
     public ProcessingEventGetInfoAction(Integer peventId) {
         this.peventId = peventId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(peventId).isAllowed(context);
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
+        return new ProcessingEventReadPermission(pevent).isAllowed(context);
     }
 
     @Override
@@ -59,8 +64,8 @@ public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
 
         peventInfo.pevent = rows.get(0);
         peventInfo.sourceSpecimenInfos =
-            new ProcessingEventGetSourceSpecimenListInfoAction(peventId).run(
-                context).getList();
+            new ProcessingEventGetSourceSpecimenListInfoAction(peventId)
+                .run(context).getList();
 
         return peventInfo;
     }

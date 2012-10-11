@@ -5,18 +5,19 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 
-public class ProcessingEventCreatePermission implements Permission {
+public class ProcessingEventReadPermissionByCenter implements Permission {
     private static final long serialVersionUID = 1L;
 
-    private Integer centerId;
+    private final Integer centerId;
 
-    public ProcessingEventCreatePermission(Center center) {
+    public ProcessingEventReadPermissionByCenter(Center center) {
         this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return PermissionEnum.PROCESSING_EVENT_CREATE.isAllowed(
+        return PermissionEnum.PROCESSING_EVENT_READ.isAllowed(
             context.getUser(), context.load(Center.class, centerId));
     }
+
 }

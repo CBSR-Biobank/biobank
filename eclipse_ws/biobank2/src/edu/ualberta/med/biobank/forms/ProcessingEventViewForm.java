@@ -81,9 +81,13 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pevent.setWrappedObject(p);
             specimens = new ArrayList<SpecimenInfo>();
         } else {
+            ProcessingEventAdapter peventAdatper =
+                (ProcessingEventAdapter) adapter;
             PEventInfo read =
                 SessionManager.getAppService().doAction(
-                    new ProcessingEventGetInfoAction(adapter.getId()));
+                    new ProcessingEventGetInfoAction(
+                        (ProcessingEvent) peventAdatper.getModelObject()
+                            .getWrappedObject()));
             pevent.setWrappedObject(read.pevent);
             specimens = read.sourceSpecimenInfos;
             SessionManager.logLookup(read.pevent);

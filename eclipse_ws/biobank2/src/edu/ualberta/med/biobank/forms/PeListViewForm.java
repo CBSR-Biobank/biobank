@@ -42,7 +42,7 @@ public class PeListViewForm extends BiobankViewForm {
         peInfos = new ArrayList<ProcessingEventBriefInfo>();
         for (ProcessingEventWrapper pe : pes) {
             peInfos.add(SessionManager.getAppService().doAction(
-                new ProcessingEventGetBriefInfoAction(pe.getId())));
+                new ProcessingEventGetBriefInfoAction(pe.getWrappedObject())));
         }
 
         setPartName(ProcessingEvent.NAME.plural().toString());

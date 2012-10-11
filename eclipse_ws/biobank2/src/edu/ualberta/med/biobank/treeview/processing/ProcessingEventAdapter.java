@@ -39,14 +39,14 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public void init() {
-        ProcessingEventWrapper pevent =
-            (ProcessingEventWrapper) getModelObject();
+        ProcessingEvent pevent =
+            (ProcessingEvent) getModelObject().getWrappedObject();
         this.isDeletable =
-            isAllowed(new ProcessingEventDeletePermission(pevent.getId()));
+            isAllowed(new ProcessingEventDeletePermission(pevent));
         this.isReadable =
-            isAllowed(new ProcessingEventReadPermission(pevent.getId()));
+            isAllowed(new ProcessingEventReadPermission(pevent));
         this.isEditable =
-            isAllowed(new ProcessingEventUpdatePermission(pevent.getId()));
+            isAllowed(new ProcessingEventUpdatePermission(pevent));
     }
 
     @Override

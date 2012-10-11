@@ -107,8 +107,10 @@ public class OhsTecanSpecimenBatchOpAction implements Action<BooleanResult> {
             addedSpecimenIds.add(specimen.getId());
         }
 
+        Center workingCenter = context.load(Center.class, workingCenterId);
+
         ProcessingEventSaveAction peventSaveAction =
-            new ProcessingEventSaveAction(null, workingCenterId,
+            new ProcessingEventSaveAction(null, workingCenter,
                 timestamp, worksheet, ActivityStatus.ACTIVE,
                 null, addedSpecimenIds, removedSpecimenIds, technician);
         peventSaveAction.run(context);

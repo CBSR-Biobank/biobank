@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermissionByCenter;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 
@@ -17,25 +17,24 @@ public class PEventByWSSearchAction implements
 
     @SuppressWarnings("nls")
     protected static final String PEVENT_BASE_QRY =
-        "SELECT pe.id FROM "
-            + ProcessingEvent.class.getName()
-            + " pe"
-            + " where pe.worksheet=? and pe.center.id=?";
+        "SELECT id FROM " + ProcessingEvent.class.getName()
+            + " WHERE worksheet=? AND center.id=?";
 
     private static final long serialVersionUID = 1L;
-    private final String worksheet;
+    private String worksheet;
 
-    private final Integer centerId;
+    private Integer centerId;
 
-    public PEventByWSSearchAction(String worksheet, Integer centerId) {
+    public PEventByWSSearchAction(String worksheet, Center center) {
         this.worksheet = worksheet;
-        this.centerId = centerId;
+        this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         Center center = context.load(Center.class, centerId);
-        return new ProcessingEventReadPermission(center).isAllowed(context);
+        return new ProcessingEventReadPermissionByCenter(center)
+            .isAllowed(context);
     }
 
     @Override

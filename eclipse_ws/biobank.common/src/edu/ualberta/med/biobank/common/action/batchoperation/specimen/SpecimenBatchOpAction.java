@@ -493,8 +493,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         OriginInfo originInfo = pojoData.getOriginInfo();
         if (originInfo == null) {
-            Center center = (Center) context.getSession()
-                .load(Center.class, workingCenterId);
+            Center center = context.load(Center.class, workingCenterId);
             originInfo = pojoData.getNewOriginInfo(center);
         }
 

@@ -26,14 +26,14 @@ public class RequestRetrievalAction implements Action<ListResult<Request>> {
 
     private Integer centerId;
 
-    public RequestRetrievalAction(Integer centerId) {
-        this.centerId = centerId;
+    public RequestRetrievalAction(Center center) {
+        this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return PermissionEnum.REQUEST_READ.isAllowed(context.getUser(),
-            (Center) context.getSession().load(Center.class, centerId));
+            context.load(Center.class, centerId));
     }
 
     @Override

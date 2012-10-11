@@ -129,8 +129,8 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             ProcessingEvent p = new ProcessingEvent();
             p.setActivityStatus(ActivityStatus.ACTIVE);
             pevent.setWrappedObject(p);
-            pevent
-                .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
+            pevent.setCenter(SessionManager.getUser()
+                .getCurrentWorkingCenter());
             specimens = new ArrayList<SpecimenInfo>();
         } else {
             PEventInfo read =
@@ -294,13 +294,13 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                         .getWorksheet(), specimen
                                         .getProcessingEvent()
                                         .getFormattedCreatedAt()));
-                        } else if (!specimen.isActive())
+                        } else if (!specimen.isActive()) {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr(
                                     "This specimen has status ''{0}''. Only ''Active'' specimens can be added to a processing event.",
                                     specimen.getActivityStatus().getName()));
-                        else if (specimen.isUsedInDispatch()) {
+                        } else if (specimen.isUsedInDispatch()) {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr("Specimen is currently listed in a dispatch."));
@@ -309,8 +309,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                             throw new VetoException(
                                 // exception message.
                                 i18n.tr("Specimen is currently listed as stored in a container."));
-                        }
-                        else if (!SessionManager.getUser()
+                        } else if (!SessionManager.getUser()
                             .getCurrentWorkingCenter().getStudyCollection()
                             .contains(
                                 specimen.getCollectionEvent().getPatient()
@@ -321,8 +320,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                     "This specimen is from study ''{0}''. This study is not linked to your current working center. Processing is not allowed.",
                                     specimen.getCollectionEvent().getPatient()
                                         .getStudy().getNameShort()));
-                        }
-                        else if (study == null) {
+                        } else if (study == null) {
                             if (specimens.size() == 0) {
                                 study =
                                     specimen.getCollectionEvent().getPatient()
@@ -343,6 +341,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                                 }
                             }
                         }
+
                         if (!specimen.getCollectionEvent().getPatient()
                             .getStudy().getWrappedObject().equals(study)) {
                             throw new VetoException(
@@ -391,15 +390,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         for (SpecimenInfo spec : specimenEntryWidget.getRemovedSpecimens())
             removed.add(spec.specimen.getId());
 
-        Integer peventId =
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new ProcessingEventSaveAction(pevent.getId(), pevent
-                        .getCenter().getId(), pevent.getCreatedAt(), pevent
-                        .getWorksheet(), pevent.getActivityStatus(), comment
-                        .getMessage(),
-                        added, removed)).getId();
+        Integer peventId = SessionManager.getAppService().doAction(
+            new ProcessingEventSaveAction(pevent.getWrappedObject(), pevent
+                .getCenter().getWrappedObject(), pevent.getCreatedAt(),
+                pevent.getWorksheet(), pevent.getActivityStatus(),
+                comment.getMessage(), added, removed)).getId();
         pevent.setId(peventId);
         ((AdapterBase) adapter).setModelObject(pevent);
     }

@@ -60,6 +60,7 @@ import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
@@ -526,16 +527,12 @@ public class LoginDialog extends TitleAreaDialog {
 
         // get create permissions - note working center can be null
         try {
-            Integer centerId = null;
-
-            if (sessionHelper.getUser().getCurrentWorkingCenter() != null) {
-                centerId =
-                    sessionHelper.getUser().getCurrentWorkingCenter().getId();
-            }
+            Center center =
+                sessionHelper.getUser().getCurrentWorkingCenter()
+                    .getWrappedObject();
 
             UserCreatePermissions userCreatePermissions = sessionHelper
-                .getAppService().doAction(
-                    new UserPermissionsGetAction(centerId));
+                .getAppService().doAction(new UserPermissionsGetAction(center));
 
             LoginPermissionSessionState loginPermissionSessionState = BgcPlugin
                 .getLoginStateSourceProvider();

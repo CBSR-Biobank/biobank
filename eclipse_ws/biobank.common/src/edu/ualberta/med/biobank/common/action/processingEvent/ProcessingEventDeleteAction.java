@@ -33,7 +33,8 @@ public class ProcessingEventDeleteAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new ProcessingEventDeletePermission(peventId).isAllowed(context);
+        ProcessingEvent pevent = context.load(ProcessingEvent.class, peventId);
+        return new ProcessingEventDeletePermission(pevent).isAllowed(context);
     }
 
     @Override

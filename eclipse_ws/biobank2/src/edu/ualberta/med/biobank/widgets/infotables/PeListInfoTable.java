@@ -124,20 +124,20 @@ public class PeListInfoTable extends InfoTableWidget<ProcessingEventBriefInfo> {
     protected Boolean canEdit(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventUpdatePermission(target.pevent.getId()));
+            new ProcessingEventUpdatePermission(target.pevent));
     }
 
     @Override
     protected Boolean canDelete(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventDeletePermission(target.pevent.getId()));
+            new ProcessingEventDeletePermission(target.pevent));
     }
 
     @Override
     protected Boolean canView(ProcessingEventBriefInfo target)
         throws ApplicationException {
         return SessionManager.getAppService().isAllowed(
-            new ProcessingEventReadPermission(target.pevent.getId()));
+            new ProcessingEventReadPermission(target.pevent));
     }
 }

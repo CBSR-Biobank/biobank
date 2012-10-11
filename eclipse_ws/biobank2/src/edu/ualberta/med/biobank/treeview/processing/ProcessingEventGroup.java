@@ -38,7 +38,7 @@ public class ProcessingEventGroup extends AdapterBase {
             SessionManager.getUser().getCurrentWorkingCenter();
         if (center != null) {
             this.createAllowed = isAllowed(
-                new ProcessingEventCreatePermission(center.getId()));
+                new ProcessingEventCreatePermission(center.getWrappedObject()));
         }
     }
 
