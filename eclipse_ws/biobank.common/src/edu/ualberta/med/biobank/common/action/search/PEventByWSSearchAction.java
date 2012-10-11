@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.processingEvent.ProcessingEventReadPermission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 public class PEventByWSSearchAction implements
@@ -22,19 +23,19 @@ public class PEventByWSSearchAction implements
             + " where pe.worksheet=? and pe.center.id=?";
 
     private static final long serialVersionUID = 1L;
-    private String worksheet;
+    private final String worksheet;
 
-    private Integer site;
+    private final Integer centerId;
 
-    public PEventByWSSearchAction(String worksheet,
-        Integer currentCenter) {
+    public PEventByWSSearchAction(String worksheet, Integer centerId) {
         this.worksheet = worksheet;
-        this.site = currentCenter;
+        this.centerId = centerId;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new ProcessingEventReadPermission(site).isAllowed(context);
+        Center center = context.load(Center.class, centerId);
+        return new ProcessingEventReadPermission(center).isAllowed(context);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class PEventByWSSearchAction implements
         Query q =
             context.getSession().createQuery(PEVENT_BASE_QRY);
         q.setParameter(0, worksheet);
-        q.setParameter(1, site);
+        q.setParameter(1, centerId);
         @SuppressWarnings("unchecked")
         List<Integer> rows = q.list();
         return new ListResult<Integer>(rows);

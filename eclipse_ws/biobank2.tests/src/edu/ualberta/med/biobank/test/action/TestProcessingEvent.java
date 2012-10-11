@@ -33,13 +33,16 @@ import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGet
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
+import edu.ualberta.med.biobank.common.action.search.PEventByWSSearchAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -322,5 +325,44 @@ public class TestProcessingEvent extends TestAction {
             peventBriefInfo.studyNameShort);
         Assert.assertEquals(new Long(1), peventBriefInfo.sourceSpcCount);
         Assert.assertEquals(new Long(1), peventBriefInfo.aliquotSpcCount);
+    }
+
+    @Test
+    public void peventSearchByWorksheet() {
+        session.beginTransaction();
+
+        Study study = factory.createStudy();
+        factory.createClinic();
+        study.getContacts().add(factory.createContact());
+        study.getPatients().add(factory.createPatient());
+        factory.createCollectionEvent();
+        Site site = factory.createSite();
+        site.getStudies().add(study);
+        Specimen parentSpecimen = factory.createParentSpecimen();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+        parentSpecimen.setProcessingEvent(pevent);
+
+        session.getTransaction().commit();
+
+        String worksheet = pevent.getWorksheet();
+
+        List<Integer> peventIds = exec(new PEventByWSSearchAction(
+            worksheet, site.getId())).getList();
+
+        Assert.assertEquals(1, peventIds.size());
+        Assert.assertEquals(pevent.getId(), peventIds.get(0));
+
+        // test delete
+        session.beginTransaction();
+
+        pevent.getSpecimens().clear();
+        parentSpecimen.setProcessingEvent(null);
+        session.delete(pevent);
+
+        session.getTransaction().commit();
+
+        peventIds = exec(new PEventByWSSearchAction(worksheet,
+            site.getId())).getList();
+        Assert.assertEquals(0, peventIds.size());
     }
 }

@@ -113,8 +113,7 @@ public enum SearchType {
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
             PEventByWSSearchAction action =
-                new PEventByWSSearchAction(searchString,
-                    center.getId());
+                new PEventByWSSearchAction(searchString, center.getId());
             return wrapIds(SessionManager.getAppService()
                 .doAction(action).getList(), ProcessingEventWrapper.class);
         }
