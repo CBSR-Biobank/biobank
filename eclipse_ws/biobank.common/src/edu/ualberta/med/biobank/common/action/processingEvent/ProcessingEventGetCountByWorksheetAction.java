@@ -38,20 +38,21 @@ public class ProcessingEventGetCountByWorksheetAction implements
     @SuppressWarnings("nls")
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        boolean result = PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
+        boolean result =
+            PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
         log.debug("isAllowed: worksheet={} allowed={}", worksheet, result);
         return result;
     }
 
-    @SuppressWarnings({ "nls", "unchecked" })
     @Override
     public CountResult run(ActionContext context)
         throws ActionException {
         log.debug("run: worksheet={}", worksheet);
 
-        Query query = context.getSession().createQuery(PROCESSING_EVENT_COUNT_HQL);
+        Query query =
+            context.getSession().createQuery(PROCESSING_EVENT_COUNT_HQL);
         query.setParameter(0, worksheet);
-        return new CountResult((Long)(query.list().get(0)));
+        return new CountResult((Long) (query.list().get(0)));
     }
 
 }
