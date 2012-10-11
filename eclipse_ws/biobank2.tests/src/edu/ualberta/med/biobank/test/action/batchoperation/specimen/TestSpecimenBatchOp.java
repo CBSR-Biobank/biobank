@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 public class TestSpecimenBatchOp extends TestAction {
 
     private static Logger log = LoggerFactory
-        .getLogger(TestSpecimenBatchOp.class.getName());
+        .getLogger(TestSpecimenBatchOp.class);
 
     private static final String CSV_NAME = "import_specimens.csv";
 
