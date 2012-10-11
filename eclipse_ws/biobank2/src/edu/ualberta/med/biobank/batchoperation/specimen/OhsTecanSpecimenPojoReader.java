@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
@@ -23,9 +22,11 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.action.CountResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetCountByWorksheetAction;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -61,6 +62,9 @@ public class OhsTecanSpecimenPojoReader implements
 
     public static final String CSV_SPECIMEN_TYPE_ERROR =
         i18n.tr("specimen type is unknown");
+
+    public static final String CSV_SPECIMEN_VOLUME_ERROR =
+        i18n.tr("specimen volume has too many decimal places");
 
     public static final String CSV_TIME_STAMP_PARSE_ERROR =
         i18n.tr("timestamp format incorrect");
@@ -312,7 +316,7 @@ public class OhsTecanSpecimenPojoReader implements
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
-        aMap.put("tecanRackId", new StrNotNullOrEmpty());
+        aMap.put("tecanRackId", null);
         aMap.put("inventoryId", null);
         aMap.put("dontCare2", null);
         aMap.put("sourceId", null);
@@ -347,8 +351,9 @@ public class OhsTecanSpecimenPojoReader implements
             throw new NullPointerException("csvHeaders is null");
         }
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
-            // last 2 columns have no column name
-            && (csvHeaders.length + 2 == NAME_MAPPINGS.length);
+            // last 2 columns can have no column name
+            && ((csvHeaders.length == NAME_MAPPINGS.length)
+                || (csvHeaders.length + 2 == NAME_MAPPINGS.length));
     }
 
     @Override
@@ -378,12 +383,12 @@ public class OhsTecanSpecimenPojoReader implements
                     NAME_MAPPINGS, cellProcessors)) != null) {
 
                 // skip certain rows
-                if (csvPojo.getSourceId().isEmpty()) continue;
-                if (csvPojo.getAliquotVolume().isEmpty()) continue;
+                if (csvPojo.sourceId == null || csvPojo.sourceId.isEmpty()) continue;
+                if (csvPojo.aliquotVolume == null || csvPojo.aliquotVolume.isEmpty()) continue;
                 if (Double.parseDouble(csvPojo.aliquotVolume) / 1000.0 <= 0.0)
                     continue;
 
-                csvPojo.setLineNumber(reader.getLineNumber());
+                csvPojo.lineNumber = reader.getLineNumber();
 
                 SpecimenBatchOpInputPojo batchOpPojo =
                     convertToSpecimenBatchOpInputPojo(csvPojo);
@@ -411,7 +416,7 @@ public class OhsTecanSpecimenPojoReader implements
                 BigDecimal sourceVolume = null;
                 if (!csvPojo.sourceVolume.isEmpty()) {
                     sourceVolume = new BigDecimal(csvPojo.sourceVolume)
-                        .divide(new BigDecimal(1000));
+                    .divide(new BigDecimal(1000));
                 }
 
                 boolean sourceSpecimenAlreadyEncountered = false;
@@ -471,25 +476,25 @@ public class OhsTecanSpecimenPojoReader implements
     private SpecimenBatchOpInputPojo convertToSpecimenBatchOpInputPojo(
         TecanCsvRowPojo csvPojo) {
         SpecimenBatchOpInputPojo batchOpPojo = new SpecimenBatchOpInputPojo();
-        batchOpPojo.setLineNumber(csvPojo.getLineNumber());
+        batchOpPojo.setLineNumber(csvPojo.lineNumber);
 
         // check for missing column values
-        if (csvPojo.tecanRackId == null) {
+        if (csvPojo.tecanRackId == null || csvPojo.tecanRackId.isEmpty()) {
             getErrorList().addError(reader.getLineNumber(),
                 CSV_TECAN_RACK_ID_MISSING_ERROR);
             return null;
         }
-        if (csvPojo.inventoryId == null) {
+        if (csvPojo.inventoryId == null || csvPojo.inventoryId.isEmpty()) {
             getErrorList().addError(reader.getLineNumber(),
                 CSV_INVENTORY_ID_MISSING_ERROR);
             return null;
         }
-        if (csvPojo.timeStamp == null) {
+        if (csvPojo.timeStamp == null || csvPojo.timeStamp.isEmpty()) {
             getErrorList().addError(reader.getLineNumber(),
                 CSV_TIME_STAMP_MISSING_ERROR);
             return null;
         }
-        if (csvPojo.technicianId == null) {
+        if (csvPojo.technicianId == null || csvPojo.technicianId.isEmpty()) {
             getErrorList().addError(reader.getLineNumber(),
                 CSV_TECHNICIAN_ID_MISSING_ERROR);
             return null;
@@ -535,9 +540,21 @@ public class OhsTecanSpecimenPojoReader implements
         batchOpPojo.setInventoryId(csvPojo.inventoryId);
 
         // deal with source ID
+        if (csvPojo.sourceVolume.lastIndexOf('.') != -1 &&
+            csvPojo.sourceVolume.length() - csvPojo.sourceVolume.lastIndexOf('.') > 7) {
+            getErrorList().addError(reader.getLineNumber(),
+                CSV_SPECIMEN_VOLUME_ERROR);
+            return null;
+        }
         batchOpPojo.setParentInventoryId(csvPojo.sourceId);
 
         // deal with aliquot volume
+        if (csvPojo.aliquotVolume.lastIndexOf('.') != -1 &&
+            csvPojo.aliquotVolume.length() - csvPojo.aliquotVolume.lastIndexOf('.') > 7) {
+            getErrorList().addError(reader.getLineNumber(),
+                CSV_SPECIMEN_VOLUME_ERROR);
+            return null;
+        }
         batchOpPojo.setVolume(new BigDecimal(csvPojo.aliquotVolume)
             .divide(new BigDecimal(1000)));
 
@@ -566,8 +583,20 @@ public class OhsTecanSpecimenPojoReader implements
 
     @Override
     public void preExecution() {
-        // TODO Auto-generated method stub
-
+        if (filename == null) {
+            throw new IllegalStateException("filename has not been set");
+        }
+        CountResult result;
+        try {
+            BiobankApplicationService service = SessionManager.getAppService();
+            result = service.doAction(
+                new ProcessingEventGetCountByWorksheetAction(new File(filename).getName()));
+        } catch (Exception e) {
+            throw new IllegalStateException("OHS TECAN pre-execution error");
+        }
+        if (result.getCount() > 0) {
+            throw new IllegalStateException("file name has been used already");
+        }
     }
 
     @Override
