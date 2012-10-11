@@ -3,27 +3,30 @@ package edu.ualberta.med.biobank.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
-import org.hibernate.proxy.HibernateProxyHelper;
 
-import edu.ualberta.med.biobank.model.constraint.HasValidTimeInserted;
+import edu.ualberta.med.biobank.model.util.ProxyUtil;
 
 @MappedSuperclass
 public abstract class AbstractModel
-    implements IBiobankModel, HasValidTimeInserted {
+    implements IBiobankModel, HasTimeInserted, HasInsertedBy {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
     private Date timeInserted;
+    private User insertedBy;
 
+    // TODO: up the increment param to ~1000, because why not? Should also
+    // change to Long.
     @Override
     @Id
     @GeneratedValue(generator = "id-generator")
@@ -43,15 +46,7 @@ public abstract class AbstractModel
     @Override
     public boolean equals(Object that) {
         if (that == this) return true;
-        if (that == null) return false;
-
-        // note that HibernateProxyHelper.getClassWithoutInitializingProxy(o)
-        // does not seem to work properly in terms of returning the actual
-        // class, it may return a superclass, such as, Center. However,
-        // Hibernate.getClass() seems to always return the correct instance.
-        Class<?> thisClass = Hibernate.getClass(this);
-        Class<?> thatClass = Hibernate.getClass(that);
-        if (thisClass != thatClass) return false;
+        if (ProxyUtil.sameClass(this, that)) return false;
 
         if (that instanceof IBiobankModel) {
             Integer thatId = ((IBiobankModel) that).getId();
@@ -71,13 +66,8 @@ public abstract class AbstractModel
         return getId() == null;
     }
 
-    @SuppressWarnings("unused")
-    private static Class<?> proxiedClass(Object o) {
-        return HibernateProxyHelper.getClassWithoutInitializingProxy(o);
-    }
-
     @Override
-    @Column(name = "TIME_INSERTED", updatable = false)
+    @Column(name = "TIME_INSERTED", updatable = false, nullable = false)
     public Date getTimeInserted() {
         return timeInserted;
     }
@@ -86,4 +76,17 @@ public abstract class AbstractModel
     public void setTimeInserted(Date timeInserted) {
         this.timeInserted = timeInserted;
     }
+
+    @Override
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "INSERTED_BY_USER_ID", updatable = false, nullable = false)
+    public User getInsertedBy() {
+        return insertedBy;
+    }
+
+    @Override
+    public void setInsertedBy(User insertedBy) {
+        this.insertedBy = insertedBy;
+    }
+
 }

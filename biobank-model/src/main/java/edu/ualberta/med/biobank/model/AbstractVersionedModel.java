@@ -3,19 +3,20 @@ package edu.ualberta.med.biobank.model;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import edu.ualberta.med.biobank.model.constraint.HasValidTimeUpdated;
 
 @MappedSuperclass
 public abstract class AbstractVersionedModel
     extends AbstractModel
-    implements HasValidTimeUpdated {
+    implements HasTimeUpdated, HasUpdatedBy {
     private static final long serialVersionUID = 1L;
 
     private Integer version;
     private Date timeUpdated;
+    private User updatedBy;
 
     @Version
     @Column(name = "VERSION", nullable = false)
@@ -34,7 +35,7 @@ public abstract class AbstractVersionedModel
     }
 
     @Override
-    @Column(name = "TIME_UPDATED")
+    @Column(name = "TIME_UPDATED", nullable = false)
     public Date getTimeUpdated() {
         return timeUpdated;
     }
@@ -42,5 +43,17 @@ public abstract class AbstractVersionedModel
     @Override
     public void setTimeUpdated(Date timeUpdated) {
         this.timeUpdated = timeUpdated;
+    }
+
+    @Override
+    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "UPDATED_BY_USER_ID", nullable = false)
+    public User getUpdatedBy() {
+        return updatedBy;
+    }
+
+    @Override
+    public void setUpdatedBy(User updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

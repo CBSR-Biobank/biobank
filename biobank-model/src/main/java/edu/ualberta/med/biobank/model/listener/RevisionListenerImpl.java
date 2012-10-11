@@ -7,22 +7,21 @@ import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
 
 import edu.ualberta.med.biobank.model.Revision;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.context.ExecutingUser;
+import edu.ualberta.med.biobank.model.context.ExecutingUserImpl;
 
 public class RevisionListenerImpl
     implements EntityTrackingRevisionListener {
     @SuppressWarnings("nls")
     private static final String WRONG_REVISION_ENTITY =
         "Unexpected RevisionEntity: {0}, was expecting an instance of: {1}";
-    private static final ThreadLocal<User> THREAD_USER =
-        new ThreadLocal<User>();
 
-    public static void setUser(User user) {
-        THREAD_USER.set(user);
-    }
+    private final ExecutingUser executingUser = new ExecutingUserImpl();
 
     @Override
     public void newRevision(Object revisionEntity) {
+        Revision revision = asRevision(revisionEntity);
+        revision.setUser(executingUser.get());
     }
 
     @Override

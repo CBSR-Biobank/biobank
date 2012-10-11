@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = ContainerType.class, property = "center", groups = PreDelete.class)
 })
 public class Center
-    extends AbstractModel
+    extends AbstractVersionedModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 

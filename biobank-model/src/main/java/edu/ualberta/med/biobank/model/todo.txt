@@ -4,7 +4,6 @@
 [v] *Rethink OriginInfo and ShipmentInfo
 [v] SendsShipments on clinic was to be replaced with what on ShippingMethod?
 [~] Include version table and value in it to check for automatic updating
-[ ] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
 [v] Specimens should never have more than one CollectionEvent or Patient
     (per Study).
 [x] Have custom Id objects and rename getId() to getInternalId() and add a
@@ -32,14 +31,16 @@
     etc. and actions/ services into those groups so that there are not so many
     classes per package.
     A: sure?
-[ ] Also record the user that inserted the object and the last user to modify
+[v] Also record the user that inserted the object and the last user to modify
     object?
+[ ] Switch the ExecutingUser "stuff" to use DI.
 [v] Change annotations so that they use InheritanceType.JOINED, only for the
     annotation id (so unique across all sub-types), but put the type, data, and
     options in a separate (joined) table.
     A: DO IT! Most efficient, Maybe have the ID come from another table in a
     Has-a relationship so we don't HAVE to join but can use a shared globally
     unique PK. And it shall be called... AnnotationAnchor?
+[ ] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
 [ ] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).

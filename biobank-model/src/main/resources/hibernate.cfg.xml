@@ -136,12 +136,12 @@
 		<event type="pre-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 			<listener class="edu.ualberta.med.biobank.model.listener.ValidEndRevisionListener" />
-			<listener class="edu.ualberta.med.biobank.model.listener.TimeUpdatedListener" />
+			<listener class="edu.ualberta.med.biobank.model.listener.EventMetaDataListener" />
 		</event>
 		<event type="pre-insert">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 			<listener class="edu.ualberta.med.biobank.model.listener.UpdateRevisionCommittedAtListener" />
-			<listener class="edu.ualberta.med.biobank.model.listener.TimeInsertedListener" />
+			<listener class="edu.ualberta.med.biobank.model.listener.EventMetaDataListener" />
 		</event>
 		<event type="pre-delete">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
