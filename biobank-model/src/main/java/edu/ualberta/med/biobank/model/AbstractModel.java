@@ -14,8 +14,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 
-import edu.ualberta.med.biobank.model.util.ProxyUtil;
-
 @MappedSuperclass
 public abstract class AbstractModel
     implements IBiobankModel, HasTimeInserted, HasInsertedBy {
@@ -43,22 +41,19 @@ public abstract class AbstractModel
         this.id = id;
     }
 
+    /**
+     * Overridden only for documentation. Note that Hibernate guarantees that,
+     * within the same session, referential equality exists between entities.
+     * Therefore, it is easiest to use the default implementations of
+     * {@link #equals(Object)} and {@link #hashCode()}.
+     * 
+     * {@inheritDoc}
+     * 
+     * @see https://community.jboss.org/wiki/EqualsAndHashCode
+     */
     @Override
     public boolean equals(Object that) {
-        if (that == this) return true;
-        if (ProxyUtil.sameClass(this, that)) return false;
-
-        if (that instanceof IBiobankModel) {
-            Integer thatId = ((IBiobankModel) that).getId();
-            if (getId() != null && getId().equals(thatId)) return true;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        if (getId() == null) return 0;
-        return getId().hashCode();
+        return super.equals(that);
     }
 
     @Transient

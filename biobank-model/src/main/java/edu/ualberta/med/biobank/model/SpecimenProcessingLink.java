@@ -15,13 +15,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
-import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
-import edu.ualberta.med.biobank.model.util.ProxyUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -53,8 +50,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 public class SpecimenProcessingLink
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
-    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
-        new HashCodeBuilderProvider(SpecimenProcessingLink.class, 17, 19);
 
     private Specimen input;
     private Specimen output;
@@ -169,26 +164,5 @@ public class SpecimenProcessingLink
 
     public void setActualOutputAmountChange(Decimal actualOutputAmountChange) {
         this.actualOutputAmountChange = actualOutputAmountChange;
-    }
-
-    @Override
-    public int hashCode() {
-        return hashCodeBuilderProvider.get()
-            .append(getInput())
-            .append(getOutput())
-            .append(getTimeDone())
-            .toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!ProxyUtil.sameClass(this, obj)) return false;
-        SpecimenProcessingLink rhs = (SpecimenProcessingLink) obj;
-        return new EqualsBuilder()
-            .append(getInput(), rhs.getInput())
-            .append(getOutput(), rhs.getOutput())
-            .append(getTimeDone(), rhs.getTimeDone())
-            .isEquals();
     }
 }

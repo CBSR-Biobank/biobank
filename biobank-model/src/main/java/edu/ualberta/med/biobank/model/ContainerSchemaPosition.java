@@ -21,6 +21,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * Represents a labelled position that a child (e.g. a {@link Container} or a
  * {@link Specimen}) has in a parent {@link Container}. Labels are associated
  * with a single {@link ContainerSchema}.
+ * <p>
+ * This is its own class instead of an {@link javax.persistence.Embeddable}
+ * (i.e. a value type) because it must be referenced and the {@link #label}
+ * could be quite long.
  * 
  * @author Jonathan Ferland
  * @see ContainerSchema
@@ -61,29 +65,5 @@ public class ContainerSchemaPosition
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((label == null) ? 0 : label.hashCode());
-        result = prime * result + ((schema == null) ? 0 : schema.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!super.equals(obj)) return false;
-        if (getClass() != obj.getClass()) return false;
-        ContainerSchemaPosition other = (ContainerSchemaPosition) obj;
-        if (label == null) {
-            if (other.label != null) return false;
-        } else if (!label.equals(other.label)) return false;
-        if (schema == null) {
-            if (other.schema != null) return false;
-        } else if (!schema.equals(other.schema)) return false;
-        return true;
     }
 }

@@ -6,6 +6,8 @@
 [~] Include version table and value in it to check for automatic updating
 [v] Specimens should never have more than one CollectionEvent or Patient
     (per Study).
+[ ] Vessel refactoring: put inventoryId in the vessel and give the Specimen
+    a reference to a vessel and a position in that vessel?
 [x] Have custom Id objects and rename getId() to getInternalId() and add a
     @Transient getId() method that returns typed ids. setInternalId() can then
     be overridden to also call setId(new TypedId(id)) and setId() can be overridden
@@ -40,10 +42,13 @@
     A: DO IT! Most efficient, Maybe have the ID come from another table in a
     Has-a relationship so we don't HAVE to join but can use a shared globally
     unique PK. And it shall be called... AnnotationAnchor?
-[ ] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
-[ ] Seriously consider override the equals and hashcode methods of model objects
+[~] Where possible, use EqualsBuilder and HashcodeBuilder for readability.
+	A: okay, but see note about entity equals and hashcode (should just be using
+	the default methods [i.e. referrential equality])
+[x] Seriously consider override the equals and hashcode methods of model objects
     to be based on the natural id (e.g. collection event uses patient & visit
     number).
+    A: NOPE! use referrential equality! See https://community.jboss.org/wiki/EqualsAndHashCode
 [v] Bring over the Sha1Hash and Md5Hash objects
 [ ] For unique strings, hash the string instead.
 [v] Make the combination of PE (worksheet, center) or (worksheet, study) unique?
@@ -116,8 +121,6 @@
 	- Yes
 [ ] Splitting model into abstract classes and then transient methods?
 	- Yes, investigate/ try
-[ ] Q: put report model objects in subpackage?
-	- Yes, for membershipts too? Label printing too?	
 [ ] Watch out for FK.sql-s, renaming columns
 [v] Get rid of activity status in a lot of places?
 	- Yes, replace with either (1) enabled/ disabled (2) active/ inactive (e.g. Study/Center)

@@ -8,12 +8,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
-import edu.ualberta.med.biobank.model.util.ProxyUtil;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -33,8 +30,6 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 public class ProcessingEventInputSpecimen
     extends AbstractModel {
     private static final long serialVersionUID = 1L;
-    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
-        new HashCodeBuilderProvider(ProcessingEventInputSpecimen.class, 23, 29);
 
     private Specimen specimen;
     private ProcessingEvent processingEvent;
@@ -61,24 +56,5 @@ public class ProcessingEventInputSpecimen
 
     public void setProcessingEvent(ProcessingEvent processingEvent) {
         this.processingEvent = processingEvent;
-    }
-
-    @Override
-    public int hashCode() {
-        return hashCodeBuilderProvider.get()
-            .append(getSpecimen())
-            .append(getProcessingEvent())
-            .toHashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!ProxyUtil.sameClass(this, obj)) return false;
-        ProcessingEventInputSpecimen rhs = (ProcessingEventInputSpecimen) obj;
-        return new EqualsBuilder()
-            .append(getSpecimen(), rhs.getSpecimen())
-            .append(getProcessingEvent(), rhs.getProcessingEvent())
-            .isEquals();
     }
 }
