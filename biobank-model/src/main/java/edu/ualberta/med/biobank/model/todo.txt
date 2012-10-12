@@ -6,8 +6,12 @@
 [~] Include version table and value in it to check for automatic updating
 [v] Specimens should never have more than one CollectionEvent or Patient
     (per Study).
-[ ] Vessel refactoring: put inventoryId in the vessel and give the Specimen
+[v] Vessel refactoring: put inventoryId in the vessel and give the Specimen
     a reference to a vessel and a position in that vessel?
+    A: sort of, just used ContainerType-s and Container-s (with derivatives)
+    for representing Vessels too (i.e. as SpecimenContainer[Type]s).
+[ ] *How to deal with duplicate ids? Namespaces (e.g. distributer)? Unique per container?
+	Q: ask CBSR!!
 [x] Have custom Id objects and rename getId() to getInternalId() and add a
     @Transient getId() method that returns typed ids. setInternalId() can then
     be overridden to also call setId(new TypedId(id)) and setId() can be overridden
@@ -147,13 +151,14 @@
 	[x] Perhaps Shipment references a Manifest with specimens and shipment info?
 [v] Update boolean primitives to be Boolean objects so can better search by example
 [v] *SpecimenType refactoring
-[ ] *ContainerType refactoring
+[v] *ContainerType refactoring
 [ ] *Think of the SpecimenLog/SpecimenEvent as a list of things being done to specimens,
 	not so much as the action being called on them. If 30,000 specimens are thawed, then
 	there should be 30,000 events recorded on each of them.
 [v] Dispatch containers AND specimens, but then product barcode must be globally unique!
-[ ] Global list of tube types, defined however, centers can make their own groups of tube
+[x] Global list of tube types, defined however, centers can make their own groups of tube
 	types and then have their CT have a list of those
+	A: hopefully answered by sharing the usage of ContainerType-s
 [v] Aaron would like the sample-type restriction to be able to be assigned at any level
 	(e.g. freezer, hotel, pallet)
 [ ] *Server API should have multiple versions that we support? *shudder*
@@ -166,8 +171,6 @@
 [v] How to deal with 96 well plates where the wells do not have ids, only the plate does?
 	A: fine, but all specimens should still have an inventory id for referencing them,
 	whether it's attached or not.
-[ ] *How to deal with duplicate ids? Namespaces (e.g. distributer)? Unique per container?
-	Q: ask CBSR!!
 [ ] Check ValidityAuditStrategy when it comes to ids that are join-table ids, it doesn't 
 	seem to update unless not add
 * requires thought/ feedback
