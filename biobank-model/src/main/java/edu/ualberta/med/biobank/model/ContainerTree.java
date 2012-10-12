@@ -40,7 +40,7 @@ public class ContainerTree
         this.location = location;
     }
 
-    @NotNull(message = "{Specimen.owningCenter.NotNull}")
+    @NotNull(message = "{ContainerTree.owningCenter.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OWNING_CENTER_ID", nullable = false)
     public Center getOwningCenter() {
