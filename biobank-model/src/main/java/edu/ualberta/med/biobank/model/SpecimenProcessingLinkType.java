@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         "OUTPUT_SPECIMEN_GROUP_ID"
     })
 })
-@Unique(properties = { "processingType", "inputGroup", "outputGroup" }, groups = PrePersist.class)
+@Unique(properties = { "type", "inputGroup", "outputGroup" }, groups = PrePersist.class)
 @NotUsed(by = SpecimenProcessingLink.class, property = "specimenProcessingLinkType", groups = PreDelete.class)
 public class SpecimenProcessingLinkType
     extends VersionedLongIdModel {

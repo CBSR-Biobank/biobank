@@ -117,10 +117,10 @@
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.ShipmentSpecimenComment" />
 		<mapping class="edu.ualberta.med.biobank.model.ShippingMethod" />
-		<mapping class="edu.ualberta.med.biobank.model.SourceSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Specimen" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotation" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotationType" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenCollectionEventType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenComment" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainer" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainerType" />

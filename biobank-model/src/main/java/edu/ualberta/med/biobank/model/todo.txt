@@ -105,7 +105,7 @@
 [v] Specimen vs Aliquot objects
 	Q: Represent them as the same object?
 	A: Yes! Otherwise very complicated doubling of relationships, everywhere.
-[ ] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
+[v] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
 	- Yes
 [ ] Attributes
 	- Yes

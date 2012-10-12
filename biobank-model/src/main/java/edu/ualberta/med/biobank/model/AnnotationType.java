@@ -53,12 +53,12 @@ public abstract class AnnotationType
     private Study study;
     private String name;
     private String description;
+    private Boolean required;
     private Boolean enabled;
     private Boolean multiValue;
 
     /**
-     * @return the {@link Study} that this {@link AnnotationType}
-     *         belongs to.
+     * @return the {@link Study} that this {@link AnnotationType} belongs to.
      */
     @NotNull(message = "{AnnotationType.study.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -100,9 +100,25 @@ public abstract class AnnotationType
     }
 
     /**
-     * @return true if this {@link AnnotationType} is still used to
-     *         collect <em>new</em> values (of {@link Annotation}s),
-     *         otherwise false if it is kept only for existing values.
+     * @return true if this {@link AnnotationType} must be recorded on its
+     *         associated type (e.g. {@link Specimen}, {@link Patient}, ...)
+     *         when an instance of the associated type is <em>created</em>,
+     *         otherwise false if optional.
+     */
+    @NotNull(message = "{AnnotationType.required.NotNull}")
+    @Column(name = "IS_REQUIRED", nullable = false)
+    public Boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(Boolean required) {
+        this.required = required;
+    }
+
+    /**
+     * @return true if this {@link AnnotationType} is still used to collect
+     *         <em>new</em> values (of {@link Annotation}s), otherwise false if
+     *         it is kept only for existing values.
      */
     @NotNull(message = "{AnnotationType.enabled.NotNull}")
     @Column(name = "IS_ENABLED", nullable = false)
