@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "SPECIMEN_ANNOTATION")
 public class SpecimenAnnotation
-    extends AbstractAnnotation<SpecimenAnnotationType> {
+    extends Annotation<SpecimenAnnotationType> {
     private static final long serialVersionUID = 1L;
 
     private Specimen specimen;

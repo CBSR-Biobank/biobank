@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.model.AbstractModel;
+import edu.ualberta.med.biobank.model.LongIdModel;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.User;
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 // TODO: just add a log listener that, after inserting, adds it to the revision?
 public abstract class Log<T extends Enum<T> & ILogType>
-    extends AbstractModel {
+    extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private User user;

@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = { "center", "name" }, groups = PrePersist.class)
 @NotUsed(by = ContainerSchemaPosition.class, property = "schema", groups = PreDelete.class)
 public class ContainerSchema
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Center center;

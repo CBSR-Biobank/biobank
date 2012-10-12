@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
 @NotUsed(by = SpecimenProcessingLinkType.class, property = "type", groups = PreDelete.class)
 public class ProcessingType
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;

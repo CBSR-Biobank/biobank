@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = { @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" }) })
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
 public class CollectionEventType
-    extends AbstractVersionedModel
+    extends VersionedLongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 

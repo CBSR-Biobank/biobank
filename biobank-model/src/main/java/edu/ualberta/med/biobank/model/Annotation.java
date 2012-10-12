@@ -20,8 +20,8 @@ import edu.ualberta.med.biobank.model.type.Decimal;
 
 @Audited
 @MappedSuperclass
-public abstract class AbstractAnnotation<T extends AbstractAnnotationType>
-    extends AbstractVersionedModel {
+public abstract class Annotation<T extends AnnotationType>
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     // TODO: validate, one column must be not-null (and correspond to the Type)

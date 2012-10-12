@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @javax.persistence.Entity
 @Table(name = "ENTITY")
-public class Entity extends AbstractModel
+public class Entity extends LongIdModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 

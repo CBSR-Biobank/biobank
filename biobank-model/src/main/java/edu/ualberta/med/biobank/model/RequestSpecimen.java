@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 @Audited
 @Entity
 @Table(name = "REQUEST_SPECIMEN")
-public class RequestSpecimen extends AbstractModel {
+public class RequestSpecimen extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Specimen specimen;

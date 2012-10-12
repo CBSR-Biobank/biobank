@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @Unique(properties = { "center", "location.name" }, groups = PrePersist.class)
 public class CenterLocation
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Center center;

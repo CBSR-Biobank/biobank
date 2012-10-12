@@ -30,9 +30,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * <li>to prevent duplicate ids between subclasses, so only one
  * {@link AnnotationOption} table is needed, not one for every type, as
  * {@link AnnotationOption#getType()} will have a unique id across all
- * {@link AbstractAnnotationType} subclasses</li>
+ * {@link AnnotationType} subclasses</li>
  * <li>because there are a relatively small number of these compared to
- * {@link AbstractAnnotation}s</li>
+ * {@link Annotation}s</li>
  * </ol>
  * 
  * @author Jonathan Ferland
@@ -46,8 +46,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique(properties = { "study", "name" }, groups = PrePersist.class)
-public abstract class AbstractAnnotationType
-    extends AbstractVersionedModel {
+public abstract class AnnotationType
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;
@@ -57,7 +57,7 @@ public abstract class AbstractAnnotationType
     private Boolean multiValue;
 
     /**
-     * @return the {@link Study} that this {@link AbstractAnnotationType}
+     * @return the {@link Study} that this {@link AnnotationType}
      *         belongs to.
      */
     @NotNull(message = "{AnnotationType.study.NotNull}")
@@ -73,7 +73,7 @@ public abstract class AbstractAnnotationType
 
     /**
      * @return a short identifying name. The name is unique within the
-     *         {@link AbstractAnnotationType}'s {@link #getStudy()}.
+     *         {@link AnnotationType}'s {@link #getStudy()}.
      */
     @Size(max = 50, message = "{AnnotationType.name.Size}")
     @NotEmpty(message = "{AnnotationType.name.NotEmpty}")
@@ -100,8 +100,8 @@ public abstract class AbstractAnnotationType
     }
 
     /**
-     * @return true if this {@link AbstractAnnotationType} is still used to
-     *         collect <em>new</em> values (of {@link AbstractAnnotation}s),
+     * @return true if this {@link AnnotationType} is still used to
+     *         collect <em>new</em> values (of {@link Annotation}s),
      *         otherwise false if it is kept only for existing values.
      */
     @NotNull(message = "{AnnotationType.enabled.NotNull}")

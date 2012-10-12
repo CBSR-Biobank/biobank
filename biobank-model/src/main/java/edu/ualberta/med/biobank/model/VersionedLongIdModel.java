@@ -10,8 +10,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 @MappedSuperclass
-public abstract class AbstractVersionedModel
-    extends AbstractModel
+public abstract class VersionedLongIdModel
+    extends LongIdModel
     implements HasTimeUpdated, HasUpdatedBy {
     private static final long serialVersionUID = 1L;
 

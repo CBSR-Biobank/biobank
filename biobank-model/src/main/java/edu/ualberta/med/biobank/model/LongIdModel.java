@@ -16,7 +16,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 
 @MappedSuperclass
-public abstract class AbstractModel
+public abstract class LongIdModel
     implements IBiobankModel, HasTimeInserted, HasInsertedBy {
     private static final long serialVersionUID = 1L;
 

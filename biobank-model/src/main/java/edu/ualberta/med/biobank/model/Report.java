@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 
 @javax.persistence.Entity
 @Table(name = "REPORT")
-public class Report extends AbstractModel
+public class Report extends LongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

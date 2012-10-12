@@ -53,7 +53,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @ValidContainerType(groups = PrePersist.class)
 public abstract class ContainerType
-    extends AbstractVersionedModel
+    extends VersionedLongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 

@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     })
 @Unique(properties = { "shipment", "specimen" }, groups = PrePersist.class)
 public class ShipmentSpecimen
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Shipment shipment;

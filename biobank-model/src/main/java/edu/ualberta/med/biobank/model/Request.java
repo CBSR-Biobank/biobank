@@ -31,7 +31,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "REQUEST")
 public class Request
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;

@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     })
 @Unique(properties = { "specimen", "processingEvent" }, groups = PrePersist.class)
 public class ProcessingEventInputSpecimen
-    extends AbstractModel {
+    extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Specimen specimen;

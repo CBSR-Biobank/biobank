@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "COLLECTION_EVENT_ANNOTATION")
 public class CollectionEventAnnotation
-    extends AbstractAnnotation<CollectionEventAnnotationType> {
+    extends Annotation<CollectionEventAnnotationType> {
     private static final long serialVersionUID = 1L;
 
     private CollectionEvent collectionEvent;

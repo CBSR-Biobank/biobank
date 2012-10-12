@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "SPECIMEN_PROCESSING_LINK")
 @Unique(properties = { "input", "output", "timeDone" }, groups = PrePersist.class)
 public class SpecimenProcessingLink
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Specimen input;

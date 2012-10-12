@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Length;
 @Audited
 @MappedSuperclass
 public abstract class Comment
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private User user;

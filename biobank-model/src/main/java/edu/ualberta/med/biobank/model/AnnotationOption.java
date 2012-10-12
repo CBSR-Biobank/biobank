@@ -19,22 +19,22 @@ import org.hibernate.envers.Audited;
         @UniqueConstraint(columnNames = { "ANNOTATION_TYPE_ID", "VALUE" })
     })
 public class AnnotationOption
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     public static final int VALUE_MAX_LENGTH = 50;
 
-    private AbstractAnnotationType type;
+    private AnnotationType type;
     private String value;
 
     @NotNull(message = "{AnnotationOption.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ANNOTATION_TYPE_ID", nullable = false)
-    public AbstractAnnotationType getType() {
+    public AnnotationType getType() {
         return type;
     }
 
-    public void setType(AbstractAnnotationType type) {
+    public void setType(AnnotationType type) {
         this.type = type;
     }
 

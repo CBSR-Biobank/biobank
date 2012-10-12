@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "REPORT_COLUMN")
-public class ReportColumn extends AbstractModel {
+public class ReportColumn extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Integer position;

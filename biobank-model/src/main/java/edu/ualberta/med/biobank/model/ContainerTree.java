@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.type.Decimal;
 @Entity
 @Table(name = "CONTAINER_TREE")
 public class ContainerTree
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private CenterLocation location;

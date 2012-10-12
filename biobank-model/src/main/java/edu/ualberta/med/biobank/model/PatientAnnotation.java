@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "PATIENT_ANNOTATION")
 public class PatientAnnotation
-    extends AbstractAnnotation<PatientAnnotationType> {
+    extends Annotation<PatientAnnotationType> {
     private static final long serialVersionUID = 1L;
 
     private Patient patient;

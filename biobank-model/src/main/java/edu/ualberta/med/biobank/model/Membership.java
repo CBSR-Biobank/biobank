@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.model.type.PermissionEnum;
  */
 @Entity
 @Table(name = "MEMBERSHIP")
-public class Membership extends AbstractModel {
+public class Membership extends LongIdModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

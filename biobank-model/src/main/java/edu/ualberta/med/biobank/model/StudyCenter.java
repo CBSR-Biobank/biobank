@@ -18,7 +18,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "STUDY_CENTER")
 public class StudyCenter
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;

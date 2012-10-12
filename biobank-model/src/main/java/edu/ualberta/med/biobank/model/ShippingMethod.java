@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = "name", groups = PrePersist.class)
 @NotUsed(by = Shipment.class, property = "data.shippingMethod", groups = PreDelete.class)
 public class ShippingMethod
-    extends AbstractVersionedModel
+    extends VersionedLongIdModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 

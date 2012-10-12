@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 
 @Entity
 @Table(name = "DOMAIN")
-public class Domain extends AbstractModel {
+public class Domain extends LongIdModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

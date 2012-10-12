@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Unique(properties = { "patient", "type", "visitNumber" }, groups = PrePersist.class)
 @NotUsed(by = StudySpecimen.class, property = "collectionEvent", groups = PreDelete.class)
 public class CollectionEvent
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Patient patient;

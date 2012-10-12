@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "PRINTER_LABEL_TEMPLATE")
 @Unique(properties = "name", groups = PrePersist.class)
-public class PrinterLabelTemplate extends AbstractModel
+public class PrinterLabelTemplate extends LongIdModel
     implements HasName {
     private static final long serialVersionUID = 1L;
 

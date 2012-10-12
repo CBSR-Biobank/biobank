@@ -15,6 +15,6 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
     @NotUsed(by = PatientAnnotation.class, property = "type", groups = PreDelete.class)
 })
 public class PatientAnnotationType
-    extends AbstractAnnotationType {
+    extends AnnotationType {
     private static final long serialVersionUID = 1L;
 }

@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @NotUsed(by = Patient.class, property = "study", groups = PreDelete.class)
 public class Study
-    extends AbstractVersionedModel
+    extends VersionedLongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();

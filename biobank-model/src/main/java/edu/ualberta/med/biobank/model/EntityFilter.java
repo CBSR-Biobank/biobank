@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "ENTITY_FILTER")
-public class EntityFilter extends AbstractModel {
+public class EntityFilter extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Integer filterType;

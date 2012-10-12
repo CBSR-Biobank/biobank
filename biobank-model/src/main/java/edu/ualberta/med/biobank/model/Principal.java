@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.CHAR)
 public abstract class Principal
-    extends AbstractModel {
+    extends LongIdModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

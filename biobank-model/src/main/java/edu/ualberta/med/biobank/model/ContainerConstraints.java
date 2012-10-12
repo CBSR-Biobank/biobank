@@ -30,7 +30,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Entity
 @Table(name = "CONTAINER_CONSTRAINTS")
 public class ContainerConstraints
-    extends AbstractVersionedModel
+    extends VersionedLongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 

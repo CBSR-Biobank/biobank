@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.i18n.Trnc;
 @Audited
 @Entity
 @Table(name = "SOURCE_SPECIMEN")
-public class SourceSpecimen extends AbstractModel {
+public class SourceSpecimen extends LongIdModel {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 

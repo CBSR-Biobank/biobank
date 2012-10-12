@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Table(name = "STUDY_SPECIMEN")
 @Unique(properties = { "study", "specimen" }, groups = PrePersist.class)
 public class StudySpecimen
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Study study;

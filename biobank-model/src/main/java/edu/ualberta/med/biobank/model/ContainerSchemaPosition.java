@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Specimen.class, property = "position", groups = PreDelete.class)
 })
 public class ContainerSchemaPosition
-    extends AbstractModel {
+    extends LongIdModel {
     private static final long serialVersionUID = 1L;
 
     private ContainerSchema schema;

@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
     @NotUsed(by = ShipmentContainer.class, property = "shipment", groups = PreDelete.class)
 })
 public class Shipment
-    extends AbstractVersionedModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private ShipmentState state;
