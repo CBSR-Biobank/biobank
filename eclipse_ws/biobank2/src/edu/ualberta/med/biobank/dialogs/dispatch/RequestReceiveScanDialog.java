@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.Well;
+import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
     private static final I18n i18n = I18nFactory
@@ -87,7 +87,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                     break;
                 if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
-                        new Well(row, col, dsa.getSpecimen()
+                        new WellRectangle(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 }
                 i++;

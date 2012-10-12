@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.scannerconfig.dmscanlib.Well;
+import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -28,19 +28,19 @@ public class PalletCell extends AbstractUICell {
 
     private SpecimenWrapper specimen;
 
-    private final Well scanCell;
+    private final WellRectangle scanCell;
 
     private SpecimenWrapper expectedSpecimen;
 
-    public PalletCell(Well scanCell) {
+    public PalletCell(WellRectangle scanCell) {
         this.scanCell = scanCell;
     }
 
     public static Map<RowColPos, PalletCell> convertArray(
-        List<Well> scancells) {
+        List<WellRectangle> scancells) {
         Map<RowColPos, PalletCell> palletScanned =
             new TreeMap<RowColPos, PalletCell>();
-        for (Well cell : scancells) {
+        for (WellRectangle cell : scancells) {
             palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
                 new PalletCell(cell));
         }
@@ -48,24 +48,24 @@ public class PalletCell extends AbstractUICell {
     }
 
     public static Map<RowColPos, PalletCell> getRandomScanLink() {
-        return convertArray(Well.getRandom());
+        return convertArray(WellRectangle.getRandom());
     }
 
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithSpecimensAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        Map<RowColPos, PalletCell> cells = convertArray(Well.getRandom());
+        Map<RowColPos, PalletCell> cells = convertArray(WellRectangle.getRandom());
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomLinkedAliquotedSpecimens(appService, siteId);
         if (specimens.size() > 1) {
             int row = 2;
             int col = 3;
-            Well scanCell = new Well(row, col, specimens.get(0)
+            WellRectangle scanCell = new WellRectangle(row, col, specimens.get(0)
                 .getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
             row = 3;
             col = 1;
             scanCell =
-                new Well(row, col, specimens.get(1).getInventoryId());
+                new WellRectangle(row, col, specimens.get(1).getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
         }
         return cells;
@@ -84,11 +84,11 @@ public class PalletCell extends AbstractUICell {
         List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
             appService, siteId, studyId);
         if (specimens.size() > 0) {
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new Well(
+            palletScanned.put(new RowColPos(0, 0), new PalletCell(new WellRectangle(
                 0, 0, specimens.get(0).getInventoryId())));
         }
         if (specimens.size() > 1) {
-            palletScanned.put(new RowColPos(2, 4), new PalletCell(new Well(
+            palletScanned.put(new RowColPos(2, 4), new PalletCell(new WellRectangle(
                 2, 4, specimens.get(1).getInventoryId())));
         }
         return palletScanned;
@@ -108,7 +108,7 @@ public class PalletCell extends AbstractUICell {
             int row = i / 12;
             int col = i % 12;
             palletScanned.put(new RowColPos(row, col), new PalletCell(
-                new Well(row, col, spc.getInventoryId())));
+                new WellRectangle(row, col, spc.getInventoryId())));
             i++;
         }
         return palletScanned;
@@ -126,7 +126,7 @@ public class PalletCell extends AbstractUICell {
             int row = i / 12;
             int col = i % 12;
             palletScanned.put(new RowColPos(row, col),
-                new PalletCell(new Well(row, col, randomSpecimens.get(i)
+                new PalletCell(new WellRectangle(row, col, randomSpecimens.get(i)
                     .getInventoryId())));
             i++;
         }

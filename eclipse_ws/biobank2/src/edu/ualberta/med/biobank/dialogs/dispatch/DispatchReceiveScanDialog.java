@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.Well;
+import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 
 public class DispatchReceiveScanDialog extends
     ReceiveScanDialog<DispatchWrapper> {
@@ -101,14 +101,14 @@ public class DispatchReceiveScanDialog extends
                 int col = i % 12;
                 if (DispatchSpecimenState.MISSING != dsa.getState())
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
-                        new Well(row, col, dsa.getSpecimen()
+                        new WellRectangle(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
             } while (i < (8 * 12 - 1)
                 && i < currentShipment.getDispatchSpecimenCollection(false)
                     .size());
 
-            palletScanned.put(new RowColPos(6, 6), new PalletCell(new Well(
+            palletScanned.put(new RowColPos(6, 6), new PalletCell(new WellRectangle(
                 6, 6, "aaah")));
         }
         return palletScanned;

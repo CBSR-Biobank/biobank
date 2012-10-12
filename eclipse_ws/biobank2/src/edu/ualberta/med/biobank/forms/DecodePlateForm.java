@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.Well;
+import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodePlateForm extends PlateForm {
@@ -155,7 +155,7 @@ public class DecodePlateForm extends PlateForm {
             // progress monitor message.
             i18n.tr("Launching scan"));
 
-        List<Well> decodedCells = ScannerConfigPlugin.decodePlate(
+        List<WellRectangle> decodedCells = ScannerConfigPlugin.decodePlate(
             plateToScan, ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
     }

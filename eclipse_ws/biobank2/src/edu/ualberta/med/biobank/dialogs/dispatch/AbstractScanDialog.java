@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.Well;
+import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
@@ -218,7 +218,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     PalletCell palletCell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing
-                        palletCell = new PalletCell(new Well(
+                        palletCell = new PalletCell(new WellRectangle(
                             servercell.getRow(), servercell.getCol(),
                             servercell.getValue()));
                         cells.put(rcp, palletCell);
