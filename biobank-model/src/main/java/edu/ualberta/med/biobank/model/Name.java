@@ -36,7 +36,6 @@ public class Name {
         tmp.put(Role.class,                     bundle.tr("Role").format());
         tmp.put(ShipmentData.class,             bundle.tr("Shipment Information").format());
         tmp.put(ShippingMethod.class,           bundle.tr("Shipping Method").format());
-        tmp.put(SourceSpecimen.class,           bundle.tr("Source Specimen").format());
         tmp.put(Specimen.class,                 bundle.tr("Specimen").format());
         tmp.put(SpecimenType.class,             bundle.tr("Specimen Type").format());
         tmp.put(Study.class,                    bundle.tr("Study").format());
