@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.Well;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodeImageForm extends PlateForm implements
@@ -103,7 +103,7 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     protected void decodeImage() throws Exception {
-        List<ScanCell> decodedCells = ScannerConfigPlugin.decodeImage(1,
+        List<Well> decodedCells = ScannerConfigPlugin.decodeImage(1,
             ProfileManager.ALL_PROFILE_NAME, imageFilename);
         cells = PalletCell.convertArray(decodedCells);
 
