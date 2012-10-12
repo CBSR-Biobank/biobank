@@ -13,16 +13,16 @@ public class ContainerComment
     extends Comment {
     private static final long serialVersionUID = 1L;
 
-    private Container container;
+    private Container<?> container;
 
     @NotNull(message = "{ContainerComment.container.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CONTAINER_ID", nullable = false)
-    public Container getContainer() {
+    public Container<?> getContainer() {
         return container;
     }
 
-    public void setContainer(Container container) {
+    public void setContainer(Container<?> container) {
         this.container = container;
     }
 }

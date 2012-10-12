@@ -1,14 +1,13 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -38,7 +37,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "CONTAINER_TYPE",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "CENTER_ID", "NAME" }) })
+        @UniqueConstraint(columnNames = { "CENTER_ID", "NAME" })
+    })
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Unique.List({
     @Unique(properties = { "center", "name" }, groups = PrePersist.class)
 })
@@ -47,11 +49,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     @NotUsed(by = Container.class, property = "containerType", groups = PreDelete.class)
 })
 @Empty.List({
-    @Empty(property = "childContainerTypes", groups = PreDelete.class),
-    @Empty(property = "childVessels", groups = PreDelete.class)
+    @Empty(property = "childContainerTypes", groups = PreDelete.class)
 })
 @ValidContainerType(groups = PrePersist.class)
-public class ContainerType
+public abstract class ContainerType
     extends AbstractVersionedModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
@@ -59,11 +60,8 @@ public class ContainerType
     private Center center;
     private String name;
     private String description;
-    private Boolean topLevel;
-    private Boolean shared;
     private ContainerSchema schema;
-    private Set<Vessel> vessels = new HashSet<Vessel>(0);
-    private Set<ContainerType> containerTypes = new HashSet<ContainerType>(0);
+    private Boolean shared;
     private Boolean enabled;
 
     /**
@@ -107,34 +105,6 @@ public class ContainerType
     }
 
     /**
-     * @return true if this {@link ContainerType} should <em>not</em> be able to
-     *         be the child of another {@link ContainerType}, otherwise false.
-     */
-    @NotNull(message = "{ContainerType.topLevel.NotNull}")
-    @Column(name = "IS_TOP_LEVEL", nullable = false)
-    public Boolean isTopLevel() {
-        return this.topLevel;
-    }
-
-    public void setTopLevel(Boolean topLevel) {
-        this.topLevel = topLevel;
-    }
-
-    /**
-     * @return true if this {@link ContainerType} can be used by (but not
-     *         modified by) other {@link Center}s, otherwise false.
-     */
-    @NotNull(message = "{ContainerType.shared.NotNull}")
-    @Column(name = "IS_SHARED", nullable = false)
-    public Boolean isShared() {
-        return shared;
-    }
-
-    public void setShared(Boolean shared) {
-        this.shared = shared;
-    }
-
-    /**
      * @return how {@link Container}s with this {@link ContainerType} are
      *         designed and laid out, with labelled positions for children.
      */
@@ -150,36 +120,17 @@ public class ContainerType
     }
 
     /**
-     * @return the {@link Vessel}s that this {@link ContainerType} can hold as
-     *         children (must be empty if {@link #getChildContainerTypes()} is
-     *         not).
+     * @return true if this {@link ContainerType} can be used by (but not
+     *         modified by) other {@link Center}s, otherwise false.
      */
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "CONTAINER_TYPE_VESSEL",
-        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_VESSEL_ID", nullable = false, updatable = false) })
-    public Set<Vessel> getChildVessels() {
-        return vessels;
+    @NotNull(message = "{ContainerType.shared.NotNull}")
+    @Column(name = "IS_SHARED", nullable = false)
+    public Boolean isShared() {
+        return shared;
     }
 
-    public void setChildVessels(Set<Vessel> childVessels) {
-        this.vessels = childVessels;
-    }
-
-    /**
-     * @return the {@link ContainerType}s that this {@link ContainerType} can
-     *         hold as children (must be empty if {@link #getVessels()} is not).
-     */
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
-    public Set<ContainerType> getChildContainerTypes() {
-        return this.containerTypes;
-    }
-
-    public void setChildContainerTypes(Set<ContainerType> childContainerTypes) {
-        this.containerTypes = childContainerTypes;
+    public void setShared(Boolean shared) {
+        this.shared = shared;
     }
 
     /**

@@ -4,19 +4,17 @@ import java.util.Date;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -36,7 +34,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN")
+@Table(name = "SPECIMEN", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {
+        "CONTAINER_ID",
+        "CONTAINER_SCHEMA_POSITION_ID"
+    })
+})
 @Unique(properties = "inventoryId", groups = PrePersist.class)
 @NotUsed.List({
     @NotUsed(by = ShipmentSpecimen.class, property = "specimen", groups = PreDelete.class),
@@ -46,34 +49,43 @@ public class Specimen
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private String inventoryId;
-    private ParentContainer parentContainer;
+    private SpecimenContainer container;
+    private ContainerSchemaPosition position;
     private Date timeCreated;
     private SpecimenGroup group;
     private Decimal amount;
-    private Vessel vessel;
     private CenterLocation originLocation;
     private CenterLocation location;
     private Boolean usable; // TODO: rename to 'exists' ?
 
-    @NotEmpty(message = "{Specimen.inventoryId.NotEmpty}")
-    @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
-    public String getInventoryId() {
-        return this.inventoryId;
+    /**
+     * @return the {@link SpecimenContainer} this {@link Specimen} is stored in,
+     *         which must exist and cannot be null.
+     */
+    @NotNull(message = "{Specimen.container.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_ID", nullable = false)
+    public SpecimenContainer getContainer() {
+        return container;
     }
 
-    public void setInventoryId(String inventoryId) {
-        this.inventoryId = inventoryId;
+    public void setContainer(SpecimenContainer container) {
+        this.container = container;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "PARENT_CONTAINER_ID", unique = true)
-    public ParentContainer getParentContainer() {
-        return parentContainer;
+    /**
+     * @return the {@link ContainerSchemaPosition} (i.e. the position or label)
+     *         this {@link Specimen} has in its {@link #container}.
+     */
+    @NotNull(message = "{Specimen.position.NotNull}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_SCHEMA_POSITION_ID", nullable = false)
+    public ContainerSchemaPosition getPosition() {
+        return position;
     }
 
-    public void setParentContainer(ParentContainer parentContainer) {
-        this.parentContainer = parentContainer;
+    public void setPosition(ContainerSchemaPosition position) {
+        this.position = position;
     }
 
     @Valid
@@ -88,16 +100,6 @@ public class Specimen
 
     public void setAmount(Decimal amount) {
         this.amount = amount;
-    }
-
-    @NotNull(message = "{SpecimenGroup.vessel.NotNull}")
-    @Column(name = "VESSEL_ID", nullable = false)
-    public Vessel getVessel() {
-        return vessel;
-    }
-
-    public void setVessel(Vessel vessel) {
-        this.vessel = vessel;
     }
 
     @NotNull(message = "{Specimen.timeCreated.NotNull}")

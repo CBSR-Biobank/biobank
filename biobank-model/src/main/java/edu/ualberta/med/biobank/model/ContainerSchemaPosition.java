@@ -37,7 +37,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
         @UniqueConstraint(columnNames = { "CONTAINER_SCHEMA_ID", "LABEL" })
     })
 @Unique(properties = { "schema", "label" }, groups = PrePersist.class)
-@NotUsed(by = ParentContainer.class, property = "position", groups = PreDelete.class)
+@NotUsed.List({
+    @NotUsed(by = Container.class, property = "position", groups = PreDelete.class),
+    @NotUsed(by = Specimen.class, property = "position", groups = PreDelete.class)
+})
 public class ContainerSchemaPosition
     extends AbstractModel {
     private static final long serialVersionUID = 1L;

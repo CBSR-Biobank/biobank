@@ -54,8 +54,8 @@ public class SpecimenProcessingLinkType
     private Decimal expectedOutputChange;
     private Integer inputcount;
     private Integer outputCount;
-    private Vessel inputVessel;
-    private Vessel outputVessel;
+    private SpecimenContainerType inputContainerType;
+    private SpecimenContainerType outputContainerType;
 
     /**
      * @return the {@link ProcessingType} that this
@@ -172,28 +172,28 @@ public class SpecimenProcessingLinkType
     }
 
     /**
-     * @return the expected {@link Vessel} that the input {@link Specimen}s
-     *         should be in, or null if unspecified.
+     * @return the expected {@link SpecimenContainerType} that the input
+     *         {@link Specimen}s should be in, or null if unspecified.
      */
-    @Column(name = "INPUT_VESSEL_ID")
-    public Vessel getInputVessel() {
-        return inputVessel;
+    @Column(name = "INPUT_CONTAINER_TYPE_ID")
+    public void setInputContainerType(SpecimenContainerType inputContainerType) {
+        this.inputContainerType = inputContainerType;
     }
 
-    public void setInputVessel(Vessel inputVessel) {
-        this.inputVessel = inputVessel;
+    public void setOutputContainerType(SpecimenContainerType outputContainerType) {
+        this.outputContainerType = outputContainerType;
     }
 
     /**
-     * @return the expected {@link Vessel} that the output {@link Specimen}s
-     *         should be put into, or null if unspecified.
+     * @return the expected {@link SpecimenContainerType} that the output
+     *         {@link Specimen}s should be put into, or null if unspecified.
      */
-    @Column(name = "OUTPUT_VESSEL_ID")
-    public Vessel getOutputVessel() {
-        return outputVessel;
+    @Column(name = "OUTPUT_CONTAINER_TYPE_ID")
+    public SpecimenContainerType getOutputContainerType() {
+        return outputContainerType;
     }
 
-    public void setOutputVessel(Vessel outputVessel) {
-        this.outputVessel = outputVessel;
+    public SpecimenContainerType getInputContainerType() {
+        return inputContainerType;
     }
 }

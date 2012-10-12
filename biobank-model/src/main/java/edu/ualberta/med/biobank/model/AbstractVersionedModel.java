@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
@@ -47,7 +48,7 @@ public abstract class AbstractVersionedModel
 
     @Override
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "UPDATED_BY_USER_ID", nullable = false)
+    @JoinColumn(name = "UPDATED_BY_USER_ID", nullable = false)
     public User getUpdatedBy() {
         return updatedBy;
     }

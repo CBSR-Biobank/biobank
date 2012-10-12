@@ -87,7 +87,6 @@
 		<mapping class="edu.ualberta.med.biobank.model.EntityProperty" />
 		<mapping class="edu.ualberta.med.biobank.model.JasperTemplate" />
 		<mapping class="edu.ualberta.med.biobank.model.Membership" />
-		<mapping class="edu.ualberta.med.biobank.model.ParentContainer" />
 		<mapping class="edu.ualberta.med.biobank.model.Patient" />
 		<mapping class="edu.ualberta.med.biobank.model.PatientComment" />
 		<mapping class="edu.ualberta.med.biobank.model.PatientAnnotation" />
@@ -123,15 +122,18 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotation" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenComment" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainer" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainerType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenGroup" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLink" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLinkType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
+		<mapping class="edu.ualberta.med.biobank.model.StorageContainer" />
+		<mapping class="edu.ualberta.med.biobank.model.StorageContainerType" />
 		<mapping class="edu.ualberta.med.biobank.model.Study" />
 		<mapping class="edu.ualberta.med.biobank.model.StudyCenter" />
 		<mapping class="edu.ualberta.med.biobank.model.StudySpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.User" />
-		<mapping class="edu.ualberta.med.biobank.model.Vessel" />
 
 		<event type="pre-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />

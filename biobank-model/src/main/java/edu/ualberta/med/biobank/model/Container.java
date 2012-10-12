@@ -1,12 +1,14 @@
 package edu.ualberta.med.biobank.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
@@ -24,35 +26,43 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * A specifically built physical unit that can hold child containers, or can be
  * contained in a parent container.
  * 
+ * @author Jonathan Ferland
  */
 @Audited
 @Entity
 @Table(name = "CONTAINER",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "PRODUCT_BARCODE" }),
-        @UniqueConstraint(columnNames = { "CONTAINER_TREE_ID", "LABEL" })
+        @UniqueConstraint(columnNames = { "INVENTORY_ID" }),
+        @UniqueConstraint(columnNames = { "CONTAINER_TREE_ID", "LABEL" }),
+        @UniqueConstraint(columnNames = {
+            "PARENT_CONTAINER_ID",
+            "CONTAINER_SCHEMA_POSITION_ID"
+        })
     })
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 // TODO: consider pulling @UniqueConstraint into this @Unique annotation,
 // because this is a total repeating of constraints. Would then need to figure
 // out how to add DDL constraints from our annotations and how to get a bean's
 // value of a specific column.
 @Unique.List({
-    @Unique(properties = { "productBarcode" }, groups = PrePersist.class),
-    @Unique(properties = { "tree", "label" }, groups = PrePersist.class)
+    @Unique(properties = { "inventoryId" }, groups = PrePersist.class),
+    @Unique(properties = { "tree", "label" }, groups = PrePersist.class),
+    @Unique(properties = { "parentContainer", "position" }, groups = PrePersist.class)
 })
 @NotUsed.List({
-    @NotUsed(by = ParentContainer.class, property = "container", groups = PreDelete.class)
+    @NotUsed(by = Container.class, property = "parent", groups = PreDelete.class),
+    @NotUsed(by = Specimen.class, property = "container", groups = PreDelete.class)
 })
 @ValidContainer(groups = PrePersist.class)
-public class Container
+public abstract class Container<T extends ContainerType>
     extends AbstractVersionedModel {
     private static final long serialVersionUID = 1L;
 
-    private String productBarcode;
-    private ContainerType containerType;
-    private ContainerConstraints constraints;
-    private Boolean enabled;
-    private ParentContainer parent;
+    private String inventoryId;
+    private T containerType;
+    private StorageContainer parent;
+    private ContainerSchemaPosition position;
     private ContainerTree tree;
     private String label;
     private Integer left;
@@ -60,40 +70,64 @@ public class Container
     private Integer depth;
 
     /**
-     * Optional, but globally unique (if specified) barcode. Global uniqueness
-     * is required so that {@link Container}s, like {@link Specimen}s, can be
+     * Required inventory identifier, such as a barcode. Global uniqueness is
+     * required so that {@link Container}s, like {@link Specimen}s, can be
      * shipped between {@link Center}s.
      * 
-     * @return a globally unique identifying barcode, or null if not specified.
+     * @return a globally unique identifier, or null if not specified.
      */
-    @Column(name = "PRODUCT_BARCODE", unique = true)
-    public String getProductBarcode() {
-        return this.productBarcode;
+    @NotNull(message = "{Container.inventoryId.NotNull}")
+    @Column(name = "INVENTORY_ID", unique = true, nullable = false)
+    public String getInventoryId() {
+        return this.inventoryId;
     }
 
-    public void setProductBarcode(String productBarcode) {
-        this.productBarcode = productBarcode;
+    public void setInventoryId(String inventoryId) {
+        this.inventoryId = inventoryId;
     }
 
+    /**
+     * @return the classification of this {@link Container}.
+     */
     @NotNull(message = "{Container.containerType.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = ContainerType.class)
     @JoinColumn(name = "CONTAINER_TYPE_ID")
-    public ContainerType getContainerType() {
+    public T getContainerType() {
         return containerType;
     }
 
-    public void setContainerType(ContainerType containerType) {
+    public void setContainerType(T containerType) {
         this.containerType = containerType;
     }
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "PARENT_CONTAINER_ID", unique = true)
-    public ParentContainer getParent() {
+    /**
+     * @return the {@link StorageContainer} that this {@link Container} is
+     *         inside, or null if it isn't inside one.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PARENT_CONTAINER_ID")
+    public StorageContainer getParent() {
         return parent;
     }
 
-    public void setParent(ParentContainer parent) {
+    public void setParent(StorageContainer parent) {
         this.parent = parent;
+    }
+
+    /**
+     * This value should always be null if {@link #getParent()} is null.
+     * 
+     * @return the position this {@link Container} has in its
+     *         {@link #getParent()}, or null if there is no specific position.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CONTAINER_SCHEMA_POSITION_ID")
+    public ContainerSchemaPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(ContainerSchemaPosition position) {
+        this.position = position;
     }
 
     @NotNull(message = "{ContainerNode.tree.NotNull}")
@@ -111,6 +145,9 @@ public class Container
      * The label must be delimited to avoid confusion, but perhaps users may
      * enter non-delimited versions (but that is 2^(n-1) different possible
      * delimited labels to search).
+     * <p>
+     * Exists as a "materialized" path, essentially, this value will never be
+     * entered, only manually calculated and looked up or searched for.
      * 
      * @return if this has a {@link #getParent()}, then return this
      *         {@link Container}'s position (i.e.
@@ -118,8 +155,6 @@ public class Container
      *         with this parent's label, recursively, back to a root of a
      *         {@link ContainerTree}. Otherwise, a user-defined label.
      */
-    // TODO: ask cbsr if we can just not store labels?
-    // TODO: but a label is needed for easy location display and look-up?
     @NotEmpty(message = "{Container.label.NotEmpty}")
     @Column(name = "LABEL", nullable = false)
     public String getLabel() {
@@ -128,35 +163,6 @@ public class Container
 
     public void setLabel(String label) {
         this.label = label;
-    }
-
-    /**
-     * @return optional information about what types of {@link Specimen}s this
-     *         {@link Container} and its children can legally contain, or null
-     *         if none specified.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CONTAINER_CONSTRAINTS_ID")
-    public ContainerConstraints getConstraints() {
-        return constraints;
-    }
-
-    public void setConstraints(ContainerConstraints constraints) {
-        this.constraints = constraints;
-    }
-
-    /**
-     * @return true if this {@link Container} can have new {@link Specimen}s
-     *         added to it, otherwise false.
-     */
-    @NotNull(message = "{Container.enabled.NotNull}")
-    @Column(name = "IS_ENABLED")
-    public Boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
     }
 
     @NotNull(message = "{Container.left.NotNull}")
