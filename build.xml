@@ -162,6 +162,12 @@
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
+    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml" 
+          tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
+	  overwrite="true" />
+    <move file="${secu-log.dir}/jboss/log4j.xml" 
+          tofile="webapp/WEB-INF/classes/log4j.xml"
+	  overwrite="true" />
   </target>
 
   <target name="check-db-properties">
@@ -204,9 +210,11 @@
     <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
           overwrite="true" verbose="true" />
+    <!-- ignore this war for now
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
           overwrite="true" verbose="true" />
+    -->
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
         <!-- TODO: fix this? -->
@@ -249,14 +257,7 @@
     </javac>
   </target>
 
-  <target name="log4j-config">
-    <!-- create the file only if not present -->
-    <copy file="webapp/WEB-INF/classes/log4j.xml.default"
-          tofile="webapp/WEB-INF/classes/log4j.xml"
-          overwrite="false"/>
-  </target>
-
-  <target name="package-webapp" depends="build-common-project,log4j-config">
+  <target name="package-webapp" depends="build-common-project">
     <mkdir dir="${output.dir}" />
     <war destfile="${war.file}"
          webxml="webapp/WEB-INF/web.xml">

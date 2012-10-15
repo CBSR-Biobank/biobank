@@ -6,10 +6,10 @@
   <appender name="BIOBANK_APPENDER"
     class="edu.ualberta.med.biobank.server.logging.BiobankJDBCAppender">
     <param name="application" value="biobank" />
-    <param name="dbDriverClass" value="com.mysql.jdbc.Driver" />
-    <param name="dbUrl" value="jdbc:mysql://localhost:3306/biobank" />
-    <param name="dbUser" value="dummy" />
-    <param name="dbPwd" value="ozzy498" />
+    <param name="dbDriverClass" value="@database.driver@" />
+    <param name="dbUrl" value="@database.url@" />
+    <param name="dbUser" value="@database.username@" />
+    <param name="dbPwd" value="@database.password@" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
         value=":: [%d{ISO8601}] %-5p %c{1}.%M() %x - %m%n" />

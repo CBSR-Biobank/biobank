@@ -1,5 +1,11 @@
 package edu.ualberta.med.biobank.test;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -56,17 +62,28 @@ public class SessionProvider {
             InitialContext ic = new InitialContext();
 
             ic.createSubcontext("java:");
+            
+            Properties dbProperties = new Properties();
+            dbProperties.load(new FileInputStream("../../db.properties"));
 
+            String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}",
+                dbProperties.getProperty("database.host"),
+                dbProperties.getProperty("database.name"));
+            
             // Construct DataSource
             MysqlConnectionPoolDataSource ds =
                 new MysqlConnectionPoolDataSource();
-            ds.setUrl("jdbc:mysql://localhost:3306/biobank");
-            ds.setUser("dummy");
-            ds.setPassword("ozzy498");
+            ds.setUrl(url);
+            ds.setUser(dbProperties.getProperty("database.username"));
+            ds.setPassword(dbProperties.getProperty("database.password"));
 
             ic.bind("java:/biobank", ds);
         } catch (NamingException ex) {
             ex.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
