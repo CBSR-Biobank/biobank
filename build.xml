@@ -76,8 +76,10 @@
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
     <uptodate property="jboss.uptodate"
-              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-              srcfile="${war.file}" />
+              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war">
+      <srcfiles file="${war.file}" />
+      <srcfiles file="db.properties" />
+    </uptodate>
   </target>
 
   <target name="keystore-gen">
@@ -182,29 +184,29 @@
   </target>
 
   <target name="deploy-jboss"
-          depends="check-deploy-jboss,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
+          depends="check-deploy-jboss,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/server${debugFileExtension}.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
     <copy file="${lib.dir}/mysql-connector-java-5.1.15-bin.jar"
           tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15-bin.jar"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
         <!-- TODO: fix this? -->
@@ -213,7 +215,7 @@
     </delete>
     <copy file="${war.file}"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-          overwrite="true" />
+          overwrite="true" verbose="true"/>
   </target>
 
   <target name="build-eclipse-projects"
