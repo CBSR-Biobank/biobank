@@ -32,6 +32,13 @@
   <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>
 
+  <condition property="databse.exec.haveUserAndPassword">
+    <and>
+      <isset property="database.exec.username" />
+      <isset property="database.exec.password" />
+    </and>
+  </condition>
+
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
@@ -50,6 +57,21 @@
     <path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
+
+  <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
+    <input message="Enter database executor's username (to execute database commands)"
+           addProperty="database.exec.username"
+           defaultValue="root" />
+    <input message="Enter password"
+           addProperty="database.exec.password"
+           defaultValue="">
+      <handler type="secure" />
+    </input>
+  </target>
+
+  <target name="check-db-user"
+          depends="check-db">
+  </target>
 
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
@@ -153,7 +175,7 @@
   </target>
 
   <target name="check-deploy-jboss"
-	  depends="db-properties-copy">
+	  depends="db-properties-copy,check-db-user">
     <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
     </exec>
