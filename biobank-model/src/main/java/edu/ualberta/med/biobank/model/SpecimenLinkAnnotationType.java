@@ -12,9 +12,9 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 @Entity
 @DiscriminatorValue("SP")
 @NotUsed.List({
-    @NotUsed(by = SpecimenAnnotation.class, property = "type", groups = PreDelete.class)
+    @NotUsed(by = SpecimenLinkAnnotation.class, property = "type", groups = PreDelete.class)
 })
-public class SpecimenAnnotationType
+public class SpecimenLinkAnnotationType
     extends AnnotationType {
     private static final long serialVersionUID = 1L;
 

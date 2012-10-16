@@ -11,21 +11,21 @@ import org.hibernate.envers.Audited;
 
 @Audited
 @Entity
-@Table(name = "SPECIMEN_ANNOTATION")
-public class SpecimenAnnotation
-    extends Annotation<SpecimenAnnotationType> {
+@Table(name = "SPECIMEN_LINK_ANNOTATION")
+public class SpecimenLinkAnnotation
+    extends Annotation<SpecimenLinkAnnotationType> {
     private static final long serialVersionUID = 1L;
 
-    private Specimen specimen;
+    private SpecimenLink link;
 
-    @NotNull(message = "{SpecimenAnnotation.specimen.NotNull}")
+    @NotNull(message = "{SpecimenLinkAnnotation.link.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_ID")
-    public Specimen getSpecimen() {
-        return specimen;
+    @JoinColumn(name = "SPECIMEN_LINK_ID")
+    public SpecimenLink getLink() {
+        return link;
     }
 
-    public void setSpecimen(Specimen specimen) {
-        this.specimen = specimen;
+    public void setLink(SpecimenLink link) {
+        this.link = link;
     }
 }

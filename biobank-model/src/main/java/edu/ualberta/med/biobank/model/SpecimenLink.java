@@ -24,18 +24,18 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
- * {@link SpecimenProcessingType}.
+ * {@link SpecimenLinkType}.
  * <p>
  * This entity provides more detailed information about the parentage of a
  * {@link Specimen}, i.e. the {@link #input}-{@link #output} pair could be
  * considered a parent-child relationship. This is opposed to
  * {@link CollectionEvent}s, which provide much more general heritage
  * information. So, special care must be taken to ensure that
- * {@link StudySpecimen} and {@link SpecimenProcessing} entities are consistent.
- * The {@link #output} must be in all the same {@link CollectionEvent}s as the
+ * {@link StudySpecimen} and {@link SpecimenLink} entities are consistent. The
+ * {@link #output} must be in all the same {@link CollectionEvent}s as the
  * {@link #input}, but if two {@link Specimen}s are in the same
  * {@link CollectionEvent} they do <em>not</em> need to be associated (directly
- * or transitively) through a {@link SpecimenProcessing}. Also note that the
+ * or transitively) through a {@link SpecimenLink}. Also note that the
  * {@link #input} does <em>not</em> need to be in the same
  * {@link CollectionEvent}(s) as the {@link #output}.
  * 
@@ -44,16 +44,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_PROCESSING")
+@Table(name = "SPECIMEN_LINK")
 @Unique(properties = { "input", "output", "timeDone" }, groups = PrePersist.class)
-public class SpecimenProcessing
+public class SpecimenLink
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Specimen input;
     private Specimen output;
     private Date timeDone;
-    private SpecimenProcessingType type;
+    private SpecimenLinkType type;
     private ProcessingEvent processingEvent;
     private Decimal actualInputAmountChange;
     private Decimal actualOutputAmountChange;
@@ -62,7 +62,7 @@ public class SpecimenProcessing
      * @return the {@link Specimen} that was processed.
      */
     @NaturalId
-    @NotNull(message = "{SpecimenProcessing.input.NotNull}")
+    @NotNull(message = "{SpecimenLink.input.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_SPECIMEN_ID", nullable = false)
     public Specimen getInput() {
@@ -77,7 +77,7 @@ public class SpecimenProcessing
      * @return the {@link Specimen} that resulted from the process.
      */
     @NaturalId
-    @NotNull(message = "{SpecimenProcessing.output.NotNull}")
+    @NotNull(message = "{SpecimenLink.output.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUTPUT_SPECIMEN_ID", nullable = false)
     public Specimen getOutput() {
@@ -92,7 +92,7 @@ public class SpecimenProcessing
      * @return when the processing happened.
      */
     @NaturalId(mutable = false)
-    @NotNull(message = "{SpecimenProcessing.timeDone.NotNull}")
+    @NotNull(message = "{SpecimenLink.timeDone.NotNull}")
     @Past
     @Column(name = "TIME_DONE", nullable = false)
     public Date getTimeDone() {
@@ -109,16 +109,16 @@ public class SpecimenProcessing
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_PROCESSING_LINK_TYPE_ID")
-    public SpecimenProcessingType getType() {
+    public SpecimenLinkType getType() {
         return type;
     }
 
-    public void setType(SpecimenProcessingType type) {
+    public void setType(SpecimenLinkType type) {
         this.type = type;
     }
 
     /**
-     * @return the {@link ProcessingEvent} this {@link SpecimenProcessing} was
+     * @return the {@link ProcessingEvent} this {@link SpecimenLink} was
      *         established in, or null if unspecified.
      */
     @ManyToOne(fetch = FetchType.LAZY)

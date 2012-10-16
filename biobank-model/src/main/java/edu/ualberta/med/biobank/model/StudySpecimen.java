@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 /**
  * Joins {@link Specimen}s to {@link CollectionEvent}s, which provides
  * generalised parentage information about where {@link Specimen}s came from (
- * {@link SpecimenProcessing} provides much more specific information). It
+ * {@link SpecimenLink} provides much more specific information). It
  * is possible for {@link Specimen}s to have at most one {@link CollectionEvent}
  * per {@link Study}.
  * <p>
@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * {@link Specimens} to another {@link Study}.
  * 
  * @author Jonathan Ferland
- * @see SpecimenProcessing
+ * @see SpecimenLink
  */
 @Audited
 @Entity
