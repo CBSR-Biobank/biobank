@@ -125,8 +125,8 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainer" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenContainerType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenGroup" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLink" />
-		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingLinkType" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessing" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenProcessingType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StorageContainer" />
 		<mapping class="edu.ualberta.med.biobank.model.StorageContainerType" />

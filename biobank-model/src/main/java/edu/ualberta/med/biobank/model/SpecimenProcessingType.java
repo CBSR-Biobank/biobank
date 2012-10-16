@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_PROCESSING_LINK_TYPE", uniqueConstraints = {
+@Table(name = "SPECIMEN_PROCESSING_TYPE", uniqueConstraints = {
     @UniqueConstraint(columnNames = {
         "PROCESSING_TYPE_ID",
         "INPUT_SPECIMEN_GROUP_ID",
@@ -42,8 +42,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     })
 })
 @Unique(properties = { "type", "inputGroup", "outputGroup" }, groups = PrePersist.class)
-@NotUsed(by = SpecimenProcessingLink.class, property = "specimenProcessingLinkType", groups = PreDelete.class)
-public class SpecimenProcessingLinkType
+@NotUsed(by = SpecimenProcessing.class, property = "type", groups = PreDelete.class)
+public class SpecimenProcessingType
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
@@ -59,10 +59,10 @@ public class SpecimenProcessingLinkType
 
     /**
      * @return the {@link ProcessingType} that this
-     *         {@link SpecimenProcessingLinkType} belongs to, which contains
+     *         {@link SpecimenProcessingType} belongs to, which contains
      *         additional textual information and descriptions.
      */
-    @NotNull(message = "{SpecimenProcessingLinkType.type.NotNull}")
+    @NotNull(message = "{SpecimenProcessingType.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROCESSING_TYPE_ID", nullable = false)
     public ProcessingType getType() {
@@ -77,7 +77,7 @@ public class SpecimenProcessingLinkType
      * @return the {@link SpecimenGroup} that the input {@link Specimen}(s) of
      *         this process must be in.
      */
-    @NotNull(message = "{SpecimenProcessingLinkType.inputGroup.NotNull}")
+    @NotNull(message = "{SpecimenProcessingType.inputGroup.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_SPECIMEN_GROUP_ID", nullable = false)
     public SpecimenGroup getInputGroup() {
@@ -92,7 +92,7 @@ public class SpecimenProcessingLinkType
      * @return the {@link SpecimenGroup} that the output {@link Specimen}(s) of
      *         this process will be in.
      */
-    @NotNull(message = "{SpecimenProcessingLinkType.outputGroup.NotNull}")
+    @NotNull(message = "{SpecimenProcessingType.outputGroup.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUTPUT_SPECIMEN_GROUP_ID", nullable = false)
     public SpecimenGroup getOutputGroup() {

@@ -24,37 +24,36 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * A record of the actual {@link Specimen}s and amounts involved in a
- * {@link SpecimenProcessingLinkType}.
+ * {@link SpecimenProcessingType}.
  * <p>
  * This entity provides more detailed information about the parentage of a
  * {@link Specimen}, i.e. the {@link #input}-{@link #output} pair could be
  * considered a parent-child relationship. This is opposed to
  * {@link CollectionEvent}s, which provide much more general heritage
  * information. So, special care must be taken to ensure that
- * {@link StudySpecimen} and {@link SpecimenProcessingLink} entities are
- * consistent. The {@link #output} must be in all the same
- * {@link CollectionEvent}s as the {@link #input}, but if two {@link Specimen}s
- * are in the same {@link CollectionEvent} they do <em>not</em> need to be
- * associated (directly or transitively) through a
- * {@link SpecimenProcessingLink}. Also note that the {@link #input} does
- * <em>not</em> need to be in the same {@link CollectionEvent}(s) as the
- * {@link #output}.
+ * {@link StudySpecimen} and {@link SpecimenProcessing} entities are consistent.
+ * The {@link #output} must be in all the same {@link CollectionEvent}s as the
+ * {@link #input}, but if two {@link Specimen}s are in the same
+ * {@link CollectionEvent} they do <em>not</em> need to be associated (directly
+ * or transitively) through a {@link SpecimenProcessing}. Also note that the
+ * {@link #input} does <em>not</em> need to be in the same
+ * {@link CollectionEvent}(s) as the {@link #output}.
  * 
  * @author Jonathan Ferland
  * @see SpecimenCollectionEvent
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_PROCESSING_LINK")
+@Table(name = "SPECIMEN_PROCESSING")
 @Unique(properties = { "input", "output", "timeDone" }, groups = PrePersist.class)
-public class SpecimenProcessingLink
+public class SpecimenProcessing
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
     private Specimen input;
     private Specimen output;
     private Date timeDone;
-    private SpecimenProcessingLinkType type;
+    private SpecimenProcessingType type;
     private ProcessingEvent processingEvent;
     private Decimal actualInputAmountChange;
     private Decimal actualOutputAmountChange;
@@ -63,7 +62,7 @@ public class SpecimenProcessingLink
      * @return the {@link Specimen} that was processed.
      */
     @NaturalId
-    @NotNull(message = "{SpecimenProcessingLink.input.NotNull}")
+    @NotNull(message = "{SpecimenProcessing.input.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_SPECIMEN_ID", nullable = false)
     public Specimen getInput() {
@@ -78,7 +77,7 @@ public class SpecimenProcessingLink
      * @return the {@link Specimen} that resulted from the process.
      */
     @NaturalId
-    @NotNull(message = "{SpecimenProcessingLink.output.NotNull}")
+    @NotNull(message = "{SpecimenProcessing.output.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUTPUT_SPECIMEN_ID", nullable = false)
     public Specimen getOutput() {
@@ -93,7 +92,7 @@ public class SpecimenProcessingLink
      * @return when the processing happened.
      */
     @NaturalId(mutable = false)
-    @NotNull(message = "{SpecimenProcessingLink.timeDone.NotNull}")
+    @NotNull(message = "{SpecimenProcessing.timeDone.NotNull}")
     @Past
     @Column(name = "TIME_DONE", nullable = false)
     public Date getTimeDone() {
@@ -110,17 +109,17 @@ public class SpecimenProcessingLink
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_PROCESSING_LINK_TYPE_ID")
-    public SpecimenProcessingLinkType getType() {
+    public SpecimenProcessingType getType() {
         return type;
     }
 
-    public void setType(SpecimenProcessingLinkType type) {
+    public void setType(SpecimenProcessingType type) {
         this.type = type;
     }
 
     /**
-     * @return the {@link ProcessingEvent} this {@link SpecimenProcessingLink}
-     *         was established in, or null if unspecified.
+     * @return the {@link ProcessingEvent} this {@link SpecimenProcessing} was
+     *         established in, or null if unspecified.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROCESSING_EVENT_ID")
