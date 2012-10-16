@@ -7,10 +7,10 @@
         <property name="connection.datasource">java:/biobank</property>
 		-->
 		
-        <property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
-        <property name="connection.username">dummy</property>
-        <property name="connection.password">ozzy498</property>
-        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">@database.url@</property>
+        <property name="connection.username">@database.username@</property>
+        <property name="connection.password">@database.password@</property>
+        <property name="connection.driver_class">@database.driver@</property>
         
 		<property name="c3p0.max_size">10</property>
 		<property name="c3p0.min_size">2</property>
