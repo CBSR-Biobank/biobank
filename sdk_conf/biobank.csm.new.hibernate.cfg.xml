@@ -3,23 +3,7 @@
 
 <hibernate-configuration>
     <session-factory>
-		<!--
         <property name="connection.datasource">java:/biobank</property>
-		-->
-		
-        <property name="connection.url">jdbc:mysql://localhost:3306/biobank</property>
-        <property name="connection.username">dummy</property>
-        <property name="connection.password">ozzy498</property>
-        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        
-		<property name="c3p0.max_size">10</property>
-		<property name="c3p0.min_size">2</property>
-		<property name="c3p0.timeout">5000</property>
-		<property name="c3p0.max_statements">100</property>
-		<property name="c3p0.idle_test_period">3000</property>
-		<property name="c3p0.acquire_increment">2</property>
-		<property name="c3p0.validate">false</property>
-		
         <property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
 
         <mapping resource="gov/nih/nci/security/authorization/domainobjects/Privilege.hbm.xml"/>

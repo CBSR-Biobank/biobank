@@ -32,6 +32,13 @@
   <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>
 
+  <condition property="databse.exec.haveUserAndPassword">
+    <and>
+      <isset property="database.exec.username" />
+      <isset property="database.exec.password" />
+    </and>
+  </condition>
+
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
@@ -51,11 +58,35 @@
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
 
+  <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
+    <input message="Enter database executor's username (to execute database commands)"
+           addProperty="database.exec.username"
+           defaultValue="root" />
+    <input message="Enter password"
+           addProperty="database.exec.password"
+           defaultValue="">
+      <handler type="secure" />
+    </input>
+  </target>
+
+  <target name="check-db-user"
+          depends="check-db">
+  </target>
+
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
+    <!-- remove the upt.war because it requires db name/url/username/pw variables
+         inside the war -->
+    <delete includeemptydirs="true">
+      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <include name="upt*.war"/>
+      </fileset>
+    </delete>
     <uptodate property="jboss.uptodate"
-              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-              srcfile="${war.file}" />
+              targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war">
+      <srcfiles file="${war.file}" />
+      <srcfiles file="db.properties" />
+    </uptodate>
   </target>
 
   <target name="keystore-gen">
@@ -138,6 +169,12 @@
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
+    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml" 
+          tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
+	  overwrite="true" />
+    <move file="${secu-log.dir}/jboss/log4j.xml" 
+          tofile="webapp/WEB-INF/classes/log4j.xml"
+	  overwrite="true" />
   </target>
 
   <target name="check-db-properties">
@@ -153,45 +190,46 @@
   </target>
 
   <target name="check-deploy-jboss"
-	  depends="db-properties-copy">
+	  depends="db-properties-copy,check-db-user">
     <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
     </exec>
   </target>
 
   <target name="deploy-jboss"
-          depends="check-deploy-jboss,package-webapp,check-jboss-uptodate,keystore-copy,update-db-config"
+          depends="check-deploy-jboss,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
           tofile="${env.JBOSS_HOME}/server/default/conf/login-config.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/server${debugFileExtension}.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/jbossweb-tomcat55.sar/server.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
     <copy file="${lib.dir}/mysql-connector-java-5.1.15-bin.jar"
           tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15-bin.jar"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/biobank-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
+    <!-- ignore this war for now
     <copy file="${secu-log.dir}/jboss/upt.war"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
-          overwrite="true" />
+          overwrite="true" verbose="true" />
+    -->
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
-        <!-- TODO: fix this? -->
-        <include name="biobank*.war"/>
+        <include name="upt*.war"/>
       </fileset>
     </delete>
     <copy file="${war.file}"
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank.war"
-          overwrite="true" />
+          overwrite="true" verbose="true"/>
   </target>
 
   <target name="build-eclipse-projects"
@@ -225,14 +263,7 @@
     </javac>
   </target>
 
-  <target name="log4j-config">
-    <!-- create the file only if not present -->
-    <copy file="webapp/WEB-INF/classes/log4j.xml.default"
-          tofile="webapp/WEB-INF/classes/log4j.xml"
-          overwrite="false"/>
-  </target>
-
-  <target name="package-webapp" depends="build-common-project,log4j-config">
+  <target name="package-webapp" depends="build-common-project">
     <mkdir dir="${output.dir}" />
     <war destfile="${war.file}"
          webxml="webapp/WEB-INF/web.xml">

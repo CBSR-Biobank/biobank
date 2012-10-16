@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetCountByWorksheetAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetProcessedCountByInventoryId;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -587,15 +588,28 @@ public class OhsTecanSpecimenPojoReader implements
             throw new IllegalStateException("filename has not been set");
         }
         CountResult result;
+        BiobankApplicationService service = SessionManager.getAppService();
+        
         try {
-            BiobankApplicationService service = SessionManager.getAppService();
             result = service.doAction(
                 new ProcessingEventGetCountByWorksheetAction(new File(filename).getName()));
         } catch (Exception e) {
-            throw new IllegalStateException("OHS TECAN pre-execution error");
+            throw new IllegalStateException("OHS TECAN pre-execution error - processing event");
         }
         if (result.getCount() > 0) {
             throw new IllegalStateException("file name has been used already");
+        }
+        
+        for (SpecimenBatchOpInputPojo sourceSpecimen : sourceSpecimens) {
+            try {
+                result = service.doAction(
+                    new SpecimenGetProcessedCountByInventoryId(sourceSpecimen.getInventoryId()));
+            } catch (Exception e) {
+                throw new IllegalStateException("OHS TECAN pre-execution error - source specimen");
+            }
+            if (result.getCount() > 0) {
+                throw new IllegalStateException("source specimen has already been processed");
+            }
         }
     }
 
