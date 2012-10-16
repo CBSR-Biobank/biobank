@@ -75,6 +75,13 @@
 
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
+    <!-- remove the upt.war because it requires db name/url/username/pw variables
+         inside the war -->
+    <delete includeemptydirs="true">
+      <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
+        <include name="upt*.war"/>
+      </fileset>
+    </delete>
     <uptodate property="jboss.uptodate"
               targetfile="${env.JBOSS_HOME}/server/default/deploy/biobank.war">
       <srcfiles file="${war.file}" />
@@ -217,8 +224,7 @@
     -->
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
-        <!-- TODO: fix this? -->
-        <include name="biobank*.war"/>
+        <include name="upt*.war"/>
       </fileset>
     </delete>
     <copy file="${war.file}"
