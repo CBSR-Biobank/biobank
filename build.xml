@@ -169,10 +169,10 @@
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
-    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml" 
+    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml"
           tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
 	  overwrite="true" />
-    <move file="${secu-log.dir}/jboss/log4j.xml" 
+    <move file="${secu-log.dir}/jboss/log4j.xml"
           tofile="webapp/WEB-INF/classes/log4j.xml"
 	  overwrite="true" />
   </target>
@@ -192,7 +192,7 @@
   <target name="check-deploy-jboss"
 	  depends="db-properties-copy,check-db-user">
     <exec dir="" executable="${perl}" failonerror="true">
-      <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
+      <arg line="scripts/chkconfig -d ${database.name} --host ${database.host} -u ${database.exec.username} -p ${database.exec.password}"/>
     </exec>
   </target>
 

@@ -23,15 +23,28 @@ SED=/bin/sed
 DBHOST="localhost"
 DBNAME=biobank2
 
-while getopts "d:hH:u:" OPTION
+while getopts "d:hH:n:u:p:o:" OPTION
 do
-  case $OPTION in
-        d) DBDUMP=$OPTARG;;
-        H) DBHOST=$OPTARG;;
-        u) DBUSER=$OPTARG;;
+    case $OPTION in
+        d) DBDUMP=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        H) DBHOST=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        n) DBNAME=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        u) DBUSER=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        p) DBPWD=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
         h) echo "$USAGE"; exit;;
-  esac
+    esac
 done
+
 
 if [ -z "$DBUSER" ]; then
     read -p "MySQL user on host $DBHOST: " DBUSER
@@ -42,8 +55,10 @@ if [ -z "$DBUSER" ]; then
     exit
 fi
 
-read -s -p "MySQL Password for user $DBUSER: " DBPWD
-echo ""
+if [ -z "$DBPWD" ]; then
+    read -s -p "MySQL Password for user $DBUSER: " DBPWD
+    echo ""
+fi
 
 if [ -z "$DBPWD" ]; then
     echo "ERROR: password not specified"
@@ -70,25 +85,25 @@ DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 echo "recreating database..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank2
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create biobank
-mysql -h$DBHOST -u$DBUSER -p$DBPWD  biobank -e "grant all privileges on biobank.* to 'dummy'@'localhost' with grant option"
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop $DBNAME
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create $DBNAME
+mysql -h$DBHOST -u$DBUSER -p$DBPWD  $DBNAME -e "grant all privileges on $DBNAME.* to '$DBUSER'@'localhost' with grant option"
 
 if [ -s /usr/bin/pv ]; then
-    pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+    pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 else
-    gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+    gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 fi
 
 echo "upgrading database from v3.0.2 to v3.1.0 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v302_v310.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v302_v310.sql
 echo "upgrading database from v3.1.0 to v3.2.0 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v310_v320.sql
 echo "assigning groups..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < db/import/data/groups.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < db/import/data/groups.sql
 echo "migrating security..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v310_v320_security_transfer.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v310_v320_security_transfer.sql
 echo "upgrading database from v3.2.0 to v3.2.1 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v320_321.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v320_321.sql
 echo "upgrading database from v3.2.1 to v3.3.0 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v321_v330.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v321_v330.sql
