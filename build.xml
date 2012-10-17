@@ -190,7 +190,9 @@
   </target>
 
   <target name="check-deploy-jboss"
-	  depends="db-properties-copy,check-db-user">
+	  depends="db-properties-copy,check-db-user"
+	  unless="check.deploy.jboss.skip">
+    <echo message="to skip this check set the check.deploy.jboss.skip property on the command line" />
     <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} --host ${database.host} -u ${database.exec.username} -p ${database.exec.password}"/>
     </exec>
