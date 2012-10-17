@@ -127,6 +127,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenLinkAnnotation" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenLinkAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenLinkType" />
+		<mapping class="edu.ualberta.med.biobank.model.SpecimenLinkTypeAnnotationType" />
 		<mapping class="edu.ualberta.med.biobank.model.SpecimenType" />
 		<mapping class="edu.ualberta.med.biobank.model.StorageContainer" />
 		<mapping class="edu.ualberta.med.biobank.model.StorageContainerType" />

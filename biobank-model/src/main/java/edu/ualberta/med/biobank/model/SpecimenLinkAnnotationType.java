@@ -10,26 +10,11 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Audited
 @Entity
-@DiscriminatorValue("SP")
+@DiscriminatorValue("SPLK")
 @NotUsed.List({
     @NotUsed(by = SpecimenLinkAnnotation.class, property = "type", groups = PreDelete.class)
 })
 public class SpecimenLinkAnnotationType
     extends AnnotationType {
     private static final long serialVersionUID = 1L;
-
-    // private Set<SpecimenGroup> groups;
-    //
-    // /**
-    // * @return the {@link SpecimenGroup}s that this
-    // * {@link SpecimenAnnotationType} is meant to be collected for.
-    // */
-    // @OnDelete(action = OnDeleteAction.CASCADE)
-    // public Set<SpecimenGroup> getGroups() {
-    // return groups;
-    // }
-    //
-    // public void setGroups(Set<SpecimenGroup> groups) {
-    // this.groups = groups;
-    // }
 }

@@ -4,6 +4,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.StorageContainerType;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainer;
 
@@ -13,8 +15,6 @@ public class ValidContainerValidator
     implements ConstraintValidator<ValidContainer, Object> {
     private static final String ILLEGAL_PARENT =
         "{edu.ualberta.med.biobank.model.Container.ValidContainer.illegalParent}";
-    private static final String MISSING_PARENT =
-        "{edu.ualberta.med.biobank.model.Container.ValidContainer.missingParent}";
 
     @Override
     public void initialize(ValidContainer annotation) {
@@ -28,7 +28,7 @@ public class ValidContainerValidator
 
         context.disableDefaultConstraintViolation();
 
-        Container container = (Container) value;
+        Container<?> container = (Container<?>) value;
 
         boolean isValid = true;
 
@@ -37,18 +37,13 @@ public class ValidContainerValidator
         return isValid;
     }
 
-    private boolean checkParent(Container container,
+    private boolean checkParent(Container<?> container,
         ConstraintValidatorContext context) {
-        if (container.getContainerType().isTopLevel()) {
-            if (container.getParent() != null) {
+        ContainerType ct = container.getContainerType();
+        if (ct instanceof StorageContainerType) {
+            StorageContainerType sct = (StorageContainerType) ct;
+            if (sct.isTopLevel() && container.getParent() != null) {
                 context.buildConstraintViolationWithTemplate(ILLEGAL_PARENT)
-                    .addNode("parent")
-                    .addConstraintViolation();
-                return false;
-            }
-        } else {
-            if (container.getParent() == null) {
-                context.buildConstraintViolationWithTemplate(MISSING_PARENT)
                     .addNode("parent")
                     .addConstraintViolation();
                 return false;

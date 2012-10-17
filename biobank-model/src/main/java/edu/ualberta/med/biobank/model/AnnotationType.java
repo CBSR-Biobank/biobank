@@ -22,9 +22,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Allow a {@link Study} to collect custom named and defined pieces of data on
- * various entities, such as {@link Specimen}s, {@link Patient}s, and
- * {@link CollectionEvent}s.
+ * various entities, such as {@link SpecimenLink}s, {@link Patient}s, and
+ * {@link CollectionEvent}s. Instances of this class defines a name and
+ * description of the type of information that should be collected and determine
+ * whether one or more value can be collected (see {@link #isMultiValue()}).
  * <p>
+ * {@link AnnotationType} derivatives should exist in the same table, i.e.
  * {@link InheritanceType#TABLE_PER_CLASS} is <em>not</em> used ...
  * <ol>
  * <li>to prevent duplicate ids between subclasses, so only one
@@ -53,8 +56,6 @@ public abstract class AnnotationType
     private Study study;
     private String name;
     private String description;
-    private Boolean required;
-    private Boolean enabled;
     private Boolean multiValue;
 
     /**
@@ -100,39 +101,8 @@ public abstract class AnnotationType
     }
 
     /**
-     * @return true if this {@link AnnotationType} must be recorded on its
-     *         associated type (e.g. {@link Specimen}, {@link Patient}, ...)
-     *         when an instance of the associated type is <em>created</em>,
-     *         otherwise false if optional.
-     */
-    @NotNull(message = "{AnnotationType.required.NotNull}")
-    @Column(name = "IS_REQUIRED", nullable = false)
-    public Boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(Boolean required) {
-        this.required = required;
-    }
-
-    /**
-     * @return true if this {@link AnnotationType} is still used to collect
-     *         <em>new</em> values (of {@link Annotation}s), otherwise false if
-     *         it is kept only for existing values.
-     */
-    @NotNull(message = "{AnnotationType.enabled.NotNull}")
-    @Column(name = "IS_ENABLED", nullable = false)
-    public Boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    /**
-     * @return true if there can be more than one value, otherwise false for at
-     *         most one value.
+     * @return true if there can be more than one value of this type per owner,
+     *         otherwise false for at most one value.
      */
     @NotNull(message = "{AnnotationType.multiValue.NotNull}")
     @Column(name = "IS_MULTI_VALUE", nullable = false)

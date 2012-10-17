@@ -1,14 +1,11 @@
 package edu.ualberta.med.biobank.validator.constraint.model.impl;
 
 import java.sql.Connection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Projections;
@@ -16,9 +13,6 @@ import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.ParentContainer;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.Vessel;
 import edu.ualberta.med.biobank.model.util.NullUtil;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;
@@ -53,34 +47,11 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
-        isValid &= checkChildrenTypes(ct, context);
-
         if (oldCt != null) {
             isValid &= checkChanges(ct, oldCt, context);
-            isValid &= checkRemovedChildContainerTypes(ct, oldCt, context);
-            isValid &= checkRemovedVessels(ct, oldCt, context);
         }
 
         return isValid;
-    }
-
-    private boolean checkChildrenTypes(ContainerType ct,
-        ConstraintValidatorContext context) {
-        // if either set is initialised we must load the other one to be sure,
-        // otherwise assume this check passed before and still does
-        if (Hibernate.isInitialized(ct.getChildContainerTypes()) ||
-            Hibernate.isInitialized(ct.getChildVessels())) {
-            if (!ct.getChildContainerTypes().isEmpty()
-                && !ct.getChildVessels().isEmpty()) {
-                context
-                    .buildConstraintViolationWithTemplate(MULTIPLE_CHILD_TYPES)
-                    .addNode("childContainerTypes")
-                    .addNode("childVessels")
-                    .addConstraintViolation();
-                return false;
-            }
-        }
-        return true;
     }
 
     private ContainerType getOldContainerTypeOrNull(ContainerType ct) {
@@ -111,12 +82,10 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
-        isValid &= NullUtil.eq(ct.isTopLevel(), oldCt.isTopLevel());
         isValid &= NullUtil.eq(ct.getSchema(), oldCt.getSchema());
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(ILLEGAL_CHANGE)
-                .addNode("topLevel")
                 .addNode("schema")
                 .addConstraintViolation();
         }
@@ -125,7 +94,7 @@ public class ValidContainerTypeValidator
     }
 
     private boolean isUsed(ContainerType ct) {
-        return isUsed(ct, ParentContainer.class, "container.containerType");
+        return isUsed(ct, Container.class, "container.containerType");
     }
 
     private boolean isUsed(ContainerType ct, Class<?> by, String property) {
@@ -138,65 +107,5 @@ public class ValidContainerTypeValidator
         Number count = (Number) results.iterator().next();
         boolean isUsed = count.intValue() != 0;
         return isUsed;
-    }
-
-    private boolean checkRemovedChildContainerTypes(ContainerType ct,
-        ContainerType oldCt, ConstraintValidatorContext context) {
-        Set<ContainerType> removed = new HashSet<ContainerType>();
-        removed.addAll(oldCt.getChildContainerTypes());
-        removed.removeAll(ct.getChildContainerTypes());
-
-        if (removed.isEmpty()) return true;
-
-        List<?> results = getEventSource()
-            .createCriteria(Container.class)
-            .add(Restrictions.in("containerType", removed))
-            .createCriteria("parent")
-            .createCriteria("container")
-            .add(Restrictions.eq("containerType", ct))
-            .setProjection(Projections.rowCount())
-            .list();
-
-        Number count = (Number) results.iterator().next();
-        boolean isValid = count.intValue() == 0;
-
-        if (!isValid) {
-            context.buildConstraintViolationWithTemplate(
-                REMOVED_CONTAINER_TYPES_IN_USE)
-                .addNode("childContainerTypes")
-                .addConstraintViolation();
-        }
-
-        return isValid;
-    }
-
-    private boolean checkRemovedVessels(ContainerType ct,
-        ContainerType oldCt, ConstraintValidatorContext context) {
-        Set<Vessel> removed = new HashSet<Vessel>();
-        removed.addAll(oldCt.getChildVessels());
-        removed.removeAll(ct.getChildVessels());
-
-        if (removed.isEmpty()) return true;
-
-        List<?> results = getEventSource()
-            .createCriteria(Specimen.class)
-            .add(Restrictions.in("vessel", removed))
-            .createCriteria("parent")
-            .createCriteria("container")
-            .add(Restrictions.eq("containerType", ct))
-            .setProjection(Projections.rowCount())
-            .list();
-
-        Number count = (Number) results.iterator().next();
-        boolean isValid = count.intValue() == 0;
-
-        if (!isValid) {
-            context.buildConstraintViolationWithTemplate(
-                REMOVED_VESSELS_IN_USE)
-                .addNode("childVessels")
-                .addConstraintViolation();
-        }
-
-        return isValid;
     }
 }
