@@ -11,6 +11,7 @@ OPTIONS
   -d DUMP     The original biobank database dump file name compressed with gzip. Optional.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
+  -n DBNAME   The name of the database. If it exists it is first DROPPED.
   -u DBUSER   The user to use on the MySQL server. Optional.
   -h          Help text.
 "
@@ -19,15 +20,19 @@ MYSQL=/usr/bin/mysql
 MYSQLDUMP=/usr/bin/mysqldump
 SED=/bin/sed
 DBHOST="localhost"
+DBNAME="biobank"
 OSTYPE=`uname -s | tr [:upper:] [:lower:]`
 
-while getopts "d:hH:u:p:o:" OPTION
+while getopts "d:hH:n:u:p:o:" OPTION
 do
     case $OPTION in
         d) DBDUMP=$OPTARG
             shift $((OPTIND-1)); OPTIND=1
             ;;
         H) DBHOST=$OPTARG
+            shift $((OPTIND-1)); OPTIND=1
+            ;;
+        n) DBNAME=$OPTARG
             shift $((OPTIND-1)); OPTIND=1
             ;;
         u) DBUSER=$OPTARG
@@ -50,8 +55,10 @@ if [ -z "$DBUSER" ]; then
     exit
 fi
 
-read -s -p "MySQL Password for user $DBUSER: " DBPWD
-echo ""
+if [ -z "$DBPWD" ]; then
+    read -s -p "MySQL Password for user $DBUSER: " DBPWD
+    echo ""
+fi
 
 if [ -z "$DBPWD" ]; then
     echo "ERROR: password not specified"
@@ -77,13 +84,14 @@ fi
 DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 echo "recreating database..."
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank create biobank
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop $DBNAME
+mysqladmin -h$DBHOST -u$DBUSER -p$DBPWD create $DBNAME
 echo "importing old database..."
 if [ $OSTYPE == 'linux' ]; then
-    pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+    pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 else
-    gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank
+    gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 fi
 echo "upgrading database..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank < data/sql/upgrade_v321_v330.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v321_v330.sql
 echo "done"

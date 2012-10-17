@@ -56,10 +56,6 @@
   </target>
 -->
 
-  <target name="check-db"
-          depends="get-db-executor">
-  </target>
-
   <target name="create-db" if="db.missing">
   </target>
 

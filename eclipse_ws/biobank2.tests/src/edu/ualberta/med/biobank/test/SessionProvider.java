@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,14 +63,23 @@ public class SessionProvider {
             InitialContext ic = new InitialContext();
 
             ic.createSubcontext("java:");
-            
+
+            String dbPropertiesFilename = System
+                .getProperty("db.properties", "../../db.properties");
+
+            File dbPropertiesFile = new File(dbPropertiesFilename);
+            if (!dbPropertiesFile.exists()) {
+                System.err.println("db.properties file does not exist at "
+                    + dbPropertiesFile.getAbsolutePath());
+            }
+
             Properties dbProperties = new Properties();
-            dbProperties.load(new FileInputStream("../../db.properties"));
+            dbProperties.load(new FileInputStream(dbPropertiesFile));
 
             String url = MessageFormat.format("jdbc:mysql://{0}:3306/{1}",
                 dbProperties.getProperty("database.host"),
                 dbProperties.getProperty("database.name"));
-            
+
             // Construct DataSource
             MysqlConnectionPoolDataSource ds =
                 new MysqlConnectionPoolDataSource();

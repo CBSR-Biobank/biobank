@@ -73,6 +73,10 @@
           depends="check-db">
   </target>
 
+  <target name="check-db"
+          depends="get-db-executor">
+  </target>
+
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
     <!-- remove the upt.war because it requires db name/url/username/pw variables
@@ -169,10 +173,10 @@
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
-    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml" 
+    <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml"
           tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
 	  overwrite="true" />
-    <move file="${secu-log.dir}/jboss/log4j.xml" 
+    <move file="${secu-log.dir}/jboss/log4j.xml"
           tofile="webapp/WEB-INF/classes/log4j.xml"
 	  overwrite="true" />
   </target>
@@ -191,13 +195,20 @@
 
   <target name="check-deploy-jboss"
 	  depends="db-properties-copy,check-db-user">
+    <echo message="to skip this check set the check.deploy.jboss.skip property on the command line" />
     <exec dir="" executable="${perl}" failonerror="true">
-      <arg line="scripts/chkconfig -d ${database.name} -u ${database.username} -p ${database.password}"/>
+      <arg line="scripts/chkconfig -d ${database.name} --host ${database.host} -u ${database.exec.username} -p ${database.exec.password}"/>
     </exec>
   </target>
 
+
+  <target name="check-deploy-jboss-required"
+	  unless="check.deploy.jboss.skip">
+    <antcall target="check-deploy-jboss" />
+  </target>
+
   <target name="deploy-jboss"
-          depends="check-deploy-jboss,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="check-deploy-jboss-required,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -237,10 +248,9 @@
     <antcall target="eclipse-projects" />
   </target>
 
-  <target name="deploy" description="deploys to JBoss and Eclipse project">
-    <!-- the order these are called in is important for now -->
-    <antcall target="deploy-jboss" />
-    <antcall target="deploy-eclipse" />
+  <target name="deploy" description="deploys to JBoss and Eclipse project"
+	  depends="deploy-jboss,deploy-eclipse">
+    <echo message="here" />
   </target>
 
   <target name="build-common-project"
@@ -364,8 +374,9 @@
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
-    <copy todir="${buildDirectory}/plugins/biobank2">
-      <fileset dir="${eclipse.workspace.dir}/biobank2" />
+    <echo message="here2" />
+    <copy todir="${buildDirectory}/plugins/biobank2" verbose="true">
+      <fileset dir="${eclipse.workspace.dir}/biobank2"/>
     </copy>
     <!-- TODO : copy all project containing .nl1. into the plugins folder -->
     <copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
