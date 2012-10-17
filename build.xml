@@ -73,6 +73,10 @@
           depends="check-db">
   </target>
 
+  <target name="check-db"
+          depends="get-db-executor">
+  </target>
+
   <!-- JBoss -->
   <target name="check-jboss-uptodate">
     <!-- remove the upt.war because it requires db name/url/username/pw variables
@@ -190,16 +194,21 @@
   </target>
 
   <target name="check-deploy-jboss"
-	  depends="db-properties-copy,check-db-user"
-	  unless="check.deploy.jboss.skip">
+	  depends="db-properties-copy,check-db-user">
     <echo message="to skip this check set the check.deploy.jboss.skip property on the command line" />
     <exec dir="" executable="${perl}" failonerror="true">
       <arg line="scripts/chkconfig -d ${database.name} --host ${database.host} -u ${database.exec.username} -p ${database.exec.password}"/>
     </exec>
   </target>
 
+
+  <target name="check-deploy-jboss-required"
+	  unless="check.deploy.jboss.skip">
+    <antcall target="check-deploy-jboss" />
+  </target>
+
   <target name="deploy-jboss"
-          depends="check-deploy-jboss,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
+          depends="check-deploy-jboss-required,update-db-config,package-webapp,check-jboss-uptodate,keystore-copy"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
