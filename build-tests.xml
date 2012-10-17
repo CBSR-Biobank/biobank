@@ -97,6 +97,7 @@
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
+      <sysproperty key="db.properties" value="db.properties" />
       <sysproperty key="server" value="http://localhost:8080" />
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
@@ -138,6 +139,8 @@
       <batchtest todir="testing/raw" unless="testcase">
         <fileset refid="testcase.files" />
       </batchtest>
+      <!-- note that his property MUST come before the emmarun command -->
+      <jvmarg value="-Ddb.properties=db.properties" />
       <jvmarg value="-Xbootclasspath/a:${emma.dir}/emma.jar" />
       <jvmarg value="emmarun" />
       <jvmarg value="-out" />
