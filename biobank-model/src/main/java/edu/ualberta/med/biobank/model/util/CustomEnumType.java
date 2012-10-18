@@ -22,8 +22,8 @@ import org.hibernate.usertype.UserType;
  * used more than once. The identifier method is determined by an optional
  * configuration parameter {@link #ID_METHOD_NAME_PARAM}.
  * <p>
- * The enum class <em>must</em> be specified via the configuration parameter
- * {@link #ENUM_CLASS_NAME_PARAM}.
+ * The enum class that is being used a property type <em>must</em> be specified
+ * via the configuration parameter {@link #ENUM_CLASS_NAME_PARAM}.
  * 
  * @author Jonathan Ferland
  * 

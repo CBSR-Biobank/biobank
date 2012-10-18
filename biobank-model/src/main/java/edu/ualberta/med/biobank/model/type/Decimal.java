@@ -10,6 +10,11 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
+import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
+import edu.ualberta.med.biobank.model.util.ProxyUtil;
+
 /**
  * Allows a {@link BigDecimal} to be saved along with its scale. The
  * {@link #getScale()} property represents the number of digits after the
@@ -21,6 +26,8 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class Decimal implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
+        new HashCodeBuilderProvider(Decimal.class, 11, 17);
 
     private BigDecimal value;
     private Integer scale;
@@ -32,8 +39,8 @@ public class Decimal implements Serializable {
         return value;
     }
 
-    public void setValue(BigDecimal bigDecimal) {
-        this.value = bigDecimal;
+    public void setValue(BigDecimal value) {
+        this.value = value;
         update();
     }
 
@@ -54,26 +61,21 @@ public class Decimal implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((scale == null) ? 0 : scale.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
-        return result;
+        return hashCodeBuilderProvider.get()
+            .append(value)
+            .append(scale)
+            .toHashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        Decimal other = (Decimal) obj;
-        if (scale == null) {
-            if (other.scale != null) return false;
-        } else if (!scale.equals(other.scale)) return false;
-        if (value == null) {
-            if (other.value != null) return false;
-        } else if (!value.equals(other.value)) return false;
-        return true;
+        if (!ProxyUtil.sameClass(this, obj)) return false;
+        Decimal that = (Decimal) obj;
+        return new EqualsBuilder()
+            .append(getValue(), that.getValue())
+            .append(getScale(), that.getScale())
+            .isEquals();
     }
 
     private void update() {
