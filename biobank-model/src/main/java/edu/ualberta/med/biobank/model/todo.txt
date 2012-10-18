@@ -67,16 +67,18 @@
 	Because why bother with two types of definitions when both can be represented
 	by one class?
 	A: Yes. Done.
-[ ] Consider SpecimenAttribute-s in combo with ProcessingEvent-s (if SpecimenGroup
+[v] Consider SpecimenAttribute-s in combo with ProcessingEvent-s (if SpecimenGroup
     changes or does not change, think opening a vial to do something then closing
     it instead of transferring it) or what about in combo with CollectionEvent-s?
+    A: Done. See SpecimenLinkAnnotationType. 
 [ ] Reports should be global or center-, study-, or center-study-specific.
 [ ] Prefix all report objects with "Report" so it's more clear what objects
  	are involved?
 [v] Get rid of "Abstract" from model names. They're declared as abstract and can't
     be directly instantiated, just make the class name shorter...
-[ ] Make annotation type requirements for specific collection event types and/or
+[v] Make annotation type requirements for specific collection event types and/or
 	specimen groups?
+    A: Done. See SpecimenLinkTypeAnnotationType and CollectionEventTypeAnnotationType 
 [ ] Q: How do contacts work again?
 	A: make ContactUsers that function like StudyCenter-s
 [v] Q: Who makes StudyCenter-s?
@@ -178,6 +180,10 @@
 	whether it's attached or not.
 [ ] Check ValidityAuditStrategy when it comes to ids that are join-table ids, it doesn't 
 	seem to update unless not add
+[ ] Use Envers in a way that we can flush out the revision on a per-Action basis, but tie
+    it to a transaction id so that we _can_ have multiple actions done per transaction with
+    the different state flushed at the end of each action, but committed after the series of
+    actions!!!
 * requires thought/ feedback
 
 =-=-=-=-=-=-=-=-=-=

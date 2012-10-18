@@ -17,47 +17,47 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Determines which {@link SpecimenLinkAnnotationType}s either can or must
+ * Determines which {@link CollectionEventAnnotationType}s either can or must
  * (determined by {@link #isRequired()}) be recorded on which
- * {@link SpecimenLinkType}s.
+ * {@link CollectionEventType}s.
  * 
  * @author Jonathan Ferland
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_LINK_TYPE_ANNOTATION_TYPE")
-@Unique(properties = { "linkType", "annotationType" }, groups = PrePersist.class)
-public class SpecimenLinkTypeAnnotationType
+@Table(name = "COLLECTION_EVENT_TYPE_ANNOTATION_TYPE")
+@Unique(properties = { "collectionEventType", "annotationType" }, groups = PrePersist.class)
+public class CollectionEventTypeAnnotationType
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
-    private SpecimenLinkType linkType;
-    private SpecimenLinkAnnotationType annotationType;
+    private CollectionEventType collectionEventType;
+    private CollectionEventAnnotationType annotationType;
     private Boolean required;
 
     @NaturalId
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull(message = "{SpecimenLinkTypeAnnotationType.linkType.NotNull}")
+    @NotNull(message = "{CollectionEventTypeAnnotationType.collectionEventType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_LINK_TYPE_ID", nullable = false)
-    public SpecimenLinkType getLinkType() {
-        return linkType;
+    @JoinColumn(name = "COLLECTION_EVENT_TYPE_ID", nullable = false)
+    public CollectionEventType getCollectionEventType() {
+        return collectionEventType;
     }
 
-    public void setLinkType(SpecimenLinkType linkType) {
-        this.linkType = linkType;
+    public void setCollectionEventType(CollectionEventType collectionEventType) {
+        this.collectionEventType = collectionEventType;
     }
 
     @NaturalId
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull(message = "{SpecimenLinkTypeAnnotationType.annotationType.NotNull}")
+    @NotNull(message = "{CollectionEventTypeAnnotationType.collectionEventType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_LINK_ANNOTATION_TYPE", nullable = false)
-    public SpecimenLinkAnnotationType getAnnotationType() {
+    @JoinColumn(name = "COLLECTION_EVENT_ANNOTATION_TYPE", nullable = false)
+    public CollectionEventAnnotationType getAnnotationType() {
         return annotationType;
     }
 
-    public void setAnnotationType(SpecimenLinkAnnotationType annotationType) {
+    public void setAnnotationType(CollectionEventAnnotationType annotationType) {
         this.annotationType = annotationType;
     }
 
@@ -67,7 +67,7 @@ public class SpecimenLinkTypeAnnotationType
      *         {@link #getLinkType()} is created, otherwise false when a value
      *         is optional.
      */
-    @NotNull(message = "{SpecimenLinkTypeAnnotationType.required.NotNull}")
+    @NotNull(message = "{CollectionEventTypeAnnotationType.required.NotNull}")
     @Column(name = "IS_REQUIRED", nullable = false)
     public Boolean isRequired() {
         return required;
