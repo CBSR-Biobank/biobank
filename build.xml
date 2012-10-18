@@ -250,7 +250,6 @@
 
   <target name="deploy" description="deploys to JBoss and Eclipse project"
 	  depends="deploy-jboss,deploy-eclipse">
-    <echo message="here" />
   </target>
 
   <target name="build-common-project"

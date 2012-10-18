@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermiss
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
+import edu.ualberta.med.biobank.model.Site;
 
 /**
  * Note: center ID can be null and the permissions that require a working center
@@ -78,10 +79,13 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(centerId)
                     .isAllowed(context);
-            p.specimenAssignPermission =
-                new SpecimenAssignPermission(centerId).isAllowed(context);
             p.specimenLinkPermission =
                 new SpecimenLinkPermission(centerId, null).isAllowed(context);
+
+            // specimen assign not allowed for clinics
+            Site site = context.get(Site.class, centerId);
+            p.specimenAssignPermission = (site != null)
+                && new SpecimenAssignPermission(centerId).isAllowed(context);
         }
 
         return p;
