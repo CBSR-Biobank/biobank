@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermissio
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
 import edu.ualberta.med.biobank.common.permission.study.StudyCreatePermission;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Site;
 
 /**
  * Note: center ID can be null and the permissions that require a working center
@@ -68,28 +69,25 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             new PatientCreatePermission(null).isAllowed(context);
 
         if (centerId != null) {
-            Center center = context.load(Center.class, centerId);
-
             p.containerCreatePermission =
-                new ContainerCreatePermission(centerId)
-                    .isAllowed(context);
+                new ContainerCreatePermission(centerId).isAllowed(context);
             p.containerTypeCreatePermission =
-                new ContainerTypeCreatePermission(centerId)
-                    .isAllowed(context);
+                new ContainerTypeCreatePermission(centerId).isAllowed(context);
             p.dispatchCreatePermission =
-                new DispatchCreatePermission(centerId)
-                    .isAllowed(context);
+                new DispatchCreatePermission(centerId).isAllowed(context);
             p.originInfoUpdatePermission =
-                new OriginInfoUpdatePermission(centerId)
-                    .isAllowed(context);
+                new OriginInfoUpdatePermission(centerId).isAllowed(context);
+            p.specimenLinkPermission =
+                new SpecimenLinkPermission(centerId, null).isAllowed(context);
+
+            // specimen assign not allowed for clinics
+            Site site = context.get(Site.class, centerId);
+            p.specimenAssignPermission = (site != null)
+                && new SpecimenAssignPermission(centerId).isAllowed(context);
+
+            Center center = context.load(Center.class, centerId);
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(center)
-                    .isAllowed(context);
-            p.specimenAssignPermission =
-                new SpecimenAssignPermission(centerId)
-                    .isAllowed(context);
-            p.specimenLinkPermission =
-                new SpecimenLinkPermission(centerId, null)
                     .isAllowed(context);
         }
 
