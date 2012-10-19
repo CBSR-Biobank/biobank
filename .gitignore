@@ -76,3 +76,8 @@ docs/clientUserGuide/*.gz
 output/
 webapp/WEB-INF/classes/log4j.xml
 webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml
+surefire-reports
+bin
+.metadata
+classes
+
