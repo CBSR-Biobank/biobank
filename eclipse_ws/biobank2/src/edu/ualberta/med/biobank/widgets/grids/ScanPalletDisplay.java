@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
@@ -25,19 +24,23 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
-    /**
-     * Pallets are always 8*12 = fixed size
-     */
-    public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCellPos.COL_MAX;
-    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCellPos.ROW_MAX;
-
-    public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
-        + LEGEND_HEIGHT + 4;
+    public final int rows;
+    public final int cols;
+    public final int palletWidth;
+    public final int palletHeight;
+    public final int palletHeightAndLegend;
 
     private ProfileSettings loadedProfile;
 
-    public ScanPalletDisplay(final ScanPalletWidget widget) {
+    public ScanPalletDisplay(final ScanPalletWidget widget, int rows, int cols) {
         super();
+
+        this.rows = rows;
+        this.cols = cols;
+        palletHeight = SAMPLE_WIDTH * rows;
+        palletWidth = SAMPLE_WIDTH * cols;
+        palletHeightAndLegend = palletHeight + LEGEND_HEIGHT + 4;
+
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
@@ -65,7 +68,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     public void setDefaultStorageSize() {
-        setStorageSize(ScanCellPos.ROW_MAX, ScanCellPos.COL_MAX);
+        setStorageSize(rows, cols);
     }
 
     protected void setProfile(ProfileSettings profile) {

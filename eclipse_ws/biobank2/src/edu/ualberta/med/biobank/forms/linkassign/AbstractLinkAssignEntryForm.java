@@ -366,7 +366,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         freezerWidget = new ContainerDisplayWidget(freezerComposite);
         freezerWidget.initDisplayFromType(true);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH, 100);
+        freezerWidget.setDisplaySize(ScanPalletDisplay.palletWidth, 100);
 
         Composite hotelComposite = toolkit
             .createComposite(multipleVisualisation);
@@ -383,7 +383,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
         hotelWidget.setDisplaySize(100,
-            ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
+            ScanPalletDisplay.palletHeightAndLegend);
 
         Composite palletComposite = toolkit
             .createComposite(multipleVisualisation);
