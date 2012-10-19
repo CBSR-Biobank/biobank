@@ -1,7 +1,7 @@
 -- start bug#1405 fix
 -- add properties for columns and filters for collectionEvent-s and topSpecimen-s
 
-INSERT INTO entity_property (id, property, property_type_id, entity_id, version) VALUES 
+INSERT INTO entity_property (id, property, property_type_id, entity_id, version) VALUES
   (32, 'processingEvent.worksheet', 1, 1, 0);
 
 INSERT INTO entity_column (id, name, entity_property_id, version) VALUES
@@ -588,16 +588,29 @@ INSERT INTO container_position (ABS_ID, VERSION, `ROW`, COL, PARENT_CONTAINER_ID
        SELECT ID, 0, `ROW`, COL, PARENT_CONTAINER_ID FROM abstract_position
        WHERE discriminator='ContainerPosition';
 
+-- temporarily drop keys on container.position_id
+ALTER TABLE container
+      DROP FOREIGN KEY FK8D995C61AC528270;
+
+ALTER TABLE container
+      DROP INDEX FK8D995C61AC528270;
+
+ALTER TABLE container
+      DROP KEY POSITION_ID;
+
 UPDATE container ct, container_position ctpos
        SET ct.position_id=ctpos.id
        WHERE ct.position_id=ctpos.abs_id;
 
+ALTER TABLE container
+      ADD CONSTRAINT `POSITION_ID` UNIQUE KEY(POSITION_ID);
+
+ALTER TABLE container
+      ADD INDEX FK8D995C61AC528270(POSITION_ID);
+
 INSERT INTO specimen_position (VERSION, `ROW`, COL, POSITION_STRING, CONTAINER_ID, SPECIMEN_ID)
        SELECT 0, `ROW`, COL, POSITION_STRING, CONTAINER_ID, SPECIMEN_ID FROM abstract_position
        WHERE discriminator='SpecimenPosition';
-
-ALTER TABLE container
-      DROP FOREIGN KEY FK8D995C61AC528270;
 
 ALTER TABLE container
       ADD CONSTRAINT FK8D995C61AC528270
