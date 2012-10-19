@@ -29,6 +29,14 @@ public class Decimal implements Serializable {
     private static final HashCodeBuilderProvider hashCodeBuilderProvider =
         new HashCodeBuilderProvider(Decimal.class, 11, 17);
 
+    public Decimal() {
+    }
+
+    public Decimal(BigDecimal bigDecimal) {
+        this.value = bigDecimal;
+        this.scale = bigDecimal.scale();
+    }
+
     private BigDecimal value;
     private Integer scale;
 
@@ -51,7 +59,7 @@ public class Decimal implements Serializable {
     @Min(value = 0, message = "{Decimal.scale.Min}")
     @Column(name = "DECIMAL_SCALE", nullable = false)
     Integer getScale() {
-        return (value != null) ? value.scale() : scale;
+        return scale;
     }
 
     void setScale(Integer scale) {
