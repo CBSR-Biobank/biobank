@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -225,7 +226,7 @@ public class PalletScanManagement {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletWell(new WellRectangle(rcp.getRow(),
+                            cell = new PalletWell(new DecodedWell(rcp.getRow(),
                                 rcp.getCol(), value));
                             cells.put(rcp, cell);
                         } else {
@@ -349,8 +350,8 @@ public class PalletScanManagement {
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 PalletWell cell =
-                    new PalletWell(new WellRectangle(rcp.getRow(), rcp.getCol(),
-                        entry.getValue().getInventoryId()));
+                    new PalletWell(new DecodedWell(rcp.getRow(),
+                        rcp.getCol(), entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 cells.put(rcp, cell);

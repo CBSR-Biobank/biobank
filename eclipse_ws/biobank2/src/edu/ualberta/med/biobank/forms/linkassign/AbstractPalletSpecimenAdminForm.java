@@ -57,7 +57,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
@@ -645,7 +645,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
-                    palletCell = new PalletWell(new WellRectangle(
+                    palletCell = new PalletWell(new DecodedWell(
                         servercell.getRow(), servercell.getCol(),
                         servercell.getValue()));
                     cells.put(rcp, palletCell);

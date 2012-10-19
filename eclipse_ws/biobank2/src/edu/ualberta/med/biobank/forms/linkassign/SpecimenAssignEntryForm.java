@@ -73,7 +73,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
@@ -1365,8 +1365,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             for (RowColPos pos : currentMultipleContainer.getSpecimens()
                 .keySet()) {
                 if (pos.getRow() != 0 && pos.getCol() != 2) {
-                    palletScanned.put(pos,
-                        new PalletWell(new WellRectangle(pos.getRow(), pos.getCol(),
+                    palletScanned.put(
+                        pos,
+                        new PalletWell(new DecodedWell(pos.getRow(), pos
+                            .getCol(),
                             currentMultipleContainer.getSpecimens().get(pos)
                                 .getInventoryId())));
                 }

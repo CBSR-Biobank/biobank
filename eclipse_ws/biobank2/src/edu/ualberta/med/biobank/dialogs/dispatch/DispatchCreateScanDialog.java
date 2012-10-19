@@ -39,7 +39,7 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
@@ -255,7 +255,7 @@ public class DispatchCreateScanDialog extends
         }
         for (SpecimenWrapper specimen : currentPallet.getSpecimens()
             .values()) {
-            PalletWell cell = new PalletWell(new WellRectangle(
+            PalletWell cell = new PalletWell(new DecodedWell(
                 specimen.getPosition().getRow(), specimen.getPosition()
                     .getCol(),
                 specimen.getInventoryId()));
