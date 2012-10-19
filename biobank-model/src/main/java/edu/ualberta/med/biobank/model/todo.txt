@@ -112,7 +112,7 @@
 	A: Yes! Otherwise very complicated doubling of relationships, everywhere.
 [v] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
 	- Yes
-[ ] Attributes
+[ ] **Attributes
 	- Yes
 	- Consider type validation (e.g. legal options, legal regex, legal range).
 	- Consider calling "Annotations"?

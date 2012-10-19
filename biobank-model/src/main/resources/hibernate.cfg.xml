@@ -43,6 +43,8 @@
 		<property name="cache.use_query_cache">false</property>
 		<property name="cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 		<!-- Envers properties -->
+		<property name="org.hibernate.envers.store_data_at_delete">true</property>
+		<property name="org.hibernate.envers.do_not_audit_optimistic_locking_field">false</property>
 		<property name="org.hibernate.envers.audit_table_suffix">_audit</property>
 		<property name="org.hibernate.envers.revision_field_name">REVISION_ID</property>
 		<property name="org.hibernate.envers.revision_type_field_name">REVISION_TYPE</property>
@@ -151,26 +153,12 @@
 		</event>
 		<event type="pre-collection-update">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 		<event type="pre-collection-recreate">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
 		</event>
 		<event type="pre-collection-remove">
 			<listener class="edu.ualberta.med.biobank.validator.BeanValidationHandler" />
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
-		</event>
-		<event type="post-insert">
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
-		</event>
-		<event type="post-update">
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
-		</event>
-		<event type="post-delete">
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
-		</event>
-		<event type="post-collection-recreate">
-			<listener class="org.hibernate.envers.event.AuditEventListener" />
 		</event>
 	</session-factory>
 </hibernate-configuration>
