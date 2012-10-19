@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
@@ -23,9 +23,9 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
 
     public boolean isEverythingTyped() {
         if (cells != null) {
-            for (AbstractUICell cell : cells.values()) {
-                PalletCell pCell = (PalletCell) cell;
-                if (PalletCell.hasValue(pCell) && pCell.getType() == null) {
+            for (AbstractUIWell cell : cells.values()) {
+                PalletWell pCell = (PalletWell) cell;
+                if (PalletWell.hasValue(pCell) && pCell.getType() == null) {
                     return false;
                 }
             }

@@ -10,6 +10,7 @@ import javax.persistence.Transient;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 
 // TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
 @Entity
@@ -17,9 +18,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 public class ContainerLabelingScheme extends AbstractBiobankModel
     implements HasName {
     private static final long serialVersionUID = 1L;
-
-    @SuppressWarnings("nls")
-    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
     @SuppressWarnings("nls")
     public static final String CBSR_2_CHAR_LABELLING_PATTERN =
@@ -31,6 +29,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     @SuppressWarnings("nls")
     public static final String TWO_CHAR_LABELLING_PATTERN =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public static final String DEWAR_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
     private String name;
     private Integer minChars;
@@ -96,15 +96,6 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the string corresponding to the given RowColPos and using the SBS
-     * standard. 2:1 will return C2.
-     */
-    public static String rowColToSbs(RowColPos rcp) {
-        return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.getRow()) //$NON-NLS-1$
-            + (rcp.getCol() + 1);
-    }
-
-    /**
      * Convert a position in row*column to two letter (in the CBSR way)
      * 
      * @throws Exception
@@ -146,7 +137,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      */
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
         int pos = rcp.getCol() + (colCapacity * rcp.getRow());
-        String letter = String.valueOf(SBS_ROW_LABELLING_PATTERN.charAt(pos));
+        String letter = String.valueOf(DEWAR_ROW_LABELLING_PATTERN.charAt(pos));
         return letter + letter;
     }
 
@@ -197,7 +188,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         switch (childLabelingSchemeId) {
         case 1:
             // SBS standard
-            return rowColToSbs(rcp);
+            return SbsLabeling.fromRowCol(rcp);
         case 2:
             // CBSR 2 char alphabetic
             return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity);
@@ -215,20 +206,6 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             return rowColToTwoChar(rcp, rowCapacity, colCapacity);
         }
         return null;
-    }
-
-    /**
-     * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
-     * string position. Could be A2 or F12.
-     */
-    public RowColPos sbsToRowCol(String pos) throws Exception {
-        if ((pos.length() != getMinChars())
-            && (pos.length() != getMaxChars())) {
-            throw new Exception("binPos has an invalid length: " + pos); //$NON-NLS-1$
-        }
-        int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
-        int col = Integer.parseInt(pos.substring(1)) - 1;
-        return new RowColPos(row, col);
     }
 
     /**
@@ -329,11 +306,11 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
                 "Label should be double letter (BB).");
         }
         // letters are double (BB). need only one
-        int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
+        int letterPosition =
+            DEWAR_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
         Integer row = letterPosition / totalCol;
         Integer col = letterPosition % totalCol;
-        RowColPos rowColPos = new RowColPos(row, col);
-        return rowColPos;
+        return new RowColPos(row, col);
     }
 
     /**
@@ -408,7 +385,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         switch (getId()) {
         case 1:
             // SBS standard
-            return sbsToRowCol(position);
+            return SbsLabeling.toRowCol(position);
         case 2:
             // CBSR 2 char alphabetic
             return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null);

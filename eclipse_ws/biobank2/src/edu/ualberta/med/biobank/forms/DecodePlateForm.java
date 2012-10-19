@@ -20,7 +20,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
@@ -157,7 +157,7 @@ public class DecodePlateForm extends PlateForm {
 
         List<WellRectangle> decodedCells = ScannerConfigPlugin.decodePlate(
             plateToScan, ProfileManager.ALL_PROFILE_NAME);
-        cells = PalletCell.convertArray(decodedCells);
+        cells = PalletWell.convertArray(decodedCells);
     }
 
     @Override

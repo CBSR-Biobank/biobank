@@ -25,8 +25,8 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
@@ -53,7 +53,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     }
 
     @Override
-    protected void specificScanPosProcess(PalletCell palletCell) {
+    protected void specificScanPosProcess(PalletWell palletCell) {
         if (palletCell.getStatus() == UICellStatus.EXTRA) {
             extras.add(palletCell.getSpecimen());
             hasExpectedSpecimens = true;
@@ -98,7 +98,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void doProceed() {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (PalletCell cell : getCells().values()) {
+        for (PalletWell cell : getCells().values()) {
             if (cell.getStatus() == UICellStatus.IN_SHIPMENT_EXPECTED) {
                 specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_RECEIVED);
@@ -130,9 +130,9 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
             if (barcodeDialog.open() == Dialog.OK) {
                 String productBarcode = barcodeDialog.getBarcode();
                 List<Object> output = new ArrayList<Object>();
-                Map<RowColPos, ? extends AbstractUICell> cells = spw.getCells();
+                Map<RowColPos, ? extends AbstractUIWell> cells = spw.getCells();
                 for (RowColPos pos : cells.keySet()) {
-                    String inventoryId = ((PalletCell) cells.get(pos))
+                    String inventoryId = ((PalletWell) cells.get(pos))
                         .getValue();
                     SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                         SessionManager.getAppService(), inventoryId);
@@ -189,7 +189,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     protected abstract List<UICellStatus> getPalletCellStatus();
 
     @Override
-    protected abstract Map<RowColPos, PalletCell> getFakeScanCells();
+    protected abstract Map<RowColPos, PalletWell> getFakeScanCells();
 
     public boolean hasReceivedSpecimens() {
         return specimensReceived;

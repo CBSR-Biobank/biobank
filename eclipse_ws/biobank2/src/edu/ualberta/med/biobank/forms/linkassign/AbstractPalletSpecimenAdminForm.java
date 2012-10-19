@@ -54,7 +54,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
@@ -136,7 +136,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected Map<RowColPos, PalletCell> getFakeScanCells()
+            protected Map<RowColPos, PalletWell> getFakeScanCells()
                 throws Exception {
                 return AbstractPalletSpecimenAdminForm.this.getFakeScanCells();
             }
@@ -180,14 +180,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletCell cell)
+            protected void postprocessScanTubeAlone(PalletWell cell)
                 throws Exception {
                 AbstractPalletSpecimenAdminForm.this
                     .postprocessScanTubeAlone(cell);
             }
 
             @Override
-            protected boolean canScanTubeAlone(PalletCell cell) {
+            protected boolean canScanTubeAlone(PalletWell cell) {
                 return AbstractPalletSpecimenAdminForm.this
                     .canScanTubeAlone(cell);
             }
@@ -409,7 +409,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
         return null;
     }
 
@@ -502,7 +502,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     @SuppressWarnings("nls")
-    protected void postprocessScanTubeAlone(PalletCell palletCell)
+    protected void postprocessScanTubeAlone(PalletWell palletCell)
         throws Exception {
         appendLog(NLS.bind(
             "Tube {0} scanned and set to position {1}",
@@ -584,7 +584,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // widgetCreator.showWidget(scanTubeAloneSwitch, show);
     }
 
-    protected Map<RowColPos, PalletCell> getCells() {
+    protected Map<RowColPos, PalletWell> getCells() {
         return palletScanManagement.getCells();
     }
 
@@ -610,14 +610,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
      */
     @SuppressWarnings("nls")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        Map<RowColPos, PalletCell> cells = getCells();
+        Map<RowColPos, PalletWell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
             null;
         if (cells != null) {
             serverCells =
                 new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
-            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
             }
@@ -642,10 +642,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
                             .getPositionString(rcp)));
-                PalletCell palletCell = cells.get(entry.getKey());
+                PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
-                    palletCell = new PalletCell(new WellRectangle(
+                    palletCell = new PalletWell(new WellRectangle(
                         servercell.getRow(), servercell.getCol(),
                         servercell.getValue()));
                     cells.put(rcp, palletCell);
@@ -661,7 +661,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     @SuppressWarnings("unused")
-    protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
+    protected void processCellResult(RowColPos rcp, PalletWell palletCell) {
         // nothing done by default
     }
 
@@ -669,7 +669,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         return palletScanManagement.getScansCount() > 0;
     }
 
-    protected boolean canScanTubeAlone(PalletCell cell) {
+    protected boolean canScanTubeAlone(PalletWell cell) {
         return cell == null || cell.getStatus() == UICellStatus.EMPTY;
     }
 

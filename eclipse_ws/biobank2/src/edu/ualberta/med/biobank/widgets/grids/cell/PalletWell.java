@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.widgets.grids.cell;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -15,11 +17,12 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
+import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PalletCell extends AbstractUICell {
+public class PalletWell extends AbstractUIWell {
     private String information;
 
     private String title = StringUtil.EMPTY_STRING;
@@ -28,106 +31,127 @@ public class PalletCell extends AbstractUICell {
 
     private SpecimenWrapper specimen;
 
-    private final WellRectangle scanCell;
+    private DecodedWell decodedWell;
 
     private SpecimenWrapper expectedSpecimen;
 
-    public PalletCell(WellRectangle scanCell) {
-        this.scanCell = scanCell;
+    public PalletWell(DecodedWell scanCell) {
+        this.decodedWell = scanCell;
     }
 
-    public static Map<RowColPos, PalletCell> convertArray(
-        List<WellRectangle> scancells) {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
-        for (WellRectangle cell : scancells) {
-            palletScanned.put(new RowColPos(cell.getRow(), cell.getColumn()),
-                new PalletCell(cell));
+    public static Map<RowColPos, PalletWell> convertArray(
+        List<DecodedWell> decodedWells) {
+        Map<RowColPos, PalletWell> palletScanned =
+            new TreeMap<RowColPos, PalletWell>();
+        for (DecodedWell decodedWell : decodedWells) {
+            palletScanned.put(SbsLabeling.toRowCol(decodedWell.getLabel()),
+                new PalletWell(decodedWell));
         }
         return palletScanned;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomScanLink() {
-        return convertArray(WellRectangle.getRandom());
+    static List<DecodedWell> getRandomDecodedCells() {
+        List<DecodedWell> result = new ArrayList<DecodedWell>();
+        Random random = new Random();
+        for (int indexRow = 0; indexRow < 8; indexRow++) {
+            for (int indexCol = 0; indexCol < 12; indexCol++) {
+                StringBuffer digits = new StringBuffer();
+                if (random.nextBoolean()) {
+                    for (int i = 0; i < 10; i++) {
+                        digits.append(random.nextInt(10));
+                    }
+                    result.add(new DecodedWell(SbsLabeling.fromRowCol(indexRow,
+                        indexCol), digits.toString()));
+                }
+            }
+        }
+        return result;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomScanLinkWithSpecimensAlreadyLinked(
+    public static Map<RowColPos, PalletWell> getRandomScanLink() {
+        return convertArray(getRandomDecodedCells());
+    }
+
+    public static Map<RowColPos, PalletWell> getRandomScanLinkWithSpecimensAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
-        Map<RowColPos, PalletCell> cells = convertArray(WellRectangle.getRandom());
+        Map<RowColPos, PalletWell> cells =
+            convertArray(getRandomDecodedCells());
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomLinkedAliquotedSpecimens(appService, siteId);
         if (specimens.size() > 1) {
-            int row = 2;
-            int col = 3;
-            WellRectangle scanCell = new WellRectangle(row, col, specimens.get(0)
-                .getInventoryId());
-            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
-            row = 3;
-            col = 1;
-            scanCell =
-                new WellRectangle(row, col, specimens.get(1).getInventoryId());
-            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
+            RowColPos pos = new RowColPos(2, 3);
+            DecodedWell decodedWell = new DecodedWell(
+                SbsLabeling.fromRowCol(pos), specimens.get(0).getInventoryId());
+            cells.put(pos, new PalletWell(decodedWell));
+
+            pos = new RowColPos(3, 1);
+            decodedWell = new DecodedWell(SbsLabeling.fromRowCol(pos),
+                specimens.get(1).getInventoryId());
+            cells.put(pos, new PalletWell(decodedWell));
         }
         return cells;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomSpecimensAlreadyAssigned(
+    public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
         return getRandomSpecimensAlreadyAssigned(appService, siteId, null);
     }
 
-    public static Map<RowColPos, PalletCell> getRandomSpecimensAlreadyAssigned(
+    public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
-        Map<RowColPos, PalletCell> palletScanned =
-            new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletWell> palletScanned =
+            new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
             appService, siteId, studyId);
         if (specimens.size() > 0) {
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new WellRectangle(
-                0, 0, specimens.get(0).getInventoryId())));
+            RowColPos pos = new RowColPos(0, 0);
+            palletScanned.put(pos, new PalletWell(
+                new DecodedWell(SbsLabeling.fromRowCol(pos),
+                    specimens.get(0).getInventoryId())));
         }
         if (specimens.size() > 1) {
-            palletScanned.put(new RowColPos(2, 4), new PalletCell(new WellRectangle(
-                2, 4, specimens.get(1).getInventoryId())));
+            RowColPos pos = new RowColPos(0, 0);
+            palletScanned.put(pos, new PalletWell(
+                new DecodedWell(SbsLabeling.fromRowCol(pos),
+                    specimens.get(1).getInventoryId())));
         }
         return palletScanned;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomSpecimensNotAssigned(
+    public static Map<RowColPos, PalletWell> getRandomSpecimensNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned =
-            new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletWell> palletScanned =
+            new HashMap<RowColPos, PalletWell>();
 
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId, 30);
 
         int i = 0;
         for (SpecimenWrapper spc : specimens) {
-            int row = i / 12;
-            int col = i % 12;
-            palletScanned.put(new RowColPos(row, col), new PalletCell(
-                new WellRectangle(row, col, spc.getInventoryId())));
+            RowColPos pos = new RowColPos(i / 12, i % 12);
+            palletScanned.put(pos, new PalletWell(
+                new DecodedWell(SbsLabeling.fromRowCol(pos), spc
+                    .getInventoryId())));
             i++;
         }
         return palletScanned;
     }
 
-    public static Map<RowColPos, PalletCell> getRandomNonDispatchedSpecimens(
+    public static Map<RowColPos, PalletWell> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned =
-            new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletWell> palletScanned =
+            new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> randomSpecimens = DebugUtil
             .getRandomNonDispatchedSpecimens(appService, siteId, 30);
         int i = 0;
         while (i < randomSpecimens.size()) {
-            int row = i / 12;
-            int col = i % 12;
-            palletScanned.put(new RowColPos(row, col),
-                new PalletCell(new WellRectangle(row, col, randomSpecimens.get(i)
-                    .getInventoryId())));
+            RowColPos pos = new RowColPos(i / 12, i % 12);
+            palletScanned.put(pos,
+                new PalletWell(new DecodedWell(SbsLabeling.fromRowCol(pos),
+                    randomSpecimens.get(i).getInventoryId())));
             i++;
         }
         return palletScanned;
@@ -190,32 +214,32 @@ public class PalletCell extends AbstractUICell {
     }
 
     public String getValue() {
-        if (scanCell != null) {
-            return scanCell.getValue();
+        if (decodedWell != null) {
+            return decodedWell.getMessage();
         }
         return null;
     }
 
-    public void setValue(String value) {
-        if (scanCell != null) {
-            scanCell.setValue(value);
-        }
-    }
+    // public void setValue(String value) {
+    // if (decodedWell != null) {
+    // decodedWell.setValue(value);
+    // }
+    // }
 
     @Override
     public Integer getRow() {
-        if (scanCell != null) {
-            return scanCell.getRow();
+        if (decodedWell == null) {
+            throw new IllegalStateException("decoded well is null");
         }
-        return null;
+        return SbsLabeling.toRowCol(decodedWell.getLabel()).getRow();
     }
 
     @Override
     public Integer getCol() {
-        if (scanCell != null) {
-            return scanCell.getColumn();
+        if (decodedWell == null) {
+            throw new IllegalStateException("decoded well is null");
         }
-        return null;
+        return SbsLabeling.toRowCol(decodedWell.getLabel()).getCol();
     }
 
     public RowColPos getRowColPos() {
@@ -228,7 +252,7 @@ public class PalletCell extends AbstractUICell {
         return rcp;
     }
 
-    public static boolean hasValue(PalletCell cell) {
+    public static boolean hasValue(PalletWell cell) {
         return cell != null && cell.getValue() != null;
     }
 
@@ -254,7 +278,7 @@ public class PalletCell extends AbstractUICell {
         setStatus(cell.getStatus());
         if (cell.getInformation() != null)
             setInformation(cell.getInformation().toString());
-        setValue(cell.getValue());
+        decodedWell = new DecodedWell(decodedWell.getLabel(), cell.getValue());
         setTitle(cell.getTitle().toString());
         SpecimenWrapper expectedSpecimen = null;
         if (cell.getExpectedSpecimenId() != null) {

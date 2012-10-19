@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
@@ -39,8 +39,8 @@ public class PalletScanManagement {
     private static final I18n i18n = I18nFactory
         .getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletCell> cells =
-        new HashMap<RowColPos, PalletCell>();
+    protected Map<RowColPos, PalletWell> cells =
+        new HashMap<RowColPos, PalletWell>();
     private int scansCount = 0;
     private boolean useScanner = true;
 
@@ -128,7 +128,7 @@ public class PalletScanManagement {
             // progress monitor text
             i18n.tr("Launching scan"));
         beforeScan();
-        Map<RowColPos, PalletCell> oldCells = cells;
+        Map<RowColPos, PalletWell> oldCells = cells;
         if (BiobankPlugin.isRealScanEnabled()) {
             int plateNum = BiobankPlugin.getDefault().getPlateNumber(
                 plateToScan);
@@ -147,7 +147,7 @@ public class PalletScanManagement {
             try {
                 scanCells = ScannerConfigPlugin.decodePlate(plateNum,
                     profile);
-                cells = PalletCell.convertArray(scanCells);
+                cells = PalletWell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin
                     .openAsyncError(
@@ -166,19 +166,19 @@ public class PalletScanManagement {
             scansCount++;
             afterScanBeforeMerge();
         }
-        Map<String, PalletCell> cellValues = getValuesMap(cells);
+        Map<String, PalletWell> cellValues = getValuesMap(cells);
         if (rescanMode && oldCells != null) {
             // rescan: merge previous scan with new in case the scanner
             // wasn't able to scan well
             boolean rescanDifferent = false;
-            for (Entry<RowColPos, PalletCell> entry : oldCells.entrySet()) {
+            for (Entry<RowColPos, PalletWell> entry : oldCells.entrySet()) {
                 RowColPos rcp = entry.getKey();
-                PalletCell oldScannedCell = entry.getValue();
-                PalletCell newScannedCell = cells.get(rcp);
+                PalletWell oldScannedCell = entry.getValue();
+                PalletWell newScannedCell = cells.get(rcp);
                 boolean copyOldValue = false;
-                if (PalletCell.hasValue(oldScannedCell)) {
+                if (PalletWell.hasValue(oldScannedCell)) {
                     copyOldValue = true;
-                    if (PalletCell.hasValue(newScannedCell)
+                    if (PalletWell.hasValue(newScannedCell)
                         && !oldScannedCell.getValue().equals(
                             newScannedCell.getValue())) {
                         // Different values at same position
@@ -191,9 +191,9 @@ public class PalletScanManagement {
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
-                    } else if (!PalletCell.hasValue(newScannedCell)) {
+                    } else if (!PalletWell.hasValue(newScannedCell)) {
                         // previous position has value - new has none
-                        PalletCell newPosition = cellValues.get(oldScannedCell
+                        PalletWell newPosition = cellValues.get(oldScannedCell
                             .getValue());
                         if (newPosition != null) {
                             // still there but moved to another position, so
@@ -220,12 +220,12 @@ public class PalletScanManagement {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
-                PalletCell cell = cells.get(rcp);
+                PalletWell cell = cells.get(rcp);
                 if (canScanTubeAlone(cell)) {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletCell(new WellRectangle(rcp.getRow(),
+                            cell = new PalletWell(new WellRectangle(rcp.getRow(),
                                 rcp.getCol(), value));
                             cells.put(rcp, cell);
                         } else {
@@ -246,7 +246,7 @@ public class PalletScanManagement {
     }
 
     protected boolean canScanTubeAlone(
-        @SuppressWarnings("unused") PalletCell cell) {
+        @SuppressWarnings("unused") PalletWell cell) {
         return true;
     }
 
@@ -259,11 +259,11 @@ public class PalletScanManagement {
         return null;
     }
 
-    private Map<String, PalletCell> getValuesMap(
-        Map<RowColPos, PalletCell> cells) {
-        Map<String, PalletCell> valuesMap = new HashMap<String, PalletCell>();
-        for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
-            PalletCell cell = entry.getValue();
+    private Map<String, PalletWell> getValuesMap(
+        Map<RowColPos, PalletWell> cells) {
+        Map<String, PalletWell> valuesMap = new HashMap<String, PalletWell>();
+        for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+            PalletWell cell = entry.getValue();
             valuesMap.put(cell.getValue(), cell);
         }
         return valuesMap;
@@ -277,7 +277,7 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
         return null;
     }
 
@@ -287,7 +287,7 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("unused")
-    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+    protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
         // default does nothing
     }
 
@@ -312,7 +312,7 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    public Map<RowColPos, PalletCell> getCells() {
+    public Map<RowColPos, PalletWell> getCells() {
         return cells;
     }
 
@@ -326,7 +326,7 @@ public class PalletScanManagement {
     }
 
     private void initCells() {
-        cells = new HashMap<RowColPos, PalletCell>();
+        cells = new HashMap<RowColPos, PalletWell>();
     }
 
     public int getScansCount() {
@@ -348,8 +348,8 @@ public class PalletScanManagement {
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
-                PalletCell cell =
-                    new PalletCell(new WellRectangle(rcp.getRow(), rcp.getCol(),
+                PalletWell cell =
+                    new PalletWell(new WellRectangle(rcp.getRow(), rcp.getCol(),
                         entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.widgets.grids.cell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
-public class ContainerCell extends AbstractUICell {
+public class ContainerCell extends AbstractUIWell {
 
     private Integer row;
 

@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 
@@ -89,9 +89,9 @@ public class DispatchReceiveScanDialog extends
 
     @SuppressWarnings("nls")
     @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+    protected Map<RowColPos, PalletWell> getFakeScanCells() {
+        Map<RowColPos, PalletWell> palletScanned =
+            new TreeMap<RowColPos, PalletWell>();
         if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
             int i = 0;
             do {
@@ -100,7 +100,7 @@ public class DispatchReceiveScanDialog extends
                 int row = i / 12;
                 int col = i % 12;
                 if (DispatchSpecimenState.MISSING != dsa.getState())
-                    palletScanned.put(new RowColPos(row, col), new PalletCell(
+                    palletScanned.put(new RowColPos(row, col), new PalletWell(
                         new WellRectangle(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
@@ -108,7 +108,7 @@ public class DispatchReceiveScanDialog extends
                 && i < currentShipment.getDispatchSpecimenCollection(false)
                     .size());
 
-            palletScanned.put(new RowColPos(6, 6), new PalletCell(new WellRectangle(
+            palletScanned.put(new RowColPos(6, 6), new PalletWell(new WellRectangle(
                 6, 6, "aaah")));
         }
         return palletScanned;

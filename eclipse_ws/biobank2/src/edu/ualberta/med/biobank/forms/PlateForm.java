@@ -8,7 +8,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Button;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
@@ -16,7 +16,7 @@ public abstract class PlateForm extends BiobankViewForm {
 
     protected Button scanButton;
 
-    protected Map<RowColPos, PalletCell> cells;
+    protected Map<RowColPos, PalletWell> cells;
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -56,10 +56,10 @@ public abstract class PlateForm extends BiobankViewForm {
             if (typesRowsCount == null) {
                 typesRowsCount = 0;
             }
-            PalletCell cell = null;
+            PalletWell cell = null;
             cell = cells.get(rcp);
             processCellStatus(cell);
-            if (PalletCell.hasValue(cell)) {
+            if (PalletWell.hasValue(cell)) {
                 typesRowsCount++;
                 typesRows.put(rcp.getRow(), typesRowsCount);
             }
@@ -69,7 +69,7 @@ public abstract class PlateForm extends BiobankViewForm {
     /**
      * Process the cell: apply a status and set correct information
      */
-    protected void processCellStatus(PalletCell cell) {
+    protected void processCellStatus(PalletWell cell) {
         if (cell != null) {
             cell.setStatus((cell.getValue() != null) ? UICellStatus.FILLED
                 : UICellStatus.EMPTY);

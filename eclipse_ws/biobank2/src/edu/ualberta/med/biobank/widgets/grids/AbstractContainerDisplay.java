@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 
 /**
@@ -39,7 +39,7 @@ public abstract class AbstractContainerDisplay {
 
     protected List<UICellStatus> legendStatus;
 
-    public AbstractUICell getObjectAtCoordinates(
+    public AbstractUIWell getObjectAtCoordinates(
         ContainerDisplayWidget displayWidget, int x, int y) {
         if (displayWidget.getCells() == null) {
             return null;
@@ -79,7 +79,7 @@ public abstract class AbstractContainerDisplay {
      */
     @SuppressWarnings("unused")
     protected String getDefaultTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = StringUtil.EMPTY_STRING;

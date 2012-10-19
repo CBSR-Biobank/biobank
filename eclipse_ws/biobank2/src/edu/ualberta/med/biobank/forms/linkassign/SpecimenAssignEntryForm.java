@@ -71,7 +71,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -1036,12 +1036,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void saveMultipleSpecimens() throws Exception {
         if (saveEvenIfMissing) {
             try {
-                Map<RowColPos, PalletCell> cells = getCells();
+                Map<RowColPos, PalletWell> cells = getCells();
                 List<SpecimenInfo> specInfos =
                     new ArrayList<SpecimenAssignSaveAction.SpecimenInfo>();
-                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
                     RowColPos rcp = entry.getKey();
-                    PalletCell cell = entry.getValue();
+                    PalletWell cell = entry.getValue();
                     if (cell != null
                         && (cell.getStatus() == UICellStatus.NEW || cell
                             .getStatus() == UICellStatus.MOVED)) {
@@ -1261,7 +1261,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    protected boolean canScanTubeAlone(PalletCell cell) {
+    protected boolean canScanTubeAlone(PalletWell cell) {
         return fieldsValid() && (super.canScanTubeAlone(cell)
             || cell.getStatus() == UICellStatus.MISSING);
     }
@@ -1358,15 +1358,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
         if (currentMultipleContainer.hasSpecimens()) {
-            Map<RowColPos, PalletCell> palletScanned =
-                new HashMap<RowColPos, PalletCell>();
+            Map<RowColPos, PalletWell> palletScanned =
+                new HashMap<RowColPos, PalletWell>();
             for (RowColPos pos : currentMultipleContainer.getSpecimens()
                 .keySet()) {
                 if (pos.getRow() != 0 && pos.getCol() != 2) {
                     palletScanned.put(pos,
-                        new PalletCell(new WellRectangle(pos.getRow(), pos.getCol(),
+                        new PalletWell(new WellRectangle(pos.getRow(), pos.getCol(),
                             currentMultipleContainer.getSpecimens().get(pos)
                                 .getInventoryId())));
                 }
@@ -1374,11 +1374,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             return palletScanned;
         }
         if (isFakeScanLinkedOnly) {
-            return PalletCell.getRandomSpecimensNotAssigned(SessionManager
+            return PalletWell.getRandomSpecimensNotAssigned(SessionManager
                 .getAppService(), currentMultipleContainer.getSite()
                 .getId());
         }
-        return PalletCell.getRandomSpecimensAlreadyAssigned(SessionManager
+        return PalletWell.getRandomSpecimensAlreadyAssigned(SessionManager
             .getAppService(), currentMultipleContainer.getSite().getId());
     }
 

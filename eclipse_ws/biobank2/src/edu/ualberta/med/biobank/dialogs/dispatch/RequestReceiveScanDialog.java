@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
 
@@ -74,9 +74,9 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     }
 
     @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+    protected Map<RowColPos, PalletWell> getFakeScanCells() {
+        Map<RowColPos, PalletWell> palletScanned =
+            new TreeMap<RowColPos, PalletWell>();
         if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
             int i = 0;
             for (RequestSpecimenWrapper dsa : (currentShipment)
@@ -86,7 +86,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                 if (row > 7)
                     break;
                 if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
-                    palletScanned.put(new RowColPos(row, col), new PalletCell(
+                    palletScanned.put(new RowColPos(row, col), new PalletWell(
                         new WellRectangle(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 }
