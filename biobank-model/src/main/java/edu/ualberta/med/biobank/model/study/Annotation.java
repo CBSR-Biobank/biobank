@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.study;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -12,11 +12,12 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.model.type.Decimal;
 
 /**
  * Holds the annotation value for a
- * {@link edu.ualberta.med.biobank.model.AnnotationType type of annotation}.
+ * {@link edu.ualberta.med.biobank.model.study.AnnotationType type of annotation}.
  * Derived classes determine what the annotation is on, such as a
  * {@link edu.ualberta.med.biobank.model.study.SpecimenLink specimen link}, a
  * {@link edu.ualberta.med.biobank.model.study.Patient patient}, or a
@@ -25,7 +26,7 @@ import edu.ualberta.med.biobank.model.type.Decimal;
  * 
  * @author Jonathan Ferland
  * 
- * @param <T> the specific {@link edu.ualberta.med.biobank.model.AnnotationType
+ * @param <T> the specific {@link edu.ualberta.med.biobank.model.study.AnnotationType
  *            type of annotation} this annotation is a value for
  */
 @Audited

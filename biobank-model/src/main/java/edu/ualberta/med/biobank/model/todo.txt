@@ -33,13 +33,15 @@
 [x] Call property 'isDerived'?
     A: called it "isDerivative()" and put it on Specimen, since this property does
     not change depending on its study.
-[ ] Group models and actions into domains, such as, user, report, center, shipping,
+[v] Group models and actions into domains, such as, user, report, center, shipping,
     etc. and actions/ services into those groups so that there are not so many
     classes per package.
     A: sure?
 [v] Also record the user that inserted the object and the last user to modify
     object?
 [ ] Switch the ExecutingUser "stuff" to use DI.
+[ ] Consider moving comment onto the Revision object. Otherwise it should probably
+	just be in the description? But what if just want to make a comment, no change?
 [v] Change annotations so that they use InheritanceType.JOINED, only for the
     annotation id (so unique across all sub-types), but put the type, data, and
     options in a separate (joined) table.
@@ -72,8 +74,9 @@
     it instead of transferring it) or what about in combo with CollectionEvent-s?
     A: Done. See SpecimenLinkAnnotationType. 
 [ ] Reports should be global or center-, study-, or center-study-specific.
-[ ] Prefix all report objects with "Report" so it's more clear what objects
+[x] Prefix all report objects with "Report" so it's more clear what objects
  	are involved?
+ 	A: moved them into a report package
 [v] Get rid of "Abstract" from model names. They're declared as abstract and can't
     be directly instantiated, just make the class name shorter...
 [v] Make annotation type requirements for specific collection event types and/or
@@ -125,7 +128,7 @@
 	- Yes
 [ ] Put hibernate configuration into a class file instead of xml? Seems like it'd be
     better if only for referencing concrete classes instead of strings
-[ ] *Split Membership into StudyMembership and CenterMembership? But then how 
+[v] *Split Membership into StudyMembership and CenterMembership? But then how 
 	does a center (or study) control which users can work on a given study? 
 	Is that necessary?
 	A: get more feedback from aaron

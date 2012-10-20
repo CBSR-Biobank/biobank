@@ -3,60 +3,40 @@ package edu.ualberta.med.biobank.model.security;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.LongIdModel;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
+
+import edu.ualberta.med.biobank.model.VersionedLongIdModel;
+import edu.ualberta.med.biobank.model.util.CustomEnumType;
 
 @Entity
-@DiscriminatorValue("P")
 @Table(name = "PRINCIPAL")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.CHAR)
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "DISCRIMINATOR", columnDefinition = "CHAR(4)", discriminatorType = DiscriminatorType.STRING)
 public abstract class Principal
-    extends LongIdModel {
+    extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc("model", "Principal",
-        "Principals");
-
-    private Set<Membership> memberships = new HashSet<Membership>(0);
     private Boolean enabled;
-
-    // Require at least one membership on creation so there is some loose
-    // association between the creator and the created user.
-    // FIXME: move this to group and require at least one group or membership
-    // for a user.
-    // @NotEmpty(groups = PreInsert.class, message =
-    // "{edu.ualberta.med.biobank.model.Principal.memberships.NotEmpty}")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    public Set<Membership> getMemberships() {
-        return this.memberships;
-    }
-
-    public void setMemberships(Set<Membership> memberships) {
-        this.memberships = memberships;
-    }
+    private Boolean admin;
+    private Set<GlobalPermission> perms = new HashSet<GlobalPermission>(0);
 
     @NotNull(message = "{Principal.enabled.NotNull}")
     @Column(name = "IS_ENABLED")
-    public Boolean getEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
@@ -65,19 +45,36 @@ public abstract class Principal
     }
 
     /**
-     * Return true if this {@link Principal} can be removed by the given
-     * {@link User}, i.e. if the given {@link User} is of <em>equal</em> or
-     * greater power.
-     * 
-     * @param user
-     * @return true if this {@link Principal} is subordinate to the given
-     *         {@link User}.
+     * @return true if this {@link User} has absolute power in the system, like
+     *         root, otherwise false if not an administrator.
      */
-    @Transient
-    public boolean isFullyManageable(User user) {
-        for (Membership membership : getMemberships()) {
-            if (!membership.isFullyManageable(user)) return false;
-        }
-        return true;
+    @NotNull(message = "{User.admin.NotNull}")
+    @Column(name = "IS_ADMIN", nullable = false)
+    public Boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
+
+    @ElementCollection(targetClass = GlobalPermission.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "STUDY_MEMBERSHIP_PERMISSION",
+        joinColumns = @JoinColumn(name = "ID"))
+    @Column(name = "PERMISSION_ID", nullable = false)
+    @Type(
+        type = "edu.ualberta.med.biobank.model.util.CustomEnumType",
+        parameters = {
+            @Parameter(
+                name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.security.GlobalPermission"
+            )
+        })
+    public Set<GlobalPermission> getPermissions() {
+        return perms;
+    }
+
+    public void setPermissions(Set<GlobalPermission> permissions) {
+        this.perms = permissions;
     }
 }

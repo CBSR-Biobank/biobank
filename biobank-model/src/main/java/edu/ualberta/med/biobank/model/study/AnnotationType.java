@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.study;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -19,10 +19,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.model.study.CollectionEvent;
-import edu.ualberta.med.biobank.model.study.Patient;
-import edu.ualberta.med.biobank.model.study.SpecimenLink;
-import edu.ualberta.med.biobank.model.study.Study;
+import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.model.type.AnnotationValueType;
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
 import edu.ualberta.med.biobank.validator.constraint.Unique;

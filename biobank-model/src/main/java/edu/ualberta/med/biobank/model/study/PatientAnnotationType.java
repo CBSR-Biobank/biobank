@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.AnnotationType;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
