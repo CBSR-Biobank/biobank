@@ -6,8 +6,8 @@ import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public abstract class CenterSaveAction implements Action<IdResult> {

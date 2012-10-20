@@ -5,8 +5,8 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.EmptyResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.container.ContainerDeletePermission;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerPosition;
 
 public class ContainerDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;

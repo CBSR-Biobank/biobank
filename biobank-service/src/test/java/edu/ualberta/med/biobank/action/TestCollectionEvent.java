@@ -35,10 +35,10 @@ import edu.ualberta.med.biobank.action.specimenType.SpecimenTypeSaveAction;
 import edu.ualberta.med.biobank.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.action.study.StudyInfo;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.MathUtil;
 
 public class TestCollectionEvent extends ActionTest {

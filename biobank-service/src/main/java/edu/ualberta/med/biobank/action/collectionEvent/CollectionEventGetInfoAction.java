@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAct
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 import edu.ualberta.med.biobank.permission.collectionEvent.CollectionEventReadPermission;
 
 public class CollectionEventGetInfoAction implements Action<CEventInfo> {

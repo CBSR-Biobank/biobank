@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.reports;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class SpecimenReport1 extends AbstractReport {
     @SuppressWarnings("nls")

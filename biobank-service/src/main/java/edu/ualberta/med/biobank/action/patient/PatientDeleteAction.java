@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.patient.PatientDeletePermission;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.study.Patient;
 
 public class PatientDeleteAction implements Action<IdResult> {
 

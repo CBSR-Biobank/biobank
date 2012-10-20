@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.security.Group;
 
 public class GroupDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;

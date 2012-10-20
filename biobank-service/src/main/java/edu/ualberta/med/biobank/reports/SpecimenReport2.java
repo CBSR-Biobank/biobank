@@ -8,9 +8,9 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SpecimenReport2 extends AbstractReport {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 
-import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
 
 public interface FilterType {
     /**

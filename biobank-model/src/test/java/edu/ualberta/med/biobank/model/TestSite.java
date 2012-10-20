@@ -7,10 +7,10 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.Empty;

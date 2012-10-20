@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.model.log;
 import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.log.CollectionEventLog.LogType;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 
 public class CollectionEventLog extends Log<LogType> {
     private static final long serialVersionUID = 1L;

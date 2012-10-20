@@ -3,11 +3,11 @@ package edu.ualberta.med.biobank.action.security;
 import java.io.Serializable;
 import java.util.List;
 
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class ManagerContext implements Serializable {
     private static final long serialVersionUID = 1L;

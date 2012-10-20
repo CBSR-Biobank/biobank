@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Membership;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Membership;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
 public class GroupSaveInput implements ActionInput {

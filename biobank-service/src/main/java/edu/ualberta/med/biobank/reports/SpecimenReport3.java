@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;

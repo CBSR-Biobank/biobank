@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.study.StudyReadPermission;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class StudyGetInfoAction implements Action<StudyInfo> {
     private static final long serialVersionUID = 1L;

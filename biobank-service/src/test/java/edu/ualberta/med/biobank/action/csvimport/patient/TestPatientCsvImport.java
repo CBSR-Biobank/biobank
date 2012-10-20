@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.action.ActionTest;
 import edu.ualberta.med.biobank.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.action.exception.CsvImportException;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.study.Patient;
 
 /**
  * 

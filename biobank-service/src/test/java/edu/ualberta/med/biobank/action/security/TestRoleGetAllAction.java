@@ -12,8 +12,8 @@ import edu.ualberta.med.biobank.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.action.security.RoleGetAllAction;
 import edu.ualberta.med.biobank.action.security.RoleGetAllInput;
 import edu.ualberta.med.biobank.action.security.RoleGetAllOutput;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.action.ActionTest;
 

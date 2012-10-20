@@ -123,6 +123,8 @@
 [v] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
 	it's just clutter
 	- Yes
+[ ] Put hibernate configuration into a class file instead of xml? Seems like it'd be
+    better if only for referencing concrete classes instead of strings
 [ ] *Split Membership into StudyMembership and CenterMembership? But then how 
 	does a center (or study) control which users can work on a given study? 
 	Is that necessary?

@@ -36,8 +36,8 @@ import edu.ualberta.med.biobank.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class TestProcessingEvent extends ActionTest {
 

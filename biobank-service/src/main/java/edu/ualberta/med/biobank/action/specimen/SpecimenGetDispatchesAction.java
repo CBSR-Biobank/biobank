@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
-import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.center.Shipment;
 
 public class SpecimenGetDispatchesAction implements
     Action<SpecimenDispatchesInfo> {

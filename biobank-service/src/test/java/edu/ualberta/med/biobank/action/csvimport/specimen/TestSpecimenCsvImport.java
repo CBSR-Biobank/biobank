@@ -18,12 +18,12 @@ import edu.ualberta.med.biobank.action.ActionTest;
 import edu.ualberta.med.biobank.action.csvimport.CsvUtil;
 import edu.ualberta.med.biobank.action.exception.CsvImportException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 /**

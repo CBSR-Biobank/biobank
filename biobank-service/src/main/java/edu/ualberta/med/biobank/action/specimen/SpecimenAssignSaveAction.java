@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.action.specimen.SpecimenAssignSaveAction.Specime
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenAssignPermission;
 

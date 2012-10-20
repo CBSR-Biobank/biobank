@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.info;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 /**
  * 

@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.action.scanprocess.data;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.action.ActionContext;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class AssignProcessInfo extends AbstractProcessPalletInfo {
 

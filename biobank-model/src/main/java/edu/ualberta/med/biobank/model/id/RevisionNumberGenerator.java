@@ -10,7 +10,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.id.enhanced.TableGenerator;
 import org.hibernate.type.Type;
 
-import edu.ualberta.med.biobank.model.Revision;
+import edu.ualberta.med.biobank.model.envers.Revision;
 
 /**
  * Intended only to work with the {@link Revision} ({@link @RevisionEntity}) to

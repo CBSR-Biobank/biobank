@@ -10,9 +10,9 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.IBiobankModel;
 import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.model.center.Shipment;
 
 public class SpecimenTransitSearchAction implements
     Action<ListResult<IBiobankModel>> {

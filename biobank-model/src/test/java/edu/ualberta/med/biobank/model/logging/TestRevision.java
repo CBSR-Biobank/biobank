@@ -4,8 +4,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Revision;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.envers.Revision;
 
 public class TestRevision extends LoggingTest {
     @Test

@@ -6,7 +6,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 
-import edu.ualberta.med.biobank.model.Revision;
+import edu.ualberta.med.biobank.model.envers.Revision;
 
 /**
  * This class does things I would like to do by extending the Envers code, but

@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.permission.researchGroup.ResearchGroupUpdatePerm
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ResearchGroup;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class ResearchGroupSaveAction implements Action<IdResult> {
 

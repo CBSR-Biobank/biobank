@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventReadPermission;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 
 public class PEventByWSSearchAction implements
     Action<ListResult<Integer>> {

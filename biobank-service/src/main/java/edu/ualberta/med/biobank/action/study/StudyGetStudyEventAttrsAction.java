@@ -10,8 +10,8 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.SetResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.study.Study;
+import edu.ualberta.med.biobank.model.study.StudyEventAttr;
 
 public class StudyGetStudyEventAttrsAction implements
     Action<SetResult<StudyEventAttr>> {

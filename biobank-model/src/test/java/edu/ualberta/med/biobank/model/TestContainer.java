@@ -7,10 +7,10 @@ import junit.framework.Assert;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;

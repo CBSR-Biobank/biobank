@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.containerType.ContainerTypeReadPermission;
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 
 public class ContainerTypeGetInfoAction implements Action<ContainerTypeInfo> {
     private static final long serialVersionUID = 1L;

@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.model.log;
 
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.log.ImportLog.LogType;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class ImportLog extends Log<LogType> {
     private static final long serialVersionUID = 1L;

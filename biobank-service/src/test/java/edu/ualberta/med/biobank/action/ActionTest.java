@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class ActionTest extends DbTest {
     private static final LocalActionExecutor EXECUTOR;

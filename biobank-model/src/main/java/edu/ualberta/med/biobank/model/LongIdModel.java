@@ -13,6 +13,15 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.id.enhanced.TableGenerator;
 
+import edu.ualberta.med.biobank.model.security.User;
+
+/**
+ * A superlcass that entities can extend if they want an automatically generated
+ * id, determined by a table generation strategy (nearly equivalent to
+ * sequences, but table based).
+ * 
+ * @author Jonathan Ferland
+ */
 @MappedSuperclass
 public abstract class LongIdModel
     implements IBiobankModel, HasTimeInserted, HasInsertedBy {

@@ -9,9 +9,9 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.action.ActionContext;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 public abstract class AbstractProcessPalletInfo implements Serializable,

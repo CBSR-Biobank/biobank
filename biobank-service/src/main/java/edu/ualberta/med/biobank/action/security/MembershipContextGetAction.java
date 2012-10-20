@@ -7,11 +7,11 @@ import org.hibernate.Hibernate;
 import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Domain;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Domain;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class MembershipContextGetAction implements
     Action<MembershipContextGetOutput> {

@@ -14,8 +14,8 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 
 public class PatientSearchAction implements Action<SearchedPatientInfo> {

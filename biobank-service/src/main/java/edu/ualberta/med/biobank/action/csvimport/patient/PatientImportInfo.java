@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.action.csvimport.patient;
 
 import edu.ualberta.med.biobank.action.csvimport.IImportInfo;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Study;
 
 /**
  * 

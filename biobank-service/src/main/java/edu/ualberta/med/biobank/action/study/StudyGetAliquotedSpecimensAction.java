@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.SetResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class StudyGetAliquotedSpecimensAction implements
     Action<SetResult<AliquotedSpecimen>> {

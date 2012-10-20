@@ -5,7 +5,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.log.ContainerLog.LogType;
 
 @Entity

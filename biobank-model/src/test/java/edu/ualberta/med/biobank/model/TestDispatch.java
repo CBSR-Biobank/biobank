@@ -6,8 +6,8 @@ import org.hibernate.Query;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Shipment;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.util.HibernateHelper;

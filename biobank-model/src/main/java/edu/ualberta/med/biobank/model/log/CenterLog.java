@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model.log;
 
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.log.CenterLog.LogType;
 
 public class CenterLog extends Log<LogType> {

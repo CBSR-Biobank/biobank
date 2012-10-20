@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventDelete
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ProcessingEventDeleteAction implements Action<IdResult> {

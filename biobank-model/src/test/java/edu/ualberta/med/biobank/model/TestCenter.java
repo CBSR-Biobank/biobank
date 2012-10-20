@@ -8,9 +8,9 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 

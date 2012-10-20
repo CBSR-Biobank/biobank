@@ -12,6 +12,15 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 
+/**
+ * Defines a single option for the
+ * {@link edu.ualberta.med.biobank.model.type.AnnotationValueType#SELECT select}
+ * types of {@link edu.ualberta.med.biobank.model.AnnotationType annotation
+ * type}s. For example, this would be used to determine values a user chooses
+ * from a drop-down, such as, "small", "medium", and "large".
+ * 
+ * @author Jonathan Ferland
+ */
 @Audited
 @Entity
 @Table(name = "ANNOTATION_OPTION",
@@ -27,6 +36,10 @@ public class AnnotationOption
     private AnnotationType type;
     private String value;
 
+    /**
+     * @return the type of annotation (i.e the name or label) that this is an
+     *         option for.
+     */
     @NotNull(message = "{AnnotationOption.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ANNOTATION_TYPE_ID", nullable = false)
@@ -38,6 +51,10 @@ public class AnnotationOption
         this.type = type;
     }
 
+    /**
+     * @return the value that can be selected (think drop-down, combo-box, or
+     *         radio selection option).
+     */
     @NotNull(message = "{AnnotationOption.value.NotNull}")
     @Size(max = VALUE_MAX_LENGTH, message = "{AnnotationOption.value.Size}")
     @Column(name = "VALUE", nullable = false, length = VALUE_MAX_LENGTH)

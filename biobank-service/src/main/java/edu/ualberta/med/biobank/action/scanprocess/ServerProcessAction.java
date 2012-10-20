@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public abstract class ServerProcessAction implements Action<ProcessResult> {

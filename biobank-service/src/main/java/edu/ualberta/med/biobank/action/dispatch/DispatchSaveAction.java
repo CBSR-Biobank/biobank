@@ -13,13 +13,13 @@ import edu.ualberta.med.biobank.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShipmentSpecimen;
-import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.Shipment;
+import edu.ualberta.med.biobank.model.center.ShipmentData;
+import edu.ualberta.med.biobank.model.center.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class DispatchSaveAction implements Action<IdResult> {

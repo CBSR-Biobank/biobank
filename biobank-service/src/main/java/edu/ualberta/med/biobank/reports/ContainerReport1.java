@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.reports;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.reports.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.reports.util.CapacityPostProcess;
 

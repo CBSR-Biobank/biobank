@@ -12,8 +12,8 @@ import edu.ualberta.med.biobank.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.action.security.RoleDeleteAction;
 import edu.ualberta.med.biobank.action.security.RoleDeleteInput;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.action.ActionTest;
 
 public class TestRoleDeleteAction extends ActionTest {

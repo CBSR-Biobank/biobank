@@ -7,15 +7,15 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
+import edu.ualberta.med.biobank.model.study.Study;
 
 /**
  * 

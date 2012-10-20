@@ -27,12 +27,12 @@ import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
-import edu.ualberta.med.biobank.model.EntityFilter;
-import edu.ualberta.med.biobank.model.PropertyModifier;
-import edu.ualberta.med.biobank.model.Report;
-import edu.ualberta.med.biobank.model.ReportColumn;
-import edu.ualberta.med.biobank.model.ReportFilter;
-import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.model.report.EntityFilter;
+import edu.ualberta.med.biobank.model.report.PropertyModifier;
+import edu.ualberta.med.biobank.model.report.Report;
+import edu.ualberta.med.biobank.model.report.ReportColumn;
+import edu.ualberta.med.biobank.model.report.ReportFilter;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 
 @SuppressWarnings("nls")

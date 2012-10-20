@@ -13,8 +13,8 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.User;
 
 /**
  * Returns a list of {@link Group}-s that the executing user has

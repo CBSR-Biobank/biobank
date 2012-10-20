@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.security;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.security.Role;
 
 public class RoleDeleteInput implements ActionInput {
     private static final long serialVersionUID = 1L;

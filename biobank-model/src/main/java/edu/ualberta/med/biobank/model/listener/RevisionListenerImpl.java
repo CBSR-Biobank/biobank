@@ -6,9 +6,9 @@ import java.text.MessageFormat;
 import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
 
-import edu.ualberta.med.biobank.model.Revision;
 import edu.ualberta.med.biobank.model.context.ExecutingUser;
 import edu.ualberta.med.biobank.model.context.ExecutingUserImpl;
+import edu.ualberta.med.biobank.model.envers.Revision;
 
 public class RevisionListenerImpl
     implements EntityTrackingRevisionListener {

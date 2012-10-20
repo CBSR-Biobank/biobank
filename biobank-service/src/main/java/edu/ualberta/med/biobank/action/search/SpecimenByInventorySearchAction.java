@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class SpecimenByInventorySearchAction implements
     Action<ListResult<Integer>> {

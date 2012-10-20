@@ -12,10 +12,10 @@ import org.hibernate.impl.CriteriaImpl;
 
 import edu.ualberta.med.biobank.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.reports.filters.FilterType;
-import edu.ualberta.med.biobank.model.CollectionEvent;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.reports.ReportRunner;
 
 public class FirstTimeProcessedFilterType implements FilterType {

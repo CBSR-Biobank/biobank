@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAct
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.action.IActionExecutor;
 
 public class SpecimenHelper extends Helper {

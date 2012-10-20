@@ -11,12 +11,12 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.security.GroupSaveAction;
 import edu.ualberta.med.biobank.action.security.GroupSaveInput;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Domain;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.security.Domain;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 import edu.ualberta.med.biobank.action.ActionTest;
 

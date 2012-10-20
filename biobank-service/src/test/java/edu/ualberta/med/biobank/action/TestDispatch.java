@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.center.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.test.Utils;

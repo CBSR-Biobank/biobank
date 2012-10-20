@@ -19,6 +19,10 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.SpecimenLink;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.type.AnnotationValueType;
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -119,6 +123,11 @@ public abstract class AnnotationType
         this.multiValue = multiValue;
     }
 
+    /**
+     * @return what types of values (e.g. string, number, date, etc.) this type
+     *         of annotation expects.
+     */
+    @NotNull(message = "{AnnotationType.valueType.NotNull}")
     @Type(
         type = "edu.ualberta.med.biobank.model.util.CustomEnumType",
         parameters = {
@@ -127,6 +136,7 @@ public abstract class AnnotationType
                 value = "edu.ualberta.med.biobank.model.type.AnnotationValueType"
             )
         })
+    @Column(name = "VALUE_TYPE", nullable = false)
     public AnnotationValueType getValueType() {
         return valueType;
     }

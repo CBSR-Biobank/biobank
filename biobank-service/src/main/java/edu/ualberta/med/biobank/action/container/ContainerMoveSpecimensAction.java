@@ -7,8 +7,8 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.container.ContainerUpdatePermission;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.center.Container;
 
 public class ContainerMoveSpecimensAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

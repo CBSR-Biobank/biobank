@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.security;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.security.Group;
 
 public class GroupDeleteInput implements ActionInput {
     private static final long serialVersionUID = 1L;

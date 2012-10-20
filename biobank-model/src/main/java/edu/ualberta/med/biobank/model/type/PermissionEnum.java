@@ -11,11 +11,11 @@ import java.util.Map;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Domain;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.security.Domain;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.User;
+import edu.ualberta.med.biobank.model.study.Study;
 
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT

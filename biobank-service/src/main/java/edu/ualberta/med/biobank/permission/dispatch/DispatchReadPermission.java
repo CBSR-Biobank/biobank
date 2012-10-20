@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.permission.dispatch;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.Shipment;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class DispatchReadPermission implements Permission {

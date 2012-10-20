@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.permission.container;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class ContainerReadPermission implements Permission {

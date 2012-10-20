@@ -9,8 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 
 import edu.ualberta.med.biobank.SessionProvider.Mode;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class DbTest extends BaseTest {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";

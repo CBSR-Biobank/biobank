@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.action.processingEvent.ProcessingEventGetInfoAction.PEventInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventReadPermission;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 
 public class ProcessingEventGetInfoAction implements Action<PEventInfo> {
     private static final long serialVersionUID = 1L;

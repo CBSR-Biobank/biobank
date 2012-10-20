@@ -8,11 +8,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.SpecimenPosition;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Specimen;
+import edu.ualberta.med.biobank.model.study.SpecimenPosition;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class SpecimenActionHelper {

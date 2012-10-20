@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.permission.processingEvent;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class ProcessingEventDeletePermission implements Permission {

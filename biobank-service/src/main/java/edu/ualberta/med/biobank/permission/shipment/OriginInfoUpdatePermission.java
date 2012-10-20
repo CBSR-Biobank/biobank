@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.permission.shipment;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class OriginInfoUpdatePermission implements Permission {

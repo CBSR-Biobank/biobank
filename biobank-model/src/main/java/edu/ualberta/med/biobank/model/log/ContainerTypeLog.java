@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model.log;
 
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 import edu.ualberta.med.biobank.model.log.ContainerTypeLog.LogType;
 
 public class ContainerTypeLog extends Log<LogType> {

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 
 public class ContainerGetInfoAction implements Action<ContainerInfo> {
     private static final long serialVersionUID = 1L;

@@ -13,9 +13,9 @@ import edu.ualberta.med.biobank.permission.containerType.ContainerTypeCreatePerm
 import edu.ualberta.med.biobank.permission.containerType.ContainerTypeUpdatePermission;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ContainerTypeSaveAction implements Action<IdResult> {

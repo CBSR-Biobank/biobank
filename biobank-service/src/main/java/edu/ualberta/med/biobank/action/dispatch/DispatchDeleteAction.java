@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.permission.dispatch.DispatchDeletePermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.center.Shipment;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 
 public class DispatchDeleteAction implements Action<EmptyResult> {

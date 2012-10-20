@@ -16,9 +16,9 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import edu.ualberta.med.biobank.model.LongIdModel;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.security.User;
+import edu.ualberta.med.biobank.model.study.Study;
 
 @Entity
 @Table(name = "LOG")

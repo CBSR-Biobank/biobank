@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 public class StudyGetClinicInfoAction implements Action<ListResult<ClinicInfo>> {

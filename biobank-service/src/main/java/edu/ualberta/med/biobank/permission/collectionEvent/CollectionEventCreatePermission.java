@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.permission.collectionEvent;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.patient.PatientUpdatePermission;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.study.Patient;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class CollectionEventCreatePermission implements Permission {

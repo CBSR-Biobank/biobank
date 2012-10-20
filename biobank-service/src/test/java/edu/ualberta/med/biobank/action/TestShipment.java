@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.helper.IdSetMutator;

@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.permission.clinic.ClinicUpdatePermission;

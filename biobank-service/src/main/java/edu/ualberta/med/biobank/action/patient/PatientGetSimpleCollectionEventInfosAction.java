@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.MapResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 import edu.ualberta.med.biobank.model.util.NotAProxy;
 
 public class PatientGetSimpleCollectionEventInfosAction implements

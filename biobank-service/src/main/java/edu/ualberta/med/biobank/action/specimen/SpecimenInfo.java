@@ -6,7 +6,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.util.InfoUtil;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class SpecimenInfo implements ActionResult {
 

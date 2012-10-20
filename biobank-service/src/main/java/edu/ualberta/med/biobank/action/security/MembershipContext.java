@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
 
 /**
  * Used by {@link UserGetInput} and {@link UserSaveInput} so that the context

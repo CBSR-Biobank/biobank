@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.action.security;
 import java.util.SortedSet;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionOutput;
-import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.security.Role;
 
 public class RoleGetAllOutput implements ActionOutput {
     private static final long serialVersionUID = 1L;

@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.EmptyResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.study.StudyDeletePermission;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class StudyDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;

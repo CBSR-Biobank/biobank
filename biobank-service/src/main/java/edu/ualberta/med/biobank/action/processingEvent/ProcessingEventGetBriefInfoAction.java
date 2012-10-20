@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventReadPermission;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 
 public class ProcessingEventGetBriefInfoAction implements
     Action<ProcessingEventBriefInfo> {

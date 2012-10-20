@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.EmptyResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.reports.ReportsPermission;
-import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.model.report.Report;
 
 public class AdvancedReportDeleteAction implements Action<EmptyResult> {
 

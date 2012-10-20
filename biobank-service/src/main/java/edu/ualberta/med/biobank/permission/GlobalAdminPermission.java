@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.permission;
 
 import edu.ualberta.med.biobank.action.ActionContext;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class GlobalAdminPermission implements Permission {
     private static final long serialVersionUID = 1L;

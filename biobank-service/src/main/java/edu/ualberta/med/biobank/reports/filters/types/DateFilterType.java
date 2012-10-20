@@ -16,7 +16,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.reports.ReportsUtil;
 import edu.ualberta.med.biobank.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.reports.filters.FilterType;
-import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
 
 public class DateFilterType implements FilterType {
     private static final String DATE_TOKEN = "{date}"; //$NON-NLS-1$

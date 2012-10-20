@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.site.SiteCreatePermission;
 import edu.ualberta.med.biobank.permission.site.SiteUpdatePermission;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class SiteSaveAction extends CenterSaveAction {
 

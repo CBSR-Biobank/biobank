@@ -11,8 +11,8 @@ import org.hibernate.StatelessSession;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 import edu.ualberta.med.biobank.model.util.NullUtil;
 import edu.ualberta.med.biobank.validator.EventSourceAwareConstraintValidator;
 import edu.ualberta.med.biobank.validator.constraint.model.ValidContainerType;

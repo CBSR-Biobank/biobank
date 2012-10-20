@@ -12,10 +12,10 @@ import edu.ualberta.med.biobank.action.collectionEvent.CollectionEventGetInfoAct
 import edu.ualberta.med.biobank.action.info.ResearchGroupReadInfo;
 import edu.ualberta.med.biobank.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.model.ResearchGroup;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Request;
+import edu.ualberta.med.biobank.model.study.RequestSpecimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.action.IActionExecutor;

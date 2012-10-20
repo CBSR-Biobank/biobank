@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.action.patient;
 import java.util.List;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 
 public class PatientGetProcessingEventsByPNumberResult implements ActionResult {
     private static final long serialVersionUID = 1L;

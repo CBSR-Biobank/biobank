@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.patient.PatientCreatePermission;
 import edu.ualberta.med.biobank.permission.patient.PatientUpdatePermission;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class PatientSaveAction implements Action<IdResult> {
 

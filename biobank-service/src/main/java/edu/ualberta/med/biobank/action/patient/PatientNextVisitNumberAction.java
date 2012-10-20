@@ -7,7 +7,7 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 
 public class PatientNextVisitNumberAction implements
     Action<PatientNextVisitNumberResult> {

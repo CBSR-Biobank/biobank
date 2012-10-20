@@ -10,11 +10,11 @@ import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.permission.request.UpdateRequestPermission;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShipmentSpecimen;
-import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.Shipment;
+import edu.ualberta.med.biobank.model.center.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.study.Request;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 
 public class RequestDispatchAction implements Action<EmptyResult> {

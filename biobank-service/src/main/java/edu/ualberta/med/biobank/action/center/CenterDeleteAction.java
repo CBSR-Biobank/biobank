@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.EmptyResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.center.Center;
 
 public abstract class CenterDeleteAction implements Action<EmptyResult> {
     private static final long serialVersionUID = 1L;

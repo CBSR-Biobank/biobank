@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ShipmentItemState;
 import edu.ualberta.med.biobank.model.type.ItemState;
 import edu.ualberta.med.biobank.model.util.RowColPos;

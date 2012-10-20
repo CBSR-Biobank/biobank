@@ -10,9 +10,9 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenLinkPermission;
 

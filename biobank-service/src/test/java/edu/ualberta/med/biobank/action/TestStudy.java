@@ -46,8 +46,8 @@ import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.study.Study;
+import edu.ualberta.med.biobank.model.study.StudyEventAttr;
 
 /**
  * This test suite assumes that the association between Sites and Studies is

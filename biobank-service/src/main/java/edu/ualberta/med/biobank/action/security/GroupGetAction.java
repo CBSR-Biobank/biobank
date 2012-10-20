@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.security.UserManagerPermission;
-import edu.ualberta.med.biobank.model.Group;
+import edu.ualberta.med.biobank.model.security.Group;
 
 public class GroupGetAction implements Action<GroupGetOutput> {
     private static final long serialVersionUID = 1L;

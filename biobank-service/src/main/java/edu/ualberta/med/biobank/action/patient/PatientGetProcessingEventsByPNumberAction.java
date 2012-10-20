@@ -8,9 +8,9 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
+import edu.ualberta.med.biobank.model.study.Patient;
 
 /**
  * 

@@ -3,15 +3,15 @@ package edu.ualberta.med.biobank.action.csvimport.shipment;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.action.csvimport.IImportInfo;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.ShipmentData;
+import edu.ualberta.med.biobank.model.security.User;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 /**
  * 

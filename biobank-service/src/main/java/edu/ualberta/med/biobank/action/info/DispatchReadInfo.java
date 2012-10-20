@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.action.info;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShipmentSpecimen;
+import edu.ualberta.med.biobank.model.center.Shipment;
+import edu.ualberta.med.biobank.model.center.ShipmentSpecimen;
 
 public class DispatchReadInfo implements ActionResult {
 

@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.Capacity;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.model.InBounds;

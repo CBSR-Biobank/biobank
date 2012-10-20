@@ -7,6 +7,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
+import edu.ualberta.med.biobank.model.security.User;
+
+/**
+ * Super class that allows derived classes to automatically inherit a version, a
+ * last update time, and a last updated by user.
+ * 
+ * @author Jonathan Ferland
+ */
 @MappedSuperclass
 public abstract class VersionedLongIdModel
     extends LongIdModel

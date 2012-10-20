@@ -6,7 +6,7 @@ import java.util.Date;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class CommentInfo implements ActionResult {
 

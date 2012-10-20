@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 
 public class TestContainer extends ActionTest {
 

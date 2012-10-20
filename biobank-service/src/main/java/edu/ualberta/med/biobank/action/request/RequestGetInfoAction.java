@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.study.Request;
 import edu.ualberta.med.biobank.permission.request.RequestReadPermission;
 
 public class RequestGetInfoAction implements Action<RequestReadInfo> {

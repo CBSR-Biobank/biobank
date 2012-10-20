@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.model.context;
 
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class ExecutingUserImpl
     implements ExecutingUser {

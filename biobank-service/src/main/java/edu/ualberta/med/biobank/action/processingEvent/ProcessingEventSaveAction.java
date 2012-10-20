@@ -11,10 +11,10 @@ import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventCreatePermission;
 import edu.ualberta.med.biobank.permission.processingEvent.ProcessingEventUpdatePermission;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 public class ProcessingEventSaveAction implements Action<IdResult> {

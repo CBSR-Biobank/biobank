@@ -18,8 +18,8 @@ import edu.ualberta.med.biobank.action.containerType.ContainerTypeGetInfoAction.
 import edu.ualberta.med.biobank.action.containerType.ContainerTypeSaveAction;
 import edu.ualberta.med.biobank.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 
 public class TestContainerType extends ActionTest {
 

@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.permission.dispatch;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.center.Shipment;
+import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 

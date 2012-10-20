@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.action.Action;
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.study.RequestSpecimen;
 import edu.ualberta.med.biobank.permission.request.RequestReadPermission;
 
 public class RequestGetSpecimenInfosAction implements

@@ -6,10 +6,10 @@ import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.permission.dispatch.DispatchChangeStatePermission;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShipmentSpecimen;
-import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.center.Shipment;
+import edu.ualberta.med.biobank.model.center.ShipmentData;
+import edu.ualberta.med.biobank.model.center.ShipmentSpecimen;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import edu.ualberta.med.biobank.model.type.ShipmentState;
 

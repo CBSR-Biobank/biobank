@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 
 public class ContainerGetSpecimenListInfoAction extends
     SpecimenListGetInfoAction {

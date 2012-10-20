@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Study;
 
 public class SiteGetStudyInfoAction implements
     Action<ListResult<StudyCountInfo>> {

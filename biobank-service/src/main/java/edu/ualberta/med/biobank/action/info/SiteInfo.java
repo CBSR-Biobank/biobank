@@ -5,8 +5,8 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Container;
 
 /**
  * 

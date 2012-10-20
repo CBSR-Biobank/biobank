@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.Permission;
 import edu.ualberta.med.biobank.permission.security.RoleManagementPermission;
-import edu.ualberta.med.biobank.model.Role;
+import edu.ualberta.med.biobank.model.security.Role;
 
 public class RoleSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

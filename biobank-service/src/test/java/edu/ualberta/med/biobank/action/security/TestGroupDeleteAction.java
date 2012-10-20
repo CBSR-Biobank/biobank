@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.action.ActionTest;
 import edu.ualberta.med.biobank.action.exception.AccessDeniedException;
-import edu.ualberta.med.biobank.model.Group;
-import edu.ualberta.med.biobank.model.Role;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Group;
+import edu.ualberta.med.biobank.model.security.Role;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class TestGroupDeleteAction extends ActionTest {
     @Test

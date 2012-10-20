@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.IdResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.collectionEvent.CollectionEventDeletePermission;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 
 public class CollectionEventDeleteAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;

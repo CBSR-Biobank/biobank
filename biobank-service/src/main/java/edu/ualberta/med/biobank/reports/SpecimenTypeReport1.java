@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.reports;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 
 /**

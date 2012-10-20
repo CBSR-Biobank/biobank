@@ -11,11 +11,11 @@ import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.action.BooleanResult;
 import edu.ualberta.med.biobank.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.permission.patient.PatientMergePermission;
 
 /**

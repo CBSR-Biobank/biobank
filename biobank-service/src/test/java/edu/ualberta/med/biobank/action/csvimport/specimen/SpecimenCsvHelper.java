@@ -9,10 +9,10 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.NameGenerator;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Specimen;
+import edu.ualberta.med.biobank.model.study.Study;
 
 /**
  * 

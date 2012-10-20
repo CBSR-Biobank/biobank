@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import javax.validation.constraints.NotNull;
 
+import edu.ualberta.med.biobank.model.security.User;
+
 public interface HasInsertedBy {
     /**
      * @return the {@link User} that first persisted the implementing instance.

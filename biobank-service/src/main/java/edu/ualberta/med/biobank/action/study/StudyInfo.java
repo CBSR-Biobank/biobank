@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.action.ActionResult;
 import edu.ualberta.med.biobank.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.model.study.Study;
+import edu.ualberta.med.biobank.model.study.StudyEventAttr;
 
 public class StudyInfo implements ActionResult {
     private static final long serialVersionUID = 1L;

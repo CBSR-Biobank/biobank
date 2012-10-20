@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.processingEvent;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 
 public class ProcessingEventBriefInfo implements ActionResult {
 

@@ -13,14 +13,14 @@ import edu.ualberta.med.biobank.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.OriginInfo;
-import edu.ualberta.med.biobank.model.ShipmentData;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.ShipmentData;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.permission.shipment.OriginInfoUpdatePermission;
 
 /**

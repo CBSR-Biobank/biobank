@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.Membership;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.Membership;
+import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.model.util.IdUtil;
 
 public class UserSaveInput implements ActionInput {

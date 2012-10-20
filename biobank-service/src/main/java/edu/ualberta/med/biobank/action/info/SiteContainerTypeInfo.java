@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.info;
 
 import edu.ualberta.med.biobank.action.ActionResult;
-import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 
 public class SiteContainerTypeInfo implements ActionResult {
     private static final long serialVersionUID = 1L;

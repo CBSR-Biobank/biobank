@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.NameGenerator;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.center.Center;
 
 class ShipmentCsvHelper {
     private final NameGenerator nameGenerator;

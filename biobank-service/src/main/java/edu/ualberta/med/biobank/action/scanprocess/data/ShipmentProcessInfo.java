@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.type.ItemState;
 
 public class ShipmentProcessInfo extends AbstractProcessPalletInfo {

@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class SpecimenGetPossibleTypesAction implements
     Action<ListResult<VersionedLongIdModel>> {

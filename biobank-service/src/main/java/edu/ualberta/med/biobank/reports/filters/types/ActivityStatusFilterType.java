@@ -13,7 +13,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.reports.filters.FilterType;
 import edu.ualberta.med.biobank.reports.filters.SelectableFilterType;
-import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
 import edu.ualberta.med.biobank.model.type.ActivityStatus;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 

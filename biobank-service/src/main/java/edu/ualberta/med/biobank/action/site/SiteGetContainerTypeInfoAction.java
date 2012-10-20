@@ -11,9 +11,9 @@ import edu.ualberta.med.biobank.action.ListResult;
 import edu.ualberta.med.biobank.action.exception.ActionException;
 import edu.ualberta.med.biobank.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.permission.site.SiteReadPermission;
-import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
 
 public class SiteGetContainerTypeInfoAction implements
     Action<ListResult<SiteContainerTypeInfo>> {

@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.permission;
 
-import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 // TODO: find a better home?

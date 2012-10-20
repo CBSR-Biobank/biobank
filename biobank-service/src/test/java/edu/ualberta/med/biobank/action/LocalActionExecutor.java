@@ -15,8 +15,8 @@ import org.hibernate.envers.AuditReaderFactory;
 import edu.ualberta.med.biobank.SessionProvider;
 import edu.ualberta.med.biobank.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.action.exception.ActionException;
-import edu.ualberta.med.biobank.model.Revision;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.envers.Revision;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class LocalActionExecutor implements IActionExecutor {
     private final SessionProvider sessionProvider;

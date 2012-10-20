@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.reports;
 
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.study.Specimen;
 
 public class ClinicReport1 extends AbstractReport {
     @SuppressWarnings("nls")

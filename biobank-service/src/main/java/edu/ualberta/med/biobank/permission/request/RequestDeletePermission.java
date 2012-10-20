@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.permission.request;
 
 import edu.ualberta.med.biobank.action.ActionContext;
 import edu.ualberta.med.biobank.permission.Permission;
-import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.study.Request;
 import edu.ualberta.med.biobank.model.type.PermissionEnum;
 
 public class RequestDeletePermission implements Permission {

@@ -16,8 +16,8 @@ import edu.ualberta.med.biobank.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.action.specimen.SpecimenIsUsedInDispatchAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.permission.specimen.SpecimenAssignPermission;
 

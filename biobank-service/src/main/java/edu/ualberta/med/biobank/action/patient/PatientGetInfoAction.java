@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.action.patient.PatientGetCollectionEventInfosAct
 import edu.ualberta.med.biobank.action.patient.PatientGetInfoAction.PatientInfo;
 import edu.ualberta.med.biobank.permission.patient.PatientReadPermission;
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.study.Patient;
 
 /**
  * Retrieve a patient information using a patient id

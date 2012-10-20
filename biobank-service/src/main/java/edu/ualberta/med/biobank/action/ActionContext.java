@@ -10,7 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 // TODO: for now extend SessionUtil only because I eventually want to delete SessionUtil and replace it with this context :-)
 public class ActionContext {

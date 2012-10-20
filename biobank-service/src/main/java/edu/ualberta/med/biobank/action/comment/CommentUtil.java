@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.model.Comment;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class CommentUtil {
     public static Comment create(User user, String message) {

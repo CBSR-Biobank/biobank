@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.reports.filters.types;
 
 import java.util.Collection;
 
-import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.model.report.ReportFilterValue;
 
 public class FilterTypeUtil {
     public static int NOT_BOUND = -1;

@@ -12,7 +12,7 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
-import edu.ualberta.med.biobank.model.Revision;
+import edu.ualberta.med.biobank.model.envers.Revision;
 
 /**
  * This class does things I would like to do by extending the Envers code, but

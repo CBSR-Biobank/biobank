@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.action.security;
 
 import edu.ualberta.med.biobank.action.security.Action2p0.ActionInput;
-import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.security.User;
 
 public class UserGetInput implements ActionInput {
     private static final long serialVersionUID = 1L;
