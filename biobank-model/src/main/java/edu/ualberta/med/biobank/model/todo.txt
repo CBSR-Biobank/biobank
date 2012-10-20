@@ -73,7 +73,7 @@
     changes or does not change, think opening a vial to do something then closing
     it instead of transferring it) or what about in combo with CollectionEvent-s?
     A: Done. See SpecimenLinkAnnotationType. 
-[ ] Reports should be global or center-, study-, or center-study-specific.
+[ ] **Reports should be global or center-, study-, or center-study-specific.
 [x] Prefix all report objects with "Report" so it's more clear what objects
  	are involved?
  	A: moved them into a report package

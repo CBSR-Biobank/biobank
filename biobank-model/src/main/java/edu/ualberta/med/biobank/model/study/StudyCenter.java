@@ -49,4 +49,6 @@ public class StudyCenter
 
     // TODO: add a list of preferred center-contacts and study-contacts for the
     // relationship
+    
+    // TODO: add roles that a center can play?
 }
