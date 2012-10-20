@@ -33,6 +33,11 @@ import org.hibernate.usertype.UserType;
 public class CustomEnumType<T extends Enum<T>>
     implements UserType, ParameterizedType {
 
+    // TODO: use this interface instead of reflection
+    public interface Enumerable {
+        Object getId();
+    }
+
     public static final String ID_METHOD_NAME_PARAM = "identifierMethod";
     public static final String DEF_ID_METHOD_NAME = "getId";
 

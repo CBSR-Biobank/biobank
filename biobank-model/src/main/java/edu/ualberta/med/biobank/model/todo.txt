@@ -113,11 +113,13 @@
 	A: Yes! Otherwise very complicated doubling of relationships, everywhere.
 [v] CollectionType/ProcessingType instead of SourceSpecimen/AliquotedSpecimen?
 	- Yes
-[ ] **Attributes
+[v] **Attributes
 	- Yes
 	- Consider type validation (e.g. legal options, legal regex, legal range).
 	- Consider calling "Annotations"?
+	A: Yes. Done
 	- Share annotations in a pool, per study? Parent studies? (inherit definitions?)
+	A: no. confusing
 [v] Remove "edu.ualberta.med.biobank.model" from all the validation messages... 
 	it's just clutter
 	- Yes

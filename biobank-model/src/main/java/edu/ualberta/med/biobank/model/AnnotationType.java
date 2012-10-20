@@ -14,9 +14,13 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import edu.ualberta.med.biobank.model.type.AnnotationValueType;
+import edu.ualberta.med.biobank.model.util.CustomEnumType;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
@@ -57,6 +61,7 @@ public abstract class AnnotationType
     private String name;
     private String description;
     private Boolean multiValue;
+    private AnnotationValueType valueType;
 
     /**
      * @return the {@link Study} that this {@link AnnotationType} belongs to.
@@ -112,5 +117,21 @@ public abstract class AnnotationType
 
     public void setMultiValue(Boolean multiValue) {
         this.multiValue = multiValue;
+    }
+
+    @Type(
+        type = "edu.ualberta.med.biobank.model.util.CustomEnumType",
+        parameters = {
+            @Parameter(
+                name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
+                value = "edu.ualberta.med.biobank.model.type.AnnotationValueType"
+            )
+        })
+    public AnnotationValueType getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(AnnotationValueType valueType) {
+        this.valueType = valueType;
     }
 }
