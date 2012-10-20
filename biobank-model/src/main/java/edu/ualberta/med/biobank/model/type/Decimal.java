@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -24,10 +25,14 @@ import edu.ualberta.med.biobank.model.util.ProxyUtil;
  * @author Jonathan Ferland
  */
 @Embeddable
-public class Decimal implements Serializable {
+public class Decimal
+    implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final HashCodeBuilderProvider hashCodeBuilderProvider =
         new HashCodeBuilderProvider(Decimal.class, 11, 17);
+
+    public static final int TOTAL_DIGITS = 27;
+    public static final int DIGITS_AFTER_DECIMAL = 9;
 
     public Decimal() {
     }
@@ -41,8 +46,8 @@ public class Decimal implements Serializable {
     private Integer scale;
 
     @NotNull(message = "{Decimal.value.NotNull}")
-    @Digits(integer = 10, fraction = 10, message = "{Decimal.value.Digits}")
-    @Column(name = "DECIMAL_VALUE", nullable = false, precision = 10, scale = 10)
+    @Digits(integer = TOTAL_DIGITS, fraction = DIGITS_AFTER_DECIMAL, message = "{Decimal.value.Digits}")
+    @Column(name = "DECIMAL_VALUE", nullable = false, precision = TOTAL_DIGITS, scale = DIGITS_AFTER_DECIMAL)
     public BigDecimal getValue() {
         return value;
     }
@@ -57,6 +62,7 @@ public class Decimal implements Serializable {
      */
     @NotNull(message = "{Decimal.scale.NotNull}")
     @Min(value = 0, message = "{Decimal.scale.Min}")
+    @Max(value = DIGITS_AFTER_DECIMAL, message = "{Decimal.scale.Max}")
     @Column(name = "DECIMAL_SCALE", nullable = false)
     Integer getScale() {
         return scale;

@@ -31,7 +31,7 @@ public class ProcessingEvent
 
     private Center center;
     private String worksheet;
-    private Date timeDone;
+    private Long timeDone;
 
     @NotNull(message = "{ProcessingEvent.center.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,12 +55,12 @@ public class ProcessingEvent
     }
 
     @NotNull(message = "{ProcessingEvent.timeDone.NotNull}")
-    @Column(name = "TIME_DONE")
-    public Date getTimeDone() {
+    @Column(name = "TIME_DONE", nullable = false)
+    public Long getTimeDone() {
         return this.timeDone;
     }
 
-    public void setTimeDone(Date timeDone) {
+    public void setTimeDone(Long timeDone) {
         this.timeDone = timeDone;
     }
 }

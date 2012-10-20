@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -16,7 +14,7 @@ public abstract class VersionedLongIdModel
     private static final long serialVersionUID = 1L;
 
     private Integer version;
-    private Date timeUpdated;
+    private Long timeUpdated;
     private User updatedBy;
 
     @Version
@@ -37,12 +35,12 @@ public abstract class VersionedLongIdModel
 
     @Override
     @Column(name = "TIME_UPDATED", nullable = false)
-    public Date getTimeUpdated() {
+    public Long getTimeUpdated() {
         return timeUpdated;
     }
 
     @Override
-    public void setTimeUpdated(Date timeUpdated) {
+    public void setTimeUpdated(Long timeUpdated) {
         this.timeUpdated = timeUpdated;
     }
 

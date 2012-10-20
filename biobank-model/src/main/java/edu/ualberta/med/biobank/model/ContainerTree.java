@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.type.Decimal;
+import edu.ualberta.med.biobank.model.type.Temperature;
 
 @Audited
 @Entity
@@ -24,7 +25,7 @@ public class ContainerTree
 
     private CenterLocation location;
     private Center owningCenter;
-    private Decimal temperature;
+    private Temperature temperature;
 
     /**
      * @return the current location of all the {@link Container}s in this
@@ -57,11 +58,11 @@ public class ContainerTree
         @AttributeOverride(name = "value", column = @Column(name = "TEMPERATURE_VALUE")),
         @AttributeOverride(name = "scale", column = @Column(name = "TEMPERATURE_SCALE"))
     })
-    public Decimal getTemperature() {
+    public Temperature getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Decimal temperature) {
+    public void setTemperature(Temperature temperature) {
         this.temperature = temperature;
     }
 }

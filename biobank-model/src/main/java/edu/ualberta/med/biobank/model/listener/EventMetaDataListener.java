@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.model.listener;
 
-import java.util.Date;
-
 import org.hibernate.event.spi.PreInsertEvent;
 import org.hibernate.event.spi.PreInsertEventListener;
 import org.hibernate.event.spi.PreUpdateEvent;
@@ -24,7 +22,7 @@ public class EventMetaDataListener
     public boolean onPreInsert(PreInsertEvent event) {
         Object entity = event.getEntity();
         if (entity instanceof HasTimeInserted) {
-            ((HasTimeInserted) entity).setTimeInserted(new Date());
+            ((HasTimeInserted) entity).setTimeInserted(System.currentTimeMillis());
         }
         if (entity instanceof HasInsertedBy) {
             ((HasInsertedBy) entity).setInsertedBy(executingUser.get());
@@ -42,7 +40,7 @@ public class EventMetaDataListener
 
     private void onPrePersist(Object entity) {
         if (entity instanceof HasTimeUpdated) {
-            ((HasTimeUpdated) entity).setTimeUpdated(new Date());
+            ((HasTimeUpdated) entity).setTimeUpdated(System.currentTimeMillis());
         }
         if (entity instanceof HasUpdatedBy) {
             ((HasUpdatedBy) entity).setUpdatedBy(executingUser.get());

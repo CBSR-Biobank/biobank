@@ -1,9 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
-
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.FetchType;
@@ -30,7 +26,6 @@ public abstract class Annotation<T extends AnnotationType>
     private T type;
     private String stringValue;
     private Decimal numberValue;
-    private Date dateValue;
     private AnnotationOption selectedValue;
 
     @NotNull(message = "{Annotation.type.NotNull}")
@@ -56,25 +51,12 @@ public abstract class Annotation<T extends AnnotationType>
 
     @Valid
     @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "value", column = @Column(name = "NUMBER_VALUE")),
-        @AttributeOverride(name = "scale", column = @Column(name = "NUMBER_VALUE_SCALE"))
-    })
     public Decimal getNumberValue() {
         return numberValue;
     }
 
     public void setNumberValue(Decimal numberValue) {
         this.numberValue = numberValue;
-    }
-
-    @Column(name = "DATE_VALUE")
-    public Date getDateValue() {
-        return dateValue;
-    }
-
-    public void setDateValue(Date dateValue) {
-        this.dateValue = dateValue;
     }
 
     @ManyToOne(fetch = FetchType.EAGER)

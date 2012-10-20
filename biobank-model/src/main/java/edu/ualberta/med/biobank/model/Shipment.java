@@ -42,10 +42,10 @@ public class Shipment
     private CenterLocation fromLocation;
     private CenterLocation toLocation;
     private ShipmentData data;
-    private Date timePacked;
-    private Date timeSent;
-    private Date timeReceived;
-    private Date timeUnpacked;
+    private Long timePacked;
+    private Long timeSent;
+    private Long timeReceived;
+    private Long timeUnpacked;
 
     @NotNull(message = "{Shipment.state.NotNull}")
     @Type(type = "shipmentState")
@@ -91,38 +91,38 @@ public class Shipment
     }
 
     @Column(name = "TIME_PACKED")
-    public Date getTimePacked() {
+    public Long getTimePacked() {
         return timePacked;
     }
 
-    public void setTimePacked(Date timePacked) {
+    public void setTimePacked(Long timePacked) {
         this.timePacked = timePacked;
     }
 
     @Column(name = "TIME_SENT")
-    public Date getTimeSent() {
+    public Long getTimeSent() {
         return timeSent;
     }
 
-    public void setTimeSent(Date timeSent) {
+    public void setTimeSent(Long timeSent) {
         this.timeSent = timeSent;
     }
 
     @Column(name = "TIME_RECEIVED")
-    public Date getTimeReceived() {
+    public Long getTimeReceived() {
         return timeReceived;
     }
 
-    public void setTimeReceived(Date timeReceived) {
+    public void setTimeReceived(Long timeReceived) {
         this.timeReceived = timeReceived;
     }
 
     @Column(name = "TIME_UNPACKED")
-    public Date getTimeUnpacked() {
+    public Long getTimeUnpacked() {
         return timeUnpacked;
     }
 
-    public void setTimeUnpacked(Date timeUnpacked) {
+    public void setTimeUnpacked(Long timeUnpacked) {
         this.timeUnpacked = timeUnpacked;
     }
 }

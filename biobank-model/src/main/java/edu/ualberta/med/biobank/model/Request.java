@@ -35,7 +35,7 @@ public class Request
     private static final long serialVersionUID = 1L;
 
     private Study study;
-    private Date timeSubmitted;
+    private Long timeSubmitted;
     private CenterLocation toLocation;
     private Set<Shipment> shipments = new HashSet<Shipment>(0);
 
@@ -51,11 +51,11 @@ public class Request
     }
 
     @Column(name = "TIME_SUBMITTED")
-    public Date getTimeSubmitted() {
+    public Long getTimeSubmitted() {
         return timeSubmitted;
     }
 
-    public void setTimeSubmitted(Date timeSubmitted) {
+    public void setTimeSubmitted(Long timeSubmitted) {
         this.timeSubmitted = timeSubmitted;
     }
 

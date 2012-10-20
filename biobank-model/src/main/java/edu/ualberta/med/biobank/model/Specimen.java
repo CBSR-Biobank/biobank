@@ -51,7 +51,7 @@ public class Specimen
 
     private SpecimenContainer container;
     private ContainerSchemaPosition position;
-    private Date timeCreated;
+    private Long timeCreated;
     private SpecimenGroup group;
     private Decimal amount;
     private CenterLocation originLocation;
@@ -102,13 +102,18 @@ public class Specimen
         this.amount = amount;
     }
 
+    /**
+     * @return when the {@link Specimen} was physically created, in
+     *         milliseconds. Not necessarily when this {@link Specimen} was
+     *         entered into the database.
+     */
     @NotNull(message = "{Specimen.timeCreated.NotNull}")
-    @Column(name = "TIME_CREATED")
-    public Date getTimeCreated() {
+    @Column(name = "TIME_CREATED", nullable = false)
+    public Long getTimeCreated() {
         return this.timeCreated;
     }
 
-    public void setTimeCreated(Date timeCreated) {
+    public void setTimeCreated(Long timeCreated) {
         this.timeCreated = timeCreated;
     }
 

@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.model;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -21,7 +19,7 @@ public abstract class LongIdModel
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-    private Date timeInserted;
+    private Long timeInserted;
     private User insertedBy;
 
     // TODO: up the increment param to ~1000, because why not? Should also
@@ -64,12 +62,12 @@ public abstract class LongIdModel
 
     @Override
     @Column(name = "TIME_INSERTED", updatable = false, nullable = false)
-    public Date getTimeInserted() {
+    public Long getTimeInserted() {
         return timeInserted;
     }
 
     @Override
-    public void setTimeInserted(Date timeInserted) {
+    public void setTimeInserted(Long timeInserted) {
         this.timeInserted = timeInserted;
     }
 

@@ -44,8 +44,8 @@ public abstract class Hash
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        Hash other = (Hash) obj;
-        if (!Arrays.equals(bytes, other.bytes)) return false;
+        Hash that = (Hash) obj;
+        if (!Arrays.equals(bytes, that.bytes)) return false;
         return true;
     }
 

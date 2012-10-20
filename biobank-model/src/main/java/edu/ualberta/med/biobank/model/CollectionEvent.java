@@ -44,7 +44,7 @@ public class CollectionEvent
     private Patient patient;
     private CollectionEventType type;
     private Integer visitNumber;
-    private Date timeDone;
+    private Long timeDone;
 
     @NotNull(message = "{CollectionEvent.patient.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -81,19 +81,19 @@ public class CollectionEvent
 
     /**
      * If a {@link CollectionEvent} does not have any associated
-     * {@link Specimen}s, then the time it occurred at must be able to be stored
-     * on the {@link CollectionEvent} itself.
+     * {@link Specimen}s, then the time (in milliseconds) it occurred at must be
+     * able to be stored on the {@link CollectionEvent} itself.
      * 
      * @return when this {@link CollectionEvent} occurred.
      */
     @NotNull(message = "{CollectionEvent.timeDone.NotNull}")
     @Past(message = "{CollectionEvent.timeDone.Past}")
     @Column(name = "TIME_DONE", nullable = false)
-    public Date getTimeDone() {
+    public Long getTimeDone() {
         return timeDone;
     }
 
-    public void setTimeDone(Date timeDone) {
+    public void setTimeDone(Long timeDone) {
         this.timeDone = timeDone;
     }
 }

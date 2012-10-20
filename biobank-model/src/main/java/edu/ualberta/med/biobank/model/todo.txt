@@ -98,11 +98,12 @@
 	have a position.
 	[v] Replace Row/Col with a `position` column
 	A: yes, done, sorta
-[ ] Standardization of HasCreationTime and HasLastModifiedTime
+[v] Standardization of HasCreationTime and HasLastModifiedTime
 	- Call them HasInsertedAt and HasUpdatedAt to remove ambiguity and 
 	[v] add listeners to update the properties
-	[ ] override date type to save to a decimal(17,3) or a long or something so
+	[x] override date type to save to a decimal(17,3) or a long or something so
 		can have millisecond precision in mysql db
+		A: just used Long...
 [v] *Specimen CreatedAt vs TimeDrawn, etc.
 	Q: Are specimens from an organism and aliquots the result of aliquotting?
 	Does "samples" include both? CreatedAt would just be the phyiscal time a

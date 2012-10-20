@@ -52,7 +52,7 @@ public class SpecimenLink
 
     private Specimen input;
     private Specimen output;
-    private Date timeDone;
+    private Long timeDone;
     private SpecimenLinkType type;
     private ProcessingEvent processingEvent;
     private Decimal actualInputAmountChange;
@@ -89,17 +89,17 @@ public class SpecimenLink
     }
 
     /**
-     * @return when the processing happened.
+     * @return when the processing happened, in milliseconds.
      */
     @NaturalId(mutable = false)
     @NotNull(message = "{SpecimenLink.timeDone.NotNull}")
     @Past
     @Column(name = "TIME_DONE", nullable = false)
-    public Date getTimeDone() {
+    public Long getTimeDone() {
         return timeDone;
     }
 
-    public void setTimeDone(Date timeDone) {
+    public void setTimeDone(Long timeDone) {
         this.timeDone = timeDone;
     }
 

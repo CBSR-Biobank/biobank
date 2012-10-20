@@ -1,13 +1,18 @@
 package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
+import javax.persistence.Embedded;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+
+import edu.ualberta.med.biobank.model.type.Decimal;
+import edu.ualberta.med.biobank.model.type.Temperature;
+import edu.ualberta.med.biobank.model.util.HashCodeBuilderProvider;
 
 /**
  * Describes how a {@link Specimen} should be preserved/stored by describing
@@ -19,22 +24,23 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class Preservation implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final HashCodeBuilderProvider hashCodeBuilderProvider =
+        new HashCodeBuilderProvider(Decimal.class, 29, 31);
 
-    private BigDecimal temp;
+    private Temperature temp;
     private PreservationType type;
 
     /**
      * @return the temperature, in degrees centigrade, that the associated
      *         object must be stored at, or null for no specific requirements
      */
-    @Digits(integer = 4, fraction = 2, message = "{Preservation.storageTemperature.Digits}")
-    @DecimalMin(value = "-273.15", message = "{Preservation.storageTemperature.DecimalMin}")
-    @Column(name = "STORAGE_TEMPERATURE", nullable = false, precision = 4, scale = 2)
-    public BigDecimal getStorageTemperature() {
+    @Valid
+    @Embedded
+    public Temperature getStorageTemperature() {
         return temp;
     }
 
-    public void setStorageTemperature(BigDecimal storageTemperature) {
+    public void setStorageTemperature(Temperature storageTemperature) {
         this.temp = storageTemperature;
     }
 
@@ -50,11 +56,10 @@ public class Preservation implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((temp == null) ? 0 : temp.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
+        return hashCodeBuilderProvider.get()
+            .append(temp)
+            .append(type)
+            .toHashCode();
     }
 
     @Override
@@ -62,14 +67,10 @@ public class Preservation implements Serializable {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        Preservation other = (Preservation) obj;
-        if (temp == null) {
-            if (other.temp != null) return false;
-        } else if (!temp.equals(other.temp))
-            return false;
-        if (type == null) {
-            if (other.type != null) return false;
-        } else if (!type.equals(other.type)) return false;
-        return true;
+        Preservation that = (Preservation) obj;
+        return new EqualsBuilder()
+            .append(getStorageTemperature(), that.getStorageTemperature())
+            .append(getType(), that.getType())
+            .isEquals();
     }
 }
