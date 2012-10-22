@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.action;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.i18n.ActionException;
 
 /**
@@ -28,5 +30,11 @@ public interface ActionHandler<A extends Action<R>, R extends ActionResult> {
      * @throws ActionException if there is a problem executing the given
      *             {@link Action}.
      */
-    R run(A action, ActionExecutor executor) throws ActionException;
+    R run(A action, ActionExecutor executor)
+        throws ActionException;
+
+    void rollback(A action, R result, ActionExecutor executor)
+        throws ActionException;
+
+    boolean allowed(A action);
 }
