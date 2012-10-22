@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model;
+package edu.ualberta.med.biobank.model.study;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,9 +13,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.model.study.Specimen;
-import edu.ualberta.med.biobank.model.study.SpecimenLinkType;
-import edu.ualberta.med.biobank.model.study.Study;
+import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;

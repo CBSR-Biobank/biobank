@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.ProcessingType;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.model.center.SpecimenContainerType;
 import edu.ualberta.med.biobank.model.type.Decimal;
