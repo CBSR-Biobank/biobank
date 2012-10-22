@@ -1,14 +1,7 @@
 package edu.ualberta.med.biobank.model.study;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -18,7 +11,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.CommonBundle;
-import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.HasDescription;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
@@ -56,7 +48,6 @@ public class Study
 
     private String name;
     private String description;
-    private Set<Contact> contacts = new HashSet<Contact>(0);
     private Boolean enabled;
 
     @Override
@@ -90,17 +81,5 @@ public class Study
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "STUDY_CONTACT",
-        joinColumns = { @JoinColumn(name = "STUDY_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CONTACT_ID", nullable = false, updatable = false) })
-    public Set<Contact> getContacts() {
-        return this.contacts;
-    }
-
-    public void setContacts(Set<Contact> contacts) {
-        this.contacts = contacts;
     }
 }
