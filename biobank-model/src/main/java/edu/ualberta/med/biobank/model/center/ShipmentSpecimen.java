@@ -64,7 +64,7 @@ public class ShipmentSpecimen
 
     @NotNull(message = "{ShipmentSpecimen.state.NotNull}")
     @Type(type = "shipmentItemState")
-    @Column(name = "STATE", length = 1)
+    @Column(name = "STATE", length = 4)
     public ShipmentItemState getState() {
         return this.state;
     }

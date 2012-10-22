@@ -2,6 +2,9 @@ package edu.ualberta.med.biobank.model.type;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.model.center.CenterLocation;
+import edu.ualberta.med.biobank.model.center.Shipment;
+
 /**
  * The id of these enumerations are saved in the database. Therefore, DO NOT
  * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
@@ -19,21 +22,21 @@ public enum ShipmentItemState implements Serializable {
      * The item was recorded as shipped out, but it's not known yet whether it
      * is received, missing, or lost.
      */
-    SENT("S"),
+    PRESENT("PRST"),
     /**
      * The item was recorded as sent from the source {@link CenterLocation} and
      * arrived as expected at the destination {@link CenterLocation}.
      */
-    RECEIVED("R"),
+    RECEIVED("RCVD"),
     /**
      * The item was recorded as sent but never showed up in a {@link Shipment}.
      */
-    MISSING("M"),
+    MISSING("MSNG"),
     /**
      * The item was never recorded as sent and showed up unexpectedly in a
      * {@link Shipment}.
      */
-    EXTRA("E");
+    EXTRA("EXTR");
 
     private String id;
 
