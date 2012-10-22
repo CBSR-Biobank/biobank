@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.model.study;
+package edu.ualberta.med.biobank.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,14 +12,13 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 
-import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Defines a single option for the
  * {@link edu.ualberta.med.biobank.model.type.AnnotationValueType#SELECT select}
- * types of {@link edu.ualberta.med.biobank.model.study.AnnotationType
+ * types of {@link edu.ualberta.med.biobank.model.AnnotationType
  * annotation type}s. For example, this would be used to determine values a user
  * chooses from a drop-down, such as, "small", "medium", and "large".
  * 

@@ -1,16 +1,15 @@
-package edu.ualberta.med.biobank.model.study;
+package edu.ualberta.med.biobank.model;
 
+import javax.lang.model.element.AnnotationValue;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -19,14 +18,15 @@ import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.model.VersionedLongIdModel;
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.SpecimenLink;
+import edu.ualberta.med.biobank.model.study.Study;
 import edu.ualberta.med.biobank.model.type.AnnotationValueType;
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
-import edu.ualberta.med.biobank.validator.constraint.Unique;
-import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Allow a {@link Study} to collect custom named and defined pieces of data on
+ * Allows a {@link Study} to collect custom named and defined pieces of data on
  * various entities, such as {@link SpecimenLink}s, {@link Patient}s, and
  * {@link CollectionEvent}s. Instances of this class defines a name and
  * description of the type of information that should be collected and determine
@@ -51,32 +51,16 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
     uniqueConstraints = {
         @UniqueConstraint(columnNames = { "STUDY_ID", "NAME" })
     })
-@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DISCRIMINATOR", columnDefinition = "CHAR(4)", discriminatorType = DiscriminatorType.STRING)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@Unique(properties = { "study", "name" }, groups = PrePersist.class)
 public abstract class AnnotationType
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
-    private Study study;
     private String name;
     private String description;
-    private Boolean multiValue;
+    private Integer maxValueCount;
     private AnnotationValueType valueType;
-
-    /**
-     * @return the {@link Study} that this {@link AnnotationType} belongs to.
-     */
-    @NotNull(message = "{AnnotationType.study.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID", nullable = false)
-    public Study getStudy() {
-        return study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-    }
 
     /**
      * @return a short identifying name. The name is unique within the
@@ -107,17 +91,18 @@ public abstract class AnnotationType
     }
 
     /**
-     * @return true if there can be more than one value of this type per owner,
-     *         otherwise false for at most one value.
+     * @return the maximum number of values, per owner, that this
+     *         {@link AnnotationValue} type can have, or zero if unlimited.
      */
-    @NotNull(message = "{AnnotationType.multiValue.NotNull}")
-    @Column(name = "IS_MULTI_VALUE", nullable = false)
-    public Boolean isMultiValue() {
-        return multiValue;
+    @NotNull(message = "{AnnotationType.maxValueCount.NotNull}")
+    @Min(value = 0, message = "{AnnotationType.maxValueCount.Min}")
+    @Column(name = "MAX_VALUE_COUNT", nullable = false)
+    public Integer getMaxValueCount() {
+        return maxValueCount;
     }
 
-    public void setMultiValue(Boolean multiValue) {
-        this.multiValue = multiValue;
+    public void setMaxValueCount(Integer maxValueCount) {
+        this.maxValueCount = maxValueCount;
     }
 
     /**

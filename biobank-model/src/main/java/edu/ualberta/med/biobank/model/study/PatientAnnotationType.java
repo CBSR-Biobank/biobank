@@ -10,11 +10,11 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 @Audited
 @Entity
-@DiscriminatorValue("PT")
+@DiscriminatorValue("PTNT")
 @NotUsed.List({
     @NotUsed(by = PatientAnnotation.class, property = "type", groups = PreDelete.class)
 })
 public class PatientAnnotationType
-    extends AnnotationType {
+    extends StudyAnnotationType {
     private static final long serialVersionUID = 1L;
 }

@@ -15,6 +15,6 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
     @NotUsed(by = SpecimenLinkAnnotation.class, property = "type", groups = PreDelete.class)
 })
 public class SpecimenLinkAnnotationType
-    extends AnnotationType {
+    extends StudyAnnotationType {
     private static final long serialVersionUID = 1L;
 }

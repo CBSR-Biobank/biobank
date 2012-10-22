@@ -9,6 +9,8 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
 
+import edu.ualberta.med.biobank.model.Annotation;
+
 
 @Audited
 @Entity
