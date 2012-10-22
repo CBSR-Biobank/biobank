@@ -17,6 +17,12 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * Represents a {@link Center}'s paper record of work or processing done on one
+ * or more {@link Specimen}s.
+ * 
+ * @author Jonathan Ferland
+ */
 @Audited
 @Entity
 @Table(name = "PROCESSING_EVENT")

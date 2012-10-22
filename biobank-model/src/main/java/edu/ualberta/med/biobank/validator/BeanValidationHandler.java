@@ -42,6 +42,13 @@ import edu.ualberta.med.biobank.validator.group.PreInsert;
 import edu.ualberta.med.biobank.validator.group.PreUpdate;
 import edu.ualberta.med.biobank.validator.messageinterpolator.OgnlMessageInterpolator;
 
+/**
+ * Listens to various hibernate events and validates the involved entity with
+ * the appropriate group (e.g. {@link PrePersist}, {@link PreInsert},
+ * {@link PreUpdate}, or {@link PreDelete}).
+ * 
+ * @author Jonathan Ferland
+ */
 public class BeanValidationHandler implements PreInsertEventListener,
     PreUpdateEventListener, PreDeleteEventListener,
     PreCollectionUpdateEventListener, PreCollectionRecreateEventListener,

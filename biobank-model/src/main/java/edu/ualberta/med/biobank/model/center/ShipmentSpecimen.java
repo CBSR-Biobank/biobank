@@ -18,6 +18,12 @@ import edu.ualberta.med.biobank.model.type.ShipmentItemState;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+/**
+ * Marks a specific {@link Specimen} as having been in a specific
+ * {@link Shipment}.
+ * 
+ * @author Jonathan Ferland
+ */
 @Audited
 @Entity
 @Table(name = "SHIPMENT_SPECIMEN",

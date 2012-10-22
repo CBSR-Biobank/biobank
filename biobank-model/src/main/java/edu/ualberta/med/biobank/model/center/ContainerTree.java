@@ -16,6 +16,13 @@ import org.hibernate.envers.Audited;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.model.type.Temperature;
 
+/**
+ * All parents and children of a {@link Container} will share the same
+ * {@link ContainerTree}. Then, certain properties can be shared, such as,
+ * temperature, their {@link Center}, and {@link Location}.
+ * 
+ * @author Jonathan Ferland
+ */
 @Audited
 @Entity
 @Table(name = "CONTAINER_TREE")
