@@ -9,16 +9,9 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.ProcessingEvent;
-import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class TestProcessingEvent extends DbTest {
-    @Test
-    public void expectedActivityStatusIds() {
-        HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createProcessingEvent());
-    }
-
     @Test
     public void duplicateWorksheet() {
         ProcessingEvent pe1 = factory.createProcessingEvent();

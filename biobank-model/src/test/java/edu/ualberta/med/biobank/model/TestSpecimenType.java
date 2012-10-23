@@ -12,11 +12,4 @@ public class TestSpecimenType extends DbTest {
             factory.createSpecimenType(),
             factory.createSpecimenType());
     }
-
-    @Test
-    public void duplicateNameShort() {
-        HasXHelper.checkDuplicateNameShort(session,
-            factory.createSpecimenType(),
-            factory.createSpecimenType());
-    }
 }

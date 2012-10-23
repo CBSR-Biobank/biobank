@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model.util;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.EntityMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -19,7 +18,7 @@ public class HibernateHelper {
             "SELECT " + StringUtils.join(columnNames, ", ") +
                 " FROM " + persister.getTableName() +
                 " WHERE " + persister.getIdentifierPropertyName() + " = ?");
-        query.setParameter(0, persister.getIdentifier(o, EntityMode.POJO));
+        query.setParameter(0, persister.getIdentifier(o));
         return query;
     }
 }

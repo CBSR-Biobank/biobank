@@ -4,21 +4,21 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.center.Center;
 import edu.ualberta.med.biobank.model.envers.Revision;
 
 public class TestRevision extends LoggingTest {
     @Test
     public void revisionEntityTypes() {
         Transaction tx = session.beginTransaction();
-        Site site = factory.createCenter();
+        Center center = factory.createCenter();
         tx.commit();
 
         tx = session.beginTransaction();
-        String oldName = site.getName();
+        String oldName = center.getName();
         String newName = oldName + "X";
-        site.setName(newName);
-        session.update(site);
+        center.setName(newName);
+        session.update(center);
         tx.commit();
 
         System.out.println(System.currentTimeMillis());
@@ -27,7 +27,7 @@ public class TestRevision extends LoggingTest {
     @Test
     public void twoSessions() {
         session.beginTransaction();
-        Site site = factory.createCenter();
+        Center center = factory.createCenter();
         session.getTransaction().commit();
 
         Session s1 = openSession();

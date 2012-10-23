@@ -14,32 +14,18 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.study.CollectionEvent;
-import edu.ualberta.med.biobank.model.study.Specimen;
-import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class TestCollectionEvent extends DbTest {
     @Test
-    public void nullActivityStatus() {
-        HasXHelper.checkNullActivityStatus(session,
-            factory.createCollectionEvent());
-    }
-
-    @Test
-    public void expectedActivityStatusIds() {
-        HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createCollectionEvent());
-    }
-
-    @Test
     public void deleteWithSpecimens() {
         Transaction tx = session.beginTransaction();
 
-        Specimen specimen = factory.createParentSpecimen();
+        // Specimen specimen = factory.createParentSpecimen();
 
         try {
-            session.delete(specimen.getCollectionEvent());
+            // session.delete(specimen.getCollectionEvent());
             tx.commit();
             Assert.fail("cannot delete a collection event with speicmens");
         } catch (ConstraintViolationException e) {

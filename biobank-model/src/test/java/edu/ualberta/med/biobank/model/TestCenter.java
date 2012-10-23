@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.constraints.NotNull;
 
 import junit.framework.Assert;
 
@@ -11,6 +10,9 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.Center;
+import edu.ualberta.med.biobank.model.center.Container;
+import edu.ualberta.med.biobank.model.center.ContainerType;
+import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 
@@ -34,37 +36,13 @@ public class TestCenter extends DbTest {
 
     @Test
     public void duplicateNameShort() {
-        HasXHelper.checkDuplicateNameShort(session,
+        HasXHelper.checkDuplicateName(session,
             factory.createCenter(),
             factory.createCenter());
     }
 
     @Test
-    public void nullActivityStatus() {
-        HasXHelper.checkNullActivityStatus(session, factory.createCenter());
-    }
-
-    @Test
-    public void expectedActivityStatusIds() {
-        HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createCenter());
-    }
-
-    @Test
     public void nullAddress() {
-        Center center = factory.createCenter();
-
-        try {
-            center.setAddress(null);
-            session.update(center);
-            session.flush();
-            Assert.fail("null address should not be allowed");
-        } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
-                .withRootBean(center)
-                .withPropertyPath("address")
-                .assertIn(e);
-        }
     }
 
     @Test
@@ -101,6 +79,64 @@ public class TestCenter extends DbTest {
         } catch (ConstraintViolationException e) {
             new AssertConstraintViolation().withAnnotationClass(Empty.class)
                 .withAttr("property", "dstDispatches")
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void deleteWithContainers() {
+        Transaction tx = session.beginTransaction();
+
+        Container<?> container = factory.createContainer();
+
+        try {
+            Center site = container.getTree().getOwningCenter();
+            session.delete(site);
+            tx.commit();
+            Assert.fail("cannot delete site with containers");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "containers")
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void deleteWithContainerTypes() {
+        Transaction tx = session.beginTransaction();
+
+        ContainerType containerType = factory.createContainerType();
+
+        try {
+            Center center = containerType.getCenter();
+            session.delete(center);
+            tx.commit();
+            Assert.fail("cannot delete site with container types");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "containerTypes")
+                .assertIn(e);
+        }
+    }
+
+    @Test
+    public void deleteWithProcessingEvents() {
+        Transaction tx = session.beginTransaction();
+
+        Center center = factory.createCenter();
+        ProcessingEvent event = factory.createProcessingEvent();
+
+        if (!event.getCenter().equals(center)) {
+            Assert.fail("unexpected center");
+        }
+
+        try {
+            session.delete(center);
+            tx.commit();
+            Assert.fail("cannot delete site with container types");
+        } catch (ConstraintViolationException e) {
+            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+                .withAttr("property", "processingEvents")
                 .assertIn(e);
         }
     }

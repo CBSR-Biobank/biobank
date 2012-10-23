@@ -11,14 +11,13 @@ import edu.ualberta.med.biobank.AssertConstraintViolation;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.study.Specimen;
-import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 
 public class TestContainer extends DbTest {
     @Test
     public void nullLabel() {
-        Container c = factory.createContainer();
+        Container<?> c = factory.createContainer();
         c.setLabel(null);
 
         try {
@@ -35,7 +34,7 @@ public class TestContainer extends DbTest {
 
     @Test
     public void emptyLabel() {
-        Container c = factory.createContainer();
+        Container<?> c = factory.createContainer();
         c.setLabel("");
 
         try {
@@ -52,10 +51,10 @@ public class TestContainer extends DbTest {
 
     @Test
     public void duplicateLabelDifferentSiteAndContainerType() {
-        Container c1 = factory.createContainer();
+        Container<?> c1 = factory.createContainer();
         factory.createCenter(); // new default site
         factory.createContainerType(); // new default container type
-        Container c2 = factory.createContainer();
+        Container<?> c2 = factory.createContainer();
 
         c2.setLabel(c1.getLabel());
 
@@ -70,9 +69,9 @@ public class TestContainer extends DbTest {
 
     @Test
     public void duplicateLabelAndSiteDifferentContainerType() {
-        Container c1 = factory.createTopContainer();
+        Container<?> c1 = factory.createTopContainer();
         factory.createTopContainerType(); // new default top container type
-        Container c2 = factory.createTopContainer();
+        Container<?> c2 = factory.createTopContainer();
 
         c2.setLabel(c1.getLabel());
 
@@ -87,8 +86,8 @@ public class TestContainer extends DbTest {
 
     @Test
     public void duplicateLabelAndSiteAndContainerType() {
-        Container c1 = factory.createContainer();
-        Container c2 = factory.createContainer();
+        Container<?> c1 = factory.createContainer();
+        Container<?> c2 = factory.createContainer();
 
         c2.setLabel(c1.getLabel());
 
@@ -107,11 +106,11 @@ public class TestContainer extends DbTest {
 
     @Test
     public void duplicateProductBarcodeDifferentSite() {
-        Container c1 = factory.createContainer();
+        Container<?> c1 = factory.createContainer();
         factory.createCenter(); // new default site
-        Container c2 = factory.createContainer();
+        Container<?> c2 = factory.createContainer();
 
-        c2.setProductBarcode(c1.getProductBarcode());
+        c2.setInventoryId(c1.getInventoryId());
 
         try {
             session.update(c2);
@@ -124,10 +123,10 @@ public class TestContainer extends DbTest {
 
     @Test
     public void duplicateProductBarcodeAndSite() {
-        Container c1 = factory.createContainer();
-        Container c2 = factory.createContainer();
+        Container<?> c1 = factory.createContainer();
+        Container<?> c2 = factory.createContainer();
 
-        c2.setProductBarcode(c1.getProductBarcode());
+        c2.setInventoryId(c1.getInventoryId());
 
         try {
             session.update(c2);
@@ -143,20 +142,8 @@ public class TestContainer extends DbTest {
     }
 
     @Test
-    public void nullActivityStatus() {
-        HasXHelper.checkNullActivityStatus(session,
-            factory.createContainer());
-    }
-
-    @Test
-    public void expectedActivityStatusIds() {
-        HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createContainer());
-    }
-
-    @Test
     public void deleteWithContainers() {
-        Container topContainer = factory.createTopContainer();
+        Container<?> topContainer = factory.createTopContainer();
         factory.createContainer();
 
         try {
@@ -173,7 +160,7 @@ public class TestContainer extends DbTest {
     @Test
     public void deleteWithSpecimens() {
         Specimen specimen = factory.createPositionedSpecimen();
-        Container container = specimen.getSpecimenPosition().getContainer();
+        Container<?> container = specimen.getContainer();
 
         try {
             session.delete(container);

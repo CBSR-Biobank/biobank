@@ -12,17 +12,4 @@ public class TestStudy extends DbTest {
             factory.createStudy(),
             factory.createStudy());
     }
-
-    @Test
-    public void duplicateNameShort() {
-        HasXHelper.checkDuplicateNameShort(session,
-            factory.createStudy(),
-            factory.createStudy());
-    }
-
-    @Test
-    public void expectedActivityStatusIds() {
-        HasXHelper.checkExpectedActivityStatusIds(session,
-            factory.createStudy());
-    }
 }
