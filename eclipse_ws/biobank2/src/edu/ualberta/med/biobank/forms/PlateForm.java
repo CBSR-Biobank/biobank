@@ -16,7 +16,7 @@ public abstract class PlateForm extends BiobankViewForm {
 
     protected Button scanButton;
 
-    protected Map<RowColPos, PalletWell> cells;
+    protected Map<RowColPos, PalletWell> wells;
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -51,13 +51,13 @@ public abstract class PlateForm extends BiobankViewForm {
      */
     protected void processScanResult() {
         Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
-        for (RowColPos rcp : cells.keySet()) {
+        for (RowColPos rcp : wells.keySet()) {
             Integer typesRowsCount = typesRows.get(rcp.getRow());
             if (typesRowsCount == null) {
                 typesRowsCount = 0;
             }
             PalletWell cell = null;
-            cell = cells.get(rcp);
+            cell = wells.get(rcp);
             processCellStatus(cell);
             if (PalletWell.hasValue(cell)) {
                 typesRowsCount++;

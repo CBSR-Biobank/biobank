@@ -7,6 +7,10 @@ public class SbsLabeling {
     @SuppressWarnings("nls")
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
+    public static final int ROW_MAX = 8;
+
+    public static final int COL_MAX = 12;
+
     /**
      * Get the string corresponding to the given RowColPos and using the SBS
      * standard. 2:1 will return C2.

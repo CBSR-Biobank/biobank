@@ -24,22 +24,18 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
-    public final int rows;
-    public final int cols;
-    public final int palletWidth;
-    public final int palletHeight;
-    public final int palletHeightAndLegend;
+    // TODO: these should be variables
+    public static final int rows = 8;
+    public static final int cols = 12;
+    public static final int palletHeight = SAMPLE_WIDTH * rows;
+    public static final int palletWidth = SAMPLE_WIDTH * cols;
+    public static final int palletHeightAndLegend = palletHeight
+        + LEGEND_HEIGHT + 4;
 
     private ProfileSettings loadedProfile;
 
-    public ScanPalletDisplay(final ScanPalletWidget widget, int rows, int cols) {
+    public ScanPalletDisplay(final ScanPalletWidget widget) {
         super();
-
-        this.rows = rows;
-        this.cols = cols;
-        palletHeight = SAMPLE_WIDTH * rows;
-        palletWidth = SAMPLE_WIDTH * cols;
-        palletHeightAndLegend = palletHeight + LEGEND_HEIGHT + 4;
 
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override

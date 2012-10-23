@@ -55,11 +55,11 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version. 
@@ -244,7 +244,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         specimenTypesWidgets =
             new ArrayList<AliquotedSpecimenSelectionWidget>();
         AliquotedSpecimenSelectionWidget precedent = null;
-        for (int i = 0; i < ScanCellPos.ROW_MAX; i++) {
+        for (int i = 0; i < SbsLabeling.ROW_MAX; i++) {
             final AliquotedSpecimenSelectionWidget typeWidget =
                 new AliquotedSpecimenSelectionWidget(
                     typesSelectionPerRowComposite,

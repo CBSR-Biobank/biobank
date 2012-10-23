@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -22,8 +22,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DecodeImageForm extends PlateForm implements
     IBgcFileBrowserListener {
@@ -103,15 +102,15 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     protected void decodeImage() throws Exception {
-        List<WellRectangle> decodedCells = ScannerConfigPlugin.decodeImage(1,
-            ProfileManager.ALL_PROFILE_NAME, imageFilename);
-        cells = PalletWell.convertArray(decodedCells);
+        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodeImage(1,
+            imageFilename);
+        wells = PalletWell.convertArray(decodedCells);
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 processScanResult();
-                spw.setCells(cells);
+                spw.setCells(wells);
             }
         });
     }

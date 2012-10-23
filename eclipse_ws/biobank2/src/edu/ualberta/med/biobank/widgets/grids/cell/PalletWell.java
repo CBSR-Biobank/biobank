@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.widgets.grids.cell;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -40,7 +41,7 @@ public class PalletWell extends AbstractUIWell {
     }
 
     public static Map<RowColPos, PalletWell> convertArray(
-        List<DecodedWell> decodedWells) {
+        Set<DecodedWell> decodedWells) {
         Map<RowColPos, PalletWell> palletScanned =
             new TreeMap<RowColPos, PalletWell>();
         for (DecodedWell decodedWell : decodedWells) {
@@ -50,8 +51,8 @@ public class PalletWell extends AbstractUIWell {
         return palletScanned;
     }
 
-    static List<DecodedWell> getRandomDecodedCells() {
-        List<DecodedWell> result = new ArrayList<DecodedWell>();
+    static Set<DecodedWell> getRandomDecodedCells() {
+        Set<DecodedWell> result = new HashSet<DecodedWell>();
         Random random = new Random();
         for (int indexRow = 0; indexRow < 8; indexRow++) {
             for (int indexCol = 0; indexCol < 12; indexCol++) {
@@ -240,6 +241,10 @@ public class PalletWell extends AbstractUIWell {
             throw new IllegalStateException("decoded well is null");
         }
         return SbsLabeling.toRowCol(decodedWell.getLabel()).getCol();
+    }
+
+    public void setValue(String value) {
+        decodedWell = new DecodedWell(decodedWell.getLabel(), value);
     }
 
     public RowColPos getRowColPos() {

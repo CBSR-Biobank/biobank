@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -23,8 +23,7 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DecodePlateForm extends PlateForm {
     private static final I18n i18n = I18nFactory
@@ -144,7 +143,7 @@ public class DecodePlateForm extends PlateForm {
             @Override
             public void run() {
                 processScanResult();
-                spw.setCells(cells);
+                spw.setCells(wells);
             }
         });
     }
@@ -155,9 +154,9 @@ public class DecodePlateForm extends PlateForm {
             // progress monitor message.
             i18n.tr("Launching scan"));
 
-        List<WellRectangle> decodedCells = ScannerConfigPlugin.decodePlate(
-            plateToScan, ProfileManager.ALL_PROFILE_NAME);
-        cells = PalletWell.convertArray(decodedCells);
+        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodePlate(
+            plateToScan);
+        wells = PalletWell.convertArray(decodedCells);
     }
 
     @Override

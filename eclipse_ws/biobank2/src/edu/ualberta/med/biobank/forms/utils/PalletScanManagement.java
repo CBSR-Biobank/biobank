@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -32,15 +32,13 @@ import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.dmscanlib.WellRectangle;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
     private static final I18n i18n = I18nFactory
         .getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletWell> cells =
+    protected Map<RowColPos, PalletWell> wells =
         new HashMap<RowColPos, PalletWell>();
     private int scansCount = 0;
     private boolean useScanner = true;
@@ -76,12 +74,11 @@ public class PalletScanManagement {
     }
 
     public void launchScanAndProcessResult(final String plateToScan) {
-        launchScanAndProcessResult(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME, false);
+        launchScanAndProcessResult(plateToScan, false);
     }
 
     public void launchScanAndProcessResult(final String plateToScan,
-        final String profile, final boolean isRescanMode) {
+        final boolean isRescanMode) {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @SuppressWarnings("nls")
             @Override
@@ -91,7 +88,7 @@ public class PalletScanManagement {
                     i18n.tr("Scan and process..."),
                     IProgressMonitor.UNKNOWN);
                 try {
-                    launchScan(monitor, plateToScan, profile, isRescanMode);
+                    launchScan(monitor, plateToScan, isRescanMode);
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
@@ -124,12 +121,12 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     private void launchScan(IProgressMonitor monitor, String plateToScan,
-        String profile, boolean rescanMode) throws Exception {
+        boolean rescanMode) throws Exception {
         monitor.subTask(
             // progress monitor text
             i18n.tr("Launching scan"));
         beforeScan();
-        Map<RowColPos, PalletWell> oldCells = cells;
+        Map<RowColPos, PalletWell> oldCells = wells;
         if (BiobankPlugin.isRealScanEnabled()) {
             int plateNum = BiobankPlugin.getDefault().getPlateNumber(
                 plateToScan);
@@ -144,11 +141,10 @@ public class PalletScanManagement {
                             plateToScan));
                 return;
             }
-            List<WellRectangle> scanCells = null;
+            Set<DecodedWell> scanCells = null;
             try {
-                scanCells = ScannerConfigPlugin.decodePlate(plateNum,
-                    profile);
-                cells = PalletWell.convertArray(scanCells);
+                scanCells = ScannerConfigPlugin.decodePlate(plateNum);
+                wells = PalletWell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin
                     .openAsyncError(
@@ -163,11 +159,11 @@ public class PalletScanManagement {
                 afterScanBeforeMerge();
             }
         } else {
-            cells = getFakeScanCells();
+            wells = getFakeScanCells();
             scansCount++;
             afterScanBeforeMerge();
         }
-        Map<String, PalletWell> cellValues = getValuesMap(cells);
+        Map<String, PalletWell> cellValues = getValuesMap(wells);
         if (rescanMode && oldCells != null) {
             // rescan: merge previous scan with new in case the scanner
             // wasn't able to scan well
@@ -175,7 +171,7 @@ public class PalletScanManagement {
             for (Entry<RowColPos, PalletWell> entry : oldCells.entrySet()) {
                 RowColPos rcp = entry.getKey();
                 PalletWell oldScannedCell = entry.getValue();
-                PalletWell newScannedCell = cells.get(rcp);
+                PalletWell newScannedCell = wells.get(rcp);
                 boolean copyOldValue = false;
                 if (PalletWell.hasValue(oldScannedCell)) {
                     copyOldValue = true;
@@ -204,7 +200,7 @@ public class PalletScanManagement {
                     }
                 }
                 if (copyOldValue) {
-                    cells.put(rcp, oldScannedCell);
+                    wells.put(rcp, oldScannedCell);
                 }
             }
             if (rescanDifferent)
@@ -221,19 +217,19 @@ public class PalletScanManagement {
             RowColPos rcp = ((ScanPalletWidget) e.widget)
                 .getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
-                PalletWell cell = cells.get(rcp);
-                if (canScanTubeAlone(cell)) {
+                PalletWell well = wells.get(rcp);
+                if (canScanTubeAlone(well)) {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
-                        if (cell == null) {
-                            cell = new PalletWell(new DecodedWell(rcp.getRow(),
+                        if (well == null) {
+                            well = new PalletWell(new DecodedWell(rcp.getRow(),
                                 rcp.getCol(), value));
-                            cells.put(rcp, cell);
+                            wells.put(rcp, well);
                         } else {
-                            cell.setValue(value);
+                            well.setValue(value);
                         }
                         try {
-                            postprocessScanTubeAlone(cell);
+                            postprocessScanTubeAlone(well);
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
                                 // dialog title
@@ -253,7 +249,7 @@ public class PalletScanManagement {
 
     private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), cells, rcp, type);
+            .getActiveWorkbenchWindow().getShell(), wells, rcp, type);
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -314,7 +310,7 @@ public class PalletScanManagement {
     }
 
     public Map<RowColPos, PalletWell> getCells() {
-        return cells;
+        return wells;
     }
 
     public void onReset() {
@@ -327,7 +323,7 @@ public class PalletScanManagement {
     }
 
     private void initCells() {
-        cells = new HashMap<RowColPos, PalletWell>();
+        wells = new HashMap<RowColPos, PalletWell>();
     }
 
     public int getScansCount() {
@@ -345,7 +341,7 @@ public class PalletScanManagement {
 
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
-            cells.clear();
+            wells.clear();
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
@@ -354,7 +350,7 @@ public class PalletScanManagement {
                         rcp.getCol(), entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
-                cells.put(rcp, cell);
+                wells.put(rcp, cell);
             }
         }
     }

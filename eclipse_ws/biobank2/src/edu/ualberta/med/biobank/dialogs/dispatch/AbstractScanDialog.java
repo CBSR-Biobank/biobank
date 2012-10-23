@@ -51,7 +51,6 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BgcBaseDialog {
@@ -324,7 +323,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     private void launchScan() {
         setScanOkValue(false);
         palletScanManagement.launchScanAndProcessResult(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME, isRescanMode());
+            isRescanMode());
     }
 
     protected void startNewPallet() {
