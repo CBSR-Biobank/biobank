@@ -102,6 +102,14 @@ public abstract class InfoTableBgrLoader<T> extends AbstractInfoTableWidget<T> {
         @Override
         public void run() {
             try {
+                if (getTableViewer().getControl().isDisposed()
+                    || (paginationWidget == null)
+                    || paginationWidget.isDisposed()) {
+                    // the parent control has been disposed, no need
+                    // for this thread to update the table
+                    return;
+                }
+
                 final Display display = getTableViewer()
                     .getTable().getDisplay();
                 display.syncExec(new Runnable() {
