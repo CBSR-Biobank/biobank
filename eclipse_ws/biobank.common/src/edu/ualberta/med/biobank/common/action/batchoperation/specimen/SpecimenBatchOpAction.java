@@ -38,6 +38,8 @@ import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
@@ -113,10 +115,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private final Integer workingCenterId;
 
+    private Center workingCenterOnServerSide;
+
     private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
         null;
 
     private FileData fileData = null;
+
+    private ArrayList<SpecimenBatchOpInputPojo> pojos = null;
 
     private final Map<String, Specimen> parentSpecimens =
         new HashMap<String, Specimen>(0);
@@ -143,9 +149,93 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         log.debug("SpecimenBatchOpAction: constructor");
     }
 
+    private void decompressData() {
+        if (compressedList == null) {
+            throw new IllegalStateException("compressed list is null");
+        }
+
+        try {
+            pojos = compressedList.get();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
+        log.debug("SpecimenBatchOpAction: isAllowed: start");
+        if (compressedList == null) {
+            throw new IllegalStateException("compressed list is null");
+        }
+
+        decompressData();
+
+        User user = context.getUser();
+        workingCenterOnServerSide = context.load(Center.class, workingCenterId);
+
+        return PermissionEnum.BATCH_OPERATIONS.isAllowed(user,
+            workingCenterOnServerSide)
+            && hasPermissionOnStudies(user, getStudies(context));
+
+    }
+
+    private boolean hasPermissionOnStudies(User user, Set<Study> studies) {
+        for (Study study : studies) {
+            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+     * Returns a list of studies that existing specimens and patients in the
+     * pojo data belong to.
+     */
+    private Set<Study> getStudies(ActionContext context) {
+        Set<Specimen> existingSpecimens = new HashSet<Specimen>();
+        Set<Patient> existingPatients = new HashSet<Patient>();
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            String parentInvId = pojo.getParentInventoryId();
+            if ((parentInvId == null) || parentInvId.isEmpty()) continue;
+            Specimen specimen =
+                BatchOpActionUtil.getSpecimen(context, parentInvId);
+            if (specimen != null) {
+                existingSpecimens.add(specimen);
+            }
+        }
+
+        for (SpecimenBatchOpInputPojo pojo : pojos) {
+            String pnumber = pojo.getPatientNumber();
+            if ((pnumber == null) || pnumber.isEmpty()) continue;
+            Patient patient = BatchOpActionUtil.getPatient(context, pnumber);
+            if (patient != null) {
+                existingPatients.add(patient);
+            }
+        }
+
+        // get all collection events
+        for (Specimen specimen : existingSpecimens) {
+            specimen.getCollectionEvent();
+        }
+
+        // get all patients from specimens
+        for (Specimen specimen : existingSpecimens) {
+            specimen.getCollectionEvent().getPatient();
+        }
+
+        Set<Study> studies = new HashSet<Study>();
+        for (Specimen specimen : existingSpecimens) {
+            studies.add(specimen.getCollectionEvent().getPatient().getStudy());
+        }
+        for (Patient patient : existingPatients) {
+            studies.add(patient.getStudy());
+        }
+        return studies;
     }
 
     @Override
@@ -156,18 +246,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new IllegalStateException("file data is null");
         }
 
-        if (compressedList == null) {
-            throw new IllegalStateException("compressed list is null");
-        }
-
-        ArrayList<SpecimenBatchOpInputPojo> pojos;
-
-        try {
-            pojos = compressedList.get();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException(e);
+        if (pojos == null) {
+            throw new IllegalStateException("pojos were not decompressed");
         }
 
         if (pojos.isEmpty()) {
@@ -491,11 +571,14 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new NullPointerException("context is null");
         }
 
+        if (workingCenterOnServerSide == null) {
+            // workingCenterOnServerSide is assigned when isAllowed() is called
+            throw new IllegalStateException("workingCenterOnServerSide is null");
+        }
+
         OriginInfo originInfo = pojoData.getOriginInfo();
         if (originInfo == null) {
-            Center center = (Center) context.getSession()
-                .load(Center.class, workingCenterId);
-            originInfo = pojoData.getNewOriginInfo(center);
+            originInfo = pojoData.getNewOriginInfo(workingCenterOnServerSide);
         }
 
         CollectionEvent cevent = pojoData.getCevent();
@@ -605,24 +688,4 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
         return pevent;
     }
-
-    /*
-     * Generates an action exception if patient does not exist.
-     */
-    /*
-     * private Patient loadPatient(ActionContext context, String pnumber) { //
-     * make sure patient exists Patient p =
-     * BatchOpActionUtil.getPatient(context, pnumber); if (p == null) { throw
-     * new LocalizedException(
-     * CSV_PATIENT_DOES_NOT_EXIST_ERROR.format(pnumber)); } return p; }
-     * 
-     * private void getModelObjects(ActionContext context,
-     * ArrayList<SpecimenBatchOpInputPojo> pojos) { Set<String> patientNumbers =
-     * new HashSet<String>(); Set<String> parentInventoryIds = new
-     * HashSet<String>();
-     * 
-     * for (SpecimenBatchOpInputPojo pojo : pojos) {
-     * patientNumbers.add(pojo.getPatientNumber());
-     * parentInventoryIds.add(pojo.getParentInventoryId()); } }
-     */
 }

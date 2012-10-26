@@ -82,6 +82,10 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
     public static final String LABEL_PRINTING_PERMISSION =
         "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission";
 
+    @SuppressWarnings("nls")
+    public static final String BATCH_OPERATION_PERMISSION =
+        "edu.ualberta.med.biobank.gui.common.sourceprovider.batchOperationPermission";
+
     private boolean loggedIn;
 
     @Override
@@ -162,6 +166,9 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
 
         fireSourceChanged(ISources.WORKBENCH, LABEL_PRINTING_PERMISSION,
             userCreatePermissions.isLabelPrintingPermission());
+
+        fireSourceChanged(ISources.WORKBENCH, BATCH_OPERATION_PERMISSION,
+            userCreatePermissions.isBatchOperationPermission());
 
     }
 
