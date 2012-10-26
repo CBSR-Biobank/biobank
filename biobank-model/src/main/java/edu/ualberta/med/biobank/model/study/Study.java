@@ -6,11 +6,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.Trnc;
-import edu.ualberta.med.biobank.model.CommonBundle;
 import edu.ualberta.med.biobank.model.HasDescription;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
@@ -38,13 +36,9 @@ public class Study
     extends VersionedLongIdModel
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
-    private static final Bundle bundle = new CommonBundle();
 
-    @SuppressWarnings("nls")
-    public static final Trnc NAME = bundle.trnc(
-        "model",
-        "Study",
-        "Studies");
+    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_DESCRIPTION_LENGTH = 5000;
 
     private String name;
     private String description;
@@ -52,7 +46,8 @@ public class Study
 
     @Override
     @NotEmpty(message = "{Study.name.NotEmpty}")
-    @Column(name = "NAME", unique = true, nullable = false, length = 50)
+    @Length(max = MAX_NAME_LENGTH, message = "{Study.name.Length}")
+    @Column(name = "NAME", unique = true, nullable = false, length = MAX_NAME_LENGTH)
     public String getName() {
         return this.name;
     }
@@ -63,7 +58,9 @@ public class Study
     }
 
     @Override
-    @Column(name = "DESCRIPTION")
+    @NotNull(message = "{Center.description.NotNull}")
+    @Length(max = MAX_DESCRIPTION_LENGTH, message = "{Study.description.Length}")
+    @Column(name = "DESCRIPTION", nullable = false, length = MAX_NAME_LENGTH)
     public String getDescription() {
         return this.description;
     }

@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import edu.ualberta.med.biobank.model.HasDescription;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
+import edu.ualberta.med.biobank.model.study.Specimen;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
@@ -38,12 +39,16 @@ public class Center
     implements HasName, HasDescription {
     private static final long serialVersionUID = 1L;
 
+    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_DESCRIPTION_LENGTH = 5000;
+
     private String name;
     private String description;
     private Boolean enabled;
 
     @Override
-    @Column(name = "DESCRIPTION")
+    @NotNull(message = "{Center.description.NotNull}")
+    @Column(name = "DESCRIPTION", nullable = false, length = MAX_NAME_LENGTH)
     public String getDescription() {
         return this.description;
     }
@@ -55,7 +60,7 @@ public class Center
 
     @Override
     @NotEmpty(message = "{Center.name.NotEmpty}")
-    @Column(name = "NAME", unique = true, nullable = false, length = 50)
+    @Column(name = "NAME", unique = true, nullable = false, length = MAX_NAME_LENGTH)
     public String getName() {
         return this.name;
     }
