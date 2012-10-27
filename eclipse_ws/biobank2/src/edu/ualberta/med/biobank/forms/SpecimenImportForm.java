@@ -158,15 +158,11 @@ public class SpecimenImportForm extends BiobankViewForm {
 
                 try {
                     SpecimenBatchOpInterpreter interpreter =
-                        new SpecimenBatchOpInterpreter(filename);
+                        new SpecimenBatchOpInterpreter();
 
-                    monitor.beginTask(i18n.tr("Reading file..."),
+                    monitor.beginTask(i18n.tr("Processing file..."),
                         IProgressMonitor.UNKNOWN);
-                    interpreter.readPojos();
-
-                    monitor.beginTask(i18n.tr("Saving data..."),
-                        IProgressMonitor.UNKNOWN);
-                    batchOpId.setValue(interpreter.savePojos());
+                    batchOpId.setValue(interpreter.processFile(filename));
 
                     success.setValue(true);
                 } catch (ClientBatchOpErrorsException e) {

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.batchoperation.specimen;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,7 +23,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.CountResult;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
@@ -294,21 +297,16 @@ public class OhsTecanSpecimenPojoReader implements
         "dontCare15"
     };
 
-    private String filename;
+    private final Center workingCenter;
 
-    private ICsvBeanReader reader;
+    private final String filename;
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    @Override
-    public void setFilename(String filename) {
+    public OhsTecanSpecimenPojoReader(Center workingCenter, String filename) {
+        this.workingCenter = workingCenter;
         this.filename = filename;
-    }
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
     }
 
     // cell processors have to be recreated every time the file is read
@@ -354,11 +352,11 @@ public class OhsTecanSpecimenPojoReader implements
         return csvHeaders[0].equals(CSV_FIRST_HEADER)
             // last 2 columns can have no column name
             && ((csvHeaders.length == NAME_MAPPINGS.length)
-                || (csvHeaders.length + 2 == NAME_MAPPINGS.length));
+            || (csvHeaders.length + 2 == NAME_MAPPINGS.length));
     }
 
     @Override
-    public List<SpecimenBatchOpInputPojo> getPojos()
+    public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
 
         sourceSpecimens =
@@ -384,15 +382,18 @@ public class OhsTecanSpecimenPojoReader implements
                     NAME_MAPPINGS, cellProcessors)) != null) {
 
                 // skip certain rows
-                if (csvPojo.sourceId == null || csvPojo.sourceId.isEmpty()) continue;
-                if (csvPojo.aliquotVolume == null || csvPojo.aliquotVolume.isEmpty()) continue;
+                if (csvPojo.sourceId == null || csvPojo.sourceId.isEmpty())
+                    continue;
+                if (csvPojo.aliquotVolume == null
+                    || csvPojo.aliquotVolume.isEmpty()) continue;
                 if (Double.parseDouble(csvPojo.aliquotVolume) / 1000.0 <= 0.0)
                     continue;
 
                 csvPojo.lineNumber = reader.getLineNumber();
 
                 SpecimenBatchOpInputPojo batchOpPojo =
-                    convertToSpecimenBatchOpInputPojo(csvPojo);
+                    convertToSpecimenBatchOpInputPojo(reader.getLineNumber(),
+                        csvPojo);
 
                 if (batchOpPojo == null) {
                     // pojo could not be converted, ignore this row
@@ -417,7 +418,7 @@ public class OhsTecanSpecimenPojoReader implements
                 BigDecimal sourceVolume = null;
                 if (!csvPojo.sourceVolume.isEmpty()) {
                     sourceVolume = new BigDecimal(csvPojo.sourceVolume)
-                    .divide(new BigDecimal(1000));
+                        .divide(new BigDecimal(1000));
                 }
 
                 boolean sourceSpecimenAlreadyEncountered = false;
@@ -475,29 +476,27 @@ public class OhsTecanSpecimenPojoReader implements
     }
 
     private SpecimenBatchOpInputPojo convertToSpecimenBatchOpInputPojo(
-        TecanCsvRowPojo csvPojo) {
+        int linenumber, TecanCsvRowPojo csvPojo) {
         SpecimenBatchOpInputPojo batchOpPojo = new SpecimenBatchOpInputPojo();
         batchOpPojo.setLineNumber(csvPojo.lineNumber);
 
         // check for missing column values
         if (csvPojo.tecanRackId == null || csvPojo.tecanRackId.isEmpty()) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_TECAN_RACK_ID_MISSING_ERROR);
+            getErrorList()
+                .addError(linenumber, CSV_TECAN_RACK_ID_MISSING_ERROR);
             return null;
         }
         if (csvPojo.inventoryId == null || csvPojo.inventoryId.isEmpty()) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_INVENTORY_ID_MISSING_ERROR);
+            getErrorList().addError(linenumber, CSV_INVENTORY_ID_MISSING_ERROR);
             return null;
         }
         if (csvPojo.timeStamp == null || csvPojo.timeStamp.isEmpty()) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_TIME_STAMP_MISSING_ERROR);
+            getErrorList().addError(linenumber, CSV_TIME_STAMP_MISSING_ERROR);
             return null;
         }
         if (csvPojo.technicianId == null || csvPojo.technicianId.isEmpty()) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_TECHNICIAN_ID_MISSING_ERROR);
+            getErrorList()
+                .addError(linenumber, CSV_TECHNICIAN_ID_MISSING_ERROR);
             return null;
         }
 
@@ -522,7 +521,7 @@ public class OhsTecanSpecimenPojoReader implements
                         specimenType = TYPE_SERUM_SECONDARY;
                     }
                     else {
-                        getErrorList().addError(reader.getLineNumber(),
+                        getErrorList().addError(linenumber,
                             CSV_BC_SCAN_TYPE_ERROR);
                         return null;
                     }
@@ -531,8 +530,7 @@ public class OhsTecanSpecimenPojoReader implements
             }
         }
         if (specimenType == null) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_SPECIMEN_TYPE_ERROR);
+            getErrorList().addError(linenumber, CSV_SPECIMEN_TYPE_ERROR);
             return null;
         }
         batchOpPojo.setSpecimenType(specimenType);
@@ -541,19 +539,21 @@ public class OhsTecanSpecimenPojoReader implements
         batchOpPojo.setInventoryId(csvPojo.inventoryId);
 
         // deal with source ID
-        if (csvPojo.sourceVolume.lastIndexOf('.') != -1 &&
-            csvPojo.sourceVolume.length() - csvPojo.sourceVolume.lastIndexOf('.') > 7) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_SPECIMEN_VOLUME_ERROR);
+        if (csvPojo.sourceVolume.lastIndexOf('.') != -1
+            &&
+            csvPojo.sourceVolume.length()
+                - csvPojo.sourceVolume.lastIndexOf('.') > 7) {
+            getErrorList().addError(linenumber, CSV_SPECIMEN_VOLUME_ERROR);
             return null;
         }
         batchOpPojo.setParentInventoryId(csvPojo.sourceId);
 
         // deal with aliquot volume
-        if (csvPojo.aliquotVolume.lastIndexOf('.') != -1 &&
-            csvPojo.aliquotVolume.length() - csvPojo.aliquotVolume.lastIndexOf('.') > 7) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_SPECIMEN_VOLUME_ERROR);
+        if (csvPojo.aliquotVolume.lastIndexOf('.') != -1
+            &&
+            csvPojo.aliquotVolume.length()
+                - csvPojo.aliquotVolume.lastIndexOf('.') > 7) {
+            getErrorList().addError(linenumber, CSV_SPECIMEN_VOLUME_ERROR);
             return null;
         }
         batchOpPojo.setVolume(new BigDecimal(csvPojo.aliquotVolume)
@@ -568,8 +568,7 @@ public class OhsTecanSpecimenPojoReader implements
         try {
             batchOpPojo.setCreatedAt(TIME_STAMP_FORMAT.parse(timeStamp));
         } catch (ParseException pe) {
-            getErrorList().addError(reader.getLineNumber(),
-                CSV_TIME_STAMP_PARSE_ERROR);
+            getErrorList().addError(linenumber, CSV_TIME_STAMP_PARSE_ERROR);
             return null;
         }
 
@@ -582,39 +581,44 @@ public class OhsTecanSpecimenPojoReader implements
         return batchOpPojo;
     }
 
-    @Override
-    public void preExecution() {
+    private void preExecution() {
         if (filename == null) {
             throw new IllegalStateException("filename has not been set");
         }
         CountResult result;
         BiobankApplicationService service = SessionManager.getAppService();
-        
+
         try {
-            result = service.doAction(
-                new ProcessingEventGetCountByWorksheetAction(new File(filename).getName()));
+            result =
+                service.doAction(
+                    new ProcessingEventGetCountByWorksheetAction(new File(
+                        filename).getName()));
         } catch (Exception e) {
-            throw new IllegalStateException("OHS TECAN pre-execution error - processing event");
+            throw new IllegalStateException(
+                "OHS TECAN pre-execution error - processing event");
         }
         if (result.getCount() > 0) {
             throw new IllegalStateException("file name has been used already");
         }
-        
+
         for (SpecimenBatchOpInputPojo sourceSpecimen : sourceSpecimens) {
             try {
-                result = service.doAction(
-                    new SpecimenGetProcessedCountByInventoryId(sourceSpecimen.getInventoryId()));
+                result =
+                    service.doAction(
+                        new SpecimenGetProcessedCountByInventoryId(
+                            sourceSpecimen.getInventoryId()));
             } catch (Exception e) {
-                throw new IllegalStateException("OHS TECAN pre-execution error - source specimen");
+                throw new IllegalStateException(
+                    "OHS TECAN pre-execution error - source specimen");
             }
             if (result.getCount() > 0) {
-                throw new IllegalStateException("source specimen has already been processed");
+                throw new IllegalStateException(
+                    "source specimen has already been processed");
             }
         }
     }
 
-    @Override
-    public void postExecution() {
+    private void postExecution() {
         if (filename == null) {
             throw new IllegalStateException("filename has not been set");
         }
@@ -633,6 +637,13 @@ public class OhsTecanSpecimenPojoReader implements
             throw new IllegalStateException("OHS TECAN post-execution error");
         }
 
+    }
+
+    @Override
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
+        IOException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
