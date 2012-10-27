@@ -655,6 +655,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // if patient number and visit number present in the pojo
             // ensure they match with the cevent and patient
             if ((inputPojo.getPatientNumber() != null)
+                && !inputPojo.getPatientNumber().isEmpty()
                 && !cevent.getPatient().getPnumber()
                     .equals(inputPojo.getPatientNumber())) {
                 errorSet.addError(inputPojo.getLineNumber(),
