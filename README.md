@@ -1,6 +1,6 @@
 # Biobank
 
-The [Canadian BioSample Repository](http://biosample.ca "Title") (CBSR) has
+The [Canadian BioSample Repository](http://biosample.ca) (CBSR) has
 processed and stored biospecimens since 2000. In 2008, CBSR began developing a
 comprehensive client-server Java application, named Biobank, to be used by
 nurses, lab technicians, researchers, and lab administrators.  Biobank allows
