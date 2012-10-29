@@ -9,8 +9,9 @@ simultaneously process and log thousands of specimens daily. Nurses can enter
 specimens into the system, technicians can process and transfer specimens,
 researchers can request specimens and view inventory information, and
 administrators can create comprehensive queries and manage users. Biobank is
-open source and free software, modelled on caTissue from the National Cancer
-Institute.
+open source and free software, modelled on
+[caTissue](http://cbmi.wustl.edu/html/caTissue.html) from the [National Cancer
+Institute](http://www.cancer.gov/).
 
 Biobank is part of a larger effort by the CBSR to create a network for research
 collaboration, to facilitate standardization, and to provide help with lab
