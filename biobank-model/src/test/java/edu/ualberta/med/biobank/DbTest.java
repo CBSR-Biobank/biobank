@@ -66,6 +66,14 @@ public class DbTest
         return mother.getProvider(klazz);
     }
 
+    /**
+     * Check an assertion when a certain type of entity is updated and when it
+     * is inserted.
+     * 
+     * @param klazz the type of entity to insert and update
+     * @param processor run on the entity instance to "make it wrong"
+     * @param assertion describes the expected ConstraintViolationException
+     */
     protected <T> void persistEntity(Class<T> klazz,
         EntityProcessor<T> processor,
         ConstraintViolationAssertion assertion) {
