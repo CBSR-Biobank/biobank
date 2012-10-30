@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.model.study;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,7 +41,7 @@ public class CollectionEvent
     private Patient patient;
     private CollectionEventType type;
     private Integer visitNumber;
-    private Long timeDone;
+    private Date timeDone;
 
     @NaturalId
     @NotNull(message = "{CollectionEvent.patient.NotNull}")
@@ -79,19 +81,19 @@ public class CollectionEvent
 
     /**
      * If a {@link CollectionEvent} does not have any associated
-     * {@link Specimen}s, then the time (in milliseconds) it occurred at must be
-     * able to be stored on the {@link CollectionEvent} itself.
+     * {@link Specimen}s, then the time it occurred at must be able to be stored
+     * on the {@link CollectionEvent} itself.
      * 
      * @return when this {@link CollectionEvent} occurred.
      */
     @NotNull(message = "{CollectionEvent.timeDone.NotNull}")
     @Past(message = "{CollectionEvent.timeDone.Past}")
     @Column(name = "TIME_DONE", nullable = false)
-    public Long getTimeDone() {
+    public Date getTimeDone() {
         return timeDone;
     }
 
-    public void setTimeDone(Long timeDone) {
+    public void setTimeDone(Date timeDone) {
         this.timeDone = timeDone;
     }
 }
