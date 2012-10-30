@@ -3,6 +3,11 @@ package edu.ualberta.med.biobank.model.provider;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.model.study.CollectionEvent;
+import edu.ualberta.med.biobank.model.study.CollectionEventType;
+import edu.ualberta.med.biobank.model.study.Patient;
+import edu.ualberta.med.biobank.model.study.Study;
+
 /**
  * Manages a set of {@link EntityProvider}s for various entities.
  * 
@@ -16,6 +21,11 @@ public class Mother {
 
     public Mother(String name) {
         this.name = name;
+
+        bind(CollectionEvent.class, new CollectionEventProvider(this));
+        bind(CollectionEventType.class, new CollectionEventTypeProvider(this));
+        bind(Patient.class, new PatientProvider(this));
+        bind(Study.class, new StudyProvider(this));
     }
 
     public <T> EntityProvider<T> getProvider(Class<T> klazz) {
