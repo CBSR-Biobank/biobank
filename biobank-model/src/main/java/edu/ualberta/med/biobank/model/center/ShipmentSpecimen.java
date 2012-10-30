@@ -79,7 +79,7 @@ public class ShipmentSpecimen
      *         has no {@link Container}.
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SPECIMEN_ID", nullable = false)
+    @JoinColumn(name = "SHIPMENT_CONTAINER_ID", nullable = false)
     public ShipmentContainer getShipmentContainer() {
         return shipmentContainer;
     }

@@ -81,7 +81,7 @@ public abstract class AnnotationType
      * @return an optional description.
      */
     @Size(max = 5000, message = "{AnnotationType.description.Size}")
-    @Column(name = "NAME", length = 5000)
+    @Column(name = "DESCRIPTION", length = 5000)
     public String getDescription() {
         return description;
     }

@@ -147,7 +147,7 @@ public class SpecimenLinkType
      *         is carried out, or null if unspecified.
      */
     @Min(value = 1, message = "{CollectionEvent.inputCount.Min}")
-    @Column(name = "OUTPUT_COUNT")
+    @Column(name = "INPUT_COUNT")
     public Integer getInputcount() {
         return inputcount;
     }

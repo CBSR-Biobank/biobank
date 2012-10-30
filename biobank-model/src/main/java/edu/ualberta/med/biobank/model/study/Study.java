@@ -58,7 +58,7 @@ public class Study
     }
 
     @Override
-    @NotNull(message = "{Center.description.NotNull}")
+    @NotNull(message = "{Study.description.NotNull}")
     @Length(max = MAX_DESCRIPTION_LENGTH, message = "{Study.description.Length}")
     @Column(name = "DESCRIPTION", nullable = false, length = MAX_NAME_LENGTH)
     public String getDescription() {

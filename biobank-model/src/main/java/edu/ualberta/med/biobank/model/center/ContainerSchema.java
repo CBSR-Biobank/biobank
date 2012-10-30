@@ -65,8 +65,8 @@ public class ContainerSchema
         this.name = name;
     }
 
-    @Size(max = 5000, message = "{ContainerSchema.name.Size}")
-    @Column(name = "NAME", length = 5000)
+    @Size(max = 5000, message = "{ContainerSchema.description.Size}")
+    @Column(name = "DESCRIPTION", length = 5000)
     public String getDescription() {
         return description;
     }
