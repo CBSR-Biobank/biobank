@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * considered a parent-child relationship. This is opposed to
  * {@link CollectionEvent}s, which provide much more general heritage
  * information. So, special care must be taken to ensure that
- * {@link StudySpecimen} and {@link SpecimenLink} entities are consistent. The
+ * {@link SpecimenCollectionEvent} and {@link SpecimenLink} entities are consistent. The
  * {@link #output} must be in all the same {@link CollectionEvent}s as the
  * {@link #input}, but if two {@link Specimen}s are in the same
  * {@link CollectionEvent} they do <em>not</em> need to be associated (directly

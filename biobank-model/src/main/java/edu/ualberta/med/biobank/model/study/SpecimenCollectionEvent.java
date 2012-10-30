@@ -17,41 +17,28 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 /**
  * Joins {@link Specimen}s to {@link CollectionEvent}s, which provides
  * generalised parentage information about where {@link Specimen}s came from (
- * {@link SpecimenLink} provides much more specific information). It
- * is possible for {@link Specimen}s to have at most one {@link CollectionEvent}
- * per {@link Study}.
+ * {@link SpecimenLink} provides much more specific information). It is possible
+ * for {@link Specimen}s to have multiple {@link CollectionEvent}s per
+ * {@link Study}, but not recommended.
  * <p>
- * Having one {@link CollectionEvent} per {@link Study} instead of one total
- * allows each {@link Study} to have their own metadata on a {@link Specimen}.
- * This allows for cases where one {@link Study} collects and transfers
- * {@link Specimens} to another {@link Study}.
+ * Having multiple {@link CollectionEvent}s allows each {@link Study} to have
+ * their own metadata on a {@link Specimen}. This allows for cases where one
+ * {@link Study} collects and transfers {@link Specimens} to another
+ * {@link Study}.
  * 
  * @author Jonathan Ferland
  * @see SpecimenLink
  */
 @Audited
 @Entity
-@Table(name = "STUDY_SPECIMEN")
-@Unique(properties = { "study", "specimen" }, groups = PrePersist.class)
-public class StudySpecimen
+@Table(name = "SPECIMEN_COLLECTION_EVENT")
+@Unique(properties = { "specimen", "collectionEvent" }, groups = PrePersist.class)
+public class SpecimenCollectionEvent
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
-    private Study study;
     private Specimen specimen;
     private CollectionEvent collectionEvent;
-
-    @NaturalId
-    @NotNull(message = "{StudySpecimen.study.NotNull}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STUDY_ID", nullable = false)
-    public Study getStudy() {
-        return study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-    }
 
     @NaturalId
     @NotNull(message = "{StudySpecimen.specimen.NotNull}")
@@ -65,6 +52,7 @@ public class StudySpecimen
         this.specimen = specimen;
     }
 
+    @NaturalId
     @NotNull(message = "{StudySpecimen.collectionEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)
