@@ -5,9 +5,9 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
@@ -31,7 +31,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_COLLECTION_EVENT")
+@Table(name = "SPECIMEN_COLLECTION_EVENT",
+    uniqueConstraints = @UniqueConstraint(columnNames = {
+        "SPECIMEN_ID",
+        "COLLECTION_EVENT_ID"
+    }))
 @Unique(properties = { "specimen", "collectionEvent" }, groups = PrePersist.class)
 public class SpecimenCollectionEvent
     extends VersionedLongIdModel {
@@ -40,7 +44,6 @@ public class SpecimenCollectionEvent
     private Specimen specimen;
     private CollectionEvent collectionEvent;
 
-    @NaturalId
     @NotNull(message = "{StudySpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
@@ -52,7 +55,6 @@ public class SpecimenCollectionEvent
         this.specimen = specimen;
     }
 
-    @NaturalId
     @NotNull(message = "{StudySpecimen.collectionEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_ID", nullable = false)

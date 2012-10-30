@@ -8,7 +8,6 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.LongIdModel;
@@ -25,9 +24,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Audited
 @Entity
 @Table(name = "PROCESSING_EVENT_INPUT_SPECIMEN",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "SPECIMEN_ID", "PROCESSING_EVENT_ID" })
-    })
+    uniqueConstraints = @UniqueConstraint(columnNames = {
+        "SPECIMEN_ID",
+        "PROCESSING_EVENT_ID"
+    }))
 @Unique(properties = { "specimen", "processingEvent" }, groups = PrePersist.class)
 public class ProcessingEventInputSpecimen
     extends LongIdModel {
@@ -36,7 +36,6 @@ public class ProcessingEventInputSpecimen
     private Specimen specimen;
     private ProcessingEvent processingEvent;
 
-    @NaturalId
     @NotNull(message = "{ProcessingEventInputSpecimen.specimen.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_ID", nullable = false)
@@ -48,7 +47,6 @@ public class ProcessingEventInputSpecimen
         this.specimen = specimen;
     }
 
-    @NaturalId
     @NotNull(message = "{ProcessingEventInputSpecimen.processingEvent.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false)

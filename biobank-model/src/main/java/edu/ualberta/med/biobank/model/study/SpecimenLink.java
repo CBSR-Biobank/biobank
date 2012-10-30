@@ -9,11 +9,11 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
@@ -31,12 +31,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * considered a parent-child relationship. This is opposed to
  * {@link CollectionEvent}s, which provide much more general heritage
  * information. So, special care must be taken to ensure that
- * {@link SpecimenCollectionEvent} and {@link SpecimenLink} entities are consistent. The
- * {@link #output} must be in all the same {@link CollectionEvent}s as the
- * {@link #input}, but if two {@link Specimen}s are in the same
- * {@link CollectionEvent} they do <em>not</em> need to be associated (directly
- * or transitively) through a {@link SpecimenLink}. Also note that the
- * {@link #input} does <em>not</em> need to be in the same
+ * {@link SpecimenCollectionEvent} and {@link SpecimenLink} entities are
+ * consistent. The {@link #output} must be in all the same
+ * {@link CollectionEvent}s as the {@link #input}, but if two {@link Specimen}s
+ * are in the same {@link CollectionEvent} they do <em>not</em> need to be
+ * associated (directly or transitively) through a {@link SpecimenLink}. Also
+ * note that the {@link #input} does <em>not</em> need to be in the same
  * {@link CollectionEvent}(s) as the {@link #output}.
  * 
  * @author Jonathan Ferland
@@ -44,7 +44,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_LINK")
+@Table(name = "SPECIMEN_LINK",
+    uniqueConstraints = @UniqueConstraint(columnNames = {
+        "INPUT_SPECIMEN_ID",
+        "OUTPUT_SPECIMEN_ID",
+        "TIME_DONE"
+    }))
 @Unique(properties = { "input", "output", "timeDone" }, groups = PrePersist.class)
 public class SpecimenLink
     extends VersionedLongIdModel {
@@ -61,7 +66,6 @@ public class SpecimenLink
     /**
      * @return the {@link Specimen} that was processed.
      */
-    @NaturalId
     @NotNull(message = "{SpecimenLink.input.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "INPUT_SPECIMEN_ID", nullable = false)
@@ -76,7 +80,6 @@ public class SpecimenLink
     /**
      * @return the {@link Specimen} that resulted from the process.
      */
-    @NaturalId
     @NotNull(message = "{SpecimenLink.output.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OUTPUT_SPECIMEN_ID", nullable = false)
@@ -91,7 +94,6 @@ public class SpecimenLink
     /**
      * @return when the processing happened, in milliseconds.
      */
-    @NaturalId(mutable = false)
     @NotNull(message = "{SpecimenLink.timeDone.NotNull}")
     @Past
     @Column(name = "TIME_DONE", nullable = false)

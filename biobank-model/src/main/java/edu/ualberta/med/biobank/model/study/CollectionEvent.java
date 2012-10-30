@@ -8,11 +8,11 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
@@ -29,7 +29,12 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "COLLECTION_EVENT")
+@Table(name = "COLLECTION_EVENT",
+    uniqueConstraints = @UniqueConstraint(columnNames = {
+        "PATIENT_ID",
+        "COLLECTION_EVENT_TYPE_ID",
+        "VISIT_NUMBER"
+    }))
 @Unique(properties = { "patient", "type", "visitNumber" }, groups = PrePersist.class)
 @NotUsed(by = SpecimenCollectionEvent.class, property = "collectionEvent", groups = PreDelete.class)
 public class CollectionEvent
@@ -43,7 +48,6 @@ public class CollectionEvent
     private Integer visitNumber;
     private Date timeDone;
 
-    @NaturalId
     @NotNull(message = "{CollectionEvent.patient.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PATIENT_ID", nullable = false)
@@ -55,7 +59,6 @@ public class CollectionEvent
         this.patient = patient;
     }
 
-    @NaturalId
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "{CollectionEvent.type.NotNull}")
     @JoinColumn(name = "COLLECTION_EVENT_TYPE_ID", nullable = false)
@@ -67,7 +70,6 @@ public class CollectionEvent
         this.type = type;
     }
 
-    @NaturalId
     @Min(value = MIN_VISIT_NUMBER, message = "{CollectionEvent.visitNumber.Min}")
     @NotNull(message = "{CollectionEvent.visitNumber.NotNull}")
     @Column(name = "VISIT_NUMBER", nullable = false)

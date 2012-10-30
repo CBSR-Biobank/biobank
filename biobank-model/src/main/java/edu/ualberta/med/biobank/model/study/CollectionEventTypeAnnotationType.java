@@ -6,9 +6,9 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
@@ -26,7 +26,11 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "COLLECTION_EVENT_TYPE_ANNOTATION_TYPE")
+@Table(name = "COLLECTION_EVENT_TYPE_ANNOTATION_TYPE",
+    uniqueConstraints = @UniqueConstraint(columnNames = {
+        "COLLECTION_EVENT_TYPE_ID",
+        "ANNOTATION_TYPE_ID"
+    }))
 @Unique(properties = { "collectionEventType", "annotationType" }, groups = PrePersist.class)
 public class CollectionEventTypeAnnotationType
     extends VersionedLongIdModel {
@@ -36,7 +40,6 @@ public class CollectionEventTypeAnnotationType
     private CollectionEventAnnotationType annotationType;
     private Boolean required;
 
-    @NaturalId
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull(message = "{CollectionEventTypeAnnotationType.collectionEventType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,11 +52,10 @@ public class CollectionEventTypeAnnotationType
         this.collectionEventType = collectionEventType;
     }
 
-    @NaturalId
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @NotNull(message = "{CollectionEventTypeAnnotationType.collectionEventType.NotNull}")
+    @NotNull(message = "{CollectionEventTypeAnnotationType.annotationType.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COLLECTION_EVENT_ANNOTATION_TYPE", nullable = false)
+    @JoinColumn(name = "ANNOTATION_TYPE_ID", nullable = false)
     public CollectionEventAnnotationType getAnnotationType() {
         return annotationType;
     }
