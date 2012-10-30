@@ -24,8 +24,8 @@ public class SbsLabeling {
             throw new IllegalArgumentException(
                 "invalid row size for position: " + row);
         }
-        StringBuffer sb =
-            new StringBuffer(SBS_ROW_LABELLING_PATTERN.charAt(row));
+        StringBuffer sb = new StringBuffer();
+        sb.append(SBS_ROW_LABELLING_PATTERN.charAt(row));
         sb.append(col + 1);
         return sb.toString();
 
