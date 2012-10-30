@@ -45,6 +45,7 @@ public class DbTest
             @Override
             public void process(Object entity) {
                 session.save(entity);
+                // session.flush();
             }
         });
 

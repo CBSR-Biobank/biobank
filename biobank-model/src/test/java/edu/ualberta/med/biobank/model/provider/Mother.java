@@ -54,6 +54,7 @@ public class Mother {
         implements EntityProvider<T> {
 
         private final EntityProvider<T> delegate;
+        private T provided = null;
 
         public TrackingEntityProvider(EntityProvider<T> delegate) {
             this.delegate = delegate;
@@ -61,7 +62,8 @@ public class Mother {
 
         @Override
         public T get() {
-            return delegate.get();
+            if (provided == null) provided = create();
+            return provided;
         }
 
         @Override
