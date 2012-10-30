@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.center.ContainerType;
@@ -50,7 +50,7 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot have two container types at the same site" +
                 " with the same name");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "site", "name" })
                 .assertIn(e);
         }
@@ -93,7 +93,7 @@ public class TestContainerType extends DbTest {
             Assert.fail("cannot have two container types at the same site" +
                 " with the same nameShort");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "site", "nameShort" })
                 .assertIn(e);
         }
@@ -154,7 +154,7 @@ public class TestContainerType extends DbTest {
             session.flush();
             Assert.fail("cannot delete a container type used by a container");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation()
+            new ConstraintViolationAssertion()
                 .withAnnotationClass(NotUsed.class)
                 .withAttr("by", Container.class)
                 .withAttr("property", "containerType")

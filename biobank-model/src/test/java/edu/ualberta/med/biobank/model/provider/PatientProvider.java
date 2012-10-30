@@ -13,7 +13,7 @@ public class PatientProvider
     }
 
     @Override
-    public Patient create() {
+    public Patient onCreate() {
         Patient patient = new Patient();
         patient.setStudy(mother.getProvider(Study.class).get());
         patient.setPnumber(mother.getName() + "_" + pnumber++);

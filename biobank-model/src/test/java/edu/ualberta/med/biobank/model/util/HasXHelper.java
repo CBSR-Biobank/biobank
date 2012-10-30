@@ -9,7 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.model.HasDescription;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasTimeInserted;
@@ -23,7 +23,7 @@ public class HasXHelper {
             session.flush();
             Assert.fail("null name should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(named)
                 .withPropertyPath("name")
                 .assertIn(e);
@@ -35,7 +35,7 @@ public class HasXHelper {
             session.flush();
             Assert.fail("empty name should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(named)
                 .withPropertyPath("name")
                 .assertIn(e);
@@ -50,7 +50,7 @@ public class HasXHelper {
             session.flush();
             Assert.fail("null nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(shortNamed)
                 .withPropertyPath("nameShort")
                 .assertIn(e);
@@ -62,7 +62,7 @@ public class HasXHelper {
             session.flush();
             Assert.fail("empty nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(shortNamed)
                 .withPropertyPath("nameShort")
                 .assertIn(e);
@@ -80,7 +80,7 @@ public class HasXHelper {
             tx.commit();
             Assert.fail("duplicate nameShort should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "nameShort" })
                 .assertIn(e);
         }
@@ -94,7 +94,7 @@ public class HasXHelper {
             session.flush();
             Assert.fail("null createdAt should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotNull.class)
                 .withRootBean(hasTimeCreated)
                 .withPropertyPath("timeCreated")
                 .assertIn(e);

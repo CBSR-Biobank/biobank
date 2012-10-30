@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.util.HasXHelper;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
@@ -54,7 +54,7 @@ public class CenterTest extends DbTest {
             tx.commit();
             Assert.fail("cannot delete a center with srcDispatches");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "srcDispatches")
                 .assertIn(e);
         }
@@ -73,7 +73,7 @@ public class CenterTest extends DbTest {
             tx.commit();
             Assert.fail("cannot delete a center with dstDispatches");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "dstDispatches")
                 .assertIn(e);
         }
@@ -91,7 +91,7 @@ public class CenterTest extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with containers");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "containers")
                 .assertIn(e);
         }
@@ -109,7 +109,7 @@ public class CenterTest extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with container types");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "containerTypes")
                 .assertIn(e);
         }
@@ -131,7 +131,7 @@ public class CenterTest extends DbTest {
             tx.commit();
             Assert.fail("cannot delete site with container types");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "processingEvents")
                 .assertIn(e);
         }

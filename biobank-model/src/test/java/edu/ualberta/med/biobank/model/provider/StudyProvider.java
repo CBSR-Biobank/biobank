@@ -10,7 +10,7 @@ public class StudyProvider
     }
 
     @Override
-    public Study create() {
+    public Study onCreate() {
         return null;
     }
 }

@@ -6,7 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.ProcessingEvent;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -23,7 +23,7 @@ public class TestProcessingEvent extends DbTest {
             session.flush();
             Assert.fail("processing event worksheet should be unique");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "worksheet" })
                 .withRootBean(pe2)
                 .assertIn(e);

@@ -17,4 +17,11 @@ public interface EntityProvider<T> {
      * @return create a new object and return it.
      */
     T create();
+
+    /**
+     * @param processor sets an {@link EntityProcessor} that is called after an
+     *            entity is created so that some general pattern can be applied
+     *            or properties can be overridden.
+     */
+    EntityProvider<T> setProcessor(EntityProcessor<T> processor);
 }

@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.model.study.CollectionEvent;
 import edu.ualberta.med.biobank.model.study.Patient;
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.Unique;
@@ -25,7 +25,7 @@ public class TestPatient extends DbTest {
             session.flush();
             Assert.fail("cannot have two patients with the same pnumber");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Unique.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Unique.class)
                 .withAttr("properties", new String[] { "pnumber" })
                 .withRootBean(p2)
                 .assertIn(e);
@@ -42,7 +42,7 @@ public class TestPatient extends DbTest {
             session.flush();
             Assert.fail("cannot have two patients with the same pnumber");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "collectionEvents")
                 .withRootBean(patient)
                 .assertIn(e);

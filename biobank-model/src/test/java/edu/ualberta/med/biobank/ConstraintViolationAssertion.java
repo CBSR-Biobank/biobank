@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.engine.PathImpl;
 import edu.ualberta.med.biobank.model.util.NullUtil;
 import edu.ualberta.med.biobank.util.StringUtil;
 
-public class AssertConstraintViolation {
+public class ConstraintViolationAssertion {
     private final Map<String, Object> attrs = new HashMap<String, Object>();
     private final Option<Class<?>> annotationClass = new Option<Class<?>>();
     private final Option<Object> invalidValue = new Option<Object>();
@@ -30,47 +30,47 @@ public class AssertConstraintViolation {
     private final Option<Object> rootBean = new Option<Object>();
     private final Option<Class<?>> rootBeanClass = new Option<Class<?>>();
 
-    public AssertConstraintViolation withAnnotationClass(
+    public ConstraintViolationAssertion withAnnotationClass(
         Class<?> annotationClass) {
         this.annotationClass.setValue(annotationClass);
         return this;
     }
 
-    public AssertConstraintViolation withInvalidValue(Object invalidValue) {
+    public ConstraintViolationAssertion withInvalidValue(Object invalidValue) {
         this.invalidValue.setValue(invalidValue);
         return this;
     }
 
-    public AssertConstraintViolation withLeafBean(Object leafBean) {
+    public ConstraintViolationAssertion withLeafBean(Object leafBean) {
         this.leafBean.setValue(leafBean);
         return this;
     }
 
-    public AssertConstraintViolation withTemplate(String template) {
+    public ConstraintViolationAssertion withTemplate(String template) {
         this.template.setValue(template);
         return this;
     }
 
-    public AssertConstraintViolation withPropertyPath(Path propertyPath) {
+    public ConstraintViolationAssertion withPropertyPath(Path propertyPath) {
         this.propertyPath.setValue(propertyPath);
         return this;
     }
 
-    public AssertConstraintViolation withPropertyPath(String propertyPath) {
+    public ConstraintViolationAssertion withPropertyPath(String propertyPath) {
         return withPropertyPath(PathImpl.createPathFromString(propertyPath));
     }
 
-    public AssertConstraintViolation withRootBean(Object rootBean) {
+    public ConstraintViolationAssertion withRootBean(Object rootBean) {
         this.rootBean.setValue(rootBean);
         return this;
     }
 
-    public AssertConstraintViolation withRootBeanClass(Class<?> rootBeanClass) {
+    public ConstraintViolationAssertion withRootBeanClass(Class<?> rootBeanClass) {
         this.rootBeanClass.setValue(rootBeanClass);
         return this;
     }
 
-    public AssertConstraintViolation withAttr(String key, Object value) {
+    public ConstraintViolationAssertion withAttr(String key, Object value) {
         attrs.put(key, value);
         return this;
     }

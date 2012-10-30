@@ -13,12 +13,12 @@ public class CollectionEventTypeProvider
     }
 
     @Override
-    public CollectionEventType create() {
+    public CollectionEventType onCreate() {
         CollectionEventType type = new CollectionEventType();
         Study study = mother.getProvider(Study.class).get();
         type.setStudy(study);
         type.setName(mother.getName() + "_" + name++);
-        type.setDescription("none");
+        type.setDescription("no description");
         type.setRecurring(Boolean.TRUE);
         return type;
     }

@@ -7,7 +7,7 @@ import junit.framework.Assert;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.center.Container;
 import edu.ualberta.med.biobank.model.study.Specimen;
@@ -25,7 +25,7 @@ public class TestContainer extends DbTest {
             session.flush();
             Assert.fail("null label should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(c)
                 .withPropertyPath("label")
                 .assertIn(e);
@@ -42,7 +42,7 @@ public class TestContainer extends DbTest {
             session.flush();
             Assert.fail("empty label should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotEmpty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotEmpty.class)
                 .withRootBean(c)
                 .withPropertyPath("label")
                 .assertIn(e);
@@ -95,7 +95,7 @@ public class TestContainer extends DbTest {
             session.update(c2);
             session.flush();
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation()
+            new ConstraintViolationAssertion()
                 .withAnnotationClass(Unique.class)
                 .withRootBean(c2)
                 .withAttr("properties",
@@ -132,7 +132,7 @@ public class TestContainer extends DbTest {
             session.update(c2);
             session.flush();
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation()
+            new ConstraintViolationAssertion()
                 .withAnnotationClass(Unique.class)
                 .withRootBean(c2)
                 .withAttr("properties",
@@ -150,7 +150,7 @@ public class TestContainer extends DbTest {
             session.delete(topContainer);
             session.flush();
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withRootBean(topContainer)
                 .withAttr("property", "childPositions")
                 .assertIn(e);
@@ -166,7 +166,7 @@ public class TestContainer extends DbTest {
             session.delete(container);
             session.flush();
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withRootBean(container)
                 .withAttr("property", "specimenPositions")
                 .assertIn(e);

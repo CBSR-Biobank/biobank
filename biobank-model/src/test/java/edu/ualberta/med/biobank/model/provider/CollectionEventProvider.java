@@ -15,7 +15,7 @@ public class CollectionEventProvider
     }
 
     @Override
-    public CollectionEvent create() {
+    public CollectionEvent onCreate() {
         CollectionEvent ce = new CollectionEvent();
         ce.setType(mother.getProvider(CollectionEventType.class).get());
         ce.setPatient(mother.getProvider(Patient.class).get());

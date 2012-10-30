@@ -12,6 +12,7 @@ public class Mother {
     private final String name;
     private final Map<Class<?>, EntityProvider<?>> providers =
         new HashMap<Class<?>, EntityProvider<?>>();
+    private EntityProcessor<Object> processor;
 
     public Mother(String name) {
         this.name = name;
@@ -23,7 +24,52 @@ public class Mother {
         return tmp;
     }
 
+    public <T> EntityProvider<T> bind(Class<T> klazz, EntityProvider<T> provider) {
+        @SuppressWarnings("unchecked")
+        EntityProvider<T> tmp = (EntityProvider<T>) providers.put(
+            klazz,
+            new TrackingEntityProvider<T>(provider));
+        return tmp;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setEntityProcessor(EntityProcessor<Object> processor) {
+        this.processor = processor;
+    }
+
+    public class TrackingEntityProvider<T>
+        implements EntityProvider<T> {
+
+        private final EntityProvider<T> delegate;
+
+        public TrackingEntityProvider(EntityProvider<T> delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public T get() {
+            return delegate.get();
+        }
+
+        @Override
+        public void set(T provided) {
+            delegate.set(provided);
+        }
+
+        @Override
+        public T create() {
+            T provided = delegate.create();
+            if (processor != null) processor.process(provided);
+            return provided;
+        }
+
+        @Override
+        public EntityProvider<T> setProcessor(EntityProcessor<T> processor) {
+            delegate.setProcessor(processor);
+            return this;
+        }
     }
 }

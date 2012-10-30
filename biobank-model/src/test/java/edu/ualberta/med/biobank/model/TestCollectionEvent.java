@@ -11,7 +11,7 @@ import junit.framework.Assert;
 import org.hibernate.Transaction;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.AssertConstraintViolation;
+import edu.ualberta.med.biobank.ConstraintViolationAssertion;
 import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.study.CollectionEvent;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
@@ -29,7 +29,7 @@ public class TestCollectionEvent extends DbTest {
             tx.commit();
             Assert.fail("cannot delete a collection event with speicmens");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(Empty.class)
+            new ConstraintViolationAssertion().withAnnotationClass(Empty.class)
                 .withAttr("property", "allSpecimens")
                 .assertIn(e);
         }
@@ -45,7 +45,7 @@ public class TestCollectionEvent extends DbTest {
             session.flush();
             Assert.fail("null visit number should not be allowed");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation().withAnnotationClass(NotNull.class)
+            new ConstraintViolationAssertion().withAnnotationClass(NotNull.class)
                 .withRootBean(ce)
                 .withPropertyPath("visitNumber")
                 .assertIn(e);
@@ -66,7 +66,7 @@ public class TestCollectionEvent extends DbTest {
                 Assert.fail(MessageFormat.format(
                     "visit number ''{0}''should not be allowed", illegalValue));
             } catch (ConstraintViolationException e) {
-                new AssertConstraintViolation()
+                new ConstraintViolationAssertion()
                     .withAnnotationClass(Min.class)
                     .withRootBean(ce)
                     .withPropertyPath("visitNumber")
@@ -89,7 +89,7 @@ public class TestCollectionEvent extends DbTest {
             session.flush();
             Assert.fail("cannot have duplicate visit number for same patient");
         } catch (ConstraintViolationException e) {
-            new AssertConstraintViolation()
+            new ConstraintViolationAssertion()
                 .withAnnotationClass(Unique.class)
                 .withAttr("properties",
                     new String[] { "patient", "visitNumber" })

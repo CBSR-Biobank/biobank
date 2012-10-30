@@ -4,6 +4,7 @@ public abstract class AbstractProvider<T>
     implements EntityProvider<T> {
 
     private T provided;
+    private EntityProcessor<T> processor;
     protected final Mother mother;
 
     protected AbstractProvider(Mother mother) {
@@ -20,4 +21,19 @@ public abstract class AbstractProvider<T>
     public void set(T provided) {
         this.provided = provided;
     }
+
+    @Override
+    public final T create() {
+        T created = onCreate();
+        if (processor != null) processor.process(created);
+        return created;
+    }
+
+    @Override
+    public EntityProvider<T> setProcessor(EntityProcessor<T> processor) {
+        this.processor = processor;
+        return this;
+    }
+
+    protected abstract T onCreate();
 }
