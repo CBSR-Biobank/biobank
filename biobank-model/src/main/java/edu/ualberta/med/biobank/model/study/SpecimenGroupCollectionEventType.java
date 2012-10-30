@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.model.study;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -30,14 +28,14 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "SPECIMEN_COLLECTION_EVENT_TYPE", uniqueConstraints = {
+@Table(name = "SPECIMEN_GROUP_COLLECTION_EVENT_TYPE", uniqueConstraints = {
     @UniqueConstraint(columnNames = {
         "COLLECTION_EVENT_TYPE_ID",
         "SPECIMEN_GROUP_ID"
     })
 })
 @Unique(properties = { "type", "group" }, groups = PrePersist.class)
-public class SpecimenCollectionEventType
+public class SpecimenGroupCollectionEventType
     extends VersionedLongIdModel {
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +45,7 @@ public class SpecimenCollectionEventType
     private Decimal amount;
     private SpecimenContainerType containerType;
 
-    @NotNull(message = "{SpecimenCollectionEventType.type.NotNull}")
+    @NotNull(message = "{SpecimenGroupCollectionEventType.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "COLLECTION_EVENT_TYPE_ID", nullable = false)
     public CollectionEventType getType() {
@@ -58,7 +56,7 @@ public class SpecimenCollectionEventType
         this.type = type;
     }
 
-    @NotNull(message = "{SpecimenCollectionEventType.group.NotNull}")
+    @NotNull(message = "{SpecimenGroupCollectionEventType.group.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SPECIMEN_GROUP_ID", nullable = false)
     public SpecimenGroup getGroup() {
@@ -86,10 +84,6 @@ public class SpecimenCollectionEventType
      */
     @Valid
     @Embedded
-    @AttributeOverrides({
-        @AttributeOverride(name = "value", column = @Column(name = "AMOUNT_VALUE")),
-        @AttributeOverride(name = "scale", column = @Column(name = "AMOUNT_SCALE"))
-    })
     public Decimal getAmount() {
         return amount;
     }
