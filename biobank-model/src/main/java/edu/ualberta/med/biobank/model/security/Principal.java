@@ -18,10 +18,12 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.VersionedLongIdModel;
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
 
+@Audited
 @Entity
 @Table(name = "PRINCIPAL")
 @Inheritance(strategy = InheritanceType.JOINED)
