@@ -54,7 +54,7 @@ public abstract class VersionedLongIdModel
 
     @Override
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UPDATED_BY_USER_ID", nullable = false)
+    @JoinColumn(name = "UPDATED_BY_USER_ID")
     public User getUpdatedBy() {
         return updatedBy;
     }

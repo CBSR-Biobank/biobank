@@ -82,7 +82,7 @@ public abstract class LongIdModel
 
     @Override
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "INSERTED_BY_USER_ID", updatable = false, nullable = false)
+    @JoinColumn(name = "INSERTED_BY_USER_ID", updatable = false)
     public User getInsertedBy() {
         return insertedBy;
     }
