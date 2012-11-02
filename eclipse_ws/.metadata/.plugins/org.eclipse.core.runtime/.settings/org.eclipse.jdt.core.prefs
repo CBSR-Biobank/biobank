@@ -20,12 +20,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant=48
 org.eclipse.jdt.core.formatter.alignment_for_assignment=16
 org.eclipse.jdt.core.formatter.alignment_for_enum_constants=49
+org.eclipse.jdt.core.formatter.alignment_for_resources_in_try=16
 org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration=48
 org.eclipse.jdt.core.formatter.comment.insert_new_line_for_parameter=do not insert
 org.eclipse.jdt.core.formatter.continuation_indentation=1
 org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer=1
-org.eclipse.jdt.core.formatter.join_wrapped_lines=false
 org.eclipse.jdt.core.formatter.keep_imple_if_on_one_line=true
+org.eclipse.jdt.core.formatter.lineSplit=100
 org.eclipse.jdt.core.formatter.tabulation.char=space
-org.eclipse.jdt.core.formatter.use_on_off_tags=true
 org.eclipse.jdt.core.userLibrary.log4j=<?xml version\="1.0" encoding\="UTF-8"?>\n<userlibrary systemlibrary\="false" version\="2">\n\t<archive path\="/biobank.common/lib/client/log4j-1.2.14.jar"/>\n</userlibrary>\n

@@ -102,8 +102,7 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     protected void decodeImage() throws Exception {
-        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodeImage(1,
-            imageFilename);
+        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodeImage(imageFilename);
         wells = PalletWell.convertArray(decodedCells);
 
         Display.getDefault().asyncExec(new Runnable() {
