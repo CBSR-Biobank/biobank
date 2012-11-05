@@ -13,9 +13,9 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCellPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
@@ -28,8 +28,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     /**
      * Pallets are always 8*12 = fixed size
      */
-    public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCellPos.COL_MAX;
-    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCellPos.ROW_MAX;
+    public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_MAX;
+    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_MAX;
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
@@ -41,7 +41,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
-                PalletCell cell = (PalletCell) getObjectAtCoordinates(widget,
+                PalletWell cell = (PalletWell) getObjectAtCoordinates(widget,
                     e.x, e.y);
                 if (cell != null) {
                     String msg = cell.getValue();
@@ -65,7 +65,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     public void setDefaultStorageSize() {
-        setStorageSize(ScanCellPos.ROW_MAX, ScanCellPos.COL_MAX);
+        setStorageSize(SbsLabeling.ROW_MAX, SbsLabeling.COL_MAX);
     }
 
     protected void setProfile(ProfileSettings profile) {
@@ -95,10 +95,10 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getMiddleTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (cells != null) {
-            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null)
                 return cell.getTitle();
@@ -108,7 +108,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getTopTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (containerType == null) {
             String row = Character.valueOf((char) (indexRow + 'A')).toString();
@@ -120,10 +120,10 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getBottomTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (cells != null) {
-            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null)
                 return cell.getTypeString();
@@ -137,7 +137,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         int indexRow, int indexCol, Color defaultBackgroundColor) {
         Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getCells() != null) {
-            PalletCell cell = (PalletCell) displayWidget.getCells().get(
+            PalletWell cell = (PalletWell) displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));
             if (cell != null && cell.getStatus() != null) {
                 backgroundColor = cell.getStatus().getColor();

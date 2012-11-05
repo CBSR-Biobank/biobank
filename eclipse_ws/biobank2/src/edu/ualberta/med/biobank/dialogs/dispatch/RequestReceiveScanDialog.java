@@ -23,9 +23,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
     private static final I18n i18n = I18nFactory
@@ -74,9 +74,9 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     }
 
     @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() {
+        Map<RowColPos, PalletWell> palletScanned =
+            new TreeMap<RowColPos, PalletWell>();
         if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
             int i = 0;
             for (RequestSpecimenWrapper dsa : (currentShipment)
@@ -86,8 +86,8 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
                 if (row > 7)
                     break;
                 if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
-                    palletScanned.put(new RowColPos(row, col), new PalletCell(
-                        new ScanCell(row, col, dsa.getSpecimen()
+                    palletScanned.put(new RowColPos(row, col), new PalletWell(
+                        new DecodedWell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 }
                 i++;

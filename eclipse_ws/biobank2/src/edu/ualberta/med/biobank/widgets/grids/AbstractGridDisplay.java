@@ -13,8 +13,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -137,7 +137,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         e.gc.drawRectangle(rectangle);
         if (displayWidget.getCells() != null) {
             if (displayWidget.getMultiSelectionManager().isEnabled()) {
-                AbstractUICell cell = displayWidget.getCells().get(
+                AbstractUIWell cell = displayWidget.getCells().get(
                     new RowColPos(indexRow, indexCol));
                 if (cell != null && cell.isSelected()) {
                     Rectangle rect = new Rectangle(rectangle.x + 5,
@@ -162,20 +162,20 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     @SuppressWarnings("unused")
     protected String getTopTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         return null;
     }
 
     protected String getMiddleTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         return getDefaultTextForBox(cells, indexRow, indexCol);
     }
 
     @SuppressWarnings("unused")
     protected String getBottomTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         return null;
     }

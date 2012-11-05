@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
  * This class is there to give a common parent class to grid container widgets
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
  */
 public class ContainerDisplayWidget extends Canvas {
 
-    protected Map<RowColPos, ? extends AbstractUICell> cells;
+    protected Map<RowColPos, ? extends AbstractUIWell> cells;
 
     protected Container container;
 
@@ -92,14 +92,14 @@ public class ContainerDisplayWidget extends Canvas {
         return super.computeSize(wHint, hHint, changed);
     }
 
-    public AbstractUICell getObjectAtCoordinates(int x, int y) {
+    public AbstractUIWell getObjectAtCoordinates(int x, int y) {
         if (containerDisplay != null) {
             return containerDisplay.getObjectAtCoordinates(this, x, y);
         }
         return null;
     }
 
-    public void setCells(Map<RowColPos, ? extends AbstractUICell> cells) {
+    public void setCells(Map<RowColPos, ? extends AbstractUIWell> cells) {
         this.cells = cells;
         redraw();
     }
@@ -227,7 +227,7 @@ public class ContainerDisplayWidget extends Canvas {
         return containerDisplay;
     }
 
-    public Map<RowColPos, ? extends AbstractUICell> getCells() {
+    public Map<RowColPos, ? extends AbstractUIWell> getCells() {
         return cells;
     }
 

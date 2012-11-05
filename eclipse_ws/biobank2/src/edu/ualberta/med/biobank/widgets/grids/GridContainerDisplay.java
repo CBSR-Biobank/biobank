@@ -10,9 +10,9 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
-import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public class GridContainerDisplay extends AbstractGridDisplay {
 
@@ -28,7 +28,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (displayWidget.getCells() != null) {
-            AbstractUICell uiCell = displayWidget.getCells().get(
+            AbstractUIWell uiCell = displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));
             if (uiCell == null) {
                 return super.getDefaultBackgroundColor(e, displayWidget,
@@ -45,7 +45,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getDefaultTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         String text = super.getDefaultTextForBox(cells, indexRow, indexCol);
         if (text.isEmpty()) {
@@ -60,7 +60,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
 
     @Override
     protected String getBottomTextForBox(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (getCellHeight() > HEIGHT_TWO_LINES) {
             return getContainerTypeText(cells, indexRow, indexCol);
@@ -70,7 +70,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
 
     @SuppressWarnings("nls")
     protected String getContainerTypeText(
-        Map<RowColPos, ? extends AbstractUICell> cells, int indexRow,
+        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         String sname = StringUtil.EMPTY_STRING;
         if (cells != null) {

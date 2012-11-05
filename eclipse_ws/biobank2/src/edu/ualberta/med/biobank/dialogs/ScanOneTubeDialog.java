@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 
 public class ScanOneTubeDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -25,11 +25,11 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     private String scannedValue;
     private BgcBaseText valueText;
     private final RowColPos position;
-    private final Map<RowColPos, PalletCell> cells;
+    private final Map<RowColPos, PalletWell> cells;
     private final ContainerType type;
 
     public ScanOneTubeDialog(Shell parentShell,
-        Map<RowColPos, PalletCell> cells, RowColPos rcp,
+        Map<RowColPos, PalletWell> cells, RowColPos rcp,
         ContainerType type) {
         super(parentShell);
         this.cells = cells;
@@ -76,7 +76,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected void okPressed() {
         this.scannedValue = valueText.getText();
-        for (PalletCell otherCell : cells.values()) {
+        for (PalletWell otherCell : cells.values()) {
             if (otherCell.getValue() != null
                 && otherCell.getValue().equals(scannedValue)) {
                 BgcPlugin.openAsyncError(

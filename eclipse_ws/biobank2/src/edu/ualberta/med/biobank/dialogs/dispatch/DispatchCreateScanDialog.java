@@ -37,9 +37,9 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
@@ -208,7 +208,7 @@ public class DispatchCreateScanDialog extends
     @Override
     protected void doProceed() throws Exception {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (PalletCell cell : getCells().values()) {
+        for (PalletWell cell : getCells().values()) {
             if (cell.getStatus() != UICellStatus.MISSING) {
                 specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_ADDED);
@@ -238,16 +238,16 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         ContainerWrapper currentPallet = null;
         if (isPalletWithPosition)
             currentPallet = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
                     SessionManager.getAppService(), (SiteWrapper) currentSite,
                     currentProductBarcode);
-        Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
         if (currentPallet == null) {
-            Map<RowColPos, PalletCell> cells = PalletCell
+            Map<RowColPos, PalletWell> cells = PalletWell
                 .getRandomNonDispatchedSpecimens(
                     SessionManager.getAppService(), (currentShipment)
                         .getSenderCenter().getId());
@@ -255,7 +255,7 @@ public class DispatchCreateScanDialog extends
         }
         for (SpecimenWrapper specimen : currentPallet.getSpecimens()
             .values()) {
-            PalletCell cell = new PalletCell(new ScanCell(
+            PalletWell cell = new PalletWell(new DecodedWell(
                 specimen.getPosition().getRow(), specimen.getPosition()
                     .getCol(),
                 specimen.getInventoryId()));

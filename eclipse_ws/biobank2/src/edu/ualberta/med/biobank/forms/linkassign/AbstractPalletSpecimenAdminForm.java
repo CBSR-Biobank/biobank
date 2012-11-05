@@ -54,14 +54,14 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
-    AbstractSpecimenAdminForm {
+AbstractSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -136,9 +136,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected Map<RowColPos, PalletCell> getFakeScanCells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
                 throws Exception {
-                return AbstractPalletSpecimenAdminForm.this.getFakeScanCells();
+                return AbstractPalletSpecimenAdminForm.this.getFakeDecodedWells();
             }
 
             @Override
@@ -158,7 +158,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 appendLog(NLS
                     .bind(
                         "Scan completed - {0} specimens found",
-                        cells.keySet().size()));
+                        wells.keySet().size()));
             }
 
             @Override
@@ -180,14 +180,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletCell cell)
+            protected void postprocessScanTubeAlone(PalletWell cell)
                 throws Exception {
                 AbstractPalletSpecimenAdminForm.this
-                    .postprocessScanTubeAlone(cell);
+                .postprocessScanTubeAlone(cell);
             }
 
             @Override
-            protected boolean canScanTubeAlone(PalletCell cell) {
+            protected boolean canScanTubeAlone(PalletWell cell) {
                 return AbstractPalletSpecimenAdminForm.this
                     .canScanTubeAlone(cell);
             }
@@ -205,7 +205,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         };
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
+        .addPropertyChangeListener(propertyListener);
 
     }
 
@@ -221,7 +221,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     public void dispose() {
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .removePropertyChangeListener(propertyListener);
+        .removePropertyChangeListener(propertyListener);
         super.dispose();
     }
 
@@ -285,37 +285,26 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void launchScanAndProcessResult() {
         palletScanManagement.launchScanAndProcessResult(plateToScanValue
-            .getValue().toString(), getProfile(), isRescanMode());
+            .getValue().toString(), isRescanMode());
         refreshPalletDisplay();
     }
 
     protected abstract void refreshPalletDisplay();
-
-    protected String getProfile() {
-        if (profilesCombo == null
-            || profilesCombo.getCombo().getItemCount() <= 0
-            || profilesCombo.getCombo().getSelectionIndex() < 0)
-            return ProfileManager.ALL_PROFILE_NAME;
-        return profilesCombo.getCombo().getItem(
-            profilesCombo.getCombo().getSelectionIndex());
-    }
 
     @SuppressWarnings("nls")
     protected void createProfileComboBox(Composite fieldsComposite) {
         Label lbl = widgetCreator.createLabel(fieldsComposite,
             // TR: label
             i18n.tr("Profile"));
-        profilesCombo =
-            widgetCreator
-                .createComboViewer(
-                    fieldsComposite,
-                    lbl,
-                    null,
-                    null,
-                    // TR: validation error message
-                    i18n.tr("Invalid profile selected"),
-                    false, null, null,
-                    new BiobankLabelProvider());
+        profilesCombo = widgetCreator.createComboViewer(
+            fieldsComposite,
+            lbl,
+            null,
+            null,
+            // TR: validation error message
+            i18n.tr("Invalid profile selected"),
+            false, null, null,
+            new BiobankLabelProvider());
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -347,16 +336,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             i18n.tr("Plate to scan"));
         plateToScanText =
             (BgcBaseText) widgetCreator
-                .createBoundWidget(
-                    fieldsComposite,
-                    BgcBaseText.class,
-                    SWT.NONE,
-                    plateToScanLabel,
-                    new String[0],
-                    plateToScanValue,
-                    new ScannerBarcodeValidator(
-                        // TR: validation error message
-                        i18n.tr("Enter a valid plate barcode")),
+            .createBoundWidget(
+                fieldsComposite,
+                BgcBaseText.class,
+                SWT.NONE,
+                plateToScanLabel,
+                new String[0],
+                plateToScanValue,
+                new ScannerBarcodeValidator(
+                    // TR: validation error message
+                    i18n.tr("Enter a valid plate barcode")),
                     PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -409,7 +398,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
-    protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         return null;
     }
 
@@ -502,7 +491,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     @SuppressWarnings("nls")
-    protected void postprocessScanTubeAlone(PalletCell palletCell)
+    protected void postprocessScanTubeAlone(PalletWell palletCell)
         throws Exception {
         appendLog(NLS.bind(
             "Tube {0} scanned and set to position {1}",
@@ -584,7 +573,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // widgetCreator.showWidget(scanTubeAloneSwitch, show);
     }
 
-    protected Map<RowColPos, PalletCell> getCells() {
+    protected Map<RowColPos, PalletWell> getCells() {
         return palletScanManagement.getCells();
     }
 
@@ -610,14 +599,14 @@ public abstract class AbstractPalletSpecimenAdminForm extends
      */
     @SuppressWarnings("nls")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        Map<RowColPos, PalletCell> cells = getCells();
+        Map<RowColPos, PalletWell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
             null;
         if (cells != null) {
             serverCells =
                 new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
-            for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
             }
@@ -637,15 +626,15 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
-                    .subTask(
+                .subTask(
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
-                            .getPositionString(rcp)));
-                PalletCell palletCell = cells.get(entry.getKey());
+                        .getPositionString(rcp)));
+                PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
-                    palletCell = new PalletCell(new ScanCell(
+                    palletCell = new PalletWell(new DecodedWell(
                         servercell.getRow(), servercell.getCol(),
                         servercell.getValue()));
                     cells.put(rcp, palletCell);
@@ -661,7 +650,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     @SuppressWarnings("unused")
-    protected void processCellResult(RowColPos rcp, PalletCell palletCell) {
+    protected void processCellResult(RowColPos rcp, PalletWell palletCell) {
         // nothing done by default
     }
 
@@ -669,7 +658,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         return palletScanManagement.getScansCount() > 0;
     }
 
-    protected boolean canScanTubeAlone(PalletCell cell) {
+    protected boolean canScanTubeAlone(PalletWell cell) {
         return cell == null || cell.getStatus() == UICellStatus.EMPTY;
     }
 
@@ -690,7 +679,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement
-                .initCellsWithContainer(currentMultipleContainer);
+            .initCellsWithContainer(currentMultipleContainer);
         }
     }
 

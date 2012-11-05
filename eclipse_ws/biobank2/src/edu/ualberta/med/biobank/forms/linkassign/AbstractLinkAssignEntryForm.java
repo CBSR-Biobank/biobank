@@ -43,8 +43,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
@@ -414,7 +414,7 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        PalletCell cell = (PalletCell) ((ScanPalletWidget) e.widget)
+        PalletWell cell = (PalletWell) ((ScanPalletWidget) e.widget)
             .getObjectAtCoordinates(e.x, e.y);
         if (canScanTubeAlone(cell) && isScanTubeAloneMode()) {
             scanTubeAlone(e);
