@@ -19,21 +19,16 @@ import org.supercsv.io.ICsvBeanReader;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.Action;
-import edu.ualberta.med.biobank.common.action.CountResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
-import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventGetCountByWorksheetAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetProcessedCountByInventoryId;
 import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 /**
  * Reads an OHS TECAN CSV file containing specimen information and returns the
@@ -77,10 +72,7 @@ public class OhsTecanSpecimenPojoReader implements
         i18n.tr("multiple technicians in same csv file");
 
     public static final String CSV_MULTIPLE_SOURCE_VOLUMES_ERROR =
-        i18n.tr("multiple source volumes for same specimen");
-
-    public static final String CSV_NO_ALIQUOTS_ERROR =
-        i18n.tr("no aliquot specimens");
+        i18n.tr("multiple volumes for same source specimen");
 
     private static final String CSV_FIRST_HEADER = "TECAN_Rack_ID";
 
@@ -114,6 +106,7 @@ public class OhsTecanSpecimenPojoReader implements
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
         new SimpleDateFormat("yyyyMMdd_HHmmss");
 
+    private List<SpecimenBatchOpInputPojo> aliquotSpecimens;
     private List<SpecimenBatchOpInputPojo> sourceSpecimens;
     private Date timestamp;
     private String technicianId;
@@ -359,8 +352,8 @@ public class OhsTecanSpecimenPojoReader implements
     public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
 
-        sourceSpecimens =
-            new ArrayList<SpecimenBatchOpInputPojo>(0);
+        aliquotSpecimens = new ArrayList<SpecimenBatchOpInputPojo>(0);
+        sourceSpecimens = new ArrayList<SpecimenBatchOpInputPojo>(0);
         timestamp = new Date();
         technicianId = null;
 
@@ -369,9 +362,6 @@ public class OhsTecanSpecimenPojoReader implements
         }
 
         CellProcessor[] cellProcessors = getCellProcessors();
-
-        List<SpecimenBatchOpInputPojo> result =
-            new ArrayList<SpecimenBatchOpInputPojo>();
 
         TecanCsvRowPojo csvPojo;
 
@@ -447,12 +437,12 @@ public class OhsTecanSpecimenPojoReader implements
                     timestamp = batchOpPojo.getCreatedAt();
                 }
 
-                result.add(batchOpPojo);
+                aliquotSpecimens.add(batchOpPojo);
             }
 
             // fix specimen type for certain csv files
             if (hasBuffy) {
-                for (SpecimenBatchOpInputPojo pojo : result) {
+                for (SpecimenBatchOpInputPojo pojo : aliquotSpecimens) {
                     if (pojo.getSpecimenType() == TYPE_SERUM_PRIMARY) {
                         pojo.setSpecimenType(TYPE_PLASMA_PRIMARY);
                     }
@@ -462,12 +452,12 @@ public class OhsTecanSpecimenPojoReader implements
                 }
             }
 
-            if (result.size() == 0) {
-                getErrorList().addError(reader.getLineNumber(),
-                    CSV_NO_ALIQUOTS_ERROR);
+            if (aliquotSpecimens.size() == 0) {
+                throw new IllegalStateException(
+                    "no aliquots to be imported");
             }
 
-            return result;
+            return aliquotSpecimens;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
@@ -566,6 +556,7 @@ public class OhsTecanSpecimenPojoReader implements
             timeStamp = timeStamp.substring(1);
         }
         try {
+            TIME_STAMP_FORMAT.setLenient(false);
             batchOpPojo.setCreatedAt(TIME_STAMP_FORMAT.parse(timeStamp));
         } catch (ParseException pe) {
             getErrorList().addError(linenumber, CSV_TIME_STAMP_PARSE_ERROR);
@@ -580,70 +571,15 @@ public class OhsTecanSpecimenPojoReader implements
 
         return batchOpPojo;
     }
-
-    private void preExecution() {
-        if (filename == null) {
-            throw new IllegalStateException("filename has not been set");
-        }
-        CountResult result;
-        BiobankApplicationService service = SessionManager.getAppService();
-
-        try {
-            result =
-                service.doAction(
-                    new ProcessingEventGetCountByWorksheetAction(new File(
-                        filename).getName()));
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                "OHS TECAN pre-execution error - processing event");
-        }
-        if (result.getCount() > 0) {
-            throw new IllegalStateException("file name has been used already");
-        }
-
-        for (SpecimenBatchOpInputPojo sourceSpecimen : sourceSpecimens) {
-            try {
-                result =
-                    service.doAction(
-                        new SpecimenGetProcessedCountByInventoryId(
-                            sourceSpecimen.getInventoryId()));
-            } catch (Exception e) {
-                throw new IllegalStateException(
-                    "OHS TECAN pre-execution error - source specimen");
-            }
-            if (result.getCount() > 0) {
-                throw new IllegalStateException(
-                    "source specimen has already been processed");
-            }
-        }
-    }
-
-    private void postExecution() {
-        if (filename == null) {
-            throw new IllegalStateException("filename has not been set");
-        }
-
-        try {
-            Center currentWorkingCenter = SessionManager.getUser()
-                .getCurrentWorkingCenter().getWrappedObject();
-            BiobankApplicationService service = SessionManager.getAppService();
-            service.doAction(new OhsTecanSpecimenBatchOpAction(
-                currentWorkingCenter,
-                sourceSpecimens,
-                new File(filename).getName(),
-                timestamp,
-                technicianId));
-        } catch (Exception e) {
-            throw new IllegalStateException("OHS TECAN post-execution error");
-        }
-
-    }
-
+    
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
         IOException {
-        // TODO Auto-generated method stub
-        return null;
+        return new OhsTecanSpecimenBatchOpAction(workingCenter, aliquotSpecimens,
+            new File(filename), sourceSpecimens, 
+            new File(filename).getName(),
+            timestamp,
+            technicianId);
     }
 
 }
