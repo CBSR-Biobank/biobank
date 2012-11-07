@@ -94,8 +94,7 @@ public class PalletScanManagement {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
                 } catch (Exception e) {
-                    BgcPlugin
-                    .openAsyncError(
+                    BgcPlugin.openAsyncError(
                         // dialog title
                         i18n.tr("Scan result error"),
                         e);
@@ -103,8 +102,7 @@ public class PalletScanManagement {
                     if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
                         msg = e.getCause().getMessage();
                     }
-                    scanAndProcessError("ERROR: "
-                        + msg);
+                    scanAndProcessError("ERROR: " + msg);
                 }
                 monitor.done();
             }
@@ -127,17 +125,14 @@ public class PalletScanManagement {
         beforeScan();
         Map<RowColPos, PalletWell> oldCells = wells;
         if (BiobankPlugin.isRealScanEnabled()) {
-            int plateNum = BiobankPlugin.getDefault().getPlateNumber(
-                plateToScan);
+            int plateNum = BiobankPlugin.getDefault().getPlateNumber(plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BgcPlugin
-                .openAsyncError(
+                BgcPlugin.openAsyncError(
                     // dialog title
                     i18n.tr("Scan error"),
                     // dialog message
-                    i18n.tr("Plate with barcode {0} is not enabled",
-                        plateToScan));
+                    i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
                 return;
             }
             Set<DecodedWell> scanCells = null;
@@ -213,16 +208,14 @@ public class PalletScanManagement {
     @SuppressWarnings("nls")
     public void scanTubeAlone(MouseEvent e) {
         if (isScanTubeAloneMode()) {
-            RowColPos rcp = ((ScanPalletWidget) e.widget)
-                .getPositionAtCoordinates(e.x, e.y);
+            RowColPos rcp = ((ScanPalletWidget) e.widget).getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
                 PalletWell cell = wells.get(rcp);
                 if (canScanTubeAlone(cell)) {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletWell(new DecodedWell(rcp.getRow(),
-                                rcp.getCol(), value));
+                            cell = new PalletWell(new DecodedWell(rcp.getRow(), rcp.getCol(), value));
                             wells.put(rcp, cell);
                         } else {
                             cell.setValue(value);

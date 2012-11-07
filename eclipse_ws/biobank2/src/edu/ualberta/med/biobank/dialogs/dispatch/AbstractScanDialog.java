@@ -493,8 +493,9 @@ BgcBaseDialog {
     }
 
     protected boolean canScanTubeAlone(PalletWell cell) {
-        return cell == null || cell.getStatus() == UICellStatus.EMPTY
-            || cell.getStatus() == UICellStatus.MISSING;
+        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
+            || (cell.getStatus() == UICellStatus.ERROR)
+            || (cell.getStatus() == UICellStatus.MISSING));
     }
 
     protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {

@@ -247,11 +247,24 @@ public class DispatchCreateScanDialog extends
                     currentProductBarcode);
         Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
         if (currentPallet == null) {
-            Map<RowColPos, PalletWell> cells = PalletWell
+            Map<RowColPos, PalletWell> wells = PalletWell
                 .getRandomNonDispatchedSpecimens(
                     SessionManager.getAppService(), (currentShipment)
                         .getSenderCenter().getId());
-            return cells;
+            
+            // HACK!
+            // mangle some barcodes to pretend there is an error
+
+            int count = 0;
+            for (PalletWell well : wells.values()) {
+                if (count == 3) {
+                    String message = well.getValue();                
+                    well.setValue(message.substring(1, message.length() - 1));
+                }
+                ++count;
+            }
+
+            return wells;
         }
         for (SpecimenWrapper specimen : currentPallet.getSpecimens()
             .values()) {

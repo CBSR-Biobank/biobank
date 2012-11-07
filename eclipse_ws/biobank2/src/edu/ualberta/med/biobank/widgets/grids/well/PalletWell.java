@@ -221,12 +221,6 @@ public class PalletWell extends AbstractUIWell {
         return null;
     }
 
-    // public void setValue(String value) {
-    // if (decodedWell != null) {
-    // decodedWell.setValue(value);
-    // }
-    // }
-
     @Override
     public Integer getRow() {
         if (decodedWell == null) {

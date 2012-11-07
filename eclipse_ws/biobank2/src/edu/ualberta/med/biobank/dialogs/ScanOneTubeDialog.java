@@ -54,7 +54,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected String getTitleAreaMessage() {
         // TR: dialog title area message
-        return i18n.tr("Scan the missing tube for position {0}",
+        return i18n.tr("Scan the tube at position {0}",
             type.getPositionString(position));
     }
 
