@@ -16,6 +16,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import edu.ualberta.med.biobank.model.context.ExecutingUser;
 
+/**
+ * 
+ * @author Jonathan Ferland
+ * @see http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-part-one-configuration/
+ * @see http://www.baeldung.com/2011/12/02/the-persistence-layer-with-spring-3-1-and-hibernate/
+ */
 @Configuration
 @EnableTransactionManagement
 public class HibernateConfig {
