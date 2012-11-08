@@ -251,18 +251,20 @@ public class DispatchCreateScanDialog extends
                 .getRandomNonDispatchedSpecimens(
                     SessionManager.getAppService(), (currentShipment)
                         .getSenderCenter().getId());
-            
+
             // HACK!
             // mangle some barcodes to pretend there is an error
-
-            int count = 0;
-            for (PalletWell well : wells.values()) {
-                if (count == 3) {
-                    String message = well.getValue();                
-                    well.setValue(message.substring(1, message.length() - 1));
-                }
-                ++count;
-            }
+            //
+            // used for testing - comment out for now
+            //
+            // int count = 0;
+            // for (PalletWell well : wells.values()) {
+            // if (count == 3) {
+            // String message = well.getValue();
+            // well.setValue(message.substring(1, message.length() - 1));
+            // }
+            // ++count;
+            // }
 
             return wells;
         }

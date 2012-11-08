@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,8 +52,6 @@ public class TestSpecimenBatchOp extends TestAction {
 
     private final Set<OriginInfo> originInfos = new HashSet<OriginInfo>();
 
-    private Transaction tx;
-
     @Override
     @Before
     public void setUp() throws Exception {
@@ -63,7 +60,7 @@ public class TestSpecimenBatchOp extends TestAction {
             new SpecimenBatchOpPojoHelper(new NameGenerator("test_"
                 + getMethodNameR()));
 
-        tx = session.beginTransaction();
+        session.beginTransaction();
         factory.createSite();
         factory.createClinic();
         factory.createStudy();
@@ -99,7 +96,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAllSpecimens(
@@ -143,7 +140,7 @@ public class TestSpecimenBatchOp extends TestAction {
             new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         Set<OriginInfo> testOriginInfos = new HashSet<OriginInfo>();
 
@@ -181,7 +178,7 @@ public class TestSpecimenBatchOp extends TestAction {
             }
         }
 
-        tx.commit();
+        session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
@@ -237,7 +234,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
@@ -291,7 +288,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
@@ -323,7 +320,7 @@ public class TestSpecimenBatchOp extends TestAction {
         factory.createAliquotedSpecimen();
         parentSpecimens.add(factory.createParentSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> inputPojos =
             specimenCsvHelper.createAliquotedSpecimens(
@@ -357,7 +354,7 @@ public class TestSpecimenBatchOp extends TestAction {
         AliquotedSpecimen aliquotedSpecimen =
             factory.createAliquotedSpecimen();
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             new ArrayList<SpecimenBatchOpInputPojo>();
@@ -387,7 +384,7 @@ public class TestSpecimenBatchOp extends TestAction {
         patients.add(patient);
         factory.createSourceSpecimen();
 
-        tx.commit();
+        session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
@@ -429,7 +426,7 @@ public class TestSpecimenBatchOp extends TestAction {
             new HashSet<AliquotedSpecimen>();
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAllSpecimens(factory.getDefaultStudy(),
@@ -480,7 +477,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
@@ -525,7 +522,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
         Set<Container> childL2Containers = createContainers(aqSpecimenType);
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             new ArrayList<SpecimenBatchOpInputPojo>();
@@ -576,7 +573,7 @@ public class TestSpecimenBatchOp extends TestAction {
         Set<Container> childL2Containers =
             createContainers(factory.getDefaultSourceSpecimenType());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         // make sure you can add parent specimens without a worksheet #
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
@@ -638,7 +635,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.createAliquotedSpecimens(
@@ -684,7 +681,7 @@ public class TestSpecimenBatchOp extends TestAction {
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
         aliquotedSpecimens.add(factory.createAliquotedSpecimen());
 
-        tx.commit();
+        session.getTransaction().commit();
 
         ArrayList<SpecimenBatchOpInputPojo> csvInfos =
             specimenCsvHelper.aliquotedSpecimensCreate(patients,

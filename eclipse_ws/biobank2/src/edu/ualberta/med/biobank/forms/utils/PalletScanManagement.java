@@ -17,6 +17,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -93,13 +94,19 @@ public class PalletScanManagement {
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
+                } catch (AccessDeniedException e) {   
+                    BgcPlugin.openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan result error"),
+                        e.getLocalizedMessage());
+                    scanAndProcessError(e.getLocalizedMessage());                    
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
                         // dialog title
                         i18n.tr("Scan result error"),
                         e);
                     String msg = e.getMessage();
-                    if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+                    if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
                     }
                     scanAndProcessError("ERROR: " + msg);
