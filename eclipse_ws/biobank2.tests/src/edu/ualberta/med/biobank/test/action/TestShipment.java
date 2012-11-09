@@ -4,9 +4,7 @@ import java.util.HashSet;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
@@ -16,98 +14,71 @@ import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoDeleteAction;
 import edu.ualberta.med.biobank.common.action.originInfo.OriginInfoSaveAction;
-import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.shipment.ShipmentGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.IdSetMutator;
 import edu.ualberta.med.biobank.test.action.helper.OriginInfoHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestShipment extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
-    private String name;
-    private Integer studyId;
-    private Integer patientId;
-    private Integer siteId;
-    private Integer centerId;
+    private Patient patient;
+    private Site site;
+    private Center clinic;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + getR().nextInt();
-        studyId =
-            StudyHelper
-                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
-        siteId =
-            SiteHelper.createSite(getExecutor(), name + "1", "Edmonton",
-                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
-        centerId =
-            SiteHelper.createSite(getExecutor(), name + "2", "Calgary",
-                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
-        patientId =
-            exec(new PatientSaveAction(null, studyId, name,
-                Utils.getRandomDate(), null)).getId();
+        session.beginTransaction();
+        site = factory.createSite();
+        clinic = factory.createClinic();
+        patient = factory.createPatient();
+        session.getTransaction().commit();
     }
 
     @Test
     public void saveWithSpecs() throws Exception {
         OriginInfoSaveInfo oisave =
             OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
-                getExecutor(),
-                patientId, siteId, centerId);
+                getExecutor(), patient.getId(), site, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
 
-        for (Integer spec : oisave.addedSpecIds) {
-            Assert.assertTrue(((Specimen) session.load(Specimen.class, spec))
-                .getOriginInfo().getCenter().getId()
-                .equals(siteId));
+        for (Integer specimenId : oisave.addedSpecIds) {
+            Specimen spc = (Specimen) session.load(Specimen.class, specimenId); 
+            Assert.assertEquals(site.getId(), spc.getOriginInfo().getCenter().getId());
         }
 
-        Integer id =
-            exec(new OriginInfoSaveAction(oisave, shipsave))
-                .getId();
+        Integer id = exec(new OriginInfoSaveAction(oisave, shipsave)).getId();
 
         ShipmentReadInfo info =
             exec(new ShipmentGetInfoAction(id));
 
-        Assert.assertTrue(info.originInfo.getCenter().getId()
-            .equals(oisave.centerId));
-        Assert.assertTrue(info.originInfo.getReceiverSite().getId()
-            .equals(oisave.siteId));
+        Assert.assertEquals(oisave.centerId, info.originInfo.getCenter().getId());
+        Assert.assertEquals(oisave.siteId, info.originInfo.getReceiverSite().getId());
         for (SpecimenInfo spec : info.specimens) {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.specimen
                 .getId()));
-            Assert.assertTrue(spec.specimen.getOriginInfo().getCenter().getId()
-                .equals(centerId));
-            Assert.assertTrue(spec.specimen.getOriginInfo().getReceiverSite()
-                .getId()
-                .equals(siteId));
-            Assert.assertTrue(spec.specimen.getCurrentCenter().getId()
-                .equals(siteId));
+            Assert.assertEquals(clinic.getId(), spec.specimen.getOriginInfo().getCenter().getId());
+            Assert.assertEquals(site.getId(), 
+                spec.specimen.getOriginInfo().getReceiverSite().getId());
+            Assert.assertEquals(site.getId(), spec.specimen.getCurrentCenter().getId());
         }
-        for (SpecimenInfo spec : info.specimens)
-            Assert.assertTrue(!oisave.removedSpecIds.contains(spec.specimen
-                .getId()));
+        for (SpecimenInfo spec : info.specimens) {
+            Assert.assertTrue(!oisave.removedSpecIds.contains(spec.specimen.getId()));
+        }
 
         oisave.removedSpecIds = oisave.addedSpecIds;
         oisave.addedSpecIds = new HashSet<Integer>();
-        id =
-            exec(new OriginInfoSaveAction(oisave, shipsave))
-                .getId();
+        id = exec(new OriginInfoSaveAction(oisave, shipsave)).getId();
 
-        info =
-            exec(new ShipmentGetInfoAction(id));
+        info = exec(new ShipmentGetInfoAction(id));
 
         Assert.assertTrue(info.specimens.size() == 0);
 
@@ -126,20 +97,19 @@ public class TestShipment extends TestAction {
         // Set of null
         try {
             oisave.addedSpecIds = mut.getSetWithNull();
-            exec(new OriginInfoSaveAction(oisave, shipsave))
-                .getId();
-            Assert.fail();
+            exec(new OriginInfoSaveAction(oisave, shipsave)).getId();
+            Assert.fail("should throw exception");
         } catch (ActionException e) {
-            // cool
+            // intentionally empty
         }
 
         // Out of Bounds
         try {
             oisave.addedSpecIds = mut.getOutOfBounds();
-            exec(new OriginInfoSaveAction(oisave, shipsave))
-                .getId();
-            Assert.fail();
+            exec(new OriginInfoSaveAction(oisave, shipsave)).getId();
+            Assert.fail("should throw exception");
         } catch (ModelNotFoundException e) {
+            // intentionally empty
         }
     }
 
@@ -147,29 +117,22 @@ public class TestShipment extends TestAction {
     public void testDelete() throws Exception {
         OriginInfoSaveInfo oisave =
             OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
-                getExecutor(),
-                patientId, siteId, centerId);
+                getExecutor(), patient.getId(), site, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
             exec(new OriginInfoSaveAction(oisave, shipsave))
                 .getId();
 
-        for (Integer spec : oisave.addedSpecIds) {
-            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getOriginInfo()
-                .getCenter().getId()
-                .equals(centerId));
-            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getOriginInfo().getReceiverSite().getId()
-                .equals(siteId));
-            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getCurrentCenter().getId()
-                .equals(siteId));
+        for (Integer specimenId : oisave.addedSpecIds) {
+            Specimen spc = (Specimen) session.get(Specimen.class, specimenId);
+            Assert.assertEquals(clinic.getId(), spc.getOriginInfo().getCenter().getId());
+            Assert.assertEquals(site.getId(), spc.getOriginInfo().getReceiverSite().getId());
+            Assert.assertEquals(site.getId(), spc.getCurrentCenter().getId());
         }
 
         ShipmentReadInfo info = exec(new ShipmentGetInfoAction(id));
-        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(site));
         OriginInfoDeleteAction action =
             new OriginInfoDeleteAction(info.originInfo, siteInfo.getSite());
         exec(action);
@@ -177,14 +140,10 @@ public class TestShipment extends TestAction {
         session.close();
         session = openSession();
 
-        for (Integer spec : oisave.addedSpecIds) {
-            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getOriginInfo()
-                .getCenter().getId()
-                .equals(siteId));
-            Assert.assertTrue(((Specimen) session.get(Specimen.class, spec))
-                .getCurrentCenter().getId()
-                .equals(siteId));
+        for (Integer specimenId : oisave.addedSpecIds) {
+            Specimen spc = (Specimen) session.get(Specimen.class, specimenId);
+            Assert.assertEquals(site.getId(), spc.getOriginInfo().getCenter().getId());
+            Assert.assertEquals(site.getId(), spc.getCurrentCenter().getId());
         }
 
     }
@@ -193,8 +152,7 @@ public class TestShipment extends TestAction {
     public void testComment() throws Exception {
         OriginInfoSaveInfo oisave =
             OriginInfoHelper.createSaveOriginInfoSpecimenInfoRandom(
-                getExecutor(),
-                patientId, siteId, centerId);
+                getExecutor(), patient.getId(), site, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =

@@ -23,23 +23,20 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class RequestHelper extends Helper {
 
     public static Integer createRequest(Session session,
-        IActionExecutor actionExecutor, Integer rgId) throws Exception {
+        IActionExecutor actionExecutor, ResearchGroup researchGroup) throws Exception {
 
         session.beginTransaction();
         String name = Utils.getRandomString(5);
 
         ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(rgId);
+            new ResearchGroupGetInfoAction(researchGroup.getId());
         ResearchGroupReadInfo rg = actionExecutor.exec(reader);
 
         // create specs
-        Integer p =
-            PatientHelper.createPatient(actionExecutor, name + "_patient",
+        Integer p = PatientHelper.createPatient(actionExecutor, name + "_patient",
                 rg.researchGroup.getStudy().getId());
-        Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(
-                actionExecutor,
-                p, rgId);
+        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(
+                actionExecutor, p, researchGroup);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
@@ -50,11 +47,9 @@ public class RequestHelper extends Helper {
 
         // request specs
         Request request = new Request();
-        request.setResearchGroup((ResearchGroup) session.get(
-            ResearchGroup.class, rgId));
+        request.setResearchGroup(researchGroup);
         request.setCreatedAt(new Date());
-        request.setAddress(((ResearchGroup) session.get(ResearchGroup.class,
-            rgId)).getAddress());
+        request.setAddress(researchGroup.getAddress());
 
         session.saveOrUpdate(request);
 

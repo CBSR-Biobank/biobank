@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
@@ -121,7 +122,7 @@ public class SiteHelper extends Helper {
 
             siteId = site.getId();
             studyId = study.getId();
-            clinicId = clinic.getId();
+            clinicId = getClinic().getId();
             for (Patient p : study.getPatients()) {
                 patientIds.add(p.getId());
             }
@@ -148,6 +149,14 @@ public class SiteHelper extends Helper {
             containerSaveAction.setTypeId(containerTypeId);
             containerSaveAction.setLabel(label);
             return executor.exec(containerSaveAction).getId();
+        }
+
+        public Clinic getClinic() {
+            return clinic;
+        }
+
+        public Center getSite() {
+            return site;
         }
     }
 }

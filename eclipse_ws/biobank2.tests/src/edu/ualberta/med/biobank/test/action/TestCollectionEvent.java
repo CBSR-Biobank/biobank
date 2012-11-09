@@ -70,7 +70,7 @@ public class TestCollectionEvent extends TestAction {
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNumber, ActivityStatus.ACTIVE, commentText, null,
-                null)).getId();
+                null, provisioning.getClinic())).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
@@ -90,13 +90,14 @@ public class TestCollectionEvent extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, getExecutor().getUserId(), provisioning.siteId);
+                typeId, getExecutor().getUserId());
 
         // Save a new cevent
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNumber, ActivityStatus.ACTIVE, commentText,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
+                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
+                provisioning.getClinic()))
             .getId();
 
         // Check CollectionEvent is in database with correct values
@@ -142,13 +143,13 @@ public class TestCollectionEvent extends TestAction {
         newSpecList.add(modifiedSpec);
         SaveCEventSpecimenInfo newSpec =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandom(typeId,
-                getExecutor().getUserId(), provisioning.siteId);
+                getExecutor().getUserId());
         newSpecList.add(newSpec);
         // modify cevent
         exec(new CollectionEventSaveAction(ceventId,
             provisioning.patientIds.get(0), visitNumber + 1,
             ActivityStatus.ACTIVE,
-            commentText, newSpecList, null));
+            commentText, newSpecList, null, provisioning.getClinic()));
 
         // Check CollectionEvent is modified
         session.clear();
@@ -196,7 +197,7 @@ public class TestCollectionEvent extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, getExecutor().getUserId(), provisioning.siteId);
+                typeId, getExecutor().getUserId());
 
         setEventAttrs(provisioning.studyId);
         StudyInfo studyInfo =
@@ -228,7 +229,7 @@ public class TestCollectionEvent extends TestAction {
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNber, ActivityStatus.ACTIVE, commentText,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                attrs)).getId();
+                attrs, provisioning.getClinic())).getId();
 
         // Call get infos action
         PatientInfo patientInfo =
@@ -299,7 +300,7 @@ public class TestCollectionEvent extends TestAction {
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNumber, ActivityStatus.ACTIVE, commentText, null,
-                attrs)).getId();
+                attrs, provisioning.getClinic())).getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent =
@@ -321,7 +322,7 @@ public class TestCollectionEvent extends TestAction {
         // Save with a different value for attrinfo
         exec(new CollectionEventSaveAction(ceventId,
             provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
-            commentText, null, attrs));
+            commentText, null, attrs, provisioning.getClinic()));
 
         session.clear();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -420,9 +421,7 @@ public class TestCollectionEvent extends TestAction {
             exec(
                 new CollectionEventSaveAction(null, provisioning.patientIds
                     .get(0), getR().nextInt(20) + 1, ActivityStatus.ACTIVE,
-                    Utils
-                        .getRandomString(20, 30),
-                    null, null)).getId();
+                    Utils.getRandomString(20, 30), null, null, provisioning.getClinic())).getId();
 
         // test delete
         CEventInfo info =
@@ -463,11 +462,9 @@ public class TestCollectionEvent extends TestAction {
 
         Integer visitNber = getR().nextInt(20) + 1;
         // Save a new cevent
-        final Integer ceventId =
-            exec(
-                new CollectionEventSaveAction(null, provisioning.patientIds
-                    .get(0), visitNber, ActivityStatus.ACTIVE, null, null,
-                    attrs)).getId();
+        final Integer ceventId = exec(new CollectionEventSaveAction(
+            null, provisioning.patientIds.get(0), visitNber, ActivityStatus.ACTIVE, 
+            null, null, attrs, provisioning.getClinic())).getId();
 
         // Call get eventAttr infos action
         Map<Integer, EventAttrInfo> infos =

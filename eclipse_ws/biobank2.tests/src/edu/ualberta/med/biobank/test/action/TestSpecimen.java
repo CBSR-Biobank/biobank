@@ -47,13 +47,14 @@ public class TestSpecimen extends TestAction {
         final Integer typeId = getSpecimenTypes().get(0).getId();
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(5,
-                typeId, getExecutor().getUserId(), provisioning.siteId);
+                typeId, getExecutor().getUserId());
 
         // Save a new cevent
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null))
+                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
+            provisioning.getClinic()))
             .getId();
 
         CEventInfo ceventInfo =

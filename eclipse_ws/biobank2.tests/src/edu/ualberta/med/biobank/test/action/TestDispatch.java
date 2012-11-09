@@ -6,9 +6,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchChangeStateAction;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
@@ -20,56 +18,40 @@ import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
-import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
-import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestDispatch extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
-    private String name;
-    private Integer studyId;
     private Integer patientId;
-    private Integer siteId;
-    private Integer centerId;
+    private Center site;
+    private Center clinic;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + getR().nextInt();
-        studyId =
-            StudyHelper
-                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
-        siteId =
-            SiteHelper.createSite(getExecutor(), name + "1", "Edmonton",
-                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
-        centerId =
-            SiteHelper.createSite(getExecutor(), name + "2", "Calgary",
-                ActivityStatus.ACTIVE, new HashSet<Integer>(studyId));
-        patientId =
-            exec(new PatientSaveAction(null, studyId, name,
-                Utils.getRandomDate(), null)).getId();
+        session.beginTransaction();
+        site = factory.createSite();
+        clinic = factory.createClinic();
+        patientId = factory.createPatient().getId();
+        session.getTransaction().commit();
     }
 
     @Test
     public void saveWithSpecs() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+            DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
                 DispatchState.CREATION,
-                name + Utils.getRandomString(5));
+                testName + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
-                patientId, centerId);
+                patientId, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
@@ -95,7 +77,7 @@ public class TestDispatch extends TestAction {
         // test duplicates
         specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
-                patientId, centerId);
+                patientId, clinic);
         Iterator<DispatchSpecimenInfo> it = specs.iterator();
 
         Integer specId = it.next().specimenId;
@@ -136,12 +118,12 @@ public class TestDispatch extends TestAction {
     @Test
     public void testStateChange() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+            DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
                 DispatchState.CREATION,
-                name + Utils.getRandomString(5));
+                testName + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
-                patientId, centerId);
+                patientId, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
@@ -181,12 +163,12 @@ public class TestDispatch extends TestAction {
     @Test
     public void testDelete() throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+            DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
                 DispatchState.IN_TRANSIT,
-                name + Utils.getRandomString(5));
+                testName + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
-                patientId, centerId);
+                patientId, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
@@ -211,18 +193,18 @@ public class TestDispatch extends TestAction {
     public void testComment() throws Exception {
 
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(siteId, centerId,
+            DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
                 DispatchState.IN_TRANSIT,
-                name + Utils.getRandomString(5));
+                testName + Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(getExecutor(),
-                patientId, centerId);
+                patientId, clinic);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
             exec(new DispatchSaveAction(d, specs, shipsave))
                 .getId();
-        d.id = id;
+        d.dispatchId = id;
 
         DispatchReadInfo info = exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(1, info.dispatch.getComments().size());
