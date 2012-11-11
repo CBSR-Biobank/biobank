@@ -28,9 +28,9 @@ public class DispatchSaveAction implements Action<IdResult> {
      * 
      */
     private static final long serialVersionUID = 1L;
-    private DispatchSaveInfo dInfo;
-    private Set<DispatchSpecimenInfo> dsInfos;
-    private ShipmentInfoSaveInfo siInfo;
+    private final DispatchSaveInfo dInfo;
+    private final Set<DispatchSpecimenInfo> dsInfos;
+    private final ShipmentInfoSaveInfo siInfo;
 
     public DispatchSaveAction(DispatchSaveInfo dInfo,
         Set<DispatchSpecimenInfo> dsInfos, ShipmentInfoSaveInfo siInfo) {
@@ -41,13 +41,13 @@ public class DispatchSaveAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new DispatchUpdatePermission(dInfo.id).isAllowed(context);
+        return new DispatchUpdatePermission(dInfo.dispatchId).isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
         Dispatch disp =
-            context.get(Dispatch.class, dInfo.id, new Dispatch());
+            context.get(Dispatch.class, dInfo.dispatchId, new Dispatch());
 
         disp.setReceiverCenter(context.get(Center.class, dInfo.receiverId));
         disp.setSenderCenter(context.get(Center.class, dInfo.senderId));

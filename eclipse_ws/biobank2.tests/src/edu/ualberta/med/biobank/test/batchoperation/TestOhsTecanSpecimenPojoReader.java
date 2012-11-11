@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.test.batchoperation;
 
-import java.io.File;
 import java.io.FileReader;
-import java.util.List;
 
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -17,7 +15,6 @@ import org.supercsv.prefs.CsvPreference;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.batchoperation.specimen.OhsTecanSpecimenPojoReader;
 import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenPojoReaderFactory;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -35,6 +32,8 @@ public class TestOhsTecanSpecimenPojoReader extends TestAction {
 
     @Test
     public void processTecanFile() throws Exception {
+        createDbConfiguration();
+
         final String CSV_NAME = "tecan/ohs_tecan.csv";
         ICsvBeanReader reader =
             new CsvBeanReader(new FileReader(CSV_NAME),
@@ -45,37 +44,19 @@ public class TestOhsTecanSpecimenPojoReader extends TestAction {
         Assert.assertTrue(csvHeaders.length > 0);
 
         IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader =
-            SpecimenPojoReaderFactory.createPojoReader(csvHeaders);
+            SpecimenPojoReaderFactory.createPojoReader(
+                factory.getDefaultSite(), CSV_NAME, csvHeaders);
 
         Assert.assertTrue(pojoReader instanceof OhsTecanSpecimenPojoReader);
 
-        try {
-            pojoReader.getPojos();
-            Assert.fail("reader not set on pojo reader and no exception");
-        } catch (IllegalStateException e) {
-            // intentionally empty
-        }
-
-        createDbConfiguration();
-
-        pojoReader.setFilename(CSV_NAME);
-        pojoReader.setReader(reader);
-        pojoReader.preExecution();
-
-        List<SpecimenBatchOpInputPojo> batchOpPojos =
-            pojoReader.getPojos();
+        pojoReader.readPojos(reader);
 
         try {
-            SpecimenBatchOpAction importAction =
-                new SpecimenBatchOpAction(factory.getDefaultSite(),
-                    batchOpPojos, new File(CSV_NAME));
-            exec(importAction);
+            exec(pojoReader.getAction());
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
-
-        pojoReader.postExecution();
     }
 
     private void createDbConfiguration() {

@@ -50,22 +50,28 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     @SuppressWarnings("nls")
     public static final Tr ABSENT_SPECIMEN_ERRMSG =
         bundle.tr("Specimen \"{0}\" not found in collection.");
+    
     @SuppressWarnings("nls")
     public static final Tr LOCKED_LABEL_ERRMSG =
         bundle.tr("Attribute for label \"{0}\" is locked, changes not" +
             " permitted.");
+    
     @SuppressWarnings("nls")
     public static final Tr STUDY_EVENT_ATTR_MISSING_ERRMSG =
         bundle.tr("Cannot find Study Event Attribute with id \"{0}\".");
+    
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG =
         bundle.tr("Value \"{0}\" is invalid for label \"{2}\".");
+    
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG =
         bundle.tr("Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".");
+    
     @SuppressWarnings("nls")
     public static final Tr CANNOT_PARSE_DATE_ERRMSG =
         bundle.tr("Cannot parse date \"{0}\".");
+    
     @SuppressWarnings("nls")
     public static final Tr UNKNOWN_EVENT_ATTR_TYPE_ERRMSG =
         bundle.tr("Unknown Event Attribute Type \"{0}\".");
@@ -78,7 +84,6 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public Date createdAt;
         public ActivityStatus activityStatus;
         public Integer specimenTypeId;
-        public Integer centerId;
         public List<String> comments = new ArrayList<String>();
         public BigDecimal quantity;
     }
@@ -91,10 +96,12 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         public String value;
     }
 
-    private Integer ceventId;
-    private Integer patientId;
-    private Integer visitNumber;
-    private ActivityStatus activityStatus;
+    private final Integer ceventId;
+    private final Integer patientId;
+    private final Integer visitNumber;
+    private final ActivityStatus activityStatus;
+    private final Integer centerId;
+
     private String commentText;
     private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
     private List<CEventAttrSaveInfo> ceAttrList =
@@ -103,7 +110,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     public CollectionEventSaveAction(Integer ceventId, Integer patientId,
         Integer visitNumber, ActivityStatus activityStatus, String commentText,
         Collection<SaveCEventSpecimenInfo> sourceSpecs,
-        List<CEventAttrSaveInfo> ceAttrList) {
+        List<CEventAttrSaveInfo> ceAttrList, Center currentWorkingCenter) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
@@ -111,22 +118,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.commentText = commentText;
         this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
-    }
-
-    public void setCeventId(Integer ceventId) {
-        this.ceventId = ceventId;
-    }
-
-    public void setPatientId(Integer patientId) {
-        this.patientId = patientId;
-    }
-
-    public void setVisitNumber(Integer visitNumber) {
-        this.visitNumber = visitNumber;
-    }
-
-    public void setActivityStatus(ActivityStatus activityStatus) {
-        this.activityStatus = activityStatus;
+        this.centerId = currentWorkingCenter.getId();
     }
 
     public void setCommentText(String commentText) {
@@ -188,8 +180,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (specInfo.id == null) {
                     if (oi == null) {
                         oi = new OriginInfo();
-                        oi.setCenter(context.load(Center.class,
-                            specInfo.centerId));
+                        oi.setCenter(context.load(Center.class, centerId));
                         context.getSession().saveOrUpdate(oi);
                     }
 

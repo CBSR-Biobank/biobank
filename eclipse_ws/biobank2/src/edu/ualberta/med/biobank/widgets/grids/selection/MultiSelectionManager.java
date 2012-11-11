@@ -18,7 +18,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUICell;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 
 public class MultiSelectionManager {
 
@@ -34,8 +34,8 @@ public class MultiSelectionManager {
     private boolean selectionTrackOn = false;
     private SelectionMode selectionMode = SelectionMode.NONE;
 
-    private Map<RowColPos, AbstractUICell> selectedCells;
-    private AbstractUICell lastSelectedCell;
+    private Map<RowColPos, AbstractUIWell> selectedCells;
+    private AbstractUIWell lastSelectedCell;
     private List<MultiSelectionListener> listeners;
 
     private MultiSelectionSpecificBehaviour specificBehaviour;
@@ -44,11 +44,11 @@ public class MultiSelectionManager {
 
     public MultiSelectionManager(ContainerDisplayWidget container) {
         this.container = container;
-        selectedCells = new TreeMap<RowColPos, AbstractUICell>();
+        selectedCells = new TreeMap<RowColPos, AbstractUIWell>();
         listeners = new ArrayList<MultiSelectionListener>();
     }
 
-    public Collection<AbstractUICell> getSelectedCells() {
+    public Collection<AbstractUIWell> getSelectedCells() {
         return selectedCells.values();
     }
 
@@ -68,7 +68,7 @@ public class MultiSelectionManager {
         container.removeMouseListener(selectionMouseListener);
         container.removeMouseTrackListener(selectionMouseTrackListener);
         clearMultiSelection();
-        for (AbstractUICell cell : container.getCells().values()) {
+        for (AbstractUIWell cell : container.getCells().values()) {
             specificBehaviour.removeSelection(cell);
         }
         enabled = false;
@@ -79,7 +79,7 @@ public class MultiSelectionManager {
     }
 
     public void clearMultiSelection(boolean notify) {
-        for (AbstractUICell cell : selectedCells.values()) {
+        for (AbstractUIWell cell : selectedCells.values()) {
             cell.setSelected(false);
         }
         selectedCells.clear();
@@ -92,8 +92,8 @@ public class MultiSelectionManager {
         notifyListeners(new MultiSelectionEvent(this, selectedCells.size()));
     }
 
-    private void addAllCellsInRange(AbstractUICell cell) {
-        AbstractUICell firstCell = lastSelectedCell;
+    private void addAllCellsInRange(AbstractUIWell cell) {
+        AbstractUIWell firstCell = lastSelectedCell;
         int startRow = firstCell.getRow();
         int endRow = cell.getRow();
         if (startRow > endRow) {
@@ -108,7 +108,7 @@ public class MultiSelectionManager {
                 endCol = firstCell.getCol();
             }
             for (int indexCol = startCol; indexCol <= endCol; indexCol++) {
-                AbstractUICell cellToAdd = container.getCells().get(
+                AbstractUIWell cellToAdd = container.getCells().get(
                     new RowColPos(indexRow, indexCol));
                 if (cellToAdd != null
                     && specificBehaviour.isSelectable(cellToAdd)) {
@@ -126,7 +126,7 @@ public class MultiSelectionManager {
                 @Override
                 public void mouseDown(MouseEvent e) {
                     selectionTrackOn = true;
-                    AbstractUICell cell = container.getObjectAtCoordinates(e.x,
+                    AbstractUIWell cell = container.getObjectAtCoordinates(e.x,
                         e.y);
                     if (cell != null && specificBehaviour.isSelectable(cell)) {
                         switch (selectionMode) {
@@ -176,7 +176,7 @@ public class MultiSelectionManager {
                 @Override
                 public void mouseHover(MouseEvent e) {
                     if (selectionTrackOn) {
-                        AbstractUICell cell = container.getObjectAtCoordinates(
+                        AbstractUIWell cell = container.getObjectAtCoordinates(
                             e.x, e.y);
                         if (cell != null && !cell.equals(lastSelectedCell)) {
                             selectCell(cell);
@@ -207,7 +207,7 @@ public class MultiSelectionManager {
         }
     }
 
-    private void selectCell(AbstractUICell cell) {
+    private void selectCell(AbstractUIWell cell) {
         selectedCells.put(new RowColPos(cell.getRow(), cell.getCol()), cell);
         cell.setSelected(true);
         lastSelectedCell = cell;

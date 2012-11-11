@@ -74,7 +74,7 @@ public class TestClinic extends TestAction {
         session.getTransaction().commit();
 
         CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(),
-            provisioning.patientIds.get(0), provisioning.clinicId);
+            provisioning.patientIds.get(0), provisioning.getClinic());
 
         ClinicInfo clinicInfo =
             exec(new ClinicGetInfoAction(provisioning.clinicId));

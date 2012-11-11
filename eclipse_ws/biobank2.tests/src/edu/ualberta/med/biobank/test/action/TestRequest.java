@@ -8,9 +8,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
@@ -24,56 +22,39 @@ import edu.ualberta.med.biobank.common.action.request.RequestStateChangeAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.RequestSubmitAction;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
-import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestRequest extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
-    private String name;
-    private Integer studyId;
-
-    private Integer rgId;
+    private ResearchGroup researchGroup;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + getR().nextInt();
-        studyId =
-            StudyHelper
-                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
-        rgId =
-            ResearchGroupHelper.createResearchGroup(getExecutor(),
-                name + "rg",
-                name + "rg",
-                studyId);
+        session.beginTransaction();
+        researchGroup = factory.createResearchGroup();
+        session.getTransaction().commit();
     }
 
     @Test
     public void testUpload() throws Exception {
 
         ResearchGroupGetInfoAction rgInfo =
-            new ResearchGroupGetInfoAction(rgId);
+            new ResearchGroupGetInfoAction(researchGroup.getId());
         ResearchGroupReadInfo rg = exec(rgInfo);
 
         // create specs
-        Integer p =
-            PatientHelper.createPatient(getExecutor(), name + "_patient",
+        Integer p = PatientHelper.createPatient(getExecutor(), testName + "_patient",
                 rg.researchGroup.getStudy().getId());
-        Integer ceId =
-            CollectionEventHelper.createCEventWithSourceSpecimens(
-                getExecutor(),
-                p, rgId);
+        Integer ceId = CollectionEventHelper.createCEventWithSourceSpecimens(
+                getExecutor(), p, researchGroup);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
@@ -88,7 +69,7 @@ public class TestRequest extends TestAction {
 
         // request specs
         RequestSubmitAction action =
-            new RequestSubmitAction(rgId, specs);
+            new RequestSubmitAction(researchGroup.getId(), specs);
         Integer rId = exec(action).getId();
 
         // make sure you got what was requested
@@ -105,7 +86,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testClaim() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -132,7 +113,7 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testStateChanges() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
 
         RequestGetSpecimenInfosAction specAction =
             new RequestGetSpecimenInfosAction(rId);
@@ -159,13 +140,13 @@ public class TestRequest extends TestAction {
 
     @Test
     public void testDelete() throws Exception {
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
 
         RequestReadInfo reqInfo = exec(new RequestGetInfoAction(rId));
         RequestDeleteAction delete = new RequestDeleteAction(reqInfo.request);
         exec(delete);
 
-        rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        rId = RequestHelper.createRequest(session, getExecutor(), researchGroup);
         session.beginTransaction();
         Request r = (Request) session.get(Request.class, rId);
         r.setSubmitted(new Date());

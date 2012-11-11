@@ -392,18 +392,16 @@ public class RequestEntryForm extends BiobankViewForm {
                         i18n.tr("Error Adding: Specimen has not been pulled."));
         }
         DispatchSaveInfo dInfo =
-            new DispatchSaveInfo(dispatch.getId(), request.getResearchGroup()
-                .getId(),
-                SessionManager.getUser()
-                    .getCurrentWorkingCenter().getId(),
+            new DispatchSaveInfo(dispatch.getId(), request.getResearchGroup().getWrappedObject(),
+                SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject(),
                 DispatchState.CREATION, StringUtil.EMPTY_STRING);
 
-        List<Integer> ids =
-            new ArrayList<Integer>();
-        if (specs != null)
+        List<Integer> ids = new ArrayList<Integer>();
+        if (specs != null) {
             for (RequestSpecimenWrapper rs : specs) {
                 ids.add(rs.getId());
             }
+        }
         RequestDispatchAction update =
             new RequestDispatchAction(request.getId(), ids,
                 RequestSpecimenState.DISPATCHED_STATE, dInfo, dsInfos);

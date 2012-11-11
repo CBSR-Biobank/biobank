@@ -160,11 +160,11 @@ public class TestSite extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        Transaction tx = session.beginTransaction();
+        session.beginTransaction();
         factory.createProcessingEvent();
         Specimen alqSpecimen = factory.createChildSpecimen();
         factory.getDefaultParentSpecimen().getChildSpecimens().add(alqSpecimen);
-        tx.commit();
+        session.getTransaction().commit();
 
         Site site = factory.getDefaultSite();
 
@@ -499,7 +499,7 @@ public class TestSite extends TestAction {
         // create a collection event
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
+                provisioning.patientIds.get(0), provisioning.getClinic());
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
@@ -539,21 +539,16 @@ public class TestSite extends TestAction {
     public void deleteWithSrcDispatch() throws Exception {
         session.beginTransaction();
         Provisioning provisioning = new Provisioning(session, factory);
+        // create a second site to dispatch to
+        Site site2 = factory.createSite();
         session.getTransaction().commit();
 
-        Integer dispatchId1 =
-            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
-                provisioning.siteId,
-                provisioning.patientIds.get(0));
+        Integer dispatchId1 = DispatchHelper.createDispatch(getExecutor(), 
+            provisioning.getClinic(), provisioning.getSite(), 
+            provisioning.patientIds.get(0));
 
-        // create a second site to dispatch to
-        Integer siteId2 = exec(
-            SiteHelper.getSaveAction(name + "_site2", name + "_site2",
-                ActivityStatus.ACTIVE)).getId();
-
-        Integer dispatchId2 =
-            DispatchHelper.createDispatch(getExecutor(), provisioning.siteId,
-                siteId2, provisioning.patientIds.get(0));
+        Integer dispatchId2 = DispatchHelper.createDispatch(getExecutor(), 
+            provisioning.getSite(), site2, provisioning.patientIds.get(0));
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
@@ -604,10 +599,9 @@ public class TestSite extends TestAction {
         Provisioning provisioning = new Provisioning(session, factory);
         session.getTransaction().commit();
 
-        Integer dispatchId =
-            DispatchHelper.createDispatch(getExecutor(), provisioning.clinicId,
-                provisioning.siteId,
-                provisioning.patientIds.get(0));
+        Integer dispatchId = DispatchHelper.createDispatch(getExecutor(), 
+            provisioning.getClinic(), provisioning.getSite(),
+            provisioning.patientIds.get(0));
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));

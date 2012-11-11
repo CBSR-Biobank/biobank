@@ -23,6 +23,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.specimen.SpecimenBatchOpInterpreter;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.common.util.Holder;
@@ -157,21 +158,20 @@ public class SpecimenImportForm extends BiobankViewForm {
 
                 try {
                     SpecimenBatchOpInterpreter interpreter =
-                        new SpecimenBatchOpInterpreter(filename);
+                        new SpecimenBatchOpInterpreter();
 
-                    monitor.beginTask(i18n.tr("Reading file..."),
+                    monitor.beginTask(i18n.tr("Processing file..."),
                         IProgressMonitor.UNKNOWN);
-                    interpreter.readPojos();
-
-                    monitor.beginTask(i18n.tr("Saving data..."),
-                        IProgressMonitor.UNKNOWN);
-                    batchOpId.setValue(interpreter.savePojos());
+                    batchOpId.setValue(interpreter.processFile(filename));
 
                     success.setValue(true);
                 } catch (ClientBatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
                 } catch (BatchOpErrorsException e) {
                     errors.addAll(e.getErrors());
+                } catch (AccessDeniedException e) {
+                    throw new RuntimeException(
+                        i18n.tr("You don't have permission to do this."));
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
                 } finally {

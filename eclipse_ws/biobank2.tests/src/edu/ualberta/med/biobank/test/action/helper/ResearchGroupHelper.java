@@ -8,16 +8,13 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class ResearchGroupHelper extends Helper {
 
-    public static Integer createResearchGroup(
-        IActionExecutor actionExecutor,
+    public static Integer createResearchGroup(IActionExecutor actionExecutor,
         String name, String nameShort, Integer studyId) throws Exception {
         AddressSaveInfo addressSaveInfo =
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");
-        ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, name + "rg", nameShort + "rg",
-                studyId, "comment", addressSaveInfo,
-                ActivityStatus.ACTIVE);
+        ResearchGroupSaveInfo save = new ResearchGroupSaveInfo(null, name, nameShort,
+            studyId, "comment", addressSaveInfo, ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 
         return actionExecutor.exec(rgSave).getId();

@@ -294,7 +294,7 @@ public class Specimen extends AbstractBiobankModel
         this.parentSpecimen = parentSpecimen;
     }
 
-    @Column(name = "PLATE_ERRORS", length = 100)
+    @Column(name = "PLATE_ERRORS", columnDefinition = "TEXT")
     public String getPlateErrors() {
         return plateErrors;
     }

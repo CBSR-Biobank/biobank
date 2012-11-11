@@ -133,7 +133,7 @@ public class TestStudy extends TestAction {
         session.getTransaction().commit();
 
         CollectionEventHelper.createCEventWithSourceSpecimens(getExecutor(),
-            provisioning.patientIds.get(0), provisioning.clinicId);
+            provisioning.patientIds.get(0), provisioning.getClinic());
 
         Set<SourceSpecimenSaveInfo> ssSaveInfosAll =
             getSourceSpecimens(getR().nextInt(5) + 1, getSpecimenTypes());

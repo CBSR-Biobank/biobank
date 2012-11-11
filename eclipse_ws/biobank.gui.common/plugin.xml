@@ -131,6 +131,12 @@
             </equals>
          </with>
       </definition>
+      <definition id="edu.ualberta.med.biobank.gui.common.batchOperationPermission">
+         <with variable="edu.ualberta.med.biobank.gui.common.sourceprovider.batchOperationPermission">
+            <equals value="true">
+            </equals>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">

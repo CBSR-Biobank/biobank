@@ -12,6 +12,7 @@ OPTIONS
               If not specified, the script prompts the user to enter it.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
+  -n DBNAME   The name of the database to create.
   -u DBUSER   The user to use on the MySQL server.
               If not specified, the script prompts the user to enter it.
   -h          Help text.
@@ -21,7 +22,7 @@ MYSQL=/usr/bin/mysql
 MYSQLDUMP=/usr/bin/mysqldump
 SED=/bin/sed
 DBHOST="localhost"
-DBNAME=biobank2
+DBNAME=biobank
 
 while getopts "d:hH:n:u:p:o:" OPTION
 do

@@ -32,7 +32,7 @@
 "NU00135288","NUEZ923745","G04",,,,0,,,,,,,,677,
 "NU00135288","NUEZ923860","H04",,,,0,,,,,,,,678,
 "NU00135288","NUEZ923037","A05","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,743,1
-"NU00135288","NUEZ923152","B05","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,744,2
+"NU00135288","NUEZ923152","B05","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,744,2
 "NU00135288","NUEZ923277","C05","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,745,3
 "NU00135288","NUEZ923392","D05","NM8W18AYOUJO",1,"calculated                                        ",300,"KDED10001","Processed_09192012_103734","KDCS_admin","Serum","BB01AE15JZ",,,746,4
 "NU00135288","NUEZ923514","E05","8LQS3FXTJMOC",1,"calculated                                        ",300,"GR5096","Processed_09192012_103745","KDCS_admin","Serum","BB01AE15JZ",,,747,5
@@ -40,7 +40,7 @@
 "NU00135288","NUEZ923754","G05",,,,0,,,,,,,,685,
 "NU00135288","NUEZ923879","H05",,,,0,,,,,,,,686,
 "NU00135288","NUEZ923046","A06","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,748,1
-"NU00135288","NUEZ923161","B06","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,749,2
+"NU00135288","NUEZ923161","B06","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,749,2
 "NU00135288","NUEZ923286","C06","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,750,3
 "NU00135288","NUEZ923408","D06","NM8W18AYOUJO",1,"calculated                                        ",300,"KDED10001","Processed_09192012_103734","KDCS_admin","Serum","BB01AE15JZ",,,751,4
 "NU00135288","NUEZ923523","E06","8LQS3FXTJMOC",1,"calculated                                        ",300,"GR5096","Processed_09192012_103745","KDCS_admin","Serum","BB01AE15JZ",,,752,5
@@ -48,7 +48,7 @@
 "NU00135288","NUEZ923763","G06",,,,0,,,,,,,,693,
 "NU00135288","NUEZ923888","H06",,,,0,,,,,,,,694,
 "NU00135288","NUEZ923055","A07","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,753,1
-"NU00135288","NUEZ923170","B07","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,754,2
+"NU00135288","NUEZ923170","B07","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,754,2
 "NU00135288","NUEZ923295","C07","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,755,3
 "NU00135288","NUEZ923417","D07","NM8W18AYOUJO",1,"calculated                                        ",300,"KDED10001","Processed_09192012_103734","KDCS_admin","Serum","BB01AE15JZ",,,756,4
 "NU00135288","NUEZ923532","E07","8LQS3FXTJMOC",1,"calculated                                        ",300,"GR5096","Processed_09192012_103745","KDCS_admin","Serum","BB01AE15JZ",,,757,5
@@ -56,7 +56,7 @@
 "NU00135288","NUEZ923772","G07",,,,0,,,,,,,,701,
 "NU00135288","NUEZ923897","H07",,,,0,,,,,,,,702,
 "NU00135288","NUEZ923064","A08","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,758,1
-"NU00135288","NUEZ923189","B08","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,759,2
+"NU00135288","NUEZ923189","B08","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,759,2
 "NU00135288","NUEZ923301","C08","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,760,3
 "NU00135288","NUEZ923426","D08","NM8W18AYOUJO",1,"calculated                                        ",300,"KDED10001","Processed_09192012_103734","KDCS_admin","Serum","BB01AE15JZ",,,761,4
 "NU00135288","NUEZ923541","E08","8LQS3FXTJMOC",1,"calculated                                        ",300,"GR5096","Processed_09192012_103745","KDCS_admin","Serum","BB01AE15JZ",,,762,5
@@ -64,7 +64,7 @@
 "NU00135288","NUEZ923781","G08",,,,0,,,,,,,,709,
 "NU00135288","NUEZ923903","H08",,,,0,,,,,,,,710,
 "NU00135288","NUEZ923073","A09","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,763,1
-"NU00135288","NUEZ923198","B09","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,764,2
+"NU00135288","NUEZ923198","B09","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,764,2
 "NU00135288","NUEZ923310","C09","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,765,3
 "NU00135288","NUEZ923435","D09","NM8W18AYOUJO",1,"calculated                                        ",300,"KDED10001","Processed_09192012_103734","KDCS_admin","Serum","BB01AE15JZ",,,766,4
 "NU00135288","NUEZ923550","E09","8LQS3FXTJMOC",1,"calculated                                        ",300,"GR5096","Processed_09192012_103745","KDCS_admin","Serum","BB01AE15JZ",,,767,5
@@ -72,7 +72,7 @@
 "NU00135288","NUEZ923790","G09",,,,0,,,,,,,,717,
 "NU00135288","NUEZ923912","H09",,,,0,,,,,,,,718,
 "NU00135288","NUEZ923082","A10","H7X6AIU7F9PR",1,"calculated                                        ",300,"VA0984","Processed_09192012_103702","KDCS_admin","Serum","BB01AE15JZ",,,768,1
-"NU00135288","NUEZ923204","B10","SCTCIUNW5RIT",1,"calculated                                        ",300,87,"Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,769,2
+"NU00135288","NUEZ923204","B10","SCTCIUNW5RIT",1,"calculated                                        ",300,"0087","Processed_09192012_103713","KDCS_admin","Serum","BB01AE15JZ",,,769,2
 "NU00135288","NUEZ923329","C10","L4QVCOOCILSU",1,"calculated                                        ",300,"AA0667","Processed_09192012_103724","KDCS_admin","Serum","BB01AE15JZ",,,770,3
 "NU00135288","NUEZ923444","D10",,,,0,,,,,,,,722,
 "NU00135288","NUEZ923569","E10",,,,0,,,,,,,,723,

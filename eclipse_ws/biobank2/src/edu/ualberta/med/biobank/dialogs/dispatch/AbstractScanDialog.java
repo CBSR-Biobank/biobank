@@ -48,13 +48,12 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-    BgcBaseDialog {
+BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractScanDialog.class);
 
@@ -68,7 +67,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n
-        .tr("Processing position {0}");
+    .tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -119,9 +118,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
 
             @Override
-            protected Map<RowColPos, PalletCell> getFakeScanCells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
                 throws Exception {
-                return AbstractScanDialog.this.getFakeScanCells();
+                return AbstractScanDialog.this.getFakeDecodedWells();
             }
 
             @Override
@@ -136,14 +135,14 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletCell cell)
+            protected void postprocessScanTubeAlone(PalletWell cell)
                 throws Exception {
                 AbstractScanDialog.this.postprocessScanTubeAlone(cell);
                 setHasValues();
             }
 
             @Override
-            protected boolean canScanTubeAlone(PalletCell cell) {
+            protected boolean canScanTubeAlone(PalletWell cell) {
                 return AbstractScanDialog.this.canScanTubeAlone(cell);
             }
         };
@@ -180,7 +179,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         return rescanMode;
     }
 
-    protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
+    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells()
         throws Exception;
 
     protected void processScanResult(IProgressMonitor monitor,
@@ -188,14 +187,14 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
         if (checkBeforeProcessing(currentCenter)) {
-            Map<RowColPos, PalletCell> cells = getCells();
+            Map<RowColPos, PalletWell> cells = getCells();
             // conversion for server side call
             Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
                 null;
             if (cells != null) {
                 serverCells =
                     new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
-                for (Entry<RowColPos, PalletCell> entry : cells.entrySet()) {
+                for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue()
                         .transformIntoServerCell());
                 }
@@ -215,16 +214,16 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     RowColPos rcp = entry.getKey();
                     monitor.subTask(MessageFormat.format(MONITOR_PROCESSING,
                         ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
-                    PalletCell palletCell = cells.get(entry.getKey());
+                    PalletWell palletCell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing
-                        palletCell = new PalletCell(new ScanCell(
+                        palletCell = new PalletWell(new DecodedWell(
                             servercell.getRow(), servercell.getCol(),
                             servercell.getValue()));
                         cells.put(rcp, palletCell);
                     }
                     palletCell
-                        .merge(SessionManager.getAppService(), servercell);
+                    .merge(SessionManager.getAppService(), servercell);
                     specificScanPosProcess(palletCell);
                 }
             }
@@ -235,7 +234,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     @SuppressWarnings("unused")
-    protected void specificScanPosProcess(PalletCell palletCell) {
+    protected void specificScanPosProcess(PalletWell palletCell) {
         // default do nothing
     }
 
@@ -299,9 +298,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         });
 
         widgetCreator
-            .addBooleanBinding(
-                new WritableValue(Boolean.FALSE,
-                    Boolean.class),
+        .addBooleanBinding(
+            new WritableValue(Boolean.FALSE,
+                Boolean.class),
                 scanOkValue,
                 i18n.tr("Error in scan result. Please keep only specimens with no errors."),
                 IStatus.ERROR);
@@ -323,8 +322,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScan,
-            ProfileManager.ALL_PROFILE_NAME, isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScan, isRescanMode());
     }
 
     protected void startNewPallet() {
@@ -366,7 +364,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         return scanHasBeenLaunchedValue.getValue().equals(true);
     }
 
-    protected Map<RowColPos, PalletCell> getCells() {
+    protected Map<RowColPos, PalletWell> getCells() {
         return palletScanManagement.getCells();
     }
 
@@ -494,12 +492,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         scanTubeAloneSwitch.setVisible(false);
     }
 
-    protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == UICellStatus.EMPTY
-            || cell.getStatus() == UICellStatus.MISSING;
+    protected boolean canScanTubeAlone(PalletWell cell) {
+        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
+            || (cell.getStatus() == UICellStatus.ERROR)
+            || (cell.getStatus() == UICellStatus.MISSING));
     }
 
-    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+    protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         CellProcessResult res = (CellProcessResult) SessionManager
             .getAppService().doAction(

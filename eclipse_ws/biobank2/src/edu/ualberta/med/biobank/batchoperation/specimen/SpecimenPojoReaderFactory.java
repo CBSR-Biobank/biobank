@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.batchoperation.specimen;
 
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Creates a IBatchOpPojoReader instance based on the headers in the CSV file.
@@ -15,15 +16,17 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 public class SpecimenPojoReaderFactory {
 
     public static IBatchOpPojoReader<SpecimenBatchOpInputPojo> createPojoReader(
-        String[] csvHeaders) {
+        Center workingCenter, String filename, String[] csvHeaders) {
         IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader = null;
 
         if (SpecimenBatchOpPojoReader.isHeaderValid(csvHeaders)) {
-            pojoReader = new SpecimenBatchOpPojoReader();
+            pojoReader = new SpecimenBatchOpPojoReader(workingCenter, filename);
         } else if (CbsrTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-            pojoReader = new CbsrTecanSpecimenPojoReader();
+            pojoReader =
+                new CbsrTecanSpecimenPojoReader(workingCenter, filename);
         } else if (OhsTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-            pojoReader = new OhsTecanSpecimenPojoReader();
+            pojoReader =
+                new OhsTecanSpecimenPojoReader(workingCenter, filename);
         } else {
             throw new IllegalStateException("no batchOp pojo reader found");
         }

@@ -106,14 +106,14 @@ public class TestPatient extends TestAction {
 
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
+                provisioning.patientIds.get(0), provisioning.getClinic());
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
 
         // save some comments on the colection event
         CollectionEventSaveAction ceventSaveAction =
-            CollectionEventHelper.getSaveAction(ceventInfo);
+            CollectionEventHelper.getSaveAction(ceventInfo, provisioning.getClinic());
         ceventSaveAction.setCommentText(Utils.getRandomString(20, 30));
         exec(ceventSaveAction);
         ceventInfo = exec(new CollectionEventGetInfoAction(ceventId));
@@ -256,11 +256,12 @@ public class TestPatient extends TestAction {
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper
                 .createSaveCEventSpecimenInfoRandomList(specNber, specType,
-                    getExecutor().getUserId(), provisioning.siteId);
+                    getExecutor().getUserId());
         // Save a new cevent
         exec(new CollectionEventSaveAction(null, patientId,
             visitNber, ActivityStatus.ACTIVE, null,
-            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
+            provisioning.getClinic()));
     }
 
     @Test
@@ -277,14 +278,14 @@ public class TestPatient extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId,
-                getExecutor().getUserId(), provisioning.siteId);
+                getExecutor().getUserId());
 
         // Save a new cevent with specimens
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, patientId,
                 getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                null)).getId();
+                null, provisioning.getClinic())).getId();
 
         Map<Integer, SimpleCEventInfo> ceventInfos =
             getExecutor()
@@ -319,12 +320,12 @@ public class TestPatient extends TestAction {
 
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId,
-                getExecutor().getUserId(), provisioning.siteId);
+                getExecutor().getUserId());
 
         // Save a new cevent with specimens
-        exec(new CollectionEventSaveAction(null, patientId, getR()
-            .nextInt(20), ActivityStatus.ACTIVE, null,
-            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null));
+        exec(new CollectionEventSaveAction(null, patientId, getR().nextInt(20) + 1, 
+            ActivityStatus.ACTIVE, null, new ArrayList<SaveCEventSpecimenInfo>(specs.values()), 
+            null, provisioning.getClinic()));
 
         List<PatientCEventInfo> infos =
             getExecutor()
@@ -358,7 +359,8 @@ public class TestPatient extends TestAction {
 
         Integer visitNumber = getR().nextInt(20) + 1;
         exec(new CollectionEventSaveAction(null, patientId,
-            visitNumber, ActivityStatus.ACTIVE, null, null, null));
+            visitNumber, ActivityStatus.ACTIVE, null, null, null,
+            provisioning.getClinic()));
 
         Integer next = exec(new PatientNextVisitNumberAction(
             patientId)).getNextVisitNumber();
@@ -379,9 +381,11 @@ public class TestPatient extends TestAction {
         // add 2 cevents to this patient:
         int vnber = getR().nextInt(20) + 1;
         exec(new CollectionEventSaveAction(null, patientId,
-            vnber, ActivityStatus.ACTIVE, null, null, null));
+            vnber, ActivityStatus.ACTIVE, null, null, null,
+            provisioning.getClinic()));
         exec(new CollectionEventSaveAction(null, patientId,
-            vnber + 1, ActivityStatus.ACTIVE, null, null, null));
+            vnber + 1, ActivityStatus.ACTIVE, null, null, null,
+            provisioning.getClinic()));
 
         // Check patient is in database
         Patient p = (Patient) session.get(Patient.class, patientId);

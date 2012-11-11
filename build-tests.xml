@@ -88,11 +88,6 @@
     <include name="**/Test*.java" />
   </fileset>
 
-  <!-- target name="test-debug">
-    <pathconvert pathsep="${line.separator}" property="sounds" refid="testcase.files"/>
-    <echo file="sounds.txt">${sounds}</echo>
-  </target -->
-
   <target name="test" depends="clean-test-results,tests-compile" description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
