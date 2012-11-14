@@ -28,7 +28,7 @@ public class DispatchSaveAction implements Action<IdResult> {
      * 
      */
     private static final long serialVersionUID = 1L;
-    private final DispatchSaveInfo dInfo;
+    private DispatchSaveInfo dInfo;
     private final Set<DispatchSpecimenInfo> dsInfos;
     private final ShipmentInfoSaveInfo siInfo;
 
@@ -52,8 +52,9 @@ public class DispatchSaveAction implements Action<IdResult> {
         disp.setReceiverCenter(context.get(Center.class, dInfo.receiverId));
         disp.setSenderCenter(context.get(Center.class, dInfo.senderId));
 
-        if (dInfo.state == null)
-            dInfo.state = DispatchState.CREATION;
+        if (dInfo.state == null) {
+            dInfo = new DispatchSaveInfo(dInfo, DispatchState.CREATION);
+        }
 
         disp.setState(dInfo.state);
 
@@ -64,7 +65,7 @@ public class DispatchSaveAction implements Action<IdResult> {
         if (siInfo != null) {
             ShipmentInfo si =
                 context
-                    .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
             si.setBoxNumber(siInfo.boxNumber);
             si.setPackedAt(siInfo.packedAt);
             si.setReceivedAt(siInfo.receivedAt);
@@ -79,7 +80,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
         // This stuff could be extracted to a util method. need to think about
         // how
-        if (!dInfo.comment.trim().isEmpty()) {
+        if ((dInfo.comment != null) && !dInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();
             Comment newComment = new Comment();
@@ -98,22 +99,13 @@ public class DispatchSaveAction implements Action<IdResult> {
         return new IdResult(disp.getId());
     }
 
-    private Set<DispatchSpecimen> reassemble(ActionContext context,
-        Dispatch dispatch,
+    private Set<DispatchSpecimen> reassemble(ActionContext context, Dispatch dispatch,
         Set<DispatchSpecimenInfo> dsInfos) {
-        Set<DispatchSpecimen> dispSpecimens =
-            new HashSet<DispatchSpecimen>();
+        Set<DispatchSpecimen> dispSpecimens = new HashSet<DispatchSpecimen>();
         for (DispatchSpecimenInfo dsInfo : dsInfos) {
-            DispatchSpecimen dspec =
-                context.get(DispatchSpecimen.class, dsInfo.id,
-                    new DispatchSpecimen());
-            Specimen spec = context.load(Specimen.class,
-                dsInfo.specimenId);
-            if (spec != null) {
-                spec.setCurrentCenter(context.get(Center.class,
-                    dInfo.receiverId));
-                context.getSession().saveOrUpdate(spec);
-            }
+            DispatchSpecimen dspec = context.get(DispatchSpecimen.class, dsInfo.dispatchSpecimenId,
+                new DispatchSpecimen());
+            Specimen spec = context.load(Specimen.class, dsInfo.specimenId);
             dspec.setSpecimen(spec);
             dspec.setState(dsInfo.state);
             dspec.setDispatch(dispatch);
@@ -126,11 +118,10 @@ public class DispatchSaveAction implements Action<IdResult> {
     public static ShipmentInfoSaveInfo prepareShipInfo(
         ShipmentInfoWrapper shipmentInfo) {
         if (shipmentInfo == null) return null;
-        ShipmentInfoSaveInfo si =
-            new ShipmentInfoSaveInfo(shipmentInfo.getId(),
-                shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
-                shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
-                shipmentInfo.getShippingMethod().getId());
+        ShipmentInfoSaveInfo si = new ShipmentInfoSaveInfo(
+            shipmentInfo.getId(), shipmentInfo.getBoxNumber(), shipmentInfo.getPackedAt(),
+            shipmentInfo.getReceivedAt(), shipmentInfo.getWaybill(),
+            shipmentInfo.getShippingMethod().getId());
         return si;
     }
 }

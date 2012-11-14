@@ -8,11 +8,11 @@ import edu.ualberta.med.biobank.model.type.DispatchState;
 public class DispatchSaveInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public Integer dispatchId;
-    public DispatchState state;
-    public Integer receiverId;
-    public Integer senderId;
-    public String comment;
+    public final Integer dispatchId;
+    public final DispatchState state;
+    public final Integer receiverId;
+    public final Integer senderId;
+    public final String comment;
 
     public DispatchSaveInfo(Integer dispatchId, Center receiverCenter, Center sendingCenter,
         DispatchState state, String comment) {
@@ -21,6 +21,24 @@ public class DispatchSaveInfo implements Serializable {
         this.senderId = sendingCenter.getId();
         this.state = state;
         this.comment = comment;
+    }
+
+    public DispatchSaveInfo(DispatchSaveInfo that, DispatchState state) {
+        this.dispatchId = that.dispatchId;
+        this.receiverId = that.receiverId;
+        this.senderId = that.senderId;
+        this.comment = that.comment;
+
+        this.state = state;
+    }
+
+    public DispatchSaveInfo(DispatchSaveInfo that, Integer dispatchId) {
+        this.receiverId = that.receiverId;
+        this.senderId = that.senderId;
+        this.comment = that.comment;
+        this.state = that.state;
+
+        this.dispatchId = dispatchId;
     }
 
 }

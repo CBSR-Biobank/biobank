@@ -7,12 +7,12 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 public class ShipmentInfoSaveInfo implements ActionResult {
     private static final long serialVersionUID = 1L;
 
-    public Integer siId;
-    public String boxNumber;
-    public Date packedAt;
-    public Date receivedAt;
-    public String waybill;
-    public Integer shippingMethodId;
+    public final Integer siId;
+    public final String boxNumber;
+    public final Date packedAt;
+    public final Date receivedAt;
+    public final String waybill;
+    public final Integer shippingMethodId;
 
     public ShipmentInfoSaveInfo(Integer siId, String boxNumber, Date packedAt,
         Date receivedAt, String waybill, Integer shippingMethodId) {

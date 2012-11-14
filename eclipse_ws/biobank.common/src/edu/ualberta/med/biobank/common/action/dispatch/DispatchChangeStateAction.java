@@ -1,5 +1,11 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
+import org.hibernate.criterion.Restrictions;
+
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
@@ -7,10 +13,12 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchChangeStateAction implements Action<IdResult> {
@@ -19,12 +27,11 @@ public class DispatchChangeStateAction implements Action<IdResult> {
      *
      */
     private static final long serialVersionUID = 1L;
-    private Integer id;
-    private DispatchState newState;
-    private ShipmentInfoSaveInfo shipInfo;
+    private final Integer id;
+    private final DispatchState newState;
+    private final ShipmentInfoSaveInfo shipInfo;
 
-    public DispatchChangeStateAction(Integer id, DispatchState state,
-        ShipmentInfoSaveInfo shipInfo) {
+    public DispatchChangeStateAction(Integer id, DispatchState state, ShipmentInfoSaveInfo shipInfo) {
         this.id = id;
         this.newState = state;
         this.shipInfo = shipInfo;
@@ -37,21 +44,35 @@ public class DispatchChangeStateAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        Dispatch disp =
-            context.load(Dispatch.class, id);
+        Dispatch dispatch = context.load(Dispatch.class, id);
 
-        disp.setState(newState);
+        dispatch.setState(newState);
 
-        if (newState.equals(DispatchState.LOST))
-            for (DispatchSpecimen ds : disp.getDispatchSpecimens())
+        if (newState.equals(DispatchState.LOST)) {
+            for (DispatchSpecimen ds : dispatch.getDispatchSpecimens()) {
                 ds.getSpecimen().setActivityStatus(ActivityStatus.FLAGGED);
+            }
+        } else if (newState.equals(DispatchState.IN_TRANSIT)) {
+            // update the current center on the specimens
+            Center receiverCenter = dispatch.getReceiverCenter();
 
-        if (shipInfo == null)
-            disp.setShipmentInfo(null);
-        else {
-            ShipmentInfo si =
-                context
-                    .get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());
+            Criteria c = context.getSession().createCriteria(DispatchSpecimen.class)
+                .add(Restrictions.eq("dispatch", dispatch))
+                .setFetchMode("specimen", FetchMode.JOIN);
+
+            @SuppressWarnings("unchecked")
+            List<DispatchSpecimen> list = c.list();
+            for (DispatchSpecimen dispatchSpecimen : list) {
+                Specimen specimen = dispatchSpecimen.getSpecimen();
+                specimen.setCurrentCenter(receiverCenter);
+                context.getSession().saveOrUpdate(specimen);
+            }
+        }
+
+        if (shipInfo == null) {
+            dispatch.setShipmentInfo(null);
+        } else {
+            ShipmentInfo si = context.get(ShipmentInfo.class, shipInfo.siId, new ShipmentInfo());
             si.setBoxNumber(shipInfo.boxNumber);
             si.setPackedAt(shipInfo.packedAt);
             si.setReceivedAt(shipInfo.receivedAt);
@@ -61,12 +82,12 @@ public class DispatchChangeStateAction implements Action<IdResult> {
                 shipInfo.shippingMethodId);
 
             si.setShippingMethod(sm);
-            disp.setShipmentInfo(si);
+            dispatch.setShipmentInfo(si);
         }
 
-        context.getSession().saveOrUpdate(disp);
+        context.getSession().saveOrUpdate(dispatch);
         context.getSession().flush();
 
-        return new IdResult(disp.getId());
+        return new IdResult(dispatch.getId());
     }
 }

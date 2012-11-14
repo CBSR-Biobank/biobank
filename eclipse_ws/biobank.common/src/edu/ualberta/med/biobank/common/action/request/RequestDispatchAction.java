@@ -64,7 +64,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
 
         for (DispatchSpecimenInfo ds : dspecs) {
             DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
-            dispatchSpecimen.setId(ds.id);
+            dispatchSpecimen.setId(ds.dispatchSpecimenId);
             dispatchSpecimen.setDispatch(d);
             dispatchSpecimen.setSpecimen(context.load(Specimen.class,
                 ds.specimenId));

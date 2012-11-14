@@ -19,8 +19,7 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class DispatchHelper extends Helper {
 
     public static Set<DispatchSpecimenInfo> createSaveDispatchSpecimenInfoRandom(
-        IActionExecutor actionExecutor, Integer patientId,
-        Center center) throws Exception {
+        IActionExecutor actionExecutor, Integer patientId, Center center) throws Exception {
         Set<DispatchSpecimenInfo> infos = new HashSet<DispatchSpecimenInfo>();
         Integer id = null;
         id = CollectionEventHelper.createCEventWithSourceSpecimens(
@@ -44,7 +43,7 @@ public class DispatchHelper extends Helper {
 
     public static Integer createDispatch(IActionExecutor actionExecutor,
         Center srcCenter, Center dstCenter, Integer patientId)
-        throws Exception {
+            throws Exception {
         DispatchSaveInfo d =
             DispatchHelper.createSaveDispatchInfoRandom(dstCenter,
                 srcCenter, DispatchState.CREATION,
