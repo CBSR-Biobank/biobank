@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Empty(property = "childSpecimens", groups = PreDelete.class)
 @NotUsed(by = DispatchSpecimen.class, property = "specimen", groups = PreDelete.class)
 public class Specimen extends AbstractBiobankModel
-    implements HasActivityStatus, HasComments, HasCreatedAt {
+implements HasActivityStatus, HasComments, HasCreatedAt {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -229,8 +229,8 @@ public class Specimen extends AbstractBiobankModel
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "SPECIMEN_COMMENT",
-        joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "SPECIMEN_ID", nullable = false, updatable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Set<Comment> getComments() {
         return this.comments;
     }
@@ -303,7 +303,7 @@ public class Specimen extends AbstractBiobankModel
         this.plateErrors = plateErrors;
     }
 
-    @Column(name = "SAMPLE_ERRORS", length = 100)
+    @Column(name = "SAMPLE_ERRORS", columnDefinition = "TEXT")
     public String getSampleErrors() {
         return sampleErrors;
     }

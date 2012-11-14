@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.test.action.helper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +17,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
@@ -32,15 +30,13 @@ public class CollectionEventHelper extends Helper {
      */
     public static SaveCEventSpecimenInfo createSaveCEventSpecimenInfoRandom(
         Integer specimenTypeId, Integer userId) {
-        SaveCEventSpecimenInfo info = new SaveCEventSpecimenInfo();
-        if (userId != null)
-            info.comments = Arrays.asList(Utils.getRandomString(20, 30));
-        info.inventoryId = Utils.getRandomString(8, 12);
-        info.quantity = new BigDecimal(r.nextInt(10) + 1);
-        info.specimenTypeId = specimenTypeId;
-        info.activityStatus = ActivityStatus.ACTIVE;
-        info.createdAt = Utils.getRandomDate();
-        return info;
+        List<String> comments = new ArrayList<String>();
+        if (userId != null) {
+            comments.add(Utils.getRandomString(20, 30));
+        }
+        return new SaveCEventSpecimenInfo(null, Utils.getRandomString(8, 12),
+            Utils.getRandomDate(), ActivityStatus.ACTIVE, specimenTypeId, comments,
+            new BigDecimal(r.nextInt(10) + 1));
     }
 
     /**
@@ -61,18 +57,9 @@ public class CollectionEventHelper extends Helper {
         return specs;
     }
 
-    public static CEventAttrSaveInfo createSaveCEventAttrInfo(
-        Integer studyEventAttrId, EventAttrTypeEnum type, String value) {
-        CEventAttrSaveInfo info = new CEventAttrSaveInfo();
-        info.studyEventAttrId = studyEventAttrId;
-        info.type = type;
-        info.value = value;
-        return info;
-    }
-
     public static Integer createCEventWithSourceSpecimens(
         IActionExecutor actionExecutor, Integer patientId, Center center)
-        throws Exception {
+            throws Exception {
         // add specimen type
         String name = "createCEventWithSourceSpecimens" + r.nextInt();
         final Integer typeId =
@@ -108,27 +95,15 @@ public class CollectionEventHelper extends Helper {
             new ArrayList<CEventAttrSaveInfo>();
 
         for (SpecimenInfo specimenInfo : ceventInfo.sourceSpecimenInfos) {
-            SaveCEventSpecimenInfo saveCEventSpecimenInfo =
-                new SaveCEventSpecimenInfo();
-            saveCEventSpecimenInfo.id = specimenInfo.specimen.getId();
-            saveCEventSpecimenInfo.inventoryId =
-                specimenInfo.specimen.getInventoryId();
-            saveCEventSpecimenInfo.createdAt =
-                specimenInfo.specimen.getCreatedAt();
-            saveCEventSpecimenInfo.activityStatus =
-                specimenInfo.specimen.getActivityStatus();
-            saveCEventSpecimenInfo.specimenTypeId =
-                specimenInfo.specimen.getSpecimenType().getId();
-            sourceSpecimens.add(saveCEventSpecimenInfo);
+            sourceSpecimens.add(new SaveCEventSpecimenInfo(specimenInfo.specimen.getId(),
+                specimenInfo.specimen.getInventoryId(), specimenInfo.specimen.getCreatedAt(),
+                specimenInfo.specimen.getActivityStatus(),
+                specimenInfo.specimen.getSpecimenType().getId(), null, new BigDecimal(0)));
         }
 
         for (EventAttrInfo eventAttrInfo : ceventInfo.eventAttrs.values()) {
-            CEventAttrSaveInfo cEventAttrSaveInfo = new CEventAttrSaveInfo();
-            cEventAttrSaveInfo.studyEventAttrId =
-                eventAttrInfo.attr.getStudyEventAttr().getId();
-            cEventAttrSaveInfo.type = eventAttrInfo.type;
-            cEventAttrSaveInfo.value = eventAttrInfo.attr.getValue();
-            ceAttrList.add(cEventAttrSaveInfo);
+            ceAttrList.add(new CEventAttrSaveInfo(eventAttrInfo.attr.getStudyEventAttr().getId(),
+                eventAttrInfo.type, eventAttrInfo.attr.getValue()));
         }
 
         CollectionEventSaveAction saveAction =

@@ -14,31 +14,28 @@ public class DispatchSaveInfo implements Serializable {
     public final Integer senderId;
     public final String comment;
 
-    public DispatchSaveInfo(Integer dispatchId, Center receiverCenter, Center sendingCenter,
+    private DispatchSaveInfo(Integer dispatchId, Integer receiverId, Integer sendingId,
         DispatchState state, String comment) {
         this.dispatchId = dispatchId;
-        this.receiverId = receiverCenter.getId();
-        this.senderId = sendingCenter.getId();
+        this.receiverId = receiverId;
+        this.senderId = sendingId;
         this.state = state;
         this.comment = comment;
     }
 
-    public DispatchSaveInfo(DispatchSaveInfo that, DispatchState state) {
-        this.dispatchId = that.dispatchId;
-        this.receiverId = that.receiverId;
-        this.senderId = that.senderId;
-        this.comment = that.comment;
-
-        this.state = state;
+    public DispatchSaveInfo(Integer dispatchId, Center receiverCenter, Center sendingCenter,
+        DispatchState state, String comment) {
+        this(dispatchId, receiverCenter.getId(), sendingCenter.getId(), state, comment);
     }
 
-    public DispatchSaveInfo(DispatchSaveInfo that, Integer dispatchId) {
-        this.receiverId = that.receiverId;
-        this.senderId = that.senderId;
-        this.comment = that.comment;
-        this.state = that.state;
+    // create a copy with a different state
+    public DispatchSaveInfo(DispatchSaveInfo that, DispatchState state) {
+        this(that.dispatchId, that.receiverId, that.senderId, state, that.comment);
+    }
 
-        this.dispatchId = dispatchId;
+    // create a copy with a different dispatchId
+    public DispatchSaveInfo(DispatchSaveInfo that, Integer dispatchId) {
+        this(dispatchId, that.receiverId, that.senderId, that.state, that.comment);
     }
 
 }

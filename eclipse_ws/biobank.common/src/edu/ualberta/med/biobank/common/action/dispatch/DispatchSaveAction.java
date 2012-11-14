@@ -46,8 +46,7 @@ public class DispatchSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        Dispatch disp =
-            context.get(Dispatch.class, dInfo.dispatchId, new Dispatch());
+        Dispatch disp = context.get(Dispatch.class, dInfo.dispatchId, new Dispatch());
 
         disp.setReceiverCenter(context.get(Center.class, dInfo.receiverId));
         disp.setSenderCenter(context.get(Center.class, dInfo.senderId));
@@ -59,27 +58,22 @@ public class DispatchSaveAction implements Action<IdResult> {
         disp.setState(dInfo.state);
 
         disp.getDispatchSpecimens().clear();
-        disp.getDispatchSpecimens().addAll(reassemble(context, disp,
-            dsInfos));
+        disp.getDispatchSpecimens().addAll(reassemble(context, disp, dsInfos));
 
         if (siInfo != null) {
-            ShipmentInfo si =
-                context
-                .get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
+            ShipmentInfo si = context.get(ShipmentInfo.class, siInfo.siId, new ShipmentInfo());
             si.setBoxNumber(siInfo.boxNumber);
             si.setPackedAt(siInfo.packedAt);
             si.setReceivedAt(siInfo.receivedAt);
             si.setWaybill(siInfo.waybill);
 
-            ShippingMethod sm = context.load(ShippingMethod.class,
-                siInfo.shippingMethodId);
+            ShippingMethod sm = context.load(ShippingMethod.class, siInfo.shippingMethodId);
 
             si.setShippingMethod(sm);
             disp.setShipmentInfo(si);
         }
 
-        // This stuff could be extracted to a util method. need to think about
-        // how
+        // This stuff could be extracted to a util method. need to think about how
         if ((dInfo.comment != null) && !dInfo.comment.trim().isEmpty()) {
             Set<Comment> comments = disp.getComments();
             if (comments == null) comments = new HashSet<Comment>();

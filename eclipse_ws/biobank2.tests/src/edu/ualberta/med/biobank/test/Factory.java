@@ -670,7 +670,7 @@ public class Factory {
         containerType.setSite(getDefaultSite());
         containerType.setCapacity(new Capacity(getDefaultCapacity()));
         containerType
-            .setChildLabelingScheme(getDefaultContainerLabelingScheme());
+        .setChildLabelingScheme(getDefaultContainerLabelingScheme());
 
         setDefaultContainerType(containerType);
         session.save(containerType);
@@ -782,7 +782,7 @@ public class Factory {
 
         Specimen specimen = new Specimen();
         specimen.setInventoryId(name);
-        specimen.setCurrentCenter(getDefaultSite());
+        specimen.setCurrentCenter(getDefaultCenter());
         specimen.setCollectionEvent(getDefaultCollectionEvent());
         specimen.setOriginInfo(getDefaultOriginInfo());
         specimen.setCreatedAt(new Date());
@@ -827,7 +827,7 @@ public class Factory {
 
         childSpecimen.setQuantity(getDefaultAliquotedSpecimen().getVolume());
         parentSpecimen.getCollectionEvent().getAllSpecimens()
-            .add(childSpecimen);
+        .add(childSpecimen);
 
         session.save(childSpecimen);
         session.flush();
@@ -1030,10 +1030,10 @@ public class Factory {
     public Membership createMembership() {
         return buildMembership().create();
     }
-    
+
     public Membership createMembership(Domain domain, Rank rank) {
-Membership membership = new Membership();
-        
+        Membership membership = new Membership();
+
         membership.getDomain().setAllCenters(true);
         membership.getDomain().setAllStudies(true);
 

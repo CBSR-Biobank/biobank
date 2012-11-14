@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.ShipmentInfo;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
@@ -68,12 +68,12 @@ public class TestDispatch extends TestAction {
         Assert.assertEquals(dispatch.senderId, result.getSenderCenter().getId());
 
         Set<Integer> actionSpecimenIds = new HashSet<Integer>();
-        Criteria c = session.createCriteria(DispatchSpecimen.class)
-            .add(Restrictions.eq("dispatch.id", dispatchId))
-            .setFetchMode("specimen", FetchMode.JOIN);
 
         @SuppressWarnings("unchecked")
-        List<DispatchSpecimen> list = c.list();
+        List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
+        .add(Restrictions.eq("dispatch.id", dispatchId))
+        .setFetchMode("specimen", FetchMode.JOIN).list();
+
         for (DispatchSpecimen dispatchSpecimen : list) {
             Specimen specimen = dispatchSpecimen.getSpecimen();
             actionSpecimenIds.add(specimen.getId());
@@ -84,58 +84,6 @@ public class TestDispatch extends TestAction {
         }
 
         Assert.assertEquals(specimenIds, actionSpecimenIds);
-    }
-
-    @Test
-    public void saveWithDuplicateSpecimens() throws Exception {
-        Dispatch dispatch = factory.createDispatch(clinic, site);
-        DispatchSpecimen [] dispatchSpecimens = new DispatchSpecimen [] {
-            factory.createDispatchSpecimen(),
-            factory.createDispatchSpecimen()
-        };
-        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
-        for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
-            dsInfos.add(new DispatchSpecimenInfo(null, dispatchSpecimen.getSpecimen().getId(),
-                dispatchSpecimen.getState()));
-        }
-
-        // have both dispatch specimens contain the same specimen
-        dispatchSpecimens[1].setSpecimen(dispatchSpecimens[0].getSpecimen());
-
-        ShipmentInfo shipInfo = factory.createShipmentInfo();
-
-        ShipmentInfoSaveInfo shipmentInfo = new ShipmentInfoSaveInfo(null,
-            shipInfo.getBoxNumber(), shipInfo.getPackedAt(), shipInfo.getReceivedAt(),
-            shipInfo.getWaybill(), shipInfo.getShippingMethod().getId());
-
-        try {
-            exec(new DispatchSaveAction(new DispatchSaveInfo(null,
-                dispatch.getReceiverCenter(), dispatch.getSenderCenter(),
-                DispatchState.CREATION, null), dsInfos, shipmentInfo)).getId();
-            Assert.fail("should not be allowed to create dispatch");
-        } catch (Exception e) {
-            // intentionally empty
-        }
-    }
-
-    @Test
-    public void saveWithNoSpecimens() throws Exception {
-        Dispatch dispatch = factory.createDispatch(clinic, site);
-        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
-        ShipmentInfo shipInfo = factory.createShipmentInfo();
-
-        ShipmentInfoSaveInfo shipmentInfo = new ShipmentInfoSaveInfo(null,
-            shipInfo.getBoxNumber(), shipInfo.getPackedAt(), shipInfo.getReceivedAt(),
-            shipInfo.getWaybill(), shipInfo.getShippingMethod().getId());
-
-        try {
-            exec(new DispatchSaveAction(new DispatchSaveInfo(null,
-                dispatch.getReceiverCenter(), dispatch.getSenderCenter(),
-                DispatchState.CREATION, null), dsInfos, shipmentInfo)).getId();
-            Assert.fail("should not be allowed to create dispatch");
-        } catch (Exception e) {
-            // intentionally empty
-        }
     }
 
     @Test
@@ -165,41 +113,37 @@ public class TestDispatch extends TestAction {
 
     }
 
+    /*
+     * Ensure current centre on specimens has been updated after a dispatch goes into
+     * IN_TRANSIT state.
+     */
     @Test
     public void specimenCurrentCenter() throws Exception {
+        session.beginTransaction();
         Dispatch dispatch = factory.createDispatch(clinic, site);
         DispatchSpecimen [] dispatchSpecimens = new DispatchSpecimen [] {
             factory.createDispatchSpecimen(),
             factory.createDispatchSpecimen()
         };
-        Set<DispatchSpecimenInfo> dsInfos = new HashSet<DispatchSpecimenInfo>();
+        ShippingMethod shippingMethod = factory.createShippingMethod();
+        session.getTransaction().commit();
+
         for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
-            dsInfos.add(new DispatchSpecimenInfo(null, dispatchSpecimen.getSpecimen().getId(),
-                dispatchSpecimen.getState()));
+            Assert.assertEquals(clinic, dispatchSpecimen.getSpecimen().getCurrentCenter());
         }
 
-        ShipmentInfo shipInfo = factory.createShipmentInfo();
-        ShipmentInfoSaveInfo shipmentSaveInfo = new ShipmentInfoSaveInfo(null,
-            shipInfo.getBoxNumber(), shipInfo.getPackedAt(), shipInfo.getReceivedAt(),
-            shipInfo.getWaybill(), shipInfo.getShippingMethod().getId());
+        exec(new DispatchChangeStateAction(dispatch.getId(), DispatchState.IN_TRANSIT,
+            new ShipmentInfoSaveInfo(null, getMethodNameR(), new Date(), new Date(),
+                getMethodNameR(), shippingMethod.getId())));
 
-        Integer dispatchId = exec(new DispatchSaveAction(new DispatchSaveInfo(null,
-            dispatch.getReceiverCenter(), dispatch.getSenderCenter(),
-            DispatchState.CREATION, null), dsInfos, shipmentSaveInfo)).getId();
-
-        exec(new DispatchChangeStateAction(dispatchId, DispatchState.IN_TRANSIT, shipmentSaveInfo));
-
-        Criteria c = session.createCriteria(DispatchSpecimen.class)
-            .add(Restrictions.eq("dispatch.id", dispatchId))
-            .setFetchMode("specimen", FetchMode.JOIN);
-
+        session.clear();
         @SuppressWarnings("unchecked")
-        List<DispatchSpecimen> list = c.list();
+        List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
+        .add(Restrictions.eq("dispatch.id", dispatch.getId()))
+        .setFetchMode("specimen", FetchMode.JOIN).list();
+
         for (DispatchSpecimen dispatchSpecimen : list) {
-            // ensure current center on specimens has not changed - it is only
-            // updated when the dipatch goes into in_transit state
-            Specimen specimen = dispatchSpecimen.getSpecimen();
-            Assert.assertEquals(site, specimen.getCurrentCenter());
+            Assert.assertEquals(site, dispatchSpecimen.getSpecimen().getCurrentCenter());
         }
     }
 
@@ -256,20 +200,29 @@ public class TestDispatch extends TestAction {
 
     @Test
     public void testComment() throws Exception {
-        DispatchSaveInfo d = DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
+        DispatchSaveInfo dispatchSaveInfo = DispatchHelper.createSaveDispatchInfoRandom(site, clinic,
             DispatchState.IN_TRANSIT, getMethodNameR());
-        Set<DispatchSpecimenInfo> specs = DispatchHelper.createSaveDispatchSpecimenInfoRandom(
+        Set<DispatchSpecimenInfo> dsInfo = DispatchHelper.createSaveDispatchSpecimenInfoRandom(
             getExecutor(), patientId, clinic);
         ShipmentInfoSaveInfo shipsave = ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
-        Integer id = exec(new DispatchSaveAction(d, specs, shipsave)).getId();
-        d = new DispatchSaveInfo(d, id);
+        Integer id = exec(new DispatchSaveAction(dispatchSaveInfo, dsInfo, shipsave)).getId();
+        dispatchSaveInfo = new DispatchSaveInfo(dispatchSaveInfo, id);
 
         DispatchReadInfo info = exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(1, info.dispatch.getComments().size());
-        exec(new DispatchSaveAction(d, specs, shipsave)).getId();
+
+        // update the dispatch specimen information
+        dsInfo = new HashSet<DispatchSpecimenInfo>();
+        for (DispatchSpecimen dispatchSpecimen : info.dispatchSpecimens) {
+            dsInfo.add(new DispatchSpecimenInfo(dispatchSpecimen.getId(),
+                dispatchSpecimen.getSpecimen().getId(), dispatchSpecimen.getState()));
+        }
+
+        exec(new DispatchSaveAction(dispatchSaveInfo, dsInfo, shipsave)).getId();
         info = exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(2, info.dispatch.getComments().size());
-        exec(new DispatchSaveAction(d, specs, shipsave)).getId();
+
+        exec(new DispatchSaveAction(dispatchSaveInfo, dsInfo, shipsave)).getId();
         info = exec(new DispatchGetInfoAction(id));
         Assert.assertEquals(3, info.dispatch.getComments().size());
     }

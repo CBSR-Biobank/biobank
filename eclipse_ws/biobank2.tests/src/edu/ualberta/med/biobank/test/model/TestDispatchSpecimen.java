@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.test.model;
 
+import javax.validation.ConstraintViolationException;
+
 import junit.framework.Assert;
 
 import org.hibernate.Query;
@@ -33,6 +35,40 @@ public class TestDispatchSpecimen extends TestDb {
             }
         } finally {
             tx.rollback();
+        }
+    }
+
+    @Test
+    public void dispatchSpecimensDuplicateSpecimen() {
+        session.beginTransaction();
+        DispatchSpecimen [] dispatchSpecimens = new DispatchSpecimen [] {
+            factory.createDispatchSpecimen(),
+            factory.createDispatchSpecimen()
+        };
+
+        // have both dispatch specimens contain the same specimen
+        dispatchSpecimens[1].setSpecimen(dispatchSpecimens[0].getSpecimen());
+
+        try {
+            session.flush();
+            Assert.fail("should not be allowed to create 2 dispatch specimens assoc to same specimen");
+        } catch (ConstraintViolationException e) {
+            // intentionally empty
+        }
+    }
+
+    @Test
+    public void saveWithNoSpecimens() {
+        session.beginTransaction();
+        DispatchSpecimen dispatchSpecimen = factory.createDispatchSpecimen();
+        dispatchSpecimen.setSpecimen(null);
+
+        // have both dispatch specimens contain the same specimen
+        try {
+            session.flush();
+            Assert.fail("should not be allowed to create dispatch specimen with null specimen");
+        } catch (ConstraintViolationException e) {
+            // intentionally empty
         }
     }
 }

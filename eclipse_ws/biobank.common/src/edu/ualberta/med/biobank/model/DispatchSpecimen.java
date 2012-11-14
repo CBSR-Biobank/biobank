@@ -12,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -21,11 +22,18 @@ import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
+import edu.ualberta.med.biobank.validator.constraint.Unique;
+import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Entity
-@Table(name = "DISPATCH_SPECIMEN")
+@Table(name = "DISPATCH_SPECIMEN",
+uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "DISPATCH_ID", "SPECIMEN_ID" }) })
+@Unique.List({
+    @Unique(properties = { "dispatch", "specimen" }, groups = PrePersist.class),
+})
 public class DispatchSpecimen extends AbstractBiobankModel
-    implements HasComments {
+implements HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -83,8 +91,8 @@ public class DispatchSpecimen extends AbstractBiobankModel
     @Override
     @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(name = "DISPATCH_SPECIMEN_COMMENT",
-        joinColumns = { @JoinColumn(name = "DISPATCH_SPECIMEN_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "DISPATCH_SPECIMEN_ID", nullable = false, updatable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Set<Comment> getComments() {
         return this.comments;
     }
