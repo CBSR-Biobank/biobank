@@ -12,7 +12,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
@@ -179,6 +178,11 @@ public class TestCollectionEvent extends TestAction {
         }
     }
 
+    /*
+     * Creates a colleciton event with parent specimens and child specimens, then re-saves
+     * the collection event with the action and then verifies that the current centre on the
+     * specimens has not changed.
+     */
     @Test
     public void checkSpecimenCurrentCenter() throws Exception {
         session.beginTransaction();
@@ -190,10 +194,21 @@ public class TestCollectionEvent extends TestAction {
         parentSpecimens.add(factory.createParentSpecimen());
         parentSpecimens.add(factory.createParentSpecimen());
         parentSpecimens.add(factory.createParentSpecimen());
-        cevent.setOriginalSpecimens(parentSpecimens);
+        cevent.getOriginalSpecimens().addAll(parentSpecimens);
+
+        Set<Specimen> childSpecimens = new HashSet<Specimen>();
+        childSpecimens.add(factory.createChildSpecimen());
+        childSpecimens.add(factory.createChildSpecimen());
+        childSpecimens.add(factory.createChildSpecimen());
+        cevent.getAllSpecimens().addAll(childSpecimens);
+
         session.getTransaction().commit();
 
-        for (Specimen specimen : parentSpecimens) {
+        Set<Specimen> allSpecimens = new HashSet<Specimen>();
+        allSpecimens.addAll(parentSpecimens);
+        allSpecimens.addAll(childSpecimens);
+
+        for (Specimen specimen : allSpecimens) {
             Assert.assertEquals(clinic, specimen.getCurrentCenter());
         }
 
@@ -201,7 +216,7 @@ public class TestCollectionEvent extends TestAction {
 
         Assert.assertEquals(cevent, info.cevent);
         Assert.assertEquals(parentSpecimens.size(), info.sourceSpecimenInfos.size());
-        Assert.assertEquals(0, info.aliquotedSpecimenInfos.size());
+        Assert.assertEquals(childSpecimens.size(), info.aliquotedSpecimenInfos.size());
 
         Set<SaveCEventSpecimenInfo> spcInfo = new HashSet<SaveCEventSpecimenInfo>();
         for (Specimen specimen : parentSpecimens) {
@@ -215,11 +230,12 @@ public class TestCollectionEvent extends TestAction {
             cevent.getVisitNumber(), cevent.getActivityStatus(), null,
             spcInfo, null, site));
 
-        Criteria c = session.createCriteria(Specimen.class)
-            .add(Restrictions.eq("collectionEvent.id", cevent.getId()));
-
         @SuppressWarnings("unchecked")
-        List<Specimen> list = c.list();
+        List<Specimen> list = session.createCriteria(Specimen.class)
+        .add(Restrictions.eq("collectionEvent.id", cevent.getId())).list();
+
+        Assert.assertEquals(allSpecimens.size(), list.size());
+
         for (Specimen specimen : list) {
             Assert.assertEquals(clinic, specimen.getCurrentCenter());
         }
