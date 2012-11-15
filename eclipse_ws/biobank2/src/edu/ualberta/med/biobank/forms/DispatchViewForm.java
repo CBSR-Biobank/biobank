@@ -101,7 +101,7 @@ public class DispatchViewForm extends BiobankViewForm {
             DispatchReadInfo read =
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
-            read.dispatch.setDispatchSpecimens(read.specimens);
+            read.dispatch.setDispatchSpecimens(read.dispatchSpecimens);
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }

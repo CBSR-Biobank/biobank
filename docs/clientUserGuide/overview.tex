@@ -1,31 +1,30 @@
 \chapter{Overview}
-The BioBank2 Java Client is designed to be a client application that connects
-to a BioBank2 server that provides services for storing inventory information
-for biological samples. More than one client can connect to the server at the
-same time. The client is a software application that runs on Microsoft Windows
-and Linux\footnote{The scanner cannot be used when using the application on
+The Biobank Java Client is designed to be a client application that connects to
+a Biobank server which provides services for storing inventory information for
+biological samples. More than one client can connect to the server at a
+time. The client is a software application that runs on Microsoft Windows and
+Linux\footnote{The flatbed scanner cannot be used when using the application on
   Linux.}. The client software is a Java application and requires that a Java
-JRE or JDK be installed on the computer. The installation program for the
-client installs a Java JRE if it is not already present on the computer.
+Run Time Environment (JRE) be installed on the host computer.
 
-When running on Microsoft Windows, the client can communicate with scanners
-that use either TWAIN\footnote{\url{http://en.wikipedia.org/wiki/TWAIN}} or
+When running on Microsoft Windows, the client can communicate with flatbed
+scanners that use either
+TWAIN\footnote{\url{http://en.wikipedia.org/wiki/TWAIN}} or
 WIA\footnote{\url{http://en.wikipedia.org/wiki/Windows_Image_Acquisition}}
-drivers. Most scanners available on the market provide these
-drivers. Therefore, most scanners work with the client software.
+drivers. Most flatbed scanners available on the market provide these
+drivers.
 
-The client does not store any inventory information on the computer that it
-runs on. All the information is stored on the server. Any client connecting to
-this server will be able to see all the information on the server.
+The client does not store any inventory information on the host computer. All
+the information is stored on the server.
 
 Figure \ref{fig:main_window} shows the application's main window and highlights
 some of its components.
 
 \begin{description}
 \item[Window Title Bar] The title bar shows the connection information when
-  connected to a BioBank2 server. The domain name or IP address of the server
-  is displayed and in square brackets the user name that was used to log in.
-\item[Main Menu] The main menu allows the user access to the different
+  connected to a Biobank server. The domain name or IP address of the server
+  is displayed and the user name that was used to log in in square brackets.
+\item[Main Menu] The main menu allows the user to access to the different
   functions provided by the software (see section \ref{sec:main_menu} for a
   description of the menu items).
 \item[Toolbar Icons] The icon buttons in the toolbar allow quick access to
@@ -36,7 +35,7 @@ some of its components.
 \item[Tree View] The tree view shown here is for the \emph{Administration
   View}. The application uses tree views in the \emph{Administration View}
   and \emph{Processing View} (see section \ref{sec:application_views}). Tree
-  view shows nodes in a hierarchical structure. If a node has children, a
+  views show nodes in a hierarchical structure. If a node has children, a
   \emph{plus} symbol is displayed next to the node. When the symbol is
   pressed the node will expand to show its' child nodes.  Sometimes,
   operations can be performed on certain nodes in the tree by right clicking
@@ -69,13 +68,13 @@ server and to quit the application.
 \end{figure}
 The items under the \emph{Server} main menu item are as follows:
 \begin{description}
-\item[Login] Allows the user to login to a BioBank2 server. On startup and
+\item[Login] Allows the user to login to a Biobank server. On startup and
   when logged out this menu item is enabled. When logged into a server this
   menu item is disabled. Also, the \mbox{\fbox{Ctrl} + \fbox{L}} keyboard
   short cut can be used to perform this function.
 \item[Logout] Allows the user to log out and close the connection to a
-  BioBank2 server. On startup this menu item is disabled. The item is enabled
-  only when the user has succesfully logged in to a BioBank2 server. Also,
+  Biobank server. On startup this menu item is disabled. The item is enabled
+  only when the user has succesfully logged in to a Biobank server. Also,
   the \mbox{\fbox{Ctrl} + \fbox{Shift} + \fbox{L}} keyboard short cut can be
   used to perform this function.
 \item[Quit] Shuts down the application. Also, the \mbox{\fbox{Ctrl} +
@@ -232,7 +231,7 @@ The help menu provides access to several functions.
 client. Software updates can be scheduled in the configuration section. See
 section \ref{sec:automatic_updates} for more details.
 \item[Install New Software] \todo[size=\small]{Are we using this?}%.
-\item[About BioBank2] Displays the Java Clients software version information.
+\item[About Biobank] Displays the Java Clients software version information.
 \end{description}
 
 \section{Views}

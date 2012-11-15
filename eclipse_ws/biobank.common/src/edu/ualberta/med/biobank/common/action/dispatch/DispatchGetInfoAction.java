@@ -58,7 +58,7 @@ public class DispatchGetInfoAction implements Action<DispatchReadInfo> {
             Object row = rows.get(0);
 
             sInfo.dispatch = (Dispatch) row;
-            sInfo.specimens =
+            sInfo.dispatchSpecimens =
                 new DispatchGetSpecimenInfosAction(id).run(context).getSet();
 
         } else {

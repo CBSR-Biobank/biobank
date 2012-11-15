@@ -103,8 +103,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
         updatePermissionSelections();
 
         createPermissionsValidation(
-        // TR: validation message if no permissions are selected
-        i18n.tr("Select at least one permission or role (with permissions) to grant"));
+            // TR: validation message if no permissions are selected
+            i18n.tr("Select at least one permission or role (with permissions) to grant"));
 
         rolesWidget.addSelectionChangedListener(rolesSelectionHandler);
         permissionsTree.addCheckStateListener(permissionsCheckStateHandler);
@@ -214,7 +214,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
 
         // TR: user manager checkbox tooltip
         userManagerButton
-            .setToolTipText(
+        .setToolTipText(
             i18n.tr("Can manage, create, edit, and delete users and groups (for the previously selected centers and studies)."));
 
         GridData gd = new GridData();
@@ -241,8 +241,8 @@ public class MembershipPermissionsPage extends BgcWizardPage {
 
         // TR: grant all permissions checkbox tooltip
         everyPermissionButton
-            .setToolTipText(i18n
-                .tr("Grant all current and future roles and permissions"));
+        .setToolTipText(i18n
+            .tr("Grant all current and future roles and permissions"));
         everyPermissionButton.setSelection(membership.isEveryPermission());
         everyPermissionButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -274,7 +274,7 @@ public class MembershipPermissionsPage extends BgcWizardPage {
             // label for roles that can be selected from a multi-combo box
             i18n.tr("Available roles"),
             // label for roles that have be selected from a multi-combo box
-            i18n.tr("Selected Centers"),
+            i18n.tr("Selected roles"),
             100) {
             @Override
             protected String getTextForObject(Role role) {

@@ -51,7 +51,7 @@ public class TestShipment extends TestAction {
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
 
         for (Integer specimenId : oisave.addedSpecIds) {
-            Specimen spc = (Specimen) session.load(Specimen.class, specimenId);
+            Specimen spc = (Specimen) session.load(Specimen.class, specimenId); 
             Assert.assertEquals(site.getId(), spc.getOriginInfo().getCenter().getId());
         }
 
@@ -66,7 +66,7 @@ public class TestShipment extends TestAction {
             Assert.assertTrue(oisave.addedSpecIds.contains(spec.specimen
                 .getId()));
             Assert.assertEquals(clinic.getId(), spec.specimen.getOriginInfo().getCenter().getId());
-            Assert.assertEquals(site.getId(),
+            Assert.assertEquals(site.getId(), 
                 spec.specimen.getOriginInfo().getReceiverCenter().getId());
             Assert.assertEquals(site.getId(), spec.specimen.getCurrentCenter().getId());
         }
@@ -87,12 +87,12 @@ public class TestShipment extends TestAction {
         // Empty
         oisave.addedSpecIds = mut.getEmpty();
         exec(new OriginInfoSaveAction(oisave, shipsave))
-        .getId();
+            .getId();
 
         // Null
         oisave.addedSpecIds = mut.getNull();
         exec(new OriginInfoSaveAction(oisave, shipsave))
-        .getId();
+            .getId();
 
         // Set of null
         try {
@@ -122,7 +122,7 @@ public class TestShipment extends TestAction {
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
             exec(new OriginInfoSaveAction(oisave, shipsave))
-            .getId();
+                .getId();
 
         for (Integer specimenId : oisave.addedSpecIds) {
             Specimen spc = (Specimen) session.get(Specimen.class, specimenId);
@@ -157,7 +157,7 @@ public class TestShipment extends TestAction {
             ShipmentInfoHelper.createRandomShipmentInfo(getExecutor());
         Integer id =
             exec(new OriginInfoSaveAction(oisave, shipsave))
-            .getId();
+                .getId();
 
         oisave.oiId = id;
 
@@ -166,12 +166,12 @@ public class TestShipment extends TestAction {
 
         Assert.assertEquals(1, info.originInfo.getComments().size());
         exec(new OriginInfoSaveAction(oisave, shipsave))
-        .getId();
+            .getId();
         info =
             exec(new ShipmentGetInfoAction(id));
         Assert.assertEquals(2, info.originInfo.getComments().size());
         exec(new OriginInfoSaveAction(oisave, shipsave))
-        .getId();
+            .getId();
         info =
             exec(new ShipmentGetInfoAction(id));
         Assert.assertEquals(3, info.originInfo.getComments().size());

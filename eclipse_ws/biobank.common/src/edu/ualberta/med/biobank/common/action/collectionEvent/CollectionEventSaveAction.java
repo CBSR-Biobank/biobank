@@ -49,51 +49,79 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     @SuppressWarnings("nls")
     public static final Tr ABSENT_SPECIMEN_ERRMSG =
-        bundle.tr("Specimen \"{0}\" not found in collection.");
-    
+    bundle.tr("Specimen \"{0}\" not found in collection.");
+
     @SuppressWarnings("nls")
     public static final Tr LOCKED_LABEL_ERRMSG =
-        bundle.tr("Attribute for label \"{0}\" is locked, changes not" +
-            " permitted.");
-    
+    bundle.tr("Attribute for label \"{0}\" is locked, changes not" +
+        " permitted.");
+
     @SuppressWarnings("nls")
     public static final Tr STUDY_EVENT_ATTR_MISSING_ERRMSG =
-        bundle.tr("Cannot find Study Event Attribute with id \"{0}\".");
-    
+    bundle.tr("Cannot find Study Event Attribute with id \"{0}\".");
+
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG =
-        bundle.tr("Value \"{0}\" is invalid for label \"{2}\".");
-    
+    bundle.tr("Value \"{0}\" is invalid for label \"{2}\".");
+
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG =
-        bundle.tr("Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".");
-    
+    bundle.tr("Value \"{0}\" (\"{1}\") is invalid for label \"{2}\".");
+
     @SuppressWarnings("nls")
     public static final Tr CANNOT_PARSE_DATE_ERRMSG =
-        bundle.tr("Cannot parse date \"{0}\".");
-    
+    bundle.tr("Cannot parse date \"{0}\".");
+
     @SuppressWarnings("nls")
     public static final Tr UNKNOWN_EVENT_ATTR_TYPE_ERRMSG =
-        bundle.tr("Unknown Event Attribute Type \"{0}\".");
+    bundle.tr("Unknown Event Attribute Type \"{0}\".");
 
     public static class SaveCEventSpecimenInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
-        public Integer id;
-        public String inventoryId;
-        public Date createdAt;
-        public ActivityStatus activityStatus;
-        public Integer specimenTypeId;
-        public List<String> comments = new ArrayList<String>();
-        public BigDecimal quantity;
+        public final Integer id;
+        public final String inventoryId;
+        public final Date createdAt;
+        public final ActivityStatus activityStatus;
+        public final Integer specimenTypeId;
+        public final List<String> comments;
+        public final BigDecimal quantity;
+
+        public SaveCEventSpecimenInfo(Integer id, String inventoryId,
+            Date createdAt, ActivityStatus activityStatus, Integer specimenTypeId,
+            List<String> comments, BigDecimal quantity) {
+            this.id = id;
+            this.inventoryId = inventoryId;
+            this.createdAt = createdAt;
+            this.activityStatus = activityStatus;
+            this.specimenTypeId = specimenTypeId;
+            if (comments == null) {
+                this.comments = new ArrayList<String>();
+            } else {
+                this.comments = comments;
+            }
+            this.quantity = quantity;
+        }
+
+        // copy but with a different id
+        public SaveCEventSpecimenInfo(SaveCEventSpecimenInfo that, Integer id) {
+            this(id, that.inventoryId, that.createdAt, that.activityStatus, that.specimenTypeId,
+                that.comments, that.quantity);
+        }
     }
 
     public static class CEventAttrSaveInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
 
-        public Integer studyEventAttrId;
-        public EventAttrTypeEnum type;
-        public String value;
+        public final Integer studyEventAttrId;
+        public final EventAttrTypeEnum type;
+        public final String value;
+
+        public CEventAttrSaveInfo(Integer studyEventAttrId, EventAttrTypeEnum type, String value) {
+            this.studyEventAttrId = studyEventAttrId;
+            this.type = type;
+            this.value = value;
+        }
     }
 
     private final Integer ceventId;
@@ -107,10 +135,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private List<CEventAttrSaveInfo> ceAttrList =
         new ArrayList<CEventAttrSaveInfo>(0);
 
-    public CollectionEventSaveAction(Integer ceventId, Integer patientId,
-        Integer visitNumber, ActivityStatus activityStatus, String commentText,
-        Collection<SaveCEventSpecimenInfo> sourceSpecs,
-        List<CEventAttrSaveInfo> ceAttrList, Center currentWorkingCenter) {
+    public CollectionEventSaveAction(Integer ceventId, Integer patientId, Integer visitNumber,
+        ActivityStatus activityStatus, String commentText,
+        Collection<SaveCEventSpecimenInfo> sourceSpecs, List<CEventAttrSaveInfo> ceAttrList,
+        Center currentWorkingCenter) {
         this.ceventId = ceventId;
         this.patientId = patientId;
         this.visitNumber = visitNumber;
@@ -230,14 +258,14 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         if (specimen.getChildSpecimens().isEmpty()) {
             specimen.getCollectionEvent().getAllSpecimens().remove(specimen);
             specimen.getCollectionEvent().getOriginalSpecimens()
-                .remove(specimen);
+            .remove(specimen);
 
             context.getSession().delete(specimen);
         } else {
             throw new LocalizedException(
                 bundle
-                    .tr(
-                        "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
+                .tr(
+                    "Specimen {0} has children and cannot be deleted. Instead, move it to a different collection event.")
                     .format(
                         specimen.getInventoryId()));
         }
@@ -284,7 +312,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 if (sAttr == null) {
                     throw new LocalizedException(
                         STUDY_EVENT_ATTR_MISSING_ERRMSG
-                            .format(attrInfo.studyEventAttrId));
+                        .format(attrInfo.studyEventAttrId));
                 }
             }
 
@@ -295,7 +323,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
             if (attrInfo.value != null) {
                 // validate the value
-                attrInfo.value = attrInfo.value.trim();
+                attrInfo = new CEventAttrSaveInfo(attrInfo.studyEventAttrId, attrInfo.type,
+                    attrInfo.value.trim());
                 if (attrInfo.value.length() > 0) {
                     EventAttrTypeEnum type = attrInfo.type;
                     List<String> permissibleSplit = null;
@@ -315,7 +344,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                 sAttr.getGlobalEventAttr().getLabel();
                             throw new LocalizedException(
                                 INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
-                                    .format(attrInfo.value, label));
+                                .format(attrInfo.value, label));
                         }
                     } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
                         for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
@@ -324,8 +353,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                                     sAttr.getGlobalEventAttr().getLabel();
                                 throw new LocalizedException(
                                     INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
-                                        .format(singleVal, attrInfo.value,
-                                            label));
+                                    .format(singleVal, attrInfo.value,
+                                        label));
                             }
                         }
                     } else if (type == EventAttrTypeEnum.NUMBER) {
@@ -333,18 +362,18 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                     } else if (type == EventAttrTypeEnum.DATE_TIME) {
                         try {
                             DateFormatter.dateFormatter
-                                .parse(attrInfo.value);
+                            .parse(attrInfo.value);
                         } catch (ParseException e) {
                             throw new LocalizedException(
                                 CANNOT_PARSE_DATE_ERRMSG
-                                    .format(attrInfo.value));
+                                .format(attrInfo.value));
                         }
                     } else if (type == EventAttrTypeEnum.TEXT) {
                         // do nothing
                     } else {
                         throw new LocalizedException(
                             UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
-                                .format(type.getName()));
+                            .format(type.getName()));
                     }
                 }
             }
