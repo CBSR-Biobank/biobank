@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 uniqueConstraints = {
     @UniqueConstraint(columnNames = { "DISPATCH_ID", "SPECIMEN_ID" }) })
 @Unique.List({
-    @Unique(properties = { "dispatch", "specimen" }, groups = PrePersist.class),
+    @Unique(properties = { "dispatch", "specimen" }, groups = PrePersist.class)
 })
 public class DispatchSpecimen extends AbstractBiobankModel
 implements HasComments {
