@@ -7,17 +7,9 @@
 		<artifactId>parent</artifactId>
 		<version>4.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>biobank-persist</artifactId>
+	<artifactId>biobank-service-api</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Biobank Service API</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>edu.ulberta.med.biobank</groupId>
-			<artifactId>biobank-model</artifactId>
-			<version>4.0-SNAPSHOT</version>
-		</dependency>
-
-	</dependencies>
 </project>

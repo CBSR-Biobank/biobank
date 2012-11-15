@@ -15,7 +15,6 @@
   </properties>
 
   <modules>
-    <module>biobank-model</module>
     <module>biobank-service-api</module>
     <module>biobank-service</module>
     <module>biobank-webapp</module>
