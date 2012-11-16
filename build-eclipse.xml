@@ -63,61 +63,7 @@ use command "ant -projecthelp" to display the targets.
   <target name="deploy-eclipse"
           depends="java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
-    <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="acegi-security-1.0.4.jar" />
-        <include name="antlr-2.7.6.jar" />
-        <include name="asm.jar" />
-        <include name="axis.jar" />
-        <include name="caGrid-CQL-cql.1.0-1.2.jar" />
-        <include name="castor-1.0.2.jar" />
-        <include name="cglib-2.1.3.jar" />
-        <include name="cog-jglobus.jar" />
-        <include name="commons-codec-1.3.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-discovery-0.2.jar" />
-        <include name="commons-lang-2.4.jar" />
-        <include name="commons-logging-1.1.jar" />
-        <include name="dom4j-1.6.1.jar" />
-        <include name="gettext-commons-0.9.6.jar" />
-        <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
-        <include name="hibernate-validator-4.2.0.Final.jar" />
-        <include name="hibernate3.jar" />
-        <include name="javassist-3.12.0.GA.jar" />
-        <include name="jaxrpc.jar" />
-        <include name="jta-1.1.jar" />
-        <include name="log4j-1.2.14.jar" />
-        <include name="messages.jar" />
-        <include name="mysql-connector-java-5.1.15-bin.jar" />
-	<include name="ognl-2.6.7.jar" />
-        <include name="saaj.jar" />
-        <include name="sdk-client-framework.jar" />
-        <include name="sdk-grid-remoting.jar" />
-        <include name="sdk-security.jar" />
-        <include name="sdk-writable-client-framework.jar" />
-        <include name="slf4j-api-1.6.1.jar" />
-        <include name="slf4j-log4j12-1.6.4.jar" />
-        <include name="spring.jar" />
-        <include name="validation-api-1.0.0.GA.jar" />
-        <include name="wsdl4j-1.5.1.jar" />
-        <include name="xercesImpl.jar" />
-        <include name="xpp3-1.1.3.4.C.jar" />
-        <include name="xstream-1.3.1.jar" />
-        <include name="jsse.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="csmapi-4.1.jar" />
-        <include name="jta-1.1.jar" />
-        <include name="sdk-core.jar" />
-        <include name="sdk-writable-core.jar" />
-        <include name="SuperCSV-1.52.jar" />
-        <include name="spiffy-all-0.05.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="false">
+   <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="false">
       <fileset dir="${req.jars.dir}">
         <include name="commons-beanutils-1.8.0.jar" />
         <include name="commons-collections-3.2.jar" />
