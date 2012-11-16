@@ -1,0 +1,8 @@
+<ivy-module version="2.0">
+  <info organisation="edu.ualberta.ca" module="biobank" />
+  <dependencies>
+    <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final"/>
+    <dependency org="commons-lang" name="commons-lang" rev="2.0"/>
+    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" />
+  </dependencies>
+</ivy-module>

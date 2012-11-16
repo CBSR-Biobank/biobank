@@ -1,0 +1,10 @@
+<ivysettings>
+    <settings defaultResolver="chain"/>
+    <resolvers>
+        <chain name="chain">
+            <ibiblio name="central" m2compatible="true"/>
+            <ibiblio name="example" m2compatible="true"
+		     root="http://gettext-commons.googlecode.com/svn/maven-repository/" />
+        </chain>
+    </resolvers>
+</ivysettings>
