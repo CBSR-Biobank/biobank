@@ -71,8 +71,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -1358,17 +1358,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         if (currentMultipleContainer.hasSpecimens()) {
             Map<RowColPos, PalletWell> palletScanned =
                 new HashMap<RowColPos, PalletWell>();
             for (RowColPos pos : currentMultipleContainer.getSpecimens()
                 .keySet()) {
                 if (pos.getRow() != 0 && pos.getCol() != 2) {
-                    palletScanned.put(
-                        pos,
-                        new PalletWell(new DecodedWell(pos.getRow(), pos
-                            .getCol(),
+                    palletScanned.put(pos,
+                        new PalletWell(new DecodedWell(pos.getRow(), pos.getCol(),
                             currentMultipleContainer.getSpecimens().get(pos)
                                 .getInventoryId())));
                 }

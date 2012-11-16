@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.batchoperation.specimen;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,8 +24,12 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Reads a TECAN CSV file containing specimen information and returns the file
@@ -229,24 +235,23 @@ public class CbsrTecanSpecimenPojoReader implements
         "sampleId"
     };
 
-    private ICsvBeanReader reader;
+    private final Center workingCenter;
+
+    private final String filename;
+
+    List<SpecimenBatchOpInputPojo> convertedPojos =
+        new ArrayList<SpecimenBatchOpInputPojo>();
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    @Override
-    public void setFilename(String filename) {
-        // not used in this implementation
-    }
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
+    public CbsrTecanSpecimenPojoReader(Center workingCenter, String filename) {
+        this.workingCenter = workingCenter;
+        this.filename = filename;
     }
 
     // cell processors have to be recreated every time the file is read
     public CellProcessor[] getCellProcessors() {
-
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
 
@@ -289,16 +294,13 @@ public class CbsrTecanSpecimenPojoReader implements
     }
 
     @Override
-    public List<SpecimenBatchOpInputPojo> getPojos()
+    public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
         if (reader == null) {
-            throw new IllegalStateException("CSV reader is null");
+            throw new NullPointerException("CSV reader is null");
         }
 
         CellProcessor[] cellProcessors = getCellProcessors();
-
-        List<SpecimenBatchOpInputPojo> result =
-            new ArrayList<SpecimenBatchOpInputPojo>();
 
         TecanCsvRowPojo csvPojo;
 
@@ -322,9 +324,9 @@ public class CbsrTecanSpecimenPojoReader implements
                     continue;
                 }
 
-                result.add(batchOpPojo);
+                convertedPojos.add(batchOpPojo);
             }
-            return result;
+            return convertedPojos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
@@ -366,14 +368,9 @@ public class CbsrTecanSpecimenPojoReader implements
     }
 
     @Override
-    public void preExecution() {
-        // TODO validate worksheet against source specimens
-        // verify that parent inventory id's have processing events
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
+        IOException {
+        return new SpecimenBatchOpAction(workingCenter, convertedPojos,
+            new File(filename));
     }
-
-    @Override
-    public void postExecution() {
-        // intentionally empty
-    }
-
 }

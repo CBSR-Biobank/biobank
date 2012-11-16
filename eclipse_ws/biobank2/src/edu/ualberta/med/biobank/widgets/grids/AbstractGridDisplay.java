@@ -13,8 +13,8 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total

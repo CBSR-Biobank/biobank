@@ -43,8 +43,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public abstract class AbstractLinkAssignEntryForm extends
     AbstractPalletSpecimenAdminForm {
@@ -366,7 +366,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         freezerWidget = new ContainerDisplayWidget(freezerComposite);
         freezerWidget.initDisplayFromType(true);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setDisplaySize(ScanPalletDisplay.palletWidth, 100);
+        freezerWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit
             .createComposite(multipleVisualisation);
@@ -383,7 +383,7 @@ public abstract class AbstractLinkAssignEntryForm extends
         hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
         hotelWidget.setDisplaySize(100,
-            ScanPalletDisplay.palletHeightAndLegend);
+            ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(multipleVisualisation);

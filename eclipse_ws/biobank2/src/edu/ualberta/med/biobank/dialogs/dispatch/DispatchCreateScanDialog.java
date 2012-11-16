@@ -37,8 +37,8 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchCreateScanDialog extends
@@ -238,7 +238,7 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         ContainerWrapper currentPallet = null;
         if (isPalletWithPosition)
             currentPallet = ContainerWrapper
@@ -247,11 +247,26 @@ public class DispatchCreateScanDialog extends
                     currentProductBarcode);
         Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
         if (currentPallet == null) {
-            Map<RowColPos, PalletWell> cells = PalletWell
+            Map<RowColPos, PalletWell> wells = PalletWell
                 .getRandomNonDispatchedSpecimens(
                     SessionManager.getAppService(), (currentShipment)
                         .getSenderCenter().getId());
-            return cells;
+
+            // HACK!
+            // mangle some barcodes to pretend there is an error
+            //
+            // used for testing - comment out for now
+            //
+            // int count = 0;
+            // for (PalletWell well : wells.values()) {
+            // if (count == 3) {
+            // String message = well.getValue();
+            // well.setValue(message.substring(1, message.length() - 1));
+            // }
+            // ++count;
+            // }
+
+            return wells;
         }
         for (SpecimenWrapper specimen : currentPallet.getSpecimens()
             .values()) {

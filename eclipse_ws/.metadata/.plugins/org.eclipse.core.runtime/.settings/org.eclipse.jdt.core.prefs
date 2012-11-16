@@ -1,7 +1,9 @@
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.ucls,*.useq
 org.eclipse.jdt.core.classpathVariable.ECLIPSE_HOME=/home/loyola/apps/eclipse/rcp/eclipse
-org.eclipse.jdt.core.classpathVariable.JRE_LIB=/usr/lib/jvm/java-6-sun-1.6.0.26/jre/lib/rt.jar
+org.eclipse.jdt.core.classpathVariable.JRE_LIB=C\:/apps/eclipse/rcp/eclipse/jre/lib/rt.jar
+org.eclipse.jdt.core.classpathVariable.JRE_SRC=
+org.eclipse.jdt.core.classpathVariable.JRE_SRCROOT=
 org.eclipse.jdt.core.classpathVariable.JUNIT_HOME=/home/loyola/apps/eclipse/rcp/eclipse/plugins/org.junit_3.8.2.v20080602-1318
 org.eclipse.jdt.core.classpathVariable.JUNIT_SRC_HOME=/home/loyola/apps/eclipse/rcp/eclipse/plugins/org.junit.source_3.8.2.v20080602-1318.jar
 org.eclipse.jdt.core.codeComplete.visibilityCheck=enabled

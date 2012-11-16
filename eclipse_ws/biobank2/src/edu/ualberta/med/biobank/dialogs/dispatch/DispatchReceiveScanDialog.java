@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchReceiveScanDialog extends
@@ -89,7 +89,7 @@ public class DispatchReceiveScanDialog extends
 
     @SuppressWarnings("nls")
     @Override
-    protected Map<RowColPos, PalletWell> getFakeScanCells() {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() {
         Map<RowColPos, PalletWell> palletScanned =
             new TreeMap<RowColPos, PalletWell>();
         if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
@@ -108,9 +108,8 @@ public class DispatchReceiveScanDialog extends
                 && i < currentShipment.getDispatchSpecimenCollection(false)
                     .size());
 
-            palletScanned.put(new RowColPos(6, 6), new PalletWell(
-                new DecodedWell(
-                    6, 6, "aaah")));
+            palletScanned.put(new RowColPos(6, 6), new PalletWell(new DecodedWell(
+                6, 6, "aaah")));
         }
         return palletScanned;
     }

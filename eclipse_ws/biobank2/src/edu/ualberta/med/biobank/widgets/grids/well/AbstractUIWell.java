@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.grids.cell;
+package edu.ualberta.med.biobank.widgets.grids.well;
 
 public abstract class AbstractUIWell {
 

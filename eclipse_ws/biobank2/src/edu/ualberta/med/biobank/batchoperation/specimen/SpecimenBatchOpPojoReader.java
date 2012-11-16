@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.batchoperation.specimen;
 
+import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,7 +23,11 @@ import org.supercsv.io.ICsvBeanReader;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
+import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.IdResult;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.model.Center;
 
 /**
  * Reads a CSV file containing specimen information and returns the file as a
@@ -54,22 +60,19 @@ public class SpecimenBatchOpPojoReader implements
         "comment"
     };
 
-    private ICsvBeanReader reader;
+    private final Center workingCenter;
+
+    private final String filename;
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    private final List<SpecimenBatchOpInputPojo> csvInfos =
+    private final List<SpecimenBatchOpInputPojo> pojos =
         new ArrayList<SpecimenBatchOpInputPojo>(0);
 
-    @Override
-    public void setFilename(String filename) {
-        // not used in this implementation
-    }
-
-    @Override
-    public void setReader(ICsvBeanReader reader) {
-        this.reader = reader;
+    public SpecimenBatchOpPojoReader(Center workingCenter, String filename) {
+        this.workingCenter = workingCenter;
+        this.filename = filename;
     }
 
     // cell processors have to be recreated every time the file is read
@@ -107,7 +110,7 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public List<SpecimenBatchOpInputPojo> getPojos()
+    public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException {
 
         SpecimenBatchOpInputPojo csvPojo;
@@ -120,10 +123,10 @@ public class SpecimenBatchOpPojoReader implements
                     NAME_MAPPINGS, cellProcessors)) != null) {
 
                 csvPojo.setLineNumber(reader.getLineNumber());
-                csvInfos.add(csvPojo);
+                pojos.add(csvPojo);
             }
 
-            return csvInfos;
+            return pojos;
         } catch (SuperCSVReflectionException e) {
             throw new ClientBatchOpErrorsException(e);
         } catch (SuperCSVException e) {
@@ -139,12 +142,9 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public void preExecution() {
-        // does nothing
-    }
-
-    @Override
-    public void postExecution() {
-        // does nothing
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
+        IOException {
+        return new SpecimenBatchOpAction(workingCenter, pojos,
+            new File(filename));
     }
 }

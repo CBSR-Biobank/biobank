@@ -767,7 +767,7 @@
                      definitionId="biobank.processingPerspectiveSelected">
                </reference>
                <reference
-                     definitionId="edu.ualberta.med.biobank.gui.common.globalAdminPermission">
+                     definitionId="edu.ualberta.med.biobank.gui.common.batchOperationPermission">
                </reference>
             </and>
          </activeWhen>

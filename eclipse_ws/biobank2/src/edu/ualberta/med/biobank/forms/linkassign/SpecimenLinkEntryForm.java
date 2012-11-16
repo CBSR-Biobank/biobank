@@ -58,8 +58,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version. 
@@ -260,14 +260,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                                 .getSelection();
                             if (selection != null) {
                                 @SuppressWarnings("unchecked")
-                                Map<RowColPos, PalletWell> cells =
-                                    (Map<RowColPos, PalletWell>) palletWidget
+                            Map<RowColPos, PalletWell> cells =
+                            (Map<RowColPos, PalletWell>) palletWidget
                                         .getCells();
                                 if (cells != null) {
                                     for (RowColPos rcp : cells.keySet()) {
                                         if (rcp.getRow() == indexRow) {
-                                            PalletWell cell = cells.get(rcp);
-                                            if (PalletWell.hasValue(cell)) {
+                                        PalletWell cell = cells.get(rcp);
+                                        if (PalletWell.hasValue(cell)) {
                                                 setHierarchyToCell(cell,
                                                     selection);
                                             }
@@ -585,7 +585,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         @SuppressWarnings("unchecked")
         Map<RowColPos, PalletWell> cells =
-            (Map<RowColPos, PalletWell>) palletWidget
+        (Map<RowColPos, PalletWell>) palletWidget
                 .getCells();
         List<AliquotedSpecimenInfo> asiList =
             new ArrayList<AliquotedSpecimenInfo>();
@@ -763,7 +763,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: return fake cells for testing
      */
-    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         if (isFakeScanRandom) {
             return PalletWell.getRandomScanLink();
         }

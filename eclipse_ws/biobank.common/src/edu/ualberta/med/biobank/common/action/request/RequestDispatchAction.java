@@ -52,8 +52,8 @@ public class RequestDispatchAction implements Action<EmptyResult> {
             new RequestStateChangeAction(specs, rsstate);
         stateaction.run(context);
         Request request = context.get(Request.class, requestId);
-        Dispatch d = context.load(Dispatch.class, dInfo.id, new Dispatch());
-        d.setId(dInfo.id);
+        Dispatch d = context.load(Dispatch.class, dInfo.dispatchId, new Dispatch());
+        d.setId(dInfo.dispatchId);
         d.setReceiverCenter(context.load(Center.class, dInfo.receiverId));
         d.setSenderCenter(context.load(Center.class, dInfo.senderId));
         d.setState(dInfo.state);
@@ -64,7 +64,7 @@ public class RequestDispatchAction implements Action<EmptyResult> {
 
         for (DispatchSpecimenInfo ds : dspecs) {
             DispatchSpecimen dispatchSpecimen = new DispatchSpecimen();
-            dispatchSpecimen.setId(ds.id);
+            dispatchSpecimen.setId(ds.dispatchSpecimenId);
             dispatchSpecimen.setDispatch(d);
             dispatchSpecimen.setSpecimen(context.load(Specimen.class,
                 ds.specimenId));

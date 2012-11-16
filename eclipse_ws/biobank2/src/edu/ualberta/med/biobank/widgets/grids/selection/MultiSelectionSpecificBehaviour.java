@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.widgets.grids.selection;
 
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 
 public abstract class MultiSelectionSpecificBehaviour {
 

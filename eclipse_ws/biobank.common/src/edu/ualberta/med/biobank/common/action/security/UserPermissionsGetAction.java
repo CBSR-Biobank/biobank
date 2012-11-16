@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.permission.researchGroup.ResearchGroupCre
 import edu.ualberta.med.biobank.common.permission.security.UserManagerPermission;
 import edu.ualberta.med.biobank.common.permission.shipment.OriginInfoUpdatePermission;
 import edu.ualberta.med.biobank.common.permission.site.SiteCreatePermission;
+import edu.ualberta.med.biobank.common.permission.specimen.BatchOperationPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.common.permission.specimenType.SpecimenTypeCreatePermission;
@@ -80,6 +81,9 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             p.specimenLinkPermission =
                 new SpecimenLinkPermission(centerId, null).isAllowed(context);
 
+            p.batchOperationPermission =
+                new BatchOperationPermission(centerId, null).isAllowed(context);
+
             // specimen assign not allowed for clinics
             Site site = context.get(Site.class, centerId);
             p.specimenAssignPermission = (site != null)
@@ -114,6 +118,7 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         private boolean studyCreatePermission;
         private boolean userManagerPermission;
         private boolean labelPrintingPermission;
+        private boolean batchOperationPermission;
 
         public static long getSerialversionuid() {
             return serialVersionUID;
@@ -185,6 +190,10 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
 
         public boolean isLabelPrintingPermission() {
             return labelPrintingPermission;
+        }
+
+        public boolean isBatchOperationPermission() {
+            return batchOperationPermission;
         }
     }
 

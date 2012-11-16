@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.grids.cell;
+package edu.ualberta.med.biobank.widgets.grids.well;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 

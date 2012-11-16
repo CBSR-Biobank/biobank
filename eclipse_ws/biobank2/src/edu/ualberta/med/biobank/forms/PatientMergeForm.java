@@ -116,12 +116,10 @@ public class PatientMergeForm extends BiobankEntryForm {
         form.setImage(BgcPlugin.getDefault().getImageRegistry()
             .get(BgcPlugin.IMG_PATIENT));
 
-        toolkit
-            .createLabel(
-                page,
-                i18n.tr(
-                    "Select Patient Number to merge into Patient {0} and press Enter",
-                    patient1.getPnumber()), SWT.LEFT);
+        toolkit.createLabel(page, i18n.tr(
+            "Enter the patient number to merge into patient {0} "
+                + "and press the Enter key",
+            patient1.getPnumber()), SWT.LEFT);
 
         createPatientSection();
         createCommentSection();

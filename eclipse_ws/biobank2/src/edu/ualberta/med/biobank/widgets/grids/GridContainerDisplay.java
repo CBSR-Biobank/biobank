@@ -10,9 +10,9 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.ContainerCell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.ContainerCell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public class GridContainerDisplay extends AbstractGridDisplay {
 

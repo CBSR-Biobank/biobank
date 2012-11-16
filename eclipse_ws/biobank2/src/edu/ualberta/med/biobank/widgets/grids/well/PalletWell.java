@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.grids.cell;
+package edu.ualberta.med.biobank.widgets.grids.well;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
@@ -221,12 +222,6 @@ public class PalletWell extends AbstractUIWell {
         return null;
     }
 
-    // public void setValue(String value) {
-    // if (decodedWell != null) {
-    // decodedWell.setValue(value);
-    // }
-    // }
-
     @Override
     public Integer getRow() {
         if (decodedWell == null) {
@@ -277,8 +272,7 @@ public class PalletWell extends AbstractUIWell {
         return sourceSpecimen;
     }
 
-    public void merge(WritableApplicationService appService,
-        edu.ualberta.med.biobank.common.action.scanprocess.CellInfo cell)
+    public void merge(WritableApplicationService appService, CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());
         if (cell.getInformation() != null)
@@ -296,9 +290,15 @@ public class PalletWell extends AbstractUIWell {
         SpecimenWrapper specimen = null;
         if (cell.getSpecimenId() != null) {
             specimen = new SpecimenWrapper(appService);
-            specimen.setWrappedObject(SessionManager.getAppService()
-                .doAction(new SpecimenGetInfoAction(cell.getSpecimenId()))
-                .getSpecimen());
+            
+            try {
+                specimen.setWrappedObject(SessionManager.getAppService()
+                    .doAction(new SpecimenGetInfoAction(cell.getSpecimenId()))
+                    .getSpecimen());
+            } catch (AccessDeniedException e) {
+                throw new Exception(e.getLocalizedMessage() + " for specimen with Id " 
+                    + cell.getValue());
+            }
         }
         setSpecimen(specimen);
     }

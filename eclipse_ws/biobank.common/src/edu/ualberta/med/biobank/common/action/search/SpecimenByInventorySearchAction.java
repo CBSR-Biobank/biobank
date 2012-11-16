@@ -20,9 +20,9 @@ public class SpecimenByInventorySearchAction implements
             + " WHERE spec.inventoryId=? AND spec.currentCenter.id=?";
 
     private static final long serialVersionUID = 1L;
-    private String inventoryId;
+    private final String inventoryId;
 
-    private Integer currentCenter;
+    private final Integer currentCenter;
 
     public SpecimenByInventorySearchAction(String inventoryId,
         Integer currentCenter) {
@@ -38,8 +38,7 @@ public class SpecimenByInventorySearchAction implements
     @Override
     public ListResult<Integer> run(ActionContext context)
         throws ActionException {
-        Query q =
-            context.getSession().createQuery(SPEC_BASE_QRY);
+        Query q = context.getSession().createQuery(SPEC_BASE_QRY);
         q.setParameter(0, inventoryId);
         q.setParameter(1, currentCenter);
         @SuppressWarnings("unchecked")

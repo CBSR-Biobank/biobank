@@ -100,7 +100,7 @@ public class TestProcessingEvent extends TestAction {
         // create a collection event from a clinic
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.clinicId);
+                provisioning.patientIds.get(0), provisioning.getClinic());
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
@@ -224,7 +224,7 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.siteId);
+                provisioning.patientIds.get(0), provisioning.getSite());
         CEventInfo ceventInfo =
             exec(new CollectionEventGetInfoAction(ceventId));
         List<SpecimenInfo> sourceSpecs = ceventInfo.sourceSpecimenInfos;
@@ -276,7 +276,7 @@ public class TestProcessingEvent extends TestAction {
         // add cevent and source specimens
         Integer ceventId = CollectionEventHelper
             .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.siteId);
+                provisioning.patientIds.get(0), provisioning.getSite());
         List<SpecimenInfo> sourceSpecs = exec(
             new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
             .getList();

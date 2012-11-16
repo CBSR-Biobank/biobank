@@ -18,7 +18,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 
 public class MultiSelectionManager {
 

@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
@@ -74,7 +74,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     }
 
     @Override
-    protected Map<RowColPos, PalletWell> getFakeScanCells() {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() {
         Map<RowColPos, PalletWell> palletScanned =
             new TreeMap<RowColPos, PalletWell>();
         if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {

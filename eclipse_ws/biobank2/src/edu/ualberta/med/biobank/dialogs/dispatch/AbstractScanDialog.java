@@ -48,8 +48,8 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
@@ -118,9 +118,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeScanCells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
                 throws Exception {
-                return AbstractScanDialog.this.getFakeScanCells();
+                return AbstractScanDialog.this.getFakeDecodedWells();
             }
 
             @Override
@@ -179,7 +179,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         return rescanMode;
     }
 
-    protected abstract Map<RowColPos, PalletWell> getFakeScanCells()
+    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells()
         throws Exception;
 
     protected void processScanResult(IProgressMonitor monitor,
@@ -322,8 +322,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScan,
-            isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScan, isRescanMode());
     }
 
     protected void startNewPallet() {
@@ -494,8 +493,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected boolean canScanTubeAlone(PalletWell cell) {
-        return cell == null || cell.getStatus() == UICellStatus.EMPTY
-            || cell.getStatus() == UICellStatus.MISSING;
+        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
+            || (cell.getStatus() == UICellStatus.ERROR)
+            || (cell.getStatus() == UICellStatus.MISSING));
     }
 
     protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {

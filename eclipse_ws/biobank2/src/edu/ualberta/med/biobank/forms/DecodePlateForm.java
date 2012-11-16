@@ -20,8 +20,8 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -154,8 +154,7 @@ public class DecodePlateForm extends PlateForm {
             // progress monitor message.
             i18n.tr("Launching scan"));
 
-        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodePlate(
-            plateToScan);
+        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodePlate(plateToScan);
         wells = PalletWell.convertArray(decodedCells);
     }
 

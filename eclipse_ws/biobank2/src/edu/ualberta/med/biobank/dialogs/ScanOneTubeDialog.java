@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 
 public class ScanOneTubeDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
@@ -54,7 +54,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected String getTitleAreaMessage() {
         // TR: dialog title area message
-        return i18n.tr("Scan the missing tube for position {0}",
+        return i18n.tr("Scan the tube at position {0}",
             type.getPositionString(position));
     }
 

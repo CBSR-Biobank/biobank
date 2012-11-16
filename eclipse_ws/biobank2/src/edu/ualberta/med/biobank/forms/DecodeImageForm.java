@@ -19,8 +19,8 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -102,7 +102,8 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     protected void decodeImage() throws Exception {
-        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodeImage(imageFilename);
+        Set<DecodedWell> decodedCells =
+            ScannerConfigPlugin.decodeImage(imageFilename);
         wells = PalletWell.convertArray(decodedCells);
 
         Display.getDefault().asyncExec(new Runnable() {

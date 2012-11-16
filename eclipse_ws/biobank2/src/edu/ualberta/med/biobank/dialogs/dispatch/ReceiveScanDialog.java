@@ -25,9 +25,9 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     AbstractScanDialog<T> {
@@ -189,7 +189,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     protected abstract List<UICellStatus> getPalletCellStatus();
 
     @Override
-    protected abstract Map<RowColPos, PalletWell> getFakeScanCells();
+    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells();
 
     public boolean hasReceivedSpecimens() {
         return specimensReceived;

@@ -7,9 +7,7 @@ import javax.validation.ConstraintViolationException;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
@@ -25,69 +23,58 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.PatientHelper;
 import edu.ualberta.med.biobank.test.action.helper.RequestHelper;
 import edu.ualberta.med.biobank.test.action.helper.ResearchGroupHelper;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestResearchGroup extends TestAction {
 
-    @Rule
-    public TestName testname = new TestName();
-
-    private String name;
-    private Integer studyId;
+    private Study study;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        name = testname.getMethodName() + getR().nextInt();
-        studyId =
-            StudyHelper
-                .createStudy(getExecutor(), name, ActivityStatus.ACTIVE);
+        session.beginTransaction();
+        study = factory.createStudy();
+        session.getTransaction().commit();
     }
 
     @Test
-    public void saveResearchGroup() throws Exception {
+    public void saveResearchGroup() throws Exception { 
+        String rgName = getMethodNameR();
+        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), rgName,
+            rgName, study.getId());
 
-        Integer rgId =
-            ResearchGroupHelper.createResearchGroup(getExecutor(), name,
-                name,
-                studyId);
-
-        ResearchGroupGetInfoAction reader =
-            new ResearchGroupGetInfoAction(rgId);
+        ResearchGroupGetInfoAction reader = new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = exec(reader);
 
-        Assert.assertTrue(rg.researchGroup.getName().equals(name + "rg"));
-        Assert.assertTrue(rg.researchGroup.getNameShort().equals(name + "rg"));
-        Assert.assertTrue(rg.researchGroup.getStudy().getId().equals(studyId));
-        Assert
-            .assertTrue(rg.researchGroup.getActivityStatus() == ActivityStatus.ACTIVE);
-
+        Assert.assertEquals(rgName, rg.researchGroup.getName());
+        Assert.assertEquals(rgName, rg.researchGroup.getNameShort());
+        Assert.assertEquals(study.getId(), rg.researchGroup.getStudy().getId());
+        Assert.assertEquals(ActivityStatus.ACTIVE, rg.researchGroup.getActivityStatus());
     }
 
     @Test
     public void testUpload() throws Exception {
         Integer rgId =
-            ResearchGroupHelper.createResearchGroup(getExecutor(), name + "rg",
-                name + "rg",
-                studyId);
+            ResearchGroupHelper.createResearchGroup(getExecutor(), getMethodNameR(),
+                getMethodNameR(), study.getId());
         ResearchGroupGetInfoAction reader =
             new ResearchGroupGetInfoAction(rgId);
         ResearchGroupReadInfo rg = exec(reader);
 
         // create specs
         Integer p =
-            PatientHelper.createPatient(getExecutor(), name + "_patient",
+            PatientHelper.createPatient(getExecutor(), testName + "_patient",
                 rg.researchGroup.getStudy().getId());
         Integer ceId =
             CollectionEventHelper.createCEventWithSourceSpecimens(
-                getExecutor(),
-                p, rgId);
+                getExecutor(), p, rg.researchGroup);
 
         CollectionEventGetInfoAction ceReader =
             new CollectionEventGetInfoAction(ceId);
@@ -121,11 +108,12 @@ public class TestResearchGroup extends TestAction {
     public void testDelete() throws Exception {
         // only one failure case specific to rg, rest are in center
 
-        Integer rgId =
-            ResearchGroupHelper.createResearchGroup(getExecutor(), name,
-                name,
-                studyId);
-        Integer rId = RequestHelper.createRequest(session, getExecutor(), rgId);
+        Integer rgId = ResearchGroupHelper.createResearchGroup(getExecutor(), 
+            getMethodNameR(), getMethodNameR(), study.getId());
+        
+        Integer rId = RequestHelper.createRequest(session, getExecutor(), 
+            (ResearchGroup) session.load(ResearchGroup.class, rgId));
+        
         ResearchGroupReadInfo rg =
             exec(new ResearchGroupGetInfoAction(rgId));
         ResearchGroupDeleteAction delete =
@@ -160,8 +148,8 @@ public class TestResearchGroup extends TestAction {
             new AddressSaveInfo(null, "test", "test", "test", "test", "test",
                 "test", "test", "test", "test");
         ResearchGroupSaveInfo save =
-            new ResearchGroupSaveInfo(null, name + "rg", name + "rg",
-                studyId, "comment", addressSaveInfo,
+            new ResearchGroupSaveInfo(null, getMethodNameR(), getMethodNameR(),
+                study.getId(), "comment", addressSaveInfo,
                 ActivityStatus.ACTIVE);
         ResearchGroupSaveAction rgSave = new ResearchGroupSaveAction(save);
 

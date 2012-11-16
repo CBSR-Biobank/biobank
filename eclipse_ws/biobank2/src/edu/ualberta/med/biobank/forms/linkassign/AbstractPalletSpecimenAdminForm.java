@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -49,11 +52,13 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
@@ -86,6 +91,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     private PalletScanManagement palletScanManagement;
 
     private Label scanTubeAloneSwitch;
+
+    protected ComboViewer profilesCombo;
 
     private IPropertyChangeListener propertyListener;
 
@@ -129,9 +136,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeScanCells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
                 throws Exception {
-                return AbstractPalletSpecimenAdminForm.this.getFakeScanCells();
+                return AbstractPalletSpecimenAdminForm.this.getFakeDecodedWells();
             }
 
             @Override
@@ -285,17 +292,61 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected abstract void refreshPalletDisplay();
 
     @SuppressWarnings("nls")
+    protected void createProfileComboBox(Composite fieldsComposite) {
+        Label lbl = widgetCreator.createLabel(fieldsComposite,
+            // TR: label
+            i18n.tr("Profile"));
+        profilesCombo = widgetCreator.createComboViewer(
+            fieldsComposite,
+            lbl,
+            null,
+            null,
+            // TR: validation error message
+            i18n.tr("Invalid profile selected"),
+            false, null, null,
+            new BiobankLabelProvider());
+
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        gd.horizontalSpan = 2;
+        profilesCombo.getCombo().setLayoutData(gd);
+        loadProfileCombo();
+    }
+
+    private void loadProfileCombo() {
+        profilesCombo.getCombo().removeAll();
+
+        ArrayList<String> profileList = new ArrayList<String>();
+        for (String element : ProfileManager.instance().getProfiles().keySet()) {
+            profileList.add(element);
+
+        }
+        Collections.sort(profileList); // Alphabetic sort
+        for (String element : profileList) {
+            profilesCombo.add(element);
+        }
+        profilesCombo.getCombo().select(0);
+
+    }
+
+    @SuppressWarnings("nls")
     protected void createPlateToScanField(Composite fieldsComposite) {
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             // TR: label;
             i18n.tr("Plate to scan"));
-        plateToScanText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE, plateToScanLabel,
-            new String[0], plateToScanValue,
-            new ScannerBarcodeValidator(
-                // TR: validation error message
-                i18n.tr("Enter a valid plate barcode")),
-            PLATE_VALIDATOR);
+        plateToScanText =
+            (BgcBaseText) widgetCreator
+                .createBoundWidget(
+                    fieldsComposite,
+                    BgcBaseText.class,
+                    SWT.NONE,
+                    plateToScanLabel,
+                    new String[0],
+                    plateToScanValue,
+                    new ScannerBarcodeValidator(
+                        // TR: validation error message
+                        i18n.tr("Enter a valid plate barcode")),
+                    PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -347,7 +398,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
-    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         return null;
     }
 

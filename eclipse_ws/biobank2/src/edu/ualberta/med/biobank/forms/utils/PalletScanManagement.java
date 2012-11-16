@@ -17,6 +17,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -28,8 +29,8 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.UICellStatus;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -38,8 +39,7 @@ public class PalletScanManagement {
     private static final I18n i18n = I18nFactory
         .getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletWell> wells =
-        new HashMap<RowColPos, PalletWell>();
+    protected Map<RowColPos, PalletWell> wells = new HashMap<RowColPos, PalletWell>();
     private int scansCount = 0;
     private boolean useScanner = true;
 
@@ -94,18 +94,22 @@ public class PalletScanManagement {
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
+                } catch (AccessDeniedException e) {   
+                    BgcPlugin.openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan result error"),
+                        e.getLocalizedMessage());
+                    scanAndProcessError(e.getLocalizedMessage());                    
                 } catch (Exception e) {
-                    BgcPlugin
-                        .openAsyncError(
+                    BgcPlugin.openAsyncError(
                             // dialog title
                             i18n.tr("Scan result error"),
                             e);
                     String msg = e.getMessage();
-                    if ((msg == null || msg.isEmpty()) && e.getCause() != null) {
+                    if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
                     }
-                    scanAndProcessError("ERROR: "
-                        + msg);
+                    scanAndProcessError("ERROR: " + msg);
                 }
                 monitor.done();
             }
@@ -128,17 +132,14 @@ public class PalletScanManagement {
         beforeScan();
         Map<RowColPos, PalletWell> oldCells = wells;
         if (BiobankPlugin.isRealScanEnabled()) {
-            int plateNum = BiobankPlugin.getDefault().getPlateNumber(
-                plateToScan);
+            int plateNum = BiobankPlugin.getDefault().getPlateNumber(plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BgcPlugin
-                    .openAsyncError(
+                BgcPlugin.openAsyncError(
                         // dialog title
                         i18n.tr("Scan error"),
                         // dialog message
-                        i18n.tr("Plate with barcode {0} is not enabled",
-                            plateToScan));
+                    i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
                 return;
             }
             Set<DecodedWell> scanCells = null;
@@ -159,7 +160,7 @@ public class PalletScanManagement {
                 afterScanBeforeMerge();
             }
         } else {
-            wells = getFakeScanCells();
+            wells = getFakeDecodedWells();
             scansCount++;
             afterScanBeforeMerge();
         }
@@ -214,22 +215,20 @@ public class PalletScanManagement {
     @SuppressWarnings("nls")
     public void scanTubeAlone(MouseEvent e) {
         if (isScanTubeAloneMode()) {
-            RowColPos rcp = ((ScanPalletWidget) e.widget)
-                .getPositionAtCoordinates(e.x, e.y);
+            RowColPos rcp = ((ScanPalletWidget) e.widget).getPositionAtCoordinates(e.x, e.y);
             if (rcp != null) {
-                PalletWell well = wells.get(rcp);
-                if (canScanTubeAlone(well)) {
+                PalletWell cell = wells.get(rcp);
+                if (canScanTubeAlone(cell)) {
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
-                        if (well == null) {
-                            well = new PalletWell(new DecodedWell(rcp.getRow(),
-                                rcp.getCol(), value));
-                            wells.put(rcp, well);
+                        if (cell == null) {
+                            cell = new PalletWell(new DecodedWell(rcp.getRow(), rcp.getCol(), value));
+                            wells.put(rcp, cell);
                         } else {
-                            well.setValue(value);
+                            cell.setValue(value);
                         }
                         try {
-                            postprocessScanTubeAlone(well);
+                            postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
                             BgcPlugin.openAsyncError(
                                 // dialog title
@@ -274,7 +273,7 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    protected Map<RowColPos, PalletWell> getFakeScanCells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
         return null;
     }
 
@@ -346,8 +345,8 @@ public class PalletScanManagement {
                 .getSpecimens().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 PalletWell cell =
-                    new PalletWell(new DecodedWell(rcp.getRow(),
-                        rcp.getCol(), entry.getValue().getInventoryId()));
+                    new PalletWell(new DecodedWell(rcp.getRow(), rcp.getCol(),
+                        entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 wells.put(rcp, cell);

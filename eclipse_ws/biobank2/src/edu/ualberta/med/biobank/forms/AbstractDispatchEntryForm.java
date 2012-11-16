@@ -39,31 +39,30 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
+
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractDispatchEntryForm.class);
 
     @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
-        .getLogger(AbstractDispatchEntryForm.class.getName());
+    .getLogger(AbstractDispatchEntryForm.class.getName());
 
-    protected DispatchWrapper dispatch = new DispatchWrapper(
-        SessionManager.getAppService());
+    protected DispatchWrapper dispatch = new DispatchWrapper(SessionManager.getAppService());
 
     protected BgcEntryFormWidgetListener biobankListener =
         new BgcEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                reloadSpecimens();
-                setDirty(true);
-            }
-        };
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            reloadSpecimens();
+            setDirty(true);
+        }
+    };
 
     protected boolean tryAgain;
 
     protected DispatchReadInfo dispatchInfo;
 
-    protected CommentWrapper comment = new CommentWrapper(
-        SessionManager.getAppService());
+    protected CommentWrapper comment = new CommentWrapper(SessionManager.getAppService());
 
     protected Set<Integer> oldSpecIds;
 
@@ -72,11 +71,9 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null");
         Assert.isTrue((adapter instanceof DispatchAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+            "Invalid editor input: object of type " + adapter.getClass().getName());
 
         setDispatchInfo(adapter.getId());
-
         setPartName(getTextForPartName());
     }
 
@@ -89,7 +86,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
             read.dispatch
-                .setDispatchSpecimens(read.specimens);
+            .setDispatchSpecimens(read.dispatchSpecimens);
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }
@@ -196,15 +193,17 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             .getDispatchSpecimenCollection(false))
             dsInfos.add(new DispatchSpecimenInfo(ds.getId(), ds.getSpecimen()
                 .getId(), ds.getState()));
-        DispatchSaveInfo dInfo =
-            new DispatchSaveInfo(dispatch.getId(), dispatch.getReceiverCenter()
-                .getId(), dispatch.getSenderCenter().getId(),
-                dispatch.getState(), (comment.getMessage() == null)
-                    ? StringUtil.EMPTY_STRING : comment.getMessage());
+
+        DispatchSaveInfo dInfo = new DispatchSaveInfo(
+            dispatch.getId(), dispatch.getReceiverCenter().getWrappedObject(),
+            dispatch.getSenderCenter().getWrappedObject(), dispatch.getState(),
+            (comment.getMessage() == null)
+            ? StringUtil.EMPTY_STRING : comment.getMessage());
+
         ShipmentInfoSaveInfo ship = null;
         if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
             ship =
-                DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+            DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, ship);
         dispatch.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(dispatch);

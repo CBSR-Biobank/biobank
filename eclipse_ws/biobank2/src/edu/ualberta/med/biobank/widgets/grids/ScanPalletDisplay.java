@@ -13,8 +13,9 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.cell.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.cell.PalletWell;
+import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
@@ -24,19 +25,19 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
-    // TODO: these should be variables
-    public static final int rows = 8;
-    public static final int cols = 12;
-    public static final int palletHeight = SAMPLE_WIDTH * rows;
-    public static final int palletWidth = SAMPLE_WIDTH * cols;
-    public static final int palletHeightAndLegend = palletHeight
+    /**
+     * Pallets are always 8*12 = fixed size
+     */
+    public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_MAX;
+    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_MAX;
+
+    public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
     private ProfileSettings loadedProfile;
 
     public ScanPalletDisplay(final ScanPalletWidget widget) {
         super();
-
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
@@ -64,7 +65,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     public void setDefaultStorageSize() {
-        setStorageSize(rows, cols);
+        setStorageSize(SbsLabeling.ROW_MAX, SbsLabeling.COL_MAX);
     }
 
     protected void setProfile(ProfileSettings profile) {

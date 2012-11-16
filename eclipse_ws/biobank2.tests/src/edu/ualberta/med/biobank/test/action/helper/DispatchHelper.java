@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.Utils;
@@ -18,12 +19,11 @@ import edu.ualberta.med.biobank.test.action.IActionExecutor;
 public class DispatchHelper extends Helper {
 
     public static Set<DispatchSpecimenInfo> createSaveDispatchSpecimenInfoRandom(
-        IActionExecutor actionExecutor, Integer patientId,
-        Integer centerId) throws Exception {
+        IActionExecutor actionExecutor, Integer patientId, Center center) throws Exception {
         Set<DispatchSpecimenInfo> infos = new HashSet<DispatchSpecimenInfo>();
         Integer id = null;
         id = CollectionEventHelper.createCEventWithSourceSpecimens(
-            actionExecutor, patientId, centerId);
+            actionExecutor, patientId, center);
 
         CEventInfo ceventInfo =
             actionExecutor.exec(new CollectionEventGetInfoAction(id));
@@ -36,22 +36,21 @@ public class DispatchHelper extends Helper {
         return infos;
     }
 
-    public static DispatchSaveInfo createSaveDispatchInfoRandom(Integer siteId,
-        Integer centerId,
-        DispatchState state, String comment) {
-        return new DispatchSaveInfo(null, siteId, centerId, state, comment);
+    public static DispatchSaveInfo createSaveDispatchInfoRandom(Center receivingCenter,
+        Center sendingCenter, DispatchState state, String comment) {
+        return new DispatchSaveInfo(null, receivingCenter, sendingCenter, state, comment);
     }
 
     public static Integer createDispatch(IActionExecutor actionExecutor,
-        Integer srcCenterId, Integer dstCenterId, Integer patientId)
-        throws Exception {
+        Center srcCenter, Center dstCenter, Integer patientId)
+            throws Exception {
         DispatchSaveInfo d =
-            DispatchHelper.createSaveDispatchInfoRandom(dstCenterId,
-                srcCenterId, DispatchState.CREATION,
+            DispatchHelper.createSaveDispatchInfoRandom(dstCenter,
+                srcCenter, DispatchState.CREATION,
                 Utils.getRandomString(5));
         Set<DispatchSpecimenInfo> specs =
             DispatchHelper.createSaveDispatchSpecimenInfoRandom(actionExecutor,
-                patientId, srcCenterId);
+                patientId, srcCenter);
         ShipmentInfoSaveInfo shipsave =
             ShipmentInfoHelper.createRandomShipmentInfo(actionExecutor);
         return actionExecutor.exec(new DispatchSaveAction(d, specs, shipsave))
