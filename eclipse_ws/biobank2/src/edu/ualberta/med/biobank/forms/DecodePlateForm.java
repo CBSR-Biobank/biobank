@@ -67,7 +67,7 @@ public class DecodePlateForm extends PlateForm {
         plateSelectionWidget.setLayoutData(gd);
 
         scanButton = toolkit.createButton(page,
-            i18n.tr("Scan & Decode Plate"), SWT.PUSH);
+            i18n.tr("Scan and Decode Plate"), SWT.PUSH);
         scanButton
         .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
