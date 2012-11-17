@@ -36,6 +36,5 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
 		<nature>com.soyatec.additional.Nature</nature>
-		<nature>org.apache.ivyde.eclipse.ivynature</nature>
 	</natures>
 </projectDescription>

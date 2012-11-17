@@ -5,7 +5,7 @@
     use command "ant -projecthelp" to display the targets.
 
 -->
-<project name="biobank" basedir="." default="deploy">
+<project name="biobank" basedir="." default="deploy" xmlns:ivy="antlib:org.apache.ivy.ant">
   <exec executable="hostname" outputproperty="host.name">
     <arg value="-f" />
   </exec>
@@ -57,6 +57,10 @@
     <path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
+
+  <target name="resolve" description="--> retrieve dependencies with ivy">
+    <ivy:retrieve />
+  </target>
 
   <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
     <input message="Enter database executor's username (to execute database commands)"
@@ -359,6 +363,7 @@
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
     <antcall target="clean-eclipse-projects" />
+    <ivy:cleancache/>
   </target>
 
   <property name="doxygen.output" location="docs/doxygen" />
