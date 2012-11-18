@@ -43,7 +43,6 @@ public class BatchOpExceptionTable
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
-            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 BatchOpException<?> e = (BatchOpException<?>) element;

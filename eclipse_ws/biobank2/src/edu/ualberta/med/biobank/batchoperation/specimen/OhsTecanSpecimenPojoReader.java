@@ -43,51 +43,75 @@ public class OhsTecanSpecimenPojoReader implements
     private static final I18n i18n = I18nFactory
         .getI18n(DecodeImageForm.class);
 
+    @SuppressWarnings("nls")
     public static final String CSV_TECAN_RACK_ID_MISSING_ERROR =
         i18n.tr("TECAN rack ID missing");
 
+    @SuppressWarnings("nls")
     public static final String CSV_INVENTORY_ID_MISSING_ERROR =
         i18n.tr("inventory ID missing");
 
+    @SuppressWarnings("nls")
     public static final String CSV_TIME_STAMP_MISSING_ERROR =
         i18n.tr("timestamp missing");
 
+    @SuppressWarnings("nls")
     public static final String CSV_TECHNICIAN_ID_MISSING_ERROR =
         i18n.tr("technician ID missing");
 
+    @SuppressWarnings("nls")
     public static final String CSV_BC_SCAN_TYPE_ERROR =
         i18n.tr("specimen type is BC-Scan but " +
             "parent inventory ID does not end in 1 or 2");
 
+    @SuppressWarnings("nls")
     public static final String CSV_SPECIMEN_TYPE_ERROR =
         i18n.tr("specimen type is unknown");
 
+    @SuppressWarnings("nls")
     public static final String CSV_SPECIMEN_VOLUME_ERROR =
         i18n.tr("specimen volume has too many decimal places");
 
+    @SuppressWarnings("nls")
     public static final String CSV_TIME_STAMP_PARSE_ERROR =
         i18n.tr("timestamp format incorrect");
 
+    @SuppressWarnings("nls")
     public static final String CSV_MULTIPLE_TECHNICIANS_ERROR =
         i18n.tr("multiple technicians in same csv file");
 
+    @SuppressWarnings("nls")
     public static final String CSV_MULTIPLE_SOURCE_VOLUMES_ERROR =
         i18n.tr("multiple volumes for same source specimen");
 
+    @SuppressWarnings("nls")
     private static final String CSV_FIRST_HEADER = "TECAN_Rack_ID";
 
+    @SuppressWarnings("nls")
     private static final String TYPE_URINE_PRIMARY = "Urine-Primary";
+    @SuppressWarnings("nls")
     private static final String TYPE_URINE_SECONDARY = "Urine-Secondary";
+    @SuppressWarnings("nls")
     private static final String TYPE_BUFFY = "Buffy";
+    @SuppressWarnings("nls")
     private static final String TYPE_RBC_PRIMARY = "RBC-Primary";
+    @SuppressWarnings("nls")
     private static final String TYPE_RBC_SECONDARY = "RBC-Secondary";
+    @SuppressWarnings("nls")
     private static final String TYPE_SERUM_PRIMARY = "Serum-Primary";
+    @SuppressWarnings("nls")
     private static final String TYPE_SERUM_SECONDARY = "Serum-Secondary";
+    @SuppressWarnings("nls")
     private static final String TYPE_PLASMA_PRIMARY = "Plasma-Primary";
+    @SuppressWarnings("nls")
     private static final String TYPE_PLASMA_SECONDARY = "Plasma-Secondary";
+    @SuppressWarnings("nls")
     private static final String TYPE_BC_SCAN = "BC-Scan";
+    @SuppressWarnings("nls")
     private static final String TYPE_PRIMARY_MATRIX = "Primary Matrix";
+    @SuppressWarnings("nls")
     private static final String TYPE_SECONDARY_MATRIX = "Secondary Matrix";
+        
     private static final String[] ALIQUOT_TYPES = new String[] {
         TYPE_URINE_PRIMARY,
         TYPE_URINE_SECONDARY,
@@ -103,6 +127,7 @@ public class OhsTecanSpecimenPojoReader implements
         TYPE_SECONDARY_MATRIX
     };
 
+    @SuppressWarnings("nls")
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
         new SimpleDateFormat("yyyyMMdd_HHmmss");
 
@@ -271,6 +296,7 @@ public class OhsTecanSpecimenPojoReader implements
         }
     }
 
+    @SuppressWarnings("nls")
     private static final String[] NAME_MAPPINGS = new String[] {
         "tecanRackId",
         "inventoryId",
@@ -303,7 +329,8 @@ public class OhsTecanSpecimenPojoReader implements
     }
 
     // cell processors have to be recreated every time the file is read
-    public CellProcessor[] getCellProcessors() {
+    @SuppressWarnings("nls")
+        public CellProcessor[] getCellProcessors() {
 
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
@@ -338,6 +365,7 @@ public class OhsTecanSpecimenPojoReader implements
         return errorList;
     }
 
+    @SuppressWarnings("nls")
     public static boolean isHeaderValid(String[] csvHeaders) {
         if (csvHeaders == null) {
             throw new NullPointerException("csvHeaders is null");
@@ -348,6 +376,7 @@ public class OhsTecanSpecimenPojoReader implements
             || (csvHeaders.length + 2 == NAME_MAPPINGS.length));
     }
 
+    @SuppressWarnings("nls")
     @Override
     public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
@@ -465,6 +494,7 @@ public class OhsTecanSpecimenPojoReader implements
         }
     }
 
+    @SuppressWarnings("nls")
     private SpecimenBatchOpInputPojo convertToSpecimenBatchOpInputPojo(
         int linenumber, TecanCsvRowPojo csvPojo) {
         SpecimenBatchOpInputPojo batchOpPojo = new SpecimenBatchOpInputPojo();

@@ -238,6 +238,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         createSpecimenImportField(client);
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimenImportField(Composite parent) {
         Label label = widgetCreator.createLabel(parent, "Imported");
 

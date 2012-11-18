@@ -40,11 +40,12 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="con" path="com.soyatec.uml.CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/server/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/server/sdk-core-4.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/server/sdk-writable-core-4.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/server/supercsv-1.52.jar"/>
-	<classpathentry kind="lib" path="lib/server/csmapi-4.1.jar"/>
-	<classpathentry kind="lib" path="lib/server/spiffy-all-0.05.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/jta-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core-4.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core-4.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/supercsv-1.52.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/spiffy-all-0.05.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/mysql-connector-java-5.1.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

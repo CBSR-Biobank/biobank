@@ -70,6 +70,13 @@
     <dependency org="javax.inject" name="javax.inject" rev="1"/>
     <dependency org="org.ops4j" name="peaberry" rev="1.2"/>
 
+    <!-- for biobank2 -->
+    <dependency org="javax.mail" name="mailapi" rev="1.4.3"/>
+
+    <!-- for biobank2.tools -->
+    <dependency org="net.sf" name="jargs" rev="1.0" />
+    <dependency org="org.mockito" name="mockito-all" rev="1.9.0"/>
+    <dependency org="tomcat" name="naming-common" rev="4.1.31"/>
 
   </dependencies>
 </ivy-module>

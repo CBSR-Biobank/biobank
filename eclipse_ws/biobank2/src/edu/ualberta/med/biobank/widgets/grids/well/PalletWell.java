@@ -222,6 +222,7 @@ public class PalletWell extends AbstractUIWell {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Integer getRow() {
         if (decodedWell == null) {
@@ -230,6 +231,7 @@ public class PalletWell extends AbstractUIWell {
         return SbsLabeling.toRowCol(decodedWell.getLabel()).getRow();
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Integer getCol() {
         if (decodedWell == null) {
@@ -272,6 +274,7 @@ public class PalletWell extends AbstractUIWell {
         return sourceSpecimen;
     }
 
+    @SuppressWarnings("nls")
     public void merge(WritableApplicationService appService, CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());

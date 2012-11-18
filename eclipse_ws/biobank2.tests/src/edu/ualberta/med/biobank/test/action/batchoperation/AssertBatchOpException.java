@@ -28,6 +28,7 @@ public class AssertBatchOpException {
         assertIn(e.getErrors());
     }
 
+    @SuppressWarnings("nls")
     private void assertIn(Set<BatchOpException<LString>> errors) {
         boolean found = false;
         for (BatchOpException<LString> error : errors) {

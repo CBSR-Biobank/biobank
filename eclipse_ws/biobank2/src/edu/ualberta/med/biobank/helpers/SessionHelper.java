@@ -85,6 +85,7 @@ public class SessionHelper implements Runnable {
         appService = null;
     }
 
+    @SuppressWarnings("nls")
     private static final String UNTRUSTED_CERT_MESSAGE =
         "The authenticity of host ''{0}'' can''t be established."
             + "\nSHA1 fingerprint is {1}"
@@ -92,6 +93,7 @@ public class SessionHelper implements Runnable {
             + "\nAre you sure you want to continue?"
             + "\n(Choosing yes will trust this certificate forever and may require an application restart)";
 
+    @SuppressWarnings("nls")
     private boolean checkCertificates(String serverUrl, Boolean firstConnection)
         throws KeyManagementException, NoSuchAlgorithmException,
         KeyStoreException, UnknownHostException, IOException,
@@ -139,6 +141,7 @@ public class SessionHelper implements Runnable {
         return restartPending;
     }
 
+    @SuppressWarnings("nls")
     private static final char[] HEXDIGITS = "0123456789abcdef".toCharArray();
 
     private static String toHexString(byte[] bytes) {

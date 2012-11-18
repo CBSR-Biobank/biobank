@@ -9,6 +9,8 @@
 		     root="http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/" />
             <ibiblio name="maven.pietschy.com" m2compatible="true"
 		     root="http://maven.pietschy.com/repository" />
+            <ibiblio name="jboss-thirdparty-releases" m2compatible="true"
+		     root="https://repository.jboss.org/nexus/content/repositories/thirdparty-releases" />
         </chain>
     </resolvers>
 </ivysettings>

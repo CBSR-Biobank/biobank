@@ -57,6 +57,7 @@ public class SpecimenImportForm extends BiobankViewForm {
             .get(BgcPlugin.IMG_DATABASE_GO);
     }
 
+    @SuppressWarnings("nls")
     private void createFileBrowser(Composite parent) {
         final String[] extensions = new String[] { "*.csv", "*.*" };
 
@@ -75,13 +76,12 @@ public class SpecimenImportForm extends BiobankViewForm {
         toolkit.adapt(fileBrowser);
     }
 
+    @SuppressWarnings("nls")
     private void createImportButton(Composite parent) {
         // take up a cell.
         new Label(parent, SWT.NONE);
 
-        importButton = toolkit.createButton(parent,
-            i18n.tr("Import"),
-            SWT.NONE);
+        importButton = toolkit.createButton(parent, i18n.tr("Import"), SWT.NONE);
         importButton.setEnabled(false);
         importButton.addSelectionListener(new SelectionListener() {
             @Override
@@ -95,6 +95,7 @@ public class SpecimenImportForm extends BiobankViewForm {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createErrorsTable(Composite parent,
         List<BatchOpException<?>> errors) {
         if (errorsTable != null) errorsTable.dispose();
@@ -121,6 +122,7 @@ public class SpecimenImportForm extends BiobankViewForm {
         form.layout(true, true);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
         form.setText(i18n.tr("Specimen Import"));
@@ -142,10 +144,10 @@ public class SpecimenImportForm extends BiobankViewForm {
         fileBrowser.reset();
     }
 
+    @SuppressWarnings("nls")
     private void doImport() {
         final String filename = fileBrowser.getFilePath();
         IRunnableWithProgress op = new IRunnableWithProgress() {
-            @SuppressWarnings("nls")
             @Override
             public void run(IProgressMonitor monitor) {
                 monitor.beginTask(i18n.tr("Importing Specimens..."),

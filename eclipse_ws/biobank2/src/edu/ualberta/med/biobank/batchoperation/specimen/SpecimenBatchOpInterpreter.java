@@ -37,6 +37,7 @@ public class SpecimenBatchOpInterpreter {
 
     private IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader;
 
+    @SuppressWarnings("nls")
     public Integer processFile(final String filename) throws IOException,
         NoSuchAlgorithmException, ApplicationException {
         ICsvBeanReader reader = new CsvBeanReader(
