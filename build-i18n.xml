@@ -59,7 +59,7 @@
                   poDirectory="${po.dir}"
                   outputDirectory="${po.output.dir}"
                   percentage="5"/>
-      <jar destfile="jars/messages.jar"
+      <jar destfile="lib/messages.jar"
            basedir="${po.output.dir}"
            includes="i18n/**"/>
   </target>

@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.dispatch;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Restrictions;
 
@@ -56,12 +55,11 @@ public class DispatchChangeStateAction implements Action<IdResult> {
             // update the current center on the specimens
             Center receiverCenter = dispatch.getReceiverCenter();
 
-            Criteria c = context.getSession().createCriteria(DispatchSpecimen.class)
+            @SuppressWarnings({ "unchecked", "nls" })
+            List<DispatchSpecimen> list = context.getSession().createCriteria(DispatchSpecimen.class)
                 .add(Restrictions.eq("dispatch", dispatch))
-                .setFetchMode("specimen", FetchMode.JOIN);
+                .setFetchMode("specimen", FetchMode.JOIN).list();
 
-            @SuppressWarnings("unchecked")
-            List<DispatchSpecimen> list = c.list();
             for (DispatchSpecimen dispatchSpecimen : list) {
                 Specimen specimen = dispatchSpecimen.getSpecimen();
                 specimen.setCurrentCenter(receiverCenter);

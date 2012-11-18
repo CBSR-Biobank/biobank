@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * @author Brian Allen
  * 
  */
-@SuppressWarnings("nls")
 public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
@@ -61,9 +60,9 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
 
     private final String technician;
 
-    private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> sourceCompressedList;
+    private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> sourceCompressedList;
     
-    private SpecimenBatchOpAction coreAction;
+    private final SpecimenBatchOpAction coreAction;
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
@@ -87,7 +86,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         this.coreAction = new SpecimenBatchOpAction(workingCenter,
             aliquotBatchOpSpecimens, importFile);
         
-        log.debug("SpecimenBatchOpAction: constructor");
+        log.debug("SpecimenBatchOpAction: constructor"); //$NON-NLS-1$
     }
 
     @Override
@@ -97,9 +96,9 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        log.debug("OhsTecanSpecimenBatchOpAction:run");
+        log.debug("OhsTecanSpecimenBatchOpAction:run"); //$NON-NLS-1$
         if (sourceCompressedList == null) {
-            throw new IllegalStateException("source compressed list is null");
+            throw new IllegalStateException("source compressed list is null"); //$NON-NLS-1$
         }
         ArrayList<SpecimenBatchOpInputPojo> sourcePojos;
         try {
@@ -112,20 +111,20 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         
         // was preExecution
         Query query = null;
-        log.debug("run: worksheet={}", worksheet);
+        log.debug("run: worksheet={}", worksheet); //$NON-NLS-1$
         query = context.getSession().createQuery(PROCESSING_EVENT_COUNT_HQL);
         query.setParameter(0, worksheet);
         if ((Long)(query.list().get(0)) > 0) {
-            throw new ActionException("File name has been used - probably already imported");
+            throw new ActionException("File name has been used - probably already imported"); //$NON-NLS-1$
         }
 
         for (SpecimenBatchOpInputPojo sourcePojo : sourcePojos) {
-            log.debug("run: inventoryId={}", sourcePojo.getInventoryId());
+            log.debug("run: inventoryId={}", sourcePojo.getInventoryId()); //$NON-NLS-1$
             query = context.getSession().createQuery(SPECIMEN_PROCESSED_COUNT_HQL);
             query.setParameter(0, sourcePojo.getInventoryId());
             if ((Long)(query.list().get(0)) > 0) {
-                throw new ActionException("Source specimen "
-                    + sourcePojo.getInventoryId() + " has already been processed");
+                throw new ActionException("Source specimen " //$NON-NLS-1$
+                    + sourcePojo.getInventoryId() + " has already been processed"); //$NON-NLS-1$
             }
         }
         // end preExecution
@@ -157,7 +156,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        log.debug("OhsTecanSpecimenBatchOpAction:end");
+        log.debug("OhsTecanSpecimenBatchOpAction:end"); //$NON-NLS-1$
         return coreIdResult;
     }
 }

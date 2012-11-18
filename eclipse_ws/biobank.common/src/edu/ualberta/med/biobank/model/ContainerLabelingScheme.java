@@ -30,6 +30,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     public static final String TWO_CHAR_LABELLING_PATTERN =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+    @SuppressWarnings("nls")
     public static final String DEWAR_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
     private String name;

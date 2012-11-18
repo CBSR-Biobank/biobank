@@ -49,6 +49,7 @@ public abstract class Hash
         return true;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
         return getClass().getName() + "{bytes=" + bytesToHex(getBytes()) + "}";
@@ -107,6 +108,7 @@ public abstract class Hash
 
         public static MD5Hash fromFile(File file)
             throws NoSuchAlgorithmException, IOException {
+            @SuppressWarnings("nls")
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             MD5Hash hash = setBytes(new MD5Hash(), md5, file);
             return hash;
@@ -128,6 +130,7 @@ public abstract class Hash
 
         public static SHA1Hash fromFile(File file)
             throws NoSuchAlgorithmException, IOException {
+            @SuppressWarnings("nls")
             MessageDigest sha1 = MessageDigest.getInstance("SHA1");
             SHA1Hash hash = setBytes(new SHA1Hash(), sha1, file);
             return hash;

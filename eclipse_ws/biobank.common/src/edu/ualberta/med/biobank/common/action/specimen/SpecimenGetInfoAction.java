@@ -117,6 +117,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             }
         }
 
+        @SuppressWarnings("nls")
         BatchOperation batch = (BatchOperation) context.getSession()
             .createQuery("select bos.batch " +
                 " from " + BatchOperationSpecimen.class.getName() + " bos" +

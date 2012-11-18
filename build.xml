@@ -27,7 +27,7 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
-  <import file="build-db.xml"/>
+  <!--import file="build-db.xml"/-->
   <import file="build-i18n.xml"/>
   <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>
@@ -60,6 +60,10 @@
 
   <target name="resolve" description="--> retrieve dependencies with ivy">
     <ivy:retrieve />
+  </target>
+
+  <target name="clean-cache" description="--> retrieve dependencies with ivy">
+    <ivy:cleancache />
   </target>
 
   <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
@@ -363,7 +367,6 @@
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
     <antcall target="clean-eclipse-projects" />
-    <ivy:cleancache/>
   </target>
 
   <property name="doxygen.output" location="docs/doxygen" />

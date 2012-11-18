@@ -15,6 +15,16 @@ import edu.ualberta.med.biobank.model.Specimen;
 public class SpecimenBatchOpGetAction
     implements Action<SpecimenBatchOpGetResult> {
     private static final long serialVersionUID = 1L;
+    
+    @SuppressWarnings("nls")
+    private static final String FILE_META_DATA_QRY = "SELECT bo.input.metaData " +
+        " FROM " + BatchOperation.class.getName() + " bo" +
+        " WHERE bo.id = ?";
+    
+    @SuppressWarnings("nls")
+    private static final String SPECIMEN_QRY = "SELECT bos.specimen " +
+        " FROM " + BatchOperationSpecimen.class.getName() + " bos" +
+        " WHERE bos.batch.id = ?";
 
     private final Integer id;
 
@@ -35,17 +45,13 @@ public class SpecimenBatchOpGetAction
         BatchOperation batch = context.load(BatchOperation.class, id);
 
         FileMetaData meta = (FileMetaData) session
-            .createQuery("select bo.input.metaData " +
-                " from " + BatchOperation.class.getName() + " bo" +
-                " where bo.id = ?")
+            .createQuery(FILE_META_DATA_QRY)
             .setParameter(0, id)
             .uniqueResult();
 
         @SuppressWarnings("unchecked")
         List<Specimen> specimens = session
-            .createQuery("select bos.specimen " +
-                " from " + BatchOperationSpecimen.class.getName() + " bos" +
-                " where bos.batch.id = ?")
+            .createQuery(SPECIMEN_QRY)
             .setParameter(0, id)
             .list();
 

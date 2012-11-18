@@ -12,6 +12,7 @@ public class ProcessingEventGetBriefInfoAction implements
     Action<ProcessingEventBriefInfo> {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("nls")
     private static final String QRY =
         "SELECT pe, study.nameShort, COUNT(DISTINCT sourceSpecs),"
             + "COUNT(DISTINCT allAlqs) FROM "
