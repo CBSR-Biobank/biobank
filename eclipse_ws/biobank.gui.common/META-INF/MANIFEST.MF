@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Biobank GUI Common
 Bundle-SymbolicName: biobank.gui.common;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0
 Bundle-Activator: edu.ualberta.med.biobank.gui.common.BgcPlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -14,7 +14,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console;bundle-version="3.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: lib/commons-beanutils-1.8.0.jar,
+Bundle-ClassPath: .,lib/commons-beanutils-1.8.0.jar,
  lib/commons-collections-3.2.jar,
  lib/commons-digester-1.7.jar,
  lib/commons-io-1.4.jar,

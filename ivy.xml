@@ -21,6 +21,8 @@
     <dependency org="supercsv" name="supercsv" rev="1.52"/>
     <dependency org="supercsv" name="spiffy-all" rev="0.05"/>
 
+    <dependency org="jsse" name="jsse" rev="1.6.0"/>
+
     <dependency org="gettext" name="gettext-ant-tasks" rev="0.9.7" />
 
     <dependency org="cacore" name="spring" rev="2.0.3"/>

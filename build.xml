@@ -48,7 +48,53 @@
 
   <path id="biobank.common.build.classpath">
     <fileset dir="${req.jars.dir}">
-      <include name="*.jar" />
+      <include name="acegi-security-1.0.4.jar" />
+      <include name="antlr-2.7.6.jar" />
+      <include name="asm-1.5.3.jar" />
+      <include name="axis-1.4.jar" />
+      <include name="caGrid-CQL-cql-1.0-1.2.jar" />
+      <include name="castor-1.0.2.jar" />
+      <include name="cglib-2.1.3.jar" />
+      <include name="cog-jglobus.jar" />
+      <include name="commons-codec-1.3.jar" />
+      <include name="commons-collections-3.2.jar" />
+      <include name="commons-collections-3.2.jar" />
+      <include name="commons-discovery-0.2.jar" />
+      <include name="commons-lang-2.4.jar" />
+      <include name="commons-logging-1.1.jar" />
+      <include name="dom4j-1.6.1.jar" />
+      <include name="gettext-commons-0.9.6.jar" />
+      <include name="hibernate-jpa-2.0-api-1.0.1.Final.jar" />
+      <include name="hibernate-validator-4.2.0.Final.jar" />
+      <include name="hibernate-core-3.6.9.Final.jar" />
+      <include name="hibernate-envers-3.6.9.Final.jar" />
+      <include name="javassist-3.12.0.GA.jar" />
+      <include name="jaxrpc-1.1.jar" />
+      <include name="jta-1.1.jar" />
+      <include name="log4j-1.2.14.jar" />
+      <include name="messages.jar" />
+      <include name="mysql-connector-java-5.1.15.jar" />
+      <include name="ognl-2.6.7.jar" />
+      <include name="saaj-1.2.jar" />
+      <include name="sdk-client-framework-4.1.1.jar" />
+      <include name="sdk-grid-remoting-4.1.1.jar" />
+      <include name="sdk-security-4.1.1.jar" />
+      <include name="sdk-writable-client-framework-4.1.1.jar" />
+      <include name="slf4j-api-1.6.4.jar" />
+      <include name="slf4j-log4j12-1.6.4.jar" />
+      <include name="spring-2.0.3.jar" />
+      <include name="validation-api-1.0.0.GA.jar" />
+      <include name="wsdl4j-1.5.1.jar" />
+      <include name="xercesImpl-2.7.1.jar" />
+      <include name="xpp3-1.1.3.4.C.jar" />
+      <include name="xstream-1.3.1.jar" />
+      <include name="jsse-1.6.0.jar" />
+      <include name="csmapi-4.1.jar" />
+      <include name="jta-1.1.jar" />
+      <include name="sdk-core-4.1.1.jar" />
+      <include name="sdk-writable-core-4.1.1.jar" />
+      <include name="supercsv-1.52.jar" />
+      <include name="spiffy-all-0.05.jar" />
     </fileset>
   </path>
 
@@ -231,8 +277,8 @@
           overwrite="true" verbose="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
-    <copy file="${lib.dir}/mysql-connector-java-5.1.15-bin.jar"
-          tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15-bin.jar"
+    <copy file="${lib.dir}/mysql-connector-java-5.1.15.jar"
+          tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java-5.1.15.jar"
           overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"
           tofile="${env.JBOSS_HOME}/server/default/deploy/upt-ds.xml"
