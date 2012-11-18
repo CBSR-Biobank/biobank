@@ -14,6 +14,7 @@
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15"/>
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1"/>
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4"/>
+    <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4"/>
     <dependency org="xpp3" name="xpp3" rev="1.1.4c"/>
     <dependency org="supercsv" name="supercsv" rev="1.52"/>
     <dependency org="supercsv" name="spiffy-all" rev="0.05"/>

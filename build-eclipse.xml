@@ -61,7 +61,7 @@ use command "ant -projecthelp" to display the targets.
   </target>
 
   <target name="deploy-eclipse"
-          depends="java-client-manifest,biobank-version-modify"
+          depends="resolve,java-client-manifest,biobank-version-modify"
           description="deploys the caCORE SDK beans to the eclipse project">
     <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="false">
       <fileset dir="${req.jars.dir}">

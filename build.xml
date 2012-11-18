@@ -27,7 +27,7 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
-  <!--import file="build-db.xml"/-->
+  <import file="build-db.xml"/>
   <import file="build-i18n.xml"/>
   <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>

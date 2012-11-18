@@ -21,7 +21,7 @@
   <path id="hibernatetool.lib">
     <path location="${lib.dir}/hibernate-envers-3.6.9.Final.jar" />
     <path location="${lib.dir}/c3p0-0.9.0.jar" />
-    <path location="${lib.dir}/commons-logging-1.1.1.jar" />
+    <path location="${lib.dir}/commons-logging-1.1.jar" />
     <path location="${lib.dir}/dom4j-1.6.1.jar" />
     <path location="${lib.dir}/freemarker-2.3.8.jar" />
     <path location="${lib.dir}/gettext-commons-0.9.6.jar" />
@@ -29,10 +29,11 @@
     <path location="${lib.dir}/hibernate-tools-3.4.0.CR2.jar" />
     <path location="${lib.dir}/hibernate-validator-4.2.0.Final.jar" />
     <path location="${lib.dir}/hibernate-core-3.6.9.Final.jar" />
+    <path location="${lib.dir}/hibernate-commons-annotations-3.2.0.Final.jar" />
     <path location="${lib.dir}/messages.jar" />
     <path location="${lib.dir}/ognl-2.6.7.jar" />
     <path location="${lib.dir}/slf4j-api-1.6.4.jar" />
-    <path location="${lib.dir}/slf4j-log4j12-1.6.4.jar" />
+    <path location="${lib.dir}/slf4j-nop-1.6.4.jar" />
     <path location="${lib.dir}/validation-api-1.0.0.GA.jar" />
     <path location="${lib.dir}/${jdbc.driver.jar}" />
     <!-- uncomment following line for debug output -->
@@ -43,7 +44,8 @@
        works with jpa annotations -->
   <taskdef name="hibernatetool"
            classname="org.hibernate.tool.ant.EnversHibernateToolTask"
-           classpathref="hibernatetool.lib" />
+           classpathref="hibernatetool.lib"
+	   onerror="ignore" />
 
 <!-- was to generate java files from hbm.xml files
   <target name="hbm2java">
@@ -62,7 +64,7 @@
   </target>
 
   <target name="schemaupdate"
-          depends="check-db,build-common-project">
+          depends="resolve,check-db,build-common-project">
     <tempfile property="temp.sql.path"
               deleteonexit="true"
               prefix="schema-export"
