@@ -48,6 +48,7 @@ public abstract class AbstractValidation implements HasValidation, Disposable {
         handlerRegistry.dispose();
     }
 
+    @SuppressWarnings("nls")
     protected void setValidationResult(ValidationResult result) {
         if (result == null) {
             throw new NullPointerException("validationResult is null");

@@ -126,20 +126,20 @@ use command "ant -projecthelp" to display the targets.
         <include name="commons-digester-1.7.jar" />
         <include name="commons-javaflow-20060411.jar" />
         <include name="commons-logging-1.1.jar" />
-        <include name="iText-2.1.7.jar" />
+        <include name="itext-2.1.7.jar" />
         <include name="jasperreports-4.0.1.jar" />
         <include name="jdt-compiler-3.1.1.jar" />
         <include name="messages.jar" />
-        <include name="DynamicJasper-3.0.14.jar" />
+        <include name="DynamicJasper-3.0.13.jar" />
       </fileset>
     </copy>
     <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="false">
       <fileset dir="${req.jars.dir}">
-        <include name="aopalliance.jar" />
+        <include name="aopalliance-1.0.jar" />
         <include name="guice-3.0.jar" />
         <include name="gwt-pectin-0.8.1.jar" />
-        <include name="gwt-user.jar" />
-        <include name="javax.inject.jar" />
+        <include name="gwt-user-2.4.0.jar" />
+        <include name="javax.inject-1.jar" />
         <include name="peaberry-1.2.jar" />
       </fileset>
     </copy>

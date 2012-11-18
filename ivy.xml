@@ -1,6 +1,7 @@
 <ivy-module version="2.0">
   <info organisation="edu.ualberta.ca" module="biobank" />
   <dependencies>
+    <!-- for biobank.common -->
     <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final"/>
     <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final"/>
     <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final"/>
@@ -16,6 +17,7 @@
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4"/>
     <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4"/>
     <dependency org="xpp3" name="xpp3" rev="1.1.4c"/>
+
     <dependency org="supercsv" name="supercsv" rev="1.52"/>
     <dependency org="supercsv" name="spiffy-all" rev="0.05"/>
 
@@ -48,6 +50,26 @@
     <dependency org="cacore" name="sdk-writable-client-framework" rev="4.1.1"/>
     <dependency org="cacore" name="wsdl4j" rev="1.5.1"/>
     <dependency org="cacore" name="xercesImpl" rev="2.7.1"/>
+
+    <!-- for biobank.gui.common -->
+    <dependency org="ar.com.fdvs" name="DynamicJasper" rev="3.0.13">
+      <exclude module="barbecue" />
+    </dependency>
+    <dependency org="com.lowagie" name="itext" rev="2.1.7"/>
+    <dependency org="net.sf.jasperreports" name="jasperreports" rev="4.0.1">
+      <exclude module="commons-javaflow" />
+      <exclude module="mondrian" />
+    </dependency>
+    <dependency org="commons-io" name="commons-io" rev="1.4"/>
+
+    <!-- for biobank.mvp -->
+    <dependency org="aopalliance" name="aopalliance" rev="1.0"/>
+    <dependency org="com.google.inject" name="guice" rev="3.0"/>
+    <dependency org="com.google.gwt" name="gwt-user" rev="2.4.0"/>
+    <dependency org="com.pietschy.gwt" name="gwt-pectin" rev="0.8.1"/>
+    <dependency org="javax.inject" name="javax.inject" rev="1"/>
+    <dependency org="org.ops4j" name="peaberry" rev="1.2"/>
+
 
   </dependencies>
 </ivy-module>

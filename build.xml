@@ -62,6 +62,10 @@
     <ivy:retrieve />
   </target>
 
+  <target name="report" depends="resolve" description="--> generates a report of dependencies">
+    <ivy:report todir="${build.dir}"/>
+  </target>
+
   <target name="clean-cache" description="--> retrieve dependencies with ivy">
     <ivy:cleancache />
   </target>

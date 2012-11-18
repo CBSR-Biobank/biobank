@@ -6,6 +6,7 @@ Bundle-Name: BioBank Common
 Bundle-SymbolicName: biobank.common
 Bundle-Version: 3.4.0.rc4
 Bundle-ClassPath: .,
+ conf/,
  lib/client/acegi-security-1.0.4.jar,
  lib/client/antlr-2.7.6.jar,
  lib/client/asm-1.5.3.jar,
@@ -41,7 +42,12 @@ Bundle-ClassPath: .,
  lib/client/validation-api-1.0.0.GA.jar,
  lib/client/wsdl4j-1.5.1.jar,
  lib/client/xercesImpl-2.7.1.jar,
- conf/
+ lib/server/csmapi-4.1.jar,
+ lib/server/jta-1.1.jar,
+ lib/server/sdk-core-4.1.1.jar,
+ lib/server/sdk-writable-core-4.1.1.jar,
+ lib/server/spiffy-all-0.05.jar,
+ lib/server/supercsv-1.52.jar
 Bundle-Vendor: AICML
 Export-Package: antlr.actions.python;uses:="antlr.collections.impl,antlr",
  antlr.build,
@@ -143,13 +149,18 @@ Export-Package: antlr.actions.python;uses:="antlr.collections.impl,antlr",
  edu.ualberta.med.biobank.server.reports,
  edu.ualberta.med.biobank.util,
  edu.ualberta.med.biobank.validator.engine,
+ gov.nih.nci.system.applicationservice,
+ org.acegisecurity,
+ org.apache.commons.lang,
+ org.springframework.remoting,
  org.supercsv.cellprocessor,
  org.supercsv.cellprocessor.constraint,
  org.supercsv.cellprocessor.ift,
  org.supercsv.exception,
  org.supercsv.io,
  org.supercsv.prefs,
- org.supercsv.util
+ org.supercsv.util,
+ org.xnap.commons.i18n
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: edu.ualberta.med.biobank.common,
  edu.ualberta.med.biobank.common.action.exception,

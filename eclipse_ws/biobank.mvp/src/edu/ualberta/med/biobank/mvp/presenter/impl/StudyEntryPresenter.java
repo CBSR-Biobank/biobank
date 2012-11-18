@@ -69,6 +69,7 @@ public class StudyEntryPresenter extends AbstractEntryFormPresenter<View> {
         view.setActivityStatusComboView(activityStatusComboPresenter.getView());
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void onBind() {
         super.onBind();

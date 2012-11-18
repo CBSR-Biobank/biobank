@@ -32,7 +32,6 @@ public class FileBrowser extends BgcBaseWidget {
 
     protected ListenerList fileSelectionListeners = new ListenerList();
 
-    @SuppressWarnings("nls")
     public FileBrowser(Composite parent, int style, String[] extensions) {
         super(parent, style);
         this.filterExtensions = extensions;
