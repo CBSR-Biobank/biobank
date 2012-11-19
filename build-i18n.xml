@@ -4,7 +4,7 @@
 
   <property name="bundle" value="i18n.Messages" />
   <property name="po.dir" value="po" />
-  <property name="po.output.dir" value="${po.dir}/output" />
+  <property name="po.output.dir" value="${lib.dir}" />
   <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
 
   <target name="init.dir">
