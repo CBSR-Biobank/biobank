@@ -82,6 +82,8 @@
     <dependency org="cacore" name="log4j" rev="1.2.14" conf="biobank.webapp->default" />
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.4" conf="biobank.webapp->default" />
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.webapp->default" />
+    <dependency org="org.jdom" name="jdom" rev="1.1" conf="biobank.webapp->default" />
+
 
     <!-- for biobank.common.client -->
     <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default" />
