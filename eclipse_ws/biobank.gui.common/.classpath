@@ -4,13 +4,10 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/DynamicJasper-3.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/itext-2.1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasperreports-4.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/messages.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

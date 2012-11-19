@@ -60,73 +60,6 @@ use command "ant -projecthelp" to display the targets.
     <antcall target="biobank-feature-platform-version-modify" />
   </target>
 
-  <target name="deploy-eclipse"
-          depends="resolve,messages-jar,java-client-manifest,biobank-version-modify"
-          description="deploys the caCORE SDK beans to the eclipse project">
-    <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="false">
-      <fileset refid="biobank.common.client.build.classpath" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="false">
-      <fileset refid="biobank.common.server.build.classpath" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.gui.common}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="commons-beanutils-1.8.0.jar" />
-        <include name="commons-collections-3.2.jar" />
-        <include name="commons-io-1.4.jar" />
-        <include name="commons-digester-1.7.jar" />
-        <include name="commons-javaflow-20060411.jar" />
-        <include name="commons-logging-1.1.jar" />
-        <include name="itext-2.1.7.jar" />
-        <include name="jasperreports-4.0.1.jar" />
-        <include name="jdt-compiler-3.1.1.jar" />
-        <include name="messages.jar" />
-        <include name="DynamicJasper-3.0.13.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.mvp}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="aopalliance-1.0.jar" />
-        <include name="guice-3.0.jar" />
-        <include name="gwt-pectin-0.8.1.jar" />
-        <include name="gwt-user-2.4.0.jar" />
-        <include name="javax.inject-1.jar" />
-        <include name="peaberry-1.2.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="gluegen.jar" />
-        <include name="jdom.jar" />
-        <include name="mailapi-1.4.3.jar" />
-        <include name="messages.jar" />
-        <include name="smtp.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="jargs-1.0.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tests}/src" overwrite="false">
-      <!-- File needed in the test project to call csm api methods -->
-      <fileset file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.tests}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="clm-4.1.jar" />
-	<include name="jta-1.1.jar" />
-        <include name="mockito-all-1.9.0.jar" />
-        <include name="naming-common-4.1.31.jar" />
-      </fileset>
-    </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="false">
-      <fileset dir="${req.jars.dir}">
-        <include name="log4j-1.2.14.jar" />
-      </fileset>
-    </copy>
-  </target>
-
   <path id="eclipse-jars">
     <fileset dir="${env.ECLIPSE_HOME}/plugins">
       <include name="*.jar" />
@@ -157,7 +90,7 @@ use command "ant -projecthelp" to display the targets.
     </fileset>
   </path>
 
-  <target name="eclipse-biobank-common" depends="deploy-eclipse">
+  <target name="eclipse-biobank-common" depends="resolve">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
@@ -233,7 +166,7 @@ use command "ant -projecthelp" to display the targets.
   </target>
 
   <target name="eclipse-biobank"
-	  depends="deploy-eclipse,eclipse-biobank-common,eclipse-biobank-gui-common,eclipse-biobank-mvp,eclipse-scanner-config">
+	  depends="resolve,eclipse-biobank-common,eclipse-biobank-gui-common,eclipse-biobank-mvp,eclipse-scanner-config">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"

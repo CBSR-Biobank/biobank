@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 
-    Overall build file
-    use command "ant -projecthelp" to display the targets.
+Overall build file
+use command "ant -projecthelp" to display the targets.
 
 -->
 <project name="biobank" basedir="." default="deploy" xmlns:ivy="antlib:org.apache.ivy.ant">
@@ -27,6 +27,13 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
+  <path id="ivy.lib.path">
+    <fileset dir="/usr/share/java" includes="ivy.jar"/>
+  </path>
+
+  <taskdef resource="org/apache/ivy/ant/antlib.xml"
+	   uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
   <import file="build-db.xml"/>
   <import file="build-i18n.xml"/>
   <import file="build-eclipse.xml"/>
@@ -46,7 +53,7 @@
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
 
-  <fileset id="biobank.common.server.build.classpath" dir="${req.jars.dir}">
+  <fileset id="biobank.common.server.build.classpath" dir="${eclipse.proj.dir.common}/lib/server">
     <include name="csmapi-4.1.jar" />
     <include name="jta-1.1.jar" />
     <include name="sdk-core-4.1.1.jar" />
@@ -55,7 +62,7 @@
     <include name="spiffy-all-0.05.jar" />
   </fileset>
 
-  <fileset id="biobank.common.client.build.classpath" dir="${req.jars.dir}">
+  <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">
     <include name="acegi-security-1.0.4.jar" />
     <include name="antlr-2.7.6.jar" />
     <include name="asm-1.5.3.jar" />
@@ -99,10 +106,10 @@
     <include name="jsse-1.6.0.jar" />
   </fileset>
 
-  <fileset id="biobank.common.build.classpath">
-    <patternset refid="biobank.common.server.build.classpath" />
-    <patternset refid="biobank.common.client.build.classpath" />
-  </fileset>
+  <path id="biobank.common.build.classpath">
+    <fileset refid="biobank.common.server.build.classpath" />
+    <fileset refid="biobank.common.client.build.classpath" />
+  </path>
 
   <!-- for tests -->
   <path id="biobank.common.run.classpath">
@@ -111,7 +118,14 @@
   </path>
 
   <target name="resolve" description="--> retrieve dependencies with ivy">
-    <ivy:retrieve />
+    <ivy:retrieve pattern="lib/[artifact]-[revision].[ext]" conf="biobank.build" />
+    <ivy:retrieve pattern="lib/[conf]/[artifact]-[revision].[ext]" conf="hibernatetool,biobank.webapp" />
+    <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/client/[artifact]-[revision].[ext]" conf="biobank.common.client" />
+    <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/server/[artifact]-[revision].[ext]" conf="biobank.common.server" />
+    <ivy:retrieve pattern="eclipse_ws/[conf]/lib/[artifact]-[revision].[ext]"
+		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests"/>
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
@@ -293,9 +307,9 @@
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
           overwrite="true" verbose="true" />
     <!-- ignore this war for now
-    <copy file="${secu-log.dir}/jboss/upt.war"
-          tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
-          overwrite="true" verbose="true" />
+	 <copy file="${secu-log.dir}/jboss/upt.war"
+         tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
+         overwrite="true" verbose="true" />
     -->
     <delete includeemptydirs="true">
       <fileset dir="${env.JBOSS_HOME}/server/default/deploy">
@@ -313,7 +327,7 @@
   </target>
 
   <target name="deploy" description="deploys to JBoss and Eclipse project"
-	  depends="deploy-jboss,deploy-eclipse">
+	  depends="deploy-jboss">
   </target>
 
   <target name="build-common-project"
@@ -346,12 +360,15 @@
       <!-- TODO: could put things in right folders (e.g. biobank.common), but for now
            just use an explicit list of what needs to be in the war -->
       <lib dir="${req.jars.dir}">
+        <include name="messages.jar" />
+      </lib>
+      <lib dir="${req.jars.dir}/biobank.webapp">
         <include name="acegi-security-1.0.4.jar" />
         <include name="antlr-2.7.6.jar" />
         <include name="asm-1.5.3.jar" />
         <include name="axis-1.4.jar" />
         <include name="backport-util-concurrent-4.1.1.jar" />
-        <include name="c3p0-0.9.0.jar" />
+        <include name="c3p0-0.9.1.jar" />
         <include name="caGrid-CQL-cql-1.0-1.2.jar" />
         <include name="caGrid-data-common-1.2.jar" />
         <include name="caGrid-data-utils-1.2.jar" />
@@ -381,7 +398,6 @@
         <include name="jdom-1.0.jar" />
         <include name="jta-1.1.jar" />
         <include name="log4j-1.2.14.jar" />
-        <include name="messages.jar" />
         <include name="mmbase-1.8.4.jar" />
         <include name="mysql-connector-java-5.1.15.jar" />
         <include name="ognl-2.6.7.jar" />
