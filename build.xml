@@ -109,7 +109,7 @@
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
-    <ivy:report todir="${build.dir}"/>
+    <ivy:report todir="${output.dir}"/>
   </target>
 
   <target name="clean-cache" description="--> retrieve dependencies with ivy">
@@ -311,7 +311,7 @@
   </target>
 
   <target name="build-common-project"
-          depends="resolve,server-manifest">
+          depends="resolve,messages-jar,server-manifest">
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">
       <fileset dir="${eclipse.proj.dir.common}/src">

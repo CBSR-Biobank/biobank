@@ -1,16 +1,25 @@
 <ivysettings>
     <settings defaultResolver="chain"/>
     <resolvers>
-        <chain name="chain">
+        <chain name="chain" returnFirst="true"  dual="true">
             <ibiblio name="central" m2compatible="true"/>
-            <ibiblio name="gettext" m2compatible="true"
-		     root="http://gettext-commons.googlecode.com/svn/maven-repository/" />
-            <ibiblio name="aicml-med" m2compatible="true"
-		     root="http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/" />
-            <ibiblio name="maven.pietschy.com" m2compatible="true"
-		     root="http://maven.pietschy.com/repository" />
-            <ibiblio name="jboss-thirdparty-releases" m2compatible="true"
-		     root="https://repository.jboss.org/nexus/content/repositories/thirdparty-releases" />
         </chain>
+        <ibiblio name="aicml-med" m2compatible="true"
+		 root="http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/" />
+        <ibiblio name="gettext" m2compatible="true"
+		 root="http://gettext-commons.googlecode.com/svn/maven-repository/" />
+        <ibiblio name="maven.pietschy.com" m2compatible="true"
+		 root="http://maven.pietschy.com/repository" />
+        <ibiblio name="jboss-thirdparty-releases" m2compatible="true"
+		 root="https://repository.jboss.org/nexus/content/repositories/thirdparty-releases" />
     </resolvers>
+    <modules>
+        <module organisation="cacore" resolver="aicml-med"/>
+	<module organisation="jsse" resolver="aicml-med" />
+	<module organisation="supercsv" resolver="aicml-med" />
+	<module organisation="gettext" name="gettext-ant-tasks" resolver="aicml-med" />
+        <module organisation="org.xnap.commons" resolver="gettext"/>
+        <module organisation="com.pietschy.gwt" resolver="maven.pietschy.com"/>
+        <module organisation="net.sf" name="jargs" resolver="jboss-thirdparty-releases"/>
+    </modules>
 </ivysettings>

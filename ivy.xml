@@ -1,5 +1,6 @@
 <ivy-module version="2.0">
   <info organisation="edu.ualberta.ca" module="biobank" />
+  <configurations defaultconfmapping="default->master,sources"/>
   <dependencies>
     <!-- for biobank.webapp -->
     <dependency org="cacore" name="caGrid-data-common" rev="1.2"/>
