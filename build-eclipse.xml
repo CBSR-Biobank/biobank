@@ -312,7 +312,7 @@ use command "ant -projecthelp" to display the targets.
     </javac>
   </target>
 
-  <target name="eclipse-label-printer" depends="eclipse-biobank2">
+  <target name="eclipse-label-printer" depends="eclipse-biobank">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
@@ -357,7 +357,7 @@ use command "ant -projecthelp" to display the targets.
     </javac>
   </target>
 
-  <target name="eclipse-biobank-tests" depends="eclipse-biobank2">
+  <target name="eclipse-biobank-tests" depends="eclipse-biobank">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
