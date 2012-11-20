@@ -1,17 +1,29 @@
 <ivy-module version="2.0">
   <info organisation="edu.ualberta.ca" module="biobank" />
+
   <configurations defaultconfmapping="default->master,sources">
-    <conf name="biobank.build" />
-    <conf name="biobank.webapp" />
-    <conf name="biobank.common.client" />
-    <conf name="biobank.common.server" />
-    <conf name="biobank.gui.common" />
-    <conf name="biobank.mvp" />
-    <conf name="biobank2" />
-    <conf name="biobank2.tools" />
-    <conf name="biobank2.tests" />
-    <conf name="hibernatetool" />
+    <conf name="biobank.build"
+	  description="required by build environment" />
+    <conf name="hibernatetool" visibility="private"
+	  description="for the hibernatetool ant task definition in build-db.xml" />
+    <conf name="biobank.common.client"
+	  description="for the biobank.common eclipse project, client side build" />
+    <conf name="biobank.common.server"
+	  description="for the biobank.common eclipse project, server side build" />
+    <conf name="biobank.webapp" extends="biobank.common.server"
+	  description="dependencies for the web application WAR file" />
+    <conf name="biobank.gui.common"
+	  description="for the biobank.gui.common eclipse project" />
+    <conf name="biobank.mvp"
+	  description="for the biobank.mvp eclipse project" />
+    <conf name="biobank2"
+	  description="for the biobank2 eclipse project" />
+    <conf name="biobank2.tools"
+	  description="for the biobank2.tools eclipse project" />
+    <conf name="biobank2.tests"
+	  description="for the biobank2.tests eclipse project" />
   </configurations>
+
   <dependencies>
     <dependency org="gettext" name="gettext-ant-tasks" rev="0.9.7" conf="biobank.build->default" />
     <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4" conf="biobank.build->default" />
@@ -86,20 +98,20 @@
 
 
     <!-- for biobank.common.client -->
-    <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default" />
-    <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final" conf="biobank.common.client->default" />
-    <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="biobank.common.client->default" />
-    <dependency org="org.hibernate" name="hibernate-envers" rev="3.6.9.Final" conf="biobank.common.client->default" />
-    <dependency org="org.hibernate" name="hibernate-tools" rev="3.4.0.CR2" conf="biobank.common.client->default" />
-    <dependency org="c3p0" name="c3p0" rev="0.9.0" conf="biobank.common.client->default" />
-    <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="biobank.common.client->default" />
-    <dependency org="javassist" name="javassist" rev="3.12.0.GA" conf="biobank.common.client->default" />
-    <dependency org="commons-lang" name="commons-lang" rev="2.4" conf="biobank.common.client->default" />
-    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" conf="biobank.common.client->default" />
-    <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.common.client->default" />
-    <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="biobank.common.client->default" />
-    <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.common.client->default" />
-    <dependency org="xpp3" name="xpp3" rev="1.1.4c" conf="biobank.common.client->default" />
+    <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
+    <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final" conf="biobank.common.client->default,sources" />
+    <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="biobank.common.client->default,sources" />
+    <dependency org="org.hibernate" name="hibernate-envers" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
+    <dependency org="org.hibernate" name="hibernate-tools" rev="3.4.0.CR2" conf="biobank.common.client->default,sources" />
+    <dependency org="c3p0" name="c3p0" rev="0.9.0" conf="biobank.common.client->default,sources" />
+    <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="biobank.common.client->default,sources" />
+    <dependency org="javassist" name="javassist" rev="3.12.0.GA" conf="biobank.common.client->default,sources" />
+    <dependency org="commons-lang" name="commons-lang" rev="2.4" conf="biobank.common.client->default,sources" />
+    <dependency org="org.xnap.commons" name="gettext-commons" rev="0.9.6" conf="biobank.common.client->default,sources" />
+    <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.common.client->default,sources" />
+    <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="biobank.common.client->default,sources" />
+    <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.common.client->default,sources" />
+    <dependency org="xpp3" name="xpp3" rev="1.1.4c" conf="biobank.common.client->default,sources" />
 
     <dependency org="jsse" name="jsse" rev="1.6.0" conf="biobank.common.client->default" />
 
@@ -136,39 +148,39 @@
     <dependency org="supercsv" name="spiffy-all" rev="0.05" conf="biobank.common.server->default" />
     <dependency org="cacore" name="csmapi" rev="4.1" conf="biobank.common.server->default" />
     <dependency org="cacore" name="sdk-writable-core" rev="4.1.1" conf="biobank.common.server->default" />
-    <dependency org="javax.transaction" name="jta" rev="1.1" conf="biobank.common.server->default" />
+    <dependency org="javax.transaction" name="jta" rev="1.1" conf="biobank.common.server->default,sources" />
 
 
     <!-- for biobank.gui.common -->
-    <dependency org="ar.com.fdvs" name="DynamicJasper" rev="3.0.13" conf="biobank.gui.common->default" >
+    <dependency org="ar.com.fdvs" name="DynamicJasper" rev="3.0.13" conf="biobank.gui.common->default,sources" >
       <exclude module="barbecue" />
     </dependency>
-    <dependency org="com.lowagie" name="itext" rev="2.1.7" conf="biobank.gui.common->default" />
-    <dependency org="net.sf.jasperreports" name="jasperreports" rev="4.0.1" conf="biobank.gui.common->default" >
+    <dependency org="com.lowagie" name="itext" rev="2.1.7" conf="biobank.gui.common->default,sources" />
+    <dependency org="net.sf.jasperreports" name="jasperreports" rev="4.0.1" conf="biobank.gui.common->default,sources" >
       <exclude module="commons-javaflow" />
       <exclude module="mondrian" />
     </dependency>
-    <dependency org="commons-io" name="commons-io" rev="1.4" conf="biobank.gui.common->default" />
+    <dependency org="commons-io" name="commons-io" rev="1.4" conf="biobank.gui.common->default,sources" />
 
     <!-- for biobank.mvp -->
-    <dependency org="aopalliance" name="aopalliance" rev="1.0" conf="biobank.mvp->default" />
-    <dependency org="com.google.inject" name="guice" rev="3.0" conf="biobank.mvp->default" />
-    <dependency org="com.google.gwt" name="gwt-user" rev="2.4.0" conf="biobank.mvp->default" />
-    <dependency org="com.pietschy.gwt" name="gwt-pectin" rev="0.8.1" conf="biobank.mvp->default" />
-    <dependency org="javax.inject" name="javax.inject" rev="1" conf="biobank.mvp->default" />
-    <dependency org="org.ops4j" name="peaberry" rev="1.2" conf="biobank.mvp->default" />
+    <dependency org="aopalliance" name="aopalliance" rev="1.0" conf="biobank.mvp->default,sources" />
+    <dependency org="com.google.inject" name="guice" rev="3.0" conf="biobank.mvp->default,sources" />
+    <dependency org="com.google.gwt" name="gwt-user" rev="2.4.0" conf="biobank.mvp->default,sources" />
+    <dependency org="com.pietschy.gwt" name="gwt-pectin" rev="0.8.1" conf="biobank.mvp->default,sources" />
+    <dependency org="javax.inject" name="javax.inject" rev="1" conf="biobank.mvp->default,sources" />
+    <dependency org="org.ops4j" name="peaberry" rev="1.2" conf="biobank.mvp->default,sources" />
 
     <!-- for biobank2 -->
-    <dependency org="javax.mail" name="mailapi" rev="1.4.3" conf="biobank2->default" />
+    <dependency org="javax.mail" name="mailapi" rev="1.4.3" conf="biobank2->default,sources" />
 
     <!-- for biobank2.tools -->
-    <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default" />
-    <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tools->default" />
+    <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />
+    <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tools->default,sources" />
     <dependency org="tomcat" name="naming-common" rev="4.1.31"
-		conf="biobank2.tools->default" />
+		conf="biobank2.tools->default,sources" />
 
     <!-- for biobank2.tools -->
-    <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tests->default" />
+    <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tests->default,sources" />
 
   </dependencies>
 </ivy-module>
