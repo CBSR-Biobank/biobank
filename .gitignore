@@ -1,4 +1,5 @@
 lib
+libsource
 db.properties
 security-logs/jboss/biobank.keystore
 security-logs/jboss/biobank-ds.xml

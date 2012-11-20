@@ -5,27 +5,23 @@ Bundle-ManifestVersion: 2
 Bundle-Name: BioBank Common
 Bundle-SymbolicName: biobank.common
 Bundle-Version: 3.4.0
-Bundle-ClassPath: .,conf/,lib/client/acegi-security-1.0.4.jar,lib/clie
- nt/antlr-2.7.6.jar,lib/client/asm-1.5.3.jar,lib/client/axis-1.4.jar,l
- ib/client/caGrid-CQL-cql-1.0-1.2.jar,lib/client/castor-1.0.2.jar,lib/
- client/cglib-2.1.3.jar,lib/client/commons-codec-1.3.jar,lib/client/co
- mmons-collections-3.2.jar,lib/client/commons-discovery-0.2.jar,lib/cl
- ient/commons-lang-2.4.jar,lib/client/commons-logging-1.1.jar,lib/clie
- nt/dom4j-1.6.1.jar,lib/client/gettext-commons-0.9.6.jar,lib/client/hi
- bernate-core-3.6.9.Final.jar,lib/client/hibernate-envers-3.6.9.Final.
- jar,lib/client/hibernate-jpa-2.0-api-1.0.1.Final.jar,lib/client/hiber
- nate-validator-4.2.0.Final.jar,lib/client/javassist-3.12.0.GA.jar,lib
- /client/jaxrpc-1.1.jar,lib/client/jta-1.1.jar,lib/client/log4j-1.2.14
- .jar,lib/client/messages.jar,lib/client/ognl-2.6.7.jar,lib/client/saa
- j-1.2.jar,lib/client/sdk-client-framework-4.1.1.jar,lib/client/sdk-gr
- id-remoting-4.1.1.jar,lib/client/sdk-security-4.1.1.jar,lib/client/sd
- k-writable-client-framework-4.1.1.jar,lib/client/slf4j-api-1.6.4.jar,
- lib/client/slf4j-log4j12-1.6.4.jar,lib/client/spring-2.0.3.jar,lib/cl
- ient/validation-api-1.0.0.GA.jar,lib/client/wsdl4j-1.5.1.jar,lib/clie
- nt/xercesImpl-2.7.1.jar,lib/server/csmapi-4.1.jar,lib/server/jta-1.1.
- jar,lib/server/sdk-core-4.1.1.jar,lib/server/sdk-writable-core-4.1.1.
- jar,lib/server/spiffy-all-0.05.jar,lib/server/supercsv-1.52.jar,lib/c
- lient/jsse-1.6.0.jar,lib/client/mysql-connector-java-5.1.15.jar
+Bundle-ClassPath: .,conf/,lib/client/acegi-security.jar,lib/clie
+ nt/antlr.jar,lib/client/asm.jar,lib/client/axis.jar,l
+ ib/client/caGrid-CQL-cql.jar,lib/client/castor.jar,lib/
+ client/cglib.jar,lib/client/commons-codec.jar,lib/client/co
+ mmons-collections.jar,lib/client/commons-discovery.jar,lib/cl
+ ient/commons-lang.jar,lib/client/commons-logging.jar,lib/clie
+ nt/dom4j.jar,lib/client/gettext-commons.jar,lib/client/hi
+ bernate-core.jar,lib/client/hibernate-envers.jar,lib/client/hibernate-jpa-2.0-api.jar,lib/client/hiber
+ nate-validator.jar,lib/client/javassist.jar,lib
+ /client/jaxrpc.jar,lib/client/jta.jar,lib/client/log4j.jar,lib/client/messages.jar,lib/client/ognl.jar,lib/client/saa
+ j.jar,lib/client/sdk-client-framework.jar,lib/client/sdk-gr
+ id-remoting.jar,lib/client/sdk-security.jar,lib/client/sd
+ k-writable-client-framework.jar,lib/client/slf4j-api.jar,
+ lib/client/slf4j-log4j12.jar,lib/client/spring.jar,lib/cl
+ ient/validation-api.jar,lib/client/wsdl4j.jar,lib/clie
+ nt/xercesImpl.jar,lib/server/csmapi.jar,lib/server/jta.jar,lib/server/sdk-core.jar,lib/server/sdk-writable-core.jar,lib/server/spiffy-all.jar,lib/server/supercsv.jar,lib/c
+ lient/jsse.jar,lib/client/mysql-connector-java.jar
 Bundle-Vendor: AICML
 Export-Package: antlr.actions.python;uses:="antlr.collections.impl,ant
  lr",antlr.build,antlr.collections;uses:="antlr",antlr.collections.imp
@@ -33,7 +29,7 @@ Export-Package: antlr.actions.python;uses:="antlr.collections.impl,ant
  s.impl,antlr",antlr.debug.misc; uses:="javax.swing.tree,  javax.swing
  ,  antlr.collections,  javax.swing.event",antlr.preprocessor;uses:="a
  ntlr.collections.impl,antlr",edu.ualberta.med.biobank.client.util,edu
- .ualberta.med.biobank.common; uses:="edu.ualberta.med.biobank.model, 
+ .ualberta.med.biobank.common; uses:="edu.ualberta.med.biobank.model,
   edu.ualberta.med.biobank.server.applicationservice,  gov.nih.nci.sys
  tem.applicationservice,  edu.ualberta.med.biobank.common.wrappers",ed
  u.ualberta.med.biobank.common.action,edu.ualberta.med.biobank.common.

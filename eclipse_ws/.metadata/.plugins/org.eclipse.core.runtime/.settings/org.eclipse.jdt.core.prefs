@@ -1,6 +1,6 @@
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.resourceCopyExclusionFilter=*.ucls,*.useq
-org.eclipse.jdt.core.classpathVariable.ECLIPSE_HOME=/home/nelson/apps/eclipse/rcp/eclipse
+org.eclipse.jdt.core.classpathVariable.ECLIPSE_HOME=/home/loyola/apps/eclipse/rcp/eclipse
 org.eclipse.jdt.core.classpathVariable.JRE_LIB=/usr/lib/jvm/jdk1.6.0_32/jre/lib/rt.jar
 org.eclipse.jdt.core.classpathVariable.JRE_SRC=/usr/lib/jvm/jdk1.6.0_32/src.zip
 org.eclipse.jdt.core.classpathVariable.JRE_SRCROOT=

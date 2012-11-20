@@ -13,13 +13,14 @@
   <property name="model.classpath" value="${eclipse.proj.dir.common}/output" />
 
   <path id="sql.classpath">
-    <fileset dir="${req.jars.dir}">
+    <fileset dir="${lib.dir}/build">
       <include name="*.jar" />
     </fileset>
   </path>
 
   <path id="hibernatetool.lib">
     <path location="${lib.dir}/messages.jar" />
+    <path location="${hibernatetool.lib.dir}/${jdbc.driver.jar}" />
     <path location="${hibernatetool.lib.dir}/hibernate-envers.jar" />
     <path location="${hibernatetool.lib.dir}/c3p0.jar" />
     <path location="${hibernatetool.lib.dir}/commons-logging.jar" />
@@ -35,7 +36,6 @@
     <path location="${hibernatetool.lib.dir}/slf4j-api.jar" />
     <path location="${hibernatetool.lib.dir}/slf4j-nop.jar" />
     <path location="${hibernatetool.lib.dir}/validation-api.jar" />
-    <path location="${lib.dir}/build/${jdbc.driver.jar}" />
     <!-- uncomment following line for debug output -->
     <!--<path location="${lib.dir}/slf4j-simple.jar" />-->
   </path>
@@ -88,7 +88,7 @@
   </target>
 
   <target name="dbcreate-add-tables"
-          depends="check-db,resolve,messages-jar">
+          depends="check-db,messages-jar">
     <sql driver="${database.driver}"
          url="${database.url}"
          userid="${database.exec.username}"

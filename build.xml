@@ -126,11 +126,13 @@ use command "ant -projecthelp" to display the targets.
 		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" type="jar" />
     <ivy:retrieve pattern="eclipse_ws/libsource/[artifact]-[type].[ext]" type="source"
 		  conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
-    <ivy:report todir="${output.dir}"/>
+    <ivy:report todir="${output.dir}"
+		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
   <target name="clean-cache" description="--> retrieve dependencies with ivy">
@@ -298,7 +300,7 @@ use command "ant -projecthelp" to display the targets.
           overwrite="true" verbose="true" />
     <!-- for compatibility: this file has been split -->
     <delete file="${env.JBOSS_HOME}/server/default/deploy/mysql-ds.xml" />
-    <copy file="${lib.dir}/mysql-connector-java.jar"
+    <copy file="${lib.dir}/build/mysql-connector-java.jar"
           tofile="${env.JBOSS_HOME}/server/default/lib/mysql-connector-java.jar"
           overwrite="true" verbose="true" />
     <copy file="${secu-log.dir}/jboss/upt-ds.xml"

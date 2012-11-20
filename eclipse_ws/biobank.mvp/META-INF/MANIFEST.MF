@@ -9,12 +9,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/aopalliance-1.0.jar,
- lib/guice-3.0.jar,
- lib/gwt-pectin-0.8.1.jar,
- lib/gwt-user-2.4.0.jar,
- lib/javax.inject-1.jar,
- lib/peaberry-1.2.jar
+ lib/aopalliance.jar,
+ lib/guice.jar,
+ lib/gwt-pectin.jar,
+ lib/gwt-user.jar,
+ lib/javax.inject.jar
 Export-Package: com.google.gwt.event.dom.client,
  com.google.gwt.event.logical.shared,
  com.google.gwt.event.shared,
@@ -51,11 +50,4 @@ Export-Package: com.google.gwt.event.dom.client,
  edu.ualberta.med.biobank.mvp.util,
  edu.ualberta.med.biobank.mvp.view,
  edu.ualberta.med.biobank.mvp.view.widget,
- javax.inject,
- org.ops4j.peaberry,
- org.ops4j.peaberry.builders,
- org.ops4j.peaberry.internal,
- org.ops4j.peaberry.osgi,
- org.ops4j.peaberry.util,
- org.ops4j.peaberry.util.decorators,
- org.ops4j.peaberry.util.ldap
+ javax.inject
