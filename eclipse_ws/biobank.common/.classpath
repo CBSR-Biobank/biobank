@@ -16,7 +16,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/dom4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/gettext-commons.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-core.jar" />
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-core.jar" sourcepath="lib/client/hibernate-core-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-envers.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar"/>

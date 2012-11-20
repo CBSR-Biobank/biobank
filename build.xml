@@ -119,13 +119,23 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="resolve" description="--> retrieve dependencies with ivy">
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
-    <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]" conf="hibernatetool,biobank.webapp"  type="jar" />
+    <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
+		  conf="hibernatetool,biobank.webapp"  type="jar" />
+
     <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/client/[artifact].[ext]" conf="biobank.common.client" type="jar" />
+    <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/client/[artifact]-[type].[ext]" conf="biobank.common.client" type="source" />
+
     <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/server/[artifact].[ext]" conf="biobank.common.server" type="jar" />
+    <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/server/[artifact]-[type].[ext]" conf="biobank.common.server" type="source" />
+
     <ivy:retrieve pattern="eclipse_ws/[conf]/lib/[artifact].[ext]"
-		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" type="jar" />
-    <ivy:retrieve pattern="eclipse_ws/libsource/[artifact]-[type].[ext]" type="source"
-		  conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
+		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests"
+		  type="jar" />
+
+    <ivy:retrieve pattern="eclipse_ws/[conf]/lib/[artifact]-[type].[ext]"
+		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests"
+		  type="source" />
+
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
   </target>

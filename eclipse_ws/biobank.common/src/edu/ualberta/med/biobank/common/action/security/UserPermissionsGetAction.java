@@ -37,6 +37,10 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
 
     private final Integer centerId;
 
+    public UserPermissionsGetAction() {
+        this.centerId = null;
+    }
+
     public UserPermissionsGetAction(Center center) {
         this.centerId = center.getId();
     }
@@ -65,7 +69,7 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         p.userManagerPermission =
             new UserManagerPermission().isAllowed(context);
         p.labelPrintingPermission = new LabelPrintingPermission()
-            .isAllowed(context);
+        .isAllowed(context);
         p.patientCreatePermission =
             new PatientCreatePermission(null).isAllowed(context);
 
@@ -92,7 +96,7 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
             Center center = context.load(Center.class, centerId);
             p.processingEventCreatePermission =
                 new ProcessingEventCreatePermission(center)
-                    .isAllowed(context);
+            .isAllowed(context);
         }
 
         return p;
