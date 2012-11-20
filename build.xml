@@ -117,7 +117,7 @@ use command "ant -projecthelp" to display the targets.
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
 
-  <target name="resolve" description="--> retrieve dependencies with ivy">
+  <target name="resolve" depends="messages-jar" description="--> retrieve dependencies with ivy">
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
 		  conf="hibernatetool,biobank.webapp"  type="jar" />
@@ -344,7 +344,7 @@ use command "ant -projecthelp" to display the targets.
   </target>
 
   <target name="build-common-project"
-          depends="resolve,messages-jar,server-manifest">
+          depends="resolve,server-manifest">
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">
       <fileset dir="${eclipse.proj.dir.common}/src">

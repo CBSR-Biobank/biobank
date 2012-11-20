@@ -88,7 +88,7 @@
   </target>
 
   <target name="dbcreate-add-tables"
-          depends="check-db,messages-jar">
+          depends="check-db,resolve">
     <sql driver="${database.driver}"
          url="${database.url}"
          userid="${database.exec.username}"
