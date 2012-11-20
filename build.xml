@@ -117,7 +117,7 @@ use command "ant -projecthelp" to display the targets.
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
 
-  <target name="resolve" depends="messages-jar" description="--> retrieve dependencies with ivy">
+  <target name="resolve" description="--> retrieve dependencies with ivy">
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
 		  conf="hibernatetool,biobank.webapp"  type="jar" />
@@ -135,9 +135,6 @@ use command "ant -projecthelp" to display the targets.
     <ivy:retrieve pattern="eclipse_ws/[conf]/lib/[artifact]-[type].[ext]"
 		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests"
 		  type="source" />
-
-    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
-    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
@@ -147,6 +144,11 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="clean-cache" description="--> retrieve dependencies with ivy">
     <ivy:cleancache />
+  </target>
+
+  <target name="deploy-eclipse" depends="messages-jar" description="--> retrieve dependencies with ivy">
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
   </target>
 
   <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">
@@ -340,11 +342,12 @@ use command "ant -projecthelp" to display the targets.
   </target>
 
   <target name="deploy" description="deploys to JBoss and Eclipse project"
-	  depends="deploy-jboss">
+	  depends="deploy-eclipse,deploy-jboss">
   </target>
 
   <target name="build-common-project"
-          depends="resolve,server-manifest">
+          depends="resolve,messages-jar,server-manifest">
+    <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output" overwrite="false">
       <fileset dir="${eclipse.proj.dir.common}/src">
