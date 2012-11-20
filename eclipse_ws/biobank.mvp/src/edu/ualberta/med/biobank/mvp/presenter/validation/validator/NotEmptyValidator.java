@@ -7,6 +7,7 @@ import com.pietschy.gwt.pectin.client.form.validation.Validator;
 import com.pietschy.gwt.pectin.client.form.validation.message.ErrorMessage;
 
 public class NotEmptyValidator implements Validator<String> {
+    @SuppressWarnings("nls")
     private static final String MESSAGE = "{0} cannot be empty";
     private final String label;
 

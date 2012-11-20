@@ -73,6 +73,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
             new SpecimenBatchOpGetAction(batchId));
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
         form.setText(i18n.tr("Specimen Import"));
@@ -96,6 +97,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         setValues();
     }
 
+    @SuppressWarnings("nls")
     private void createFileInfo() {
         Composite client = createSectionWithClient(i18n.tr("File Input"));
         inputSection = (Section) client.getParent();
@@ -142,7 +144,6 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                     // download file
                     final Holder<FileData> data = new Holder<FileData>(null);
                     IRunnableWithProgress op = new IRunnableWithProgress() {
-                        @SuppressWarnings("nls")
                         @Override
                         public void run(IProgressMonitor monitor) {
                             monitor.beginTask(i18n.tr("Downloading file..."),
@@ -188,9 +189,9 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createSpecimenTable() {
-        Composite client =
-            createSectionWithClient(i18n.tr("Imported Specimens"));
+        Composite client = createSectionWithClient(i18n.tr("Imported Specimens"));
         Section section = (Section) client.getParent();
         section.setExpanded(true);
 
@@ -219,6 +220,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         specimenTable.reload();
     }
 
+    @SuppressWarnings("nls")
     public static String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
@@ -240,6 +242,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
     public static class SpecimenBatchOpViewFormInput
         extends FormInput {
 
+        @SuppressWarnings("nls")
         public SpecimenBatchOpViewFormInput(Integer batchOpId) {
             super(batchOpId, i18n.tr("Specimen Import"));
             this.batchOpId = batchOpId;

@@ -2,8 +2,9 @@ Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.7.1
 Created-By: 14.3-b01 (Sun Microsystems Inc.)
 Bundle-Name: Biobank Plug-in
-Bundle-ClassPath: .,lib/mailapi.jar,lib/smtp.jar,lib/jdom.jar,lib/glue
- gen.jar,lib/messages.jar
+Bundle-ClassPath: .,
+ lib/mailapi-1.4.3.jar,
+ lib/messages.jar
 Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2

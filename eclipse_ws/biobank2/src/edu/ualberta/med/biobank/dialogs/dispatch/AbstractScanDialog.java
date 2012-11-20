@@ -53,7 +53,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-BgcBaseDialog {
+    BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractScanDialog.class);
 
@@ -67,7 +67,7 @@ BgcBaseDialog {
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n
-    .tr("Processing position {0}");
+        .tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -223,7 +223,7 @@ BgcBaseDialog {
                         cells.put(rcp, palletCell);
                     }
                     palletCell
-                    .merge(SessionManager.getAppService(), servercell);
+                        .merge(SessionManager.getAppService(), servercell);
                     specificScanPosProcess(palletCell);
                 }
             }
@@ -298,9 +298,9 @@ BgcBaseDialog {
         });
 
         widgetCreator
-        .addBooleanBinding(
-            new WritableValue(Boolean.FALSE,
-                Boolean.class),
+            .addBooleanBinding(
+                new WritableValue(Boolean.FALSE,
+                    Boolean.class),
                 scanOkValue,
                 i18n.tr("Error in scan result. Please keep only specimens with no errors."),
                 IStatus.ERROR);

@@ -4,7 +4,7 @@
 
   <property name="bundle" value="i18n.Messages" />
   <property name="po.dir" value="po" />
-  <property name="po.output.dir" value="${po.dir}/output" />
+  <property name="po.output.dir" value="${lib.dir}" />
   <property name="gettexttasks.jar" value="${req.jars.dir}/gettext-ant-tasks-0.9.7.jar"/>
 
   <target name="init.dir">
@@ -52,15 +52,22 @@
                               potfile="${po.dir}/messages.pot"/>
   </target>
 
+  <target name="check-messages-jar-uptodate">
+    <uptodate property="messages.jar.uptodate"
+              targetfile="${po.output.dir}/messages.jar">
+      <srcfiles file="${po.dir}/messages.pot" />
+      <srcfiles file="${po.dir}/*.po" />
+    </uptodate>
+  </target>
+
   <target name="messages-jar"
           description="Generates Java ResourceBundles and jars them up"
-          depends="init.dir,init.gettext,messages-bundle">
+          depends="check-messages-jar-uptodate,init.dir,init.gettext,messages-bundle"
+	  unless="messages.jar.uptodate">
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"
                   outputDirectory="${po.output.dir}"
                   percentage="5"/>
-      <jar destfile="jars/messages.jar"
-           basedir="${po.output.dir}"
-           includes="i18n/**"/>
+      <jar destfile="${po.output.dir}/messages.jar" basedir="${po.output.dir}" includes="i18n/**"/>
   </target>
 </project>

@@ -102,9 +102,9 @@ public class PalletScanManagement {
                     scanAndProcessError(e.getLocalizedMessage());                    
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan result error"),
-                        e);
+                            // dialog title
+                            i18n.tr("Scan result error"),
+                            e);
                     String msg = e.getMessage();
                     if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
@@ -136,9 +136,9 @@ public class PalletScanManagement {
             if (plateNum == -1) {
                 plateError();
                 BgcPlugin.openAsyncError(
-                    // dialog title
-                    i18n.tr("Scan error"),
-                    // dialog message
+                        // dialog title
+                        i18n.tr("Scan error"),
+                        // dialog message
                     i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
                 return;
             }
@@ -148,12 +148,12 @@ public class PalletScanManagement {
                 wells = PalletWell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin
-                .openAsyncError(
-                    // dialog title
-                    i18n.tr("Scan error"),
-                    ex,
-                    // dialog message
-                    i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
+                    .openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan error"),
+                        ex,
+                        // dialog message
+                        i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
                 return;
             } finally {
                 scansCount++;
@@ -181,11 +181,11 @@ public class PalletScanManagement {
                             newScannedCell.getValue())) {
                         // Different values at same position
                         oldScannedCell
-                        .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
-                            .getInformation()
-                            : StringUtil.EMPTY_STRING)
-                            + " "
-                            + i18n.tr("Rescanned value is different"));
+                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                                .getInformation()
+                                : StringUtil.EMPTY_STRING)
+                                + " "
+                                + i18n.tr("Rescanned value is different"));
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 

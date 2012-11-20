@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.test.action.ActionSuite;
 import edu.ualberta.med.biobank.test.model.ModelSuite;
 
+@SuppressWarnings("nls")
 @RunWith(Suite.class)
 @SuiteClasses({ ActionSuite.class, ModelSuite.class })
 public class AllTestsSuite {

@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.model.Study;
 public class SpecimenReadPermission implements Permission {
     private static final long serialVersionUID = 1L;
     
+    @SuppressWarnings("nls")
     private static final String HQL_QRY = 
         "FROM "+ Specimen.class.getName() + " spec " 
             + "INNER JOIN FETCH spec.currentCenter " 

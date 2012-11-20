@@ -7,10 +7,7 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="lib/mailapi.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/smtp.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jdom.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gluegen.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/messages.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mailapi-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/messages.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

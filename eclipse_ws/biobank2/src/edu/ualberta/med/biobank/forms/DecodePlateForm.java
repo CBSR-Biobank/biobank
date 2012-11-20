@@ -31,7 +31,7 @@ public class DecodePlateForm extends PlateForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-    "edu.ualberta.med.biobank.forms.DecodePlateForm";
+        "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
     private ScanPalletWidget spw;
 
@@ -48,7 +48,7 @@ public class DecodePlateForm extends PlateForm {
     @Override
     public void dispose() {
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-        .removePropertyChangeListener(propertyListener);
+            .removePropertyChangeListener(propertyListener);
     }
 
     @SuppressWarnings("nls")
@@ -69,7 +69,7 @@ public class DecodePlateForm extends PlateForm {
         scanButton = toolkit.createButton(page,
             i18n.tr("Scan and Decode Plate"), SWT.PUSH);
         scanButton
-        .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
+            .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -83,7 +83,7 @@ public class DecodePlateForm extends PlateForm {
         toolkit.adapt(spw);
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-        .addPropertyChangeListener(propertyListener);
+            .addPropertyChangeListener(propertyListener);
     }
 
     @Override

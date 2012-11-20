@@ -64,7 +64,8 @@ public class SiteEntryPresenter extends AbstractEntryFormPresenter<View> {
         view.setAddressEditView(addressEntryPresenter.getView());
         view.setActivityStatusComboView(activityStatusComboPresenter.getView());
     }
-
+    
+    @SuppressWarnings("nls")
     @Override
     public void onBind() {
         super.onBind();

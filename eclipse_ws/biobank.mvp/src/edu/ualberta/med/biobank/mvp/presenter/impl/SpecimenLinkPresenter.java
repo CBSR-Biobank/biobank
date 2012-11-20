@@ -45,9 +45,9 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
     private boolean patientExists = false;
     private List<ProcessingEvent> processingEvents = Collections.emptyList();
     @SuppressWarnings("unused")
-    private List<CollectionEvent> collectionEvents = Collections.emptyList();
+    private final List<CollectionEvent> collectionEvents = Collections.emptyList();
     @SuppressWarnings("unused")
-    private List<SourceSpecimen> sourceSpecimens = Collections.emptyList();
+    private final List<SourceSpecimen> sourceSpecimens = Collections.emptyList();
 
     public interface View extends IEntryFormView {
         ValueField<String> getPatientNumber();
@@ -81,6 +81,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         this.appContext = appContext;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void onBind() {
         view.getPatientNumber().addValueChangeHandler(pNumberMonitor);
@@ -202,6 +203,7 @@ public class SpecimenLinkPresenter extends AbstractEntryFormPresenter<View> {
         }
     }
 
+    @SuppressWarnings("nls")
     private class PNumberValidator implements Validator<String> {
         @Override
         public void validate(String value, ValidationResultCollector results) {

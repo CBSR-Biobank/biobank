@@ -56,7 +56,6 @@ public class SimpleSpecimenTable
     @Override
     protected BgcLabelProvider getLabelProvider() {
         return new BgcLabelProvider() {
-            @SuppressWarnings("nls")
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 Specimen specimen = (Specimen) element;

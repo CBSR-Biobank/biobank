@@ -19,6 +19,7 @@ public class SbsLabeling {
         return fromRowCol(rcp.getRow(), rcp.getCol());
     }
 
+    @SuppressWarnings("nls")
     public static String fromRowCol(int row, int col) {
         if (row > SBS_ROW_LABELLING_PATTERN.length()) {
             throw new IllegalArgumentException(
@@ -35,6 +36,7 @@ public class SbsLabeling {
      * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
      * string position. Could be A2 or F12.
      */
+    @SuppressWarnings("nls")
     public static RowColPos toRowCol(String pos) {
         if ((pos.length() < 2) || (pos.length() > 3)) {
             throw new IllegalArgumentException(

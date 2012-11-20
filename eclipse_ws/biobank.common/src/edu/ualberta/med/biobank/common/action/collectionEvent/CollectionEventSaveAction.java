@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -228,8 +229,8 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 specimen.setCreatedAt(specInfo.createdAt);
                 specimen.setInventoryId(specInfo.inventoryId);
                 specimen.setQuantity(specInfo.quantity);
-                specimen.setPlateErrors("");
-                specimen.setSampleErrors("");
+                specimen.setPlateErrors(StringUtil.EMPTY_STRING);
+                specimen.setSampleErrors(StringUtil.EMPTY_STRING);
                 specimen.setSpecimenType(context.load(SpecimenType.class,
                     specInfo.specimenTypeId));
 

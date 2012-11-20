@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@SuppressWarnings("nls")
 public abstract class AbstractReportTest {
     public static enum CompareResult {
         ORDER,
@@ -127,7 +128,7 @@ public abstract class AbstractReportTest {
         wanted.setTime(date);
 
         return new Predicate<SpecimenWrapper>() {
-            private Calendar drawn = Calendar.getInstance();
+            private final Calendar drawn = Calendar.getInstance();
 
             @Override
             public boolean evaluate(SpecimenWrapper aliquot) {
