@@ -90,15 +90,17 @@ use command "ant -projecthelp" to display the targets.
     </fileset>
   </path>
 
-  <target name="eclipse-biobank-common" depends="resolve">
+  <path id="eclipse-compiler">
+    <pathelement  location="${lib.dir}/build/ecj.jar"/>
+  </path>
+
+  <target name="eclipse-biobank-common" depends="deploy-eclipse">
     <javac
 	compiler="org.eclipse.jdt.core.JDTCompilerAdapter"
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.common}/src"
 	destdir="${eclipse.proj.dir.common}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <!-- compilerarg value="-Xlint:all"/ -->
       <!-- compilerarg value="-Xlint:unchecked"/ -->
@@ -114,9 +116,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.gui.common}/src"
 	destdir="${eclipse.proj.dir.gui.common}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="eclipse-jars" />
       <classpath refid="biobank-common-client-jars" />
@@ -132,9 +132,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.mvp}/src"
 	destdir="${eclipse.proj.dir.mvp}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="eclipse-jars" />
       <classpath refid="biobank-common-client-jars" />
@@ -151,13 +149,12 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.workspace.dir}/scannerConfig/src"
 	destdir="${eclipse.workspace.dir}/scannerConfig/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="eclipse-jars" />
       <classpath refid="biobank-common-client-jars" />
       <classpath>
+	<pathelement path="${eclipse.proj.dir.common}/bin" />
 	<fileset dir="${eclipse.workspace.dir}/scannerConfig/lib">
 	  <include name="*.jar" />
 	</fileset>
@@ -172,9 +169,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir}/src"
 	destdir="${eclipse.proj.dir}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="biobank-common-client-jars" />
       <classpath refid="biobank-common-server-jars" />
@@ -202,9 +197,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.workspace.dir}/labelPrinter/src"
 	destdir="${eclipse.workspace.dir}/labelPrinter/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="eclipse-jars" />
       <classpath refid="biobank-common-client-jars" />
@@ -226,9 +219,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.tools}/src"
 	destdir="${eclipse.proj.dir.tools}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="biobank-common-client-jars" />
       <classpath refid="biobank-common-server-jars" />
@@ -247,9 +238,7 @@ use command "ant -projecthelp" to display the targets.
 	includeantruntime="false"
 	srcdir="${eclipse.proj.dir.tests}/src"
 	destdir="${eclipse.proj.dir.tests}/bin">
-      <compilerclasspath>
-	<pathelement location="jars/ecj-3.7.2.jar"/>
-      </compilerclasspath>
+      <compilerclasspath refid="eclipse-compiler" />
       <compilerarg line="${build.compiler.arg}"/>
       <classpath refid="biobank-common-client-jars" />
       <classpath refid="biobank-common-server-jars" />
@@ -291,6 +280,7 @@ use command "ant -projecthelp" to display the targets.
       <fileset dir="${eclipse.workspace.dir}/labelPrinter/bin" includes="**/*"/>
       <fileset dir="${eclipse.proj.dir.tools}/bin" includes="**/*"/>
       <fileset dir="${eclipse.proj.dir.tests}/bin" includes="**/*"/>
+      <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
     </delete>
     <delete dir="${temp.dir}" />
   </target>

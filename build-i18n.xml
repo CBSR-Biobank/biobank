@@ -62,7 +62,7 @@
 
   <target name="messages-jar"
           description="Generates Java ResourceBundles and jars them up"
-          depends="check-messages-jar-uptodate,init.dir,init.gettext,messages-bundle"
+          depends="check-messages-jar-uptodate,messages-bundle"
 	  unless="messages.jar.uptodate">
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"

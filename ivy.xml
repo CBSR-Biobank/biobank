@@ -28,6 +28,7 @@
     <dependency org="gettext" name="gettext-ant-tasks" rev="0.9.7" conf="biobank.build->default" />
     <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4" conf="biobank.build->default" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.build->default" />
+    <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="3.7.2" conf="biobank.build->default" />
 
     <!-- for hibernatetool -->
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="hibernatetool->default" />

@@ -156,11 +156,12 @@ use command "ant -projecthelp" to display the targets.
 		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
-  <target name="clean-cache" description="--> retrieve dependencies with ivy">
+  <target name="clean-cache" description="--> cleans the ivy cache">
     <ivy:cleancache />
   </target>
 
-  <target name="deploy-eclipse" depends="resolve,messages-jar" description="--> retrieve dependencies with ivy">
+  <target name="deploy-eclipse" depends="resolve,messages-jar"
+	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
 
