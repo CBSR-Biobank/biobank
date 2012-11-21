@@ -58,10 +58,10 @@
       <exclude name="**/test/action/tmp/**" />
       <exclude name="**/presenters/**" />
       <exclude name="**/TestingDispatcher.java" />
-     <classpath>
+      <classpath>
         <pathelement location="${eclipse.proj.dir.common}/output" />
-        <pathelement location="${eclipse.proj.dir.common}/lib/client" />
-        <pathelement location="${req.jars.dir}" />
+        <!-- pathelement location="${eclipse.proj.dir.common}/lib/client" / -->
+        <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
       </classpath>
       <classpath refid="biobank.common.build.classpath" />
     </javac>
@@ -92,6 +92,12 @@
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
+      <classpath>
+        <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
+        <pathelement location="${eclipse.proj.dir.tests}/lib/clm.jar" />
+        <pathelement location="${eclipse.proj.dir.tests}/lib/naming-common.jar" />
+        <pathelement location="${eclipse.proj.dir.tests}/conf" />
+      </classpath>
       <sysproperty key="db.properties" value="db.properties" />
       <sysproperty key="server" value="http://localhost:8080" />
       <formatter usefile="yes" type="xml" />

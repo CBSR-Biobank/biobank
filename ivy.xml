@@ -99,13 +99,12 @@
 
 
     <!-- for biobank.common.client -->
-    <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default,sources">
-      <exclude module="hibernate-commons-annotations" />
-    </dependency>
+    <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
     <dependency org="org.hibernate" name="hibernate-envers" rev="3.6.9.Final" conf="biobank.common.client->default,sources">
       <exclude module="hibernate-commons-annotations" />
       <exclude module="hibernate-entity-manager" />
     </dependency>
+    <dependency org="org.hibernate" name="hibernate-ehcache" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
     <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final" conf="biobank.common.client->default,sources" />
     <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="biobank.common.client->default,sources" />
     <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="biobank.common.client->default,sources" />
@@ -115,9 +114,11 @@
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.common.client->default,sources" />
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.1" conf="biobank.common.client->default,sources" />
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.common.client->default,sources" />
+    <dependency org="org.jdom" name="jdom" rev="1.1" conf="biobank.common.client->default,sources" />
 
     <dependency org="jsse" name="jsse" rev="1.6.0" conf="biobank.common.client->default" />
 
+    <dependency org="cacore" name="cog-jglobus" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="spring" rev="2.0.3" conf="biobank.common.client->default" />
     <dependency org="cacore" name="acegi-security" rev="1.0.4" conf="biobank.common.client->default" />
     <dependency org="cacore" name="antlr" rev="2.7.6" conf="biobank.common.client->default" />
@@ -131,17 +132,15 @@
     <dependency org="cacore" name="commons-collections" rev="3.2" conf="biobank.common.client->default" />
     <dependency org="cacore" name="commons-discovery" rev="0.2" conf="biobank.common.client->default" />
     <dependency org="cacore" name="commons-logging" rev="1.1" conf="biobank.common.client->default" />
-    <dependency org="cacore" name="dom4j" rev="1.4" conf="biobank.common.client->default" />
     <dependency org="cacore" name="jaxrpc" rev="1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="log4j" rev="1.2.14" conf="biobank.common.client->default" />
     <dependency org="cacore" name="ognl" rev="2.6.7" conf="biobank.common.client->default" />
-    <dependency org="cacore" name="saaj" rev="1.2" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-client-framework" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-grid-remoting" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-security" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="sdk-writable-client-framework" rev="4.1.1" conf="biobank.common.client->default" />
-    <dependency org="cacore" name="wsdl4j" rev="1.5.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="xercesImpl" rev="2.7.1" conf="biobank.common.client->default" />
+    <dependency org="cacore" name="ehcache" rev="1.2.2" conf="biobank.common.client->default,sources" />
 
     <!-- for biobank.common.server -->
     <dependency org="cacore" name="sdk-core" rev="4.1.1" conf="biobank.common.server->default" />
@@ -149,7 +148,6 @@
     <dependency org="supercsv" name="spiffy-all" rev="0.05" conf="biobank.common.server->default" />
     <dependency org="cacore" name="csmapi" rev="4.1" conf="biobank.common.server->default" />
     <dependency org="cacore" name="sdk-writable-core" rev="4.1.1" conf="biobank.common.server->default" />
-    <dependency org="javax.transaction" name="jta" rev="1.1" conf="biobank.common.server->default,sources" />
 
 
     <!-- for biobank.gui.common -->
@@ -194,8 +192,11 @@
     <!-- for biobank2.tools -->
     <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />
 
-    <!-- for biobank2.tools -->
+    <!-- for biobank2.tests -->
     <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tests->default,sources" />
+    <dependency org="tomcat" name="naming-common" rev="4.1.31" conf="biobank2.tests->default,sources" />
+    <dependency org="junit" name="junit" rev="4.10" conf="biobank2.tests->default,sources" />
+    <dependency org="cacore" name="clm" rev="4.1" conf="biobank2.tests->default,sources" />
 
   </dependencies>
 </ivy-module>

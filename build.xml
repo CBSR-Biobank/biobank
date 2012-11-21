@@ -104,6 +104,10 @@ use command "ant -projecthelp" to display the targets.
     <include name="xpp3.jar" />
     <include name="xstream.jar" />
     <include name="jsse.jar" />
+    <include name="hibernate-commons-annotations.jar"/>
+    <include name="hibernate-ehcache.jar"/>
+    <include name="ehcache.jar"/>
+    <include name="jdom.jar"/>
   </fileset>
 
   <path id="biobank.common.build.classpath">
@@ -113,11 +117,20 @@ use command "ant -projecthelp" to display the targets.
 
   <!-- for tests -->
   <path id="biobank.common.run.classpath">
-    <filelist refid="biobank.common.build.classpath" />
+    <fileset refid="biobank.common.server.build.classpath" />
+    <fileset refid="biobank.common.client.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
 
-  <target name="resolve" description="--> retrieve dependencies with ivy">
+  <target name="check-dependencies-uptodate">
+    <uptodate property="dependencies.uptodate">
+      <srcfiles dir="." includes="ivy.xml"/>
+      <mapper type="merge" to="${lib.dir}/.dependencies.resolved"/>
+    </uptodate>
+  </target>
+
+  <target name="resolve" depends="check-dependencies-uptodate" unless="dependencies.uptodate"
+	  description="--> retrieve dependencies with ivy">
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
 		  conf="hibernatetool,biobank.webapp"  type="jar" />
@@ -135,6 +148,7 @@ use command "ant -projecthelp" to display the targets.
     <ivy:retrieve pattern="eclipse_ws/[conf]/lib/[artifact]-[type].[ext]"
 		  conf="biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests"
 		  type="source" />
+    <touch file="${lib.dir}/.dependencies.resolved" />
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
@@ -146,9 +160,12 @@ use command "ant -projecthelp" to display the targets.
     <ivy:cleancache />
   </target>
 
-  <target name="deploy-eclipse" depends="messages-jar" description="--> retrieve dependencies with ivy">
+  <target name="deploy-eclipse" depends="resolve,messages-jar" description="--> retrieve dependencies with ivy">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>
+
+    <!-- File needed in the test project to call csm api methods -->
+    <copy file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" todir="${eclipse.proj.dir.tests}/src" overwrite="false" />
   </target>
 
   <target name="get-db-executor" unless="databse.exec.haveUserAndPassword">

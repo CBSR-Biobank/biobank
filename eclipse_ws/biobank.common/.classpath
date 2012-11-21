@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="conf"/>
+	<classpathentry exported="true" kind="con" path="com.soyatec.uml.CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/asm.jar"/>
@@ -15,18 +16,23 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/dom4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/ehcache.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/gettext-commons.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-commons-annotations.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-core.jar" sourcepath="lib/client/hibernate-core-source.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-ehcache.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-envers.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/jdom.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/jsse.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/messages.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/mysql-connector-java.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/ognl.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-grid-remoting.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-security.jar"/>
@@ -35,18 +41,14 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/validation-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/xercesImpl.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="con" path="com.soyatec.uml.CONTAINER"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/csmapi.jar" sourcepath="/home/loyola/Dropbox/CBSR/caCORE/CSM_API_4_1_Source.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/supercsv.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/server/csmapi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/spiffy-all.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/mysql-connector-java.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/jsse.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/server/supercsv.jar"/>
+	<classpathentry kind="src" path="conf"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/cog-jglobus.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
