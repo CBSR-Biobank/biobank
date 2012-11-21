@@ -156,6 +156,13 @@ use command "ant -projecthelp" to display the targets.
 		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
+  <target name="clean-ivy"
+	  description="--> cleans ivy temporary files">
+    <delete>
+      <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
+    </delete>
+  </target>
+
   <target name="clean-cache" description="--> cleans the ivy cache">
     <ivy:cleancache />
   </target>
@@ -410,6 +417,17 @@ use command "ant -projecthelp" to display the targets.
 	<exclude name="**/web.xml" />
       </webinf>
     </war>
+  </target>
+
+  <target name="clean-jars" depends="clean-ivy" description="deletes jars from eclipse projects">
+    <delete>
+      <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
+      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
+    </delete>
   </target>
 
   <target name="clean"

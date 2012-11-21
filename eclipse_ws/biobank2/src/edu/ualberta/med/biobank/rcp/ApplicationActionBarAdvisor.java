@@ -46,28 +46,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @SuppressWarnings("nls")
     private static final String SHORTCUTS_COMMAND_ID =
-        "org.eclipse.ui.window.showKeyAssist";
+    "org.eclipse.ui.window.showKeyAssist";
 
     private static BgcLogger logger = BgcLogger
         .getLogger(ApplicationActionBarAdvisor.class.getName());
 
     @SuppressWarnings("nls")
     public static final String VIEW_ID_PARM =
-        "org.eclipse.ui.views.showView.viewId";
+    "org.eclipse.ui.views.showView.viewId";
 
     @SuppressWarnings("nls")
     public static final String ERROR_LOGS_VIEW =
-        "org.eclipse.pde.runtime.LogView";
+    "org.eclipse.pde.runtime.LogView";
 
     List<Action> helpMenuCustomActions = new ArrayList<Action>();
 
     @SuppressWarnings("nls")
-    public static final String SEND_ERROR_EMAIL_ID =
-        "edu.ualberta.med.biobank.commands.sendErrorMail";
-
-    @SuppressWarnings("nls")
     public static final String EXPORT_ERRORS_LOGS_ID =
-        "edu.ualberta.med.biobank.commands.exportErrorsLogs";
+    "edu.ualberta.med.biobank.commands.exportErrorsLogs";
 
     private IWorkbenchAction resetPerspectiveAction;
 
@@ -85,11 +81,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             // tooltip.
             i18n.tr("Show shorcuts for the current view"));
 
-        createCustomAction(window,
-            i18n.tr("Send Error Mail"),
-            SEND_ERROR_EMAIL_ID, "sendErrorMail",
-            // tooltip.
-            i18n.tr("Report a problem to developpers"));
         createCustomAction(window,
             i18n.tr("Export Errors Logs"),
             EXPORT_ERRORS_LOGS_ID,
@@ -115,10 +106,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                     handlerService.executeCommand(commandId, null);
                 } catch (Exception e) {
                     BgcPlugin
-                        .openAsyncError(
-                            // dialog message.
-                            i18n.tr("Problem with command"),
-                            e);
+                    .openAsyncError(
+                        // dialog message.
+                        i18n.tr("Problem with command"),
+                        e);
                 }
             }
         };
@@ -157,10 +148,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                     handlerService.executeCommand(cmd, null);
                 } catch (Exception e) {
                     BgcPlugin
-                        .openAsyncError(
-                            // dialog title.
-                            i18n.tr("Problem with command"),
-                            e);
+                    .openAsyncError(
+                        // dialog title.
+                        i18n.tr("Problem with command"),
+                        e);
                 }
             }
         };

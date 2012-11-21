@@ -49,6 +49,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/supercsv.jar"/>
 	<classpathentry kind="src" path="conf"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/cog-jglobus.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

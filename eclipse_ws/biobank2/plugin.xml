@@ -180,11 +180,6 @@
             name="CBSR Help">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
-            id="edu.ualberta.med.biobank.commands.sendErrorMail"
-            name="%ErrorEmail.command">
-      </command>
-      <command
             categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.deleteSelection"
             name="%DeleteItem.command">
@@ -1984,11 +1979,6 @@
             class="edu.ualberta.med.biobank.preferences.LinkAssignPreferencePage"
             id="edu.ualberta.med.biobank.preferences.linkAssign"
             name="%LinkAssign.preference">
-      </page>
-      <page
-            class="edu.ualberta.med.biobank.preferences.IssueTrackerPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.gereral"
-            name="%IssueTracker.preference">
       </page>
       <page
             class="edu.ualberta.med.biobank.preferences.ServerPreferencePage"

@@ -259,17 +259,6 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="eclipse-projects" depends="eclipse-label-printer,eclipse-biobank-tools,eclipse-biobank-tests" />
 
-  <target name="clean-jars" description="deletes jars from eclipse projects">
-    <delete>
-      <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.mvp}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.gui.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tests}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.tools}/lib" includes="**/*.jar" />
-    </delete>
-  </target>
-
   <target name="clean-eclipse-projects" depends="clean-jars">
     <delete failonerror="false">
       <fileset dir="${eclipse.proj.dir.common}/bin" includes="**/*"/>
@@ -280,7 +269,6 @@ use command "ant -projecthelp" to display the targets.
       <fileset dir="${eclipse.workspace.dir}/labelPrinter/bin" includes="**/*"/>
       <fileset dir="${eclipse.proj.dir.tools}/bin" includes="**/*"/>
       <fileset dir="${eclipse.proj.dir.tests}/bin" includes="**/*"/>
-      <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
     </delete>
     <delete dir="${temp.dir}" />
   </target>

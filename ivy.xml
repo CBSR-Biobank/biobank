@@ -103,9 +103,11 @@
     <dependency org="org.hibernate" name="hibernate-core" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
     <dependency org="org.hibernate" name="hibernate-envers" rev="3.6.9.Final" conf="biobank.common.client->default,sources">
       <exclude module="hibernate-commons-annotations" />
-      <exclude module="hibernate-entity-manager" />
+      <exclude module="hibernate-entitymanager" />
     </dependency>
-    <dependency org="org.hibernate" name="hibernate-ehcache" rev="3.6.9.Final" conf="biobank.common.client->default,sources" />
+    <dependency org="org.hibernate" name="hibernate-ehcache" rev="3.6.9.Final" conf="biobank.common.client->default,sources">
+      <exclude module="ehcache-core" />
+    </dependency>
     <dependency org="org.hibernate" name="hibernate-validator" rev="4.2.0.Final" conf="biobank.common.client->default,sources" />
     <dependency org="org.hibernate.javax.persistence" name="hibernate-jpa-2.0-api" rev="1.0.1.Final" conf="biobank.common.client->default,sources" />
     <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="biobank.common.client->default,sources" />
@@ -119,7 +121,6 @@
 
     <dependency org="jsse" name="jsse" rev="1.6.0" conf="biobank.common.client->default" />
 
-    <dependency org="cacore" name="cog-jglobus" rev="4.1.1" conf="biobank.common.client->default" />
     <dependency org="cacore" name="spring" rev="2.0.3" conf="biobank.common.client->default" />
     <dependency org="cacore" name="acegi-security" rev="1.0.4" conf="biobank.common.client->default" />
     <dependency org="cacore" name="antlr" rev="2.7.6" conf="biobank.common.client->default" />
@@ -185,10 +186,8 @@
     </dependency>
     <dependency org="javax.inject" name="javax.inject" rev="1" conf="biobank.mvp->default,sources" />
 
-    <!-- for biobank2 -->
-    <dependency org="javax.mail" name="mailapi" rev="1.4.3" conf="biobank2->default,sources">
-      <exclude module="activation" />
-    </dependency>
+    <!-- nothing for biobank2 -->
+
 
     <!-- for biobank2.tools -->
     <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />
