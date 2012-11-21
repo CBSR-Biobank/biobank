@@ -167,7 +167,16 @@ use command "ant -projecthelp" to display the targets.
     <ivy:cleancache />
   </target>
 
-  <target name="deploy-eclipse" depends="resolve,messages-jar"
+  <target name="check-messages-jar-exists">
+    <available file="${lib.dir}/messages.jar" property="messages-jar-exists" />
+  </target>
+
+  <target name="create-messages-jar" depends="check-messages-jar-exists"
+	  unless="messages-jar-exists">
+    <antcall target="messages-jar"/>
+  </target>
+
+  <target name="deploy-eclipse" depends="resolve,create-messages-jar"
 	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib" overwrite="true"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client" overwrite="true"/>

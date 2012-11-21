@@ -52,18 +52,9 @@
                               potfile="${po.dir}/messages.pot"/>
   </target>
 
-  <target name="check-messages-jar-uptodate">
-    <uptodate property="messages.jar.uptodate"
-              targetfile="${po.output.dir}/messages.jar">
-      <srcfiles file="${po.dir}/messages.pot" />
-      <srcfiles file="${po.dir}/*.po" />
-    </uptodate>
-  </target>
-
   <target name="messages-jar"
           description="Generates Java ResourceBundles and jars them up"
-          depends="check-messages-jar-uptodate,messages-bundle"
-	  unless="messages.jar.uptodate">
+          depends="messages-bundle">
     <gettext-dist targetBundle="${bundle}"
                   poDirectory="${po.dir}"
                   outputDirectory="${po.output.dir}"
