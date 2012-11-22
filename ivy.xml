@@ -4,6 +4,8 @@
   <configurations defaultconfmapping="default->master,sources">
     <conf name="biobank.build"
 	  description="required by build environment" />
+    <conf name="flyway" visibility="private"
+	  description="for the flyway ant task definition in build-db.xml" />
     <conf name="hibernatetool" visibility="private"
 	  description="for the hibernatetool ant task definition in build-db.xml" />
     <conf name="biobank.common.client"
@@ -29,6 +31,9 @@
     <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4" conf="biobank.build->default" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.build->default" />
     <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="3.7.2" conf="biobank.build->default" />
+
+    <!-- for flyway -->
+    <dependency org="com.googlecode.flyway" name="flyway-ant" rev="2.0.1" conf="flyway->default" />
 
     <!-- for hibernatetool -->
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="hibernatetool->default" />
