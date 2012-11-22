@@ -185,7 +185,9 @@ use command "ant -projecthelp" to display the targets.
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
 		  conf="hibernatetool,biobank.webapp"  type="jar" />
+
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]" conf="flyway"  type="jar" />
+    <ivy:retrieve pattern="lib/[conf]//[artifact]-[type].[ext]" conf="flyway" type="source" />
 
     <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/client/[artifact].[ext]" conf="biobank.common.client" type="jar" />
     <ivy:retrieve pattern="eclipse_ws/biobank.common/lib/client/[artifact]-[type].[ext]" conf="biobank.common.client" type="source" />
@@ -352,6 +354,9 @@ use command "ant -projecthelp" to display the targets.
         <filter token="database.password" value="${database.password}"/>
       </filterset>
     </copy>
+    <move file="${secu-log.dir}/jboss/application-config.xml"
+          tofile="webapp/WEB-INF/classes/application-config.xml"
+	  overwrite="true" />
     <move file="${secu-log.dir}/jboss/biobank.csm.new.hibernate.cfg.xml"
           tofile="webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml"
 	  overwrite="true" />
@@ -454,6 +459,12 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="package-webapp" depends="build-common-project">
     <mkdir dir="${output.dir}" />
+    <delete dir="webapp/db"/>
+    <copy includeemptydirs="false" todir="webapp">
+      <fileset dir=".">
+        <include name="db/migration/*" />
+      </fileset>
+    </copy>
     <war destfile="${war.file}"
          webxml="webapp/WEB-INF/web.xml">
       <manifest>
@@ -464,6 +475,9 @@ use command "ant -projecthelp" to display the targets.
       </lib>
       <lib dir="${req.jars.dir}/biobank.webapp">
         <include name="*.jar" />
+      </lib>
+      <lib dir="${req.jars.dir}/flyway">
+        <include name="flyway-core.jar" />
       </lib>
       <fileset dir="webapp">
         <exclude name="**/WEB-INF/**" />

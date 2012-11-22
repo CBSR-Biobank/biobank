@@ -4,7 +4,7 @@
   <configurations defaultconfmapping="default->master,sources">
     <conf name="biobank.build"
 	  description="required by build environment" />
-    <conf name="flyway" visibility="private"
+    <conf name="flyway"
 	  description="for the flyway ant task definition in build-db.xml" />
     <conf name="hibernatetool" visibility="private"
 	  description="for the hibernatetool ant task definition in build-db.xml" />
@@ -33,7 +33,8 @@
     <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="3.7.2" conf="biobank.build->default" />
 
     <!-- for flyway -->
-    <dependency org="com.googlecode.flyway" name="flyway-ant" rev="2.0.1" conf="flyway->default" />
+    <dependency org="com.googlecode.flyway" name="flyway-ant" rev="2.0.1" conf="flyway->default,sources" />
+    <dependency org="com.googlecode.flyway" name="flyway-commandline" rev="2.0.1" conf="flyway->default,sources" />
 
     <!-- for hibernatetool -->
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="hibernatetool->default" />
@@ -155,7 +156,7 @@
     <dependency org="supercsv" name="spiffy-all" rev="0.05" conf="biobank.common.server->default" />
     <dependency org="cacore" name="csmapi" rev="4.1" conf="biobank.common.server->default" />
     <dependency org="cacore" name="sdk-writable-core" rev="4.1.1" conf="biobank.common.server->default" />
-
+    <dependency org="com.googlecode.flyway" name="flyway-core" rev="2.0.1" conf="biobank.common.server->default,sources" />
 
     <!-- for biobank.gui.common -->
     <dependency org="ar.com.fdvs" name="DynamicJasper" rev="3.0.13" conf="biobank.gui.common->default,sources" >

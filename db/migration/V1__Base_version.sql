@@ -1975,7 +1975,7 @@ CREATE TABLE `property_modifier` (
 
 LOCK TABLES `property_modifier` WRITE;
 /*!40000 ALTER TABLE `property_modifier` DISABLE KEYS */;
--- INSERT INTO `property_modifier` VALUES (1,'Year','YEAR({value})',3,0),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3,0),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3,0),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3,0);
+INSERT INTO `property_modifier` VALUES (1,'Year','YEAR({value})',3,0),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT("-", QUARTER({value})))',3,0),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT("-", MONTH({value})))',3,0),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT("-", WEEK({value})))',3,0);
 /*!40000 ALTER TABLE `property_modifier` ENABLE KEYS */;
 UNLOCK TABLES;
 
