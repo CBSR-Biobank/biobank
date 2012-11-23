@@ -22,16 +22,16 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     @SuppressWarnings("nls")
     public static final Tr MULTIPLE_PATIENTS_FOUND =
-        bundle.tr("More than one patient found with pnumber \"{0}\".");
+    bundle.tr("More than one patient found with pnumber \"{0}\".");
 
     @SuppressWarnings("nls")
     private static final String PATIENT_INFO_QRY =
-        " SELECT p.id,COUNT(cevents)"
-            + " FROM " + Patient.class.getName() + " p"
-            + " LEFT JOIN p.study study"
-            + " LEFT JOIN p.collectionEvents cevents"
-            + " WHERE p.id=?"
-            + " GROUP BY p.id";
+    " SELECT p.id,COUNT(cevents)"
+        + " FROM " + Patient.class.getName() + " p"
+        + " LEFT JOIN p.study study"
+        + " LEFT JOIN p.collectionEvents cevents"
+        + " WHERE p.id=?"
+        + " GROUP BY p.id";
 
     private String pnumber;
     private Integer patientId;
@@ -61,7 +61,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
         throws ActionException {
         @SuppressWarnings("nls")
         Criteria criteria = context.getSession()
-            .createCriteria(Patient.class, "p");
+        .createCriteria(Patient.class, "p");
 
         if (pnumber != null) {
             criteria.add(Restrictions.eq("pnumber", pnumber)); //$NON-NLS-1$
@@ -72,7 +72,7 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
         Patient patient = (Patient) criteria.uniqueResult();
 
         if (patient == null) {
-            throw new NullPointerException("patient not found in query result"); //$NON-NLS-1$
+            return null;
         }
 
         Query query = context.getSession().createQuery(PATIENT_INFO_QRY);
