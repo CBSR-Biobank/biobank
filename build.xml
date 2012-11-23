@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-
-Overall build file
-use command "ant -projecthelp" to display the targets.
-
--->
 <project name="biobank" basedir="." default="deploy"
-	 xmlns:flyway="antlib:com.googlecode.flyway.ant"
-	 xmlns:ivy="antlib:org.apache.ivy.ant">
+	 xmlns:ivy="antlib:org.apache.ivy.ant"
+	 xmlns:flyway="antlib:com.googlecode.flyway.ant">
+  <!--
+
+      Overall build file
+      use command "ant -projecthelp" to display the targets.
+
+  -->
 
   <property environment="env" />
   <property name="doxygen" location="/usr/bin/doxygen" />
@@ -192,6 +192,7 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="resolve" depends="check-dependencies-uptodate" unless="dependencies.uptodate"
 	  description="--> retrieve dependencies with ivy">
+
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
     <ivy:retrieve pattern="lib/[conf]/[artifact].[ext]"
 		  conf="hibernatetool,biobank.webapp"  type="jar" />

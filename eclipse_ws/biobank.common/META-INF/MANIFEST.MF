@@ -46,7 +46,8 @@ Bundle-ClassPath: .,
  lib/server/spiffy-all.jar,
  lib/server/supercsv.jar,
  lib/client/jsse.jar,
- lib/client/mysql-connector-java.jar
+ lib/client/mysql-connector-java.jar,
+ lib/server/flyway-core.jar
 Bundle-Vendor: AICML
 Export-Package: antlr.actions.python;uses:="antlr.collections.impl,ant
  lr",antlr.build,antlr.collections;uses:="antlr",antlr.collections.imp
