@@ -139,7 +139,10 @@ use command "ant -projecthelp" to display the targets.
     <property name="flyway.user" value="${database.exec.username}"/>
     <property name="flyway.password" value="${database.exec.password}"/>
     <property name="flyway.schemas" value="${database.name}"/>
+    <!--property name="flyway.locations"
+	value="edu.ualberta.med.biobank.migration,db/migrations"/-->
     <property name="flyway.locations" value="edu.ualberta.med.biobank.migration,db/migrations"/>
+
     <jar destfile="${lib.dir}/flyway/migrations.jar"
 	 basedir="."
 	 includes="db/migration/**">
