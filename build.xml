@@ -39,11 +39,6 @@ use command "ant -projecthelp" to display the targets.
     <fileset dir="${lib.dir}/flyway" includes="*.jar"/>
   </path>
 
-  <taskdef uri="antlib:com.googlecode.flyway.ant"
-           resource="com/googlecode/flyway/ant/antlib.xml"
-           classpathref="flyway.lib.path"
-	   onerror="ignore" />
-
   <import file="build-db.xml"/>
   <import file="build-i18n.xml"/>
   <import file="build-eclipse.xml"/>
@@ -70,6 +65,7 @@ use command "ant -projecthelp" to display the targets.
     <include name="sdk-writable-core.jar" />
     <include name="supercsv.jar" />
     <include name="spiffy-all.jar" />
+    <include name="flyway-core.jar" />
   </fileset>
 
   <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">
@@ -132,21 +128,23 @@ use command "ant -projecthelp" to display the targets.
     <pathelement location="${eclipse.proj.dir.common}/output" />
   </path>
 
-  <taskdef uri="antlib:com.googlecode.flyway.ant"
-           resource="com/googlecode/flyway/ant/antlib.xml"
-           classpathref="flyway.lib.path"/>
+  <target name="flyway-set-properties" depends="resolve,get-db-executor,build-common-project">
+    <taskdef uri="antlib:com.googlecode.flyway.ant"
+             resource="com/googlecode/flyway/ant/antlib.xml"
+             classpathref="flyway.lib.path"
+	     onerror="ignore" />
 
-  <target name="flyway-set-properties" depends="resolve,get-db-executor">
     <property name="flyway.driver" value="${database.driver}"/>
     <property name="flyway.url" value="${database.url}"/>
     <property name="flyway.user" value="${database.exec.username}"/>
     <property name="flyway.password" value="${database.exec.password}"/>
     <property name="flyway.schemas" value="${database.name}"/>
-    <property name="flyway.locations"
-	      value="edu.ualberta.med.biobank.migration,db/migrations"/>
+    <property name="flyway.locations" value="edu.ualberta.med.biobank.migration,db/migrations"/>
     <jar destfile="${lib.dir}/flyway/migrations.jar"
 	 basedir="."
-	 includes="db/migration/**"/>
+	 includes="db/migration/**">
+      <fileset dir="${eclipse.proj.dir.common}/output" includes="**/migration/*.class"/>
+    </jar>
   </target>
 
   <target name="flyway-clean" depends="flyway-set-properties">

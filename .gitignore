@@ -75,6 +75,7 @@ docs/clientUserGuide/*.lof
 docs/clientUserGuide/*.tdo
 docs/clientUserGuide/*.gz
 output/
+webapp/db
 webapp/WEB-INF/classes/log4j.xml
 webapp/WEB-INF/classes/biobank.csm.new.hibernate.cfg.xml
 surefire-reports

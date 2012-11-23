@@ -30,6 +30,11 @@
     <appender-ref ref="BIOBANK_APPENDER" />
   </category>
 
+  <category name="com.googlecode.flyway.core">
+    <level value="debug" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
   <category name="org.apache.dbcp">
     <level value="error" />
     <appender-ref ref="CONSOLE" />
