@@ -12,6 +12,7 @@ po/output
 .options
 .settings
 *.jasper
+flyway-application-config.xml
 backup/
 docs/doxygen
 eclipse_ws/.metadata

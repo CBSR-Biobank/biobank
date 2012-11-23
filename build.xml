@@ -143,6 +143,15 @@ use command "ant -projecthelp" to display the targets.
 	value="edu.ualberta.med.biobank.migration,db/migrations"/-->
     <property name="flyway.locations" value="edu.ualberta.med.biobank.migration,db/migrations"/>
 
+    <copy file="${secu-log.dir}/jboss/flyway-application-config.xml.template"
+	  tofile="${lib.dir}/flyway/flyway-application-config.xml"/>
+    <replace file="${lib.dir}/flyway/flyway-application-config.xml">
+      <replacefilter token="@database.url@" value="${database.url}"/>
+      <replacefilter token="@database.driver@" value="${database.driver}"/>
+      <replacefilter token="@database.username@" value="${database.username}"/>
+      <replacefilter token="@database.password@" value="${database.password}"/>
+    </replace>
+
     <jar destfile="${lib.dir}/flyway/migrations.jar"
 	 basedir="."
 	 includes="db/migration/**">
@@ -345,7 +354,8 @@ use command "ant -projecthelp" to display the targets.
 
   <target name="update-db-config"
           description="copies db configuration information from db.properties to various config files">
-    <copy todir="${secu-log.dir}/jboss" overwrite="true">
+
+    <copy todir="${secu-log.dir}/jboss">
       <fileset dir="${secu-log.dir}/jboss"/>
       <globmapper from="*.template" to="*"/>
       <filterset>
