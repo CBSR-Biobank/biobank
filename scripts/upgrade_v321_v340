@@ -83,26 +83,13 @@ if [ ! -f "$DBDUMP" ]; then
 fi
 
 echo "recreating database..."
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank2
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop $DBNAME
-mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD create $DBNAME
-mysql -h$DBHOST -u$DBUSER -p$DBPWD  $DBNAME -e "grant all privileges on $DBNAME.* to '$DBUSER'@'localhost' with grant option"
-
 if [ -s /usr/bin/pv ]; then
     pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 else
     gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 fi
 
-echo "upgrading database from v3.0.2 to v3.1.0 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v302_v310.sql
-echo "upgrading database from v3.1.0 to v3.2.0 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v310_v320.sql
-echo "assigning groups..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < db/import/data/groups.sql
-echo "migrating security..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v310_v320_security_transfer.sql
-echo "upgrading database from v3.2.0 to v3.2.1 ..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v320_321.sql
 echo "upgrading database from v3.2.1 to v3.3.0 ..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v321_v330.sql
+echo "upgrading database from v3.3.0 to v3.4.0 ..."
+mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME < data/sql/upgrade_v330_v340.sql
