@@ -26,10 +26,6 @@
   <property name="product.dir" location="product" />
   <property name="buildDirectory" value="${product.dir}/buildDirectory" />
 
-  <path id="ivy.lib.path">
-    <fileset dir="/usr/share/java" includes="ivy.jar"/>
-  </path>
-
   <path id="flyway.lib.path">
     <fileset dir="${lib.dir}/flyway" includes="*.jar"/>
   </path>
@@ -60,12 +56,12 @@
 
   <fileset id="biobank.common.server.build.classpath" dir="${eclipse.proj.dir.common}/lib/server">
     <include name="csmapi.jar" />
+    <include name="flyway-core.jar" />
     <include name="jta.jar" />
     <include name="sdk-core.jar" />
     <include name="sdk-writable-core.jar" />
-    <include name="supercsv.jar" />
     <include name="spiffy-all.jar" />
-    <include name="flyway-core.jar" />
+    <include name="supercsv.jar" />
   </fileset>
 
   <fileset id="biobank.common.client.build.classpath" dir="${eclipse.proj.dir.common}/lib/client">
@@ -79,18 +75,22 @@
     <include name="cog-jglobus.jar" />
     <include name="commons-codec.jar" />
     <include name="commons-collections.jar" />
-    <include name="commons-collections.jar" />
     <include name="commons-discovery.jar" />
     <include name="commons-lang.jar" />
     <include name="commons-logging.jar" />
     <include name="dom4j.jar" />
+    <include name="ehcache.jar"/>
     <include name="gettext-commons.jar" />
+    <include name="hibernate-commons-annotations.jar"/>
+    <include name="hibernate-core.jar" />
+    <include name="hibernate-ehcache.jar"/>
+    <include name="hibernate-envers.jar" />
     <include name="hibernate-jpa-2.0-api.jar" />
     <include name="hibernate-validator.jar" />
-    <include name="hibernate-core.jar" />
-    <include name="hibernate-envers.jar" />
     <include name="javassist.jar" />
     <include name="jaxrpc.jar" />
+    <include name="jdom.jar"/>
+    <include name="jsse.jar" />
     <include name="jta.jar" />
     <include name="log4j.jar" />
     <include name="messages.jar" />
@@ -109,11 +109,6 @@
     <include name="xercesImpl.jar" />
     <include name="xpp3.jar" />
     <include name="xstream.jar" />
-    <include name="jsse.jar" />
-    <include name="hibernate-commons-annotations.jar"/>
-    <include name="hibernate-ehcache.jar"/>
-    <include name="ehcache.jar"/>
-    <include name="jdom.jar"/>
   </fileset>
 
   <path id="biobank.common.build.classpath">
@@ -183,6 +178,35 @@
     <flyway:validate/>
   </target>
 
+  <property name="ivy.install.version" value="2.2.0" />
+  <condition property="ivy.home" value="${env.IVY_HOME}">
+    <isset property="env.IVY_HOME" />
+  </condition>
+  <property name="ivy.home" value="${user.home}/.ant" />
+  <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+  <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+
+  <target name="download-ivy" unless="offline">
+
+    <mkdir dir="${ivy.jar.dir}"/>
+    <!-- download Ivy from web site so that it can be used even without any special installation -->
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+         dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <target name="init-ivy" depends="download-ivy">
+    <!-- try to load ivy here from ivy home, in case the user has not already dropped
+         it into ant's lib dir (note that the latter copy will always take precedence).
+         We will not fail as long as local lib dir exists (it may be empty) and
+         ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+             uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+  </target>
+
   <target name="check-dependencies-uptodate">
     <uptodate property="dependencies.uptodate">
       <srcfiles dir="." includes="ivy.xml"/>
@@ -190,7 +214,7 @@
     </uptodate>
   </target>
 
-  <target name="resolve" depends="check-dependencies-uptodate" unless="dependencies.uptodate"
+  <target name="resolve" depends="init-ivy,check-dependencies-uptodate" unless="dependencies.uptodate"
 	  description="--> retrieve dependencies with ivy">
 
     <ivy:retrieve pattern="lib/build/[artifact].[ext]" conf="biobank.build"  type="jar" />
@@ -221,14 +245,14 @@
 		conf="biobank.common.client,biobank.common.server,biobank.gui.common,biobank.mvp,biobank2,biobank2.tools,biobank2.tests" />
   </target>
 
-  <target name="clean-ivy"
+  <target name="clean-ivy" depends="init-ivy"
 	  description="--> cleans ivy temporary files">
     <delete>
       <fileset dir="${lib.dir}" includes=".dependencies.resolved"/>
     </delete>
   </target>
 
-  <target name="clean-cache" description="--> cleans the ivy cache">
+  <target name="clean-cache" depends="init-ivy" description="--> cleans the ivy cache">
     <ivy:cleancache />
   </target>
 
