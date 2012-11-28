@@ -12,6 +12,16 @@
 
 	<name>Biobank Service</name>
 
+	<repositories>
+		<repository>
+			<id>aicml-site</id>
+			<url>http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/</url>
+			<releases>
+				<updatePolicy>daily</updatePolicy>
+			</releases>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -105,7 +115,7 @@
 		</dependency>
 		<dependency>
 			<groupId>supercsv</groupId>
-			<artifactId>spiffy</artifactId>
+			<artifactId>spiffy-all</artifactId>
 			<version>0.05</version>
 		</dependency>
 	</dependencies>

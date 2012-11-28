@@ -12,20 +12,10 @@ INSTALL GETTEXT
 
   sudo apt-get install gettext
 
-INSTALL ADDITIONAL MAVEN LIBRARIES
-  Maven repositories do not exist for the following jars and must be installed
-  locally.
-
-  mvn install:install-file -Dfile=jars/SuperCSV-1.52.jar -DgroupId=supercsv \
-   -DartifactId=supercsv -Dversion=1.52 -Dpackaging=jar
-
-  mvn install:install-file -Dfile=jars/spiffy-all-0.05.jar -DgroupId=supercsv \
-   -DartifactId=spiffy -Dversion=0.05 -Dpackaging=jar
-
 BUILD ECLIPSE PROJECTS
 
   mvn eclipse:eclipse
 
   To also download available sources for libraries, instead run:
-  
+
   mvn eclipse:eclipse -DdownloadSources=true
