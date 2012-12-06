@@ -19,6 +19,22 @@
       org.springframework.web.context.ContextLoaderListener
     </listener-class>
   </listener>
+  
+  <filter>
+        <filter-name>encoding-filter</filter-name>
+        <filter-class>
+            org.springframework.web.filter.CharacterEncodingFilter
+        </filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>encoding-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
   <!-- Handles all requests into the application -->
   <servlet>
