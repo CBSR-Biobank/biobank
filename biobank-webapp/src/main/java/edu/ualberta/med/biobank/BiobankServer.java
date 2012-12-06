@@ -24,11 +24,9 @@ public class BiobankServer {
 
     // TODO: You should configure this appropriately for
     // your environment
-    private static final String LOG_PATH =
-        "logs/access/yyyy_mm_dd.request.log";
+    private static final String LOG_PATH = "logs/access/yyyy_mm_dd.request.log";
 
-    private static final String WEB_XML =
-        "webapp/WEB-INF/web.xml";
+    private static final String WEB_XML = "webapp/WEB-INF/web.xml";
 
     public static interface WebContext {
         public File getWarPath();

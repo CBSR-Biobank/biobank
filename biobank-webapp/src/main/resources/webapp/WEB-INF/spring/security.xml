@@ -7,10 +7,18 @@
           http://www.springframework.org/schema/security
           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
+    <security:http security="none"
+        pattern="/resource/**"/>
 	<security:http use-expressions="true">
+        <security:intercept-url pattern="/login" 
+            access="permitAll"/>
 		<security:intercept-url pattern="/**"
 			access="hasRole('ROLE_USER')" />
-		<security:form-login />
+		<security:form-login login-page="/login"
+		  authentication-failure-url="/login?error"
+		  login-processing-url="/authenticate"
+		  password-parameter="password"
+		  username-parameter="username"/>
 	</security:http>
 
 	<security:authentication-manager>

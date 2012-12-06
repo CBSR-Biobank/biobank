@@ -16,13 +16,8 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	<context:component-scan base-package="edu.ualberta.med.biobank.controller"/>
 
 	<!-- Forwards requests to the "/" resource to the "home" view -->
-	<mvc:view-controller path="/" view-name="index" />
+	<mvc:view-controller path="/" view-name="home" />
 
-	<mvc:resources mapping="/i/**" location="classpath:WEB-INF/images/" />
-	<mvc:resources mapping="/c/**" location="classpath:WEB-INF/css/" />
-	<mvc:resources mapping="/s/**" location="classpath:WEB-INF/scripts/" />
-	<mvc:resources mapping="/favicon.ico" location="classpath:WEB-INF/images/favicon.ico" />
-	
 	<mvc:resources mapping="/**" location="classpath:static_content/"/>
 
 	<!-- Resolve jsp's -->
