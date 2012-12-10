@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.controller;
+package edu.ualberta.med.biobank.mvc;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +9,6 @@ public class BiobankController {
 
     @RequestMapping(method=RequestMethod.GET, value="/home")
     public String handleRequest(){
-        return "about.html";
+        return "about";
     }
 }

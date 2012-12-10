@@ -44,7 +44,7 @@
     </servlet-class>
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>/WEB-INF/web-context.xml</param-value>
+      <param-value>/WEB-INF/biobank-servlet.xml</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>

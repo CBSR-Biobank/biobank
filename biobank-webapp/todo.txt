@@ -1,0 +1,7 @@
+This web page outlines how to do authentication with spring security:
+
+   http://www.cleancode.co.nz/blog/937/customization-spring-security-authentication
+   
+For OpenID configuration see:
+
+   https://github.com/SpringSource/spring-security/blob/master/samples/openid/src/main/webapp/WEB-INF/applicationContext-security.xml
