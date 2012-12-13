@@ -1,9 +1,7 @@
-# Translations for the Biobank thick client.
-#
-# Copyright (C) 2012 Canadian BioSample Repository.
-
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Nelson Loyola <loyola@ualberta.ca>.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:33
 #, fuzzy
@@ -11,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-10 11:18-0700\n"
+"POT-Creation-Date: 2012-12-11 10:48-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8209,7 +8207,7 @@ msgstr ""
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:808
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:814
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:225
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:237
 msgid "Enable"
 msgstr ""
 
@@ -8527,7 +8525,7 @@ msgctxt "Error message"
 msgid "Could not find key in configuration: "
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:170
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:168
 msgid "Could not scan image:\n"
 msgstr ""
 
@@ -8535,20 +8533,25 @@ msgstr ""
 msgid "Could not scan flatbed:\n"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:274
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:238
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:285
+msgid "Landscape"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:254
 msgid "Could not decode plate:\n"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:306
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:301
 msgid "Could not decode image: "
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:315
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:311
 msgid "plate id is invalid: "
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:383
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:399
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:394
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:412
 msgid "preference not assigned"
 msgstr ""
 
@@ -8565,7 +8568,7 @@ msgstr ""
 msgid "Invalid value"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/PreferenceInitializer.java:41
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/PreferenceInitializer.java:42
 msgid "PLATE"
 msgstr ""
 
@@ -8587,6 +8590,10 @@ msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/Decoding.java:87
 msgid "Decode Scan Gap:"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/Decoding.java:96
+msgid "Decode Cell Distance:"
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/Scanner.java:53
@@ -8638,31 +8645,43 @@ msgid "Bottom"
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:77
-msgid "Barcode"
+msgid "Cell Gap Horizontal"
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:83
-msgid "Plate is not enabled"
-msgstr ""
-
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:86
-msgid "Align grid with barcodes"
+msgid "Cell Gap Vertical"
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:89
+msgid "Barcode"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:95
+msgid "Plate is not enabled"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:98
+msgid "Align grid with barcodes"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:101
 msgid "A scan is required"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:180
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:192
 msgid "Scan"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:193
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:205
 msgid "Refresh"
 msgstr ""
 
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:239
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:251
 msgid "Orientation"
+msgstr ""
+
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/plateposition/PlateSettings.java:270
+msgid "Barcode:"
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/preferences/scanner/profiles/ProfileManager.java:39
