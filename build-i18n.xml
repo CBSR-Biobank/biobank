@@ -12,7 +12,7 @@
     <mkdir dir="${po.output.dir}" />
   </target>
 
-  <target name="init.gettext" description="Loads the Ant gettext tasks">
+  <target name="init.gettext" description="Loads the Ant gettext tasks" depends="resolve">
     <taskdef name="gettext-extract"
              classname="org.xnap.commons.ant.gettext.GettextExtractKeysTask"
              classpath="${gettexttasks.jar}"/>
