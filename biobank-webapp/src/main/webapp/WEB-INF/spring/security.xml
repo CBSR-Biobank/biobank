@@ -7,9 +7,8 @@
           http://www.springframework.org/schema/security
           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
-    <http security="none" pattern="/openidlogin.html*" />
-	<http security="none" pattern="/images/**" />
-	<http security="none" pattern="/css/**" />
+    <http security="none" pattern="/login*" />
+	<http security="none" pattern="/static/**" />
 
     <!-- this taken from example on youtube ===========================
 	<http use-expressions="true">
@@ -37,8 +36,8 @@
 	<http>
 		<intercept-url pattern="/**" access="ROLE_USER" />
 		<logout />
-		<openid-login login-page="/openidlogin.jsp"
-			user-service-ref="registeringUserService" authentication-failure-url="/openidlogin.jsp?login_error=true">
+		<openid-login login-page="/login"
+			user-service-ref="registeringUserService" authentication-failure-url="/login-error">
 			<attribute-exchange identifier-match="https://www.google.com/.*">
 				<openid-attribute name="email"
 					type="http://axschema.org/contact/email" required="true" count="1" />
@@ -69,6 +68,6 @@
 	<authentication-manager alias="authenticationManager" />
 
 	<b:bean id="registeringUserService"
-		class="org.springframework.security.samples.openid.CustomUserDetailsService" />
+		class="edu.ualberta.med.biobank.openid.CustomUserDetailsService" />
     <!-- ================================================================== -->
 </b:beans>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <!-- 
+        - [THYMELEAF] In this page, we have removed the java code and converted the file into a displayable HTML one 
+    -->
+
+    <head th:substituteby="layout :: header">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="../../styles/petclinic.css" type="text/css" />
+        <title>PetClinic :: a Spring Framework demonstration</title>  
+    </head>
+    
+    <body>
+    
+        <div id="main">
+        
+            <h2>Data access failure: <span th:text="${exception.message}">There has been an error</span></h2>
+            
+            <p>
+              <span th:each="st : ${exception.stackTrace}">
+                at <span th:text="${st}">a.b.c.MainController.do(MainController:5)</span><br />
+              </span>
+            </p>
+            
+            <br />
+            
+            <table th:substituteby="layout :: footer" class="footer">
+                <tr>
+                    <td><a href="welcome.html">Home</a></td>
+                    <td style="float: right;"><img src="../../images/springsource-logo.png" 
+                        alt="Sponsored by SpringSource" /></td>
+                </tr>
+            </table>
+        </div>
+        
+    </body>
+    
+</html>

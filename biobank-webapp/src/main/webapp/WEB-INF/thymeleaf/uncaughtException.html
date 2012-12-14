@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <!-- 
+        - [THYMELEAF] In this page, we have removed the java code and converted the file into a displayable HTML one 
+    -->
+
+    <head th:substituteby="layout :: header">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="../../styles/petclinic.css" type="text/css" />
+        <title>PetClinic :: a Spring Framework demonstration</title>  
+    </head>
+    
+    <body>
+    
+        <div id="main" th:with="exception = ${#httpServletRequest.getAttribute('javax.servlet.error.exception')},
+                                cookies   = ${#httpServletRequest.cookies}">
+                                
+            <h2>Internal error</h2>
+            
+            <div th:if="${exception != null}">
+            
+                <div th:if="${exception instanceof T(javax.servlet.ServletException)}"  
+                     th:object="${exception.rootCause} ?: ${exception}">
+                    <p>** Root cause is: <span th:utext="*{message}">ClassNotFound</span></p>  
+                    <p>
+                      <span th:each="st : *{stackTrace}">
+                        at <span th:text="${st}">a.b.c.MainController.do(MainController:5)</span><br />
+                      </span>
+                    </p>
+                </div>
+                
+                <div th:unless="${exception instanceof T(javax.servlet.ServletException)}" >
+                    <p>
+                      <span th:text="${exception.class.name}">NullPointerException</span>: 
+                      <span th:text="${exception.message}">null</span><br />
+                    </p>
+                    <p>
+                      <span th:each="st : ${exception.stackTrace}">
+                        at <span th:text="${st}">a.b.c.MainController.do(MainController:5)</span><br />
+                      </span>
+                    </p>
+                </div>
+                
+            </div>            
+            
+            <p th:if="${exception == null}">No error information available</p>
+            
+            <br />
+            Cookies:
+            <br />
+            <ul>
+                <li th:each="c : ${cookies}" th:text="${c.name + '=[' + c.value + ']'}">
+                    user =[anonymous]
+                </li>
+            </ul>
+            
+            <br />
+            
+            <table th:substituteby="layout :: footer" class="footer">
+                <tr>
+                    <td><a href="welcome.html">Home</a></td>
+                    <td style="float: right;"><img src="../../images/springsource-logo.png" 
+                        alt="Sponsored by SpringSource" /></td>
+                </tr>
+            </table>
+        </div>
+        
+    </body>
+
+</html>
