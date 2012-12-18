@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Biobank</title>
+</head>
+
+<body>
+	<p th:if="${loginError}">Wrong user or password</p>
+
+	<form th:action="@{/j_spring_security_check}" method="post">
+		<input type="hidden" name="action" value="verify" />
+
+		<fieldset>
+			<label for="login">Username or Email</label> 
+			<input name="username" type="text" size="25" autocorrect="off" autocapitalize="off" />
+			<label for="password">Password</label> 
+			<input name="password" type="password" size="25" />
+		</fieldset>
+		<p>
+			<button type="submit">Sign In</button>
+		</p>
+	</form>
+	<!-- /Simple OpenID Selector -->
+
+</body>
+</html>

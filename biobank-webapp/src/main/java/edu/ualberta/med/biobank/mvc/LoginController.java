@@ -10,19 +10,19 @@ public class LoginController {
 
     @RequestMapping(value="/login", method = RequestMethod.GET)
     public String handleRequest(){
-        return "openidlogin"; //$NON-NLS-1$
+        return "login"; //$NON-NLS-1$
     }
 
     /** Login form with error. */
-    @RequestMapping("/login-error")
+    @RequestMapping(value="/login-error", method = RequestMethod.GET)
     public String loginError(Model model) {
         model.addAttribute("loginError", true); //$NON-NLS-1$
-        return "openidlogin"; //$NON-NLS-1$
+        return "login"; //$NON-NLS-1$
     }
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
     public String logout() {
-        return "openidlogin"; //$NON-NLS-1$
+        return "login"; //$NON-NLS-1$
 
     }
 
