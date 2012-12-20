@@ -116,11 +116,21 @@
 		<dependency>
 			<groupId>supercsv</groupId>
 			<artifactId>spiffy-all</artifactId>
-			<version>0.05</version>
+	<version>0.05</version>
 		</dependency>
 	</dependencies>
 
 	<build>
+		<!-- To define the plugin version in your parent POM -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.xnap.commons</groupId>
+					<artifactId>maven-gettext-plugin</artifactId>
+					<version>1.2.3</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.xnap.commons</groupId>
@@ -132,6 +142,29 @@
 					<targetBundle>i18n.Messages</targetBundle>
 				</configuration>
 			</plugin>
+
+			<!-- gettext: To use the plugin goals in your POM or parent POM -->
+			<plugin>
+				<groupId>org.xnap.commons</groupId>
+				<artifactId>maven-gettext-plugin</artifactId>
+				<version>1.2.3</version>
+			</plugin>
 		</plugins>
 	</build>
+
+	<!-- To use the report goals in your POM or parent POM -->
+	<reporting>
+	<plugins>
+		<plugin>
+			<groupId>org.xnap.commons</groupId>
+			<artifactId>maven-gettext-plugin</artifactId>
+			<version>1.2.3</version>
+			<configuration>
+				<targetBundle>edu.ualberta.med.biobank.Messages</targetBundle>
+				<outputFormat>properties</outputFormat>
+			</configuration>
+		</plugin>
+	</plugins>
+</reporting>
+
 </project>

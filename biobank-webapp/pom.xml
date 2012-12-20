@@ -12,8 +12,11 @@
 	<name>Biobank Web Application</name>
 
 	<dependencies>
-		<!--dependency> <groupId>edu.ulberta.med.biobank</groupId> <artifactId>biobank-service</artifactId> 
-			<version>4.0-SNAPSHOT</version> </dependency -->
+		<dependency>
+			<groupId>edu.ulberta.med.biobank</groupId>
+			<artifactId>biobank-service</artifactId>
+			<version>4.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
@@ -126,7 +129,29 @@
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.6</version>
 		</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>${org.hibernate.version}</version>
+        </dependency>
+
+
+        <!-- MySQL C3P0 Data Pool -->
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.1.2</version>
+        </dependency>
+    
+ 
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.12.1.GA</version>
+        </dependency>
+        
 	</dependencies>
+	
 
 	<build>
 		<plugins>
