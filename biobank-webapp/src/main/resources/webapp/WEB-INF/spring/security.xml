@@ -15,8 +15,10 @@
 	<http use-expressions="true">
 		<intercept-url pattern="/login" access="permitAll" />
 		<intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
-		<form-login login-page="/login" default-target-url="/home"
-			authentication-failure-url="/login-error" username-parameter="username"
+		<form-login login-page="/login" default-target-url="/"
+			authentication-failure-url="/login-error"
+			always-use-default-target="true"
+			username-parameter="username"
 			password-parameter="password" />
 		<logout logout-success-url="/logout" />
 	</http>

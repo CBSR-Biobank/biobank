@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class BiobankController {
 
-    @RequestMapping(method=RequestMethod.GET, value="/home")
+    @RequestMapping(method=RequestMethod.GET, value="/")
     public String handleRequest(){
         return "about";
     }
