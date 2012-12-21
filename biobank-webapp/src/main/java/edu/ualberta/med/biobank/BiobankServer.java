@@ -54,7 +54,7 @@ public class BiobankServer {
     private HandlerCollection createHandlers() {
         WebAppContext context = new WebAppContext();
         context.setContextPath("/");
-        context.setWar("src/main/webapp");
+        context.setWar("src/main/resources/webapp");
 
         RequestLogHandler log = new RequestLogHandler();
         log.setRequestLog(createRequestLog());

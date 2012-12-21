@@ -53,6 +53,12 @@
 			<groupId>ognl</groupId>
 			<artifactId>ognl</artifactId>
 			<version>3.0.5</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>javassist</artifactId>
+					<groupId>javassist</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>

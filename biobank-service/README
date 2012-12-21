@@ -1,5 +1,5 @@
 For translations:
    Update pot and po files:
-   	  mvn org.xnap.commons:maven-gettext-plugin:merge
+   	  mvn gettext:merge
    Create properties/classs files:
-   	  mvn org.xnap.commons:maven-gettext-plugin:dist
+   	  mvn gettext:dist
