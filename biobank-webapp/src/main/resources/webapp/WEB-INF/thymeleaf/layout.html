@@ -2,22 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="header">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" th:href="@{/static/css/openid.css}"
-	href="../../styles/petclinic.css" type="text/css" />
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+	href="../../css/bootstrap.min.css" type="text/css" media="screen"/>
+<script th:src="@{/js/bootstrap.min.js}" src="../../js/bootstrap.min.js"></script>
 <title>Biobank</title>
 </head>
 <body>
 	<div id="main">
 		<p>The page content should be here</p>
-		<table class="footer" th:fragment="footer">
-			<tr>
-				<td><a th:href="@{/}" href="welcome.html">Home</a></td>
-				<td style="float: right"><img
-					th:src="@{/static/images/springsource-logo.png}"
-					src="../../images/springsource-logo.png"
-					alt="Sponsored by SpringSource" /></td>
-			</tr>
-		</table>
 	</div>
 
 	<footer id="footer">
