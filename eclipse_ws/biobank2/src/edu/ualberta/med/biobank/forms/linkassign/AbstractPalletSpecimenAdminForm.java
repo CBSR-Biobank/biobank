@@ -61,7 +61,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
-    AbstractSpecimenAdminForm {
+AbstractSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -180,8 +180,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletWell cell)
-                throws Exception {
+            protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
                 AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cell);
             }
 
@@ -203,7 +202,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         };
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
+        .addPropertyChangeListener(propertyListener);
 
     }
 
@@ -219,7 +218,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     public void dispose() {
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .removePropertyChangeListener(propertyListener);
+        .removePropertyChangeListener(propertyListener);
         super.dispose();
     }
 
@@ -332,19 +331,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
             // TR: label;
             i18n.tr("Plate to scan"));
-        plateToScanText =
-            (BgcBaseText) widgetCreator
-                .createBoundWidget(
-                    fieldsComposite,
-                    BgcBaseText.class,
-                    SWT.NONE,
-                    plateToScanLabel,
-                    new String[0],
-                    plateToScanValue,
-                    new ScannerBarcodeValidator(
-                        // TR: validation error message
-                        i18n.tr("Enter a valid plate barcode")),
-                    PLATE_VALIDATOR);
+        plateToScanText = (BgcBaseText) widgetCreator.createBoundWidget(
+            fieldsComposite, BgcBaseText.class, SWT.NONE, plateToScanLabel, new String[0],
+            plateToScanValue,
+            new ScannerBarcodeValidator(
+                // TR: validation error message
+                i18n.tr("Enter a valid plate barcode")),
+                PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -441,15 +434,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected void setScanHasBeenLaunched(final boolean launched, boolean async) {
-        if (async)
+        if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
                     setScanHasBeenLaunched(launched);
                 }
             });
-        else
+        } else {
             setScanHasBeenLaunched(launched);
+        }
     }
 
     protected boolean isRescanMode() {
@@ -499,7 +493,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         beforeScanTubeAlone();
         CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
             getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    palletCell.transformIntoServerCell(), Locale.getDefault()));
+                palletCell.transformIntoServerCell(), Locale.getDefault()));
         palletCell.merge(SessionManager.getAppService(), res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
@@ -510,6 +504,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         // && (palletCell.getStatus() != UICellStatus.ERROR);
         // setScanValid(ok);
         afterScanAndProcess(palletCell.getRow());
+        setScanHasBeenLaunched(true);
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
@@ -545,12 +540,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 if (isScanHasBeenLaunched()) {
                     palletScanManagement.toggleScanTubeAloneMode();
                     if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
-                            .getImageRegistry()
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
                             .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
-                            .getImageRegistry().get(BgcPlugin.IMG_SCAN_EDIT));
+                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
+                            .get(BgcPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }
@@ -620,11 +614,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
-                    .subTask(
+                .subTask(
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
-                            .getPositionString(rcp)));
+                        .getPositionString(rcp)));
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
@@ -673,7 +667,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement
-                .initCellsWithContainer(currentMultipleContainer);
+            .initCellsWithContainer(currentMultipleContainer);
         }
     }
 
