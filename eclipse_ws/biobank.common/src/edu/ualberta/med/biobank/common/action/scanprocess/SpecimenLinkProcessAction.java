@@ -34,8 +34,9 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     // single cell link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId, CellInfo cell,
-        Locale locale) {
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
+        Integer studyId,
+        CellInfo cell, Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.studyId = studyId;
     }
@@ -43,7 +44,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     @Override
     protected ScanProcessResult getScanProcessResult(
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
-            throws ActionException {
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells,
             internalProcessScanResult(session, cells, isRescanMode));
@@ -55,7 +56,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     @SuppressWarnings("nls")
     protected CellInfoStatus internalProcessScanResult(Session session,
         Map<RowColPos, CellInfo> cells, boolean isRescanMode)
-            throws ActionException {
+        throws ActionException {
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         if (cells != null) {
             Map<String, CellInfo> allValues = new HashMap<String, CellInfo>();
@@ -73,7 +74,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         cell.setInformation(bundle
                             .tr(
                                 "Value ''{0}'' has already been scanned in position {1}")
-                                .format(cell.getValue(), otherPosition));
+                            .format(cell.getValue(), otherPosition));
                         appendNewLog(MessageFormat
                             .format(
                                 "ERROR in {0}: Value ''{1}'' has already been scanned in position {2}",
@@ -86,7 +87,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                 }
                 if (!isRescanMode
                     || (cell != null && cell.getStatus() != CellInfoStatus.TYPE && cell
-                    .getStatus() != CellInfoStatus.NO_TYPE)) {
+                        .getStatus() != CellInfoStatus.NO_TYPE)) {
                     processCellLinkStatus(session, cell);
                 }
                 CellInfoStatus newStatus = CellInfoStatus.EMPTY;
@@ -137,23 +138,23 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                             "ERROR in {0}: Specimen ''{1}'' already in database linked to visit {2} from patient {3} (currently in center {4})",
                             palletPosition, value,
                             foundSpecimen.getCollectionEvent()
-                            .getVisitNumber(), foundSpecimen
-                            .getCollectionEvent().getPatient()
-                            .getPnumber(), foundSpecimen
-                            .getCurrentCenter().getNameShort()));
+                                .getVisitNumber(), foundSpecimen
+                                .getCollectionEvent().getPatient()
+                                .getPnumber(), foundSpecimen
+                                .getCurrentCenter().getNameShort()));
                 else
                     appendNewLog(MessageFormat
                         .format(
                             "ERROR in {0}: Specimen ''{1}'' already in database linked to source specimen ''{2}'' ({3}) of visit {4} from patient {5} (currently in center {6})",
                             palletPosition, value,
                             foundSpecimen.getParentSpecimen()
-                            .getInventoryId(), foundSpecimen
-                            .getParentSpecimen().getSpecimenType()
-                            .getNameShort(), foundSpecimen
-                            .getCollectionEvent().getVisitNumber(),
+                                .getInventoryId(), foundSpecimen
+                                .getParentSpecimen().getSpecimenType()
+                                .getNameShort(), foundSpecimen
+                                .getCollectionEvent().getVisitNumber(),
                             foundSpecimen.getCollectionEvent().getPatient()
-                            .getPnumber(), foundSpecimen
-                            .getCurrentCenter().getNameShort()));
+                                .getPnumber(), foundSpecimen
+                                .getCurrentCenter().getNameShort()));
             } else {
                 cell.setStatus(CellInfoStatus.NO_TYPE);
             }
@@ -166,7 +167,7 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         return new SpecimenLinkPermission(currentWorkingCenterId, studyId)
-        .isAllowed(context);
+            .isAllowed(context);
     }
 
 }
