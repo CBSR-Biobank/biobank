@@ -34,9 +34,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     // single cell link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
-        Integer studyId,
-        CellInfo cell, Locale locale) {
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId, CellInfo cell,
+        Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.studyId = studyId;
     }

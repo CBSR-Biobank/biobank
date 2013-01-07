@@ -83,6 +83,9 @@ if [ ! -f "$DBDUMP" ]; then
 fi
 
 echo "recreating database..."
+mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop $DBNAME
+mysqladmin -h$DBHOST -u$DBUSER -p$DBPWD create $DBNAME
+echo "importing old database..."
 if [ -s /usr/bin/pv ]; then
     pv $DBDUMP | gzip -dc | mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME
 else

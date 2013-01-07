@@ -99,7 +99,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected String currentPlateToScan;
 
     // global state of the pallet process
-    protected UICellStatus currentScanState;
+    protected UICellStatus currentScanState = UICellStatus.NOT_INITIALIZED;
     private Label plateToScanLabel;
 
     @Override
@@ -182,14 +182,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             protected void postprocessScanTubeAlone(PalletWell cell)
                 throws Exception {
-                AbstractPalletSpecimenAdminForm.this
-                    .postprocessScanTubeAlone(cell);
+                AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cell);
             }
 
             @Override
             protected boolean canScanTubeAlone(PalletWell cell) {
-                return AbstractPalletSpecimenAdminForm.this
-                    .canScanTubeAlone(cell);
+                return AbstractPalletSpecimenAdminForm.this.canScanTubeAlone(cell);
             }
         };
     }
@@ -499,12 +497,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             palletScanManagement.getContainerType().getPositionString(
                 palletCell.getRowColPos())));
         beforeScanTubeAlone();
-        CellProcessResult res = (CellProcessResult) SessionManager
-            .getAppService()
-            .doAction(
-                getCellProcessAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter()
-                    .getId(),
+        CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+            getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     palletCell.transformIntoServerCell(), Locale.getDefault()));
         palletCell.merge(SessionManager.getAppService(), res.getCell());
         appendLogs(res.getLogs());

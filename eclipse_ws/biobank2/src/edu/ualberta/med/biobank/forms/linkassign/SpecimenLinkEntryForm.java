@@ -783,8 +783,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         CellInfo cell, Locale locale) {
         log.debug("getCellProcessAction");
         return new SpecimenLinkProcessAction(centerId,
-            linkFormPatientManagement
-                .getCurrentPatient().getStudy().getId(), cell, locale);
+            linkFormPatientManagement.getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
     @SuppressWarnings("nls")
@@ -812,21 +811,20 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 log.debug("afterScanAndProcess: asyncExec");
 
                 // enabled the hierarchy combos
-                typesSelectionPerRowComposite
-                    .setEnabled(currentScanState != UICellStatus.ERROR);
+                typesSelectionPerRowComposite.setEnabled(currentScanState != UICellStatus.ERROR);
                 // set the combos lists
                 if (typesRows.size() > 0)
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             if (rowToProcess == null) {
-                                if (typesRows != null)
-                                    for (int row = 0; row < specimenTypesWidgets
-                                        .size(); row++)
+                                if (typesRows != null) {
+                                    for (int row = 0; row < specimenTypesWidgets.size(); row++)
                                         setCountOnSpecimenWidget(typesRows, row);
-                            } else
-                                setCountOnSpecimenWidget(typesRows,
-                                    rowToProcess);
+                                }
+                            } else {
+                                setCountOnSpecimenWidget(typesRows, rowToProcess);
+                            }
                         }
                     });
                 // focus first available list
@@ -912,6 +910,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         log.debug("enableFields: " + enable);
         super.enableFields(enable);
         multipleOptionsFields.setEnabled(enable);
+    }
+
+    @Override
+    protected boolean canScanTubeAlone(PalletWell cell) {
+        if (linkFormPatientManagement.getCurrentPatient() == null) {
+            return false;
+        }
+        return super.canScanTubeAlone(cell);
     }
 
 }
