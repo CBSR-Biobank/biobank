@@ -61,7 +61,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
-    AbstractSpecimenAdminForm {
+AbstractSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -99,7 +99,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected String currentPlateToScan;
 
     // global state of the pallet process
-    protected UICellStatus currentScanState;
+    protected UICellStatus currentScanState = UICellStatus.NOT_INITIALIZED;
     private Label plateToScanLabel;
 
     @Override
@@ -182,14 +182,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             @Override
             protected void postprocessScanTubeAlone(PalletWell cell)
                 throws Exception {
-                AbstractPalletSpecimenAdminForm.this
-                    .postprocessScanTubeAlone(cell);
+                AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cell);
             }
 
             @Override
             protected boolean canScanTubeAlone(PalletWell cell) {
-                return AbstractPalletSpecimenAdminForm.this
-                    .canScanTubeAlone(cell);
+                return AbstractPalletSpecimenAdminForm.this.canScanTubeAlone(cell);
             }
         };
     }
@@ -205,7 +203,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         };
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
+        .addPropertyChangeListener(propertyListener);
 
     }
 
@@ -221,7 +219,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     public void dispose() {
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .removePropertyChangeListener(propertyListener);
+        .removePropertyChangeListener(propertyListener);
         super.dispose();
     }
 
@@ -336,16 +334,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             i18n.tr("Plate to scan"));
         plateToScanText =
             (BgcBaseText) widgetCreator
-                .createBoundWidget(
-                    fieldsComposite,
-                    BgcBaseText.class,
-                    SWT.NONE,
-                    plateToScanLabel,
-                    new String[0],
-                    plateToScanValue,
-                    new ScannerBarcodeValidator(
-                        // TR: validation error message
-                        i18n.tr("Enter a valid plate barcode")),
+            .createBoundWidget(
+                fieldsComposite,
+                BgcBaseText.class,
+                SWT.NONE,
+                plateToScanLabel,
+                new String[0],
+                plateToScanValue,
+                new ScannerBarcodeValidator(
+                    // TR: validation error message
+                    i18n.tr("Enter a valid plate barcode")),
                     PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -499,13 +497,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             palletScanManagement.getContainerType().getPositionString(
                 palletCell.getRowColPos())));
         beforeScanTubeAlone();
-        CellProcessResult res = (CellProcessResult) SessionManager
-            .getAppService()
-            .doAction(
-                getCellProcessAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter()
-                    .getId(),
-                    palletCell.transformIntoServerCell(), Locale.getDefault()));
+        CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+            getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                palletCell.transformIntoServerCell(), Locale.getDefault()));
         palletCell.merge(SessionManager.getAppService(), res.getCell());
         appendLogs(res.getLogs());
         processCellResult(palletCell.getRowColPos(), palletCell);
@@ -626,11 +620,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 .getCells().entrySet()) {
                 RowColPos rcp = entry.getKey();
                 monitor
-                    .subTask(
+                .subTask(
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
-                            .getPositionString(rcp)));
+                        .getPositionString(rcp)));
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
@@ -679,7 +673,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement
-                .initCellsWithContainer(currentMultipleContainer);
+            .initCellsWithContainer(currentMultipleContainer);
         }
     }
 
