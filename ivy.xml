@@ -198,10 +198,10 @@
 
     <!-- for biobank2.tools -->
     <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />
+    <dependency org="tomcat" name="naming-common" rev="4.1.31" conf="biobank2.tools->default,sources" />
 
     <!-- for biobank2.tests -->
     <dependency org="org.mockito" name="mockito-all" rev="1.9.0" conf="biobank2.tests->default,sources" />
-    <dependency org="tomcat" name="naming-common" rev="4.1.31" conf="biobank2.tests->default,sources" />
     <dependency org="junit" name="junit" rev="4.10" conf="biobank2.tests->default,sources" />
     <dependency org="cacore" name="clm" rev="4.1" conf="biobank2.tests->default,sources" />
 

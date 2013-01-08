@@ -270,7 +270,7 @@
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>
 
-    <!-- File needed in the test project to call csm api methods -->
+      <!-- File needed in the test project to call csm api methods -->
     <copy file="sdk_conf/biobank.csm.new.hibernate.cfg.xml" todir="${eclipse.proj.dir.tests}/src" />
   </target>
 
@@ -449,8 +449,8 @@
           tofile="${env.JBOSS_HOME}/server/default/deploy/biobank-ds.xml"
           overwrite="true" verbose="true" />
     <!-- ignore this war for now
-	 <copy file="${secu-log.dir}/jboss/upt.war"
-         tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
+    <copy file="${secu-log.dir}/jboss/upt.war"
+          tofile="${env.JBOSS_HOME}/server/default/deploy/upt.war"
          overwrite="true" verbose="true" />
     -->
     <delete includeemptydirs="true">
@@ -565,7 +565,7 @@
     <!-- plugins and features are copied into the buildDirectory -->
     <echo message="here2" />
     <copy todir="${buildDirectory}/plugins/biobank2" verbose="true">
-      <fileset dir="${eclipse.workspace.dir}/biobank2"/>
+      <fileset dir="${eclipse.workspace.dir}/biobank2" />
     </copy>
     <!-- TODO : copy all project containing .nl1. into the plugins folder -->
     <copy todir="${buildDirectory}/plugins/biobank.nl1.fr_CA">
@@ -697,6 +697,10 @@
     <delete dir="docs/doxygen/html" />
     <delete dir="docs/doxygen/xml" />
   </target>
+
+<!-- (setq nxml-slash-auto-complete-flag t) -->
+
+
 </project>
 
 <!--

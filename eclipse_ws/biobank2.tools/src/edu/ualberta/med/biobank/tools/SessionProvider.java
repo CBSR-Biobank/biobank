@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test;
+package edu.ualberta.med.biobank.tools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +18,7 @@ import org.hibernate.cfg.Environment;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
+@SuppressWarnings("nls")
 public class SessionProvider {
     public enum Mode {
         DEBUG,
@@ -58,14 +59,12 @@ public class SessionProvider {
             // Create initial context
             System.setProperty(Context.INITIAL_CONTEXT_FACTORY,
                 "org.apache.naming.java.javaURLContextFactory");
-            System.setProperty(Context.URL_PKG_PREFIXES,
-                "org.apache.naming");
+            System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
             InitialContext ic = new InitialContext();
 
             ic.createSubcontext("java:");
 
-            String dbPropertiesFilename = System
-                .getProperty("db.properties", "../../db.properties");
+            String dbPropertiesFilename = System.getProperty("db.properties", "../../db.properties");
 
             File dbPropertiesFile = new File(dbPropertiesFilename);
             if (!dbPropertiesFile.exists()) {
@@ -81,8 +80,7 @@ public class SessionProvider {
                 dbProperties.getProperty("database.name"));
 
             // Construct DataSource
-            MysqlConnectionPoolDataSource ds =
-                new MysqlConnectionPoolDataSource();
+            MysqlConnectionPoolDataSource ds = new MysqlConnectionPoolDataSource();
             ds.setUrl(url);
             ds.setUser(dbProperties.getProperty("database.username"));
             ds.setPassword(dbProperties.getProperty("database.password"));

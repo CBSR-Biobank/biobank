@@ -11,7 +11,8 @@ import org.junit.Before;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.SessionProvider.Mode;
+import edu.ualberta.med.biobank.tools.SessionProvider;
+import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 
 public class TestDb extends BaseTest {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
@@ -62,8 +63,8 @@ public class TestDb extends BaseTest {
         // check if user already exists
         @SuppressWarnings("unchecked")
         List<User> users = session.createCriteria(User.class)
-            .add(Restrictions.eq("login", GLOBAL_ADMIN_LOGIN))
-            .list();
+        .add(Restrictions.eq("login", GLOBAL_ADMIN_LOGIN))
+        .list();
 
         if (users.size() >= 1) return users.get(0);
 
