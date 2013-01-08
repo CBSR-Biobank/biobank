@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="/biobank.common/lib/client/log4j-1.2.14.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.15-bin.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.9.0.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache-1.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

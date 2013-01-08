@@ -262,6 +262,9 @@ End:
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset dir="${req.jars.dir}">
+        <include name="c3p0-0.9.0.jar" />
+	<include name="dom4j-1.4.jar" />
+	<include name="ehcache-1.2.2.jar" />
         <include name="log4j-1.2.14.jar" />
       </fileset>
     </copy>
