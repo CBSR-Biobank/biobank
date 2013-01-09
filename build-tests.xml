@@ -95,7 +95,7 @@
       <classpath>
         <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
         <pathelement location="${eclipse.proj.dir.tests}/lib/clm.jar" />
-        <pathelement location="${eclipse.proj.dir.tests}/lib/naming-common.jar" />
+        <pathelement location="${eclipse.proj.dir.tools}/lib/naming-common.jar" />
         <pathelement location="${eclipse.proj.dir.tests}/conf" />
       </classpath>
       <sysproperty key="db.properties" value="db.properties" />
