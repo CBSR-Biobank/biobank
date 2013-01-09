@@ -49,17 +49,17 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
-        if (specimenTypeId == null)
+        if (specimenTypeId == null) {
             permission = new SpecimenTypeCreatePermission();
-        else
+        } else {
             permission = new SpecimenTypeUpdatePermission();
+        }
         return permission.isAllowed(context);
     }
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
-        specimenType =
-            context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
+        specimenType = context.get(SpecimenType.class, specimenTypeId, new SpecimenType());
         specimenType.setName(name);
         specimenType.setNameShort(nameShort);
 
@@ -72,14 +72,14 @@ public class SpecimenTypeSaveAction implements Action<IdResult> {
     }
 
     private void saveChildSpecimenTypes(ActionContext context) {
-        Set<SpecimenType> studies =
-            context.load(SpecimenType.class, childSpecimenTypeIds);
-        SetDifference<SpecimenType> sitesDiff =
-            new SetDifference<SpecimenType>(
-                specimenType.getChildSpecimenTypes(), studies);
-        specimenType.setChildSpecimenTypes(sitesDiff.getNewSet());
+        Set<SpecimenType> studies = context.load(SpecimenType.class, childSpecimenTypeIds);
+        SetDifference<SpecimenType> sitesDiff = new SetDifference<SpecimenType>(
+            specimenType.getChildSpecimenTypes(), studies);
+        specimenType.getChildSpecimenTypes().addAll(sitesDiff.getAddSet());
+        specimenType.getChildSpecimenTypes().removeAll(sitesDiff.getRemoveSet());
+
         for (SpecimenType childType : sitesDiff.getRemoveSet()) {
-            context.getSession().delete(childType);
+            childType.getParentSpecimenTypes().remove(specimenType);
         }
 
     }
