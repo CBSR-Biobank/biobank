@@ -30,6 +30,11 @@
     <appender-ref ref="BIOBANK_APPENDER" />
   </category>
 
+  <category name="edu.ualberta.med.biobank.common.action">
+    <level value="debug" />
+    <appender-ref ref="CONSOLE" />
+  </category>
+
   <category name="com.googlecode.flyway.core">
     <level value="debug" />
     <appender-ref ref="CONSOLE" />

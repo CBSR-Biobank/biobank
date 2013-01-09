@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class ContainerGetChildrenAction implements
-    Action<ListResult<Container>> {
+Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory
@@ -33,7 +33,7 @@ public class ContainerGetChildrenAction implements
     public boolean isAllowed(ActionContext context) throws ActionException {
         Container c = context.load(Container.class, parentContainerId);
         return new ContainerReadPermission(c.getSite().getId())
-            .isAllowed(context);
+        .isAllowed(context);
     }
 
     @SuppressWarnings("nls")
@@ -42,10 +42,9 @@ public class ContainerGetChildrenAction implements
         throws ActionException {
         log.info("run: parentContainerId={}", parentContainerId);
 
-        Container parentContainer =
-            context.load(Container.class, parentContainerId);
-        ArrayList<Container> childContainers =
-            new ArrayList<Container>(parentContainer.getChildPositions().size());
+        Container parentContainer = context.load(Container.class, parentContainerId);
+        ArrayList<Container> childContainers = new ArrayList<Container>(
+            parentContainer.getChildPositions().size());
 
         parentContainer.getContainerType().getChildLabelingScheme().getName();
 
@@ -58,12 +57,14 @@ public class ContainerGetChildrenAction implements
 
             child.getSite().getName();
 
+            // need to initialize specimen types for the container tree view
+            child.getContainerType().getSpecimenTypes().size();
+
             log.debug("run: parentContainerId={} getting container types");
 
             // need to initialize containerType.childContainerTypes to
             // support container drag and drop.
-            for (ContainerType ct : child.getContainerType()
-                .getChildContainerTypes()) {
+            for (ContainerType ct : child.getContainerType().getChildContainerTypes()) {
                 ct.getName();
 
                 if (!ctSet.contains(ct)) {

@@ -265,7 +265,7 @@
     <antcall target="messages-jar"/>
   </target>
 
-  <target name="deploy-eclipse" depends="resolve,create-messages-jar"
+  <target name="deploy-eclipse" depends="resolve,create-messages-jar,java-client-manifest"
 	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir.common}/lib/client"/>

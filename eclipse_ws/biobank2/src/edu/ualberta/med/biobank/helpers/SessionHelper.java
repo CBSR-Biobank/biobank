@@ -54,7 +54,7 @@ public class SessionHelper implements Runnable {
 
     @SuppressWarnings("nls")
     private static final String DOWNLOAD_URL =
-        "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
+    "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
 
     @SuppressWarnings("nls")
     private static final String DEFAULT_TEST_USER = "testuser";
@@ -87,11 +87,11 @@ public class SessionHelper implements Runnable {
 
     @SuppressWarnings("nls")
     private static final String UNTRUSTED_CERT_MESSAGE =
-        "The authenticity of host ''{0}'' can''t be established."
-            + "\nSHA1 fingerprint is {1}"
-            + "\nMD5 fingerprint is {2}"
-            + "\nAre you sure you want to continue?"
-            + "\n(Choosing yes will trust this certificate forever and may require an application restart)";
+    "The authenticity of host ''{0}'' can''t be established."
+        + "\nSHA1 fingerprint is {1}"
+        + "\nMD5 fingerprint is {2}"
+        + "\nAre you sure you want to continue?"
+        + "\n(Choosing yes will trust this certificate forever and may require an application restart)";
 
     @SuppressWarnings("nls")
     private boolean checkCertificates(String serverUrl, Boolean firstConnection)
@@ -130,9 +130,9 @@ public class SessionHelper implements Runnable {
             if (trustedAny && !firstConnection) {
                 // restart because the trustStore has been read from once.
                 BgcPlugin
-                    .openInformation(
-                        i18n.tr("Restart Required"),
-                        i18n.tr("The application must be restarted to connect to the entered server."));
+                .openInformation(
+                    i18n.tr("Restart Required"),
+                    i18n.tr("The application must be restarted to connect to the entered server."));
                 restartPending = true;
                 PlatformUI.getWorkbench().close();
             }
@@ -175,21 +175,19 @@ public class SessionHelper implements Runnable {
                 appService = ServiceConnection.getAppService(serverUrl,
                     userName, password);
             }
-            String clientVersion = Platform.getProduct().getDefiningBundle()
-                .getVersion().toString();
-            logger.debug("Check client version:"
-                + clientVersion);
+            String clientVersion = Platform.getProduct().getDefiningBundle().getVersion().toString();
+            logger.debug("Check client version:" + clientVersion);
             appService.checkVersion(clientVersion);
             user = UserWrapper.getUser(appService, userName);
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
                 BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Server Version Error"),
-                        // dialog message.
-                        i18n.tr("The server you are connecting to does not have a version. Cannot authenticate."),
-                        exp);
+                .openError(
+                    // dialog title.
+                    i18n.tr("Server Version Error"),
+                    // dialog message.
+                    i18n.tr("The server you are connecting to does not have a version. Cannot authenticate."),
+                    exp);
             } else if (exp instanceof ServerVersionNewerException) {
                 if (BgcPlugin.openConfirm(
                     // dialog title.
@@ -211,22 +209,20 @@ public class SessionHelper implements Runnable {
                     i18n.tr("Server Version Error"),
                     exp.getMessage(), exp);
             } else if (exp instanceof ClientVersionInvalidException) {
-                BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Client Version Error"),
-                        // dialog message.
-                        i18n.tr("Cannot connect to this server because the Java Client version is invalid."),
-                        exp);
+                BgcPlugin.openError(
+                    // dialog title.
+                    i18n.tr("Client Version Error"),
+                    // dialog message.
+                    i18n.tr("Cannot connect to this server because the Java Client version is invalid."),
+                    exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BgcPlugin
-                    .openAsyncError(
-                        // dialog title.
-                        i18n.tr("Login Failed"),
-                        // dialog message.
-                        i18n.tr("Bad credentials. Warning: You will be locked out after 3 failed login attempts."),
-                        exp);
+                BgcPlugin.openAsyncError(
+                    // dialog title.
+                    i18n.tr("Login Failed"),
+                    // dialog message.
+                    i18n.tr("Bad credentials. Warning: You will be locked out after 3 failed login attempts."),
+                    exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
                 BgcPlugin.openAsyncError(

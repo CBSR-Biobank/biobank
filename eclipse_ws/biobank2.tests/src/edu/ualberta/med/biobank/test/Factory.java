@@ -669,8 +669,7 @@ public class Factory {
         containerType.setNameShort(name);
         containerType.setSite(getDefaultSite());
         containerType.setCapacity(new Capacity(getDefaultCapacity()));
-        containerType
-        .setChildLabelingScheme(getDefaultContainerLabelingScheme());
+        containerType.setChildLabelingScheme(getDefaultContainerLabelingScheme());
 
         setDefaultContainerType(containerType);
         session.save(containerType);

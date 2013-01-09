@@ -135,16 +135,17 @@ public class AdapterTreeWidget extends Composite {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
+                if (event.type != SWT.Show) return;
+
                 Menu menu = treeViewer.getTree().getMenu();
                 for (MenuItem menuItem : menu.getItems()) {
                     menuItem.dispose();
                 }
 
-                Object element = ((StructuredSelection) treeViewer
-                    .getSelection()).getFirstElement();
+                Object element = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
                 if (element != null) {
-                    ((AbstractAdapterBase) element).popupMenu(treeViewer,
-                        treeViewer.getTree(), menu);
+                    ((AbstractAdapterBase) element).popupMenu(
+                        treeViewer, treeViewer.getTree(), menu);
                 }
             }
         });

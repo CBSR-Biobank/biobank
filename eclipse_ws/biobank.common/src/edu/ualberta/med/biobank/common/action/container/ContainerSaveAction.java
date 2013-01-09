@@ -25,7 +25,7 @@ public class ContainerSaveAction implements Action<IdResult> {
 
     @SuppressWarnings("nls")
     public static final LString CANNOT_SET_LABEL_ERRMSG =
-        bundle.tr("Cannot set label on child containers.").format();
+    bundle.tr("Cannot set label on child containers.").format();
 
     @SuppressWarnings("nls")
     public static final String PATH_DELIMITER = "/";

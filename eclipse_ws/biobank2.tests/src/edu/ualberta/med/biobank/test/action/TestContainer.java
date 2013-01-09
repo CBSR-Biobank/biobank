@@ -1,83 +1,172 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.hibernate.Transaction;
-import org.junit.Before;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class TestContainer extends TestAction {
 
-    private String name;
+    @Test
+    public void createTopContainer() throws Exception {
+        session.beginTransaction();
+        ContainerType ctype = factory.createTopContainerType();
+        session.getTransaction().commit();
 
-    private Integer siteId;
+        ActivityStatus astatus = ActivityStatus.FLAGGED;
 
-    private Integer containerTypeId;
+        String uniqueString = getMethodNameR();
 
-    private ContainerSaveAction containerSaveAction;
+        ContainerSaveAction saveAction = new ContainerSaveAction();
+        saveAction.setLabel(uniqueString);
+        saveAction.setBarcode(uniqueString);
+        saveAction.setTypeId(ctype.getId());
+        saveAction.setSiteId(ctype.getSite().getId());
+        saveAction.setActivityStatus(astatus);
+        saveAction.setCommentText(uniqueString);
+        Integer containerId = exec(saveAction).getId();
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        name = getMethodNameR();
+        session.clear();
 
-        siteId = exec(SiteHelper.getSaveAction(
-            name, name, ActivityStatus.ACTIVE)).getId();
+        Container container = (Container) session.get(Container.class, containerId);
 
-        containerTypeId = exec(ContainerTypeHelper.getSaveAction(
-            "FREEZER_3x10", "FR3x10", siteId, true, 3, 10,
-            getContainerLabelingSchemes().get("CBSR 2 char alphabetic")
-                .getId(), getR().nextDouble())).getId();
+        Assert.assertEquals(uniqueString, container.getLabel());
+        Assert.assertEquals(uniqueString, container.getProductBarcode());
+        Assert.assertEquals(ctype.getName(), container.getContainerType().getName());
+        Assert.assertEquals(astatus, container.getActivityStatus());
+        Assert.assertEquals(ctype.getSite().getName(), container.getSite().getName());
+        Assert.assertEquals(0, container.getChildPositions().size());
+        Assert.assertEquals(0, container.getSpecimenPositions().size());
 
-        containerSaveAction = new ContainerSaveAction();
-        containerSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        containerSaveAction.setBarcode(Utils.getRandomString(5, 10));
-        containerSaveAction.setLabel("01");
-        containerSaveAction.setSiteId(siteId);
-        containerSaveAction.setTypeId(containerTypeId);
+        Assert.assertEquals(1, container.getComments().size());
+        Assert.assertEquals(uniqueString, container.getComments().iterator().next().getMessage());
     }
 
     @Test
-    public void saveNew() throws Exception {
+    public void createChildContainer() throws Exception {
+        session.beginTransaction();
 
+        ContainerLabelingScheme labeling = (ContainerLabelingScheme)
+            session.createCriteria(ContainerLabelingScheme.class)
+            .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
+
+        Capacity capacity = new Capacity();
+        capacity.setRowCapacity(4);
+        capacity.setColCapacity(4);
+        factory.setDefaultCapacity(capacity);
+
+        Container topContainer = factory.createTopContainer();
+        ContainerType ctype = factory.createContainerType();
+        topContainer.getContainerType().setChildLabelingScheme(labeling);
+        topContainer.getContainerType().getChildContainerTypes().add(ctype);
+        session.getTransaction().commit();
+
+        ActivityStatus astatus = ActivityStatus.FLAGGED;
+
+        String uniqueString = getMethodNameR();
+
+        ContainerSaveAction saveAction = new ContainerSaveAction();
+        saveAction.setParentId(topContainer.getId());
+        saveAction.setPosition(new RowColPos(0, 0));
+        saveAction.setBarcode(uniqueString);
+        saveAction.setTypeId(ctype.getId());
+        saveAction.setSiteId(ctype.getSite().getId());
+        saveAction.setActivityStatus(astatus);
+        saveAction.setCommentText(uniqueString);
+        Integer containerId = exec(saveAction).getId();
+
+        session.clear();
+
+        Container container = (Container) session.get(Container.class, containerId);
+
+        Assert.assertEquals(topContainer, container.getParentContainer());
+        Assert.assertEquals(0, container.getPosition().getRow().intValue());
+        Assert.assertEquals(0, container.getPosition().getCol().intValue());
+        Assert.assertEquals(topContainer, container.getTopContainer());
+        Assert.assertEquals(topContainer.getLabel() + "A1", container.getLabel());
+        Assert.assertEquals(uniqueString, container.getProductBarcode());
+        Assert.assertEquals(ctype.getName(), container.getContainerType().getName());
+        Assert.assertEquals(astatus, container.getActivityStatus());
+        Assert.assertEquals(ctype.getSite().getName(), container.getSite().getName());
+        Assert.assertEquals(0, container.getChildPositions().size());
+        Assert.assertEquals(0, container.getSpecimenPositions().size());
+
+        Assert.assertEquals(1, container.getComments().size());
+        Assert.assertEquals(uniqueString, container.getComments().iterator().next().getMessage());
     }
 
     @Test
     public void checkGetAction() throws Exception {
-        Integer containerId = exec(containerSaveAction).getId();
-        ContainerInfo containerInfo =
-            exec(new ContainerGetInfoAction(containerId));
+        session.beginTransaction();
+        Container container = factory.createContainer();
+        session.getTransaction().commit();
 
-        Assert.assertEquals("01", containerInfo.container.getLabel());
-        Assert.assertEquals("FREEZER_3x10", containerInfo.container
+        ContainerInfo containerInfo = exec(new ContainerGetInfoAction(container.getId()));
+
+        Assert.assertEquals(container.getLabel(), containerInfo.container.getLabel());
+        Assert.assertEquals(container.getContainerType().getName(), containerInfo.container
             .getContainerType().getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE, containerInfo.container
-            .getActivityStatus());
-        Assert.assertEquals(name, containerInfo.container.getSite().getName());
-        Assert.assertEquals(0, containerInfo.container
-            .getChildPositions().size());
-        Assert.assertEquals(0, containerInfo.container
-            .getSpecimenPositions().size());
-        Assert.assertEquals(0, containerInfo.container.getComments()
-            .size());
+        Assert.assertEquals(ActivityStatus.ACTIVE, containerInfo.container.getActivityStatus());
+        Assert.assertEquals(container.getSite().getName(),
+            containerInfo.container.getSite().getName());
+        Assert.assertEquals(0, containerInfo.container.getChildPositions().size());
+        Assert.assertEquals(0, containerInfo.container.getSpecimenPositions().size());
+        Assert.assertEquals(0, containerInfo.container.getComments().size());
     }
 
     // TODO: need tests for container labels
 
     @Test
-    public void testMoveContainer() {
-        Transaction tx = session.beginTransaction();
+    public void getChildren() throws Exception {
+        session.beginTransaction();
+
+        ContainerLabelingScheme labeling = (ContainerLabelingScheme)
+            session.createCriteria(ContainerLabelingScheme.class)
+            .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
+
+        Capacity capacity = new Capacity();
+        capacity.setRowCapacity(4);
+        capacity.setColCapacity(4);
+        factory.setDefaultCapacity(capacity);
+
+        Container topContainer = factory.createTopContainer();
+        Container childContainer = factory.createContainer();
+        topContainer.getContainerType().setChildLabelingScheme(labeling);
+        topContainer.getContainerType().getChildContainerTypes().add(
+            childContainer.getContainerType());
+
+        SpecimenType specimenType = factory.createSpecimenType();
+        childContainer.getContainerType().getSpecimenTypes().add(specimenType);
+
+        session.getTransaction().commit();
+
+        List<Container> containers = exec(new ContainerGetChildrenAction(
+            topContainer.getId())).getList();
+        Assert.assertEquals(1, containers.size());
+
+        Container container = containers.iterator().next();
+        Assert.assertEquals(1, container.getContainerType().getSpecimenTypes().size());
+    }
+
+    @Test
+    public void moveContainer() {
+        session.beginTransaction();
 
         factory.createTopContainer();
         Container childL1Container = factory.createParentContainer();
@@ -88,7 +177,7 @@ public class TestContainer extends TestAction {
         };
 
         Container topContainer2 = factory.createTopContainer();
-        tx.commit();
+        session.getTransaction().commit();
 
         exec(new ContainerMoveAction(childL1Container, topContainer2,
             topContainer2.getLabel() + "A1"));
@@ -117,12 +206,12 @@ public class TestContainer extends TestAction {
 
             // check the path
             Assert
-                .assertEquals(expectedL2Path, containerInfo.container.getPath());
+            .assertEquals(expectedL2Path, containerInfo.container.getPath());
         }
     }
 
     @Test
-    public void testMoveContainerOccupiedLocation() {
+    public void moveContainerOccupiedLocation() {
         Transaction tx = session.beginTransaction();
 
         factory.createTopContainer();
@@ -137,16 +226,16 @@ public class TestContainer extends TestAction {
             exec(new ContainerMoveAction(child1Container, topContainer2,
                 topContainer2.getLabel() + "A1"));
             Assert
-                .fail("should not be allowed to move a containers to occupied spot");
+            .fail("should not be allowed to move a containers to occupied spot");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
     }
 
     @Test
-    public void testMoveContainerDiffSites() {
+    public void moveContainerDiffSites() {
         // containers are not allowed to be moved between sites
-        Transaction tx = session.beginTransaction();
+        session.beginTransaction();
 
         factory.createTopContainer();
         Container childContainer = factory.createContainer();
@@ -155,14 +244,14 @@ public class TestContainer extends TestAction {
         factory.createTopContainerType();
         Container topContainerS2 = factory.createTopContainer();
 
-        tx.commit();
+        session.getTransaction().commit();
 
         try {
             // use default labeling scheme
             exec(new ContainerMoveAction(childContainer, topContainerS2,
                 topContainerS2.getLabel() + "A1"));
             Assert
-                .fail("should not be allowed to move containers between sites");
+            .fail("should not be allowed to move containers between sites");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }

@@ -318,8 +318,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         // take care with null pointers here
         ContainerTypeWrapper ctype = getContainerType();
         if (ctype != null) {
-            return !ctype.getSpecimenTypeCollection().isEmpty()
-                && !getSpecimens().isEmpty();
+            return !(getSpecimens().isEmpty() || ctype.getSpecimenTypeCollection().isEmpty());
         }
         return false;
     }
@@ -380,7 +379,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public long getChildCount(boolean fast) throws BiobankException,
-        ApplicationException {
+    ApplicationException {
         return getPropertyCount(ContainerPeer.CHILD_POSITIONS, fast);
     }
 
@@ -531,9 +530,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + " as c left join c."
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CHILD_CONTAINER_TYPES)
-            + " as ct where c."
-            + ContainerPeer.SITE.getName() + "=? and c."
-            + ContainerPeer.LABEL.getName() + " in (";
+                + " as ct where c."
+                + ContainerPeer.SITE.getName() + "=? and c."
+                + ContainerPeer.LABEL.getName() + " in (";
 
     /**
      * Get containers with a given label that can have a child (container or
@@ -547,7 +546,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
         SiteWrapper site, ContainerTypeWrapper type)
-        throws ApplicationException {
+            throws ApplicationException {
         List<Integer> validLengths = ContainerLabelingSchemeWrapper
             .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
@@ -555,10 +554,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
                 validParents
-                    .add(new StringBuilder("'")
-                        .append(
-                            childLabel.substring(0, childLabel.length() - crop))
-                        .append("'").toString());
+                .add(new StringBuilder("'")
+                .append(
+                    childLabel.substring(0, childLabel.length() - crop))
+                    .append("'").toString());
 
         List<ContainerWrapper> filteredWrappers =
             new ArrayList<ContainerWrapper>();
@@ -567,7 +566,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             params.add(site.getWrappedObject());
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
-                StringUtil.join(validParents, ",")).append(")");
+                    StringUtil.join(validParents, ",")).append(")");
             if (type != null) {
                 parentQuery.append(" and ct.id=?");
                 params.add(type.getId());
@@ -582,7 +581,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     if (ct.getRowColFromPositionString(childLabel.substring(c
                         .getLabel().length())) != null)
                         filteredWrappers
-                            .add(new ContainerWrapper(appService, c));
+                        .add(new ContainerWrapper(appService, c));
                 } catch (Exception e) {
                     // can't throw an exception: it means that this label is not
                     // possible in this parent.
@@ -603,20 +602,20 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + ".size = 0 and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-            + " >= ? and "
-            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-                ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-            + " >= ? and "
-            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-                ContainerTypePeer.ID)
-            + " in (select ct."
-            + ContainerTypePeer.ID.getName()
-            + " from "
-            + ContainerType.class.getName()
-            + " as ct left join ct."
-            + ContainerTypePeer.SPECIMEN_TYPES.getName()
-            + " as sampleType where sampleType."
-            + SpecimenTypePeer.ID.getName() + " in (";
+                + " >= ? and "
+                + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                    ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
+                    + " >= ? and "
+                    + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                        ContainerTypePeer.ID)
+                        + " in (select ct."
+                        + ContainerTypePeer.ID.getName()
+                        + " from "
+                        + ContainerType.class.getName()
+                        + " as ct left join ct."
+                        + ContainerTypePeer.SPECIMEN_TYPES.getName()
+                        + " as sampleType where sampleType."
+                        + SpecimenTypePeer.ID.getName() + " in (";
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -642,7 +641,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(
             EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
-            .append(StringUtil.join(typeIds, ",")).append("))").toString();
+        .append(StringUtil.join(typeIds, ",")).append("))").toString();
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
@@ -677,7 +676,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      */
     public static List<ContainerWrapper> getContainersByLabel(
         WritableApplicationService appService, String label)
-        throws ApplicationException {
+            throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(CONTAINERS_BY_LABEL,
             Arrays.asList(new Object[] { label }));
         List<Container> containers = appService.query(criteria);
@@ -820,7 +819,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankCheckException
      */
     public boolean isContainerFull() throws BiobankException,
-        ApplicationException {
+    ApplicationException {
         return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
@@ -838,7 +837,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, SiteWrapper site,
         String positionText, ContainerTypeWrapper contType)
-        throws ApplicationException, BiobankException {
+            throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
             positionText, site, contType);
@@ -894,7 +893,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.COL).getName()
         + "=? and "
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER)
-            .getName() + "=?";
+        .getName() + "=?";
 
     /**
      * Method used to check if the current position of this Specimen is
@@ -1003,7 +1002,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private static class ResetUpdateChildrenFlagQueryTask extends
-        NoActionWrapperQueryTask<ContainerWrapper> {
+    NoActionWrapperQueryTask<ContainerWrapper> {
         public ResetUpdateChildrenFlagQueryTask(ContainerWrapper container) {
             super(container);
         }

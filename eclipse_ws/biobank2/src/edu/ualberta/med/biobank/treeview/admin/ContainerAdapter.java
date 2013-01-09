@@ -50,7 +50,7 @@ public class ContainerAdapter extends AdapterBase {
 
     @SuppressWarnings("unused")
     private static BgcLogger LOGGER = BgcLogger
-        .getLogger(ContainerAdapter.class.getName());
+    .getLogger(ContainerAdapter.class.getName());
 
     private List<Container> childContainers = null;
 
@@ -100,7 +100,7 @@ public class ContainerAdapter extends AdapterBase {
             return container.getLabel();
         }
         return container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")";
+        + container.getContainerType().getNameShort() + ")";
     }
 
     @SuppressWarnings("nls")
@@ -170,43 +170,43 @@ public class ContainerAdapter extends AdapterBase {
                 context.run(true,
                     false,
                     new IRunnableWithProgress() {
-                        @Override
-                        public void run(final IProgressMonitor monitor) {
-                            monitor.beginTask(
-                                // progress monitor message.
-                                i18n.tr(
-                                    "Moving specimens from container {0} to {1}",
-                                    getContainer().getFullInfoLabel(),
-                                    newContainer.getFullInfoLabel()),
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask(
+                            // progress monitor message.
+                            i18n.tr(
+                                "Moving specimens from container {0} to {1}",
+                                getContainer().getFullInfoLabel(),
+                                newContainer.getFullInfoLabel()),
                                 IProgressMonitor.UNKNOWN);
-                            try {
-                                SessionManager.getAppService()
-                                    .doAction(new ContainerMoveSpecimensAction(
-                                        getContainer().getWrappedObject(),
-                                        newContainer.getWrappedObject()));
-                                monitor.done();
-                                BgcPlugin
-                                    .openAsyncInformation(
-                                        // dialog title.
-                                        i18n.tr("Specimens moved"),
-                                        // dialog message.
-                                        i18n.tr(
-                                            "{0} specimens are now in {1}.",
-                                            newContainer.getSpecimens().size(),
-                                            newContainer.getFullInfoLabel()));
-                            } catch (Exception e) {
-                                monitor.setCanceled(true);
-                                BgcPlugin
-                                    .openAsyncError(
-                                        // dialog title.
-                                        i18n.tr("Move problem"), e);
-                            }
+                        try {
+                            SessionManager.getAppService()
+                            .doAction(new ContainerMoveSpecimensAction(
+                                getContainer().getWrappedObject(),
+                                newContainer.getWrappedObject()));
+                            monitor.done();
+                            BgcPlugin
+                            .openAsyncInformation(
+                                // dialog title.
+                                i18n.tr("Specimens moved"),
+                                // dialog message.
+                                i18n.tr(
+                                    "{0} specimens are now in {1}.",
+                                    newContainer.getSpecimens().size(),
+                                    newContainer.getFullInfoLabel()));
+                        } catch (Exception e) {
+                            monitor.setCanceled(true);
+                            BgcPlugin
+                            .openAsyncError(
+                                // dialog title.
+                                i18n.tr("Move problem"), e);
                         }
-                    });
+                    }
+                });
                 ContainerAdapter newContainerAdapter =
                     (ContainerAdapter) SessionManager
-                        .searchFirstNode(ContainerWrapper.class,
-                            newContainer.getId());
+                    .searchFirstNode(ContainerWrapper.class,
+                        newContainer.getId());
                 if (newContainerAdapter != null) {
                     getContainer().reload();
                     newContainerAdapter.performDoubleClick();
@@ -215,9 +215,9 @@ public class ContainerAdapter extends AdapterBase {
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
                 BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Problem while moving specimens"), e);
+                .openError(
+                    // dialog title.
+                    i18n.tr("Problem while moving specimens"), e);
             }
         }
     }
@@ -244,8 +244,8 @@ public class ContainerAdapter extends AdapterBase {
                         getContainer().getParentContainer();
                     ContainerAdapter parentAdapter =
                         (ContainerAdapter) SessionManager
-                            .searchFirstNode(ContainerWrapper.class,
-                                newParentContainer.getId());
+                        .searchFirstNode(ContainerWrapper.class,
+                            newParentContainer.getId());
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
                         parentAdapter.removeAll();
@@ -258,10 +258,10 @@ public class ContainerAdapter extends AdapterBase {
                 }
             } catch (Exception e) {
                 BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Problem while moving container"),
-                        e);
+                .openError(
+                    // dialog title.
+                    i18n.tr("Problem while moving container"),
+                    e);
             }
         }
     }
@@ -280,16 +280,16 @@ public class ContainerAdapter extends AdapterBase {
             SessionManager.getAppService().doAction(
                 new ContainerGetInfoByLabelAction(newLabel,
                     SessionManager.getUser().getCurrentWorkingSite()
-                        .getId())).getList();
+                    .getId())).getList();
         if (newParentContainers.size() == 0) {
             BgcPlugin
-                .openError(
-                    // dialog title.
-                    i18n.tr("Container Move Error"),
-                    // dialog message. {0}=label.
-                    i18n.tr(
-                        "A parent container with child \"{0}\" does not exist.",
-                        newLabel));
+            .openError(
+                // dialog title.
+                i18n.tr("Container Move Error"),
+                // dialog message. {0}=label.
+                i18n.tr(
+                    "A parent container with child \"{0}\" does not exist.",
+                    newLabel));
             return false;
         }
 
@@ -347,9 +347,8 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     protected List<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        childContainers =
-            SessionManager.getAppService()
-                .doAction(new ContainerGetChildrenAction(getId())).getList();
+        childContainers = SessionManager.getAppService().doAction(
+            new ContainerGetChildrenAction(getId())).getList();
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
             childContainers, ContainerWrapper.class);
     }
