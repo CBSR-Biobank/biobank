@@ -59,6 +59,42 @@ public class TestSpecimenType extends TestAction {
     }
 
     @Test
+    public void addChildTypes() {
+        session.beginTransaction();
+
+        // create two parent specimen types and three child specimen types,
+        // the two parent specimen types each have the three child ones as children
+        SpecimenType parentSpcType = factory.createSpecimenType();
+
+        Set<SpecimenType> childSpcTypes = new HashSet<SpecimenType>();
+        childSpcTypes.add(factory.createSpecimenType());
+        childSpcTypes.add(factory.createSpecimenType());
+        childSpcTypes.add(factory.createSpecimenType());
+
+        session.getTransaction().commit();
+
+        Set<Integer> childSpecimenTypeIds = new HashSet<Integer>();
+        for (SpecimenType spcType : childSpcTypes) {
+            childSpecimenTypeIds.add(spcType.getId());
+        }
+
+        // add the child types to the parent
+        SpecimenTypeSaveAction saveAction = new SpecimenTypeSaveAction(parentSpcType.getName(),
+            parentSpcType.getNameShort());
+        saveAction.setId(parentSpcType.getId());
+        saveAction.setChildSpecimenTypeIds(childSpecimenTypeIds);
+        exec(saveAction);
+
+        session.clear();
+        SpecimenType specimenType = (SpecimenType) session.load(
+            SpecimenType.class, parentSpcType.getId());
+
+        Assert.assertEquals(childSpcTypes.size(), specimenType.getChildSpecimenTypes().size());
+        Assert.assertTrue(specimenType.getChildSpecimenTypes().containsAll(childSpcTypes));
+
+    }
+
+    @Test
     public void removeChildTypes() {
         session.beginTransaction();
 
@@ -107,11 +143,9 @@ public class TestSpecimenType extends TestAction {
     }
 
     @Test
-    public void deleteChildTypes() {
+    public void deleteChildType() {
         session.beginTransaction();
 
-        // create two parent specimen types and three child specimen types,
-        // the two parent specimen types each have the three child ones as children
         Set<SpecimenType> parentSpcTypes = new HashSet<SpecimenType>();
         parentSpcTypes.add(factory.createSpecimenType());
         parentSpcTypes.add(factory.createSpecimenType());
@@ -150,6 +184,34 @@ public class TestSpecimenType extends TestAction {
 
         // now delete the child type
         exec(new SpecimenTypeDeleteAction(childSpcType));
+    }
+
+    @Test
+    public void deleteParentType() {
+        session.beginTransaction();
+
+        SpecimenType parentSpcType = factory.createSpecimenType();
+        SpecimenType childSpcType = factory.createSpecimenType();
+        parentSpcType.getChildSpecimenTypes().add(childSpcType);
+
+        session.getTransaction().commit();
+
+        // attempt to remove parent type
+        try {
+            exec(new SpecimenTypeDeleteAction(parentSpcType));
+            Assert.fail("should not be allowed to delete parent specimen type with children");
+        } catch (ConstraintViolationException e) {
+            // do nothing
+        }
+
+        // remove child type from parent
+        SpecimenTypeSaveAction saveAction = new SpecimenTypeSaveAction(parentSpcType.getName(),
+            parentSpcType.getNameShort());
+        saveAction.setId(parentSpcType.getId());
+        exec(saveAction);
+
+        // remove parent type
+        exec(new SpecimenTypeDeleteAction(parentSpcType));
     }
 
     @Test
