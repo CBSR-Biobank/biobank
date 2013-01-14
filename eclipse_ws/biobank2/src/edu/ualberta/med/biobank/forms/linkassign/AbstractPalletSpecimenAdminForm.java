@@ -66,10 +66,15 @@ AbstractSpecimenAdminForm {
         .getI18n(AbstractPalletSpecimenAdminForm.class);
 
     @SuppressWarnings("nls")
-    private static final String PLATE_VALIDATOR = "plate-validator";
+    protected static final String PLATE_VALIDATOR = "plate-validator";
     private BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
+
+    @SuppressWarnings("nls")
+    private final ScannerBarcodeValidator scannerBarcodeValidator = new ScannerBarcodeValidator(
+        // TR: validation error message
+        i18n.tr("Enter a valid plate barcode"));
 
     protected CancelConfirmWidget cancelConfirmWidget;
 
@@ -155,10 +160,7 @@ AbstractSpecimenAdminForm {
             @SuppressWarnings("nls")
             @Override
             protected void afterSuccessfulScan() {
-                appendLog(NLS
-                    .bind(
-                        "Scan completed - {0} specimens found",
-                        wells.keySet().size()));
+                appendLog(NLS.bind("Scan completed - {0} specimens found", wells.keySet().size()));
             }
 
             @Override
@@ -293,11 +295,7 @@ AbstractSpecimenAdminForm {
         Label lbl = widgetCreator.createLabel(fieldsComposite,
             // TR: label
             i18n.tr("Profile"));
-        profilesCombo = widgetCreator.createComboViewer(
-            fieldsComposite,
-            lbl,
-            null,
-            null,
+        profilesCombo = widgetCreator.createComboViewer(fieldsComposite,lbl,null, null,
             // TR: validation error message
             i18n.tr("Invalid profile selected"),
             false, null, null,
@@ -333,11 +331,7 @@ AbstractSpecimenAdminForm {
             i18n.tr("Plate to scan"));
         plateToScanText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE, plateToScanLabel, new String[0],
-            plateToScanValue,
-            new ScannerBarcodeValidator(
-                // TR: validation error message
-                i18n.tr("Enter a valid plate barcode")),
-                PLATE_VALIDATOR);
+            plateToScanValue, scannerBarcodeValidator, PLATE_VALIDATOR);
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -350,8 +344,7 @@ AbstractSpecimenAdminForm {
             @Override
             public void modifyText(ModifyEvent e) {
                 if (scanButton != null)
-                    scanButton.setEnabled((Boolean) canLaunchScanValue
-                        .getValue() && fieldsValid());
+                    scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid());
             }
         });
         // TR: tooltip
@@ -456,8 +449,7 @@ AbstractSpecimenAdminForm {
     }
 
     protected boolean isPlateValid() {
-        return BiobankPlugin.getDefault().isValidPlateBarcode(
-            plateToScanText.getText());
+        return BiobankPlugin.getDefault().isValidPlateBarcode(plateToScanText.getText());
     }
 
     protected void resetPlateToScan() {
@@ -483,13 +475,9 @@ AbstractSpecimenAdminForm {
     }
 
     @SuppressWarnings("nls")
-    protected void postprocessScanTubeAlone(PalletWell palletCell)
-        throws Exception {
-        appendLog(NLS.bind(
-            "Tube {0} scanned and set to position {1}",
-            palletCell.getValue(),
-            palletScanManagement.getContainerType().getPositionString(
-                palletCell.getRowColPos())));
+    protected void postprocessScanTubeAlone(PalletWell palletCell) throws Exception {
+        appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
+            palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
         beforeScanTubeAlone();
         CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
             getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
@@ -575,10 +563,11 @@ AbstractSpecimenAdminForm {
 
     protected void setUseScanner(boolean useScanner) {
         palletScanManagement.setUseScanner(useScanner);
-        if (useScanner)
+        if (useScanner) {
             currentScanState = null;
-        else
+        } else {
             currentScanState = UICellStatus.EMPTY;
+        }
     }
 
     /**
@@ -673,5 +662,9 @@ AbstractSpecimenAdminForm {
 
     protected void setContainerType(ContainerType type) {
         palletScanManagement.setContainerType(type);
+    }
+
+    protected void hideScannerBarcodeDecoration() {
+        scannerBarcodeValidator.hideDecoration();
     }
 }

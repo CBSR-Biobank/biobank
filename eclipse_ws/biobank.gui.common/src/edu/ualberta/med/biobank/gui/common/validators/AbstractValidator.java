@@ -23,13 +23,13 @@ public abstract class AbstractValidator implements IValidator {
         return errorMessage;
     }
 
-    protected void hideDecoration() {
+    public void hideDecoration() {
         if (controlDecoration != null) {
             controlDecoration.hide();
         }
     }
 
-    protected void showDecoration() {
+    public void showDecoration() {
         if (controlDecoration != null) {
             controlDecoration.show();
         }

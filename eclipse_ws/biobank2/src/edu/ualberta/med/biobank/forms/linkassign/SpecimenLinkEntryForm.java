@@ -86,6 +86,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private static Mode mode = Mode.MULTIPLE;
 
+    // set to true when in scan link multiple and user enters barcodes using the handheld scanner
+    private boolean scanMultipleWithHandheldInput = false;
+
     // TODO do not need a composite class anymore if only one link form is left
     private final LinkFormPatientManagement linkFormPatientManagement;
 
@@ -146,6 +149,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void setMode(Mode m) {
         log.debug("setMode: " + mode);
         mode = m;
+        if (mode == Mode.MULTIPLE) {
+            scanMultipleWithHandheldInput = false;
+        }
     }
 
     @SuppressWarnings("nls")
@@ -300,6 +306,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         log.debug("defaultInitialisation");
         super.defaultInitialisation();
         setNeedSinglePosition(mode == Mode.SINGLE_POSITION);
+        scanMultipleWithHandheldInput = false;
     }
 
     @SuppressWarnings("nls")
@@ -546,8 +553,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected boolean fieldsValid() {
-        return (mode.isSingleMode() ? true : isPlateValid())
-            && linkFormPatientManagement.fieldsValid();
+        if (mode.isSingleMode()) return true;
+        if ((mode == Mode.MULTIPLE) && scanMultipleWithHandheldInput) return true;
+        return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 
     @SuppressWarnings("nls")
@@ -570,13 +578,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void saveForm() throws Exception {
         log.debug("saveForm");
-        if (mode.isSingleMode())
+        if (mode.isSingleMode()) {
             saveSingleSpecimen();
-        else
+        } else {
             saveMultipleSpecimens();
+        }
         setFinished(false);
-        SessionManager.log("save", null,
-            "SpecimenLink");
+        SessionManager.log("save", null, "SpecimenLink");
     }
 
     @SuppressWarnings("nls")
@@ -918,6 +926,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             return false;
         }
         return super.canScanTubeAlone(cell);
+    }
+
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletWell palletCell) throws Exception {
+        super.postprocessScanTubeAlone(palletCell);
+        widgetCreator.setBinding(PLATE_VALIDATOR, false);
+        scanMultipleWithHandheldInput = true;
+        hideScannerBarcodeDecoration();
     }
 
 }

@@ -167,9 +167,8 @@ public class BgcWidgetCreator {
     }
 
     @SuppressWarnings("nls")
-    public Control createBoundWidget(Composite composite,
-        Class<? extends Widget> widgetClass, int widgetOptions,
-        String[] widgetValues, IObservableValue modelObservableValue,
+    public Control createBoundWidget(Composite composite, Class<? extends Widget> widgetClass,
+        int widgetOptions, String[] widgetValues, IObservableValue modelObservableValue,
         IValidator validator, String bindingKey) {
         Assert.isNotNull(dbc);
         UpdateValueStrategy uvs = null;
@@ -178,17 +177,14 @@ public class BgcWidgetCreator {
             uvs.setAfterGetValidator(validator);
         }
         if (widgetClass == BgcBaseText.class) {
-            return createText(composite, widgetOptions, modelObservableValue,
-                uvs, bindingKey);
+            return createText(composite, widgetOptions, modelObservableValue,uvs, bindingKey);
         } else if (widgetClass == Combo.class) {
-            return createCombo(composite, widgetOptions, widgetValues,
-                modelObservableValue, uvs, bindingKey);
-        } else if (widgetClass == Button.class) {
-            return createButton(composite, modelObservableValue, uvs,
+            return createCombo(composite, widgetOptions, widgetValues, modelObservableValue, uvs,
                 bindingKey);
+        } else if (widgetClass == Button.class) {
+            return createButton(composite, modelObservableValue, uvs,bindingKey);
         } else {
-            Assert.isTrue(false,
-                "invalid widget class " + widgetClass.getName());
+            Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
         }
         return null;
     }
@@ -243,8 +239,7 @@ public class BgcWidgetCreator {
             @Override
             public void handleValueChange(ValueChangeEvent event) {
                 if ((event.getObservableValue().getValue() == null)
-                    || event.getObservableValue().getValue().toString()
-                        .isEmpty()) {
+                    || event.getObservableValue().getValue().toString().isEmpty()) {
                     combo.deselectAll();
                 }
             }
@@ -309,11 +304,9 @@ public class BgcWidgetCreator {
             @Override
             public void keyPressed(KeyEvent e) {
                 if ((modelObservableValue != null)
-                    && (modelObservableValue.getValueType().equals(
-                        Integer.class)
-                    || modelObservableValue.getValueType().equals(
-                        Double.class))
-                    && Character.isLetter(e.character))
+                    && (modelObservableValue.getValueType().equals(Integer.class)
+                        || modelObservableValue.getValueType().equals(Double.class))
+                        && Character.isLetter(e.character))
                     e.doit = false;
             }
         });
@@ -477,19 +470,19 @@ public class BgcWidgetCreator {
         if (csu != null) {
 
             comboViewer
-                .addSelectionChangedListener(new ISelectionChangedListener() {
-                    @Override
-                    public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection =
-                            (IStructuredSelection) comboViewer
-                                .getSelection();
-                        if ((selection != null) && (selection.size() > 0)) {
-                            csu.doSelection(selection.getFirstElement());
-                        } else {
-                            csu.doSelection(null);
-                        }
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    IStructuredSelection selection =
+                        (IStructuredSelection) comboViewer
+                        .getSelection();
+                    if ((selection != null) && (selection.size() > 0)) {
+                        csu.doSelection(selection.getFirstElement());
+                    } else {
+                        csu.doSelection(null);
                     }
-                });
+                }
+            });
         }
         if (modifyListener != null) {
             combo.addModifyListener(modifyListener);
@@ -602,16 +595,14 @@ public class BgcWidgetCreator {
         final WritableValue writableValue,
         final IObservableValue observableValue, final String errorMsg) {
 
-        final ControlDecoration decoration = BgcBaseWidget
-            .createDecorator(control, errorMsg, SWT.LEFT | SWT.TOP);
-        Binding b = addBooleanBinding(writableValue, observableValue, errorMsg,
-            IStatus.ERROR);
+        final ControlDecoration decoration = BgcBaseWidget.createDecorator(
+            control, errorMsg, SWT.LEFT | SWT.TOP);
+        Binding b = addBooleanBinding(writableValue, observableValue, errorMsg, IStatus.ERROR);
 
         b.getValidationStatus().addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                boolean equal = NullUtil.eq(
-                    writableValue.getValue(), observableValue.getValue());
+                boolean equal = NullUtil.eq(writableValue.getValue(), observableValue.getValue());
 
                 if (equal) {
                     decoration.hide();
@@ -698,8 +689,8 @@ public class BgcWidgetCreator {
         IObservableValue modelObservableValue,
         UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
         Assert.isNotNull(dbc);
-        return dbc.bindValue(targetObservableValue, modelObservableValue,
-            targetToModel, modelToTarget);
+        return dbc.bindValue(targetObservableValue, modelObservableValue, targetToModel,
+            modelToTarget);
     }
 
     public void removeBinding(Binding binding) {
@@ -728,10 +719,11 @@ public class BgcWidgetCreator {
     }
 
     public void setBinding(String bindingKey, boolean set) {
-        if (set)
+        if (set) {
             addBinding(bindingKey);
-        else
+        } else {
             removeBinding(bindingKey);
+        }
     }
 
     public void createWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
