@@ -54,26 +54,31 @@ public class EventAttrWidget extends BgcBaseWidget {
 
     @SuppressWarnings("nls")
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
-        new HashMap<String, LabelDialogInfo>() {
-            private static final long serialVersionUID = 1L;
-            {
-                put(i18n.tr("Patient Type"),
-                    new LabelDialogInfo(
-                        i18n.tr("Patient Type Values"),
-                        i18n.tr("Please enter a patient type:"),
-                        i18n.tr("To enter multiple patient type values, separate with semicolon.")));
-                put(i18n.tr("Visit Type"),
-                    new LabelDialogInfo(
-                        i18n.tr("Visit Type Values"),
-                        i18n.tr("Please enter a visit type:"),
-                        i18n.tr("To enter multiple visit type values, separate with semicolon.")));
-                put(i18n.tr("Consent"),
-                    new LabelDialogInfo(
-                        i18n.tr("Consent Types"),
-                        i18n.tr("Please enter a consent type:"),
-                        i18n.tr("To enter multiple consent values, separate with semicolon.")));
-            }
-        };
+    new HashMap<String, LabelDialogInfo>() {
+        private static final long serialVersionUID = 1L;
+        {
+            put(i18n.tr("Patient Type"),
+                new LabelDialogInfo(
+                    i18n.tr("Patient Type Values"),
+                    i18n.tr("Please enter a patient type:"),
+                    i18n.tr("To enter multiple patient type values, separate with semicolon.")));
+            put(i18n.tr("Visit Type"),
+                new LabelDialogInfo(
+                    i18n.tr("Visit Type Values"),
+                    i18n.tr("Please enter a visit type:"),
+                    i18n.tr("To enter multiple visit type values, separate with semicolon.")));
+            put(i18n.tr("Consent"),
+                new LabelDialogInfo(
+                    i18n.tr("Consent Types"),
+                    i18n.tr("Please enter a consent type:"),
+                    i18n.tr("To enter multiple consent values, separate with semicolon.")));
+            put(i18n.tr("Gender"),
+                new LabelDialogInfo(
+                    i18n.tr("Gender"),
+                    i18n.tr("Please enter the valid genders:"),
+                    i18n.tr("To enter multiple consent values, separate with semicolon.")));
+        }
+    };
 
     @SuppressWarnings("nls")
     public EventAttrWidget(Composite parent, int style,
