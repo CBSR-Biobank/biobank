@@ -43,7 +43,6 @@ public class PalletScanManagement {
     private int scansCount = 0;
     private boolean useScanner = true;
 
-    private final boolean scanTubeAloneMode = true;
     private ContainerType type;
 
     @SuppressWarnings("nls")
@@ -94,17 +93,17 @@ public class PalletScanManagement {
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
-                } catch (AccessDeniedException e) {   
+                } catch (AccessDeniedException e) {
                     BgcPlugin.openAsyncError(
                         // dialog title
                         i18n.tr("Scan result error"),
                         e.getLocalizedMessage());
-                    scanAndProcessError(e.getLocalizedMessage());                    
+                    scanAndProcessError(e.getLocalizedMessage());
                 } catch (Exception e) {
                     BgcPlugin.openAsyncError(
-                            // dialog title
-                            i18n.tr("Scan result error"),
-                            e);
+                        // dialog title
+                        i18n.tr("Scan result error"),
+                        e);
                     String msg = e.getMessage();
                     if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
@@ -136,9 +135,9 @@ public class PalletScanManagement {
             if (plateNum == -1) {
                 plateError();
                 BgcPlugin.openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan error"),
-                        // dialog message
+                    // dialog title
+                    i18n.tr("Scan error"),
+                    // dialog message
                     i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
                 return;
             }
@@ -148,12 +147,12 @@ public class PalletScanManagement {
                 wells = PalletWell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin
-                    .openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan error"),
-                        ex,
-                        // dialog message
-                        i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
+                .openAsyncError(
+                    // dialog title
+                    i18n.tr("Scan error"),
+                    ex,
+                    // dialog message
+                    i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
                 return;
             } finally {
                 scansCount++;
@@ -181,11 +180,11 @@ public class PalletScanManagement {
                             newScannedCell.getValue())) {
                         // Different values at same position
                         oldScannedCell
-                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
-                                .getInformation()
-                                : StringUtil.EMPTY_STRING)
-                                + " "
-                                + i18n.tr("Rescanned value is different"));
+                        .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                            .getInformation()
+                            : StringUtil.EMPTY_STRING)
+                            + " "
+                            + i18n.tr("Rescanned value is different"));
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
@@ -214,27 +213,26 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void scanTubeAlone(MouseEvent e) {
-        if (isScanTubeAloneMode()) {
-            RowColPos rcp = ((ScanPalletWidget) e.widget).getPositionAtCoordinates(e.x, e.y);
-            if (rcp != null) {
-                PalletWell cell = wells.get(rcp);
-                if (canScanTubeAlone(cell)) {
-                    String value = scanTubeAloneDialog(rcp);
-                    if (value != null && !value.isEmpty()) {
-                        if (cell == null) {
-                            cell = new PalletWell(new DecodedWell(rcp.getRow(), rcp.getCol(), value));
-                            wells.put(rcp, cell);
-                        } else {
-                            cell.setValue(value);
-                        }
-                        try {
-                            postprocessScanTubeAlone(cell);
-                        } catch (Exception ex) {
-                            BgcPlugin.openAsyncError(
-                                // dialog title
-                                i18n.tr("Scan tube error"),
-                                ex);
-                        }
+        RowColPos pos = ((ScanPalletWidget) e.widget).getPositionAtCoordinates(e.x, e.y);
+        if (pos != null) {
+            PalletWell cell = wells.get(pos);
+            if (canScanTubeAlone(cell)) {
+                String value = scanTubeAloneDialog(pos);
+                if (value != null && !value.isEmpty()) {
+                    if (cell == null) {
+                        cell = new PalletWell(pos.getRow(), pos.getCol(),
+                            new DecodedWell(pos.getRow(), pos.getCol(), value));
+                        wells.put(pos, cell);
+                    } else {
+                        cell.setValue(value);
+                    }
+                    try {
+                        postprocessScanTubeAlone(cell);
+                    } catch (Exception ex) {
+                        BgcPlugin.openAsyncError(
+                            // dialog title
+                            i18n.tr("Scan tube error"),
+                            ex);
                     }
                 }
             }
@@ -248,7 +246,7 @@ public class PalletScanManagement {
 
     private String scanTubeAloneDialog(RowColPos rcp) {
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), wells, rcp, type);
+            .getActiveWorkbenchWindow().getShell(), wells, type.getPositionString(rcp));
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -329,27 +327,16 @@ public class PalletScanManagement {
         return scansCount;
     }
 
-    public void toggleScanTubeAloneMode() {
-        // might want to remove this toggle thing if users don't ask for it back
-        // scanTubeAloneMode = !scanTubeAloneMode;
-    }
-
-    public boolean isScanTubeAloneMode() {
-        return scanTubeAloneMode;
-    }
-
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
             wells.clear();
-            for (Entry<RowColPos, SpecimenWrapper> entry : container
-                .getSpecimens().entrySet()) {
-                RowColPos rcp = entry.getKey();
-                PalletWell cell =
-                    new PalletWell(new DecodedWell(rcp.getRow(), rcp.getCol(),
-                        entry.getValue().getInventoryId()));
+            for (Entry<RowColPos, SpecimenWrapper> entry : container.getSpecimens().entrySet()) {
+                RowColPos pos = entry.getKey();
+                PalletWell cell = new PalletWell(pos.getRow(), pos.getCol(),
+                    new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
-                wells.put(rcp, cell);
+                wells.put(pos, cell);
             }
         }
     }

@@ -21,7 +21,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,7 +46,6 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -95,8 +93,6 @@ AbstractSpecimenAdminForm {
 
     private PalletScanManagement palletScanManagement;
 
-    private Label scanTubeAloneSwitch;
-
     protected ComboViewer profilesCombo;
 
     private IPropertyChangeListener propertyListener;
@@ -114,11 +110,6 @@ AbstractSpecimenAdminForm {
         currentPlateToScan = plateToScanSessionString;
         addScannerPreferencesPropertyListener();
         palletScanManagement = new PalletScanManagement() {
-            @Override
-            public boolean isScanTubeAloneMode() {
-                // FIXME: see issue #1230. always activate this mode
-                return true;
-            }
 
             @Override
             protected void beforeThreadStart() {
@@ -506,49 +497,6 @@ AbstractSpecimenAdminForm {
         // default does nothing
     }
 
-    protected boolean isScanTubeAloneMode() {
-        return palletScanManagement.isScanTubeAloneMode();
-    }
-
-    protected void toggleScanTubeAloneMode() {
-        palletScanManagement.toggleScanTubeAloneMode();
-    }
-
-    protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch =
-            toolkit.createLabel(parent, StringUtil.EMPTY_STRING, SWT.NONE);
-        GridData gd = new GridData();
-        gd.verticalAlignment = SWT.TOP;
-        scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_SCAN_EDIT));
-        scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(MouseEvent e) {
-                if (isScanHasBeenLaunched()) {
-                    palletScanManagement.toggleScanTubeAloneMode();
-                    if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
-                            .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
-                    } else {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
-                            .get(BgcPlugin.IMG_SCAN_EDIT));
-                    }
-                }
-            }
-        });
-        // FIXME: see issue #1230. deactivate this button until the users say we
-        // can really remove it
-        scanTubeAloneSwitch.setVisible(false);
-    }
-
-    @SuppressWarnings("unused")
-    protected void showScanTubeAloneSwitch(boolean show) {
-        // FIXME: see issue #1230. deactivate this button until the users say we
-        // can really remove it
-        // widgetCreator.showWidget(scanTubeAloneSwitch, show);
-    }
-
     protected Map<RowColPos, PalletWell> getCells() {
         return palletScanManagement.getCells();
     }
@@ -599,26 +547,24 @@ AbstractSpecimenAdminForm {
 
         if (cells != null) {
             // for each cell, convert into a client side cell
-            for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
-                .getCells().entrySet()) {
-                RowColPos rcp = entry.getKey();
-                monitor
-                .subTask(
+            for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
+                RowColPos pos = entry.getKey();
+                monitor.subTask(
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
-                        .getPositionString(rcp)));
+                        .getPositionString(pos)));
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
-                    palletCell = new PalletWell(new DecodedWell(
-                        servercell.getRow(), servercell.getCol(),
-                        servercell.getValue()));
-                    cells.put(rcp, palletCell);
+                    palletCell = new PalletWell(pos.getRow(), pos.getCol(),
+                        new DecodedWell(servercell.getRow(), servercell.getCol(),
+                            servercell.getValue()));
+                    cells.put(pos, palletCell);
                 }
                 palletCell.merge(SessionManager.getAppService(), servercell);
                 // additional cell specific client conversion if needed
-                processCellResult(rcp, palletCell);
+                processCellResult(pos, palletCell);
             }
         }
         currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());

@@ -37,17 +37,16 @@ public class PalletWell extends AbstractUIWell {
 
     private SpecimenWrapper expectedSpecimen;
 
-    public PalletWell(DecodedWell scanCell) {
+    public PalletWell(Integer row, Integer col, DecodedWell scanCell) {
+        super(row, col);
         this.decodedWell = scanCell;
     }
 
-    public static Map<RowColPos, PalletWell> convertArray(
-        Set<DecodedWell> decodedWells) {
-        Map<RowColPos, PalletWell> palletScanned =
-            new TreeMap<RowColPos, PalletWell>();
+    public static Map<RowColPos, PalletWell> convertArray(Set<DecodedWell> decodedWells) {
+        Map<RowColPos, PalletWell> palletScanned = new TreeMap<RowColPos, PalletWell>();
         for (DecodedWell decodedWell : decodedWells) {
-            palletScanned.put(SbsLabeling.toRowCol(decodedWell.getLabel()),
-                new PalletWell(decodedWell));
+            RowColPos pos = SbsLabeling.toRowCol(decodedWell.getLabel());
+            palletScanned.put(pos, new PalletWell(pos.getRow(), pos.getCol(), decodedWell));
         }
         return palletScanned;
     }
@@ -84,12 +83,12 @@ public class PalletWell extends AbstractUIWell {
             RowColPos pos = new RowColPos(2, 3);
             DecodedWell decodedWell = new DecodedWell(
                 SbsLabeling.fromRowCol(pos), specimens.get(0).getInventoryId());
-            cells.put(pos, new PalletWell(decodedWell));
+            cells.put(pos, new PalletWell(pos.getRow(), pos.getCol(), decodedWell));
 
             pos = new RowColPos(3, 1);
             decodedWell = new DecodedWell(SbsLabeling.fromRowCol(pos),
                 specimens.get(1).getInventoryId());
-            cells.put(pos, new PalletWell(decodedWell));
+            cells.put(pos, new PalletWell(pos.getRow(), pos.getCol(), decodedWell));
         }
         return cells;
     }
@@ -101,20 +100,20 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(
         WritableApplicationService appService, Integer siteId, Integer studyId)
-        throws Exception {
+            throws Exception {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
             appService, siteId, studyId);
         if (specimens.size() > 0) {
             RowColPos pos = new RowColPos(0, 0);
-            palletScanned.put(pos, new PalletWell(
+            palletScanned.put(pos, new PalletWell(pos.getRow(), pos.getCol(),
                 new DecodedWell(SbsLabeling.fromRowCol(pos),
                     specimens.get(0).getInventoryId())));
         }
         if (specimens.size() > 1) {
             RowColPos pos = new RowColPos(0, 0);
-            palletScanned.put(pos, new PalletWell(
+            palletScanned.put(pos, new PalletWell(pos.getRow(), pos.getCol(),
                 new DecodedWell(SbsLabeling.fromRowCol(pos),
                     specimens.get(1).getInventoryId())));
         }
@@ -123,7 +122,7 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomSpecimensNotAssigned(
         WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
+            throws ApplicationException {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
 
@@ -133,7 +132,7 @@ public class PalletWell extends AbstractUIWell {
         int i = 0;
         for (SpecimenWrapper spc : specimens) {
             RowColPos pos = new RowColPos(i / 12, i % 12);
-            palletScanned.put(pos, new PalletWell(
+            palletScanned.put(pos, new PalletWell(pos.getRow(), pos.getCol(),
                 new DecodedWell(SbsLabeling.fromRowCol(pos), spc
                     .getInventoryId())));
             i++;
@@ -143,7 +142,7 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
+            throws ApplicationException {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> randomSpecimens = DebugUtil
@@ -152,8 +151,9 @@ public class PalletWell extends AbstractUIWell {
         while (i < randomSpecimens.size()) {
             RowColPos pos = new RowColPos(i / 12, i % 12);
             palletScanned.put(pos,
-                new PalletWell(new DecodedWell(SbsLabeling.fromRowCol(pos),
-                    randomSpecimens.get(i).getInventoryId())));
+                new PalletWell(pos.getRow(), pos.getCol(),
+                    new DecodedWell(SbsLabeling.fromRowCol(pos),
+                        randomSpecimens.get(i).getInventoryId())));
             i++;
         }
         return palletScanned;
@@ -222,36 +222,18 @@ public class PalletWell extends AbstractUIWell {
         return null;
     }
 
-    @SuppressWarnings("nls")
-    @Override
-    public Integer getRow() {
-        if (decodedWell == null) {
-            throw new IllegalStateException("decoded well is null");
-        }
-        return SbsLabeling.toRowCol(decodedWell.getLabel()).getRow();
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    public Integer getCol() {
-        if (decodedWell == null) {
-            throw new IllegalStateException("decoded well is null");
-        }
-        return SbsLabeling.toRowCol(decodedWell.getLabel()).getCol();
-    }
-
     public void setValue(String value) {
         decodedWell = new DecodedWell(decodedWell.getLabel(), value);
     }
 
+    @SuppressWarnings("nls")
     public RowColPos getRowColPos() {
-        RowColPos rcp = null;
         Integer row = getRow();
         Integer col = getCol();
-        if (row != null && col != null) {
-            rcp = new RowColPos(row, col);
+        if ((row == null) || (col == null)) {
+            throw new RuntimeException("row or column is null");
         }
-        return rcp;
+        return new RowColPos(row, col);
     }
 
     public static boolean hasValue(PalletWell cell) {
@@ -293,13 +275,13 @@ public class PalletWell extends AbstractUIWell {
         SpecimenWrapper specimen = null;
         if (cell.getSpecimenId() != null) {
             specimen = new SpecimenWrapper(appService);
-            
+
             try {
                 specimen.setWrappedObject(SessionManager.getAppService()
                     .doAction(new SpecimenGetInfoAction(cell.getSpecimenId()))
                     .getSpecimen());
             } catch (AccessDeniedException e) {
-                throw new Exception(e.getLocalizedMessage() + " for specimen with Id " 
+                throw new Exception(e.getLocalizedMessage() + " for specimen with Id "
                     + cell.getValue());
             }
         }

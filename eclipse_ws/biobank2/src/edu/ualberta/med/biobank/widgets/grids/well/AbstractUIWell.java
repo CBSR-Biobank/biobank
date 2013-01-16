@@ -6,6 +6,15 @@ public abstract class AbstractUIWell {
 
     private UICellStatus status;
 
+    private final Integer row;
+
+    private final Integer col;
+
+    public AbstractUIWell(Integer row, Integer col) {
+        this.row = row;
+        this.col = col;
+    }
+
     public boolean isSelected() {
         return selected;
     }
@@ -22,8 +31,12 @@ public abstract class AbstractUIWell {
         this.status = status;
     }
 
-    public abstract Integer getRow();
+    public Integer getRow() {
+        return row;
+    }
 
-    public abstract Integer getCol();
+    public Integer getCol() {
+        return col;
+    }
 
 }

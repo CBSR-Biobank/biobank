@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchReceiveScanDialog extends
-    ReceiveScanDialog<DispatchWrapper> {
+ReceiveScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory
         .getI18n(DispatchReceiveScanDialog.class);
 
@@ -61,11 +61,11 @@ public class DispatchReceiveScanDialog extends
     protected void addExtraCells() {
         if (extras != null && extras.size() > 0) {
             BgcPlugin
-                .openAsyncInformation(
-                    // alert error title
-                    i18n.tr("Specimens not in dispatch"),
-                    // alert error message
-                    i18n.tr("Some of the specimens in this pallet were not supposed  to be in this shipment. They will be added to the extra-pending list."));
+            .openAsyncInformation(
+                // alert error title
+                i18n.tr("Specimens not in dispatch"),
+                // alert error message
+                i18n.tr("Some of the specimens in this pallet were not supposed  to be in this shipment. They will be added to the extra-pending list."));
             try {
                 currentShipment.addSpecimens(extras,
                     DispatchSpecimenState.EXTRA);
@@ -90,8 +90,7 @@ public class DispatchReceiveScanDialog extends
     @SuppressWarnings("nls")
     @Override
     protected Map<RowColPos, PalletWell> getFakeDecodedWells() {
-        Map<RowColPos, PalletWell> palletScanned =
-            new TreeMap<RowColPos, PalletWell>();
+        Map<RowColPos, PalletWell> palletScanned = new TreeMap<RowColPos, PalletWell>();
         if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
             int i = 0;
             do {
@@ -100,16 +99,16 @@ public class DispatchReceiveScanDialog extends
                 int row = i / 12;
                 int col = i % 12;
                 if (DispatchSpecimenState.MISSING != dsa.getState())
-                    palletScanned.put(new RowColPos(row, col), new PalletWell(
+                    palletScanned.put(new RowColPos(row, col), new PalletWell(row, col,
                         new DecodedWell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
             } while (i < (8 * 12 - 1)
                 && i < currentShipment.getDispatchSpecimenCollection(false)
-                    .size());
+                .size());
 
-            palletScanned.put(new RowColPos(6, 6), new PalletWell(new DecodedWell(
-                6, 6, "aaah")));
+            palletScanned.put(new RowColPos(6, 6),
+                new PalletWell(6, 6, new DecodedWell(6, 6, "aaah")));
         }
         return palletScanned;
     }

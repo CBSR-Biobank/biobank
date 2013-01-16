@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -53,7 +52,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-    BgcBaseDialog {
+BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractScanDialog.class);
 
@@ -67,7 +66,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n
-        .tr("Processing position {0}");
+    .tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -86,7 +85,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         Boolean.class);
 
     private Button scanButton;
-    private Button scanTubeAloneSwitch;
     private boolean rescanMode = false;
 
     protected CenterWrapper<?> currentSite;
@@ -97,12 +95,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
         palletScanManagement = new PalletScanManagement() {
-
-            @Override
-            public boolean isScanTubeAloneMode() {
-                // FIXME: see issue #1230. always activate this mode
-                return true;
-            }
 
             @Override
             protected void beforeThreadStart() {
@@ -211,19 +203,19 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 // for each cell, convert into a client side cell
                 for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
                     .getCells().entrySet()) {
-                    RowColPos rcp = entry.getKey();
+                    RowColPos pos = entry.getKey();
                     monitor.subTask(MessageFormat.format(MONITOR_PROCESSING,
-                        ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
+                        ContainerLabelingSchemeWrapper.rowColToSbs(pos)));
                     PalletWell palletCell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing
-                        palletCell = new PalletWell(new DecodedWell(
+                        palletCell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
                             servercell.getRow(), servercell.getCol(),
                             servercell.getValue()));
-                        cells.put(rcp, palletCell);
+                        cells.put(pos, palletCell);
                     }
                     palletCell
-                        .merge(SessionManager.getAppService(), servercell);
+                    .merge(SessionManager.getAppService(), servercell);
                     specificScanPosProcess(palletCell);
                 }
             }
@@ -282,8 +274,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         });
         scanButton.setEnabled(false);
 
-        createScanTubeAloneButton(contents);
-
         spw = new ScanPalletWidget(contents, getPalletCellStatus());
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -298,9 +288,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         });
 
         widgetCreator
-            .addBooleanBinding(
-                new WritableValue(Boolean.FALSE,
-                    Boolean.class),
+        .addBooleanBinding(
+            new WritableValue(Boolean.FALSE,
+                Boolean.class),
                 scanOkValue,
                 i18n.tr("Error in scan result. Please keep only specimens with no errors."),
                 IStatus.ERROR);
@@ -462,35 +452,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     protected abstract void doProceed() throws Exception;
-
-    protected void createScanTubeAloneButton(Composite parent) {
-        scanTubeAloneSwitch = new Button(parent, SWT.NONE);
-        GridData gd = new GridData();
-        gd.verticalAlignment = SWT.TOP;
-        gd.horizontalSpan = 2;
-        gd.horizontalAlignment = SWT.RIGHT;
-        scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setText(StringUtil.EMPTY_STRING);
-        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_SCAN_EDIT));
-        scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(MouseEvent e) {
-                if (isScanHasBeenLaunched()) {
-                    palletScanManagement.toggleScanTubeAloneMode();
-                    if (palletScanManagement.isScanTubeAloneMode()) {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
-                            .getImageRegistry()
-                            .get(BgcPlugin.IMG_SCAN_CLOSE_EDIT));
-                    } else {
-                        scanTubeAloneSwitch.setImage(BgcPlugin.getDefault()
-                            .getImageRegistry().get(BgcPlugin.IMG_SCAN_EDIT));
-                    }
-                }
-            }
-        });
-        scanTubeAloneSwitch.setVisible(false);
-    }
 
     protected boolean canScanTubeAlone(PalletWell cell) {
         return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)

@@ -13,7 +13,6 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
@@ -22,19 +21,15 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(ScanOneTubeDialog.class);
 
+    private final String label;
     private String scannedValue;
     private BgcBaseText valueText;
-    private final RowColPos position;
     private final Map<RowColPos, PalletWell> cells;
-    private final ContainerType type;
 
-    public ScanOneTubeDialog(Shell parentShell,
-        Map<RowColPos, PalletWell> cells, RowColPos rcp,
-        ContainerType type) {
+    public ScanOneTubeDialog(Shell parentShell, Map<RowColPos, PalletWell> cells, String label) {
         super(parentShell);
+        this.label = label;
         this.cells = cells;
-        this.position = rcp;
-        this.type = type;
     }
 
     @Override
@@ -54,8 +49,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected String getTitleAreaMessage() {
         // TR: dialog title area message
-        return i18n.tr("Scan the tube at position {0}",
-            type.getPositionString(position));
+        return i18n.tr("Scan the tube at position {0}", label);
     }
 
     @SuppressWarnings("nls")
@@ -83,10 +77,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
                     // TR: dialog title
                     i18n.tr("Tube Scan Error"),
                     // TR: dialog message
-                    i18n.tr("The value entered already exists in position {0}",
-                        type.getPositionString(new RowColPos(
-                            otherCell.getRow(),
-                            otherCell.getCol()))));
+                    i18n.tr("The value entered already exists in position {0}", label));
                 valueText.setFocus();
                 valueText.setSelection(0, scannedValue.length());
                 return;
