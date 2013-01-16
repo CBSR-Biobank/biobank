@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -17,9 +20,9 @@ import edu.ualberta.med.biobank.model.Specimen;
 
 
 /**
- * This dialog prompts the user to enter a string that represents the value decoded from a single
- * aliquot tube. It is assumed that the user will use a hand scanner to decode the 2D barcode at
- * the bottom of the tube.
+ * This dialog prompts the user to enter one or more inventory IDs decoded from
+ * aliquot tubes. It is assumed that the user will use a hand scanner to decode the 2D
+ * barcode at the bottom of the tube.
  * 
  * Once the value is entered by the user, it is checked against already decode values to
  * ensure that the same value is not recorded for two or more tubes.
@@ -28,10 +31,11 @@ import edu.ualberta.med.biobank.model.Specimen;
 public class ScanOneTubeDialog extends BgcBaseDialog {
     private static final I18n i18n = I18nFactory.getI18n(ScanOneTubeDialog.class);
 
-    private final String label;
-    private String scannedValue;
+    private final Set<String> labels;
+    private final Map<String, String> barcodeMsgs = new HashMap<String, String>();
     private BgcBaseText valueText;
     private final Map<String, String> decodedBarcodes;
+    private final Iterator<String> currentLabel;
 
     /**
      * 
@@ -39,13 +43,15 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
      *      the parent SWT shell
      * @param decodedBarcodes
      *      maps decoded barcodes to corresponding position label.
-     * @param label
-     *      the label that corresponds to the tube.
+     * @param labels
+     *      the labels that the user should be prompted for.
      */
-    public ScanOneTubeDialog(Shell parentShell, Map<String, String> decodedBarcodes, String label) {
+    public ScanOneTubeDialog(Shell parentShell, Map<String, String> decodedBarcodes,
+        Set<String> labels) {
         super(parentShell);
-        this.label = label;
+        this.labels = labels;
         this.decodedBarcodes = decodedBarcodes;
+        currentLabel = labels.iterator();
     }
 
     @Override
@@ -65,7 +71,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected String getTitleAreaMessage() {
         // TR: dialog title area message
-        return i18n.tr("Scan the tube at position {0}", label);
+        return i18n.tr("Scan the tube at position {0}", labels);
     }
 
     @SuppressWarnings("nls")
@@ -85,7 +91,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
-        this.scannedValue = valueText.getText();
+        scannedValue = valueText.getText();
 
         // check if this value entered by the user belongs to another tube
         String label = decodedBarcodes.get(scannedValue);
@@ -102,7 +108,10 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
         super.okPressed();
     }
 
-    public String getScannedValue() {
-        return scannedValue;
+    /**
+     * Returns the inventory IDs entered by the user. This is a map of labels to inventory IDs.
+     */
+    public Map<String, String> getInventoryIds() {
+        return barcodeMsgs;
     }
 }

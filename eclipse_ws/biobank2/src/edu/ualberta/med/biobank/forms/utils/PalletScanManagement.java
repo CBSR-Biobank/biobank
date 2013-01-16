@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -252,10 +253,22 @@ public class PalletScanManagement {
             decodedBarcodes.put(well.getValue(), well.getLabel());
         }
 
+        // find the tubes that were not successfully scanned
+        Set<String> missingDecodeLabels = new HashSet<String>();
+        Capacity capacity = type.getCapacity();
+        for (int row = 0, rows = capacity.getRowCapacity(); row < rows; ++row) {
+            for (int col = 0, cols = capacity.getColCapacity(); col < cols; ++col) {
+                RowColPos pos = new RowColPos(row, col);
+                if (wells.get(pos).getValue().isEmpty()) {
+                    missingDecodeLabels.add(type.getPositionString(pos));
+                }
+            }
+        }
+
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), decodedBarcodes, type.getPositionString(rcp));
+            .getActiveWorkbenchWindow().getShell(), decodedBarcodes, missingDecodeLabels);
         if (dlg.open() == Dialog.OK) {
-            return dlg.getScannedValue();
+            return dlg.getBarcodes();
         }
         return null;
     }
