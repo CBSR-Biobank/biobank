@@ -311,4 +311,8 @@ public class PalletWell extends AbstractUIWell {
         serverCell.setTitle(getTitle());
         return serverCell;
     }
+
+    public String getLabel() {
+        return decodedWell.getLabel();
+    }
 }

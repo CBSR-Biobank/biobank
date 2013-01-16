@@ -14,22 +14,38 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 
+
+/**
+ * This dialog prompts the user to enter a string that represents the value decoded from a single
+ * aliquot tube. It is assumed that the user will use a hand scanner to decode the 2D barcode at
+ * the bottom of the tube.
+ * 
+ * Once the value is entered by the user, it is checked against already decode values to
+ * ensure that the same value is not recorded for two or more tubes.
+ *
+ */
 public class ScanOneTubeDialog extends BgcBaseDialog {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ScanOneTubeDialog.class);
+    private static final I18n i18n = I18nFactory.getI18n(ScanOneTubeDialog.class);
 
     private final String label;
     private String scannedValue;
     private BgcBaseText valueText;
-    private final Map<RowColPos, PalletWell> cells;
+    private final Map<String, String> decodedBarcodes;
 
-    public ScanOneTubeDialog(Shell parentShell, Map<RowColPos, PalletWell> cells, String label) {
+    /**
+     * 
+     * @param parentShell
+     *      the parent SWT shell
+     * @param decodedBarcodes
+     *      maps decoded barcodes to corresponding position label.
+     * @param label
+     *      the label that corresponds to the tube.
+     */
+    public ScanOneTubeDialog(Shell parentShell, Map<String, String> decodedBarcodes, String label) {
         super(parentShell);
         this.label = label;
-        this.cells = cells;
+        this.decodedBarcodes = decodedBarcodes;
     }
 
     @Override
@@ -70,18 +86,18 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @Override
     protected void okPressed() {
         this.scannedValue = valueText.getText();
-        for (PalletWell otherCell : cells.values()) {
-            if (otherCell.getValue() != null
-                && otherCell.getValue().equals(scannedValue)) {
-                BgcPlugin.openAsyncError(
-                    // TR: dialog title
-                    i18n.tr("Tube Scan Error"),
-                    // TR: dialog message
-                    i18n.tr("The value entered already exists in position {0}", label));
-                valueText.setFocus();
-                valueText.setSelection(0, scannedValue.length());
-                return;
-            }
+
+        // check if this value entered by the user belongs to another tube
+        String label = decodedBarcodes.get(scannedValue);
+        if (label != null) {
+            BgcPlugin.openAsyncError(
+                // TR: dialog title
+                i18n.tr("Tube Scan Error"),
+                // TR: dialog message
+                i18n.tr("The value entered already exists in position {0}", label));
+            valueText.setFocus();
+            valueText.setSelection(0, scannedValue.length());
+            return;
         }
         super.okPressed();
     }

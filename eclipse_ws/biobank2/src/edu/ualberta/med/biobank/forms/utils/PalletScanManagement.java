@@ -245,8 +245,15 @@ public class PalletScanManagement {
     }
 
     private String scanTubeAloneDialog(RowColPos rcp) {
+        // get the decoded cells and corresponding labels
+        // the map is: decodedMsg => label
+        Map<String, String> decodedBarcodes = new HashMap<String, String>();
+        for (PalletWell well : wells.values()) {
+            decodedBarcodes.put(well.getValue(), well.getLabel());
+        }
+
         ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), wells, type.getPositionString(rcp));
+            .getActiveWorkbenchWindow().getShell(), decodedBarcodes, type.getPositionString(rcp));
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
