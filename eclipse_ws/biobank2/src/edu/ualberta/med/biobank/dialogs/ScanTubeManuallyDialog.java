@@ -104,7 +104,7 @@ public class ScanTubeManuallyDialog extends BgcBaseDialog {
         String inventoryId = valueText.getText();
 
         // check if this value entered by the user belongs to another tube
-        String label = decodedBarcodes.get(inventoryId);
+        String label = invalidInventoryIdsToLabel.get(inventoryId);
         if (label != null) {
             BgcPlugin.openAsyncError(
                 // TR: dialog title
@@ -121,7 +121,7 @@ public class ScanTubeManuallyDialog extends BgcBaseDialog {
     /**
      * Returns the inventory IDs entered by the user. This is a map of labels to inventory IDs.
      */
-    public Map<String, String> getInventoryIds() {
-        return userInventoryIds;
+    public Map<String, String> getInventoryIdsByLabel() {
+        return resultIventoryIdsByLabel;
     }
 }

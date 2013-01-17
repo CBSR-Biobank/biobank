@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -40,7 +40,8 @@ public class PalletScanManagement {
     private static final I18n i18n = I18nFactory
         .getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletWell> wells = new HashMap<RowColPos, PalletWell>();
+    protected Map<RowColPos, PalletWell> wells =
+        new HashMap<RowColPos, PalletWell>();
     private int scansCount = 0;
     private boolean useScanner = true;
 
@@ -106,7 +107,8 @@ public class PalletScanManagement {
                         i18n.tr("Scan result error"),
                         e);
                     String msg = e.getMessage();
-                    if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
+                    if (((msg == null) || msg.isEmpty())
+                        && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
                     }
                     scanAndProcessError("ERROR: " + msg);
@@ -132,14 +134,16 @@ public class PalletScanManagement {
         beforeScan();
         Map<RowColPos, PalletWell> oldCells = wells;
         if (BiobankPlugin.isRealScanEnabled()) {
-            int plateNum = BiobankPlugin.getDefault().getPlateNumber(plateToScan);
+            int plateNum =
+                BiobankPlugin.getDefault().getPlateNumber(plateToScan);
             if (plateNum == -1) {
                 plateError();
                 BgcPlugin.openAsyncError(
                     // dialog title
                     i18n.tr("Scan error"),
                     // dialog message
-                    i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
+                    i18n.tr("Plate with barcode {0} is not enabled",
+                        plateToScan));
                 return;
             }
             Set<DecodedWell> scanCells = null;
@@ -213,28 +217,37 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    public void scanTubeAlone(MouseEvent e) {
-        RowColPos pos = ((ScanPalletWidget) e.widget).getPositionAtCoordinates(e.x, e.y);
-        if (pos != null) {
-            PalletWell cell = wells.get(pos);
-            if (canScanTubeAlone(cell)) {
-                String value = scanTubesManually(pos);
-                if (value != null && !value.isEmpty()) {
-                    if (cell == null) {
-                        cell = new PalletWell(pos.getRow(), pos.getCol(),
-                            new DecodedWell(pos.getRow(), pos.getCol(), value));
-                        wells.put(pos, cell);
-                    } else {
-                        cell.setValue(value);
-                    }
-                    try {
-                        postprocessScanTubeAlone(cell);
-                    } catch (Exception ex) {
-                        BgcPlugin.openAsyncError(
-                            // dialog title
-                            i18n.tr("Scan tube error"),
-                            ex);
-                    }
+    public void scanTubeAlone(MouseEvent event) {
+        RowColPos startPos = ((ScanPalletWidget) event.widget)
+            .getPositionAtCoordinates(event.x, event.y);
+
+        // if mouse click does not produce a position then there is nothing to do
+        if (startPos == null) return;
+
+        if (canScanTubeAlone(wells.get(startPos))) {
+            for (Entry<RowColPos, String> entry : scanTubesManually(startPos)
+                .entrySet()) {
+                RowColPos pos = entry.getKey();
+                int row = pos.getRow();
+                int col = pos.getCol();
+                String inventoryId = entry.getValue();
+
+                if (inventoryId.isEmpty()) continue;
+
+                PalletWell cell = wells.get(pos);
+                if (cell == null) {
+                    wells.put(pos, new PalletWell(row, col, new DecodedWell(
+                        row, col, inventoryId)));
+                } else {
+                    cell.setValue(inventoryId);
+                }
+                try {
+                    postprocessScanTubeAlone(cell);
+                } catch (Exception ex) {
+                    BgcPlugin.openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan tube error"),
+                        ex);
                 }
             }
         }
@@ -245,36 +258,83 @@ public class PalletScanManagement {
         return true;
     }
 
-    private Map<RowColPos, String> scanTubesManually(RowColPos rcp) {
-        // get the decoded cells and corresponding labels
-        // the map is: decodedMsg => label
-        Map<String, String> decodedBarcodes = new HashMap<String, String>();
+    @SuppressWarnings("nls")
+    private Map<RowColPos, String> scanTubesManually(RowColPos startPos) {
+        Map<String, String> decodedInventoryIdsByLabel = new HashMap<String, String>();
         for (PalletWell well : wells.values()) {
-            decodedBarcodes.put(well.getValue(), well.getLabel());
+            String inventoryId = well.getValue();
+            if (!inventoryId.isEmpty()) {
+                decodedInventoryIdsByLabel.put(well.getLabel(), well.getValue());
+            }
+        }
+        ScanTubeManuallyDialog dlg = new ScanTubeManuallyDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(),
+            getLabelsForMissingInventoryIds(startPos), decodedInventoryIdsByLabel);
+
+        if (dlg.open() != Dialog.OK) return null;
+
+        Map<RowColPos, String> result = new HashMap<RowColPos, String>();
+        for (Entry<String, String> entry : dlg.getInventoryIdsByLabel()
+            .entrySet()) {
+            try {
+                RowColPos pos = type.getRowColFromPositionString(entry.getKey());
+                if (pos == null) {
+                    throw new RuntimeException("label converstion to position failed: "
+                        + entry.getKey());
+                }
+                result.put(pos, entry.getValue());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
+        return result;
+    }
+
+    /**
+     * Returns the set of labels missing an inventory ID. The set is ordered, so that the set starts
+     * with the label at position <code>startPos</code>, the remainder of the set is populated with
+     * the missing labels after the selection, and then the missing labels from the start of the
+     * container through to the one just before the selection
+     * 
+     * @param startPos The label at the start of the set.
+     */
+    private Set<String> getLabelsForMissingInventoryIds(RowColPos startPos) {
+
         // find the tubes that were not successfully scanned
-        Set<String> missingDecodeLabels = new HashSet<String>();
         Capacity capacity = type.getCapacity();
+
+        Set<String> labelsMissingInventoryId = new LinkedHashSet<String>();
+        labelsMissingInventoryId.add(type.getPositionString(startPos));
+
+        Set<String> labelsMissingInventoryIdBeforeSelection =
+            new LinkedHashSet<String>();
+
+        // now add the other positions missing inventory IDs
+        boolean selectionFound = false;
         for (int row = 0, rows = capacity.getRowCapacity(); row < rows; ++row) {
             for (int col = 0, cols = capacity.getColCapacity(); col < cols; ++col) {
                 RowColPos pos = new RowColPos(row, col);
+                if (pos.equals(startPos)) {
+                    selectionFound = true;
+                }
+
                 if (wells.get(pos).getValue().isEmpty()) {
-                    missingDecodeLabels.add(type.getPositionString(pos));
+                    if (selectionFound) {
+                        labelsMissingInventoryId.add(type
+                            .getPositionString(pos));
+                    } else {
+                        labelsMissingInventoryIdBeforeSelection.add(type
+                            .getPositionString(pos));
+                    }
                 }
             }
         }
 
-        ScanTubeManuallyDialog dlg = new ScanTubeManuallyDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), decodedBarcodes, missingDecodeLabels);
-        if (dlg.open() != Dialog.OK)  return null;
+        labelsMissingInventoryId
+        .addAll(labelsMissingInventoryIdBeforeSelection);
 
-        Map<RowColPos, String> result = new HashMap<RowColPos, String>();
-        for (Entry<String, String> entry : dlg.getInventoryIds().entrySet()) {
-
-        }
-
-        return result;
+        return labelsMissingInventoryId;
     }
 
     private Map<String, PalletWell> getValuesMap(
@@ -354,10 +414,13 @@ public class PalletScanManagement {
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
             wells.clear();
-            for (Entry<RowColPos, SpecimenWrapper> entry : container.getSpecimens().entrySet()) {
+            for (Entry<RowColPos, SpecimenWrapper> entry : container
+                .getSpecimens().entrySet()) {
                 RowColPos pos = entry.getKey();
-                PalletWell cell = new PalletWell(pos.getRow(), pos.getCol(),
-                    new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
+                PalletWell cell =
+                    new PalletWell(pos.getRow(), pos.getCol(),
+                        new DecodedWell(pos.getRow(), pos.getCol(), entry
+                            .getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 wells.put(pos, cell);
