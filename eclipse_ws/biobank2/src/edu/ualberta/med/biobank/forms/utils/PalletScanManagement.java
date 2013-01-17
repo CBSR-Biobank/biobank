@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
+import edu.ualberta.med.biobank.dialogs.ScanTubeManuallyDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -218,7 +218,7 @@ public class PalletScanManagement {
         if (pos != null) {
             PalletWell cell = wells.get(pos);
             if (canScanTubeAlone(cell)) {
-                String value = scanTubeAloneDialog(pos);
+                String value = scanTubesManually(pos);
                 if (value != null && !value.isEmpty()) {
                     if (cell == null) {
                         cell = new PalletWell(pos.getRow(), pos.getCol(),
@@ -245,7 +245,7 @@ public class PalletScanManagement {
         return true;
     }
 
-    private String scanTubeAloneDialog(RowColPos rcp) {
+    private Map<RowColPos, String> scanTubesManually(RowColPos rcp) {
         // get the decoded cells and corresponding labels
         // the map is: decodedMsg => label
         Map<String, String> decodedBarcodes = new HashMap<String, String>();
@@ -265,12 +265,16 @@ public class PalletScanManagement {
             }
         }
 
-        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
+        ScanTubeManuallyDialog dlg = new ScanTubeManuallyDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), decodedBarcodes, missingDecodeLabels);
-        if (dlg.open() == Dialog.OK) {
-            return dlg.getBarcodes();
+        if (dlg.open() != Dialog.OK)  return null;
+
+        Map<RowColPos, String> result = new HashMap<RowColPos, String>();
+        for (Entry<String, String> entry : dlg.getInventoryIds().entrySet()) {
+
         }
-        return null;
+
+        return result;
     }
 
     private Map<String, PalletWell> getValuesMap(

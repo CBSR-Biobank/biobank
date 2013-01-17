@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.swt.SWT;
@@ -22,35 +23,44 @@ import edu.ualberta.med.biobank.model.Specimen;
 /**
  * This dialog prompts the user to enter one or more inventory IDs decoded from
  * aliquot tubes. It is assumed that the user will use a hand scanner to decode the 2D
- * barcode at the bottom of the tube.
+ * barcode at the bottom of each tube.
  * 
- * Once the value is entered by the user, it is checked against already decode values to
- * ensure that the same value is not recorded for two or more tubes.
- *
+ * A set of inavlid inventory IDs should be passed to the constructor. These are inventory IDs
+ * that the user should not be allowed to enter.
  */
-public class ScanOneTubeDialog extends BgcBaseDialog {
-    private static final I18n i18n = I18nFactory.getI18n(ScanOneTubeDialog.class);
+public class ScanTubeManuallyDialog extends BgcBaseDialog {
+    private static final I18n i18n = I18nFactory.getI18n(ScanTubeManuallyDialog.class);
 
     private final Set<String> labels;
-    private final Map<String, String> barcodeMsgs = new HashMap<String, String>();
+    private final Map<String, String> invalidInventoryIdsToLabel = new HashMap<String, String>();
     private BgcBaseText valueText;
-    private final Map<String, String> decodedBarcodes;
     private final Iterator<String> currentLabel;
+    private final Map<String, String> resultIventoryIdsByLabel = new HashMap<String, String>();
 
     /**
      * 
      * @param parentShell
      *      the parent SWT shell
-     * @param decodedBarcodes
-     *      maps decoded barcodes to corresponding position label.
      * @param labels
      *      the labels that the user should be prompted for.
+     * @param invalidInventoryIdsByLabel
+     *      a map decoded barcodes to corresponding position label.
      */
-    public ScanOneTubeDialog(Shell parentShell, Map<String, String> decodedBarcodes,
-        Set<String> labels) {
+    @SuppressWarnings("nls")
+    public ScanTubeManuallyDialog(Shell parentShell, Set<String> labels,
+        Map<String, String> invalidInventoryIdsByLabel) {
         super(parentShell);
         this.labels = labels;
-        this.decodedBarcodes = decodedBarcodes;
+
+        // convert invalidInventoryIdsByLabel to use invenrtory ID as the key
+        for (Entry<String, String> entry : invalidInventoryIdsByLabel.entrySet()) {
+            invalidInventoryIdsToLabel.put(entry.getValue(), entry.getKey());
+        }
+
+        if (labels.isEmpty()) {
+            throw new RuntimeException("labels is empty");
+        }
+
         currentLabel = labels.iterator();
     }
 
@@ -91,10 +101,10 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
     @SuppressWarnings("nls")
     @Override
     protected void okPressed() {
-        scannedValue = valueText.getText();
+        String inventoryId = valueText.getText();
 
         // check if this value entered by the user belongs to another tube
-        String label = decodedBarcodes.get(scannedValue);
+        String label = decodedBarcodes.get(inventoryId);
         if (label != null) {
             BgcPlugin.openAsyncError(
                 // TR: dialog title
@@ -102,7 +112,7 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
                 // TR: dialog message
                 i18n.tr("The value entered already exists in position {0}", label));
             valueText.setFocus();
-            valueText.setSelection(0, scannedValue.length());
+            valueText.setSelection(0, inventoryId.length());
             return;
         }
         super.okPressed();
@@ -112,6 +122,6 @@ public class ScanOneTubeDialog extends BgcBaseDialog {
      * Returns the inventory IDs entered by the user. This is a map of labels to inventory IDs.
      */
     public Map<String, String> getInventoryIds() {
-        return barcodeMsgs;
+        return userInventoryIds;
     }
 }
