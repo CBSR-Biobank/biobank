@@ -38,7 +38,7 @@ import edu.ualberta.med.biobank.model.Center;
  */
 @SuppressWarnings("nls")
 public class SpecimenBatchOpPojoReader implements
-    IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
+IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 
     private static final String CSV_FIRST_HEADER = "Inventory ID";
 
@@ -89,7 +89,7 @@ public class SpecimenBatchOpPojoReader implements
         aMap.put("visitNumber", new Optional(new ParseInt()));
         aMap.put("waybill", new Optional());
         aMap.put("sourceSpecimen", new ParseBool());
-        aMap.put("worksheet", new Optional(new Unique()));
+        aMap.put("worksheet", new Optional());
         aMap.put("palletProductBarcode", new Optional());
         aMap.put("rootContainerType", new Optional());
         aMap.put("palletLabel", new Optional());
@@ -143,7 +143,7 @@ public class SpecimenBatchOpPojoReader implements
 
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException {
+    IOException {
         return new SpecimenBatchOpAction(workingCenter, pojos,
             new File(filename));
     }
