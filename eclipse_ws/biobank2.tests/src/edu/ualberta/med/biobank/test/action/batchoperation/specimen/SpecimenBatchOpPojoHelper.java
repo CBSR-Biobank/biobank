@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,17 +91,15 @@ class SpecimenBatchOpPojoHelper {
             for (Patient p : patients) {
                 for (OriginInfo originInfo : originInfos) {
                     // create ones with shipment info
-                    SpecimenBatchOpInputPojo specimenInfo =
-                        sourceSpecimenCreate(ss.getSpecimenType().getName(),
-                            p.getPnumber(), originInfo.getShipmentInfo()
-                                .getWaybill());
+                    SpecimenBatchOpInputPojo specimenInfo = sourceSpecimenCreate(
+                        ss.getSpecimenType().getName(), p.getPnumber(),
+                        originInfo.getShipmentInfo().getWaybill());
                     specimenInfos.add(specimenInfo);
                 }
 
                 // create ones without shipment info
-                SpecimenBatchOpInputPojo specimenInfo =
-                    sourceSpecimenCreate(ss.getSpecimenType().getName(),
-                        p.getPnumber(), null);
+                SpecimenBatchOpInputPojo specimenInfo = sourceSpecimenCreate(
+                    ss.getSpecimenType().getName(), p.getPnumber(), null);
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -113,21 +112,18 @@ class SpecimenBatchOpPojoHelper {
      * specimens must already be present in the database.
      */
     ArrayList<SpecimenBatchOpInputPojo> createAliquotedSpecimens(Study study,
-        Set<Specimen> parentSpecimens) {
+        Collection<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
-            throw new IllegalStateException(
-                "study does not have any aliquoted specimens");
+            throw new IllegalStateException("study does not have any aliquoted specimens");
         }
 
-        Map<String, String> parentSpecimenInfoMap =
-            new HashMap<String, String>();
+        Map<String, String> parentSpecimenInfoMap = new HashMap<String, String>();
         for (Specimen parentSpecimen : parentSpecimens) {
             parentSpecimenInfoMap.put(parentSpecimen.getInventoryId(),
                 parentSpecimen.getCollectionEvent().getPatient().getPnumber());
         }
 
-        return aliquotedSpecimensCreate(parentSpecimenInfoMap,
-            study.getAliquotedSpecimens());
+        return aliquotedSpecimensCreate(parentSpecimenInfoMap, study.getAliquotedSpecimens());
     }
 
     /**
@@ -144,9 +140,8 @@ class SpecimenBatchOpPojoHelper {
         for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap
             .entrySet()) {
             for (AliquotedSpecimen as : aliquotedSpecimens) {
-                SpecimenBatchOpInputPojo specimenInfo =
-                    aliquotedSpecimenCreate(parentSpecimenInfo.getKey(),
-                        as.getSpecimenType().getName());
+                SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
+                    parentSpecimenInfo.getKey(), as.getSpecimenType().getName());
                 specimenInfos.add(specimenInfo);
             }
         }
@@ -178,8 +173,7 @@ class SpecimenBatchOpPojoHelper {
 
     private SpecimenBatchOpInputPojo sourceSpecimenCreate(
         String specimenTypeName, String patientNumber, String waybill) {
-        SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(
-            null, specimenTypeName);
+        SpecimenBatchOpInputPojo specimenInfo = aliquotedSpecimenCreate(null, specimenTypeName);
         specimenInfo.setPatientNumber(patientNumber);
         specimenInfo.setVisitNumber(1);
         specimenInfo.setWaybill(waybill);
