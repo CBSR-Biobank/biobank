@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.model.Log;
  */
 public class JDBCLogExecutor implements Runnable {
 
-    private Log log;
+    private final Log log;
     private Properties props;
     private String dbUrl = null;
     private String dbDriverClass = null;
@@ -61,22 +61,30 @@ public class JDBCLogExecutor implements Runnable {
             Statement stmt = null;
             try {
                 conn = createConn();
-                conn.setAutoCommit(false);
-                stmt = conn.createStatement();
-                String statement = LogSql.getLogMessageSQLStatement(log);
-                stmt.execute(statement);
-                conn.commit();
+                if (conn != null) {
+                    conn.setAutoCommit(false);
+                    stmt = conn.createStatement();
+                    String statement = LogSql.getLogMessageSQLStatement(log);
+                    stmt.execute(statement);
+                    conn.commit();
+                }
             } catch (Exception e) {
-                conn.rollback();
-                conn.close();
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 throw e;
             } finally {
                 try {
-                    stmt.close();
+                    if (stmt != null) {
+                        stmt.close();
+                    }
                 } catch (Exception ex) {
                 }
                 try {
-                    conn.close();
+                    if (conn != null) {
+                        conn.close();
+                    }
                 } catch (Exception ex) {
                 }
             }
@@ -91,8 +99,7 @@ public class JDBCLogExecutor implements Runnable {
             if (getDbDriverClass() != null) {
                 Class.forName(getDbDriverClass());
             }
-            con = DriverManager.getConnection(getDbUrl(), getDbUser(),
-                getDbPwd());
+            con = DriverManager.getConnection(getDbUrl(), getDbUser(), getDbPwd());
         } catch (Throwable t) {
             ExceptionUtils.writeMsgToTmpFile(t);
         }
