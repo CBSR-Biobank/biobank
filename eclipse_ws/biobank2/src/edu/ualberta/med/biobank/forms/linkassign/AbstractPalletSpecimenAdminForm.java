@@ -461,8 +461,8 @@ AbstractSpecimenAdminForm {
         canLaunchScanValue.setValue(canLauch);
     }
 
-    protected void scanTubeAlone(MouseEvent e) {
-        palletScanManagement.scanTubeAlone(e);
+    protected void scanTubesManually(MouseEvent e) {
+        palletScanManagement.scanTubesManually(e);
     }
 
     @SuppressWarnings("nls")

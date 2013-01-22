@@ -102,12 +102,12 @@ public class StudySourceSpecimenDialog extends PagedDialog {
             // TR: validation error message
             i18n.tr("A specimen type should be selected"),
             new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    userSourceSpecimen
-                        .setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                }
-            }, new BiobankLabelProvider());
+            @Override
+            public void doSelection(Object selectedObject) {
+                userSourceSpecimen
+                .setSpecimenType((SpecimenTypeWrapper) selectedObject);
+            }
+        }, new BiobankLabelProvider());
 
         volume = (Button) createBoundWidgetWithLabel(contents, Button.class,
             SWT.BORDER,
@@ -134,10 +134,8 @@ public class StudySourceSpecimenDialog extends PagedDialog {
 
     @Override
     protected void copy(Object newModelObject) {
-        SourceSpecimenWrapper sourceSpecimen =
-            (SourceSpecimenWrapper) newModelObject;
-        sourceSpecimen.setNeedOriginalVolume(userSourceSpecimen
-            .getNeedOriginalVolume());
+        SourceSpecimenWrapper sourceSpecimen = (SourceSpecimenWrapper) newModelObject;
+        sourceSpecimen.setNeedOriginalVolume(userSourceSpecimen.getNeedOriginalVolume());
         sourceSpecimen.setSpecimenType(userSourceSpecimen.getSpecimenType());
     }
 

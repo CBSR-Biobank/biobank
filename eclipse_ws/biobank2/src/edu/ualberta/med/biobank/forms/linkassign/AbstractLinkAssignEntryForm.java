@@ -415,7 +415,7 @@ AbstractPalletSpecimenAdminForm {
         PalletWell cell = (PalletWell) ((ScanPalletWidget) e.widget)
             .getObjectAtCoordinates(e.x, e.y);
         if (canScanTubeAlone(cell)) {
-            scanTubeAlone(e);
+            scanTubesManually(e);
         } else if (cell != null) {
             switch (cell.getStatus()) {
             case ERROR:

@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.events.MouseEvent;
@@ -24,7 +23,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.ScanTubeManuallyDialog;
+import edu.ualberta.med.biobank.dialogs.ScanTubesManuallyWizard;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -217,38 +216,36 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    public void scanTubeAlone(MouseEvent event) {
-        RowColPos startPos = ((ScanPalletWidget) event.widget)
-            .getPositionAtCoordinates(event.x, event.y);
+    public void scanTubesManually(MouseEvent event) {
+        RowColPos startPos = ((ScanPalletWidget) event.widget).getPositionAtCoordinates(
+            event.x, event.y);
 
         // if mouse click does not produce a position then there is nothing to do
         if (startPos == null) return;
 
-        if (canScanTubeAlone(wells.get(startPos))) {
-            for (Entry<RowColPos, String> entry : scanTubesManually(startPos)
-                .entrySet()) {
-                RowColPos pos = entry.getKey();
-                int row = pos.getRow();
-                int col = pos.getCol();
-                String inventoryId = entry.getValue();
+        if (!canScanTubeAlone(wells.get(startPos))) return;
 
-                if (inventoryId.isEmpty()) continue;
+        for (Entry<RowColPos, String> entry : scanTubesManually(startPos).entrySet()) {
+            RowColPos pos = entry.getKey();
+            int row = pos.getRow();
+            int col = pos.getCol();
+            String inventoryId = entry.getValue();
 
-                PalletWell cell = wells.get(pos);
-                if (cell == null) {
-                    wells.put(pos, new PalletWell(row, col, new DecodedWell(
-                        row, col, inventoryId)));
-                } else {
-                    cell.setValue(inventoryId);
-                }
-                try {
-                    postprocessScanTubeAlone(cell);
-                } catch (Exception ex) {
-                    BgcPlugin.openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan tube error"),
-                        ex);
-                }
+            if (inventoryId.isEmpty()) continue;
+
+            PalletWell cell = wells.get(pos);
+            if (cell == null) {
+                wells.put(pos, new PalletWell(row, col, new DecodedWell(row, col, inventoryId)));
+            } else {
+                cell.setValue(inventoryId);
+            }
+            try {
+                postprocessScanTubeAlone(cell);
+            } catch (Exception ex) {
+                BgcPlugin.openAsyncError(
+                    // dialog title
+                    i18n.tr("Scan tube error"),
+                    ex);
             }
         }
     }
@@ -260,22 +257,21 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     private Map<RowColPos, String> scanTubesManually(RowColPos startPos) {
-        Map<String, String> decodedInventoryIdsByLabel = new HashMap<String, String>();
+        Map<String, String> existingInventoryIdsByLabel = new HashMap<String, String>();
         for (PalletWell well : wells.values()) {
             String inventoryId = well.getValue();
             if (!inventoryId.isEmpty()) {
-                decodedInventoryIdsByLabel.put(well.getLabel(), well.getValue());
+                existingInventoryIdsByLabel.put(well.getLabel(), well.getValue());
             }
         }
-        ScanTubeManuallyDialog dlg = new ScanTubeManuallyDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(),
-            getLabelsForMissingInventoryIds(startPos), decodedInventoryIdsByLabel);
 
-        if (dlg.open() != Dialog.OK) return null;
+        Map<String, String> inventoryIds = ScanTubesManuallyWizard.getInventoryIds(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            getLabelsForMissingInventoryIds(startPos), existingInventoryIdsByLabel);
 
         Map<RowColPos, String> result = new HashMap<RowColPos, String>();
-        for (Entry<String, String> entry : dlg.getInventoryIdsByLabel()
-            .entrySet()) {
+
+        for (Entry<String, String> entry : inventoryIds.entrySet()) {
             try {
                 RowColPos pos = type.getRowColFromPositionString(entry.getKey());
                 if (pos == null) {
@@ -307,8 +303,7 @@ public class PalletScanManagement {
         Set<String> labelsMissingInventoryId = new LinkedHashSet<String>();
         labelsMissingInventoryId.add(type.getPositionString(startPos));
 
-        Set<String> labelsMissingInventoryIdBeforeSelection =
-            new LinkedHashSet<String>();
+        Set<String> labelsMissingInventoryIdBeforeSelection = new LinkedHashSet<String>();
 
         // now add the other positions missing inventory IDs
         boolean selectionFound = false;
@@ -319,20 +314,19 @@ public class PalletScanManagement {
                     selectionFound = true;
                 }
 
-                if (wells.get(pos).getValue().isEmpty()) {
+                PalletWell well = wells.get(pos);
+
+                if ((well == null) || well.getValue().isEmpty()) {
                     if (selectionFound) {
-                        labelsMissingInventoryId.add(type
-                            .getPositionString(pos));
+                        labelsMissingInventoryId.add(type.getPositionString(pos));
                     } else {
-                        labelsMissingInventoryIdBeforeSelection.add(type
-                            .getPositionString(pos));
+                        labelsMissingInventoryIdBeforeSelection.add(type.getPositionString(pos));
                     }
                 }
             }
         }
 
-        labelsMissingInventoryId
-        .addAll(labelsMissingInventoryIdBeforeSelection);
+        labelsMissingInventoryId.addAll(labelsMissingInventoryIdBeforeSelection);
 
         return labelsMissingInventoryId;
     }

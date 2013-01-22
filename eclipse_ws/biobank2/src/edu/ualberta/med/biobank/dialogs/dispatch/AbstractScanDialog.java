@@ -283,7 +283,7 @@ BgcBaseDialog {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 if (isScanHasBeenLaunched())
-                    palletScanManagement.scanTubeAlone(e);
+                    palletScanManagement.scanTubesManually(e);
             }
         });
 

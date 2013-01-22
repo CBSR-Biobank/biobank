@@ -9,24 +9,21 @@ import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 
 public abstract class PagedDialog extends BgcBaseDialog {
 
+    protected boolean addMode;
+    protected NewListener newListener;
+
     public PagedDialog(Shell parentShell, NewListener listener, boolean addMode) {
         super(parentShell);
         this.addMode = addMode;
         this.newListener = listener;
     }
 
-    protected boolean addMode;
-    protected NewListener newListener;
-
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
         if (addMode) {
-            createButton(parent, IDialogConstants.CANCEL_ID,
-                IDialogConstants.CANCEL_LABEL, false);
-            createButton(parent, IDialogConstants.FINISH_ID,
-                IDialogConstants.FINISH_LABEL, false);
-            createButton(parent, IDialogConstants.NEXT_ID,
-                IDialogConstants.NEXT_LABEL, true);
+            createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+            createButton(parent, IDialogConstants.FINISH_ID, IDialogConstants.FINISH_LABEL, false);
+            createButton(parent, IDialogConstants.NEXT_ID, IDialogConstants.NEXT_LABEL, true);
         } else {
             super.createButtonsForButtonBar(parent);
         }
@@ -37,8 +34,8 @@ public abstract class PagedDialog extends BgcBaseDialog {
         if (addMode) {
             Button nextButton = getButton(IDialogConstants.NEXT_ID);
             Button finishButton = getButton(IDialogConstants.FINISH_ID);
-            if (nextButton != null && !nextButton.isDisposed()
-                && finishButton != null && !finishButton.isDisposed()) {
+            if ((nextButton != null) && !nextButton.isDisposed()
+                && (finishButton != null) && !finishButton.isDisposed()) {
                 nextButton.setEnabled(enabled);
                 finishButton.setEnabled(enabled);
             } else {
