@@ -31,12 +31,12 @@
   </category>
 
   <category name="edu.ualberta.med.biobank.common.action">
-    <level value="debug" />
+    <level value="info" />
     <appender-ref ref="CONSOLE" />
   </category>
 
   <category name="com.googlecode.flyway.core">
-    <level value="debug" />
+    <level value="info" />
     <appender-ref ref="CONSOLE" />
   </category>
 

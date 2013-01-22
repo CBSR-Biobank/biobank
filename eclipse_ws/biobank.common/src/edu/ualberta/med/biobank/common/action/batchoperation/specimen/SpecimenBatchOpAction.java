@@ -82,7 +82,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet position defined but not product barcode or label")
-            .format();
+        .format();
 
     private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
         bundle.tr("pallet product barcode defined but not position").format();
@@ -122,14 +122,17 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private FileData fileData = null;
 
     private ArrayList<SpecimenBatchOpInputPojo> pojos = null;
-    private final Map<String, Specimen> parentSpecimens =
-        new HashMap<String, Specimen>(0);
+
+    private final Map<String, Specimen> parentSpecimens = new HashMap<String, Specimen>(0);
+
+    private final Map<String, ProcessingEvent> createdProcessingEvents =
+        new HashMap<String, ProcessingEvent>(0);
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
     public SpecimenBatchOpAction(Center workingCenter,
         List<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
-        throws NoSuchAlgorithmException, IOException {
+            throws NoSuchAlgorithmException, IOException {
         if (batchOpSpecimens.isEmpty()) {
             throw new IllegalArgumentException("pojo list is empty");
         }
@@ -161,6 +164,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
     }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         log.debug("SpecimenBatchOpAction: isAllowed: start");
@@ -313,8 +317,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 if ((pojoData.getParentSpecimen() != null)
                     && (pojoData.getParentSpecimen().getCollectionEvent() == null)) {
                     errorSet.addError(pojo.getLineNumber(),
-                        CSV_CEVENT_ERROR.format(pojo.getPatientNumber(),
-                            pojo.getVisitNumber()));
+                        CSV_CEVENT_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
                 }
             }
         }
@@ -333,7 +336,15 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             Specimen spc = addSpecimen(context, batchOp, info);
             parentSpecimens.put(spc.getInventoryId(), spc);
 
-            createProcessignEventIfRequired(context, info);
+            if (info.getPevent() == null) {
+                ProcessingEvent pevent = createProcessignEventIfRequired(context, info);
+                if (pevent != null) {
+                    createdProcessingEvents.put(pevent.getWorksheet(), pevent);
+
+                    spc.setProcessingEvent(pevent);
+                    pevent.getSpecimens().add(spc);
+                }
+            }
 
             // TODO: set activity status to closed?
         }
@@ -385,8 +396,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private void validatePojo(SpecimenBatchOpInputPojo pojo) {
         if (pojo.getSourceSpecimen()) {
             if ((pojo.getParentInventoryId() != null)) {
-                errorSet.addError(pojo.getLineNumber(),
-                    CSV_PARENT_SPC_ERROR);
+                errorSet.addError(pojo.getLineNumber(), CSV_PARENT_SPC_ERROR);
             }
 
             checkForPatientAndCollectionEvent(pojo);
@@ -403,28 +413,24 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         if ((pojo.getPalletProductBarcode() == null)
             && (pojo.getPalletLabel() == null)
             && (pojo.getPalletPosition() != null)) {
-            errorSet.addError(pojo.getLineNumber(),
-                CSV_PALLET_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
         }
 
         //
         if ((pojo.getPalletProductBarcode() != null)
             && (pojo.getPalletPosition() == null)) {
-            errorSet.addError(pojo.getLineNumber(),
-                CSV_PROD_BARCODE_NO_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), CSV_PROD_BARCODE_NO_POS_ERROR);
         }
 
         if ((pojo.getPalletLabel() != null)
             && (pojo.getPalletPosition() == null)) {
-            errorSet.addError(pojo.getLineNumber(),
-                CSV_PALLET_POS_ERROR);
+            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_POS_ERROR);
         }
 
         if ((pojo.getPalletLabel() == null)
             && (pojo.getRootContainerType() == null)
             && (pojo.getPalletPosition() != null)) {
-            errorSet.addError(pojo.getLineNumber(),
-                CSV_PALLET_LABEL_NO_CTYPE_ERROR);
+            errorSet.addError(pojo.getLineNumber(), CSV_PALLET_LABEL_NO_CTYPE_ERROR);
         }
 
     }
@@ -471,8 +477,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         if (pojoData.isSourceSpecimen()) {
-            patient = BatchOpActionUtil.getPatient(context,
-                inputPojo.getPatientNumber());
+            patient = BatchOpActionUtil.getPatient(context, inputPojo.getPatientNumber());
             if (patient == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
                     CSV_PATIENT_NUMBER_INVALID_ERROR.format());
@@ -491,7 +496,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // event
             if (pojoData.isAliquotedSpecimen()) {
                 if (pojoData.getParentInventoryId() == null) {
-                    errorSet.addError(inputPojo.getLineNumber(),
+                    errorSet.addError(
+                        inputPojo.getLineNumber(),
                         CSV_CEVENT_ERROR.format(inputPojo.getPatientNumber(),
                             inputPojo.getVisitNumber()));
                 }
@@ -502,8 +508,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         if (inputPojo.getWaybill() != null) {
-            OriginInfo originInfo = BatchOpActionUtil.getOriginInfo(context,
-                inputPojo.getWaybill());
+            OriginInfo originInfo =
+                BatchOpActionUtil.getOriginInfo(context, inputPojo.getWaybill());
             if (originInfo == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
                     CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
@@ -538,24 +544,19 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             Container container = BatchOpActionUtil.getContainer(context,
                 inputPojo.getPalletLabel());
             if (container == null) {
-                errorSet
-                    .addError(inputPojo.getLineNumber(),
-                        CSV_CONTAINER_LABEL_ERROR.format(inputPojo
-                            .getPalletLabel()));
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_CONTAINER_LABEL_ERROR.format(inputPojo.getPalletLabel()));
             } else {
                 pojoData.setContainer(container);
             }
 
             try {
                 RowColPos pos =
-                    container.getPositionFromLabelingScheme(inputPojo
-                        .getPalletPosition());
+                    container.getPositionFromLabelingScheme(inputPojo.getPalletPosition());
                 pojoData.setSpecimenPos(pos);
             } catch (Exception e) {
-                errorSet
-                    .addError(inputPojo.getLineNumber(),
-                        CSV_SPECIMEN_LABEL_ERROR.format(inputPojo
-                            .getPalletLabel()));
+                errorSet.addError(inputPojo.getLineNumber(),
+                    CSV_SPECIMEN_LABEL_ERROR.format(inputPojo.getPalletLabel()));
             }
         }
 
@@ -650,14 +651,10 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
             // if patient number and visit number present in the pojo
             // ensure they match with the cevent and patient
-            if ((inputPojo.getPatientNumber() != null)
-                && !inputPojo.getPatientNumber().isEmpty()
-                && !cevent.getPatient().getPnumber()
-                    .equals(inputPojo.getPatientNumber())) {
-                errorSet.addError(inputPojo.getLineNumber(),
-                    CSV_PATIENT_MATCH_ERROR.format(
-                        inputPojo.getPatientNumber(),
-                        cevent.getPatient().getPnumber()));
+            if ((inputPojo.getPatientNumber() != null) && !inputPojo.getPatientNumber().isEmpty()
+                && !cevent.getPatient().getPnumber().equals(inputPojo.getPatientNumber())) {
+                errorSet.addError(inputPojo.getLineNumber(), CSV_PATIENT_MATCH_ERROR.format(
+                    inputPojo.getPatientNumber(), cevent.getPatient().getPnumber()));
             }
 
             if ((inputPojo.getVisitNumber() != null)
@@ -672,16 +669,25 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         return cevent;
     }
 
-    private ProcessingEvent createProcessignEventIfRequired(
-        ActionContext context,
+    private ProcessingEvent createProcessignEventIfRequired(ActionContext context,
         SpecimenBatchOpPojoData pojoData) {
         ProcessingEvent pevent = null;
 
         // add the processing event for this source specimen
-        if ((pojoData.getPojo().getWorksheet() != null)
-            && (pojoData.getPevent() == null)) {
-            pevent = pojoData.getNewProcessingEvent();
-            context.getSession().saveOrUpdate(pevent);
+        if (pojoData.getPojo().getWorksheet() != null) {
+            pevent = createdProcessingEvents.get(pojoData.getPojo().getWorksheet());
+
+            if (pojoData.getPevent() == null) {
+                if (pevent != null) {
+                    pojoData.setPevent(pevent);
+                    log.debug("createProcessignEventIfRequired: processing event created previously");
+                } else {
+                    pevent = pojoData.getNewProcessingEvent();
+                    context.getSession().saveOrUpdate(pevent);
+                    log.debug("createProcessignEventIfRequired: created new processing event");
+
+                }
+            }
         }
         return pevent;
     }

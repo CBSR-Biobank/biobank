@@ -223,10 +223,10 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
         log.trace("created collection event: pt={} v#={} invId={}",
             new Object[] {
-                pojo.getPatientNumber(),
-                pojo.getVisitNumber(),
-                pojo.getInventoryId()
-            });
+            pojo.getPatientNumber(),
+            pojo.getVisitNumber(),
+            pojo.getInventoryId()
+        });
 
         return cevent;
     }
@@ -242,11 +242,12 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         pevent.setCenter(originInfo.getCenter());
         pevent.setActivityStatus(ActivityStatus.ACTIVE);
         specimen.setProcessingEvent(pevent);
+        pevent.getSpecimens().add(specimen);
 
         log.trace("created processing event: worksheet={} parentSpc={}",
             pojo.getWorksheet(), pojo.getInventoryId());
 
-        return getPevent();
+        return pevent;
     }
 
     Specimen getNewSpecimen() {
@@ -259,7 +260,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
             && (parentSpecimen == null)) {
             throw new IllegalStateException(
                 "parent specimen for specimen with " + pojo.getInventoryId()
-                    + " has not be created yet");
+                + " has not be created yet");
         }
 
         specimen = new Specimen();
@@ -278,11 +279,13 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         specimen.setCreatedAt(pojo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
-        if ((pojo.getComment() != null)
-            && !pojo.getComment().isEmpty()) {
+        if (pevent != null) {
+            specimen.setProcessingEvent(pevent);
+        }
+
+        if ((pojo.getComment() != null) && !pojo.getComment().isEmpty()) {
             if (user == null) {
-                throw new IllegalStateException(
-                    "user is null, cannot add comment");
+                throw new IllegalStateException("user is null, cannot add comment");
             }
 
             Comment comment = new Comment();
@@ -300,8 +303,7 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
             if (parentSpecimen != null) {
                 pevent = parentSpecimen.getProcessingEvent();
-            } else if ((parentPojoData != null)
-                && (parentPojoData.pevent != null)) {
+            } else if ((parentPojoData != null) && (parentPojoData.pevent != null)) {
                 pevent = parentPojoData.pevent;
             }
 
@@ -325,11 +327,11 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
 
         log.trace("creating specimen: pt={} v#={} invId={} isParent={}",
             new Object[] {
-                pojo.getPatientNumber(),
-                pojo.getVisitNumber(),
-                pojo.getInventoryId(),
-                specimen.getOriginalCollectionEvent() != null
-            });
+            pojo.getPatientNumber(),
+            pojo.getVisitNumber(),
+            pojo.getInventoryId(),
+            specimen.getOriginalCollectionEvent() != null
+        });
 
         return specimen;
     }
