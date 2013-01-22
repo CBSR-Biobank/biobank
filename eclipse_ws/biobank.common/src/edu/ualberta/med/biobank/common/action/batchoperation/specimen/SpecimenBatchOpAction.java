@@ -336,9 +336,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             Specimen spc = addSpecimen(context, batchOp, info);
             parentSpecimens.put(spc.getInventoryId(), spc);
 
-            if (info.getPevent() != null) {
-                spc.setProcessingEvent(info.getPevent());
-            } else {
+            if (info.getPevent() == null) {
                 ProcessingEvent pevent = createProcessignEventIfRequired(context, info);
                 if (pevent != null) {
                     createdProcessingEvents.put(pevent.getWorksheet(), pevent);

@@ -279,11 +279,13 @@ public class SpecimenBatchOpPojoData implements IBatchOpHelper {
         specimen.setCreatedAt(pojo.getCreatedAt());
         specimen.setActivityStatus(ActivityStatus.ACTIVE);
 
-        if ((pojo.getComment() != null)
-            && !pojo.getComment().isEmpty()) {
+        if (pevent != null) {
+            specimen.setProcessingEvent(pevent);
+        }
+
+        if ((pojo.getComment() != null) && !pojo.getComment().isEmpty()) {
             if (user == null) {
-                throw new IllegalStateException(
-                    "user is null, cannot add comment");
+                throw new IllegalStateException("user is null, cannot add comment");
             }
 
             Comment comment = new Comment();
