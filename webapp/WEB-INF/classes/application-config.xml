@@ -46,8 +46,8 @@
 	class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
     <property name="url" value="jdbc:mysql://localhost:3306/biobank"/>
-    <property name="username" value="dummy"/>
-    <property name="password" value="ozzy498"/>
+    <property name="username" value="XXXXX"/>
+    <property name="password" value="ZZZZZ"/>
   </bean>
 
   <bean id="flyway" class="com.googlecode.flyway.core.Flyway" init-method="migrate">
