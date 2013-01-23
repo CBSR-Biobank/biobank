@@ -8,5 +8,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/messages.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

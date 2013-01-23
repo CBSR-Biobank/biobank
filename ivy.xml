@@ -193,8 +193,8 @@
     </dependency>
     <dependency org="javax.inject" name="javax.inject" rev="1" conf="biobank.mvp->default,sources" />
 
-    <!-- nothing for biobank2 -->
-
+    <!-- for biobank2 -->
+    <dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="biobank2->default,sources" />
 
     <!-- for biobank2.tools -->
     <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />

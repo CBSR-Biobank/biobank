@@ -36,11 +36,10 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
-    private static final I18n i18n = I18nFactory
-        .getI18n(PalletScanManagement.class);
+    private static final I18n i18n = I18nFactory.getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletWell> wells =
-        new HashMap<RowColPos, PalletWell>();
+    protected Map<RowColPos, PalletWell> wells = new HashMap<RowColPos, PalletWell>();
+
     private int scansCount = 0;
     private boolean useScanner = true;
 

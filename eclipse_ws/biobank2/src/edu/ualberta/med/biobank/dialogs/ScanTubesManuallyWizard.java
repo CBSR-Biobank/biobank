@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections.BidiMap;
+import org.apache.commons.collections.bidimap.DualHashBidiMap;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
@@ -20,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Specimen;
 
@@ -34,8 +38,10 @@ import edu.ualberta.med.biobank.model.Specimen;
 public class ScanTubesManuallyWizard extends Wizard {
     private static final I18n i18n = I18nFactory.getI18n(ScanTubesManuallyWizard.class);
 
+    protected static BgcLogger log = BgcLogger.getLogger(ScanTubesManuallyWizard.class.getName());
+
     private final Set<String> labels;
-    private final Map<String, String> existingInventoryIdsToLabel = new HashMap<String, String>();
+    private final BidiMap existingInventoryIds = new DualHashBidiMap();
     private final Map<String, String> resultIventoryIdsByLabel = new HashMap<String, String>();
 
     public static Map<String, String> getInventoryIds(Shell parentShell, Set<String> labels,
@@ -95,7 +101,9 @@ public class ScanTubesManuallyWizard extends Wizard {
                     // see http://www.eclipse.org/articles/article.php?file=Article-JFaceWizards/index.html
 
                     // check if this value already exists
-                    String label = existingInventoryIdsToLabel.get(inventoryId);
+                    String label = (String) existingInventoryIds.getKey(inventoryId);
+                    log.debug("keyReleased: label: " + label + ", inventoryId: " + inventoryId);
+
                     if ((label != null) && !label.equals(labelToScan)) {
                         BgcPlugin.openAsyncError(
                             // TR: dialog title
@@ -108,16 +116,22 @@ public class ScanTubesManuallyWizard extends Wizard {
                         return;
                     }
 
-                    if (!inventoryId.isEmpty()) {
-                        existingInventoryIdsToLabel.put(inventoryId, labelToScan);
-                        setPageComplete(true);
-                    }
+                    setPageComplete(!inventoryId.isEmpty());
                 }
 
             });
 
             setControl(area);
+            text.setFocus();
             setPageComplete(false);
+        }
+
+        @SuppressWarnings("nls")
+        @Override
+        public IWizardPage getNextPage() {
+            log.debug("getNextPage: labelToScan: " + labelToScan + ", value: " + text.getText());
+            existingInventoryIds.put(labelToScan, text.getText());
+            return super.getNextPage();
         }
 
     };
@@ -135,9 +149,9 @@ public class ScanTubesManuallyWizard extends Wizard {
         Map<String, String> existingInventoryIdsByLabel) {
         super();
 
-        // convert invalidInventoryIdsByLabel to use inventory ID as the key
+        // convert to a BidiMap
         for (Entry<String, String> entry : existingInventoryIdsByLabel.entrySet()) {
-            existingInventoryIdsToLabel.put(entry.getValue(), entry.getKey());
+            existingInventoryIds.put(entry.getKey(), entry.getValue());
         }
 
         if (labels.isEmpty()) {
@@ -150,7 +164,7 @@ public class ScanTubesManuallyWizard extends Wizard {
     @Override
     public void addPages() {
         for (String label : labels) {
-            addP1age(new ScanSingleTubePage(label));
+            addPage(new ScanSingleTubePage(label));
         }
     }
 
