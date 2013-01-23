@@ -56,9 +56,10 @@ public class ScanTubesManuallyWizard extends Wizard {
 
     private class ScanSingleTubePage extends WizardPage {
 
-        private final String labelToScan;
-        private Text text;
-        private Composite area;
+        final String labelToScan;
+        Text text;
+        Composite area;
+        String inventoryId;
 
         @SuppressWarnings("nls")
         protected ScanSingleTubePage(String labelToScan) {
@@ -129,8 +130,9 @@ public class ScanTubesManuallyWizard extends Wizard {
         @SuppressWarnings("nls")
         @Override
         public IWizardPage getNextPage() {
-            log.debug("getNextPage: labelToScan: " + labelToScan + ", value: " + text.getText());
-            existingInventoryIds.put(labelToScan, text.getText());
+            inventoryId = text.getText();
+            log.debug("getNextPage: labelToScan: " + labelToScan + ", value: " + inventoryId);
+            existingInventoryIds.put(labelToScan, inventoryId);
             return super.getNextPage();
         }
 
@@ -201,6 +203,10 @@ public class ScanTubesManuallyWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
+        for (IWizardPage page : this.getPages()) {
+            ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
+            resultIventoryIdsByLabel.put(tubePage.labelToScan, tubePage.inventoryId);
+        }
         return true;
     }
 

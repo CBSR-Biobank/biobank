@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -173,13 +174,13 @@ AbstractSpecimenAdminForm {
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
-                AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cell);
+            protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+                AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cells);
             }
 
             @Override
             protected boolean canScanTubeAlone(PalletWell cell) {
-                return AbstractPalletSpecimenAdminForm.this.canScanTubeAlone(cell);
+                return AbstractPalletSpecimenAdminForm.this.canScanTubesManually(cell);
             }
         };
     }
@@ -466,24 +467,27 @@ AbstractSpecimenAdminForm {
     }
 
     @SuppressWarnings("nls")
-    protected void postprocessScanTubeAlone(PalletWell palletCell) throws Exception {
-        appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
-            palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
-        beforeScanTubeAlone();
-        CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-            getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                palletCell.transformIntoServerCell(), Locale.getDefault()));
-        palletCell.merge(SessionManager.getAppService(), res.getCell());
-        appendLogs(res.getLogs());
-        processCellResult(palletCell.getRowColPos(), palletCell);
-        currentScanState = currentScanState.mergeWith(palletCell.getStatus());
-        setScanValid(getCells() != null && !getCells().isEmpty()
-            && currentScanState != UICellStatus.ERROR);
-        // boolean ok = isScanValid()
-        // && (palletCell.getStatus() != UICellStatus.ERROR);
-        // setScanValid(ok);
-        afterScanAndProcess(palletCell.getRow());
-        setScanHasBeenLaunched(true);
+    protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
+
+        for (PalletWell palletCell : palletCells) {
+            appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
+                palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
+            beforeScanTubeAlone();
+            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+                getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    palletCell.transformIntoServerCell(), Locale.getDefault()));
+            palletCell.merge(SessionManager.getAppService(), res.getCell());
+            appendLogs(res.getLogs());
+            processCellResult(palletCell.getRowColPos(), palletCell);
+            currentScanState = currentScanState.mergeWith(palletCell.getStatus());
+            setScanValid(getCells() != null && !getCells().isEmpty()
+                && currentScanState != UICellStatus.ERROR);
+            // boolean ok = isScanValid()
+            // && (palletCell.getStatus() != UICellStatus.ERROR);
+            // setScanValid(ok);
+            afterScanAndProcess(palletCell.getRow());
+            setScanHasBeenLaunched(true);
+        }
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
@@ -581,7 +585,7 @@ AbstractSpecimenAdminForm {
         return palletScanManagement.getScansCount() > 0;
     }
 
-    protected boolean canScanTubeAlone(PalletWell cell) {
+    protected boolean canScanTubesManually(PalletWell cell) {
         return cell == null || cell.getStatus() == UICellStatus.EMPTY;
     }
 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -127,9 +128,9 @@ BgcBaseDialog {
             }
 
             @Override
-            protected void postprocessScanTubeAlone(PalletWell cell)
+            protected void postprocessScanTubesManually(Set<PalletWell> cells)
                 throws Exception {
-                AbstractScanDialog.this.postprocessScanTubeAlone(cell);
+                AbstractScanDialog.this.postprocessScanTubeAlone(cells);
                 setHasValues();
             }
 
@@ -459,20 +460,22 @@ BgcBaseDialog {
             || (cell.getStatus() == UICellStatus.MISSING));
     }
 
-    protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
-        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        CellProcessResult res = (CellProcessResult) SessionManager
-            .getAppService().doAction(
-                getCellProcessAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getId(),
-                    cell.transformIntoServerCell(),
-                    Locale.getDefault()));
-        cell.merge(SessionManager.getAppService(), res.getCell());
-        if (res.getProcessStatus() == CellInfoStatus.ERROR) {
-            Button okButton = getButton(IDialogConstants.PROCEED_ID);
-            okButton.setEnabled(false);
+    protected void postprocessScanTubeAlone(Set<PalletWell> cells) throws Exception {
+        for (PalletWell cell : cells) {
+            Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+            CellProcessResult res = (CellProcessResult) SessionManager
+                .getAppService().doAction(
+                    getCellProcessAction(SessionManager.getUser()
+                        .getCurrentWorkingCenter().getId(),
+                        cell.transformIntoServerCell(),
+                        Locale.getDefault()));
+            cell.merge(SessionManager.getAppService(), res.getCell());
+            if (res.getProcessStatus() == CellInfoStatus.ERROR) {
+                Button okButton = getButton(IDialogConstants.PROCEED_ID);
+                okButton.setEnabled(false);
+            }
+            specificScanPosProcess(cell);
         }
-        specificScanPosProcess(cell);
         spw.redraw();
     }
 

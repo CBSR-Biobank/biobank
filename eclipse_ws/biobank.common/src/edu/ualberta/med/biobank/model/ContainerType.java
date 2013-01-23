@@ -45,9 +45,9 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Entity
 @Table(name = "CONTAINER_TYPE",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
-        @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
+uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
+    @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
 @Unique.List({
     @Unique(properties = { "site", "name" }, groups = PrePersist.class),
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
@@ -63,7 +63,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 })
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractBiobankModel
-    implements HasName, HasNameShort, HasActivityStatus, HasComments {
+implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -147,8 +147,8 @@ public class ContainerType extends AbstractBiobankModel
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
-        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
     public Set<SpecimenType> getSpecimenTypes() {
         return this.specimenTypes;
     }
@@ -167,8 +167,8 @@ public class ContainerType extends AbstractBiobankModel
     @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, SITE_ID) SELECT ?, ID, SITE_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
     @ForeignKey(name = "FK_ContainerType_childContainerTypes", inverseName = "FK_ContainerType_parentContainerTypes")
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
@@ -194,8 +194,8 @@ public class ContainerType extends AbstractBiobankModel
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
-        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+    joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Set<Comment> getComments() {
         return this.comments;
     }
@@ -267,11 +267,9 @@ public class ContainerType extends AbstractBiobankModel
     }
 
     @Transient
-    public RowColPos getRowColFromPositionString(String position)
-        throws Exception {
-        return getChildLabelingScheme()
-            .getRowColFromPositionString(position, getRowCapacity(),
-                getColCapacity());
+    public RowColPos getRowColFromPositionString(String position) throws Exception {
+        return getChildLabelingScheme().getRowColFromPositionString(
+            position, getRowCapacity(), getColCapacity());
     }
 
     @Transient

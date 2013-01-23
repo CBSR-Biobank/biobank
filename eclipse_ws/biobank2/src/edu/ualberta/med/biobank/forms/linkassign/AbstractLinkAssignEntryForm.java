@@ -414,7 +414,7 @@ AbstractPalletSpecimenAdminForm {
     protected void manageDoubleClick(MouseEvent e) {
         PalletWell cell = (PalletWell) ((ScanPalletWidget) e.widget)
             .getObjectAtCoordinates(e.x, e.y);
-        if (canScanTubeAlone(cell)) {
+        if (canScanTubesManually(cell)) {
             scanTubesManually(e);
         } else if (cell != null) {
             switch (cell.getStatus()) {

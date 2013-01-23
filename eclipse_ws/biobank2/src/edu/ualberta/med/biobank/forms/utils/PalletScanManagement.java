@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,10 +18,11 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction;
+import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction.ContainerLabelingSchemeInfo;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanTubesManuallyWizard;
@@ -59,12 +61,19 @@ public class PalletScanManagement {
         }
     }
 
+    @SuppressWarnings("nls")
     private ContainerType getFakePallet96() throws ApplicationException {
         ContainerType ct = new ContainerType();
         ct.setCapacity(new Capacity(8, 12));
-        ct.setChildLabelingScheme(ContainerLabelingSchemeWrapper
-            .getLabelingSchemeById(SessionManager.getAppService(),
-                ContainerLabelingSchemeWrapper.SCHEME_SBS).getWrappedObject());
+
+        ContainerLabelingSchemeInfo schemeInfo = SessionManager.getAppService().doAction(
+            new ContainerLabelingSchemeGetInfoAction("SBS Standard"));
+
+        if (schemeInfo == null) {
+            throw new RuntimeException("SBS Standard labeling scheme not found in database");
+        }
+
+        ct.setChildLabelingScheme(schemeInfo.getLabelingScheme());
         return ct;
     }
 
@@ -224,28 +233,34 @@ public class PalletScanManagement {
 
         if (!canScanTubeAlone(wells.get(startPos))) return;
 
+        Set<PalletWell> manuallyEnteredCells = new HashSet<PalletWell>();
+
         for (Entry<RowColPos, String> entry : scanTubesManually(startPos).entrySet()) {
             RowColPos pos = entry.getKey();
             int row = pos.getRow();
             int col = pos.getCol();
             String inventoryId = entry.getValue();
 
-            if (inventoryId.isEmpty()) continue;
+            if ((inventoryId == null) || inventoryId.isEmpty()) continue;
 
             PalletWell cell = wells.get(pos);
             if (cell == null) {
-                wells.put(pos, new PalletWell(row, col, new DecodedWell(row, col, inventoryId)));
+                cell = new PalletWell(row, col, new DecodedWell(row, col, inventoryId));
+                wells.put(pos, cell);
             } else {
                 cell.setValue(inventoryId);
             }
-            try {
-                postprocessScanTubeAlone(cell);
-            } catch (Exception ex) {
-                BgcPlugin.openAsyncError(
-                    // dialog title
-                    i18n.tr("Scan tube error"),
-                    ex);
-            }
+
+            manuallyEnteredCells.add(cell);
+        }
+
+        try {
+            postprocessScanTubesManually(manuallyEnteredCells);
+        } catch (Exception ex) {
+            BgcPlugin.openAsyncError(
+                // dialog title
+                i18n.tr("Scan tube error"),
+                ex);
         }
     }
 
@@ -358,7 +373,7 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("unused")
-    protected void postprocessScanTubeAlone(PalletWell cell) throws Exception {
+    protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
         // default does nothing
     }
 

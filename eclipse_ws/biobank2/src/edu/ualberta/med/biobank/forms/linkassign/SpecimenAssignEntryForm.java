@@ -1252,8 +1252,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    protected boolean canScanTubeAlone(PalletWell cell) {
-        return fieldsValid() && (super.canScanTubeAlone(cell)
+    protected boolean canScanTubesManually(PalletWell cell) {
+        return fieldsValid() && (super.canScanTubesManually(cell)
             || cell.getStatus() == UICellStatus.MISSING);
     }
 

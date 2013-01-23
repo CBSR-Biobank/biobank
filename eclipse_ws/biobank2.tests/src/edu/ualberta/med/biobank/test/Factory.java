@@ -661,6 +661,20 @@ public class Factory {
         return site;
     }
 
+    public ContainerLabelingScheme createContainerLabelingScheme() {
+        String name = nameGenerator.next(ContainerLabelingScheme.class);
+
+        ContainerLabelingScheme scheme = new ContainerLabelingScheme();
+        scheme.setName(name);
+        scheme.setMinChars(1);
+        scheme.setMaxChars(1);
+        scheme.setMaxCapacity(1);
+        setDefaultContainerLabelingScheme(scheme);
+        session.save(scheme);
+        session.flush();
+        return scheme;
+    }
+
     public ContainerType createContainerType() {
         String name = nameGenerator.next(ContainerType.class);
 

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Status;
@@ -921,17 +922,17 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected boolean canScanTubeAlone(PalletWell cell) {
+    protected boolean canScanTubesManually(PalletWell cell) {
         if (linkFormPatientManagement.getSelectedCollectionEvent() == null) {
             return false;
         }
-        return super.canScanTubeAlone(cell);
+        return super.canScanTubesManually(cell);
     }
 
 
     @Override
-    protected void postprocessScanTubeAlone(PalletWell palletCell) throws Exception {
-        super.postprocessScanTubeAlone(palletCell);
+    protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
+        super.postprocessScanTubeAlone(palletCells);
         widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
         hideScannerBarcodeDecoration();
