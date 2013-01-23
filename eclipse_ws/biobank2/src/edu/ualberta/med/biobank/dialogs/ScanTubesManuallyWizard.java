@@ -12,28 +12,27 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
-import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Specimen;
 
 /**
- * This dialog prompts the user to enter one or more inventory IDs decoded from
- * aliquot tubes. It is assumed that the user will use a hand scanner to decode
- * the 2D barcode at the bottom of each tube.
+ * This wizard prompts the user to enter one or more inventory IDs (which correspond to tubes on
+ * pallet that is being scanned). It is assumed that the user will use a hand scanner to decode the
+ * 2D barcode at the bottom of each tube.
  * 
- * A set of inavlid inventory IDs should be passed to the constructor. These are
- * inventory IDs that the user should not be allowed to enter.
+ * A set of existing inventory IDs (already decoded inventory IDS) should be passed to the
+ * constructor. These are inventory IDs that the user should not be allowed to enter.
  */
 public class ScanTubesManuallyWizard extends Wizard {
     private static final I18n i18n = I18nFactory.getI18n(ScanTubesManuallyWizard.class);
@@ -54,7 +53,7 @@ public class ScanTubesManuallyWizard extends Wizard {
         return wizard.getInventoryIdsByLabel();
     }
 
-    private class ScanSingleTubePage extends WizardPage {
+    private class ScanSingleTubePage extends WizardPage implements Listener {
 
         final String labelToScan;
         Text text;
@@ -65,7 +64,7 @@ public class ScanTubesManuallyWizard extends Wizard {
         protected ScanSingleTubePage(String labelToScan) {
             super(labelToScan);
             this.labelToScan = labelToScan;
-            setTitle(labelToScan);
+            setTitle(i18n.tr("Position {0}", labelToScan));
 
             // TR: wizard dialog dialog page description message
             setDescription(i18n.tr("Scan the tube at position {0}", labelToScan));
@@ -87,40 +86,7 @@ public class ScanTubesManuallyWizard extends Wizard {
             text = new Text(area, SWT.BORDER | SWT.SINGLE);
             text.setText("");
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            text.addKeyListener(new KeyListener() {
-
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    // do nothing
-                }
-
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    String inventoryId = text.getText();
-
-                    // TODO: use status messages here instead
-                    // see http://www.eclipse.org/articles/article.php?file=Article-JFaceWizards/index.html
-
-                    // check if this value already exists
-                    String label = (String) existingInventoryIds.getKey(inventoryId);
-                    log.debug("keyReleased: label: " + label + ", inventoryId: " + inventoryId);
-
-                    if ((label != null) && !label.equals(labelToScan)) {
-                        BgcPlugin.openAsyncError(
-                            // TR: dialog title
-                            i18n.tr("Tube Scan Error"),
-                            // TR: dialog message
-                            i18n.tr("The value entered already exists at position {0}", label));
-                        text.setFocus();
-                        text.setSelection(0, inventoryId.length());
-                        setPageComplete(false);
-                        return;
-                    }
-
-                    setPageComplete(!inventoryId.isEmpty());
-                }
-
-            });
+            text.addListener(SWT.KeyUp, this);
 
             setControl(area);
             text.setFocus();
@@ -129,11 +95,26 @@ public class ScanTubesManuallyWizard extends Wizard {
 
         @SuppressWarnings("nls")
         @Override
-        public IWizardPage getNextPage() {
+        public void handleEvent(Event event) {
             inventoryId = text.getText();
-            log.debug("getNextPage: labelToScan: " + labelToScan + ", value: " + inventoryId);
-            existingInventoryIds.put(labelToScan, inventoryId);
-            return super.getNextPage();
+
+            // check if this value already exists
+            String label = (String) existingInventoryIds.getKey(inventoryId);
+            log.debug("handleEvent: existing inventory id found: label: " + label
+                + ", inventoryId: " + inventoryId);
+
+            if ((label != null) && !label.equals(labelToScan)) {
+                // TR: wizard page error message
+                setErrorMessage(i18n.tr("The value entered already exists at position {0}", label));
+                setMessage(null);
+                setPageComplete(false);
+            } else {
+                existingInventoryIds.put(labelToScan, inventoryId);
+                setErrorMessage(null);
+                setMessage(null);
+                setPageComplete(!inventoryId.isEmpty());
+            }
+
         }
 
     };
@@ -141,10 +122,9 @@ public class ScanTubesManuallyWizard extends Wizard {
     /**
      * 
      * @param parentShell the parent SWT shell
-     * @param labels the labels that the user should be prompted for. The order
-     *            is important.
-     * @param existingInventoryIdsByLabel a map of inventory IDs that the user should not enter.
-     *            The key for the map is the position label where this inventory ID is present.
+     * @param labels the labels that the user should be prompted for. The order is important.
+     * @param existingInventoryIdsByLabel a map of inventory IDs that the user should not enter. The
+     *            key for the map is the position label where this inventory ID is present.
      */
     @SuppressWarnings("nls")
     public ScanTubesManuallyWizard(Set<String> labels,
@@ -206,13 +186,14 @@ public class ScanTubesManuallyWizard extends Wizard {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
             resultIventoryIdsByLabel.put(tubePage.labelToScan, tubePage.inventoryId);
+            log.debug("performFinish: label: " + tubePage.labelToScan + ", inventoryId: "
+                + tubePage.inventoryId);
         }
         return true;
     }
 
     /**
-     * Returns the inventory IDs entered by the user. This is a map of labels to
-     * inventory IDs.
+     * Returns the inventory IDs entered by the user. This is a map of labels to inventory IDs.
      */
     public Map<String, String> getInventoryIdsByLabel() {
         return resultIventoryIdsByLabel;
