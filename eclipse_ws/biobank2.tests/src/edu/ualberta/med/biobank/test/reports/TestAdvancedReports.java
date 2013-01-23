@@ -12,6 +12,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
@@ -36,7 +37,7 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 @SuppressWarnings("all")
-// outdated tests
+@Ignore
 public class TestAdvancedReports extends TestDatabase {
     private static final SimpleDateFormat SQL_DATE_FORMAT =
         new SimpleDateFormat(
