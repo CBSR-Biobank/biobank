@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.SetResult;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -25,11 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteA
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchDeleteAction;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetInfoAction;
-import edu.ualberta.med.biobank.common.action.dispatch.DispatchGetSpecimenInfosAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
-import edu.ualberta.med.biobank.common.action.info.DispatchReadInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
 import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
@@ -43,7 +38,6 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -51,7 +45,6 @@ import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
-import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
@@ -59,7 +52,6 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
@@ -406,7 +398,7 @@ public class TestSite extends TestAction {
 
         provisioning.addContainerType(getExecutor(), name,
             getContainerLabelingSchemes().values().iterator().next()
-                .getId(), getR().nextDouble());
+            .getId(), getR().nextDouble());
         return provisioning;
     }
 
@@ -441,7 +433,7 @@ public class TestSite extends TestAction {
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
-                .fail(
+            .fail(
                 "should not be allowed to delete a site with container types");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -468,7 +460,7 @@ public class TestSite extends TestAction {
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
-                .fail(
+            .fail(
                 "should not be allowed to delete a site with containers");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -476,7 +468,7 @@ public class TestSite extends TestAction {
 
         List<Container> topContainers =
             exec(new SiteGetTopContainersAction(provisioning.siteId))
-                .getList();
+            .getList();
         Assert.assertEquals(1, topContainers.size());
 
         // delete container followed by site - should work now
@@ -510,17 +502,17 @@ public class TestSite extends TestAction {
         Integer peventId = exec(new ProcessingEventSaveAction(
             null, site, Utils.getRandomDate(), Utils.getRandomString(5,
                 8), ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>(
-                Arrays.asList(sourceSpecs.get(0).specimen.getId())),
-            new HashSet<Integer>()))
-            .getId();
+                new HashSet<Integer>(
+                    Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+                    new HashSet<Integer>()))
+                    .getId();
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
-                .fail(
+            .fail(
                 "should not be allowed to delete a site with processing events");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -538,100 +530,50 @@ public class TestSite extends TestAction {
     @Test
     public void deleteWithSrcDispatch() throws Exception {
         session.beginTransaction();
-        Provisioning provisioning = new Provisioning(session, factory);
-        // create a second site to dispatch to
+        Site site1 = factory.createSite();
         Site site2 = factory.createSite();
+        factory.createDispatch(site1, site2);
         session.getTransaction().commit();
 
-        Integer dispatchId1 = DispatchHelper.createDispatch(getExecutor(), 
-            provisioning.getClinic(), provisioning.getSite(), 
-            provisioning.patientIds.get(0));
-
-        Integer dispatchId2 = DispatchHelper.createDispatch(getExecutor(), 
-            provisioning.getSite(), site2, provisioning.patientIds.get(0));
-
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-                .fail(
+            exec(new SiteDeleteAction(site1));
+            Assert.fail(
                 "should not be allowed to delete a site which is a source of dispatches");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
-        // delete the dispatch and then the site
-        Set<Specimen> specimens = new HashSet<Specimen>();
-        SetResult<DispatchSpecimen> dispatchSpecimens =
-            getExecutor()
-                .exec(new DispatchGetSpecimenInfosAction(dispatchId1));
-        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
-            specimens.add(dspec.getSpecimen());
-        }
+        // now delete the dispatch and then the originating site
+        session.beginTransaction();
+        session.delete(factory.getDefaultDispatch());
+        session.getTransaction().commit();
 
-        dispatchSpecimens =
-            getExecutor()
-                .exec(new DispatchGetSpecimenInfosAction(dispatchId2));
-        for (DispatchSpecimen dspec : dispatchSpecimens.getSet()) {
-            specimens.add(dspec.getSpecimen());
-        }
-
-        DispatchReadInfo dispatchInfo =
-            exec(new DispatchGetInfoAction(dispatchId2));
-        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
-        dispatchInfo =
-            exec(new DispatchGetInfoAction(dispatchId1));
-        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
-
-        for (Specimen specimen : specimens) {
-            exec(new SpecimenDeleteAction(specimen));
-        }
-
-        deleteOriginInfos(provisioning.siteId);
-        exec(new SiteDeleteAction(siteInfo.getSite()));
+        exec(new SiteDeleteAction(site1));
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void deleteWithDstDispatch() throws Exception {
         session.beginTransaction();
-        Provisioning provisioning = new Provisioning(session, factory);
+        Site site1 = factory.createSite();
+        Site site2 = factory.createSite();
+        factory.createDispatch(site1, site2);
         session.getTransaction().commit();
 
-        Integer dispatchId = DispatchHelper.createDispatch(getExecutor(), 
-            provisioning.getClinic(), provisioning.getSite(),
-            provisioning.patientIds.get(0));
-
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
         try {
-            exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-                .fail(
+            exec(new SiteDeleteAction(site2));
+            Assert.fail(
                 "should not be allowed to delete a site which is a destination for dispatches");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
-        // delete the dispatch and then the site - no need to delete dispatch
-        // specimens
-        DispatchReadInfo dispatchInfo =
-            exec(new DispatchGetInfoAction(dispatchId));
-        exec(new DispatchDeleteAction(dispatchInfo.dispatch));
+        // now delete the dispatch and then the originating site
+        session.beginTransaction();
+        session.delete(factory.getDefaultDispatch());
+        session.getTransaction().commit();
 
-        // TODO: delete specimens
-        Transaction tx = session.beginTransaction();
-        Query q = session.createQuery("from " + Specimen.class.getName()
-            + " where currentCenter.id = ?")
-            .setParameter(0, provisioning.siteId);
-        for (Specimen s : (List<Specimen>) q.list()) {
-            session.delete(s);
-        }
-
-        tx.commit();
-
-        exec(new SiteDeleteAction(siteInfo.getSite()));
+        exec(new SiteDeleteAction(site2));
     }
 
     @Test
@@ -652,7 +594,7 @@ public class TestSite extends TestAction {
 
         List<StudyCountInfo> studyCountInfos =
             exec(new SiteGetStudyInfoAction(factory.getDefaultSite().getId()))
-                .getList();
+            .getList();
         Assert.assertEquals(1, studyCountInfos.size());
 
         StudyCountInfo studyCountInfo = studyCountInfos.get(0);

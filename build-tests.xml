@@ -115,7 +115,7 @@
     <echo message="test report: file://${test.output}/html/junit-noframes.html" />
   </target>
 
-  <property name="emma.dir" value="${req.jars.dir}" />
+  <property name="emma.dir" value="${req.jars.dir}/build" />
   <path id="emma.lib">
     <pathelement location="${emma.dir}/emma.jar" />
     <pathelement location="${emma.dir}/emma_ant.jar" />
@@ -134,6 +134,12 @@
       <classpath refid="biobank.common.run.classpath" />
       <classpath refid="test.class.path" />
       <classpath refid="emma.lib" />
+      <classpath>
+        <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
+        <pathelement location="${eclipse.proj.dir.tests}/lib/clm.jar" />
+        <pathelement location="${eclipse.proj.dir.tools}/lib/naming-common.jar" />
+        <pathelement location="${eclipse.proj.dir.tests}/conf" />
+      </classpath>
       <formatter usefile="yes" type="brief" />
       <formatter type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
@@ -158,6 +164,18 @@
       </fileset>
       <report format="noframes" todir="${test.output}/html" />
     </junitreport>
+    <java classname="emma" fork="true" failonerror="true">
+      <arg value="report" />
+      <arg value="-r" />
+      <arg value="xml" />
+      <arg value="-sp" />
+      <arg value="eclipse_ws/biobank.common/src" />
+      <arg value="-in" />
+      <arg value="testing/coverage.emma" />
+      <classpath>
+        <pathelement path="${emma.dir}/emma.jar" />
+      </classpath>
+    </java>
     <java classname="emma" fork="true" failonerror="true">
       <arg value="report" />
       <arg value="-r" />

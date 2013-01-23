@@ -31,6 +31,9 @@
     <dependency org="org.slf4j" name="slf4j-nop" rev="1.6.4" conf="biobank.build->default" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.15" conf="biobank.build->default" />
     <dependency org="org.eclipse.jdt.core.compiler" name="ecj" rev="3.7.2" conf="biobank.build->default" />
+    <dependency org="emma" name="emma" rev="2.1.5320" conf="biobank.build->default" />
+    <dependency org="emma" name="emma_ant" rev="2.1.5320" conf="biobank.build->default" />
+
 
     <!-- for flyway -->
     <dependency org="com.googlecode.flyway" name="flyway-ant" rev="2.0.2" conf="flyway->default,sources" />
