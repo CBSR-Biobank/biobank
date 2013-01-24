@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
-import edu.ualberta.med.biobank.dialogs.ScanTubesManuallyWizard;
+import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -279,7 +279,7 @@ public class PalletScanManagement {
             }
         }
 
-        Map<String, String> inventoryIds = ScanTubesManuallyWizard.getInventoryIds(
+        Map<String, String> inventoryIds = ScanTubesManuallyWizardDialog.getInventoryIds(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             getLabelsForMissingInventoryIds(startPos), existingInventoryIdsByLabel);
 

@@ -523,7 +523,6 @@ public class TestSite extends TestAction {
         exec(new SiteDeleteAction(site1));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void deleteWithDstDispatch() throws Exception {
         session.beginTransaction();
