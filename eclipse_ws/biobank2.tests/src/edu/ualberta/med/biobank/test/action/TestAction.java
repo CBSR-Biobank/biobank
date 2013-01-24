@@ -102,22 +102,18 @@ public class TestAction extends TestDb {
     }
 
     protected List<SpecimenType> getSpecimenTypes() {
-        Query q = session.createQuery("from " + SpecimenType.class.getName());
         @SuppressWarnings("unchecked")
-        List<SpecimenType> spcTypes = q.list();
-        Assert.assertTrue("specimen types not found in database",
-            !spcTypes.isEmpty());
+        List<SpecimenType> spcTypes = session.createCriteria(SpecimenType.class).list();
+        Assert.assertTrue("specimen types not found in database", !spcTypes.isEmpty());
         return spcTypes;
     }
 
     protected Map<String, ContainerLabelingScheme> getContainerLabelingSchemes() {
         Map<String, ContainerLabelingScheme> result =
             new HashMap<String, ContainerLabelingScheme>();
-        Query q =
-            session.createQuery("from "
-                + ContainerLabelingScheme.class.getName());
         @SuppressWarnings("unchecked")
-        List<ContainerLabelingScheme> labelingSchemes = q.list();
+        List<ContainerLabelingScheme> labelingSchemes = session.createCriteria(
+            ContainerLabelingScheme.class).list();
         Assert.assertTrue("container labeling schemes not found in database",
             !labelingSchemes.isEmpty());
         for (ContainerLabelingScheme scheme : labelingSchemes) {
@@ -126,22 +122,28 @@ public class TestAction extends TestDb {
         return result;
     }
 
+    protected ContainerLabelingScheme getLabelingSchemeWithLargerCapacity(int capacity) {
+        for (ContainerLabelingScheme scheme : getContainerLabelingSchemes().values()) {
+            if (scheme.getMaxCapacity() > capacity) {
+                return scheme;
+            }
+        }
+        return null;
+    }
+
     protected List<ShippingMethod> getShippingMethods() {
-        Query q =
-            session.createQuery("from " + ShippingMethod.class.getName());
         @SuppressWarnings("unchecked")
-        List<ShippingMethod> labelingSchemes = q.list();
-        Assert.assertTrue("shipping methods not found in database",
-            !labelingSchemes.isEmpty());
-        return labelingSchemes;
+        List<ShippingMethod> shippingMethods = session.createCriteria(ShippingMethod.class).list();
+        Assert.assertTrue("shipping methods not found in database", !shippingMethods.isEmpty());
+        return shippingMethods;
     }
 
     protected void deleteOriginInfos(Integer centerId) {
         // delete origin infos
         session.clear();
         session.beginTransaction();
-        Query q = session.createQuery("DELETE FROM "
-            + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
+        Query q = session.createQuery(
+            "DELETE FROM " + OriginInfo.class.getName() + " oi WHERE oi.center.id=?");
         q.setParameter(0, centerId);
         q.executeUpdate();
         session.getTransaction().commit();

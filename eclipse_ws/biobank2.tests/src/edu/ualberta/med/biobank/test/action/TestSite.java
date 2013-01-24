@@ -8,8 +8,8 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 
-import org.hibernate.Query;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,12 +39,10 @@ import edu.ualberta.med.biobank.common.action.site.SiteGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.action.site.SiteSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
-import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
@@ -335,15 +333,11 @@ public class TestSite extends TestAction {
     public void containerTypes() {
         Integer siteId = exec(siteSaveAction).getId();
 
-        List<ContainerLabelingScheme> labelingSchemes =
-            new ArrayList<ContainerLabelingScheme>(
-                getContainerLabelingSchemes().values());
-
         String ctName = name + "FREEZER01";
 
-        ContainerTypeSaveAction ctSaveAction =
-            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 6,
-                10, labelingSchemes.get(0).getId(), getR().nextDouble());
+        ContainerTypeSaveAction ctSaveAction = ContainerTypeHelper.getSaveAction(
+            ctName, ctName, siteId, true, 6, 10, getLabelingSchemeWithLargerCapacity(1).getId(),
+            getR().nextDouble());
         Integer ctId = exec(ctSaveAction).getId();
 
         SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
@@ -355,9 +349,8 @@ public class TestSite extends TestAction {
 
         // add another container
         ctName += "_2";
-        ctSaveAction =
-            ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3,
-                8, labelingSchemes.get(1).getId(), getR().nextDouble());
+        ctSaveAction = ContainerTypeHelper.getSaveAction(ctName, ctName, siteId, true, 3, 8,
+            getLabelingSchemeWithLargerCapacity(1).getId(), getR().nextDouble());
         ctId = exec(ctSaveAction).getId();
 
         siteInfo = exec(new SiteGetInfoAction(siteId));
@@ -382,13 +375,10 @@ public class TestSite extends TestAction {
         SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
         exec(new SiteDeleteAction(siteInfo.getSite()));
 
-        // hql query for site should return empty
-        Query q =
-            session.createQuery("SELECT COUNT(*) FROM "
-                + Site.class.getName() + " WHERE id=?");
-        q.setParameter(0, siteId);
-        Long result = HibernateUtil.getCountFromQuery(q);
-        Assert.assertTrue(result.equals(0L));
+        @SuppressWarnings("unchecked")
+        List<Site> sites = session.createCriteria(Site.class).add(Restrictions.eq("id", siteId))
+        .list();
+        Assert.assertEquals(0, sites.size());
     }
 
     private Provisioning createSiteWithContainerType() {
@@ -397,8 +387,7 @@ public class TestSite extends TestAction {
         session.getTransaction().commit();
 
         provisioning.addContainerType(getExecutor(), name,
-            getContainerLabelingSchemes().values().iterator().next()
-            .getId(), getR().nextDouble());
+            getLabelingSchemeWithLargerCapacity(1).getId(), getR().nextDouble());
         return provisioning;
     }
 
@@ -407,44 +396,35 @@ public class TestSite extends TestAction {
         Provisioning provisioning = createSiteWithContainerType();
 
         List<SiteContainerTypeInfo> ctypeInfo = exec(
-            new SiteGetContainerTypeInfoAction(provisioning.siteId))
-            .getList();
+            new SiteGetContainerTypeInfoAction(provisioning.siteId)).getList();
 
         Assert.assertEquals(1, ctypeInfo.size());
-        Assert.assertEquals(0L, ctypeInfo.get(0).getContainerCount()
-            .longValue());
+        Assert.assertEquals(0L, ctypeInfo.get(0).getContainerCount().longValue());
 
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
         provisioning.addContainer(getExecutor(), containerTypeId, "01");
 
-        ctypeInfo = exec(
-            new SiteGetContainerTypeInfoAction(provisioning.siteId))
-            .getList();
+        ctypeInfo = exec(new SiteGetContainerTypeInfoAction(provisioning.siteId)).getList();
 
-        Assert.assertEquals(1L, ctypeInfo.get(0).getContainerCount()
-            .longValue());
+        Assert.assertEquals(1L, ctypeInfo.get(0).getContainerCount().longValue());
     }
 
     @Test
     public void deleteWithContainerTypes() {
         Provisioning provisioning = createSiteWithContainerType();
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(provisioning.siteId));
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-            .fail(
+            Assert.fail(
                 "should not be allowed to delete a site with container types");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
         // delete container type followed by site - should work now
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(
-                provisioning.containerTypeIds.get(0)));
-        exec(new ContainerTypeDeleteAction(containerTypeInfo
-            .getContainerType()));
+        ContainerTypeInfo containerTypeInfo = exec(new ContainerTypeGetInfoAction(
+            provisioning.containerTypeIds.get(0)));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo.getContainerType()));
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
@@ -452,33 +432,25 @@ public class TestSite extends TestAction {
     public void deleteWithContainers() {
         Provisioning provisioning = createSiteWithContainerType();
         Integer containerTypeId = provisioning.containerTypeIds.get(0);
-        Integer containerId =
-            provisioning.addContainer(getExecutor(), containerTypeId, "01");
+        Integer containerId = provisioning.addContainer(getExecutor(), containerTypeId, "01");
 
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(provisioning.siteId));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(provisioning.siteId));
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
-            Assert
-            .fail(
-                "should not be allowed to delete a site with containers");
+            Assert.fail("should not be allowed to delete a site with containers");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
         }
 
-        List<Container> topContainers =
-            exec(new SiteGetTopContainersAction(provisioning.siteId))
+        List<Container> topContainers = exec(new SiteGetTopContainersAction(provisioning.siteId))
             .getList();
         Assert.assertEquals(1, topContainers.size());
 
         // delete container followed by site - should work now
-        ContainerInfo containerInfo =
-            exec(new ContainerGetInfoAction(containerId));
+        ContainerInfo containerInfo = exec(new ContainerGetInfoAction(containerId));
         exec(new ContainerDeleteAction(containerInfo.container));
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(containerTypeId));
-        exec(new ContainerTypeDeleteAction(containerTypeInfo
-            .getContainerType()));
+        ContainerTypeInfo containerTypeInfo = exec(new ContainerTypeGetInfoAction(containerTypeId));
+        exec(new ContainerTypeDeleteAction(containerTypeInfo.getContainerType()));
         exec(new SiteDeleteAction(siteInfo.getSite()));
     }
 
