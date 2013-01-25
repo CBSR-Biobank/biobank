@@ -35,7 +35,7 @@ public class ScanTubesManuallyWizard extends Wizard {
     private final Map<String, String> resultIventoryIdsByLabel = new HashMap<String, String>();
 
     /**
-     * This constructor is private. Use {@link #getInventoryIds} to create this wizard.
+     * This constructor is private. Use {@link #ScanTubesManuallyWizardDialog.getInventoryIds} to create this wizard.
      * 
      * @param parentShell the parent SWT shell
      * @param labels the labels that the user should be prompted for. The order is important.

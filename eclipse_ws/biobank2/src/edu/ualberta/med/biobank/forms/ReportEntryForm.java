@@ -88,15 +88,15 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ReportEntryForm";
+    "edu.ualberta.med.biobank.forms.ReportEntryForm";
 
     private static final Comparator<EntityFilter> COMPARE_FILTERS_BY_NAME =
         new Comparator<EntityFilter>() {
-            @Override
-            public int compare(EntityFilter lhs, EntityFilter rhs) {
-                return lhs.getName().compareToIgnoreCase(rhs.getName());
-            }
-        };
+        @Override
+        public int compare(EntityFilter lhs, EntityFilter rhs) {
+            return lhs.getName().compareToIgnoreCase(rhs.getName());
+        }
+    };
 
     private FilterSelectWidget filtersWidget;
     private ColumnSelectWidget columnsWidget;
@@ -296,13 +296,13 @@ public class ReportEntryForm extends BiobankEntryForm {
                         public void run() {
                             results = (List<Object>) new ReportListProxy(
                                 SessionManager.getAppService(), rawReport)
-                                .init();
+                            .init();
 
                             if (results instanceof AbstractBiobankListProxy)
                                 ((AbstractBiobankListProxy<?>) results)
-                                    .addBusyListener(new ProgressMonitorDialogBusyListener(
-                                        // progress monitor label.
-                                        i18n.tr("Loading more results...")));
+                                .addBusyListener(new ProgressMonitorDialogBusyListener(
+                                    // progress monitor label.
+                                    i18n.tr("Loading more results...")));
                         }
                     };
 
@@ -334,15 +334,15 @@ public class ReportEntryForm extends BiobankEntryForm {
 
                             if (!report.getIsCount()) {
                                 resultsTable
-                                    .addDoubleClickListener(new IDoubleClickListener() {
-                                        @Override
-                                        public void doubleClick(
-                                            DoubleClickEvent event) {
-                                            ISelection selection = event
-                                                .getSelection();
-                                            openViewForm(selection);
-                                        }
-                                    });
+                                .addDoubleClickListener(new IDoubleClickListener() {
+                                    @Override
+                                    public void doubleClick(
+                                        DoubleClickEvent event) {
+                                        ISelection selection = event
+                                            .getSelection();
+                                        openViewForm(selection);
+                                    }
+                                });
                             }
 
                             for (Button button : exportButtons) {
@@ -497,24 +497,24 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         filtersWidget = new FilterSelectWidget(container, SWT.NONE, report);
         filtersWidget
-            .addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
-                @Override
-                public void handleEvent(FilterChangeEvent event) {
-                    if (event.isDataChange()) {
-                        setDirty(true);
-                    }
-
-                    book.reflow(true);
-                    form.layout(true, true);
-
-                    EntityFilter entityFilter = event.getEntityFilter();
-                    if (event.isSelected()) {
-                        filterCombo.remove(entityFilter);
-                    } else {
-                        filterCombo.add(entityFilter);
-                    }
+        .addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
+            @Override
+            public void handleEvent(FilterChangeEvent event) {
+                if (event.isDataChange()) {
+                    setDirty(true);
                 }
-            });
+
+                book.reflow(true);
+                form.layout(true, true);
+
+                EntityFilter entityFilter = event.getEntityFilter();
+                if (event.isSelected()) {
+                    filterCombo.remove(entityFilter);
+                } else {
+                    filterCombo.add(entityFilter);
+                }
+            }
+        });
 
         Collection<EntityFilter> entityFilters = getSortedEntityFilters(report,
             COMPARE_FILTERS_BY_NAME);
@@ -563,21 +563,21 @@ public class ReportEntryForm extends BiobankEntryForm {
         });
 
         filterCombo
-            .addPostSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    Object selection = ((IStructuredSelection) filterCombo
-                        .getSelection()).getFirstElement();
-                    if (selection instanceof EntityFilter) {
-                        EntityFilter entityFilter = (EntityFilter) selection;
-                        filterCombo.remove(entityFilter);
-                        filtersWidget.addFilterRow(entityFilter);
+        .addPostSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                Object selection = ((IStructuredSelection) filterCombo
+                    .getSelection()).getFirstElement();
+                if (selection instanceof EntityFilter) {
+                    EntityFilter entityFilter = (EntityFilter) selection;
+                    filterCombo.remove(entityFilter);
+                    filtersWidget.addFilterRow(entityFilter);
 
-                        setDirty(true);
-                        form.layout(true, true);
-                    }
+                    setDirty(true);
+                    form.layout(true, true);
                 }
-            });
+            }
+        });
     }
 
     private static Collection<EntityFilter> getSortedEntityFilters(
@@ -601,7 +601,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(options);
 
         createBoundWidgetWithLabel(options, Button.class, SWT.CHECK,
-            i18n.tr("Show count\r\n(for displayed columns)"), null, report,
+            i18n.tr("Show count\n(for displayed columns)"), null, report,
             "isCount",
             null);
 
@@ -617,16 +617,16 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
         columnsWidget
-            .addColumnChangeListener(new ChangeListener<ColumnChangeEvent>() {
-                @Override
-                public void handleEvent(ColumnChangeEvent event) {
-                    setDirty(true);
-                    book.reflow(true);
-                    form.layout(true, true);
+        .addColumnChangeListener(new ChangeListener<ColumnChangeEvent>() {
+            @Override
+            public void handleEvent(ColumnChangeEvent event) {
+                setDirty(true);
+                book.reflow(true);
+                form.layout(true, true);
 
-                    updateGenerateButton();
-                }
-            });
+                updateGenerateButton();
+            }
+        });
 
         section.setClient(options);
     }
