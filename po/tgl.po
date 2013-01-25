@@ -69,14 +69,14 @@ msgstr "mayroon nang nananatili na ganitong ispesimen"
 msgid ""
 "collection event for patient {0} with visit number \"{1}\" does not exist"
 msgstr ""
-"Walang nananatiling kaganapan ng pagkolekta para sa pasyenteng {0} namay "
-"bilang \"{1}\" ng pagbisita"
+"Walang nananatiling kaganapan ng pagkolekta para sa pasyenteng {0} na"
+"may bilang \"{1}\" ng pagbisita"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:72
 msgid "specimen declared a source specimen but parent inventory ID present"
 msgstr ""
-"may idiniklerang pinagmulan na ispesimen, ngunit mayroon dinnananatiling "
-"pangimbentaryong ID ng pinaghugutan"
+"may idiniklerang pinagmulan na ispesimen, ngunit mayroon din"
+"nananatiling pangimbentaryong ID ng pinaghugutan"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:76
 #, java-format
@@ -94,19 +94,16 @@ msgstr ""
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:84
 msgid "pallet position defined but not product barcode or label"
 msgstr ""
-"ang posisyon ng arag-arag (pallet) ay natukoy pero hindi ang barcode o "
-"etiketa ngprodukto"
+"ang posisyon ng arag-arag (pallet) ay natukoy pero hindi ang barcode o etiketa ng"
+"produkto"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:88
 msgid "pallet product barcode defined but not position"
-msgstr ""
-"ang barcode ng produkto ng arag-arag (pallet) ay natukoy pero hindi ang "
-"posisyon"
+msgstr "ang barcode ng produkto ng arag-arag (pallet) ay natukoy pero hindi ang posisyon"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:91
 msgid "pallet label defined but not container type"
-msgstr ""
-"natukoy ang etiketa ng arag-arag (pallet) pero hindi ang uri ng lalagyan"
+msgstr "natukoy ang etiketa ng arag-arag (pallet) pero hindi ang uri ng lalagyan"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:94
 #, java-format
@@ -138,8 +135,8 @@ msgid ""
 "patient number \"{0}\" does not match the patient on the source specimen "
 "\"{1}\""
 msgstr ""
-"ang numero ng pasyente \"{0}\" ay hindi tumutugma sa pasyente ng pinagmulan "
-"na ispesimen  \"{1}\""
+"ang numero ng pasyente \"{0}\" ay hindi tumutugma sa pasyente ng "
+"pinagmulan na ispesimen  \"{1}\""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:113
 #, java-format
@@ -170,8 +167,8 @@ msgstr "Ang ispesimen \"{0}\" ay hindi mahanap sa koleksyon."
 #, java-format
 msgid "Attribute for label \"{0}\" is locked, changes not permitted."
 msgstr ""
-"Ang mga katangian para sa etiketang \"{0}\" ay nakakandado, ang mga "
-"pagbabago ayhindi pinahihintulutan."
+"Ang mga katangian para sa etiketang \"{0}\" ay nakakandado, ang mga pagbabago ay"
+"hindi pinahihintulutan."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:62
 #, java-format
@@ -213,8 +210,8 @@ msgstr ""
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenActionHelper.java:95
 msgid "Parent container and position should either both be set or both be null"
 msgstr ""
-"Ang lalagyan at posisyon ng pinaghugutan ay kailangan parehong nakatakda o "
-"iwanan na walang laman"
+"Ang lalagyan at posisyon ng pinaghugutan ay kailangan parehong nakatakda "
+"o iwanan na walang laman"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/container/ContainerMoveAction.java:91
 msgid "Unable to move container."
@@ -265,8 +262,8 @@ msgstr "May problema sa pagsasama-sama ng mga pasyente"
 msgid ""
 "Delete failed. There are child specimens linked through this processing event"
 msgstr ""
-"Nabigong burahin. Mayroong mga anak na ispesimen na nakaugnay sa kaganapan "
-"ng pagproprosesong ito"
+"Nabigong burahin. Mayroong mga anak na ispesimen na nakaugnay sa kaganapan ng "
+"pagproprosesong ito"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/reports/ReportAction.java:23
 msgid "Unable to run report for unknown reason"
@@ -280,8 +277,8 @@ msgstr "Walang mahanap na hiling na may id \"{0}\"."
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/researchGroup/RequestSubmitAction.java:29
 msgid "Blank specimen id, please check your your file for correct input."
 msgstr ""
-"Walang laman ang id ng ispesimen, i-tsek muli ang talaksan (file) para sa "
-"tamang pagpasok ng impormasyon."
+"Walang laman ang id ng ispesimen, i-tsek muli ang talaksan (file) para "
+"sa tamang pagpasok ng impormasyon."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/DispatchCreateProcessAction.java:28
 #, java-format
@@ -331,8 +328,7 @@ msgstr "Ang {0} ay naandito na sa padalang ito."
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/ShipmentReceiveProcessAction.java:115
 #, java-format
 msgid "Specimen {0} not found in database"
-msgstr ""
-"Ang ispesimen {0} ay hindi mahanap sa kalipunan ng mga datos (database)"
+msgstr "Ang ispesimen {0} ay hindi mahanap sa kalipunan ng mga datos (database)"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/ShipmentReceiveProcessAction.java:126
 msgid "Specimen should not be in shipment"
@@ -384,14 +380,12 @@ msgstr "Ang ispesimen ay mayroon nang posisyon sa ibang lugar (site {0})"
 #, fuzzy, java-format
 msgid "This pallet type {0} can''t hold a specimen of type {1}"
 msgstr ""
-"Ang uri ng arag-arag (pallet) {0} ay hindi maaring maglaman ng uri ng "
-"ispesimen {1}"
+"Ang uri ng arag-arag (pallet) {0} ay hindi maaring maglaman ng uri ng ispesimen {1}"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:378
 msgid "Cannot assign position to a specimen that in dispatch transit"
 msgstr ""
-"Hindi maitatalaga ang posisyon ng ispesimen sa mga kargamentong nasa "
-"padalahan na"
+"Hindi maitatalaga ang posisyon ng ispesimen sa mga kargamentong nasa padalahan na"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:75
 #, java-format
@@ -412,8 +406,7 @@ msgstr "Ikaw ay walang sapat na mga pahintulot para impukin ang grupong ito."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserDeleteAction.java:24
 msgid "You do not have adequate permissions to delete this user."
-msgstr ""
-"Ikaw ay walang sapat na mga pahintulot para burahin ang tagagamit na ito"
+msgstr "Ikaw ay walang sapat na mga pahintulot para burahin ang tagagamit na ito"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserDeleteAction.java:28
 msgid "Unable to delete associated CSM user."
@@ -425,8 +418,7 @@ msgid ""
 "refresh your user management, start over, and try again."
 msgstr ""
 "Maaring may mga grupo kang dinadagdag nang hindi mo nalalaman. Kung maari,"
-"sariwain (i-refresh) ang pamamahala ng gumagamit, ulitin sa simula at "
-"subukang muli."
+"sariwain (i-refresh) ang pamamahala ng gumagamit, ulitin sa simula at subukang muli."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:48
 msgid "You cannot add this user to groups you cannot manage."
@@ -436,8 +428,7 @@ msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:52
 msgid "You do not have adequate permissions to modify this user."
-msgstr ""
-"Ikaw ay walang sapat na mga pahintulot para palitan ang tagagamit na ito."
+msgstr "Ikaw ay walang sapat na mga pahintulot para palitan ang tagagamit na ito."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:56
 msgid ""
@@ -457,15 +448,16 @@ msgid ""
 "Your manageable memberships have changed since you began modifying this "
 "user. Please refresh your user management, start over, and try again."
 msgstr ""
-"Ang mga pamamahala mo bilang miyembro ay nagbago simula ng baguhin itong "
-"tagagamit. Sariwain (refresh) ang pamamahala ng miyembro, ulitin sa simula "
-"at subukan muli."
+"Ang mga pamamahala mo bilang miyembro ay nagbago simula ng baguhin "
+"itong tagagamit. Sariwain (refresh) ang pamamahala ng miyembro, ulitin sa "
+"simula at subukan muli."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/security/UserSaveAction.java:68
 #, java-format
 msgid "Passwords must be at least {0} characters long"
 msgstr ""
-"Ang hudyat (password) ay hindi dapat kukulang sa {0} na mga karakter ang haba"
+"Ang hudyat (password) ay hindi dapat kukulang sa {0} na mga karakter ang "
+"haba"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenAssignSaveAction.java:75
 msgid "Problem with sent data. Container id is null"
@@ -492,8 +484,8 @@ msgstr ""
 #, java-format
 msgid "Cannot add multiple study event attributes with the same id (\"{0}\")."
 msgstr ""
-"Hindi maaring magdagdag ng maramihang mga katangian ng kaganapan ng "
-"pagsusuri na may parehong id (\"{0}\")."
+"Hindi maaring magdagdag ng maramihang mga katangian ng kaganapan ng pagsusuri "
+"na may parehong id (\"{0}\")."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:142
 #, java-format
@@ -530,8 +522,8 @@ msgstr "Ang etiketang {0} ay hindi nananatili sa {1}"
 #, java-format
 msgid "Max value is {0}. (Max row: {1}. Max col: {2}.)"
 msgstr ""
-"Ang pinakamataas na halaga ay {0}. (Pinakamaraming hanay: {1}. "
-"Pinakamaraming haligi: {2}.)"
+"Ang pinakamataas na halaga ay {0}. (Pinakamaraming hanay: {1}. Pinakamaraming "
+"haligi: {2}.)"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:447
 msgid "2 char numeric labeling scheme not found"
@@ -558,8 +550,8 @@ msgid ""
 "Position {0} of container {1} already contains container {2} when trying to "
 "add container {3}."
 msgstr ""
-"Ang posisyon {0} ng lalagyan {1} ay nilalaman na ang lalagyan {2} kapag "
-"sinusubukang idagdag ang lalagyan {3}."
+"Ang posisyon {0} ng lalagyan {1} ay nilalaman na ang lalagyan {2} "
+"kapag sinusubukang idagdag ang lalagyan {3}."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerWrapper.java:56
 #, java-format
@@ -600,8 +592,8 @@ msgstr ""
 #, java-format
 msgid "Can''t find container that will match these possible labels: {0}"
 msgstr ""
-"Hindi mahanap ang lalagyan na maaring tumugma sa sumusunod na mga etiketa: "
-"{0}"
+"Hindi mahanap ang lalagyan na maaring tumugma sa sumusunod na mga "
+"etiketa: {0}"
 
 #. {0} container type short name
 #. {1} possible labels
@@ -611,8 +603,8 @@ msgid ""
 "Can''t find container with type {0} that will match these possible labels: "
 "{1}"
 msgstr ""
-"Hindi mahanap ang lalagyan na may uri {0} na maaring tumugma sa mga "
-"sumusunod na etiketa: {1}"
+"Hindi mahanap ang lalagyan na may uri {0} na maaring tumugma sa mga sumusunod na "
+"etiketa: {1}"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/DispatchWrapper.java:196
 #, java-format
@@ -643,7 +635,8 @@ msgstr "Ang posisyong \"{0}\" ay hindi wasto."
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/SpecimenWrapper.java:200
 #, java-format
 msgid "Error retrieving specimens: found {0} results."
-msgstr "May mali sa paghahanap ng mga ispesimen: May {0} na mga resulta. "
+msgstr ""
+"May mali sa paghahanap ng mga ispesimen: May {0} na mga resulta. "
 
 #. {0} when the top specimen was created
 #. {1} where the specimen originated from
@@ -1831,8 +1824,8 @@ msgstr "Ang Tagagamit ay hindi maaring magbura sa sarili."
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:56
 msgid "Only the user itself can modify its password through this method"
 msgstr ""
-"Natatanging ang tagagamit lamang ang maaring magpalit ng hudyat (password) "
-"sa pamamaraang ito"
+"Natatanging ang tagagamit lamang ang maaring magpalit ng hudyat (password) sa "
+"pamamaraang ito"
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/BiobankCSMSecurityUtil.java:60
 msgid "Cannot modify password: verification password is incorrect."
@@ -1849,8 +1842,8 @@ msgid ""
 "Client authentication failed. The Java Client version is not compatible with "
 "the server and must be upgraded."
 msgstr ""
-"Nabigo ang pagpapatunay sa kliente. Ang bersyon ng Java Client ay hindi "
-"tumutugma sa server at kinakailangang i-upgrade."
+"Nabigo ang pagpapatunay sa kliente. Ang bersyon ng Java Client ay "
+"hindi tumutugma sa server at kinakailangang i-upgrade."
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/exceptions/ServerVersionInvalidException.java:13
 msgid "Server version could not be determined."
@@ -2275,8 +2268,8 @@ msgstr "nawawala ang ID ng teknisyan"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/batchoperation/specimen/OhsTecanSpecimenPojoReader.java:64
 msgid "specimen type is BC-Scan but parent inventory ID does not end in 1 or 2"
 msgstr ""
-"Ang uri ng ispesimen ay BC-Scan ngunit ang pangimbentaryong ID ng "
-"pinaghugutan ay hindi nagtatapos sa 1 o 2"
+"Ang uri ng ispesimen ay BC-Scan ngunit ang pangimbentaryong ID "
+"ng pinaghugutan ay hindi nagtatapos sa 1 o 2"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/batchoperation/specimen/OhsTecanSpecimenPojoReader.java:69
 msgid "specimen type is unknown"
@@ -2454,8 +2447,8 @@ msgid ""
 "Your password has been successfully changed. You will need to reconnect "
 "again to see your data"
 msgstr ""
-"Matagumpay nang napalitan ang hudyat (password). Kinakailangan muli "
-"kumonekta upang makita ang iyong datos"
+"Matagumpay nang napalitan ang hudyat (password). Kinakailangan muli kumonekta "
+"upang makita ang iyong datos"
 
 #. dialog title area message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ChangePasswordDialog.java:217
@@ -2476,8 +2469,8 @@ msgstr "Piliin ang mga opsyon na akma sa iyong mga pangangailangan"
 msgid ""
 "Export activity logs from Scan Link or Scan Assign or Cabinet Link Assign"
 msgstr ""
-"Ilipat ang talaan ng mga akitibidad mula sa Inugnay sa Skan (Scan Link) o "
-"Itinalaga sa Skan (Scan Assign)"
+"Ilipat ang talaan ng mga akitibidad mula sa Inugnay sa Skan (Scan Link) o Itinalaga sa "
+"Skan (Scan Assign)"
 
 #. TR: checkbox text
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/ExportErrorsLogsDialog.java:108
@@ -2545,8 +2538,8 @@ msgstr "Address ng Destinasyon"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/MoveContainerDialog.java:77
 msgid "Destination label must be another container (4 characters minimum)."
 msgstr ""
-"Ang etiketa ng destinasyon ay nangangailangan ng hiwalay na lalagyan(Hindi "
-"dapat kukulang sa 4 na mga karakter)."
+"Ang etiketa ng destinasyon ay nangangailangan ng hiwalay na lalagyan"
+"(Hindi dapat kukulang sa 4 na mga karakter)."
 
 #. TR: dialog shell title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/MoveSpecimensToDialog.java:71
@@ -2560,8 +2553,8 @@ msgid ""
 "accept these specimens."
 msgstr ""
 "Piliin ang bagong lalagyan na maglalaman ng mga ispesimen.\n"
-"Kinakailangang ito ay masimulan (initialized), walang laman, kasing laki ng "
-"dati, at kailangan tanggapin ang mga ispesimen na ito."
+"Kinakailangang ito ay masimulan (initialized), walang laman, kasing laki ng dati, at "
+"kailangan tanggapin ang mga ispesimen na ito."
 
 #. TR: dialog title area title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/MoveSpecimensToDialog.java:86
@@ -2666,10 +2659,10 @@ msgid ""
 "center from the list."
 msgstr ""
 "Ang mga pinagmulan na ispesimen ay nangangailangan ng pinagmulan na center."
-"Sa pagtanggal ng ispesimen na ito mula sa kargamento, kailangan muli italaga "
-"ang pinagmulan na center. Piliin ang pinagmulan na center ng ispesimenna "
-"ito. Kung kailangan burahin ang ispesimen na ito, piliin ang iyong center "
-"mulasa listahan."
+"Sa pagtanggal ng ispesimen na ito mula sa kargamento, kailangan muli "
+"italaga ang pinagmulan na center. Piliin ang pinagmulan na center ng ispesimen"
+"na ito. Kung kailangan burahin ang ispesimen na ito, piliin ang iyong center mula"
+"sa listahan."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/SpecimenOriginSelectDialog.java:85
 msgid "Creation center"
@@ -2738,8 +2731,8 @@ msgid ""
 "No more aliquoted specimen type can be derived from the study source "
 "specimen types."
 msgstr ""
-"Wala nang uri ng aliquoted specimen na makukuha mula sa mga uri ng "
-"pinagmulan na ispesimen sa pagsusuri."
+"Wala nang uri ng aliquoted specimen na makukuha mula sa mga uri ng pinagmulan "
+"na ispesimen sa pagsusuri."
 
 #. TR: dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/StudyAliquotedSpecimenDialog.java:169
@@ -2838,9 +2831,9 @@ msgid ""
 "specimens scanned\n"
 "will be compared to those that are supposed to be in the pallet."
 msgstr ""
-"I-skan ang mga ispesimen na ipapadala. Kung ang arag-arag (pallet) na na-"
-"skan ay may nauna nang posisyon, ang mga ispesimen na na-skan ay ikukumpara "
-"doon sa mga dapat na nilalaman ng arag-arag (pallet)."
+"I-skan ang mga ispesimen na ipapadala. Kung ang arag-arag (pallet) na na-skan ay "
+"may nauna nang posisyon, ang mga ispesimen na na-skan ay ikukumpara doon sa "
+"mga dapat na nilalaman ng arag-arag (pallet)."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/DispatchCreateScanDialog.java:86
 msgid "Pallet without previous position"
@@ -2901,7 +2894,8 @@ msgstr "May mali sa paglalagay ng palatandaan sa mga ispesimen"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ModifyStateDispatchDialog.java:26
 #, java-format
 msgid "Setting {0} state to specimens in current dispatch"
-msgstr "Itinatakda ang kalagayan {0} sa mga ispesimen sa kasalukuyang padala"
+msgstr ""
+"Itinatakda ang kalagayan {0} sa mga ispesimen sa kasalukuyang padala"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ModifyStateDispatchDialog.java:29
 msgid "Modifying comment of specimens in current dispatch"
@@ -3426,8 +3420,8 @@ msgstr "Kung ano-ano ang maaring gawin ng tagagamit (o grupo)"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:107
 msgid "Select at least one permission or role (with permissions) to grant"
 msgstr ""
-"Pumili ng kahit isang pahintulot o tungkulin (na may mga pahintulot) na "
-"papayagan"
+"Pumili ng kahit isang pahintulot o tungkulin (na may mga pahintulot) "
+"na papayagan"
 
 #. TR: user manager checkbox label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/user/MembershipPermissionsPage.java:213
@@ -3782,8 +3776,8 @@ msgid ""
 "Clinics can be associated with studies after submitting this initial "
 "information."
 msgstr ""
-"Ang mga klinika ay maari na iugnay sa mga pagsusuri matapos isumite itong "
-"inisyal na impormasyon."
+"Ang mga klinika ay maari na iugnay sa mga pagsusuri matapos isumite "
+"itong inisyal na impormasyon."
 
 #. validation error message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ClinicEntryForm.java:186
@@ -4141,9 +4135,7 @@ msgstr "Ang ilan sa mga anak na lalagyan ay may maling numero ng posisyon"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:318
 msgid "Error in container children : can't display those initialized"
-msgstr ""
-"May mali sa anak na lalagyan: hindi maipakita ang mga nasimulan "
-"(initialized)."
+msgstr "May mali sa anak na lalagyan: hindi maipakita ang mga nasimulan (initialized)."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:378
 msgid "Initialize selection to"
@@ -4300,8 +4292,8 @@ msgid ""
 "Specimen with inventory id {0} has not been found in this dispatch. It will "
 "be moved into the extra-pending list."
 msgstr ""
-"Ang ispesimen na may pangimbentaryong id {0} ay hindi nahanap sa padala na "
-"ito. Ililipat ito sa listahan ng mga labis na nakabinbin."
+"Ang ispesimen na may pangimbentaryong id {0} ay hindi nahanap sa padala "
+"na ito. Ililipat ito sa listahan ng mga labis na nakabinbin."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchReceivingEntryForm.java:207
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchReceivingEntryForm.java:210
@@ -4584,8 +4576,7 @@ msgstr "Hindi maipapagsama ang pasyente sa kanyang sarili"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientMergeForm.java:283
 msgid "Patients from different studies cannot be merged"
 msgstr ""
-"Ang mga pasyente na nagmumula sa magkaibang mga pagsusuri ay hindi "
-"mapapagsama"
+"Ang mga pasyente na nagmumula sa magkaibang mga pagsusuri ay hindi mapapagsama"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientMergeForm.java:297
 msgid "Confirm Merge"
@@ -4597,8 +4588,8 @@ msgid ""
 "Are you sure you want to merge patient {0} into patient {1}? All collection "
 "events, source specimens, and aliquoted specimens will be transferred."
 msgstr ""
-"Sigurado bang nais pagsamahin ang pasyenteng {0} sa pasyenteng {1}? Lahat ng "
-"kaganapan ng pagkolekta, pinagmulan na ispesimen at mga aliquoted specimen "
+"Sigurado bang nais pagsamahin ang pasyenteng {0} sa pasyenteng {1}? Lahat "
+"ng kaganapan ng pagkolekta, pinagmulan na ispesimen at mga aliquoted specimen "
 "ay malilipat din."
 
 #. dialog title.
@@ -4695,8 +4686,7 @@ msgstr "wala"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:286
 #, java-format
 msgid "Specimen is currently in center {0}. You can''t process it."
-msgstr ""
-"Ang ispesimen ay kasalukuyang nasa center {0}. Hindi mo ito maproproseso."
+msgstr "Ang ispesimen ay kasalukuyang nasa center {0}. Hindi mo ito maproproseso."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:292
 #, java-format
@@ -4726,7 +4716,8 @@ msgstr "Ang ispesimen ay kasalukuyang nakalista sa padala."
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:311
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:433
 msgid "Specimen is currently listed as stored in a container."
-msgstr "Ang ispesimen ay kasalukuyang nakalista sa mga nakatago sa lalagyan."
+msgstr ""
+"Ang ispesimen ay kasalukuyang nakalista sa mga nakatago sa lalagyan."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:320
 #, java-format
@@ -4747,8 +4738,8 @@ msgstr "Ang lahat ng mga ispesimen ay kailangang parte ng parehong pagsusuri."
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:349
 msgid "In a processing event, all specimens must be part of the same study."
 msgstr ""
-"Sa kaganapan ng pagproproseso, lahat ng mga ispesimen ay kinakailangang "
-"parte ng parehong pagsusuri."
+"Sa kaganapan ng pagproproseso, lahat ng mga ispesimen ay kinakailangang parte "
+"ng parehong pagsusuri."
 
 #. exception message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:362
@@ -4904,8 +4895,8 @@ msgstr "Ang ispesimen {0} ay hindi balidong pagpili."
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/RequestEntryForm.java:322
 msgid "You must claim this specimen before pulling is permitted."
 msgstr ""
-"Kailangan mo munang kunin (claim) ang ispesimen na ito bagopayagang mabatak "
-"(pull)."
+"Kailangan mo munang kunin (claim) ang ispesimen na ito bago" 
+"payagang mabatak (pull)."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/RequestEntryForm.java:332
 msgid "This specimen is not available for processing."
@@ -5096,8 +5087,9 @@ msgid ""
 "Specimen is currently part of another shipment: {0}. You must remove this "
 "specimen from that shipment before it can be added to this one."
 msgstr ""
-"Ang ispesimen ay kasalukuyang parte ng ibang kargamento: {0}. Kailangan muna "
-"burahin ang ispesimen na ito sa kargamentong iyon bago ito madadagdag dito."
+"Ang ispesimen ay kasalukuyang parte ng ibang kargamento: {0}. Kailangan "
+"muna burahin ang ispesimen na ito sa kargamentong iyon bago ito madadagdag "
+"dito."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:463
 msgid "Must select a new center for this specimen to originate from."
@@ -5475,8 +5467,8 @@ msgid ""
 "Source Specimen types must be added before any aliquoted specimen types can "
 "be added."
 msgstr ""
-"Kinakailangan madagdag ang mga uri ng pinagmulan na ispesimen bago "
-"makakapagdagdag ng kahit na anong uri ng mga aliquoted specimen."
+"Kinakailangan madagdag ang mga uri ng pinagmulan na ispesimen "
+"bago makakapagdagdag ng kahit na anong uri ng mga aliquoted specimen."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyEntryForm.java:315
 msgid "Add aliquoted Specimen type"
@@ -5510,8 +5502,8 @@ msgstr ""
 msgid ""
 "Please fill in the fields and hit enter or tab or resolve previous errors"
 msgstr ""
-"Punuin ang mga patlang at pindutin ang enter o tab o itama ang mga naunang "
-"pagkakamali"
+"Punuin ang mga patlang at pindutin ang enter o tab o itama ang mga "
+"naunang pagkakamali"
 
 #. TR: radio button label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:248
@@ -5579,8 +5571,8 @@ msgstr "May mail sa posisyon"
 msgid ""
 "Position {0} is invalid: no specimen position found that matches this label"
 msgstr ""
-"Hindi wasto ang posisyon {0} : walang posisyon ng ispesimen na nahanap na "
-"tumutugma sa etiketang ito"
+"Hindi wasto ang posisyon {0} : walang posisyon ng ispesimen na nahanap "
+"na tumutugma sa etiketang ito"
 
 #. TR: dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:729
@@ -5714,8 +5706,8 @@ msgid ""
 "Patient {0} has been found but it is linked to the study {1}. The center {2} "
 "is not working with this study."
 msgstr ""
-"Ang pasyente {0} ay nahanap ngunit ito ay nakaugnay sa pagsusuring {1}. Ang "
-"center {2} ay hindi nagtatrabaho kasama ng pagsusuring ito."
+"Ang pasyente {0} ay nahanap ngunit ito ay nakaugnay sa pagsusuring {1}. "
+"Ang center {2} ay hindi nagtatrabaho kasama ng pagsusuring ito."
 
 #. TR: dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:409
@@ -5897,8 +5889,8 @@ msgid ""
 "There is already a different pallet (product barcode = {0}) in this position "
 "of site {1}"
 msgstr ""
-"Mayroon nang ibang arag arag (pallet) (product barcode = {0}) sa posisyong "
-"ito sa lugar {1}"
+"Mayroon nang ibang arag arag (pallet) (product barcode = {0}) sa posisyong ito sa "
+"lugar {1}"
 
 #. TR: dialog message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:767
@@ -5937,8 +5929,7 @@ msgstr ""
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:862
 #, java-format
 msgid "A pallet with barcode {0} is already used in position {1}."
-msgstr ""
-"Ang arag arag (pallet) na may barcode {0} ay ginagamit na sa posisyong {1}."
+msgstr "Ang arag arag (pallet) na may barcode {0} ay ginagamit na sa posisyong {1}."
 
 #. TR: validation error message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:960
@@ -5976,8 +5967,8 @@ msgid ""
 "Specimens are missing from this pallet, are you sure you want to save? These "
 "specimens will still be registered at their current position."
 msgstr ""
-"May mga ispesimen na nawawala mula sa arag arag (pallet) na ito, sigurado ka "
-"ba na gusto mo mag-impok? Ang mga ispesimen na ito ay maitatakda pa rin sa "
+"May mga ispesimen na nawawala mula sa arag arag (pallet) na ito, sigurado ka ba "
+"na gusto mo mag-impok? Ang mga ispesimen na ito ay maitatakda pa rin sa "
 "kanilang kasalukuyang posisyon."
 
 #. TR: radio button text
@@ -6266,8 +6257,7 @@ msgstr "Hindi napagana ang plaka na may barcode {0}"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:167
 msgid "Barcodes can still be scanned with the handheld 2D scanner."
 msgstr ""
-"Ang mga barcode ay maari pa rin ma-skan gamit ang mahahawakang (handheld) 2D "
-"skaner."
+"Ang mga barcode ay maari pa rin ma-skan gamit ang mahahawakang (handheld) 2D skaner."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:199
 msgid "Rescanned value is different"
@@ -6360,14 +6350,14 @@ msgstr "Lokasyon ng Talaan ng Aktibidad"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/SpecimenAssignHandler.java:22
 msgid "Invalid path selected. Cannot proceed with specimen assign."
 msgstr ""
-"Hindi wasto nag napiling landas. Hindi mapapagpatuloy ang nakatakdang "
-"ispesimen."
+"Hindi wasto nag napiling landas. Hindi mapapagpatuloy ang "
+"nakatakdang ispesimen."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/SpecimenLinkHandler.java:30
 msgid "Invalid path selected. Cannot proceed with link assign."
 msgstr ""
-"Hindi wasto ang landas na napili. Hindi mapapagpatuloy ang pagtatakda sa "
-"kaugnay"
+"Hindi wasto ang landas na napili. Hindi mapapagpatuloy ang pagtatakda "
+"sa kaugnay"
 
 #. dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/UserManagementHandler.java:39
@@ -6605,15 +6595,15 @@ msgstr "Hindi balido ang ekstensyon. Gumamit ng 'pdf' o 'csv'."
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:222
 msgid "Printing Canceled. Check your printer settings and try again."
 msgstr ""
-"Nakansela ang paglimbag (Printing). I-tsek ang mga nakatakda sa panlimbag at "
-"subukan muli."
+"Nakansela ang paglimbag (Printing). I-tsek ang mga nakatakda sa panlimbag at subukan "
+"muli."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:228
 #, java-format
 msgid "Error with printer - No Print Service found with name {0}"
 msgstr ""
-"May mali sa panlimbag (printer) - Walang nahanap na serbisyo ng paglimbag na "
-"may pangalang {0}"
+"May mali sa panlimbag (printer) - Walang nahanap na serbisyo ng paglimbag na may "
+"pangalang {0}"
 
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:249
@@ -6634,8 +6624,7 @@ msgstr "May mali sa paglilimbag (printing)"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/reporting/ReportingUtils.java:305
 msgid "Select a file location to export the printed page."
 msgstr ""
-"Pumili ng lokasyon ng talaksan (file) kung saan ililipat ang pahinang "
-"lilimbagin."
+"Pumili ng lokasyon ng talaksan (file) kung saan ililipat ang pahinang lilimbagin."
 
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:56
@@ -6772,8 +6761,7 @@ msgstr "Nabigong lumikha ng lalagyan"
 #. dialog message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ContainerGroup.java:153
 msgid "You must define a top-level container type before initializing storage."
-msgstr ""
-"Kailangan magtakda ng pangunahing lalagyan bago simulan ang pag-iimbak."
+msgstr "Kailangan magtakda ng pangunahing lalagyan bago simulan ang pag-iimbak."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ContainerTypeAdapter.java:83
 msgid "Are you sure you want to delete this container type?"
@@ -7080,8 +7068,7 @@ msgstr "Resulta ng Paghahanap"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:175
 #, java-format
 msgid "Found {0} results. Do you want to open all of them?"
-msgstr ""
-"Nakahanap ng {0} na mga resulta. Gusto mo bang buksan lahat ng mga ito?"
+msgstr "Nakahanap ng {0} na mga resulta. Gusto mo bang buksan lahat ng mga ito?"
 
 #. validation error message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/validators/CabinetInventoryIDValidator.java:29
@@ -7177,8 +7164,8 @@ msgstr "Mga Talaan ng Paghahanap"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/LoggingView.java:399
 msgid "Error: start date cannot be ahead end date."
 msgstr ""
-"May mali: ang petsa ng pagsisimula ay hindi maaring mauna sa petsa ng "
-"pagtatapos."
+"May mali: ang petsa ng pagsisimula ay hindi maaring mauna sa petsa "
+"ng pagtatapos."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/LoggingView.java:404
 msgid "Logging Form Input"
@@ -7371,8 +7358,8 @@ msgstr "Ipasok ang uri ng pagbisita:"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/EventAttrWidget.java:69
 msgid "To enter multiple visit type values, separate with semicolon."
 msgstr ""
-"Para makapagpasok ng maramihang halaga ng uri ng pagbisita, ihiwalay ito "
-"gamit ang tuldok-kuwit."
+"Para makapagpasok ng maramihang halaga ng uri ng pagbisita, ihiwalay "
+"ito gamit ang tuldok-kuwit."
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/EventAttrWidget.java:70
 msgid "Consent"
@@ -7397,12 +7384,12 @@ msgstr ""
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/EventAttrWidget.java:77
 #, fuzzy
 msgid "Gender"
-msgstr "Ang Nagpapadala"
+msgstr "Kasarian"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/EventAttrWidget.java:78
 #, fuzzy
 msgid "Please enter the valid genders:"
-msgstr "Magpasok ng balidong server URL"
+msgstr "Magpasok ng balidong mga kasarian:"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/EventAttrWidget.java:160
 msgid "Remove"
@@ -7578,16 +7565,16 @@ msgstr "Tanggalin ang Ispesimen"
 #, fuzzy, java-format
 msgid "Are you sure you want to remove specimen \"{0}\" from this shipment ?"
 msgstr ""
-"Sigurado ka ba na gusto mo tanggalin ang ispesimen \"{0}\" mula sa "
-"kargamentong ito?"
+"Sigurado ka ba na gusto mo tanggalin ang ispesimen \"{0}\" mula "
+"sa kargamentong ito?"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/DispatchSpecimenListInfoTable.java:95
 #, java-format
 msgid ""
 "Are you sure you want to remove these {0} specimens from this shipment ?"
 msgstr ""
-"Sigurado ka ba na gusto mo tanggalin ang mga ispesimen {0} na ito mula sa "
-"kargamentong ito?"
+"Sigurado ka ba na gusto mo tanggalin ang mga ispesimen {0} na ito mula "
+"sa kargamentong ito?"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/GroupInfoTable.java:80
 msgid "duplicate (verb)"
@@ -7805,8 +7792,7 @@ msgstr "Burahin ang pinagmulan na ispesimen"
 #. dialog message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/entry/SourceSpecimenEntryInfoTable.java:109
 msgid "Are you sure you want to delete this source specimen?"
-msgstr ""
-"Sigurado ka ba na gusto mong burahin ang pinagmulan na ispesimen na ito?"
+msgstr "Sigurado ka ba na gusto mong burahin ang pinagmulan na ispesimen na ito?"
 
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/entry/StudyAddInfoTable.java:74
@@ -7904,8 +7890,7 @@ msgstr "Paliitin"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/report/TextFilterValueWidget.java:28
 msgid "For string values, use '%' as a wildcard character"
 msgstr ""
-"Para sa mga magkakasunod na halaga, gumamit ng '%' bilang wildcard na "
-"karakter"
+"Para sa mga magkakasunod na halaga, gumamit ng '%' bilang wildcard na karakter"
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/DispatchSpecimensTreeTable.java:100
 msgid "Dispatch comment"
@@ -8157,8 +8142,8 @@ msgstr "Iniimpok ang Patnugot sa Kumpigurasyon ng Jasper "
 msgid ""
 "Jasper Configuration has been modified, do you want to save your changes?"
 msgstr ""
-"Napalitan na ang Kumpigurasyon ng Jasper, nais mo bang impukin ang mga "
-"pagbabago?"
+"Napalitan na ang Kumpigurasyon ng Jasper, nais mo bang impukin ang "
+"mga pagbabago?"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/JasperTemplateEntryForm.java:314
 msgid "Jasper file was not selected"
@@ -8331,8 +8316,7 @@ msgstr "May mali sa Pangalan ng Template"
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:302
 msgid "Severe Error: Internal template names do not match."
 msgstr ""
-"Matinding Pagkakamali: Hindi nagtutugma ang mga pangalan ng internal "
-"template."
+"Matinding Pagkakamali: Hindi nagtutugma ang mga pangalan ng internal template."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:315
 msgid "Failed to find the jasper configuration name."
@@ -8357,8 +8341,7 @@ msgstr "Nabigong palitan ang patnugot ng tangkay"
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:406
 #, java-format
 msgid "Template {0} has been modified, do you want to save your changes?"
-msgstr ""
-"Ang Template {0} ay nabago na, gusto mo bang impukin ang mga pagbabago?"
+msgstr "Ang Template {0} ay nabago na, gusto mo bang impukin ang mga pagbabago?"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:476
 msgid "New Template"
@@ -8377,8 +8360,8 @@ msgid ""
 "Please select a Jasper Configuration that you would like to base this "
 "template on."
 msgstr ""
-"Pumili ng Kumpigurasyon ng Jasper kung saan mo gusto ibatay ang templatena "
-"ito."
+"Pumili ng Kumpigurasyon ng Jasper kung saan mo gusto ibatay ang template"
+"na ito."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:529
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/LabelTemplateEntryForm.java:596
@@ -8451,8 +8434,8 @@ msgstr "Baguhin ang impormasyon sa form"
 msgid ""
 "Do you want to clear any information that you have entered into this form?"
 msgstr ""
-"Gusto mo ba burahin ang kahit na anong impormasyon na ipinasok mo sa form na "
-"ito?"
+"Gusto mo ba burahin ang kahit na anong impormasyon na ipinasok mo sa form "
+"na ito?"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:181
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1297
@@ -8477,8 +8460,7 @@ msgstr "Pagpapatibay ng Gui"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:229
 msgid "Print source specimen labels for a patient"
-msgstr ""
-"Limbagin (I-print) ang etiketa ng pinagmulan na ispesimen para sa pasyente"
+msgstr "Limbagin (I-print) ang etiketa ng pinagmulan na ispesimen para sa pasyente"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:304
 msgid "WARNING: preference store was NULL!"
@@ -8604,48 +8586,48 @@ msgid ""
 "Custom field 1 contains an empty name. Please disable the name field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 1 ay walang nilalaman na pangalan. Huwag paganahin "
-"ang patlang ng pangalan o magpasok ng teksto."
+"Ang Nababagong Patlang 1 ay walang nilalaman na pangalan. Huwag paganahin ang "
+"patlang ng pangalan o magpasok ng teksto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1172
 msgid ""
 "Custom field 1 contains an empty value. Please disable the value field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 1 ay walang nilalaman na halaga. Huwag paganahin ang "
-"halaga ng patlang o magpasok ng ilang teksto."
+"Ang Nababagong Patlang 1 ay walang nilalaman na halaga. Huwag paganahin "
+"ang halaga ng patlang o magpasok ng ilang teksto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1183
 msgid ""
 "Custom field 2 contains an empty name. Please disable the name field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 2 ay hindi naglalaman ng pangalan. Huwag paganahin "
-"ang patlang ng pangalan o maglagay ng ilang teskto."
+"Ang Nababagong Patlang 2 ay hindi naglalaman ng pangalan. Huwag paganahin ang "
+"patlang ng pangalan o maglagay ng ilang teskto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1196
 msgid ""
 "Custom field 2 contains an empty value. Please disable the value field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 2 ay walang nilalaman na halaga. Huwag paganahin ang "
-"halaga ng patlang o magpasok ng ilang teskto."
+"Ang Nababagong Patlang 2 ay walang nilalaman na halaga. Huwag paganahin "
+"ang halaga ng patlang o magpasok ng ilang teskto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1208
 msgid ""
 "Custom field 3 contains an empty name. Please disable the name field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 3 ay walang nilalaman na pangalan. Huwag paganahin "
-"ang patlang o magpasok ng ilang teksto."
+"Ang Nababagong Patlang 3 ay walang nilalaman na pangalan. Huwag paganahin ang "
+"patlang o magpasok ng ilang teksto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1220
 msgid ""
 "Custom field 3 contains an empty value. Please disable the value field or "
 "enter some text."
 msgstr ""
-"Ang Nababagong Patlang 3 ay walang nilalaman na halaga. Huwag paganahin ang "
-"patlang o magpasok ng ilang teksto."
+"Ang Nababagong Patlang 3 ay walang nilalaman na halaga. Huwag paganahin "
+"ang patlang o magpasok ng ilang teksto."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/forms/PatientLabelEntryForm.java:1252
 msgid "Could not load template.. Selected template is null."
@@ -8686,8 +8668,8 @@ msgid ""
 "The current set of prints are invalid, please shred any sheets that were "
 "printed from this operation."
 msgstr ""
-"Ang kasalukuyang kumpol ng mga limbag ay hindi wasto, pilasin ang kahit na "
-"anong nalimbag mula sa operasyon na ito."
+"Ang kasalukuyang kumpol ng mga limbag ay hindi wasto, pilasin ang kahit "
+"na anong nalimbag mula sa operasyon na ito."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/progress/SaveOperation.java:43
 msgid "Saving Barcode Labels PDF"
@@ -8756,8 +8738,8 @@ msgstr "Nabigong punuin ang datos ng kumpigurasyon sa jasper template."
 msgctxt "Error message"
 msgid "Failed to fill configuration data into jasper template for printing."
 msgstr ""
-"Nabigong punuin ang datos ng kumpigurasyon sa jasper template para sa "
-"paglilimbag."
+"Nabigong punuin ang datos ng kumpigurasyon sa jasper template para "
+"sa paglilimbag."
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/template/presets/cbsr/CBSRLabelMaker.java:153
 msgctxt "Error message"
@@ -8784,8 +8766,7 @@ msgstr "Walang laman o halaga ang sunod-sunod na barcode na tinukoy"
 msgctxt "Error message"
 msgid "Barcode ID must be a 12 character alphanumeric string."
 msgstr ""
-"Ang Barcode ID ay mayroon dapat 12 karakter na may sunod-sunod na "
-"magkahalong alpabeto at numero"
+"Ang Barcode ID ay mayroon dapat 12 karakter na may sunod-sunod na magkahalong alpabeto at numero"
 
 #: eclipse_ws/labelPrinter/src/edu/ualberta/med/biobank/labelprinter/template/presets/cbsr/CBSRLabelMaker.java:306
 #, java-format
