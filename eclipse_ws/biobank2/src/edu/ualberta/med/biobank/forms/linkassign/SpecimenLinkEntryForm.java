@@ -119,6 +119,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
 
+    protected RowColPos currentGridDimensions = new RowColPos(
+        RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
+
     public SpecimenLinkEntryForm() {
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
@@ -230,28 +233,43 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         plateToScanText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                int rows;
-                int cols;
-                int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
-                if (plateNumber == -1) {
-                    rows = RowColPos.ROWS_DEFAULT;
-                    cols = RowColPos.COLS_DEFAULT;
+                if (checkGridDimensionsChanged()) {
+                    recreateScanPalletWidget(currentGridDimensions.getRow(), currentGridDimensions.getCol());
+                    typesSelectionPerRowComposite.dispose();
+                    createHierarchyWidgets(parent);
+                    page.layout(true, true);
+                    book.reflow(true);
+
                 }
-                else {
-                    String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
-                    String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                    rows = PreferenceConstants.gridRows(gridDimensions, orientation);
-                    cols = PreferenceConstants.gridCols(gridDimensions, orientation);
-                }
-                recreateScanPalletWidget(rows, cols);
-                typesSelectionPerRowComposite.dispose();
-                createHierarchyWidgets(parent);
-                page.layout(true, true);
-                book.reflow(true);
             }
         });
         createScanButton(parent);
         createHierarchyWidgets(parent);
+    }
+
+    /**
+     * Returns true if the grid dimensions have changed.
+     */
+    private boolean checkGridDimensionsChanged() {
+        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+
+        if (plateNumber < 0) return false;
+
+        String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+        String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+
+        if (gridDimensions.isEmpty()) return false;
+
+        RowColPos plateDimensions = new RowColPos(
+            PreferenceConstants.gridRows(gridDimensions, orientation),
+            PreferenceConstants.gridCols(gridDimensions, orientation));
+
+        if (!currentGridDimensions.equals(plateDimensions)) {
+            currentGridDimensions = plateDimensions;
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("nls")
