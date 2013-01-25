@@ -10,6 +10,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -19,6 +21,8 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
+import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
+import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class PlateSelectionWidget extends BgcBaseWidget {
@@ -114,5 +118,12 @@ public class PlateSelectionWidget extends BgcBaseWidget {
             }
         }
         return selectedId;
+    }
+
+    public void addPlateSelectionListener(SelectionListener listener) {
+        for (Button b : plateButtons.values()) {
+            b.addSelectionListener(listener);
+        }
+        return;
     }
 }

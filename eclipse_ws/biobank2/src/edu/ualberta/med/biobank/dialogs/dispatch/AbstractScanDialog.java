@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -46,11 +48,14 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BgcBaseDialog {
@@ -247,7 +252,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        Composite contents = new Composite(parent, SWT.NONE);
+        final Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -267,6 +272,28 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 }
             }
         });
+        plateToScanText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                int rows;
+                int cols;
+                int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+                if (plateNumber == -1) {
+                    rows = RowColPos.ROWS_DEFAULT;
+                    cols = RowColPos.COLS_DEFAULT;
+                }
+                else {
+                    String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+                    String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+                    rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+                    cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                }
+                spw.dispose();
+                createScanPalletWidget(contents, rows, cols);
+                initializeBounds();
+                contents.layout(true, true);
+            }
+        });
 
         String scanButtonText = SCAN_BUTTON_LAUNCH;
         if (!BiobankPlugin.isRealScanEnabled()) {
@@ -284,18 +311,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createScanTubeAloneButton(contents);
 
-        spw = new ScanPalletWidget(contents, getPalletCellStatus());
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        spw.setLayoutData(gd);
-
-        spw.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDoubleClick(MouseEvent e) {
-                if (isScanHasBeenLaunched())
-                    palletScanManagement.scanTubeAlone(e);
-            }
-        });
+        createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
         widgetCreator
             .addBooleanBinding(
@@ -527,5 +543,20 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             spw.setCells(null);
         setScanHasBeenLaunched(false);
         palletScanManagement.onReset();
+    }
+
+    private void createScanPalletWidget(Composite contents, int rows, int cols) {
+        spw = new ScanPalletWidget(contents, getPalletCellStatus(), rows, cols);
+        GridData gd = new GridData();
+        gd.horizontalSpan = 2;
+        spw.setLayoutData(gd);
+
+        spw.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                if (isScanHasBeenLaunched())
+                    palletScanManagement.scanTubeAlone(e);
+            }
+        });
     }
 }

@@ -19,24 +19,24 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
- * Specific widget to draw a 8*12 pallet for scan features
+ * Specific widget to draw a pallet for scan features
  */
 public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
     /**
-     * Pallets are always 8*12 = fixed size
+     * Pallets are always 8*12 by default = fixed size
      */
-    public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_MAX;
-    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_MAX;
+    public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_DEFAULT;
+    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_DEFAULT;
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
     private ProfileSettings loadedProfile;
 
-    public ScanPalletDisplay(final ScanPalletWidget widget) {
+    public ScanPalletDisplay(final ScanPalletWidget widget, int rows, int cols) {
         super();
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
@@ -61,11 +61,16 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         });
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
-        setDefaultStorageSize();
+        setDefaultStorageSize(rows, cols);
     }
 
+
     public void setDefaultStorageSize() {
-        setStorageSize(SbsLabeling.ROW_MAX, SbsLabeling.COL_MAX);
+        setStorageSize(SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
+    }
+
+    public void setDefaultStorageSize(int rows, int cols) {
+        setStorageSize(rows, cols);
     }
 
     protected void setProfile(ProfileSettings profile) {

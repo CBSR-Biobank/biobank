@@ -37,6 +37,7 @@ import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -73,7 +74,9 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
@@ -697,6 +700,27 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         createPalletTypesViewer(multipleOptionsFields);
 
         createPlateToScanField(multipleOptionsFields);
+        plateToScanText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                int rows;
+                int cols;
+                int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+                if (plateNumber == -1) {
+                    rows = RowColPos.ROWS_DEFAULT;
+                    cols = RowColPos.COLS_DEFAULT;
+                }
+                else {
+                    String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+                    String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+                    rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+                    cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                }
+                recreateScanPalletWidget(rows, cols);
+                page.layout(true, true);
+                book.reflow(true);
+            }
+        });
 
         createScanButton(parent);
     }
@@ -786,7 +810,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         // TR: dialog title
                         i18n.tr("Containers Error"),
                         // TR: dialog message
-                        i18n.tr("No container type that can hold specimens has been found (if scanner is used, the container should be of size 8*12)"));
+                        i18n.tr("No container type that can hold specimens has been found (if scanner is used, the container should be of size 8*12 or 10*10)"));
                 typeSelection = null;
                 return false;
             }
@@ -812,7 +836,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     /**
-     * is use scanner, want only 8*12 pallets. Also check the container type can
+     * is use scanner, want only 8*12 or 10*10 pallets. Also check the container type can
      * hold specimens
      */
     private List<ContainerTypeWrapper> getPossibleTypes(
@@ -821,10 +845,28 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             new ArrayList<ContainerTypeWrapper>();
         for (ContainerTypeWrapper type : childContainerTypeCollection) {
             if (type.getSpecimenTypeCollection().size() > 0
-                && (!useScanner || type.isPallet96()))
+                && (!useScanner || isPalletScannable(type)))
                 palletTypes.add(type);
         }
         return palletTypes;
+    }
+
+    private boolean isPalletScannable(ContainerTypeWrapper type) {
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            int rows = PreferenceConstants.gridRows(gridDimensions);
+            int cols = PreferenceConstants.gridCols(gridDimensions);
+            if (type.isPalletRowsCols(rows, cols)) return true;
+        }
+        return false;
+    }
+
+    private boolean isPalletScannable(ContainerWrapper container) {
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            int rows = PreferenceConstants.gridRows(gridDimensions);
+            int cols = PreferenceConstants.gridCols(gridDimensions);
+            if (container.isPalletRowsCols(rows, cols)) return true;
+        }
+        return false;
     }
 
     @SuppressWarnings("nls")
@@ -839,13 +881,13 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             isNewMultipleContainer = palletFoundWithProductBarcode == null;
             if (palletFoundWithProductBarcode != null) {
                 // a container with this barcode exists
-                if (!palletFoundWithProductBarcode.isPallet96()) {
+                if (!isPalletScannable(palletFoundWithProductBarcode)) {
                     BgcPlugin
                         .openAsyncError(
                             // TR: dialog title
                             i18n.tr("Values validation"),
                             // TR: dialog message
-                            i18n.tr("A container with this barcode exists but is not a 8*12 container."));
+                            i18n.tr("A container with this barcode exists but is not a 8*12 or 10*10 container."));
                     return false;
                 }
                 if (!palletPositionText.getText().isEmpty()
@@ -980,12 +1022,24 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     /**
-     * Multiple assign. Initialise list of possible pallets (8*12)
+     * Multiple assign. Initialise list of possible pallets (8*12 or 10*10)
      */
     private void initPalletContainerTypes() throws ApplicationException {
-        palletContainerTypes = ContainerTypeWrapper.getContainerTypesPallet96(
-            SessionManager.getAppService(), SessionManager.getUser()
-                .getCurrentWorkingSite());
+        palletContainerTypes = null;
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            int rows = PreferenceConstants.gridRows(gridDimensions);
+            int cols = PreferenceConstants.gridCols(gridDimensions);
+            if (palletContainerTypes == null) {
+                palletContainerTypes = ContainerTypeWrapper.getContainerTypesByCapacity(
+                    SessionManager.getAppService(), SessionManager.getUser()
+                        .getCurrentWorkingSite(), rows, cols);
+            }
+            else {
+                palletContainerTypes.addAll(ContainerTypeWrapper.getContainerTypesByCapacity(
+                    SessionManager.getAppService(), SessionManager.getUser()
+                    .getCurrentWorkingSite(), rows, cols));
+            }
+        }
     }
 
     @SuppressWarnings("nls")
@@ -996,8 +1050,43 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     // TR: dialog title
                     i18n.tr("No Pallet defined?"),
                     // TR: dialog message
-                    i18n.tr("No child container types found with 8 rows and 12 columns"));
+                    i18n.tr("No child container types found with 8 rows and 12 columns or 10 rows and 10 columns"));
         }
+    }
+
+    @SuppressWarnings("nls")
+    private boolean matchedGridDimensions() {
+        int rows;
+        int cols;
+        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+        if (plateNumber == -1) {
+            return true;
+        }
+        String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+        String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+        rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+        cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+        ContainerWrapper palletFoundWithProductBarcode = null;
+        try {
+            palletFoundWithProductBarcode = ContainerWrapper
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(),
+                    currentMultipleContainer.getSite(),
+                    currentMultipleContainer.getProductBarcode());
+        }
+        catch (Exception ex) {
+            return true;
+        }
+        if (!palletFoundWithProductBarcode.isPalletRowsCols(rows, cols)) {
+            BgcPlugin
+                .openAsyncError(
+                    // TR: dialog title
+                    i18n.tr("Grid dimensions mismatch"),
+                    // TR: dialog message
+                    i18n.tr("Container type and plate have different number of rows and/or columns"));
+            return false;
+        }
+        else return true;
     }
 
     @Override
@@ -1017,7 +1106,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             && (!useScanner || productBarcodeValidator.validate(
                 palletproductBarcodeText.getText()).equals(Status.OK_STATUS))
             && palletLabelValidator.validate(palletPositionText.getText())
-                .equals(Status.OK_STATUS) && selection.size() > 0;
+                .equals(Status.OK_STATUS) && selection.size() > 0 && matchedGridDimensions();
     }
 
     @SuppressWarnings("nls")

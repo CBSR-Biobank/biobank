@@ -882,8 +882,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return foundContainers;
     }
 
-    public boolean isPallet96() {
-        return getContainerType().isPallet96();
+    public boolean isPalletRowsCols(int rows, int cols) {
+        return getContainerType().isPalletRowsCols(rows, cols);
     }
 
     private static final String POSITION_FREE_QRY = "from "

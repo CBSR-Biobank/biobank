@@ -285,6 +285,10 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             && RowColPos.PALLET_96_COL_MAX.equals(getColCapacity());
     }
 
+    public boolean isPalletRowsCols(int rows, int cols) {
+        return ((rows == getRowCapacity()) && (cols == getColCapacity()));
+    }
+
     @Deprecated
     @Override
     protected void addPersistTasks(TaskList tasks) {

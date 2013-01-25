@@ -51,14 +51,14 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     /**
-     * get all sample types in a site for pallet containers (8*12 size) (go
+     * get all sample types in a site for pallet containers (go
      * recursively inside found containers)
      */
-    public static List<SpecimenTypeWrapper> getSpecimenTypeForPallet96(
-        WritableApplicationService appService, SiteWrapper siteWrapper)
+    public static List<SpecimenTypeWrapper> getSpecimenTypeForPalletRowsCols(
+        WritableApplicationService appService, SiteWrapper siteWrapper, int rows, int cols)
         throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
-            .getContainerTypesPallet96(appService, siteWrapper);
+            .getContainerTypesByCapacity(appService, siteWrapper, rows, cols);
         Set<SpecimenTypeWrapper> SpecimenTypes =
             new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {

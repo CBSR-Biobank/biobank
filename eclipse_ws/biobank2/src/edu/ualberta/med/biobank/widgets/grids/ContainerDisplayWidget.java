@@ -184,6 +184,10 @@ public class ContainerDisplayWidget extends Canvas {
         setContainerType(type.getWrappedObject(), cellSize, false);
     }
 
+    public ContainerType getContainerType() {
+        return containerType;
+    }
+
     public void initDisplayFromType(boolean createDefaultContainer) {
         initDisplayFromType(createDefaultContainer,
             ScanPalletDisplay.SAMPLE_WIDTH);

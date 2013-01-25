@@ -67,7 +67,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     @SuppressWarnings("nls")
     private static final String PLATE_VALIDATOR = "plate-validator";
-    private BgcBaseText plateToScanText;
+    protected BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 

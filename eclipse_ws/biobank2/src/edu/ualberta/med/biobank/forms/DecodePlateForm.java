@@ -9,6 +9,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -18,12 +19,14 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public class DecodePlateForm extends PlateForm {
     private static final I18n i18n = I18nFactory
@@ -65,6 +68,29 @@ public class DecodePlateForm extends PlateForm {
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
+        plateSelectionWidget.addPlateSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                int plateNumber = plateSelectionWidget.getSelectedPlate();
+                String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+                String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+                int rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+                int cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                spw.dispose();
+                spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
+                    UICellStatus.FILLED), rows, cols);
+                spw.setVisible(true);
+                toolkit.adapt(spw);
+                page.layout(true, true);
+                book.reflow(true);
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                widgetSelected(e);
+            }
+          });
 
         scanButton = toolkit.createButton(page,
             i18n.tr("Scan and Decode Plate"), SWT.PUSH);
@@ -77,8 +103,22 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
+        int rows;
+        int cols;
+        Integer plateNumber = plateSelectionWidget.getSelectedPlate();
+        if (plateNumber == null) {
+            rows = RowColPos.ROWS_DEFAULT;
+            cols = RowColPos.COLS_DEFAULT;
+        }
+        else {
+            String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+            String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+            rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+            cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+        }
+
         spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
-            UICellStatus.FILLED));
+            UICellStatus.FILLED), rows, cols);
         spw.setVisible(true);
         toolkit.adapt(spw);
 
@@ -163,5 +203,4 @@ public class DecodePlateForm extends PlateForm {
         // TODO Auto-generated method stub
 
     }
-
 }
