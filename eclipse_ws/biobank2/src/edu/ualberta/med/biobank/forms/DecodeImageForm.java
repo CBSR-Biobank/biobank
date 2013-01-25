@@ -7,8 +7,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -18,9 +22,11 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcFileBrowser;
 import edu.ualberta.med.biobank.gui.common.widgets.IBgcFileBrowserListener;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -39,6 +45,8 @@ public class DecodeImageForm extends PlateForm implements
 
     private String imageFilename;
 
+    private Button[] gridDimensionsButtons;
+
     @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
@@ -56,6 +64,50 @@ public class DecodeImageForm extends PlateForm implements
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
+
+        toolkit.createLabel(page, i18n.tr("Select grid dimensions:"));
+        Composite buttonsComposite = toolkit
+            .createComposite(page);
+        layout = new GridLayout(3, false);
+        layout.horizontalSpacing = 0;
+        layout.marginWidth = 0;
+        buttonsComposite.setLayout(layout);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        gd.horizontalSpan = 2;
+        buttonsComposite.setLayoutData(gd);
+        toolkit.paintBordersFor(buttonsComposite);
+        // radio button to choose grid dimensions
+        gridDimensionsButtons = new Button[PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS.length];
+        int iGridDimensions = 0;
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            gridDimensionsButtons[iGridDimensions] = toolkit
+                .createButton(buttonsComposite, gridDimensions,
+                    SWT.RADIO);
+            gridDimensionsButtons[iGridDimensions].addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    int rows = RowColPos.ROWS_DEFAULT;
+                    int cols = RowColPos.COLS_DEFAULT;
+                    for (Button b : gridDimensionsButtons) {
+                        if (b.getSelection()) {
+                            rows = PreferenceConstants.gridRows(b.getText());
+                            cols = PreferenceConstants.gridCols(b.getText());
+                            break;
+                        }
+                    }
+                    spw.dispose();
+                    spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
+                        UICellStatus.FILLED), rows, cols);
+                    toolkit.adapt(spw);
+                    page.layout(true, true);
+                    book.reflow(true);
+                }
+            });
+            iGridDimensions++;
+        }
+        gridDimensionsButtons[0].setSelection(true);
 
         imageFileSelector = new BgcFileBrowser(page,
             // label.
@@ -102,8 +154,17 @@ public class DecodeImageForm extends PlateForm implements
     }
 
     protected void decodeImage() throws Exception {
+        int rows = RowColPos.ROWS_DEFAULT;
+        int cols = RowColPos.COLS_DEFAULT;
+        for (Button b : gridDimensionsButtons) {
+            if (b.getSelection()) {
+                rows = PreferenceConstants.gridRows(b.getText());
+                cols = PreferenceConstants.gridCols(b.getText());
+                break;
+            }
+        }
         Set<DecodedWell> decodedCells =
-            ScannerConfigPlugin.decodeImage(imageFilename);
+            ScannerConfigPlugin.decodeImage(imageFilename, rows, cols);
         wells = PalletWell.convertArray(decodedCells);
 
         Display.getDefault().asyncExec(new Runnable() {

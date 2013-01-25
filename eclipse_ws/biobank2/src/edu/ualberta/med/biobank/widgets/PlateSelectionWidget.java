@@ -10,6 +10,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -93,14 +94,14 @@ public class PlateSelectionWidget extends BgcBaseWidget {
         }
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
+        .addPropertyChangeListener(propertyListener);
 
         addDisposeListener(new DisposeListener() {
 
             @Override
             public void widgetDisposed(DisposeEvent event) {
                 ScannerConfigPlugin.getDefault().getPreferenceStore()
-                    .removePropertyChangeListener(propertyListener);
+                .removePropertyChangeListener(propertyListener);
             }
         });
     }
@@ -114,5 +115,12 @@ public class PlateSelectionWidget extends BgcBaseWidget {
             }
         }
         return selectedId;
+    }
+
+    public void addPlateSelectionListener(SelectionListener listener) {
+        for (Button b : plateButtons.values()) {
+            b.addSelectionListener(listener);
+        }
+        return;
     }
 }

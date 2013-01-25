@@ -10,6 +10,9 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     public static Integer PALLET_96_ROW_MAX = 8;
     public static Integer PALLET_96_COL_MAX = 12;
 
+    public static Integer ROWS_DEFAULT = 8;
+    public static Integer COLS_DEFAULT = 12;
+
     private final Integer row;
     private final Integer col;
 

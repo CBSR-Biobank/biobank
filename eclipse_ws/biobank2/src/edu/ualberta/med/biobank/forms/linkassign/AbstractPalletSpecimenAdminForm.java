@@ -66,7 +66,7 @@ AbstractSpecimenAdminForm {
 
     @SuppressWarnings("nls")
     protected static final String PLATE_VALIDATOR = "plate-validator";
-    private BgcBaseText plateToScanText;
+    protected BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
 

@@ -29,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -61,6 +62,8 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version.
@@ -210,9 +213,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         });
     }
 
-    @SuppressWarnings("nls")
     @Override
-    protected void createMultipleFields(Composite parent) {
+    protected void createMultipleFields(final Composite parent) {
         multipleOptionsFields = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 10;
@@ -225,80 +227,31 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         multipleOptionsFields.setLayoutData(gd);
         // plate selection
         createPlateToScanField(multipleOptionsFields);
-        createScanButton(parent);
-
-        // source/type hierarchy widgets
-        typesSelectionPerRowComposite = toolkit.createComposite(parent);
-        layout = new GridLayout(4, false);
-        layout.horizontalSpacing = 10;
-        typesSelectionPerRowComposite.setLayout(layout);
-        toolkit.paintBordersFor(typesSelectionPerRowComposite);
-        gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.horizontalAlignment = SWT.FILL;
-        typesSelectionPerRowComposite.setLayoutData(gd);
-
-        toolkit.createLabel(typesSelectionPerRowComposite,
-            StringUtil.EMPTY_STRING);
-        toolkit.createLabel(typesSelectionPerRowComposite,
-            SourceSpecimen.NAME.singular().toString());
-        toolkit.createLabel(typesSelectionPerRowComposite,
-            // label
-            i18n.tr("Aliquoted Specimen Types"));
-        toolkit.createLabel(typesSelectionPerRowComposite,
-            StringUtil.EMPTY_STRING);
-
-        specimenTypesWidgets =
-            new ArrayList<AliquotedSpecimenSelectionWidget>();
-        AliquotedSpecimenSelectionWidget precedent = null;
-        for (int i = 0; i < SbsLabeling.ROW_MAX; i++) {
-            final AliquotedSpecimenSelectionWidget typeWidget =
-                new AliquotedSpecimenSelectionWidget(
-                    typesSelectionPerRowComposite,
-                    ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
-                    .charAt(i), widgetCreator, true);
-            final int indexRow = i;
-            typeWidget
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    if (typeWidget.needToSave()) {
-                        SpecimenHierarchyInfo selection = typeWidget
-                            .getSelection();
-                        if (selection != null) {
-                            @SuppressWarnings("unchecked")
-                            Map<RowColPos, PalletWell> cells =
-                            (Map<RowColPos, PalletWell>) palletWidget
-                            .getCells();
-                            if (cells != null) {
-                                for (RowColPos rcp : cells.keySet()) {
-                                    if (rcp.getRow() == indexRow) {
-                                        PalletWell cell = cells.get(rcp);
-                                        if (PalletWell.hasValue(cell)) {
-                                            setHierarchyToCell(cell,
-                                                selection);
-                                        }
-                                    }
-                                }
-                                palletWidget.redraw();
-                            }
-                        }
-                    }
-                    if (palletWidget.isEverythingTyped()) {
-                        setDirty(true);
-                    }
+        plateToScanText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                int rows;
+                int cols;
+                int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+                if (plateNumber == -1) {
+                    rows = RowColPos.ROWS_DEFAULT;
+                    cols = RowColPos.COLS_DEFAULT;
                 }
-
-            });
-            typeWidget.addBindings();
-            specimenTypesWidgets.add(typeWidget);
-            if (precedent != null) {
-                precedent.setNextWidget(typeWidget);
+                else {
+                    String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
+                    String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+                    rows = PreferenceConstants.gridRows(gridDimensions, orientation);
+                    cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                }
+                recreateScanPalletWidget(rows, cols);
+                typesSelectionPerRowComposite.dispose();
+                createHierarchyWidgets(parent);
+                page.layout(true, true);
+                book.reflow(true);
             }
-            precedent = typeWidget;
-            typeWidget.setNumber(0);
-            typeWidget.setEnabled(false);
-        }
+        });
+        createScanButton(parent);
+        createHierarchyWidgets(parent);
     }
 
     @SuppressWarnings("nls")
@@ -501,16 +454,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
             /*
              * If the current center is a site, and if this site defines
-             * containers of 8*12 size, then get the specimen types these
+             * containers of 8*12 or 10*10 size, then get the specimen types these
              * containers can contain
              */
             if (SessionManager.getUser().getCurrentWorkingSite() != null) {
                 List<SpecimenTypeWrapper> res = null;
                 try {
-                    res = SpecimenTypeWrapper.getSpecimenTypeForPallet96(
-                        SessionManager.getAppService(), SessionManager
-                        .getUser()
-                        .getCurrentWorkingSite());
+                    res = getSpecimenTypeForPalletScannable();
                 } catch (ApplicationException e) {
                     BgcPlugin.openAsyncError("Error",
                         "Failed to retrieve specimen types.");
@@ -550,6 +500,27 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 widget.setResultTypes(studiesAliquotedTypes);
                 widget.setSelection(previousSelection);
             }
+    }
+
+    private List<SpecimenTypeWrapper> getSpecimenTypeForPalletScannable() throws ApplicationException {
+        List<SpecimenTypeWrapper> res = null;
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            int rows = PreferenceConstants.gridRows(gridDimensions);
+            int cols = PreferenceConstants.gridCols(gridDimensions);
+            if (res == null) {
+                res = SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(
+                    SessionManager.getAppService(), SessionManager
+                    .getUser()
+                    .getCurrentWorkingSite(), rows, cols);
+            }
+            else {
+                res.addAll(SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(
+                    SessionManager.getAppService(), SessionManager
+                    .getUser()
+                    .getCurrentWorkingSite(), rows, cols));
+            }
+        }
+        return res;
     }
 
     @Override
@@ -792,7 +763,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         CellInfo cell, Locale locale) {
         log.debug("getCellProcessAction");
         return new SpecimenLinkProcessAction(centerId,
-            linkFormPatientManagement.getCurrentPatient().getStudy().getId(), cell, locale);
+            linkFormPatientManagement
+            .getCurrentPatient().getStudy().getId(), cell, locale);
     }
 
     @SuppressWarnings("nls")
@@ -820,20 +792,21 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 log.debug("afterScanAndProcess: asyncExec");
 
                 // enabled the hierarchy combos
-                typesSelectionPerRowComposite.setEnabled(currentScanState != UICellStatus.ERROR);
+                typesSelectionPerRowComposite
+                .setEnabled(currentScanState != UICellStatus.ERROR);
                 // set the combos lists
                 if (typesRows.size() > 0)
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
                             if (rowToProcess == null) {
-                                if (typesRows != null) {
-                                    for (int row = 0; row < specimenTypesWidgets.size(); row++)
+                                if (typesRows != null)
+                                    for (int row = 0; row < specimenTypesWidgets
+                                        .size(); row++)
                                         setCountOnSpecimenWidget(typesRows, row);
-                                }
-                            } else {
-                                setCountOnSpecimenWidget(typesRows, rowToProcess);
-                            }
+                            } else
+                                setCountOnSpecimenWidget(typesRows,
+                                    rowToProcess);
                         }
                     });
                 // focus first available list
@@ -936,6 +909,82 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
         hideScannerBarcodeDecoration();
+    }
+
+    @SuppressWarnings("nls")
+    private void createHierarchyWidgets(Composite parent) {
+        // source/type hierarchy widgets
+        typesSelectionPerRowComposite = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(4, false);
+        layout.horizontalSpacing = 10;
+        typesSelectionPerRowComposite.setLayout(layout);
+        toolkit.paintBordersFor(typesSelectionPerRowComposite);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        typesSelectionPerRowComposite.setLayoutData(gd);
+
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            StringUtil.EMPTY_STRING);
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            SourceSpecimen.NAME.singular().toString());
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            // label
+            i18n.tr("Aliquoted Specimen Types"));
+        toolkit.createLabel(typesSelectionPerRowComposite,
+            StringUtil.EMPTY_STRING);
+
+        specimenTypesWidgets =
+            new ArrayList<AliquotedSpecimenSelectionWidget>();
+        AliquotedSpecimenSelectionWidget precedent = null;
+        for (int i = 0; i < SbsLabeling.ROW_DEFAULT; i++) {
+            final AliquotedSpecimenSelectionWidget typeWidget =
+                new AliquotedSpecimenSelectionWidget(
+                    typesSelectionPerRowComposite,
+                    ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
+                    .charAt(i), widgetCreator, true);
+            final int indexRow = i;
+            typeWidget
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    if (typeWidget.needToSave()) {
+                        SpecimenHierarchyInfo selection = typeWidget
+                            .getSelection();
+                        if (selection != null) {
+                            @SuppressWarnings("unchecked")
+                            Map<RowColPos, PalletWell> cells =
+                            (Map<RowColPos, PalletWell>) palletWidget
+                            .getCells();
+                            if (cells != null) {
+                                for (RowColPos rcp : cells.keySet()) {
+                                    if (rcp.getRow() == indexRow) {
+                                        PalletWell cell = cells.get(rcp);
+                                        if (PalletWell.hasValue(cell)) {
+                                            setHierarchyToCell(cell,
+                                                selection);
+                                        }
+                                    }
+                                }
+                                palletWidget.redraw();
+                            }
+                        }
+                    }
+                    if (palletWidget.isEverythingTyped()) {
+                        setDirty(true);
+                    }
+                }
+
+            });
+            typeWidget.addBindings();
+            specimenTypesWidgets.add(typeWidget);
+            if (precedent != null) {
+                precedent.setNextWidget(typeWidget);
+            }
+            precedent = typeWidget;
+            typeWidget.setNumber(0);
+            typeWidget.setEnabled(false);
+        }
     }
 
 }

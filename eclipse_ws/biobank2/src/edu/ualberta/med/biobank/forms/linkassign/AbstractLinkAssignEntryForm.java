@@ -408,6 +408,14 @@ AbstractPalletSpecimenAdminForm {
         showOnlyPallet(true);
     }
 
+    protected void recreateScanPalletWidget(int rows, int cols) {
+        Composite palletComposite = palletWidget.getParent();
+        palletWidget.dispose();
+        palletWidget = new ScanPalletWidget(palletComposite,
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
+        toolkit.adapt(palletWidget);
+    }
+
     /**
      * Multiple assign
      */

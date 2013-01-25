@@ -10,6 +10,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
@@ -50,21 +52,21 @@ public class PalletScanManagement {
     @SuppressWarnings("nls")
     public PalletScanManagement() {
         try {
-            this.type = getFakePallet96();
+            this.type = getFakePalletRowsCols(8, 12);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Error"),
                 // TR: dialog message
-                i18n.tr("Unable to load pallet type 96"),
+                i18n.tr("Unable to load pallet type 8*12"),
                 e);
         }
     }
 
     @SuppressWarnings("nls")
-    private ContainerType getFakePallet96() throws ApplicationException {
+    private ContainerType getFakePalletRowsCols(int rows, int cols) throws ApplicationException {
         ContainerType ct = new ContainerType();
-        ct.setCapacity(new Capacity(8, 12));
+        ct.setCapacity(new Capacity(rows, cols));
 
         ContainerLabelingSchemeInfo schemeInfo = SessionManager.getAppService().doAction(
             new ContainerLabelingSchemeGetInfoAction("SBS Standard"));
@@ -97,6 +99,25 @@ public class PalletScanManagement {
                     IProgressMonitor.UNKNOWN);
                 try {
                     launchScan(monitor, plateToScan, isRescanMode);
+
+                    int rows = RowColPos.ROWS_DEFAULT;
+                    int cols = RowColPos.COLS_DEFAULT;
+                    int plateId = -1;
+                    IPreferenceStore prefs = ScannerConfigPlugin.getDefault()
+                        .getPreferenceStore();
+                    for (plateId = 0; plateId < PreferenceConstants.SCANNER_PLATE_BARCODES.length; plateId++) {
+                        if (plateToScan.equals(prefs.getString(PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
+                            rows = PreferenceConstants.gridRows(prefs.getString(
+                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]),
+                                prefs.getString(PreferenceConstants.SCANNER_PALLET_ORIENTATION[plateId]));
+                            cols = PreferenceConstants.gridCols(prefs.getString(
+                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]),
+                                prefs.getString(PreferenceConstants.SCANNER_PALLET_ORIENTATION[plateId]));
+                            break;
+                        }
+                    }
+                    type.setCapacity(new Capacity(rows, cols));
+
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
@@ -114,8 +135,7 @@ public class PalletScanManagement {
                         i18n.tr("Scan result error"),
                         e);
                     String msg = e.getMessage();
-                    if (((msg == null) || msg.isEmpty())
-                        && (e.getCause() != null)) {
+                    if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
                         msg = e.getCause().getMessage();
                     }
                     scanAndProcessError("ERROR: " + msg);
@@ -141,16 +161,14 @@ public class PalletScanManagement {
         beforeScan();
         Map<RowColPos, PalletWell> oldCells = wells;
         if (BiobankPlugin.isRealScanEnabled()) {
-            int plateNum =
-                BiobankPlugin.getDefault().getPlateNumber(plateToScan);
+            int plateNum = BiobankPlugin.getDefault().getPlateNumber(plateToScan);
             if (plateNum == -1) {
                 plateError();
                 BgcPlugin.openAsyncError(
                     // dialog title
                     i18n.tr("Scan error"),
                     // dialog message
-                    i18n.tr("Plate with barcode {0} is not enabled",
-                        plateToScan));
+                    i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
                 return;
             }
             Set<DecodedWell> scanCells = null;
