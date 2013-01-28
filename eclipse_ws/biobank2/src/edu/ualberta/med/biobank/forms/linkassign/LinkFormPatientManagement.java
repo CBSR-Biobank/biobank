@@ -177,19 +177,16 @@ public class LinkFormPatientManagement {
                     viewerProcessingEvents.getSelection();
                 if (selection != null && selection.size() > 0) {
                     ProcessingEventWrapper pe =
-                        (ProcessingEventWrapper) selection
-                        .getFirstElement();
+                        (ProcessingEventWrapper) selection.getFirstElement();
                     if (pe != null) {
-                        specimenAdminForm.appendLog(NLS
-                            .bind(
-                                "Processing event {0} / {1} selected",
-                                pe.getWorksheet(), pe.getFormattedCreatedAt()));
+                        specimenAdminForm.appendLog(NLS.bind(
+                            "Processing event {0} / {1} selected",
+                            pe.getWorksheet(), pe.getFormattedCreatedAt()));
                     }
                 }
             }
         });
-        pEventListCheck = specimenAdminForm.getToolkit().createButton(
-            compositeFields,
+        pEventListCheck = specimenAdminForm.getToolkit().createButton(compositeFields,
             // TR: checkbox text
             i18n.tr("Last 7 days"), SWT.CHECK);
         pEventListCheck.setSelection(pEventListCheckSelection);
@@ -244,17 +241,13 @@ public class LinkFormPatientManagement {
             @Override
             public void focusLost(FocusEvent e) {
                 IStructuredSelection selection =
-                    (IStructuredSelection) viewerCollectionEvents
-                    .getSelection();
+                    (IStructuredSelection) viewerCollectionEvents.getSelection();
                 if (selection != null && selection.size() > 0) {
                     CollectionEventWrapper ce =
-                        (CollectionEventWrapper) selection
-                        .getFirstElement();
+                        (CollectionEventWrapper) selection.getFirstElement();
                     if (ce != null) {
-                        specimenAdminForm.appendLog(NLS
-                            .bind(
-                                "Visit number {0} selected",
-                                ce.getVisitNumber()));
+                        specimenAdminForm.appendLog(NLS.bind(
+                            "Visit number {0} selected", ce.getVisitNumber()));
                     }
                 }
             }
@@ -500,8 +493,7 @@ public class LinkFormPatientManagement {
     }
 
     /**
-     * get the list of aliquoted specimen type the study wants and that the
-     * container authorized
+     * get the list of aliquoted specimen type the study wants and that the container authorized
      */
     @SuppressWarnings("nls")
     public List<AliquotedSpecimenWrapper> getStudyAliquotedTypes(
