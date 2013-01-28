@@ -743,8 +743,8 @@ AbstractPalletSpecimenAdminForm {
                             positionString));
                         focusControl(positionField);
                         return;
-                    } else if (!specimenTypeCollection.contains(singleSpecimen
-                        .getSpecimenType())) {
+                    } else if ((singleSpecimen.getSpecimenType() != null)
+                        && !specimenTypeCollection.contains(singleSpecimen.getSpecimenType())) {
                         BgcPlugin.openError(
                             // TR: dialog title
                             i18n.tr("Container error"),
