@@ -124,6 +124,17 @@ public class DecodeImageForm extends PlateForm implements
 
     @Override
     public void fileSelected(String filename) {
+        int r = RowColPos.ROWS_DEFAULT;
+        int c = RowColPos.COLS_DEFAULT;
+        for (Button b : gridDimensionsButtons) {
+            if (b.getSelection()) {
+                r = PreferenceConstants.gridRows(b.getText());
+                c = PreferenceConstants.gridCols(b.getText());
+                break;
+            }
+        }
+        final int rows = r;
+        final int cols = c;
         imageFilename = filename;
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @SuppressWarnings("nls")
@@ -134,7 +145,7 @@ public class DecodeImageForm extends PlateForm implements
                     i18n.tr("Decoding..."),
                     IProgressMonitor.UNKNOWN);
                 try {
-                    decodeImage();
+                    decodeImage(rows, cols);
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
@@ -153,16 +164,7 @@ public class DecodeImageForm extends PlateForm implements
         }
     }
 
-    protected void decodeImage() throws Exception {
-        int rows = RowColPos.ROWS_DEFAULT;
-        int cols = RowColPos.COLS_DEFAULT;
-        for (Button b : gridDimensionsButtons) {
-            if (b.getSelection()) {
-                rows = PreferenceConstants.gridRows(b.getText());
-                cols = PreferenceConstants.gridCols(b.getText());
-                break;
-            }
-        }
+    protected void decodeImage(int rows, int cols) throws Exception {
         Set<DecodedWell> decodedCells =
             ScannerConfigPlugin.decodeImage(imageFilename, rows, cols);
         wells = PalletWell.convertArray(decodedCells);
