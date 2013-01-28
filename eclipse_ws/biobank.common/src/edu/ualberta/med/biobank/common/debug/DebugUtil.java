@@ -27,18 +27,18 @@ public class DebugUtil {
 
     private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY =
         "select children from " //$NON-NLS-1$
-            + Center.class.getName()
-            + " as center join center." //$NON-NLS-1$
-            + CenterPeer.PROCESSING_EVENTS.getName()
-            + " as pevents join pevents." //$NON-NLS-1$
-            + ProcessingEventPeer.SPECIMENS.getName()
-            + " as srcSpcs join srcSpcs." //$NON-NLS-1$
-            + SpecimenPeer.CHILD_SPECIMENS.getName()
-            + " as children where center." + CenterPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
+        + Center.class.getName()
+        + " as center join center." //$NON-NLS-1$
+        + CenterPeer.PROCESSING_EVENTS.getName()
+        + " as pevents join pevents." //$NON-NLS-1$
+        + ProcessingEventPeer.SPECIMENS.getName()
+        + " as srcSpcs join srcSpcs." //$NON-NLS-1$
+        + SpecimenPeer.CHILD_SPECIMENS.getName()
+        + " as children where center." + CenterPeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<SpecimenWrapper> getRandomLinkedAliquotedSpecimens(
         WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
+            throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { siteId }));
@@ -58,24 +58,24 @@ public class DebugUtil {
 
     public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
+            throws ApplicationException {
         return getRandomAssignedSpecimens(appService, siteId, null);
     }
 
     private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY =
         "select specimen from " //$NON-NLS-1$
-            + Site.class.getName()
-            + " as site join site." //$NON-NLS-1$
-            + SitePeer.CONTAINERS.getName()
-            + " as cont join cont." //$NON-NLS-1$
-            + ContainerPeer.SPECIMEN_POSITIONS.getName()
-            + " as spcpos join spcpos." //$NON-NLS-1$
-            + SpecimenPositionPeer.SPECIMEN.getName()
-            + " as specimen where site." + SitePeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
+        + Site.class.getName()
+        + " as site join site." //$NON-NLS-1$
+        + SitePeer.CONTAINERS.getName()
+        + " as cont join cont." //$NON-NLS-1$
+        + ContainerPeer.SPECIMEN_POSITIONS.getName()
+        + " as spcpos join spcpos." //$NON-NLS-1$
+        + SpecimenPositionPeer.SPECIMEN.getName()
+        + " as specimen where site." + SitePeer.ID.getName() + "=?"; //$NON-NLS-1$ //$NON-NLS-2$
 
     public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer studyId)
-        throws ApplicationException {
+            throws ApplicationException {
         List<Object> params = new ArrayList<Object>();
         params.add(siteId);
 
@@ -106,26 +106,26 @@ public class DebugUtil {
 
     @SuppressWarnings("nls")
     private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY =
-        "select spec from "
-            + Site.class.getName()
-            + " as site left join site."
-            + SitePeer.PROCESSING_EVENTS.getName()
-            + " as pe left join pe."
-            + ProcessingEventPeer.SPECIMENS.getName()
-            + " as srcSpcs left join srcSpcs."
-            + SpecimenPeer.CHILD_SPECIMENS.getName()
-            + " as spec left join spec."
-            + SpecimenPeer.SPECIMEN_POSITION.getName()
-            + " as spcpos where spcpos is null"
-            + " and spec is not null and site."
-            + SitePeer.ID.getName()
-            + "=?";
+    "select spec from "
+        + Site.class.getName()
+        + " as site left join site."
+        + SitePeer.PROCESSING_EVENTS.getName()
+        + " as pe left join pe."
+        + ProcessingEventPeer.SPECIMENS.getName()
+        + " as srcSpcs left join srcSpcs."
+        + SpecimenPeer.CHILD_SPECIMENS.getName()
+        + " as spec left join spec."
+        + SpecimenPeer.SPECIMEN_POSITION.getName()
+        + " as spcpos where spcpos is null"
+        + " and spec is not null and site."
+        + SitePeer.ID.getName()
+        + "=?";
 
     // TODO: the check on activityStatus.name makes no sense;
 
     public static List<SpecimenWrapper> getRandomNonAssignedNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer maxSize)
-        throws ApplicationException {
+            throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { siteId }));
@@ -157,15 +157,17 @@ public class DebugUtil {
 
     public static List<SpecimenWrapper> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer centerId, Integer maxSize)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            RANDOM_NON_DISPATCHED_SPECIMENS_QRY,
+            throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(RANDOM_NON_DISPATCHED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { centerId }));
         List<Specimen> res = appService.query(criteria);
         List<Specimen> specimens;
-        if (maxSize == null)
+
+        if ((res == null) || (res.size() == 0)) {
+            return new ArrayList<SpecimenWrapper>();
+        } else if ((maxSize == null) || (maxSize >= res.size())) {
             specimens = res;
-        else {
+        } else {
             specimens = new ArrayList<Specimen>();
             int i = 0;
             while (i < maxSize) {
@@ -173,7 +175,6 @@ public class DebugUtil {
                 i++;
             }
         }
-        return ModelWrapper.wrapModelCollection(appService, specimens,
-            SpecimenWrapper.class);
+        return ModelWrapper.wrapModelCollection(appService, specimens, SpecimenWrapper.class);
     }
 }
