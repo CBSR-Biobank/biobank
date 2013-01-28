@@ -12,79 +12,79 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
 
     @SuppressWarnings("nls")
     public final static String LOGIN_STATE_SOURCE_NAME =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.loginState";
 
     @SuppressWarnings("nls")
     public static final String CLINIC_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.clinicCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.clinicCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String CONTAINER_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.containerCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.containerCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String CONTAINER_TYPE_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.containerTypeCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.containerTypeCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String DISPATCH_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.dispatchCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.dispatchCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String GLOBAL_ADMIN_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.globalAdminPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.globalAdminPermission";
 
     @SuppressWarnings("nls")
     public static final String ORIGIN_INFO_UPDATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.originInfoUpdatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.originInfoUpdatePermission";
 
     @SuppressWarnings("nls")
     public static final String PATIENT_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.patientCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.patientCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String PATIENT_MERGE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.patientMergePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.patientMergePermission";
 
     @SuppressWarnings("nls")
     public static final String PROCESSING_EVENT_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.processingEventCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.processingEventCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String RESEARCH_GROUP_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.researchGroupCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.researchGroupCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String SITE_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.siteCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.siteCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String SPECIMEN_ASSIGN_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenAssignPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenAssignPermission";
 
     @SuppressWarnings("nls")
     public static final String SPECIMEN_LINK_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenLinkPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenLinkPermission";
 
     @SuppressWarnings("nls")
     public static final String SPECIMEN_TYPE_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenTypeCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.specimenTypeCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String STUDY_CREATE_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.studyCreatePermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.studyCreatePermission";
 
     @SuppressWarnings("nls")
     public static final String USER_MANAGER_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.userManagerPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.userManagerPermission";
 
     @SuppressWarnings("nls")
     public static final String LABEL_PRINTING_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.labelPrintingPermission";
 
     @SuppressWarnings("nls")
     public static final String BATCH_OPERATION_PERMISSION =
-        "edu.ualberta.med.biobank.gui.common.sourceprovider.batchOperationPermission";
+    "edu.ualberta.med.biobank.gui.common.sourceprovider.batchOperationPermission";
 
     private boolean loggedIn;
 
@@ -110,6 +110,11 @@ public class LoginPermissionSessionState extends AbstractSourceProvider {
 
         this.loggedIn = loggedIn;
         fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME, loggedIn);
+
+        // need to update UI on logout
+        if (!loggedIn) {
+            setUserCreatePermissions(UserCreatePermissions.getUserCreatePermissionsLoggedOut());
+        }
     }
 
     public void setUserCreatePermissions(

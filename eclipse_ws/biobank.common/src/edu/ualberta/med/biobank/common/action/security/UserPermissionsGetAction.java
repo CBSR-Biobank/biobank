@@ -199,6 +199,30 @@ public class UserPermissionsGetAction implements Action<UserCreatePermissions> {
         public boolean isBatchOperationPermission() {
             return batchOperationPermission;
         }
+
+        public static UserCreatePermissions getUserCreatePermissionsLoggedOut() {
+            UserCreatePermissions permissions = new UserCreatePermissions();
+
+            permissions.clinicCreatePermission = false;
+            permissions.containerCreatePermission = false;
+            permissions.containerTypeCreatePermission = false;
+            permissions.dispatchCreatePermission = false;
+            permissions.globalAdminPermission = false;
+            permissions.originInfoUpdatePermission = false;
+            permissions.patientCreatePermission = false;
+            permissions.patientMergePermission = false;
+            permissions.processingEventCreatePermission = false;
+            permissions.researchGroupCreatePermission = false;
+            permissions.siteCreatePermission = false;
+            permissions.specimenAssignPermission = false;
+            permissions.specimenLinkPermission = false;
+            permissions.specimenTypeCreatePermission = false;
+            permissions.studyCreatePermission = false;
+            permissions.userManagerPermission = false;
+            permissions.labelPrintingPermission = false;
+
+            return permissions;
+        }
     }
 
 }
