@@ -236,7 +236,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 if (checkGridDimensionsChanged()) {
                     recreateScanPalletWidget(currentGridDimensions.getRow(), currentGridDimensions.getCol());
                     typesSelectionPerRowComposite.dispose();
-                    createHierarchyWidgets(parent);
+                    createHierarchyWidgets(parent, currentGridDimensions.getRow());
                     page.layout(true, true);
                     book.reflow(true);
 
@@ -244,7 +244,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         });
         createScanButton(parent);
-        createHierarchyWidgets(parent);
+        createHierarchyWidgets(parent, RowColPos.ROWS_DEFAULT);
     }
 
     /**
@@ -930,7 +930,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @SuppressWarnings("nls")
-    private void createHierarchyWidgets(Composite parent) {
+    private void createHierarchyWidgets(Composite parent, int rows) {
         // source/type hierarchy widgets
         typesSelectionPerRowComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(4, false);
@@ -955,7 +955,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         specimenTypesWidgets =
             new ArrayList<AliquotedSpecimenSelectionWidget>();
         AliquotedSpecimenSelectionWidget precedent = null;
-        for (int i = 0; i < SbsLabeling.ROW_DEFAULT; i++) {
+        for (int i = 0; i < rows; i++) {
             final AliquotedSpecimenSelectionWidget typeWidget =
                 new AliquotedSpecimenSelectionWidget(
                     typesSelectionPerRowComposite,
