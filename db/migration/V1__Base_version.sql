@@ -631,7 +631,7 @@ CREATE TABLE `csm_application` (
 
 LOCK TABLES `csm_application` WRITE;
 /*!40000 ALTER TABLE `csm_application` DISABLE KEYS */;
-INSERT INTO `csm_application` VALUES (1,'csmupt','CSM UPT Super Admin Application',0,0,'2009-07-22',NULL,NULL,NULL,NULL,NULL),(2,'biobank','biobank',0,0,'2009-07-22','jdbc:mysql://localhost:3306/biobank','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQLDialect','com.mysql.jdbc.Driver');
+INSERT INTO `csm_application` VALUES (1,'csmupt','CSM UPT Super Admin Application',0,0,'2009-07-22',NULL,NULL,NULL,NULL,NULL),(2,'biobank','biobank',0,0,'2009-07-22','jdbc:mysql://localhost:3306/biobank_stanford','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQLDialect','com.mysql.jdbc.Driver');
 /*!40000 ALTER TABLE `csm_application` ENABLE KEYS */;
 UNLOCK TABLES;
 

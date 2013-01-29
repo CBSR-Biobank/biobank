@@ -147,6 +147,15 @@
       <replacefilter token="@database.password@" value="${database.password}"/>
     </replace>
 
+    <copy file="db/migration/V1__Base_version.sql.template"
+	  tofile="db/migration/V1__Base_version.sql"/>
+    <replace file="db/migration/V1__Base_version.sql">
+      <replacefilter token="@database.url@" value="${database.url}"/>
+      <replacefilter token="@database.driver@" value="${database.driver}"/>
+      <replacefilter token="@database.username@" value="${database.username}"/>
+      <replacefilter token="@database.password@" value="${database.password}"/>
+    </replace>
+
     <jar destfile="${lib.dir}/flyway/migrations.jar"
 	 basedir="."
 	 includes="db/migration/**">
@@ -380,7 +389,7 @@
   <target name="update-db-config"
           description="copies db configuration information from db.properties to various config files">
 
-    <copy todir="${secu-log.dir}/jboss">
+    <copy todir="${secu-log.dir}/jboss" overwrite="true">
       <fileset dir="${secu-log.dir}/jboss"/>
       <globmapper from="*.template" to="*"/>
       <filterset>
@@ -498,7 +507,7 @@
     <delete dir="webapp/db"/>
     <copy includeemptydirs="false" todir="webapp">
       <fileset dir=".">
-        <include name="db/migration/*" />
+        <include name="db/migration/*.sql" />
       </fileset>
     </copy>
     <war destfile="${war.file}"

@@ -45,7 +45,7 @@
   <bean id="dataSource"
 	class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="jdbc:mysql://localhost:3306/biobank"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/biobank_stanford"/>
     <property name="username" value="dummy"/>
     <property name="password" value="ozzy498"/>
   </bean>
