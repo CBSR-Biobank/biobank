@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -17,6 +18,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.menus.IMenuService;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -111,7 +114,10 @@ public class DispatchViewForm extends BiobankViewForm {
     public void setValues() throws Exception {
         commentTable.setList(dispatch.getCommentCollection(false));
         setDispatchValues();
-        specimensTree.refresh();
+
+        if (specimensTree != null) {
+            specimensTree.refresh();
+        }
     }
 
     @SuppressWarnings({ "nls" })
@@ -122,47 +128,42 @@ public class DispatchViewForm extends BiobankViewForm {
             && dispatch.getShipmentInfo().getPackedAt() != null) {
             dateString = dispatch.getFormattedPackedAt();
         }
-        if (dateString == null)
-            form.setText(i18n.tr(
-                "Dispatch created for {1}", dateString,
+        if (dateString == null) {
+            form.setText(i18n.tr("Dispatch created for {1}", dateString,
                 dispatch.getSenderCenter().getNameShort()));
-        else
+        } else {
             form.setText(i18n.tr("Dispatch sent on {0} from {1}",
                 dateString, dispatch.getSenderCenter().getNameShort()));
+        }
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
 
+        DispatchChangeStatePermission perm = new DispatchChangeStatePermission(dispatch.getId());
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+        if (SessionManager.getAppService().isAllowed(perm)) {
+            if (dispatch.isInCreationState()
+                && SessionManager.getUser().getCurrentWorkingCenter().equals(
+                    dispatch.getSenderCenter())) {
+                createSendButton();
+            } else if (dispatch.isInTransitState()
+                && SessionManager.getUser().getCurrentWorkingCenter().equals(
+                    dispatch.getReceiverCenter())) {
+                createReceiveButtons();
+            } else if (dispatch.isInReceivedState()
+                && SessionManager.getUser().getCurrentWorkingCenter().equals(
+                    dispatch.getReceiverCenter())
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0) {
+                createCloseButton();
+            }
+        }
+
         createTreeTableSection();
 
         setDispatchValues();
 
-        DispatchChangeStatePermission perm =
-            new DispatchChangeStatePermission(dispatch.getId());
-        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        if (SessionManager.getAppService().isAllowed(perm)) {
-            if (dispatch.isInCreationState()
-                && SessionManager.getUser().getCurrentWorkingCenter()
-                    .equals(dispatch.getSenderCenter()))
-                createSendButton();
-            else if (dispatch.isInTransitState()
-                && SessionManager.getUser().getCurrentWorkingCenter()
-                    .equals(dispatch.getReceiverCenter()))
-                createReceiveButtons();
-            else if (dispatch.isInReceivedState()
-                && SessionManager.getUser().getCurrentWorkingCenter()
-                    .equals(dispatch.getReceiverCenter())
-                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
-                createCloseButton();
-        }
-
         commentTable.setList(dispatch.getCommentCollection(false));
-    }
-
-    @Override
-    protected void addEditAction() {
-        super.addEditAction();
     }
 
     private void createTreeTableSection() {
@@ -225,9 +226,7 @@ public class DispatchViewForm extends BiobankViewForm {
                     }
                 });
         } else {
-            specimensTree =
-                new DispatchSpecimensTreeTable(page, dispatch,
-                    false);
+            specimensTree = new DispatchSpecimensTreeTable(page, dispatch, false);
             specimensTree.addClickListener();
         }
     }
@@ -236,9 +235,7 @@ public class DispatchViewForm extends BiobankViewForm {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(3, false));
         @SuppressWarnings("nls")
-        Button sendButton =
-            toolkit.createButton(composite,
-                i18n.tr("Receive"), SWT.PUSH);
+        Button sendButton = toolkit.createButton(composite, i18n.tr("Receive"), SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -247,10 +244,8 @@ public class DispatchViewForm extends BiobankViewForm {
         });
 
         @SuppressWarnings("nls")
-        Button sendProcessButton =
-            toolkit.createButton(composite,
-                i18n.tr("Receive and Process"),
-                SWT.PUSH);
+        Button sendProcessButton = toolkit.createButton(
+            composite, i18n.tr("Receive and Process"), SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -259,9 +254,7 @@ public class DispatchViewForm extends BiobankViewForm {
         });
 
         @SuppressWarnings("nls")
-        Button lostProcessButton =
-            toolkit.createButton(composite,
-                i18n.tr("Lost"), SWT.PUSH);
+        Button lostProcessButton = toolkit.createButton(composite, i18n.tr("Lost"), SWT.PUSH);
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -286,49 +279,13 @@ public class DispatchViewForm extends BiobankViewForm {
         });
     }
 
+    @SuppressWarnings("nls")
     private void createSendButton() {
-        @SuppressWarnings("nls")
-        final Button sendButton =
-            toolkit.createButton(page,
-                // button label.
-                i18n.tr("Send"), SWT.PUSH);
-        sendButton.addSelectionListener(new SelectionAdapter() {
-            @SuppressWarnings("nls")
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (new SendDispatchDialog(Display.getDefault()
-                    .getActiveShell(), dispatch).open() == Dialog.OK) {
-                    IRunnableContext context =
-                        new ProgressMonitorDialog(Display.getDefault()
-                            .getActiveShell());
-                    try {
-                        context.run(true, true, new IRunnableWithProgress() {
-                            @Override
-                            public void run(final IProgressMonitor monitor) {
-                                monitor.beginTask(
-                                    // progress message.
-                                    i18n.tr("Saving..."),
-                                    IProgressMonitor.UNKNOWN);
-                                try {
-                                    dispatchAdapter.setModelObject(dispatch);
-                                    dispatchAdapter.doSend();
-                                } catch (Exception ex) {
-                                    saveErrorCatch(ex, monitor, false);
-                                    return;
-                                }
-                                monitor.done();
-                            }
-                        });
-                    } catch (Exception e1) {
-                        BgcPlugin.openAsyncError(
-                            // dialog title.
-                            i18n.tr("Save error"), e1);
-                    }
-                    SpecimenTransitView.getCurrent().reload();
-                    dispatchAdapter.openViewForm();
-                }
-            }
-        });
+        ToolBarManager manager = (ToolBarManager) form.getToolBarManager();
+
+        IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
+        menuService.populateContributionManager(manager, "popup:dispatchCreationFormsToolBar");
+        manager.update(true);
     }
 
     @SuppressWarnings("nls")
@@ -341,18 +298,16 @@ public class DispatchViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         String stateMessage = null;
-        if (dispatch.isInLostState())
+        if (dispatch.isInLostState()) {
             stateMessage = i18n.tr(" Dispatch Lost ");
-        else if (dispatch.isInClosedState())
+        } else if (dispatch.isInClosedState()) {
             stateMessage = i18n.tr(" Dispatch Complete ");
+        }
+
         if (stateMessage != null) {
-            Label label =
-                widgetCreator.createLabel(client, stateMessage, SWT.CENTER,
-                    false);
-            label.setBackground(Display.getDefault().getSystemColor(
-                SWT.COLOR_RED));
-            label.setForeground(Display.getDefault().getSystemColor(
-                SWT.COLOR_WHITE));
+            Label label = widgetCreator.createLabel(client, stateMessage, SWT.CENTER, false);
+            label.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_RED));
+            label.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
             GridData gd = new GridData();
             gd.horizontalAlignment = SWT.CENTER;
             gd.grabExcessHorizontalSpace = true;
@@ -360,37 +315,32 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        senderLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Dispatch.PropertyName.SENDER_CENTER.toString());
-        receiverLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Dispatch.PropertyName.RECEIVER_CENTER.toString());
+        senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Dispatch.PropertyName.SENDER_CENTER.toString());
+        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Dispatch.PropertyName.RECEIVER_CENTER.toString());
         if (!dispatch.isInCreationState()) {
-            departedLabel =
-                createReadOnlyLabelledField(client, SWT.NONE,
-                    "Packed at");
-            shippingMethodLabel =
-                createReadOnlyLabelledField(client, SWT.NONE,
-                    ShippingMethod.NAME.singular().toString());
-            waybillLabel =
-                createReadOnlyLabelledField(client, SWT.NONE,
-                    ShipmentInfo.PropertyName.WAYBILL.toString());
+            departedLabel = createReadOnlyLabelledField(client, SWT.NONE, "Packed at");
+            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                ShippingMethod.NAME.singular().toString());
+            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                ShipmentInfo.PropertyName.WAYBILL.toString());
         }
         if (dispatch.hasBeenReceived()) {
-            dateReceivedLabel =
-                createReadOnlyLabelledField(client, SWT.NONE,
-                    "Date received");
+            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE, "Date received");
         }
         createCommentsSection();
     }
 
     private void createCommentsSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.plural().toString());
-        commentTable =
-            new CommentsInfoTable(client,
-                dispatch.getCommentCollection(false));
+        Section section = createSection(Comment.NAME.plural().toString());
+
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);
+        section.setExpanded(false);
+
+        client.setLayout(new GridLayout(1, false));
+        commentTable = new CommentsInfoTable(client, dispatch.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
@@ -420,6 +370,41 @@ public class DispatchViewForm extends BiobankViewForm {
                 setTextValue(dateReceivedLabel,
                     shipInfo.getFormattedDateReceived());
         }
+    }
+
+    @SuppressWarnings("nls")
+    public void dispatchSend() {
+        if (new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open()
+            == Dialog.OK) {
+            IRunnableContext context = new ProgressMonitorDialog(Display.getDefault()
+                .getActiveShell());
+            try {
+                context.run(true, true, new IRunnableWithProgress() {
+                    @Override
+                    public void run(final IProgressMonitor monitor) {
+                        monitor.beginTask(
+                            // progress message.
+                            i18n.tr("Saving..."),
+                            IProgressMonitor.UNKNOWN);
+                        try {
+                            dispatchAdapter.setModelObject(dispatch);
+                            dispatchAdapter.doSend();
+                        } catch (Exception ex) {
+                            saveErrorCatch(ex, monitor, false);
+                            return;
+                        }
+                        monitor.done();
+                    }
+                });
+            } catch (Exception e1) {
+                BgcPlugin.openAsyncError(
+                    // dialog title.
+                    i18n.tr("Save error"), e1);
+            }
+            SpecimenTransitView.getCurrent().reload();
+            dispatchAdapter.openViewForm();
+        }
+
     }
 
 }

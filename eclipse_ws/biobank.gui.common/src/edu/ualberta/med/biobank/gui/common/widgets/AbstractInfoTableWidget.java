@@ -39,12 +39,10 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcClipboard;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * This abstract class is used to create most the tables used in the client. The
- * template parameter is the collection that contains the information to be
- * displayed in the table.
+ * This abstract class is used to create most the tables used in the client. The template parameter
+ * is the collection that contains the information to be displayed in the table.
  * <p>
- * Derived classes must provide the following (through the use of abstract
- * methods):
+ * Derived classes must provide the following (through the use of abstract methods):
  * <ul>
  * <li>label provider</li>
  * <li>table sorter</li>
@@ -105,8 +103,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
     List<MenuItem> items = new ArrayList<MenuItem>();
 
-    public AbstractInfoTableWidget(final Composite parent,
-        final String[] headings,
+    public AbstractInfoTableWidget(final Composite parent, final String[] headings,
         int[] columnWidths, int rowsPerPage) {
         super(parent, SWT.NO_FOCUS);
 
@@ -204,9 +201,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
                 }
             }
         });
-        BgcClipboard.addClipboardCopySupport(tableViewer, menu,
-            labelProvider,
-            headings.length);
+        BgcClipboard.addClipboardCopySupport(tableViewer, menu, labelProvider, headings.length);
 
         // need to autosize at creation to be sure the size is well initialized
         // the first time. (if don't do that, display problems in UserManagement
@@ -390,8 +385,8 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
     }
 
     /**
-     * IMPORTANT: Remember that your primary class in TableRowData must be of
-     * type T.. can't enforce this from superclass
+     * IMPORTANT: Remember that your primary class in TableRowData must be of type T.. can't enforce
+     * this from superclass
      * 
      * @return
      */

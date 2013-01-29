@@ -292,11 +292,11 @@ public class ContainerViewForm extends BiobankViewForm {
 
     protected void createVisualizeContainer() {
         @SuppressWarnings("nls")
-        Section s = createSection(
+        Section section = createSection(
             // section label.
             i18n.tr("Container Visual"));
-        s.setLayout(new GridLayout(1, false));
-        Composite containerSection = new Composite(s, SWT.NONE);
+        section.setLayout(new GridLayout(1, false));
+        Composite containerSection = new Composite(section, SWT.NONE);
         containerSection.setLayout(new FillLayout(SWT.VERTICAL));
         ScrolledComposite sc =
             new ScrolledComposite(containerSection, SWT.H_SCROLL);
@@ -308,7 +308,7 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.adapt(sc);
         toolkit.adapt(client);
         sc.setContent(client);
-        s.setClient(containerSection);
+        section.setClient(containerSection);
         if (!childrenOk) {
             @SuppressWarnings("nls")
             Label label =

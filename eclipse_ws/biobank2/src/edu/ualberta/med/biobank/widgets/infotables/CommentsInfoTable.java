@@ -25,8 +25,8 @@ import edu.ualberta.med.biobank.model.User;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * TODO: it would be nice to set the cells that contain the comment message to
- * automatically wrap the text.
+ * TODO: it would be nice to set the cells that contain the comment message to automatically wrap
+ * the text.
  * 
  */
 public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
@@ -55,16 +55,14 @@ public class CommentsInfoTable extends InfoTableWidget<CommentWrapper> {
         i18n.tr("Date"),
         Comment.PropertyName.MESSAGE.toString() };
 
-    public CommentsInfoTable(Composite parent,
-        List<CommentWrapper> collection) {
+    public CommentsInfoTable(Composite parent, List<CommentWrapper> collection) {
         super(parent, collection, HEADINGS, CommentWrapper.class);
 
         Table table = getTableViewer().getTable();
 
         /*
-         * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly.
-         * Therefore, it is critical for performance that these methods be as
-         * efficient as possible.
+         * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+         * critical for performance that these methods be as efficient as possible.
          */
         table.addListener(SWT.MeasureItem, new Listener() {
             @Override

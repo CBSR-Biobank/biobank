@@ -274,6 +274,11 @@
              id="edu.ualberta.med.biobank.commands.researchGroupAdd"
              name="Add Research Group">
        </command>
+       <command
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.dispatchSend"
+             name="Send dispatch">
+       </command>
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
@@ -786,6 +791,15 @@
             </and>
          </activeWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.DispatchSendHandler"
+            commandId="edu.ualberta.med.biobank.commands.dispatchSend">
+         <enabledWhen>
+            <reference
+                  definitionId="edu.ualberta.med.biobank.form.instanceof.DispatchViewForm">
+            </reference>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -1270,6 +1284,31 @@
                   tooltip="Reload tree">
             </command>
          </toolbar>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:viewFormsToolBar">
+         <command
+               commandId="edu.ualberta.med.biobank.commands.reload"
+               icon="icons/reload.png"
+               label="%Reload.command"
+               style="push">
+         </command>
+         <command
+               commandId="edu.ualberta.med.biobank.commands.edit"
+               icon="icons/edit.png"
+               label="%Edit.command"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:dispatchCreationFormsToolBar">
+         <command
+               commandId="edu.ualberta.med.biobank.commands.dispatchSend"
+               label="%Send.command"
+               style="push">
+         </command>
       </menuContribution>
    </extension>
    <extension
@@ -2182,6 +2221,14 @@
              </equals>
           </with>
        </definition>
+      <definition id="edu.ualberta.med.biobank.form.instanceof.DispatchViewForm">
+        <with
+              variable="activeEditor">
+           <instanceof
+                 value="edu.ualberta.med.biobank.forms.DispatchViewForm">
+           </instanceof>
+        </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
