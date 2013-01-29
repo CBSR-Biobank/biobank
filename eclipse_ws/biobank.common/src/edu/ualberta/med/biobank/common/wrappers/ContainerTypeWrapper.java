@@ -175,9 +175,9 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         + ContainerTypePeer.SITE.getName() + "=? and "; //$NON-NLS-1$
 
     /**
-     * Get containers types defined in a site. if useStrictName is true, then
-     * the container type name should be exactly containerName, otherwise, it
-     * should contain containerName as a substring in the name.
+     * Get containers types defined in a site. if useStrictName is true, then the container type
+     * name should be exactly containerName, otherwise, it should contain containerName as a
+     * substring in the name.
      */
     public static List<ContainerTypeWrapper> getContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -218,8 +218,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             + " is empty"; //$NON-NLS-1$
 
     /**
-     * Get containers types with the given capacity in the given site. The
-     * container types returned are ones that can only hold specimens.
+     * Get containers types with the given capacity in the given site. The container types returned
+     * are ones that can only hold specimens.
      */
     public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -286,7 +286,8 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public boolean isPalletRowsCols(int rows, int cols) {
-        return ((rows == getRowCapacity()) && (cols == getColCapacity()));
+        return ((rows == getRowCapacity()) && (cols == getColCapacity())
+        && (getSpecimenTypeCollection().size() > 0));
     }
 
     @Deprecated
