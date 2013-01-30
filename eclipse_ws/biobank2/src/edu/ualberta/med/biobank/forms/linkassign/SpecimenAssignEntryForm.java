@@ -1057,18 +1057,18 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
         rows = PreferenceConstants.gridRows(gridDimensions, orientation);
         cols = PreferenceConstants.gridCols(gridDimensions, orientation);
-        ContainerWrapper palletFoundWithProductBarcode = null;
+        ContainerWrapper palletFoundWithLabel = null;
         try {
-            palletFoundWithProductBarcode = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(
+            palletFoundWithLabel = ContainerWrapper
+                .getContainerWithLabelInSite(
                     SessionManager.getAppService(),
                     currentMultipleContainer.getSite(),
-                    currentMultipleContainer.getProductBarcode());
+                    currentMultipleContainer.getLabel());
         }
         catch (Exception ex) {
             return true;
         }
-        if (!palletFoundWithProductBarcode.isPalletRowsCols(rows, cols)) {
+        if (!palletFoundWithLabel.isPalletRowsCols(rows, cols)) {
             BgcPlugin
             .openAsyncError(
                 // TR: dialog title

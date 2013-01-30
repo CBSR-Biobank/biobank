@@ -707,6 +707,29 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return null;
     }
 
+    private static final String CONTAINER_WITH_LABEL_IN_SITE_QRY =
+        "from "
+            + Container.class.getName() + " where "
+            + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
+            + ContainerPeer.LABEL.getName() + "=?";
+
+    /**
+     * Get the container with the given label in a site
+     */
+    public static ContainerWrapper getContainerWithLabelInSite(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        String label) throws Exception {
+        HQLCriteria criteria =
+            new HQLCriteria(
+                CONTAINER_WITH_LABEL_IN_SITE_QRY,
+                Arrays.asList(new Object[] { siteWrapper.getId(),
+                    label }));
+        List<Container> containers = appService.query(criteria);
+        if (containers.size() > 0)
+            return new ContainerWrapper(appService, containers.get(0));
+        return null;
+    }
+
     /**
      * Initialise children at given position with the given type. If the
      * positions list is null, initialise all the children. <strong>If a
