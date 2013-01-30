@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -51,13 +49,11 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
 AbstractSpecimenAdminForm {
@@ -281,40 +277,6 @@ AbstractSpecimenAdminForm {
     }
 
     protected abstract void refreshPalletDisplay();
-
-    @SuppressWarnings("nls")
-    protected void createProfileComboBox(Composite fieldsComposite) {
-        Label lbl = widgetCreator.createLabel(fieldsComposite,
-            // TR: label
-            i18n.tr("Profile"));
-        profilesCombo = widgetCreator.createComboViewer(fieldsComposite,lbl,null, null,
-            // TR: validation error message
-            i18n.tr("Invalid profile selected"),
-            false, null, null,
-            new BiobankLabelProvider());
-
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.FILL;
-        gd.horizontalSpan = 2;
-        profilesCombo.getCombo().setLayoutData(gd);
-        loadProfileCombo();
-    }
-
-    private void loadProfileCombo() {
-        profilesCombo.getCombo().removeAll();
-
-        ArrayList<String> profileList = new ArrayList<String>();
-        for (String element : ProfileManager.instance().getProfiles().keySet()) {
-            profileList.add(element);
-
-        }
-        Collections.sort(profileList); // Alphabetic sort
-        for (String element : profileList) {
-            profilesCombo.add(element);
-        }
-        profilesCombo.getCombo().select(0);
-
-    }
 
     @SuppressWarnings("nls")
     protected void createPlateToScanField(Composite fieldsComposite) {

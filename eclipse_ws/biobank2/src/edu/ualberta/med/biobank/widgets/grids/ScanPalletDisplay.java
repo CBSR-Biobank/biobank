@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 /**
  * Specific widget to draw a pallet for scan features
@@ -33,8 +32,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
-
-    private ProfileSettings loadedProfile;
 
     public ScanPalletDisplay(final ScanPalletWidget widget, int rows, int cols) {
         super();
@@ -73,29 +70,12 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         setStorageSize(rows, cols);
     }
 
-    protected void setProfile(ProfileSettings profile) {
-        this.loadedProfile = profile;
-    }
-
     @Override
     protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
         FontData fd = e.gc.getFont().getFontData()[0];
         FontData fd2 = new FontData(fd.getName(), 8, fd.getStyle());
         e.gc.setFont(new Font(e.display, fd2));
         super.paintGrid(e, displayWidget);
-    }
-
-    @Override
-    protected Color getDefaultBackgroundColor(PaintEvent e,
-        ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol) {
-        if (this.loadedProfile != null) {
-            if (this.loadedProfile.get(indexCol + indexRow * 12)) {
-                return new Color(e.display, 185, 211, 238);
-            }
-        }
-        return super.getDefaultBackgroundColor(e, displayWidget, rectangle,
-            indexRow, indexCol);
     }
 
     @Override

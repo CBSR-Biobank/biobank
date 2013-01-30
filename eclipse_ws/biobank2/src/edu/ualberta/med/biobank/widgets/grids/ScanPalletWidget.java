@@ -8,8 +8,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
-import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 public class ScanPalletWidget extends ContainerDisplayWidget {
 
@@ -38,13 +36,6 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
             return true;
         }
         return false;
-    }
-
-    public void loadProfile(String profileName) {
-        ProfileSettings profile = ProfileManager.instance().getProfile(
-            profileName);
-        ((ScanPalletDisplay) getContainerDisplay()).setProfile(profile);
-        this.redraw();
     }
 
     @Override
