@@ -73,10 +73,9 @@ public class DecodePlateForm extends PlateForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int plateNumber = plateSelectionWidget.getSelectedPlate();
-                String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
                 String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                int rows = PreferenceConstants.gridRows(gridDimensions, orientation);
-                int cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                int rows = PreferenceConstants.gridRows(gridDimensions);
+                int cols = PreferenceConstants.gridCols(gridDimensions);
                 spw.dispose();
                 spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
                     UICellStatus.FILLED), rows, cols);
@@ -111,10 +110,9 @@ public class DecodePlateForm extends PlateForm {
             cols = RowColPos.COLS_DEFAULT;
         }
         else {
-            String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
             String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-            rows = PreferenceConstants.gridRows(gridDimensions, orientation);
-            cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+            rows = PreferenceConstants.gridRows(gridDimensions);
+            cols = PreferenceConstants.gridCols(gridDimensions);
         }
 
         spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,

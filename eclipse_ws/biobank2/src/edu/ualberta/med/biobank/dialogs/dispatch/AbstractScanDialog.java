@@ -276,10 +276,9 @@ BgcBaseDialog {
                     cols = RowColPos.COLS_DEFAULT;
                 }
                 else {
-                    String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
                     String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                    rows = PreferenceConstants.gridRows(gridDimensions, orientation);
-                    cols = PreferenceConstants.gridCols(gridDimensions, orientation);
+                    rows = PreferenceConstants.gridRows(gridDimensions);
+                    cols = PreferenceConstants.gridCols(gridDimensions);
                 }
                 spw.dispose();
                 createScanPalletWidget(contents, rows, cols);

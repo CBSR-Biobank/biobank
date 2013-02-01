@@ -108,11 +108,9 @@ public class PalletScanManagement {
                     for (plateId = 0; plateId < PreferenceConstants.SCANNER_PLATE_BARCODES.length; plateId++) {
                         if (plateToScan.equals(prefs.getString(PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
                             rows = PreferenceConstants.gridRows(prefs.getString(
-                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]),
-                                prefs.getString(PreferenceConstants.SCANNER_PALLET_ORIENTATION[plateId]));
+                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]));
                             cols = PreferenceConstants.gridCols(prefs.getString(
-                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]),
-                                prefs.getString(PreferenceConstants.SCANNER_PALLET_ORIENTATION[plateId]));
+                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]));
                             break;
                         }
                     }

@@ -254,14 +254,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         if (plateNumber < 0) return false;
 
-        String orientation = ScannerConfigPlugin.getDefault().getPlateOrientation(plateNumber);
         String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
 
         if (gridDimensions.isEmpty()) return false;
 
         RowColPos plateDimensions = new RowColPos(
-            PreferenceConstants.gridRows(gridDimensions, orientation),
-            PreferenceConstants.gridCols(gridDimensions, orientation));
+            PreferenceConstants.gridRows(gridDimensions),
+            PreferenceConstants.gridCols(gridDimensions));
 
         if (!currentGridDimensions.equals(plateDimensions)) {
             currentGridDimensions = plateDimensions;
