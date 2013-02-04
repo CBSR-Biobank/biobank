@@ -1287,7 +1287,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:viewFormsToolBar">
+            locationURI="popup:viewFormsEditToolBar">
          <command
                commandId="edu.ualberta.med.biobank.commands.reload"
                icon="icons/reload.png"
@@ -1298,6 +1298,16 @@
                commandId="edu.ualberta.med.biobank.commands.edit"
                icon="icons/edit.png"
                label="%Edit.command"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:viewFormsRefreshToolBar">
+         <command
+               commandId="edu.ualberta.med.biobank.commands.reload"
+               icon="icons/reload.png"
+               label="%Reload.command"
                style="push">
          </command>
       </menuContribution>

@@ -33,16 +33,14 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     @SuppressWarnings("nls")
     private static final String CONTEXT_VIEW_FORM = "biobank.context.viewForm";
 
-    private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class
-        .getName());
+    private static BgcLogger logger = BgcLogger.getLogger(BiobankViewForm.class.getName());
 
     protected String sessionName;
 
     private AdapterChangedListener adapterChangedListener;
 
     @Override
-    public void init(IEditorSite editorSite, IEditorInput input)
-        throws PartInitException {
+    public void init(IEditorSite editorSite, IEditorInput input) throws PartInitException {
         super.init(editorSite, input);
 
         if (adapter != null) {
@@ -72,9 +70,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        addToolbarButtons();
-        IContextService contextService = (IContextService) getSite()
-            .getService(IContextService.class);
+        addToolbarDefaultButtons();
+        IContextService contextService =
+            (IContextService) getSite().getService(IContextService.class);
         contextService.activateContext(CONTEXT_VIEW_FORM);
     }
 
@@ -96,8 +94,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
             Object value = ov.getValue();
             if (value != null) {
                 Control widget = getWidget(label);
-                if ((fi.widgetClass == Combo.class)
-                    || (fi.widgetClass == BgcBaseText.class)
+                if ((fi.widgetClass == Combo.class) || (fi.widgetClass == BgcBaseText.class)
                     || (fi.widgetClass == Label.class)) {
                     ((BgcBaseText) widget).setText((String) value);
                 }
@@ -105,13 +102,24 @@ public abstract class BiobankViewForm extends BiobankFormBase {
         }
     }
 
-    @SuppressWarnings("nls")
-    protected void addToolbarButtons() {
+    /**
+     * @param location The starting location to begin populating this
+     *            contribution manager. The format is the Menu API URI format.
+     */
+    protected void addToolbarButtons(String location) {
         ToolBarManager manager = (ToolBarManager) form.getToolBarManager();
 
         IMenuService menuService = (IMenuService) getSite().getService(IMenuService.class);
-        menuService.populateContributionManager(manager, "popup:viewFormsToolBar");
+        menuService.populateContributionManager(manager, location);
         manager.update(true);
+    }
+
+    @SuppressWarnings("nls")
+    protected void addToolbarDefaultButtons() {
+        addToolbarButtons("popup:viewFormsRefreshToolBar");
+        if ((adapter != null) && adapter.isEditable()) {
+            addToolbarButtons("popup:viewFormsEditToolBar");
+        }
     }
 
     public void edit() {

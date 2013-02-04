@@ -11,7 +11,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodsGetAllAction;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -24,11 +24,11 @@ public class ShippingMethodViewForm extends BiobankViewForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.ShippingMethodViewForm";
+    "edu.ualberta.med.biobank.forms.ShippingMethodViewForm";
 
     @SuppressWarnings("nls")
     public static final String OK_MESSAGE =
-        i18n.tr("Add or edit a shipping method");
+    i18n.tr("Add or edit a shipping method");
 
     private ShippingMethodEntryInfoTable statusWidget;
     private List<ShippingMethodWrapper> globalShippingMethods;
@@ -43,9 +43,9 @@ public class ShippingMethodViewForm extends BiobankViewForm {
         globalShippingMethods =
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
                 SessionManager.getAppService()
-                    .doAction(
-                        new ShippingMethodGetInfoAction()).getList(),
-                ShippingMethodWrapper.class);
+                .doAction(
+                    new ShippingMethodsGetAllAction()).getList(),
+                    ShippingMethodWrapper.class);
     }
 
     @Override
@@ -72,11 +72,11 @@ public class ShippingMethodViewForm extends BiobankViewForm {
         addSectionToolbar(section,
             i18n.tr("Add a shipping method"),
             new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    statusWidget.addShippingMethod();
-                }
-            }, ShippingMethodWrapper.class);
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                statusWidget.addShippingMethod();
+            }
+        }, ShippingMethodWrapper.class);
         section.setClient(statusWidget);
     }
 

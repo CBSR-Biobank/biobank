@@ -56,7 +56,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * </ul>
  */
 public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
-    implements IInfoTablePagination, ListChangeSource<T> {
+implements IInfoTablePagination, ListChangeSource<T> {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractInfoTableWidget.class);
 
@@ -141,7 +141,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
 
         paginationWidget = new PaginationWidget(this, SWT.NONE, this,
             PaginationWidget.NEXT_PAGE_BUTTON
-                | PaginationWidget.LAST_PAGE_BUTTON, rowsPerPage);
+            | PaginationWidget.LAST_PAGE_BUTTON, rowsPerPage);
 
         autoSizeColumns = (columnWidths == null) ? true : false;
 
@@ -429,7 +429,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
             final IInfoTableAddItemListener<T> l =
-                (IInfoTableAddItemListener<T>) listeners[i];
+            (IInfoTableAddItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -451,7 +451,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
             final IInfoTableEditItemListener<T> l =
-                (IInfoTableEditItemListener<T>) listeners[i];
+            (IInfoTableEditItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {
@@ -473,7 +473,7 @@ public abstract class AbstractInfoTableWidget<T> extends BgcBaseWidget
         for (int i = 0; i < listeners.length; ++i) {
             @SuppressWarnings("unchecked")
             final IInfoTableDeleteItemListener<T> l =
-                (IInfoTableDeleteItemListener<T>) listeners[i];
+            (IInfoTableDeleteItemListener<T>) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
                 @Override
                 public void run() {

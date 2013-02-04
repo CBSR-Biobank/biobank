@@ -21,11 +21,11 @@ public class SpecimenTypesViewForm extends BiobankViewForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm";
+    "edu.ualberta.med.biobank.forms.SpecimenTypesViewForm";
 
     @SuppressWarnings("nls")
     public static final String OK_MESSAGE =
-        "Add or edit a specimen type";
+    "Add or edit a specimen type";
 
     private SpecimenTypeEntryInfoTree specimenWidget;
 
@@ -65,11 +65,11 @@ public class SpecimenTypesViewForm extends BiobankViewForm {
         addSectionToolbar(section,
             i18n.tr("Add a specimen type"),
             new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    specimenWidget.addSpecimenType();
-                }
-            }, SpecimenTypeWrapper.class);
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                specimenWidget.addSpecimenType();
+            }
+        }, SpecimenTypeWrapper.class);
         section.setClient(specimenWidget);
     }
 

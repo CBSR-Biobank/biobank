@@ -12,6 +12,8 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodDeleteAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction;
+import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodGetInfoAction.ShippingMethodInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodSaveAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -31,12 +33,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * Displays the current shipping method collection and allows the user to add
  * additional shipping method to the collection.
  */
-public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
-    public static final I18n i18n = I18nFactory
-        .getI18n(ShippingMethodEntryInfoTable.class);
+public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable implements
+IInfoTableDeleteItemListener<ShippingMethodWrapper> {
+    public static final I18n i18n = I18nFactory.getI18n(ShippingMethodEntryInfoTable.class);
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(ShippingMethodEntryInfoTable.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(ShippingMethodEntryInfoTable.class
+        .getName());
 
     private final String addMessage;
 
@@ -50,8 +52,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
      *            be displayed in the table viewer (can be null).
      */
     public ShippingMethodEntryInfoTable(Composite parent,
-        List<ShippingMethodWrapper> globalShippingMethod, String addMessage,
-        String editMessage) {
+        List<ShippingMethodWrapper> globalShippingMethod, String addMessage, String editMessage) {
         super(parent, null);
         setList(globalShippingMethod);
         this.addMessage = addMessage;
@@ -69,17 +70,16 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addShippingMethod() {
-        ShippingMethodWrapper newST = new ShippingMethodWrapper(
-            SessionManager.getAppService());
+        ShippingMethodWrapper newST = new ShippingMethodWrapper(SessionManager.getAppService());
         addOrEditShippingMethod(true, newST, addMessage);
     }
 
     @SuppressWarnings("nls")
-    private boolean addOrEditShippingMethod(boolean add,
-        ShippingMethodWrapper shippingMethod, String message) {
-        ShippingMethodDialog dlg = new ShippingMethodDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            shippingMethod, message);
+    private boolean addOrEditShippingMethod(boolean add, ShippingMethodWrapper shippingMethod,
+        String message) {
+        ShippingMethodDialog dlg =
+            new ShippingMethodDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getShell(), shippingMethod, message);
         if (dlg.open() == Dialog.OK) {
             if (addEditOk(shippingMethod)) {
                 if (add) {
@@ -90,10 +90,20 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                     SessionManager.getAppService().doAction(
                         new ShippingMethodSaveAction(shippingMethod.getId(),
                             shippingMethod.getName()));
+
+                    if (add) {
+                        // load the object
+                        ShippingMethodInfo smi = SessionManager.getAppService().doAction(
+                            new ShippingMethodGetInfoAction(shippingMethod.getName()));
+                        if (smi == null) {
+                            throw new RuntimeException("action to query for just added shipping method returned null");
+                        }
+
+                        shippingMethod.setWrappedObject(smi.getShippingMethod());
+                    }
+
                 } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        i18n.tr("Save Failed"),
-                        e);
+                    BgcPlugin.openAsyncError(i18n.tr("Save Failed"), e);
                 }
                 return true;
             }
@@ -113,58 +123,50 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             @Override
             public void editItem(InfoTableEvent<ShippingMethodWrapper> event) {
                 ShippingMethodWrapper type = getSelection();
-                if (type != null)
-                    addOrEditShippingMethod(false, type, editMessage);
+                if (type != null) addOrEditShippingMethod(false, type, editMessage);
             }
         });
 
-        addDeleteItemListener(new IInfoTableDeleteItemListener<ShippingMethodWrapper>() {
-            @SuppressWarnings("nls")
-            @Override
-            public void deleteItem(InfoTableEvent<ShippingMethodWrapper> event) {
-                ShippingMethodWrapper type = getSelection();
-                if (type != null) {
-                    try {
-                        if (!type.isNew() && type.isUsed()) {
-                            BgcPlugin
-                                .openError(
-                                    // dialog title.
-                                    i18n.tr("Delete Error"),
-                                    // dialog message.
-                                    i18n.tr(
-                                        "Cannot delete shipping method \"{0}\" since shipments are using it.",
-                                        type.getName()));
-                            return;
-                        }
+        addDeleteItemListener(this);
+    }
 
-                        if (!MessageDialog
-                            .openConfirm(
-                                PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                                // dialog title.
-                                i18n.tr("Delete shipping method"),
-                                // dialog message.
-                                i18n.tr(
-                                    "Are you sure you want to delete shipping method \"{0}\"?",
-                                    type.getName()))) {
-                            return;
-                        }
+    @SuppressWarnings("nls")
+    @Override
+    public void deleteItem(InfoTableEvent<ShippingMethodWrapper> event) {
+        ShippingMethodWrapper type = getSelection();
+        if (type == null) return;
 
-                        // equals method now compare toString() results if both
-                        // ids are null.
-                        getList().remove(type);
-                        SessionManager.getAppService().doAction(
-                            new ShippingMethodDeleteAction(
-                                type.getId()));
-                    } catch (final RemoteConnectFailureException exp) {
-                        BgcPlugin.openRemoteConnectErrorMessage(exp);
-                    } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
-                            e);
-                    }
-                }
+        try {
+            if (!type.isNew() && type.isUsed()) {
+                BgcPlugin.openError(
+                    // dialog title.
+                    i18n.tr("Delete Error"),
+                    // dialog message.
+                    i18n.tr("Cannot delete shipping method \"{0}\" since shipments are using it.",
+                        type.getName()));
+                return;
             }
-        });
+
+            if (!MessageDialog
+                .openConfirm(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    // dialog title.
+                    i18n.tr("Delete shipping method"),
+                    // dialog message.
+                    i18n.tr("Are you sure you want to delete shipping method \"{0}\"?",
+                        type.getName()))) {
+                return;
+            }
+
+            // equals method now compare toString() results if both ids are
+            // null.
+            getList().remove(type);
+            SessionManager.getAppService().doAction(new ShippingMethodDeleteAction(type.getId()));
+        } catch (final RemoteConnectFailureException exp) {
+            BgcPlugin.openRemoteConnectErrorMessage(exp);
+        } catch (Exception e) {
+            logger.error("BioBankFormBase.createPartControl Error", e);
+        }
     }
 
     @SuppressWarnings("nls")
@@ -172,8 +174,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
         try {
             for (ShippingMethodWrapper sv : getList())
                 if ((sv.getId() == null || !sv.getId().equals(type.getId()))
-                    && sv.getName().equals(type.getName()))
-                    throw new BiobankCheckException(
+                    && sv.getName().equals(type.getName())) throw new BiobankCheckException(
                         // exception message.
                         i18n.tr("That shipping method has already been added."));
         } catch (BiobankException bce) {
@@ -189,13 +190,11 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
     @Override
     public void reload() {
         try {
-            setList(ShippingMethodWrapper.getShippingMethods(SessionManager
-                .getAppService()));
+            setList(ShippingMethodWrapper.getShippingMethods(SessionManager.getAppService()));
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 // dialog title.
-                i18n.tr("AppService unavailable"),
-                e);
+                i18n.tr("AppService unavailable"), e);
         }
     }
 
