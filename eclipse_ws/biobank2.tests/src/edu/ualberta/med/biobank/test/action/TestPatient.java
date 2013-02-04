@@ -3,8 +3,10 @@ package edu.ualberta.med.biobank.test.action;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -17,6 +19,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.patient.PatientDeleteAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetCollectionEventInfosAction.PatientCEventInfo;
@@ -36,7 +39,9 @@ import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
@@ -164,54 +169,88 @@ public class TestPatient extends TestAction {
     @Test
     public void merge() throws Exception {
         session.beginTransaction();
-        Provisioning provisioning = new Provisioning(session, factory);
-        final String string = name;
+        Set<Patient> patients = new HashSet<Patient>();
+
+        for (int i = 0; i < 2; ++i) {
+            Patient patient = factory.createPatient();
+            Comment comment = factory.createComment();
+            comment.setMessage(getMethodNameR());
+            patient.getComments().add(comment);
+            patients.add(patient);
+
+            for (int j = 0; j < 3; ++j) {
+                CollectionEvent cevent = factory.createCollectionEvent();
+                comment = factory.createComment();
+                comment.setMessage(getMethodNameR());
+                cevent.getComments().add(comment);
+
+                for (int k = 0; k < 3; ++k) {
+                    Specimen specimen = factory.createParentSpecimen();
+                    comment = factory.createComment();
+                    comment.setMessage(getMethodNameR());
+                    specimen.getComments().add(comment);
+                }
+            }
+        }
         session.getTransaction().commit();
 
-        // add specimen type
-        final Integer typeId =
-            exec(new SpecimenTypeSaveAction(name, name)).getId();
+        Assert.assertTrue(patients.size() == 2);
 
-        // create a new patient 1
-        final Integer patientId1 = provisioning.patientIds.get(0);
-        // create cevents in patient1
-        createCEventWithSpecimens(provisioning, patientId1, 1, typeId, 4);
-        createCEventWithSpecimens(provisioning, patientId1, 2, typeId, 2);
-
-        // create a new patient 2
-        final Integer patientId2 = exec(new PatientSaveAction(
-            null, provisioning.studyId, string + "2", Utils
-                .getRandomDate(), null)).getId();
-        // create cevents in patient2
-        createCEventWithSpecimens(provisioning, patientId2, 1, typeId, 5);
-        createCEventWithSpecimens(provisioning, patientId2, 3, typeId, 7);
+        List<Integer> patientIds = new ArrayList<Integer>();
+        for (Patient patient : patients) {
+            patientIds.add(patient.getId());
+        }
 
         // merge patient1 into patient2
-        exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
+        exec(new PatientMergeAction(patientIds.get(0), patientIds.get(1), getMethodNameR()));
 
         session.clear();
 
-        Patient p1 = (Patient) session.get(Patient.class, patientId1);
+        Patient p1 = (Patient) session.get(Patient.class, patientIds.get(0));
         Assert.assertNotNull(p1);
-        Patient p2 = (Patient) session.get(Patient.class, patientId2);
+        Assert.assertEquals(3, p1.getComments().size());
+
+        Patient p2 = (Patient) session.get(Patient.class, patientIds.get(1));
         Assert.assertNull(p2);
         Collection<CollectionEvent> cevents = p1.getCollectionEvents();
         Assert.assertEquals(3, cevents.size());
 
         for (CollectionEvent cevent : cevents) {
+            Assert.assertEquals(2, cevent.getComments().size());
+
             switch (cevent.getVisitNumber()) {
             case 1:
-                Assert.assertEquals(9, cevent.getAllSpecimens().size());
+                Assert.assertEquals(6, cevent.getAllSpecimens().size());
                 break;
             case 2:
-                Assert.assertEquals(2, cevent.getAllSpecimens().size());
+                Assert.assertEquals(6, cevent.getAllSpecimens().size());
                 break;
             case 3:
-                Assert.assertEquals(7, cevent.getAllSpecimens().size());
+                Assert.assertEquals(6, cevent.getAllSpecimens().size());
                 break;
             default:
                 Assert.fail("wrong visit number");
             }
+
+            for (Specimen specimen : cevent.getAllSpecimens()) {
+                Assert.assertEquals(1, specimen.getComments().size());
+            }
+        }
+    }
+
+    @Test
+    public void mergeNoComment() throws Exception {
+        session.beginTransaction();
+        Patient patient1 = factory.createPatient();
+        Patient patient2 = factory.createPatient();
+        session.getTransaction().commit();
+
+        // merge patient1 into patient2
+        try {
+            exec(new PatientMergeAction(patient1.getId(), patient2.getId(), null));
+            Assert.fail("should not be allowed to merge patients without a comment");
+        } catch (ActionException e) {
+            // do nothing
         }
     }
 
@@ -244,7 +283,7 @@ public class TestPatient extends TestAction {
         try {
             exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
             Assert
-                .fail("Should not be able to merge when patients are from different studies");
+            .fail("Should not be able to merge when patients are from different studies");
         } catch (PatientMergeException pme) {
             Assert.assertTrue(true);
         }
@@ -255,8 +294,8 @@ public class TestPatient extends TestAction {
         Integer patientId, Integer visitNber, Integer specType, int specNber) {
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper
-                .createSaveCEventSpecimenInfoRandomList(specNber, specType,
-                    getExecutor().getUserId());
+            .createSaveCEventSpecimenInfoRandomList(specNber, specType,
+                getExecutor().getUserId());
         // Save a new cevent
         exec(new CollectionEventSaveAction(null, patientId,
             visitNber, ActivityStatus.ACTIVE, null,
@@ -289,8 +328,8 @@ public class TestPatient extends TestAction {
 
         Map<Integer, SimpleCEventInfo> ceventInfos =
             getExecutor()
-                .exec(new PatientGetSimpleCollectionEventInfosAction(
-                    patientId)).getMap();
+            .exec(new PatientGetSimpleCollectionEventInfosAction(
+                patientId)).getMap();
         Assert.assertEquals(1, ceventInfos.size());
         SimpleCEventInfo info = ceventInfos.get(ceventId);
         Assert.assertNotNull(info);
@@ -323,14 +362,14 @@ public class TestPatient extends TestAction {
                 getExecutor().getUserId());
 
         // Save a new cevent with specimens
-        exec(new CollectionEventSaveAction(null, patientId, getR().nextInt(20) + 1, 
-            ActivityStatus.ACTIVE, null, new ArrayList<SaveCEventSpecimenInfo>(specs.values()), 
+        exec(new CollectionEventSaveAction(null, patientId, getR().nextInt(20) + 1,
+            ActivityStatus.ACTIVE, null, new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
             null, provisioning.getClinic()));
 
         List<PatientCEventInfo> infos =
             getExecutor()
-                .exec(new PatientGetCollectionEventInfosAction(patientId))
-                .getList();
+            .exec(new PatientGetCollectionEventInfosAction(patientId))
+            .getList();
         Assert.assertEquals(1, infos.size());
         PatientCEventInfo info = infos.get(0);
         // no aliquoted specimens added:

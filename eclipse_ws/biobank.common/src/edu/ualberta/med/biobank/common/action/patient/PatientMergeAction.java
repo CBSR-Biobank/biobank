@@ -43,10 +43,14 @@ public class PatientMergeAction implements Action<BooleanResult> {
             context);
     }
 
+    @SuppressWarnings("nls")
     @Override
     public BooleanResult run(ActionContext context) throws ActionException {
-        // FIXME add checks
-        // FIXME logging?
+        Session session = context.getSession();
+
+        if ((comment == null) || comment.trim().isEmpty()) {
+            throw new ActionException("comment cannot be null or empty");
+        }
 
         Patient patient1 = context.load(Patient.class, patient1Id);
         Patient patient2 = context.load(Patient.class, patient2Id);
@@ -54,17 +58,14 @@ public class PatientMergeAction implements Action<BooleanResult> {
             throw new PatientMergeException();
         }
 
-        Set<CollectionEvent> c1events =
-            patient1.getCollectionEvents();
-        Set<CollectionEvent> c2events =
-            patient2.getCollectionEvents();
+        Set<CollectionEvent> c1events = patient1.getCollectionEvents();
+        Set<CollectionEvent> c2events = patient2.getCollectionEvents();
         if (!c2events.isEmpty()) {
             boolean merged = false;
             // for loop on a different list.
-            for (CollectionEvent c2event : new ArrayList<CollectionEvent>(
-                c2events)) {
+            for (CollectionEvent c2event : new ArrayList<CollectionEvent>(c2events)) {
                 for (CollectionEvent c1event : c1events) {
-                    merged = merge(context.getSession(), c1event, c2event);
+                    merged = merge(session, c1event, c2event);
                     if (merged)
                         break;
                 }
@@ -78,6 +79,15 @@ public class PatientMergeAction implements Action<BooleanResult> {
                 merged = false;
             }
         }
+
+        // merge all comments from old patient into new patient
+        Set<Comment> commentsToMerge = CommentUtil.copyCommentsFromCollection(
+            patient2.getComments());
+        for (Comment comment : commentsToMerge) {
+            session.save(comment);
+        }
+        patient1.getComments().addAll(commentsToMerge);
+
         Comment c = CommentUtil.create(context.getUser(), comment);
         patient1.getComments().add(c);
         context.getSession().saveOrUpdate(patient1);
@@ -90,19 +100,17 @@ public class PatientMergeAction implements Action<BooleanResult> {
 
         // FIXME see how logs should be done properly...
         Log logP2 = new Log();
-        logP2.setAction("merge"); //$NON-NLS-1$
+        logP2.setAction("merge");
         logP2.setPatientNumber(patient2.getPnumber());
-        logP2.setDetails(patient2.getPnumber() + " --> " //$NON-NLS-1$
-            + patient1.getPnumber());
-        logP2.setType("Patient"); //$NON-NLS-1$
+        logP2.setDetails(patient2.getPnumber() + " --> " + patient1.getPnumber());
+        logP2.setType("Patient");
         context.getSession().save(logP2);
 
         Log logP1 = new Log();
-        logP1.setAction("merge"); //$NON-NLS-1$
+        logP1.setAction("merge");
         logP1.setPatientNumber(patient1.getPnumber());
-        logP1.setDetails(patient1.getPnumber() + " <-- " //$NON-NLS-1$
-            + patient2.getPnumber());
-        logP1.setType("Patient"); //$NON-NLS-1$
+        logP1.setDetails(patient1.getPnumber() + " <-- " + patient2.getPnumber());
+        logP1.setType("Patient");
         context.getSession().save(logP1);
 
         return new BooleanResult(true);
@@ -113,32 +121,34 @@ public class PatientMergeAction implements Action<BooleanResult> {
      * 
      * @return true if a merge has been made, otherwise false
      */
-    private boolean merge(Session session, CollectionEvent c1event,
-        CollectionEvent c2event) {
-        if (c1event.getVisitNumber().equals(c2event.getVisitNumber())) {
-            Collection<Specimen> c2Origspecs =
-                c2event.getOriginalSpecimens();
-            Collection<Specimen> c2AllSpecs =
-                c2event.getAllSpecimens();
+    private boolean merge(Session session, CollectionEvent c1event, CollectionEvent c2event) {
+        if (!c1event.getVisitNumber().equals(c2event.getVisitNumber()))  return false;
 
-            Collection<Specimen> c1OrigSpecs =
-                c1event.getOriginalSpecimens();
-            Collection<Specimen> c1AllSpecs =
-                c1event.getAllSpecimens();
+        Collection<Specimen> c2Origspecs = c2event.getOriginalSpecimens();
+        Collection<Specimen> c2AllSpecs = c2event.getAllSpecimens();
 
-            for (Specimen spec : c2AllSpecs) {
-                if (c2Origspecs.contains(spec)) {
-                    spec.setOriginalCollectionEvent(c1event);
-                    c1OrigSpecs.add(spec);
-                }
-                spec.setCollectionEvent(c1event);
-                c1AllSpecs.add(spec);
+        Collection<Specimen> c1OrigSpecs = c1event.getOriginalSpecimens();
+        Collection<Specimen> c1AllSpecs = c1event.getAllSpecimens();
+
+        for (Specimen spec : c2AllSpecs) {
+            if (c2Origspecs.contains(spec)) {
+                spec.setOriginalCollectionEvent(c1event);
+                c1OrigSpecs.add(spec);
             }
-            // because of this and the move of specimens into another cevent, we
-            // can't use delete-orphan
-            session.delete(c2event);
-            return true;
+            spec.setCollectionEvent(c1event);
+            c1AllSpecs.add(spec);
         }
-        return false;
+
+        Set<Comment> commentsToMerge = CommentUtil.copyCommentsFromCollection(
+            c2event.getComments());
+        for (Comment comment : commentsToMerge) {
+            session.save(comment);
+        }
+        c1event.getComments().addAll(commentsToMerge);
+
+        // because of this and the move of specimens into another cevent, we
+        // can't use delete-orphan
+        session.delete(c2event);
+        return true;
     }
 }
