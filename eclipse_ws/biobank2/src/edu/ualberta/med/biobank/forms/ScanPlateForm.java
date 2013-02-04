@@ -73,7 +73,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
         Label label = toolkit.createLabel(page,
-            i18n.tr("NOTE: Cell A1 is at the TOP RIGHT corner of the image."));
+            i18n.tr("NOTE: Cell A1 is at the TOP RIGHT corner of the image for LANDSCAPE orientation, or TOP LEFT for PORTRAIT."));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
