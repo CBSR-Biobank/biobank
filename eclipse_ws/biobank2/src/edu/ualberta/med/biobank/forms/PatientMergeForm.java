@@ -138,7 +138,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         gd.horizontalAlignment = SWT.FILL;
         createBoundWidgetWithLabel(client, BgcBaseText.class,
             SWT.MULTI, i18n.tr("Add a comment"), null, comment, "message",
-            new NonEmptyStringValidator(i18n.tr("Add a comment")));
+            new NonEmptyStringValidator(i18n.tr("A comment is required")));
 
     }
 
