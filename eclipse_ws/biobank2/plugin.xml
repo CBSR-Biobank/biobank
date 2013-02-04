@@ -1289,12 +1289,6 @@
             allPopups="false"
             locationURI="popup:viewFormsEditToolBar">
          <command
-               commandId="edu.ualberta.med.biobank.commands.reload"
-               icon="icons/reload.png"
-               label="%Reload.command"
-               style="push">
-         </command>
-         <command
                commandId="edu.ualberta.med.biobank.commands.edit"
                icon="icons/edit.png"
                label="%Edit.command"
