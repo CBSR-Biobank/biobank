@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -22,6 +23,7 @@ import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.Patie
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -62,6 +64,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private ComboViewer studiesViewer;
 
+    private BgcBaseText pnumberText;
+
     private Label createdAtLabel;
 
     private NotNullValidator createdAtValidator;
@@ -86,24 +90,22 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof PatientAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+            "Invalid editor input: object of type " + adapter.getClass().getName());
         updatePatientInfo();
 
         String tabName;
         if (patientInfo == null) {
             tabName = i18n.tr("New Patient");
         } else {
-            tabName = i18n.tr("Patient {0}",
-                patientInfo.patient.getPnumber());
+            tabName = i18n.tr("Patient {0}", patientInfo.patient.getPnumber());
         }
         setPartName(tabName);
     }
 
     protected void updatePatientInfo() throws ApplicationException {
         if (adapter.getId() != null) {
-            patientInfo = SessionManager.getAppService().doAction(
-                new PatientGetInfoAction(adapter.getId()));
+            patientInfo =
+                SessionManager.getAppService().doAction(new PatientGetInfoAction(adapter.getId()));
             patient.setWrappedObject(patientInfo.patient);
             SessionManager.logLookup(patientInfo.patient);
         } else {
@@ -138,33 +140,30 @@ public class PatientEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         List<Study> studies = SessionManager.getAppService().doAction(
-            new CenterGetStudyListAction(SessionManager.getUser()
-                .getCurrentWorkingCenter())).getList();
+            new CenterGetStudyListAction(SessionManager.getUser().getCurrentWorkingCenter()))
+            .getList();
         Study selectedStudy = null;
         if (patientInfo == null) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
-                patient.setStudy(new StudyWrapper(SessionManager
-                    .getAppService(), selectedStudy));
+                patient.setStudy(new StudyWrapper(SessionManager.getAppService(), selectedStudy));
             }
         } else {
             selectedStudy = patient.getStudy().getWrappedObject();
         }
 
-        studiesViewer =
-            createComboViewer(client,
-                Study.NAME.singular().toString(), studies,
-                selectedStudy,
-                // validation error message.
-                i18n.tr("A study should be selected"),
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        patient.setStudy(new StudyWrapper(
-                            SessionManager.getAppService(),
-                            (Study) selectedObject));
-                    }
-                });
+        studiesViewer = createComboViewer(client, Study.NAME.singular().toString(), studies,
+            selectedStudy,
+            // validation error message.
+            i18n.tr("A study should be selected"),
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    patient.setStudy(new StudyWrapper(
+                        SessionManager.getAppService(),
+                        (Study) selectedObject));
+                }
+            });
         studiesViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -173,9 +172,14 @@ public class PatientEntryForm extends BiobankEntryForm {
         });
         setFirstControl(studiesViewer.getControl());
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-            Patient.PropertyName.PNUMBER.toString(), null, patient,
-            PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
+        Label pnumberLabel = widgetCreator.createLabel(client,
+            Patient.PropertyName.PNUMBER.toString());
+
+        pnumberText = (BgcBaseText) widgetCreator.createBoundWidget(client, BgcBaseText.class,
+            SWT.NONE, pnumberLabel, null, new WritableValue(StringUtil.EMPTY_STRING, String.class),
+            pnumberNonEmptyValidator);
+
+        pnumberText.setText(patient.getPnumber());
 
         createdAtLabel = widgetCreator.createLabel(client,
             HasCreatedAt.PropertyName.CREATED_AT.toString());
@@ -218,6 +222,17 @@ public class PatientEntryForm extends BiobankEntryForm {
         return MSG_PATIENT_OK;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doBeforeSave() throws Exception {
+        patient.setPnumber(pnumberText.getText());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void saveForm() throws Exception {
         SessionManager.getAppService().doAction(
@@ -228,6 +243,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             .doAction(new PatientSearchAction(patient.getPnumber())));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doAfterSave() throws Exception {
         Display.getDefault().syncExec(new Runnable() {
@@ -251,6 +269,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     public void setValues() throws Exception {
         GuiUtil.reset(studiesViewer, patient.getStudy());
+        pnumberText.setText(patient.getPnumber());
     }
 
     @Override
