@@ -58,6 +58,7 @@ use command "ant -projecthelp" to display the targets.
     <antcall target="biobank-product-version-modify" />
     <antcall target="biobank-feature-core-version-modify" />
     <antcall target="biobank-feature-platform-version-modify" />
+    <antcall target="java-client-manifest" />
   </target>
 
   <path id="eclipse-jars">
