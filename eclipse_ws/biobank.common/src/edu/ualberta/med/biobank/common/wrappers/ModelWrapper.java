@@ -174,22 +174,20 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Add tasks to the given {@link TaskList} that will persist (i.e. insert or
-     * update) the wrapped model object. The {@link TaskList}-s might also check
-     * certain conditions on the client or server, as well as persist potential
-     * dependent objects.
+     * Add tasks to the given {@link TaskList} that will persist (i.e. insert or update) the wrapped
+     * model object. The {@link TaskList}-s might also check certain conditions on the client or
+     * server, as well as persist potential dependent objects.
      * <p>
-     * This method should be overridden as necessary to add to the
-     * {@link TaskList} so the wrapped model object is properly persisted.
+     * This method should be overridden as necessary to add to the {@link TaskList} so the wrapped
+     * model object is properly persisted.
      * <p>
-     * <strong>IMPORTANT.</strong> Checks can also be added to the
-     * {@link TaskList}. However, in general, checks should be performed using
-     * HQL <em>after</em> the object is persisted (and related objects are
-     * cascaded) so that the database's state can be verified. This is opposed
-     * to checking the in-memory model objects, since it cannot be easily
-     * determined which will or have actually been persisted. Checks can be done
-     * on the in-memory model objects (before persisting) before the database
-     * throws an error, but it is often difficult to know what values to check.
+     * <strong>IMPORTANT.</strong> Checks can also be added to the {@link TaskList}. However, in
+     * general, checks should be performed using HQL <em>after</em> the object is persisted (and
+     * related objects are cascaded) so that the database's state can be verified. This is opposed
+     * to checking the in-memory model objects, since it cannot be easily determined which will or
+     * have actually been persisted. Checks can be done on the in-memory model objects (before
+     * persisting) before the database throws an error, but it is often difficult to know what
+     * values to check.
      * 
      * @param tasks where to add the tasks
      */
@@ -199,12 +197,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Add tasks to the given {@link TaskList} that will delete the wrapped
-     * model object. The {@link TaskList}-s might also check certain conditions
-     * on the client or server, as well as persist potential dependent objects.
+     * Add tasks to the given {@link TaskList} that will delete the wrapped model object. The
+     * {@link TaskList}-s might also check certain conditions on the client or server, as well as
+     * persist potential dependent objects.
      * <p>
-     * This method should be overridden as necessary to add to the
-     * {@link TaskList} so the wrapped model object is properly deleted.
+     * This method should be overridden as necessary to add to the {@link TaskList} so the wrapped
+     * model object is properly deleted.
      * 
      * @param tasks where to add the tasks
      */
@@ -244,14 +242,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * return the list of the different properties we want to notify when we
-     * call firePropertyChanges
+     * return the list of the different properties we want to notify when we call
+     * firePropertyChanges
      */
     protected abstract List<Property<?, ? super E>> getProperties();
 
     /**
-     * When retrieve the values from the database, need to fire the
-     * modifications for the different objects contained in the wrapped object
+     * When retrieve the values from the database, need to fire the modifications for the different
+     * objects contained in the wrapped object
      */
     private void firePropertyChanges(E oldWrappedObject, E newWrappedObject) {
         List<Property<?, ? super E>> properties = getProperties();
@@ -341,8 +339,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * even if this object was loaded form database, start form scratch (so
-     * isNew = true)
+     * even if this object was loaded form database, start form scratch (so isNew = true)
      * 
      * @throws Exception
      */
@@ -395,8 +392,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * The query should be a count query. The value returned is the result of
-     * the count.
+     * The query should be a count query. The value returned is the result of the count.
      */
     // TODO: move this to some Util class somewhere else
     public static Long getCountResult(WritableApplicationService appService,
@@ -443,8 +439,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * If we want to reset internal fields when reload or reset is called (even
-     * if the object is new). Please don't touch the wrapped object.
+     * If we want to reset internal fields when reload or reset is called (even if the object is
+     * new). Please don't touch the wrapped object.
      */
     protected void resetInternalFields() {
         // default do nothing
@@ -817,27 +813,24 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     /**
-     * Determines whether the given property of the wrapped object has been
-     * initialized.
+     * Determines whether the given property of the wrapped object has been initialized.
      * 
      * @param property of the wrapped object
-     * @return true if the given {@code Property} has been initialized or if the
-     *         wrapped object is not a proxy (and therefore new), otherwise
-     *         false.
+     * @return true if the given {@code Property} has been initialized or if the wrapped object is
+     *         not a proxy (and therefore new), otherwise false.
      */
     protected boolean isInitialized(Property<?, ? super E> property) {
         return isNew() || isInitialized(wrappedObject, property);
     }
 
     /**
-     * Determines whether the given property of the given model object has been
-     * initialized (loaded).
+     * Determines whether the given property of the given model object has been initialized
+     * (loaded).
      * 
      * @param model object with the {@code property}
      * @param property of the wrapped object
-     * @return true if the given {@code Property} has been initialized or if the
-     *         wrapped object is not a proxy (and therefore new), otherwise
-     *         false.
+     * @return true if the given {@code Property} has been initialized or if the wrapped object is
+     *         not a proxy (and therefore new), otherwise false.
      */
     private static <E> boolean isInitialized(E model,
         Property<?, ? super E> property) {
@@ -864,8 +857,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         // need to add into cache before the firePropertyChange is called
         // because its will call the getters that refers to the cache
         modelWrapper.cacheProperty(property, valueForCache);
-        propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
-            newValue);
+        propertyChangeSupport.firePropertyChange(property.getName(), oldValue, newValue);
     }
 
     private void cacheProperty(Property<?, ?> property, Object value) {
@@ -896,8 +888,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * @return a list of center security should check for modifications
      * 
-     *         is not used anymore for now. But we will need something like that
-     *         so I keep it until I reuse what subclasses are doing with it.
+     *         is not used anymore for now. But we will need something like that so I keep it until
+     *         I reuse what subclasses are doing with it.
      */
     @Deprecated
     public List<? extends CenterWrapper<?>> getSecuritySpecificCenters() {

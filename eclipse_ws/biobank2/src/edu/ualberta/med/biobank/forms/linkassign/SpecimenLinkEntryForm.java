@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -300,11 +299,17 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         final NonEmptyStringValidator idValidator = new NonEmptyStringValidator(
             // validation error message
             i18n.tr("Inventory ID cannot be empty"));
+
+        // position field
+        Label inventoryIdLabel = widgetCreator.createLabel(fieldsComposite,
+            Specimen.PropertyName.INVENTORY_ID.toString());
+
         // inventoryID
-        inventoryIdText = (BgcBaseText) createBoundWidgetWithLabel(
+        inventoryIdText = (BgcBaseText) widgetCreator.createBoundWidget(
             fieldsComposite, BgcBaseText.class, SWT.NONE,
-            Specimen.PropertyName.INVENTORY_ID.toString(), new String[0], singleSpecimen,
-            SpecimenPeer.INVENTORY_ID.getName(), idValidator, INVENTORY_ID_BINDING);
+            inventoryIdLabel, new String[0],
+            new WritableValue(StringUtil.EMPTY_STRING, String.class),
+            idValidator, INVENTORY_ID_BINDING);
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {
             @Override
@@ -337,11 +342,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         newSinglePositionValidator = new StringLengthValidator(4,
             // validation error message
             i18n.tr("Enter a position"));
-        newSinglePositionText =
-            (BgcBaseText) widgetCreator.createBoundWidget(fieldsComposite, BgcBaseText.class,
-                SWT.NONE, newSinglePositionLabel, new String[0], new WritableValue(
-                    StringUtil.EMPTY_STRING, String.class), newSinglePositionValidator,
-                NEW_SINGLE_POSITION_BINDING);
+        newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
+            fieldsComposite, BgcBaseText.class, SWT.NONE, newSinglePositionLabel, new String[0],
+            new WritableValue(StringUtil.EMPTY_STRING, String.class),
+            newSinglePositionValidator, NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -512,6 +516,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("nls")
     @Override
     protected void doBeforeSave() throws Exception {
@@ -519,6 +526,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         // can't access the combos in another thread, so do it now
         if (mode.isSingleMode()) {
             SpecimenHierarchyInfo selection = singleTypesWidget.getSelection();
+            singleSpecimen.setInventoryId(inventoryIdText.getText());
             singleSpecimen.setParentSpecimen(selection.getParentSpecimen());
             singleSpecimen.setSpecimenType(selection.getAliquotedSpecimenType().getSpecimenType());
             singleSpecimen.setCollectionEvent(linkFormPatientManagement
@@ -606,13 +614,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         asi.inventoryId = singleSpecimen.getInventoryId();
         asi.parentSpecimenId = singleSpecimen.getParentSpecimen().getId();
 
-        List<AliquotedSpecimenResInfo> resList =
-            SessionManager
-                .getAppService()
-                .doAction(
-                    new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
-                        .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
-                        Arrays.asList(asi))).getList();
+        List<AliquotedSpecimenResInfo> resList = SessionManager.getAppService().doAction(
+            new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
+                .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
+                Arrays.asList(asi))).getList();
         printSaveSingleLogMessage(resList);
     }
 

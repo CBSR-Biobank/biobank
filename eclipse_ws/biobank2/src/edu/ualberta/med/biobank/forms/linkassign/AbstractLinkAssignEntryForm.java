@@ -47,7 +47,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public abstract class AbstractLinkAssignEntryForm extends
-AbstractPalletSpecimenAdminForm {
+    AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
 
@@ -105,13 +105,11 @@ AbstractPalletSpecimenAdminForm {
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(SessionManager.getAppService());
-        canSaveSingleBinding =
-            widgetCreator
-            .addBooleanBinding(
-                new WritableValue(Boolean.FALSE, Boolean.class),
-                canSaveSingleSpecimen,
-                // TR: validation error message
-                i18n.tr("Please fill in the fields and hit enter or tab or resolve previous errors"));
+        canSaveSingleBinding = widgetCreator.addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
+            canSaveSingleSpecimen,
+            // TR: validation error message
+            i18n.tr("Please fill in the fields and hit enter or tab or resolve previous errors"));
     }
 
     protected abstract String getFormTitle();
@@ -616,7 +614,7 @@ AbstractPalletSpecimenAdminForm {
                         secondSingleParentWidget.setSelection(firstParent
                             .getPositionAsRowCol());
                         secondSingleParentLabel
-                        .setText(secondParent.getLabel());
+                            .setText(secondParent.getLabel());
                     }
                 }
             }
@@ -627,12 +625,11 @@ AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * Search possible parents from the position text. Is used both by single
-     * and multiple assign.
+     * Search possible parents from the position text. Is used both by single and multiple assign.
      * 
      * @param positionText the position to use for initialisation
-     * @param isContainerPosition if true, the position is a full container
-     *            position, if false, it is a full specimen position
+     * @param isContainerPosition if true, the position is a full container position, if false, it
+     *            is a full specimen position
      */
     @SuppressWarnings("unused")
     protected void initContainersFromPosition(BgcBaseText positionText,
@@ -643,10 +640,10 @@ AbstractPalletSpecimenAdminForm {
                 SessionManager.getAppService().doAction(
                     new ContainerGetInfoByLabelAction(positionText.getText(),
                         SessionManager.getUser().getCurrentWorkingSite()
-                        .getId())).getList();
+                            .getId())).getList();
             if (foundContainers.isEmpty())
                 BgcPlugin
-                .openAsyncError(
+                    .openAsyncError(
                     i18n.tr("Unable to find a container with label ", //$NON-NLS-1$
                         positionText.getText()));
             else if (foundContainers.size() == 1) {
@@ -656,7 +653,7 @@ AbstractPalletSpecimenAdminForm {
                 SelectParentContainerDialog dlg =
                     new SelectParentContainerDialog(
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), foundContainers);
+                            .getShell(), foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
@@ -673,7 +670,7 @@ AbstractPalletSpecimenAdminForm {
                 } else {
                     parentContainers.add(new ContainerWrapper(
                         SessionManager.getAppService(), dlg
-                        .getSelectedContainer()));
+                            .getSelectedContainer()));
                 }
             }
             updateAvailableSpecimenTypes();
@@ -729,7 +726,7 @@ AbstractPalletSpecimenAdminForm {
 
                     List<SpecimenTypeWrapper> specimenTypeCollection =
                         container.getContainerType()
-                        .getSpecimenTypeCollection();
+                            .getSpecimenTypeCollection();
 
                     if (specimenTypeCollection.isEmpty()) {
                         BgcPlugin.openError(
@@ -775,12 +772,12 @@ AbstractPalletSpecimenAdminForm {
                             i18n.tr(
                                 "Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                .getLabel()));
+                                    .getLabel()));
                         appendLog(NLS
                             .bind(
                                 "ERROR: Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                .getLabel()));
+                                    .getLabel()));
                         focusControl(positionField);
                         return;
                     }

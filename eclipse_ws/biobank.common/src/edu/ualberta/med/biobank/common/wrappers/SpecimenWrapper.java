@@ -266,9 +266,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return 0;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return getInventoryId();
+        return "inventoryId: " + getInventoryId();
     }
 
     @SuppressWarnings("unchecked")
@@ -341,9 +342,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     /**
-     * Call {@code setParentSpecimen(SpecimenWrapper parent)} instead of this
-     * method to change the top {@code Specimen}. The top {@code Specimen} will
-     * be automatically updated.
+     * Call {@code setParentSpecimen(SpecimenWrapper parent)} instead of this method to change the
+     * top {@code Specimen}. The top {@code Specimen} will be automatically updated.
      */
     @SuppressWarnings("nls")
     @Override
@@ -377,10 +377,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     /**
-     * Return the top {@code Specimen} of the top loaded {@code Specimen}. This
-     * will give the correct "in memory" answer of who the top {@code Specimen}
-     * is (whereas super.getTopSpecimen() will give the value from the
-     * underlying model).
+     * Return the top {@code Specimen} of the top loaded {@code Specimen}. This will give the
+     * correct "in memory" answer of who the top {@code Specimen} is (whereas super.getTopSpecimen()
+     * will give the value from the underlying model).
      */
     @Override
     public SpecimenWrapper getTopSpecimen() {
@@ -463,8 +462,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     /**
-     * return a string with collection date (different from created at if it is
-     * an aliquoted specimen) + the collection center
+     * return a string with collection date (different from created at if it is an aliquoted
+     * specimen) + the collection center
      */
     @SuppressWarnings("nls")
     public String getCollectionInfo() {
