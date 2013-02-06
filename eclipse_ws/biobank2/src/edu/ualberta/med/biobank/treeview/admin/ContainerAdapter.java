@@ -27,9 +27,6 @@ import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenActi
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveSpecimensAction;
-import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
-import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -56,22 +53,15 @@ public class ContainerAdapter extends AdapterBase {
 
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
+        this.isDeletable = parent.isDeletable();
+        this.isReadable = parent.isReadable();
+        this.isEditable = parent.isEditable();
+
         // assume it has children for now and set it appropriately when user
         // double clicks on node
         if (container != null) {
             setHasChildren(true);
         }
-    }
-
-    @Override
-    public void init() {
-        ContainerWrapper container = (ContainerWrapper) getModelObject();
-        Integer id = container.getId();
-
-        this.isDeletable = isAllowed(new ContainerDeletePermission(id));
-        this.isReadable =
-            isAllowed(new ContainerReadPermission(container.getSite().getId()));
-        this.isEditable = isAllowed(new ContainerUpdatePermission(id));
     }
 
     @Override

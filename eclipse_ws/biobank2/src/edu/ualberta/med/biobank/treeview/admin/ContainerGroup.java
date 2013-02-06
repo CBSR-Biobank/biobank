@@ -19,6 +19,9 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.site.SiteGetTopContainersAction;
 import edu.ualberta.med.biobank.common.permission.container.ContainerCreatePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerDeletePermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
+import edu.ualberta.med.biobank.common.permission.container.ContainerUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -26,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
@@ -39,12 +43,20 @@ public class ContainerGroup extends AdapterBase {
 
     private List<Container> topContainers = null;
 
-    private final boolean createAllowed;
+    protected boolean createAllowed;
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Container.NAME.plural().toString(), true);
-        this.createAllowed =
-            isAllowed(new ContainerCreatePermission(parent.getId()));
+
+        this.createAllowed = isAllowed(new ContainerCreatePermission(parent.getId()));
+        this.isDeletable = isAllowed(new ContainerDeletePermission());
+        this.isReadable = isAllowed(new ContainerReadPermission(parent.getId()));
+        this.isEditable = isAllowed(new ContainerUpdatePermission(
+            (Site) parent.getModelObject().getWrappedObject()));
+    }
+
+    public boolean isCreateAllowed() {
+        return createAllowed;
     }
 
     @Override
@@ -146,11 +158,11 @@ public class ContainerGroup extends AdapterBase {
                     site);
             if (top.size() == 0) {
                 BgcPlugin
-                    .openError(
-                        // dialog title.
-                        i18n.tr("Unable to create container"),
-                        // dialog message.
-                        i18n.tr("You must define a top-level container type before initializing storage."));
+                .openError(
+                    // dialog title.
+                    i18n.tr("Unable to create container"),
+                    // dialog message.
+                    i18n.tr("You must define a top-level container type before initializing storage."));
             } else {
                 ContainerWrapper c = new ContainerWrapper(
                     SessionManager.getAppService());
