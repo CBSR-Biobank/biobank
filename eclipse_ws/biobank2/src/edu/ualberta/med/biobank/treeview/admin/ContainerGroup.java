@@ -43,7 +43,7 @@ public class ContainerGroup extends AdapterBase {
 
     private List<Container> topContainers = null;
 
-    protected boolean createAllowed;
+    private final boolean createAllowed;
 
     public ContainerGroup(SiteAdapter parent, int id) {
         super(parent, id, Container.NAME.plural().toString(), true);
