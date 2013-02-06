@@ -18,9 +18,11 @@ Bundle-ClassPath: .,
  lib/commons-beanutils.jar,
  lib/commons-digester.jar,
  lib/commons-io.jar,
+ lib/jasperreports.jar,
  lib/DynamicJasper.jar,
  lib/itext.jar,
- lib/jasperreports.jar
+ lib/commons-collections.jar,
+ lib/jdtcore.jar
 Export-Package: ar.com.fdvs.dj.core,
  ar.com.fdvs.dj.core.layout,
  ar.com.fdvs.dj.core.registration,

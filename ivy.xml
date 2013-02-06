@@ -176,12 +176,12 @@
       <exclude module="commons-javaflow" />
       <exclude module="commons-logging" />
       <exclude module="jcommon" />
-      <exclude module="jdtcore" />
       <exclude module="jfreechart" />
       <exclude module="mondrian" />
       <exclude module="xml-apis" />
     </dependency>
     <dependency org="commons-io" name="commons-io" rev="1.4" conf="biobank.gui.common->default,sources" />
+    <dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="biobank.gui.common->default,sources" />
 
     <!-- for biobank.mvp -->
     <dependency org="aopalliance" name="aopalliance" rev="1.0" conf="biobank.mvp->default,sources" />
@@ -197,7 +197,6 @@
     <dependency org="javax.inject" name="javax.inject" rev="1" conf="biobank.mvp->default,sources" />
 
     <!-- for biobank2 -->
-    <dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="biobank2->default,sources" />
 
     <!-- for biobank2.tools -->
     <dependency org="net.sf" name="jargs" rev="1.0" conf="biobank2.tools->default,sources" />
