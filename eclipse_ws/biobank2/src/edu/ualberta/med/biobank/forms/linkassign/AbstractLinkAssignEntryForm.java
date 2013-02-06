@@ -27,7 +27,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetParentsByChildLabelAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -46,8 +46,8 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
-public abstract class AbstractLinkAssignEntryForm extends
-    AbstractPalletSpecimenAdminForm {
+public abstract class AbstractLinkAssignEntryForm
+extends AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
 
@@ -614,7 +614,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                         secondSingleParentWidget.setSelection(firstParent
                             .getPositionAsRowCol());
                         secondSingleParentLabel
-                            .setText(secondParent.getLabel());
+                        .setText(secondParent.getLabel());
                     }
                 }
             }
@@ -631,29 +631,34 @@ public abstract class AbstractLinkAssignEntryForm extends
      * @param isContainerPosition if true, the position is a full container position, if false, it
      *            is a full specimen position
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "nls" })
     protected void initContainersFromPosition(BgcBaseText positionText,
         ContainerTypeWrapper type) {
         parentContainers = new ArrayList<ContainerWrapper>();
         try {
-            List<Container> foundContainers =
-                SessionManager.getAppService().doAction(
-                    new ContainerGetInfoByLabelAction(positionText.getText(),
-                        SessionManager.getUser().getCurrentWorkingSite()
-                            .getId())).getList();
+            List<Container> foundContainers;
+
+            if (type == null) {
+                foundContainers = SessionManager.getAppService().doAction(
+                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
+                        SessionManager.getUser().getCurrentWorkingSite().getWrappedObject()))
+                        .getList();
+            } else {
+                foundContainers = SessionManager.getAppService().doAction(
+                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
+                        type.getWrappedObject()))
+                        .getList();
+            }
             if (foundContainers.isEmpty())
-                BgcPlugin
-                    .openAsyncError(
-                    i18n.tr("Unable to find a container with label ", //$NON-NLS-1$
-                        positionText.getText()));
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Unable to find a container with label ", positionText.getText()));
             else if (foundContainers.size() == 1) {
                 parentContainers.add(new ContainerWrapper(SessionManager
                     .getAppService(), foundContainers.get(0)));
             } else {
-                SelectParentContainerDialog dlg =
-                    new SelectParentContainerDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), foundContainers);
+                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow() .getShell(),
+                    foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
@@ -670,7 +675,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 } else {
                     parentContainers.add(new ContainerWrapper(
                         SessionManager.getAppService(), dlg
-                            .getSelectedContainer()));
+                        .getSelectedContainer()));
                 }
             }
             updateAvailableSpecimenTypes();
@@ -725,8 +730,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                     }
 
                     List<SpecimenTypeWrapper> specimenTypeCollection =
-                        container.getContainerType()
-                            .getSpecimenTypeCollection();
+                        container.getContainerType().getSpecimenTypeCollection();
 
                     if (specimenTypeCollection.isEmpty()) {
                         BgcPlugin.openError(
@@ -772,12 +776,12 @@ public abstract class AbstractLinkAssignEntryForm extends
                             i18n.tr(
                                 "Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                    .getLabel()));
+                                .getLabel()));
                         appendLog(NLS
                             .bind(
                                 "ERROR: Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                    .getLabel()));
+                                .getLabel()));
                         focusControl(positionField);
                         return;
                     }
