@@ -26,6 +26,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -45,6 +46,8 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public abstract class AbstractLinkAssignEntryForm extends
 AbstractPalletSpecimenAdminForm {
@@ -99,6 +102,9 @@ AbstractPalletSpecimenAdminForm {
     protected ContainerDisplayWidget freezerWidget;
     protected ContainerDisplayWidget hotelWidget;
     protected ScanPalletWidget palletWidget;
+
+    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
+        RowColPos.COLS_DEFAULT);
 
     @SuppressWarnings("nls")
     @Override
@@ -394,8 +400,14 @@ AbstractPalletSpecimenAdminForm {
         palletLabel = toolkit.createLabel(palletComposite,
             // TR: label
             i18n.tr("Pallet"));
+        createScanPalletWidget(palletComposite, currentGridDimensions.getRow(),
+            currentGridDimensions.getCol());
+        showOnlyPallet(true);
+    }
+
+    protected ScanPalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols) {
         palletWidget = new ScanPalletWidget(palletComposite,
-            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -403,21 +415,13 @@ AbstractPalletSpecimenAdminForm {
                 manageDoubleClick(e);
             }
         });
-        showOnlyPallet(true);
+        return palletWidget;
     }
 
     protected void recreateScanPalletWidget(int rows, int cols) {
         Composite palletComposite = palletWidget.getParent();
         palletWidget.dispose();
-        palletWidget = new ScanPalletWidget(palletComposite,
-            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
-        palletWidget.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDoubleClick(MouseEvent e) {
-                manageDoubleClick(e);
-            }
-        });
-        toolkit.adapt(palletWidget);
+        createScanPalletWidget(palletComposite, rows, cols);
     }
 
     /**
@@ -848,6 +852,31 @@ AbstractPalletSpecimenAdminForm {
     @Override
     protected void refreshPalletDisplay() {
         palletWidget.redraw();
+    }
+
+    /**
+     * Returns true if the grid dimensions have changed.
+     */
+    protected boolean checkGridDimensionsChanged() {
+        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+
+        if (plateNumber < 0) return false;
+
+        String gridDimensions =
+            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+
+        if (gridDimensions.isEmpty()) return false;
+
+        RowColPos plateDimensions =
+            new RowColPos(PreferenceConstants.gridRows(gridDimensions),
+                PreferenceConstants.gridCols(gridDimensions));
+
+        if (!currentGridDimensions.equals(plateDimensions)) {
+            currentGridDimensions = plateDimensions;
+            return true;
+        }
+
+        return false;
     }
 
 }

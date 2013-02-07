@@ -29,7 +29,6 @@ import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -60,7 +59,6 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -113,9 +111,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     // source/type hierarchy selected (use rows order)
     private List<SpecimenHierarchyInfo> preSelections;
-
-    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
-        RowColPos.COLS_DEFAULT);
 
     public SpecimenLinkEntryForm() {
         linkFormPatientManagement = new LinkFormPatientManagement(widgetCreator, this);
@@ -231,37 +226,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     createHierarchyWidgets(parent, currentGridDimensions.getRow());
                     page.layout(true, true);
                     book.reflow(true);
-
                 }
             }
         });
         createScanButton(parent);
         createHierarchyWidgets(parent, RowColPos.ROWS_DEFAULT);
-    }
-
-    /**
-     * Returns true if the grid dimensions have changed.
-     */
-    private boolean checkGridDimensionsChanged() {
-        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
-
-        if (plateNumber < 0) return false;
-
-        String gridDimensions =
-            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-
-        if (gridDimensions.isEmpty()) return false;
-
-        RowColPos plateDimensions =
-            new RowColPos(PreferenceConstants.gridRows(gridDimensions),
-                PreferenceConstants.gridCols(gridDimensions));
-
-        if (!currentGridDimensions.equals(plateDimensions)) {
-            currentGridDimensions = plateDimensions;
-            return true;
-        }
-
-        return false;
     }
 
     @SuppressWarnings("nls")
@@ -568,11 +537,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
         List<AliquotedSpecimenResInfo> resList =
             SessionManager
-                .getAppService()
-                .doAction(
-                    new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
-                        .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
-                        asiList)).getList();
+            .getAppService()
+            .doAction(
+                new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
+                    .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
+                    asiList)).getList();
         printSaveMultipleLogMessage(resList);
     }
 
@@ -597,7 +566,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         appendLog(MessageFormat.format(
             "LINKING: {0} specimens linked to patient {1} on center {2}", resList.size(),
             linkFormPatientManagement.getCurrentPatient().getPnumber(), SessionManager.getUser()
-                .getCurrentWorkingCenter().getNameShort()));
+            .getCurrentWorkingCenter().getNameShort()));
     }
 
     @SuppressWarnings("nls")
@@ -725,7 +694,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         try {
             return PalletWell.getRandomScanLinkWithSpecimensAlreadyLinked(
                 SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId());
+                .getId());
         } catch (Exception ex) {
             BgcPlugin.openAsyncError("Fake Scan problem", ex);
         }
@@ -907,7 +876,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                         if (selection != null) {
                             @SuppressWarnings("unchecked")
                             Map<RowColPos, PalletWell> cells =
-                                (Map<RowColPos, PalletWell>) palletWidget.getCells();
+                            (Map<RowColPos, PalletWell>) palletWidget.getCells();
                             if (cells != null) {
                                 for (RowColPos rcp : cells.keySet()) {
                                     if (rcp.getRow() == indexRow) {
