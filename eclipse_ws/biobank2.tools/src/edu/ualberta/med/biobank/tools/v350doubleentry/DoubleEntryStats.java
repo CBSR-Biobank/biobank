@@ -35,7 +35,7 @@ public class DoubleEntryStats {
         + " JOIN patient p on p.id=ce.patient_id" + " JOIN study s on s.id=p.study_id"
         + " LEFT JOIN specimen_position spos on spos.specimen_id=spc.id"
         + " LEFT JOIN container c on c.id=spos.container_id"
-        + " WHERE (spc.created_at > ? AND spc.created_at < ?)"
+        + " WHERE spc.created_at >= convert_tz(?,'Canada/Mountain','GMT') AND spc.created_at <= convert_tz(?,'Canada/Mountain','GMT')"
         + " AND (ocenter.name_short='CBSR' or ccenter.name_short='CBSR')";
 
     public static final String SELECT_DETAILS_CLAUSE =
@@ -47,9 +47,9 @@ public class DoubleEntryStats {
     public static final String ORDER_BY_CLAUSE =
         " ORDER BY s.name_short,p.pnumber,spc.inventory_id,spc.created_at";
 
-    public static final String DATE_START_MINUS_ONE = "2013-02-03";
+    public static final String DATE_START = "2013-02-04 09:00";
 
-    public static final String DATE_END_PLUS_ONE = "2013-02-07";
+    public static final String DATE_END = "2013-02-06 18:00";
 
     private static class DoubleEntryData {
         int studies;
@@ -206,8 +206,8 @@ public class DoubleEntryStats {
     }
 
     private ResultSet doQuery(PreparedStatement ps) throws SQLException {
-        ps.setString(1, DATE_START_MINUS_ONE);
-        ps.setString(2, DATE_END_PLUS_ONE);
+        ps.setString(1, DATE_START);
+        ps.setString(2, DATE_END);
         return ps.executeQuery();
     }
 
