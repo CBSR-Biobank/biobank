@@ -46,8 +46,6 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public abstract class AbstractLinkAssignEntryForm extends
 AbstractPalletSpecimenAdminForm {
@@ -858,18 +856,10 @@ AbstractPalletSpecimenAdminForm {
      * Returns true if the grid dimensions have changed.
      */
     protected boolean checkGridDimensionsChanged() {
-        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
+        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
+            plateToScanText.getText());
 
-        if (plateNumber < 0) return false;
-
-        String gridDimensions =
-            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-
-        if (gridDimensions.isEmpty()) return false;
-
-        RowColPos plateDimensions =
-            new RowColPos(PreferenceConstants.gridRows(gridDimensions),
-                PreferenceConstants.gridCols(gridDimensions));
+        if (plateDimensions == null) return false;
 
         if (!currentGridDimensions.equals(plateDimensions)) {
             currentGridDimensions = plateDimensions;
