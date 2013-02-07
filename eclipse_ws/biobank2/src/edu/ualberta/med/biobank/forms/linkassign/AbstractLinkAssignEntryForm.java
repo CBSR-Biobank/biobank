@@ -47,7 +47,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public abstract class AbstractLinkAssignEntryForm extends
-    AbstractPalletSpecimenAdminForm {
+AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
 
@@ -411,6 +411,12 @@ public abstract class AbstractLinkAssignEntryForm extends
         palletWidget.dispose();
         palletWidget = new ScanPalletWidget(palletComposite,
             UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
+        palletWidget.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                manageDoubleClick(e);
+            }
+        });
         toolkit.adapt(palletWidget);
     }
 
@@ -614,7 +620,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                         secondSingleParentWidget.setSelection(firstParent
                             .getPositionAsRowCol());
                         secondSingleParentLabel
-                            .setText(secondParent.getLabel());
+                        .setText(secondParent.getLabel());
                     }
                 }
             }
@@ -640,10 +646,10 @@ public abstract class AbstractLinkAssignEntryForm extends
                 SessionManager.getAppService().doAction(
                     new ContainerGetInfoByLabelAction(positionText.getText(),
                         SessionManager.getUser().getCurrentWorkingSite()
-                            .getId())).getList();
+                        .getId())).getList();
             if (foundContainers.isEmpty())
                 BgcPlugin
-                    .openAsyncError(
+                .openAsyncError(
                     i18n.tr("Unable to find a container with label ", //$NON-NLS-1$
                         positionText.getText()));
             else if (foundContainers.size() == 1) {
@@ -653,7 +659,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 SelectParentContainerDialog dlg =
                     new SelectParentContainerDialog(
                         PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), foundContainers);
+                        .getShell(), foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
@@ -670,7 +676,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 } else {
                     parentContainers.add(new ContainerWrapper(
                         SessionManager.getAppService(), dlg
-                            .getSelectedContainer()));
+                        .getSelectedContainer()));
                 }
             }
             updateAvailableSpecimenTypes();
@@ -726,7 +732,7 @@ public abstract class AbstractLinkAssignEntryForm extends
 
                     List<SpecimenTypeWrapper> specimenTypeCollection =
                         container.getContainerType()
-                            .getSpecimenTypeCollection();
+                        .getSpecimenTypeCollection();
 
                     if (specimenTypeCollection.isEmpty()) {
                         BgcPlugin.openError(
@@ -772,12 +778,12 @@ public abstract class AbstractLinkAssignEntryForm extends
                             i18n.tr(
                                 "Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                    .getLabel()));
+                                .getLabel()));
                         appendLog(NLS
                             .bind(
                                 "ERROR: Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                    .getLabel()));
+                                .getLabel()));
                         focusControl(positionField);
                         return;
                     }

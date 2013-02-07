@@ -28,63 +28,51 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     private final AssignProcessInfo data;
 
     // multiple cells assign process
-    public SpecimenAssignProcessAction(AssignProcessInfo data,
-        Integer currentWorkingCenterId,
-        Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode, Locale locale) {
+    public SpecimenAssignProcessAction(AssignProcessInfo data, Integer currentWorkingCenterId,
+        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.data = data;
     }
 
     // single cell assign process
-    public SpecimenAssignProcessAction(AssignProcessInfo data,
-        Integer currentWorkingCenterId,
-        CellInfo cell,
-        Locale locale) {
+    public SpecimenAssignProcessAction(AssignProcessInfo data, Integer currentWorkingCenterId,
+        CellInfo cell, Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.data = data;
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
-        throws ActionException {
+    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells,
+        boolean isRescanMode) throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells,
-            internalProcessScanResult(session, cells, isRescanMode));
+        res.setResult(cells, internalProcessScanResult(session, cells, isRescanMode));
         return res;
     }
 
     protected CellInfoStatus internalProcessScanResult(Session session,
-        Map<RowColPos, CellInfo> cells,
-        boolean rescanMode) throws ActionException {
+        Map<RowColPos, CellInfo> cells, boolean rescanMode) throws ActionException {
         AssignProcessInfo assignData = data;
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet =
             new HashMap<RowColPos, Boolean>();
         for (int row = 0; row < assignData.getPalletRowCapacity(actionContext); row++) {
-            for (int col = 0; col < assignData
-                .getPalletColCapacity(actionContext); col++) {
+            for (int col = 0; col < assignData.getPalletColCapacity(actionContext); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 CellInfo cell = cells.get(rcp);
                 if (!rescanMode || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellInfoStatus.EMPTY
                     || cell.getStatus() == CellInfoStatus.ERROR
                     || cell.getStatus() == CellInfoStatus.MISSING) {
-                    Specimen expectedSpecimen = assignData
-                        .getExpectedSpecimen(session, row, col);
+                    Specimen expectedSpecimen = assignData.getExpectedSpecimen(session, row, col);
                     if (expectedSpecimen != null) {
                         if (cell == null) {
-                            cell =
-                                new CellInfo(rcp.getRow(), rcp.getCol(), null,
-                                    null);
+                            cell = new CellInfo(rcp.getRow(), rcp.getCol(), null, null);
                             cells.put(rcp, cell);
                         }
                         cell.setExpectedSpecimenId(expectedSpecimen.getId());
                     }
                     if (cell != null) {
-                        internalProcessCellAssignStatus(cell,
-                            movedAndMissingSpecimensFromPallet);
+                        internalProcessCellAssignStatus(cell, movedAndMissingSpecimensFromPallet);
                     }
                 }
                 CellInfoStatus newStatus = CellInfoStatus.EMPTY;
@@ -98,8 +86,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected CellProcessResult getCellProcessResult(CellInfo cell)
-        throws ActionException {
+    protected CellProcessResult getCellProcessResult(CellInfo cell) throws ActionException {
         CellProcessResult res = new CellProcessResult();
         internalProcessCellAssignStatus(cell, null);
         res.setResult(cell);
@@ -110,23 +97,16 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
      * set the status of the cell
      */
     protected CellInfoStatus internalProcessCellAssignStatus(CellInfo scanCell,
-        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet)
-        throws ActionException {
+        Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) throws ActionException {
         Specimen expectedSpecimen = null;
         if (scanCell.getExpectedSpecimenId() != null) {
-            expectedSpecimen =
-                actionContext.load(Specimen.class,
-                    scanCell.getExpectedSpecimenId());
+            expectedSpecimen = actionContext.load(Specimen.class, scanCell.getExpectedSpecimenId());
         }
         String value = scanCell.getValue();
         String positionString =
-            data
-                .getPalletLabel(session)
-                + data.getContainerType(session, actionContext)
-                    .getPositionString(
-                        new RowColPos(
-                            scanCell
-                                .getRow(), scanCell.getCol()));
+            data.getPalletLabel(session)
+            + data.getContainerType(session, actionContext).getPositionString(
+                new RowColPos(scanCell.getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
             updateCellAsMissing(positionString, scanCell, expectedSpecimen,
                 movedAndMissingSpecimensFromPallet);
@@ -134,51 +114,40 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             Specimen foundSpecimen = searchSpecimen(session, value);
             if (foundSpecimen == null) {
                 updateCellAsNotFound(positionString, scanCell);
-            } else if (!foundSpecimen.getCurrentCenter().getId()
-                .equals(currentWorkingCenterId)) {
+            } else if (!foundSpecimen.getCurrentCenter().getId().equals(currentWorkingCenterId)) {
                 updateCellAsInOtherSite(positionString, scanCell, foundSpecimen);
-            } else if (expectedSpecimen != null
-                && !foundSpecimen.equals(expectedSpecimen)) {
-                updateCellAsPositionAlreadyTaken(positionString, scanCell,
-                    expectedSpecimen, foundSpecimen);
+            } else if ((expectedSpecimen != null) && !foundSpecimen.equals(expectedSpecimen)) {
+                updateCellAsPositionAlreadyTaken(positionString, scanCell, expectedSpecimen,
+                    foundSpecimen);
             } else {
                 scanCell.setSpecimenId(foundSpecimen.getId());
                 if (expectedSpecimen != null) {
                     // specimen scanned is already registered at this
                     // position (everything is ok !)
                     scanCell.setStatus(CellInfoStatus.FILLED);
-                    scanCell.setTitle(foundSpecimen.getCollectionEvent()
-                        .getPatient().getPnumber());
+                    scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
                     scanCell.setSpecimenId(expectedSpecimen.getId());
                 } else {
-                    ContainerType cType =
-                        data.getContainerType(session, actionContext);
-                    if (cType.getSpecimenTypes().contains(
-                        foundSpecimen.getSpecimenType())) {
+                    ContainerType cType = data.getContainerType(session, actionContext);
+                    if (cType.getSpecimenTypes().contains(foundSpecimen.getSpecimenType())) {
                         if (foundSpecimen.getSpecimenPosition() != null
-                            && foundSpecimen.getSpecimenPosition()
-                                .getContainer() != null) { // moved ?
-                            processCellWithPreviousPosition(session, scanCell,
-                                positionString, foundSpecimen,
-                                movedAndMissingSpecimensFromPallet);
+                            && foundSpecimen.getSpecimenPosition().getContainer() != null) { // moved
+                            // ?
+                            processCellWithPreviousPosition(session, scanCell, positionString,
+                                foundSpecimen, movedAndMissingSpecimensFromPallet);
                         } else { // new in pallet
-                            if (new SpecimenIsUsedInDispatchAction(
-                                foundSpecimen.getId()).run(actionContext)
-                                .isTrue()) {
-                                updateCellAsDispatchedError(
-                                    positionString,
-                                    scanCell, foundSpecimen);
+                            if (new SpecimenIsUsedInDispatchAction(foundSpecimen.getId()).run(
+                                actionContext).isTrue()) {
+                                updateCellAsDispatchedError(positionString, scanCell, foundSpecimen);
                             } else {
                                 scanCell.setStatus(CellInfoStatus.NEW);
-                                scanCell.setTitle(foundSpecimen
-                                    .getCollectionEvent().getPatient()
+                                scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient()
                                     .getPnumber());
                             }
                         }
                     } else {
                         // pallet can't hold this specimen type
-                        updateCellAsTypeError(positionString, scanCell,
-                            foundSpecimen, cType);
+                        updateCellAsTypeError(positionString, scanCell, foundSpecimen, cType);
                     }
                 }
             }
@@ -192,25 +161,22 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsMissing(String position, CellInfo scanCell,
-        Specimen missingSpecimen,
+    private void updateCellAsMissing(String position, CellInfo scanCell, Specimen missingSpecimen,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) {
         RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-        Boolean posHasMovedSpecimen = movedAndMissingSpecimensFromPallet
-            .get(rcp);
+        Boolean posHasMovedSpecimen = movedAndMissingSpecimensFromPallet.get(rcp);
         if (!Boolean.TRUE.equals(posHasMovedSpecimen)) {
             scanCell.setStatus(CellInfoStatus.MISSING);
-            scanCell.setInformation(bundle.tr("Missing specimen \"{0}\".")
-                .format(missingSpecimen.getInventoryId()));
+            scanCell.setInformation(bundle.tr("Missing specimen \"{0}\".").format(
+                missingSpecimen.getInventoryId()));
             scanCell.setTitle("?");
             // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
             // missing
-            appendNewLog(MessageFormat
-                .format(
-                    "MISSING in {0}: specimen ''{1}'' from visit {2} (patient {3}) missing",
-                    position, missingSpecimen.getInventoryId(), missingSpecimen
-                        .getCollectionEvent().getVisitNumber(), missingSpecimen
-                        .getCollectionEvent().getPatient().getPnumber()));
+            appendNewLog(MessageFormat.format(
+                "MISSING in {0}: specimen ''{1}'' from visit {2} (patient {3}) missing", position,
+                missingSpecimen.getInventoryId(), missingSpecimen.getCollectionEvent()
+                .getVisitNumber(), missingSpecimen.getCollectionEvent().getPatient()
+                .getPnumber()));
             movedAndMissingSpecimensFromPallet.put(rcp, true);
         } else {
             movedAndMissingSpecimensFromPallet.remove(rcp);
@@ -228,8 +194,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell.setInformation(bundle.tr("Specimen not found").format());
         appendNewLog(MessageFormat.format(
-            "ERROR in {0}: specimen ''{1}'' not found in the database",
-            position, scanCell.getValue()));
+            "ERROR in {0}: specimen ''{1}'' not found in the database", position,
+            scanCell.getValue()));
     }
 
     /**
@@ -238,20 +204,17 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsPositionAlreadyTaken(String position,
-        CellInfo scanCell, Specimen expectedSpecimen,
-        Specimen foundSpecimen) {
+    private void updateCellAsPositionAlreadyTaken(String position, CellInfo scanCell,
+        Specimen expectedSpecimen, Specimen foundSpecimen) {
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell.setInformation(bundle.tr("Error").format());
         scanCell.setTitle("!");
         appendNewLog(MessageFormat
             .format(
                 "ERROR in {0}: Expected inventoryId {1} from patient {2} -- Found inventoryId {3} from patient {4}",
-                position, expectedSpecimen.getInventoryId(), expectedSpecimen
-                    .getCollectionEvent().getPatient().getPnumber(),
-                foundSpecimen
-                    .getInventoryId(), foundSpecimen.getCollectionEvent()
-                    .getPatient().getPnumber()));
+                position, expectedSpecimen.getInventoryId(), expectedSpecimen.getCollectionEvent()
+                .getPatient().getPnumber(), foundSpecimen.getInventoryId(), foundSpecimen
+                .getCollectionEvent().getPatient().getPnumber()));
     }
 
     /**
@@ -259,36 +222,34 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
      * 
      * @throws Exception
      */
-    private void processCellWithPreviousPosition(Session session,
-        CellInfo scanCell,
+    private void processCellWithPreviousPosition(Session session, CellInfo scanCell,
         String positionString, Specimen foundSpecimen,
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet) {
-        if (foundSpecimen.getSpecimenPosition() != null && foundSpecimen
-            .getSpecimenPosition().getContainer().equals(
-                data.getPallet(session))) {
+        if (foundSpecimen.getSpecimenPosition() != null
+            && foundSpecimen.getSpecimenPosition().getContainer().equals(data.getPallet(session))) {
             // same pallet
             RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-            RowColPos foundSpecPosition = new RowColPos(foundSpecimen
-                .getSpecimenPosition().getRow(),
-                foundSpecimen.getSpecimenPosition().getCol());
+            RowColPos foundSpecPosition =
+                new RowColPos(foundSpecimen.getSpecimenPosition().getRow(), foundSpecimen
+                    .getSpecimenPosition().getCol());
             if (!foundSpecPosition.equals(rcp)) {
                 // moved inside the same pallet
-                updateCellAsMoved(positionString, scanCell,
-                    foundSpecimen);
+                updateCellAsMoved(positionString, scanCell, foundSpecimen);
                 RowColPos movedFromPosition = foundSpecPosition;
-                Boolean posHasMissing = movedAndMissingSpecimensFromPallet
-                    .get(movedFromPosition);
-                if (Boolean.TRUE.equals(posHasMissing)) {
-                    // missing position has already been processed: remove
-                    // the MISSING flag
-                    // missingSpecimen.setStatus(UICellStatus.EMPTY);
-                    // missingSpecimen.setTitle("");
-                    movedAndMissingSpecimensFromPallet
-                        .remove(movedFromPosition);
-                } else {
-                    // missing position has not yet been processed
-                    movedAndMissingSpecimensFromPallet.put(movedFromPosition,
-                        true);
+
+                if (movedAndMissingSpecimensFromPallet != null) {
+                    Boolean posHasMissing = movedAndMissingSpecimensFromPallet.get(movedFromPosition);
+
+                    if (Boolean.TRUE.equals(posHasMissing)) {
+                        // missing position has already been processed: remove
+                        // the MISSING flag
+                        // missingSpecimen.setStatus(UICellStatus.EMPTY);
+                        // missingSpecimen.setTitle("");
+                        movedAndMissingSpecimensFromPallet.remove(movedFromPosition);
+                    } else {
+                        // missing position has not yet been processed
+                        movedAndMissingSpecimensFromPallet.put(movedFromPosition, true);
+                    }
                 }
             }
         } else {
@@ -300,94 +261,79 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsMoved(String position, CellInfo scanCell,
-        Specimen foundSpecimen) {
-        String expectedPosition = SpecimenActionHelper.getPositionString(
-            foundSpecimen, true, false);
+    private void updateCellAsMoved(String position, CellInfo scanCell, Specimen foundSpecimen) {
+        String expectedPosition =
+            SpecimenActionHelper.getPositionString(foundSpecimen, true, false);
         if (expectedPosition == null) {
             expectedPosition = "none";
         }
 
         scanCell.setStatus(CellInfoStatus.MOVED);
-        scanCell.setTitle(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber());
-        scanCell.setInformation(bundle.tr(
-            "Specimen previously registered on another position: {0}")
+        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
+        scanCell
+        .setInformation(bundle.tr("Specimen previously registered on another position: {0}")
             .format(expectedPosition));
 
-        appendNewLog(MessageFormat
-            .format(
-                "MOVED in {0}: specimen ''{1}'' previously registered on another position: {2}",
-                position, scanCell.getValue(), expectedPosition));
+        appendNewLog(MessageFormat.format(
+            "MOVED in {0}: specimen ''{1}'' previously registered on another position: {2}",
+            position, scanCell.getValue(), expectedPosition));
     }
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsInOtherSite(String position, CellInfo scanCell,
-        Specimen foundSpecimen) {
-        String currentPosition = SpecimenActionHelper.getPositionString(
-            foundSpecimen, true, false);
+    private void updateCellAsInOtherSite(String position, CellInfo scanCell, Specimen foundSpecimen) {
+        String currentPosition = SpecimenActionHelper.getPositionString(foundSpecimen, true, false);
         if (currentPosition == null) {
             currentPosition = "none";
         }
         String siteName = foundSpecimen.getCurrentCenter().getNameShort();
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setTitle(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber());
-        scanCell.setInformation(bundle.tr(
-            "Specimen has a position in another site (site {0})")
+        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
+        scanCell.setInformation(bundle.tr("Specimen has a position in another site (site {0})")
             .format(siteName));
 
-        appendNewLog(MessageFormat
-            .format(
-                "ERROR in {0}: specimen ''{1}'' registered in another site ({2}) in position: {3}",
-                position, scanCell.getValue(), siteName, currentPosition));
+        appendNewLog(MessageFormat.format(
+            "ERROR in {0}: specimen ''{1}'' registered in another site ({2}) in position: {3}",
+            position, scanCell.getValue(), siteName, currentPosition));
     }
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsTypeError(String position, CellInfo scanCell,
-        Specimen foundSpecimen, ContainerType containerType) {
+    private void updateCellAsTypeError(String position, CellInfo scanCell, Specimen foundSpecimen,
+        ContainerType containerType) {
         String palletType = containerType.getName();
         String sampleType = foundSpecimen.getSpecimenType().getName();
 
-        scanCell.setTitle(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber());
+        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell.setInformation(bundle.tr(
-            "This pallet type {0} can''t hold a specimen of type {1}")
-            .format(palletType, sampleType));
-        appendNewLog(MessageFormat
-            .format(
-                "ERROR in {0}: pallet type \"{1}\" can''t hold a specimen of type \"{2}\"",
-                position, palletType, sampleType));
+        scanCell.setInformation(bundle
+            .tr("This pallet type {0} can''t hold a specimen of type {1}").format(palletType,
+                sampleType));
+        appendNewLog(MessageFormat.format(
+            "ERROR in {0}: pallet type \"{1}\" can''t hold a specimen of type \"{2}\"", position,
+            palletType, sampleType));
     }
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsDispatchedError(String positionString,
-        CellInfo scanCell, Specimen foundSpecimen) {
-        scanCell.setTitle(foundSpecimen
-            .getCollectionEvent().getPatient().getPnumber());
+    private void updateCellAsDispatchedError(String positionString, CellInfo scanCell,
+        Specimen foundSpecimen) {
+        scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
         scanCell.setStatus(CellInfoStatus.ERROR);
-        scanCell
-            .setInformation(bundle
-                .tr("Cannot assign position to a specimen that in dispatch transit")
-                .format());
-        appendNewLog(MessageFormat
-            .format(
-                "ERROR in {0}: Cannot assign position to a specimen that still is in dispatch transit",
-                positionString));
+        scanCell.setInformation(bundle.tr(
+            "Cannot assign position to a specimen that in dispatch transit").format());
+        appendNewLog(MessageFormat.format(
+            "ERROR in {0}: Cannot assign position to a specimen that still is in dispatch transit",
+            positionString));
 
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new SpecimenAssignPermission(currentWorkingCenterId).isAllowed(
-            context);
+        return new SpecimenAssignPermission(currentWorkingCenterId).isAllowed(context);
     }
 
 }

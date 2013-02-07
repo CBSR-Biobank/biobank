@@ -290,7 +290,7 @@ public class PalletScanManagement {
         Map<String, String> existingInventoryIdsByLabel = new HashMap<String, String>();
         for (PalletWell well : wells.values()) {
             String inventoryId = well.getValue();
-            if (!inventoryId.isEmpty()) {
+            if ((inventoryId == null) || !inventoryId.isEmpty()) {
                 existingInventoryIdsByLabel.put(well.getLabel(), well.getValue());
             }
         }
@@ -346,7 +346,7 @@ public class PalletScanManagement {
 
                 PalletWell well = wells.get(pos);
 
-                if ((well == null) || well.getValue().isEmpty()) {
+                if ((well == null) || (well.getValue() == null) || well.getValue().isEmpty()) {
                     if (selectionFound) {
                         labelsMissingInventoryId.add(type.getPositionString(pos));
                     } else {
