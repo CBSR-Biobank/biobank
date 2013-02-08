@@ -15,6 +15,11 @@ public class BgcBaseWidget extends Composite {
 
     List<BgcEntryFormWidgetListener> listeners;
 
+    public BgcBaseWidget(Composite parent, int style) {
+        super(parent, style); // | SWT.H_SCROLL | SWT.V_SCROLL);
+        listeners = new ArrayList<BgcEntryFormWidgetListener>();
+    }
+
     public static ControlDecoration createDecorator(Control control, String message) {
         return createDecorator(control, message, SWT.RIGHT | SWT.TOP);
     }
@@ -26,11 +31,6 @@ public class BgcBaseWidget extends Composite {
             .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
         controlDecoration.setImage(fieldDecoration.getImage());
         return controlDecoration;
-    }
-
-    public BgcBaseWidget(Composite parent, int style) {
-        super(parent, style); // | SWT.H_SCROLL | SWT.V_SCROLL);
-        listeners = new ArrayList<BgcEntryFormWidgetListener>();
     }
 
     public void adaptToToolkit(FormToolkit toolkit, boolean paintBorder) {

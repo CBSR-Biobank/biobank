@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
@@ -29,23 +30,27 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimensAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAliquotedSpecimensAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class LinkFormPatientManagement {
     private static final I18n i18n = I18nFactory
@@ -466,14 +471,16 @@ public class LinkFormPatientManagement {
     }
 
     @SuppressWarnings("nls")
-    protected List<SpecimenWrapper> getParentSpecimenForPEventAndCEvent() {
+    protected List<Specimen> getParentSpecimenForPEventAndCEvent() {
         if (currentCEventSelected == null || currentPEventSelected == null)
             return Collections.emptyList();
-        List<SpecimenWrapper> specs;
+        List<Specimen> specs;
         try {
-            specs = currentCEventSelected
-                .getSourceSpecimenCollectionInProcessNotFlagged(
-                    currentPEventSelected, true);
+            specs = SessionManager.getAppService().doAction(
+                new CollectionEventGetSourceSpecimensAction(
+                    currentCEventSelected.getWrappedObject(),
+                    currentPEventSelected.getWrappedObject(),
+                    true)).getList();
             if (specs.size() == 0) {
                 BgcPlugin
                 .openAsyncError(
@@ -483,7 +490,7 @@ public class LinkFormPatientManagement {
                     i18n.tr("No source specimen of this collection event has been declared in a processing event."));
             }
         } catch (ApplicationException e) {
-            specs = new ArrayList<SpecimenWrapper>();
+            specs = new ArrayList<Specimen>();
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Problem retrieveing source specimens"),
@@ -515,8 +522,8 @@ public class LinkFormPatientManagement {
         List<AliquotedSpecimenWrapper> studiesAliquotedTypes;
         try {
             studiesAliquotedTypes =
-                study
-                .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
+                getAuthorizedActiveAliquotedTypes(study, authorizedSpecimenTypesInContainer);
+
             if (studiesAliquotedTypes.size() == 0) {
                 // TR: study name short
                 String studyNameShort = i18n.tr("unknown");
@@ -546,5 +553,24 @@ public class LinkFormPatientManagement {
         } else {
             pEventListCheckSelection = pEventListCheck.getSelection();
         }
+    }
+
+    public List<AliquotedSpecimenWrapper> getAuthorizedActiveAliquotedTypes(StudyWrapper study,
+        List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
+
+        Set<AliquotedSpecimen> aliquotedSpecTypes = SessionManager.getAppService().doAction(
+            new StudyGetAliquotedSpecimensAction(study.getId())).getSet();
+
+        WritableApplicationService appService = SessionManager.getAppService();
+
+        List<AliquotedSpecimenWrapper> result = new ArrayList<AliquotedSpecimenWrapper>();
+        for (AliquotedSpecimen st : aliquotedSpecTypes) {
+            AliquotedSpecimenWrapper atype = new AliquotedSpecimenWrapper(appService, st);
+            SpecimenTypeWrapper type = atype.getSpecimenType();
+            if (authorizedTypes == null || authorizedTypes.contains(type)) {
+                result.add(atype);
+            }
+        }
+        return result;
     }
 }

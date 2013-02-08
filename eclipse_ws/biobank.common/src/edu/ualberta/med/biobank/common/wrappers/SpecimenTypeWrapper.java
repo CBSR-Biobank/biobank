@@ -21,7 +21,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     @SuppressWarnings("nls")
-    private static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
+    public static final String UNKNOWN_IMPORT_NAME = "Unknown / import";
 
     public SpecimenTypeWrapper(WritableApplicationService appService,
         SpecimenType wrappedObject) {
@@ -56,7 +56,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
      */
     public static List<SpecimenTypeWrapper> getSpecimenTypeForPalletRowsCols(
         WritableApplicationService appService, SiteWrapper siteWrapper, int rows, int cols)
-        throws ApplicationException {
+            throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesByCapacity(appService, siteWrapper, rows, cols);
         Set<SpecimenTypeWrapper> SpecimenTypes =
@@ -73,7 +73,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
         WritableApplicationService appService, boolean sort)
-        throws ApplicationException {
+            throws ApplicationException {
         HQLCriteria c = new HQLCriteria(ALL_SAMPLE_TYPES_QRY);
 
         List<SpecimenType> SpecimenTypes = appService.query(c);
@@ -94,7 +94,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
         WritableApplicationService appService, boolean sort)
-        throws ApplicationException {
+            throws ApplicationException {
         HQLCriteria c = new HQLCriteria(ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY);
 
         List<SpecimenType> SpecimenTypes = appService.query(c);
@@ -128,12 +128,12 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     private static final String IS_USED_QRY_START = "select count(x) from ";
     @SuppressWarnings("nls")
     private static final String IS_USED_QRY_END =
-        " as x where x.specimenType.id=?";
+    " as x where x.specimenType.id=?";
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
     public boolean isUsed() throws ApplicationException,
-        BiobankQueryResultSizeException {
+    BiobankQueryResultSizeException {
         long usedCount = 0;
         for (Class<?> clazz : isUsedCheckClasses) {
             StringBuilder sb = new StringBuilder(IS_USED_QRY_START).append(

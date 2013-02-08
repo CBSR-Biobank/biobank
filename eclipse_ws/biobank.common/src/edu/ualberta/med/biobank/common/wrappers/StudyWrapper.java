@@ -147,7 +147,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         String[] permissibleValues) throws Exception {
         Map<String, EventAttrTypeWrapper> EventAttrTypeMap =
             EventAttrTypeWrapper
-                .getAllEventAttrTypesMap(appService);
+            .getAllEventAttrTypesMap(appService);
         EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
             .getName());
         if (EventAttrType == null) {
@@ -270,7 +270,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     public long getPatientCount(boolean fast) throws ApplicationException,
-        BiobankException {
+    BiobankException {
         return getPropertyCount(StudyPeer.PATIENTS, fast);
     }
 
@@ -297,13 +297,13 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     public static final String IS_LINKED_TO_CLINIC_QRY =
-        "select count(clinics) from "
-            + Contact.class.getName()
-            + " as contacts join contacts."
-            + ContactPeer.CLINIC.getName()
-            + " as clinics where contacts."
-            + Property.concatNames(ContactPeer.STUDIES, StudyPeer.ID)
-            + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
+    "select count(clinics) from "
+        + Contact.class.getName()
+        + " as contacts join contacts."
+        + ContactPeer.CLINIC.getName()
+        + " as clinics where contacts."
+        + Property.concatNames(ContactPeer.STUDIES, StudyPeer.ID)
+        + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
 
     /**
      * return true if this study is linked to the given clinic (through
@@ -348,15 +348,15 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     private static final String COLLECTION_EVENT_COUNT_QRY =
-        "select count(distinct ce) from "
-            + CollectionEvent.class.getName()
-            + " as ce where ce."
-            + Property.concatNames(CollectionEventPeer.PATIENT,
-                PatientPeer.STUDY,
-                StudyPeer.ID) + "=?";
+    "select count(distinct ce) from "
+        + CollectionEvent.class.getName()
+        + " as ce where ce."
+        + Property.concatNames(CollectionEventPeer.PATIENT,
+            PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
 
     public long getCollectionEventCount() throws ApplicationException,
-        BiobankException {
+    BiobankException {
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, c);
@@ -399,18 +399,19 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY =
-        "select aspec from "
-            + AliquotedSpecimen.class.getName()
-            + " as aspec where aspec."
-            + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
-            + " = ? and aspec.activityStatus = "
-            + ActivityStatus.ACTIVE.getId();
+    "select aspec from "
+        + AliquotedSpecimen.class.getName()
+        + " as aspec where aspec."
+        + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
+        + " = ? and aspec.activityStatus = "
+        + ActivityStatus.ACTIVE.getId();
 
+    @Deprecated
     public List<AliquotedSpecimenWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
         List<AliquotedSpecimen> raw = appService.query(new HQLCriteria(
             ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY, Arrays
-                .asList(new Object[] { getId() })));
+            .asList(new Object[] { getId() })));
         if (raw == null) {
             return new ArrayList<AliquotedSpecimenWrapper>();
         }
