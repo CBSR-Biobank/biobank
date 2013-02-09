@@ -274,6 +274,12 @@
     <antcall target="messages-jar"/>
   </target>
 
+
+  <target name="versions-update"
+          depends="server-manifest,biobank-version-modify"
+	  description="--> update version strings on server and client">
+  </target>
+
   <target name="deploy-eclipse" depends="resolve,create-messages-jar,biobank-version-modify"
 	  description="--> retrieve dependencies for eclipse projects">
     <copy file="${lib.dir}/messages.jar" todir="${eclipse.proj.dir}/lib"/>
@@ -568,7 +574,7 @@
   </target>
 
   <target name="product"
-	  depends="clean-product,biobank-version-modify,deploy"
+	  depends="clean-product,versions-update,deploy"
 	  description="build the product">
     <!-- buildDirectory is the folder where the plugins and products are found and build -->
     <!-- plugins and features are copied into the buildDirectory -->
