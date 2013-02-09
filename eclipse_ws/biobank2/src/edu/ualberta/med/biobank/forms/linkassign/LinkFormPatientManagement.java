@@ -33,11 +33,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetAliquotedSpecimensAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
@@ -48,9 +46,9 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class LinkFormPatientManagement {
     private static final I18n i18n = I18nFactory
@@ -503,8 +501,8 @@ public class LinkFormPatientManagement {
      * get the list of aliquoted specimen type the study wants and that the container authorized
      */
     @SuppressWarnings("nls")
-    public List<AliquotedSpecimenWrapper> getStudyAliquotedTypes(
-        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
+    public List<AliquotedSpecimen> getStudyAliquotedTypes(
+        List<SpecimenType> authorizedSpecimenTypesInContainer) {
         if (currentPatient == null)
             return Collections.emptyList();
         StudyWrapper study = currentPatient.getStudy();
@@ -519,7 +517,7 @@ public class LinkFormPatientManagement {
                 i18n.tr("Problem reloading study"), e);
         }
 
-        List<AliquotedSpecimenWrapper> studiesAliquotedTypes;
+        List<AliquotedSpecimen> studiesAliquotedTypes;
         try {
             studiesAliquotedTypes =
                 getAuthorizedActiveAliquotedTypes(study, authorizedSpecimenTypesInContainer);
@@ -539,7 +537,7 @@ public class LinkFormPatientManagement {
                         studyNameShort));
             }
         } catch (ApplicationException e) {
-            studiesAliquotedTypes = new ArrayList<AliquotedSpecimenWrapper>();
+            studiesAliquotedTypes = new ArrayList<AliquotedSpecimen>();
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Error retrieving available types"), e);
@@ -555,20 +553,16 @@ public class LinkFormPatientManagement {
         }
     }
 
-    public List<AliquotedSpecimenWrapper> getAuthorizedActiveAliquotedTypes(StudyWrapper study,
-        List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
+    public List<AliquotedSpecimen> getAuthorizedActiveAliquotedTypes(StudyWrapper study,
+        List<SpecimenType> authorizedTypes) throws ApplicationException {
 
         Set<AliquotedSpecimen> aliquotedSpecTypes = SessionManager.getAppService().doAction(
             new StudyGetAliquotedSpecimensAction(study.getId())).getSet();
 
-        WritableApplicationService appService = SessionManager.getAppService();
-
-        List<AliquotedSpecimenWrapper> result = new ArrayList<AliquotedSpecimenWrapper>();
-        for (AliquotedSpecimen st : aliquotedSpecTypes) {
-            AliquotedSpecimenWrapper atype = new AliquotedSpecimenWrapper(appService, st);
-            SpecimenTypeWrapper type = atype.getSpecimenType();
-            if (authorizedTypes == null || authorizedTypes.contains(type)) {
-                result.add(atype);
+        List<AliquotedSpecimen> result = new ArrayList<AliquotedSpecimen>();
+        for (AliquotedSpecimen aqSpc : aliquotedSpecTypes) {
+            if (authorizedTypes == null || authorizedTypes.contains(aqSpc)) {
+                result.add(aqSpc);
             }
         }
         return result;

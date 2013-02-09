@@ -33,8 +33,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     /**
-     * get all sample types in a site for containers which type name contains
-     * "typeNameContains" (go recursively inside found containers)
+     * get all sample types in a site for containers which type name contains "typeNameContains" (go
+     * recursively inside found containers)
      */
     public static List<SpecimenTypeWrapper> getSpecimenTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
@@ -51,16 +51,14 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     }
 
     /**
-     * get all sample types in a site for pallet containers (go
-     * recursively inside found containers)
+     * get all sample types in a site for pallet containers (go recursively inside found containers)
      */
     public static List<SpecimenTypeWrapper> getSpecimenTypeForPalletRowsCols(
         WritableApplicationService appService, SiteWrapper siteWrapper, int rows, int cols)
             throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesByCapacity(appService, siteWrapper, rows, cols);
-        Set<SpecimenTypeWrapper> SpecimenTypes =
-            new HashSet<SpecimenTypeWrapper>();
+        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }

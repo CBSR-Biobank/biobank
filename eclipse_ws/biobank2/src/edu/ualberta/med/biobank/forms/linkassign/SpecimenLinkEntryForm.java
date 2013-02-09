@@ -51,6 +51,7 @@ import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
@@ -405,14 +406,15 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private void setTypeCombos() {
         log.debug("setTypeCombos");
 
-        List<AliquotedSpecimenWrapper> studiesAliquotedTypesWrapped = null;
-        List<SpecimenTypeWrapper> authorizedTypesInContainers = null;
+        List<AliquotedSpecimen> studiesAliquotedTypes = null;
+        List<SpecimenType> authorizedTypesInContainers = new ArrayList<SpecimenType>();
         if (isSingleMode()) {
             log.debug("setTypeCombos: single mode");
 
             if ((parentContainers != null) && (parentContainers.size() >= 1)) {
-                authorizedTypesInContainers =
-                    parentContainers.get(0).getContainerType().getSpecimenTypeCollection();
+                for (SpecimenTypeWrapper wrapper : parentContainers.get(0).getContainerType().getSpecimenTypeCollection()) {
+                    authorizedTypesInContainers.add(wrapper.getWrappedObject());
+                }
             }
         } else {
             log.debug("setTypeCombos: multiple mode");
@@ -422,7 +424,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
              * size, then get the specimen types these containers can contain
              */
             if (SessionManager.getUser().getCurrentWorkingSite() != null) {
-                List<SpecimenTypeWrapper> res = null;
+                List<SpecimenType> res = null;
                 try {
                     res = getSpecimenTypeForPalletScannable();
                 } catch (ApplicationException e) {
@@ -432,7 +434,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             }
         }
 
-        studiesAliquotedTypesWrapped =
+        studiesAliquotedTypes =
             linkFormPatientManagement.getStudyAliquotedTypes(authorizedTypesInContainers);
         List<Specimen> availableSourceSpecimens =
             linkFormPatientManagement.getParentSpecimenForPEventAndCEvent();
@@ -451,7 +453,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         // for single
         List<AliquotedSpecimen> studiesAliquotedTypes = new ArrayList<AliquotedSpecimen>();
-        for (AliquotedSpecimenWrapper aqWrapper : studiesAliquotedTypesWrapped) {
+        for (AliquotedSpecimenWrapper aqWrapper : studiesAliquotedTypes) {
             studiesAliquotedTypes.add(aqWrapper.getWrappedObject());
         }
 
@@ -463,23 +465,21 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
-    private List<SpecimenTypeWrapper> getSpecimenTypeForPalletScannable()
-        throws ApplicationException {
-        List<SpecimenTypeWrapper> res = null;
+    private List<SpecimenType> getSpecimenTypeForPalletScannable() throws ApplicationException {
+        List<SpecimenType> result = null;
         for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
             int rows = PreferenceConstants.gridRows(gridDimensions);
             int cols = PreferenceConstants.gridCols(gridDimensions);
-            if (res == null) {
-                res =
-                    SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
-                        .getAppService(), SessionManager.getUser().getCurrentWorkingSite(), rows,
-                        cols);
+            if (result == null) {
+                result = SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
+                    .getAppService(), SessionManager.getUser().getCurrentWorkingSite(), rows,
+                    cols);
             } else {
-                res.addAll(SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
+                result.addAll(SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
                     .getAppService(), SessionManager.getUser().getCurrentWorkingSite(), rows, cols));
             }
         }
-        return res;
+        return result;
     }
 
     @Override
