@@ -64,6 +64,7 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
     private ControlDecoration rowControlDecoration;
     private ControlDecoration sourceControlDecoration;
     private ControlDecoration resultControlDecoration;
+    private Label rowLabel;
     private Label textNumber;
     private Integer number;
 
@@ -95,7 +96,7 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
         this.rowNumber = rowNumber;
 
         if (letter != null) {
-            widgetCreator.getToolkit().createLabel(parent, letter.toString(), SWT.LEFT);
+            rowLabel = widgetCreator.getToolkit().createLabel(parent, letter.toString(), SWT.LEFT);
         }
         if (!oneRow) {
             sourceLabel = widgetCreator.createLabel(parent, SourceSpecimen.NAME.singular().toString());
@@ -165,7 +166,7 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
                 }
 
                 return (filterBySource
-                    || sourceChildTypes.contains(((AliquotedSpecimen) element).getSpecimenType()));
+                || sourceChildTypes.contains(((AliquotedSpecimen) element).getSpecimenType()));
             }
         });
         if (oneRow) {
@@ -263,27 +264,27 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
     }
 
     public void setNumber(Integer number) {
-        if (textNumber != null) {
-            this.number = number;
-            String text = StringUtil.EMPTY_STRING;
-            if (number != null) {
-                text = number.toString();
-            }
-            if (number == null || number == 0) {
-                cvSource.getControl().setEnabled(false);
-                sourceSelected.setValue(true);
-                cvResult.getControl().setEnabled(false);
-                resultSelected.setValue(true);
-                bothSelected.setValue(true);
-            } else {
-                cvSource.getControl().setEnabled(true);
-                sourceSelected.setValue(getSourceSelection() != null);
-                cvResult.getControl().setEnabled(true);
-                resultSelected.setValue(getResultTypeSelection() != null);
-                updateBothSelectedField();
-            }
-            textNumber.setText(text);
+        if (textNumber == null) return;
+
+        this.number = number;
+        String text = StringUtil.EMPTY_STRING;
+        if (number != null) {
+            text = number.toString();
         }
+        if (number == null || number == 0) {
+            cvSource.getControl().setEnabled(false);
+            sourceSelected.setValue(true);
+            cvResult.getControl().setEnabled(false);
+            resultSelected.setValue(true);
+            bothSelected.setValue(true);
+        } else {
+            cvSource.getControl().setEnabled(true);
+            sourceSelected.setValue(getSourceSelection() != null);
+            cvResult.getControl().setEnabled(true);
+            resultSelected.setValue(getResultTypeSelection() != null);
+            updateBothSelectedField();
+        }
+        textNumber.setText(text);
     }
 
     public void increaseNumber() {
@@ -446,10 +447,18 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
     }
 
     public void showWidget(boolean enabled) {
+        if (rowLabel != null) {
+            rowLabel.setVisible(enabled);
+        }
+
         if (sourceLabel != null) widgetCreator.showWidget(sourceLabel, enabled);
         widgetCreator.showWidget(cvSource.getControl(), enabled);
         if (resultLabel != null) widgetCreator.showWidget(resultLabel, enabled);
         widgetCreator.showWidget(cvResult.getControl(), enabled);
+
+        if (textNumber != null) {
+            textNumber.setVisible(enabled);
+        }
     }
 
     public void setReadOnlySelections(SpecimenWrapper sourceSpecimen, SpecimenTypeWrapper resultType) {

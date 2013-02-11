@@ -20,7 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -51,11 +53,23 @@ public class PalletWell extends AbstractUIWell {
         return palletScanned;
     }
 
-    static Set<DecodedWell> getRandomDecodedCells() {
+    static Set<DecodedWell> getRandomDecodedCells(String plateToScan) {
         Set<DecodedWell> result = new HashSet<DecodedWell>();
+        int plateNumber = ScannerConfigPlugin.getDefault().getPlateNumber(plateToScan);
+
+        if (plateNumber < 0) return result;
+
+        String gridDimensions =
+            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+
+        if (gridDimensions.isEmpty()) return null;
+
+        int maxRows = PreferenceConstants.gridRows(gridDimensions);
+        int maxCols = PreferenceConstants.gridCols(gridDimensions);
+
         Random random = new Random();
-        for (int indexRow = 0; indexRow < 8; indexRow++) {
-            for (int indexCol = 0; indexCol < 12; indexCol++) {
+        for (int indexRow = 0; indexRow < maxRows; indexRow++) {
+            for (int indexCol = 0; indexCol < maxCols; indexCol++) {
                 StringBuffer digits = new StringBuffer();
                 if (random.nextBoolean()) {
                     for (int i = 0; i < 10; i++) {
@@ -69,14 +83,14 @@ public class PalletWell extends AbstractUIWell {
         return result;
     }
 
-    public static Map<RowColPos, PalletWell> getRandomScanLink() {
-        return convertArray(getRandomDecodedCells());
+    public static Map<RowColPos, PalletWell> getRandomScanLink(String plateToScan) {
+        return convertArray(getRandomDecodedCells(plateToScan));
     }
 
     public static Map<RowColPos, PalletWell> getRandomScanLinkWithSpecimensAlreadyLinked(
-        WritableApplicationService appService, Integer siteId) throws Exception {
+        WritableApplicationService appService, Integer siteId, String plateToScan) throws Exception {
         Map<RowColPos, PalletWell> cells =
-            convertArray(getRandomDecodedCells());
+            convertArray(getRandomDecodedCells(plateToScan));
         List<SpecimenWrapper> specimens = DebugUtil
             .getRandomLinkedAliquotedSpecimens(appService, siteId);
         if (specimens.size() > 1) {
@@ -100,7 +114,7 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(
         WritableApplicationService appService, Integer siteId, Integer studyId)
-            throws Exception {
+        throws Exception {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> specimens = DebugUtil.getRandomAssignedSpecimens(
@@ -122,7 +136,7 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomSpecimensNotAssigned(
         WritableApplicationService appService, Integer siteId)
-            throws ApplicationException {
+        throws ApplicationException {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
 
@@ -142,7 +156,7 @@ public class PalletWell extends AbstractUIWell {
 
     public static Map<RowColPos, PalletWell> getRandomNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId)
-            throws ApplicationException {
+        throws ApplicationException {
         Map<RowColPos, PalletWell> palletScanned =
             new HashMap<RowColPos, PalletWell>();
         List<SpecimenWrapper> randomSpecimens = DebugUtil

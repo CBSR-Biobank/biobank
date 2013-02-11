@@ -25,10 +25,12 @@ import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenTypeSelectionWidget extends BgcBaseWidget
-implements ISpecimenTypeSelectionChangedListener {
+    implements ISpecimenTypeSelectionChangedListener {
     private static final I18n i18n = I18nFactory.getI18n(AliquotedSpecimenSelectionWidget.class);
 
     private final int maxRows;
+
+    private int currentRows;
 
     private final FormToolkit toolkit;
 
@@ -41,6 +43,7 @@ implements ISpecimenTypeSelectionChangedListener {
         int maxRows, int currentRows) {
         super(parent, SWT.NONE);
         this.maxRows = maxRows;
+        this.currentRows = currentRows;
         GridLayout layout = new GridLayout(4, false);
         layout.horizontalSpacing = 10;
         setLayout(layout);
@@ -110,11 +113,16 @@ implements ISpecimenTypeSelectionChangedListener {
 
     public void setSelections(List<Specimen> sourceSpecimens,
         List<AliquotedSpecimen> studiesAliquotedTypes) {
+        int rowCount = 0;
         for (AliquotedSpecimenSelectionWidget widget : specimenTypesWidgets) {
             SpecimenHierarchyInfo previousSelection = widget.getSelection();
             widget.setSourceSpecimens(sourceSpecimens);
             widget.setResultTypes(studiesAliquotedTypes);
             widget.setSelection(previousSelection);
+            ++rowCount;
+
+            // only assign for the currently configured rows
+            if (rowCount >= currentRows) break;
         }
     }
 
@@ -127,8 +135,13 @@ implements ISpecimenTypeSelectionChangedListener {
 
     public List<SpecimenHierarchyInfo> getSelections() {
         List<SpecimenHierarchyInfo> result = new ArrayList<SpecimenHierarchyInfo>();
+        int rowCount = 0;
         for (AliquotedSpecimenSelectionWidget widget : specimenTypesWidgets) {
             result.add(widget.getSelection());
+            ++rowCount;
+
+            // only return the results for the currently configured rows
+            if (rowCount >= currentRows) break;
         }
         return result;
     }
@@ -175,8 +188,9 @@ implements ISpecimenTypeSelectionChangedListener {
     }
 
     public void updateHierarchyWidgets(int rows) {
+        currentRows = rows;
         for (int i = 0; i < maxRows; ++i) {
-            specimenTypesWidgets.get(i).showWidget(i < rows);
+            specimenTypesWidgets.get(i).showWidget(i < currentRows);
         }
     }
 }

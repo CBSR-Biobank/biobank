@@ -74,7 +74,7 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
     }
 
     @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells() {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) {
         Map<RowColPos, PalletWell> palletScanned =
             new TreeMap<RowColPos, PalletWell>();
         if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {

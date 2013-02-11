@@ -103,10 +103,10 @@ public class PalletScanManagement {
                     int rows = RowColPos.ROWS_DEFAULT;
                     int cols = RowColPos.COLS_DEFAULT;
                     int plateId = -1;
-                    IPreferenceStore prefs = ScannerConfigPlugin.getDefault()
-                        .getPreferenceStore();
+                    IPreferenceStore prefs = ScannerConfigPlugin.getDefault().getPreferenceStore();
                     for (plateId = 0; plateId < PreferenceConstants.SCANNER_PLATE_BARCODES.length; plateId++) {
-                        if (plateToScan.equals(prefs.getString(PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
+                        if (plateToScan.equals(prefs.getString(
+                            PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
                             rows = PreferenceConstants.gridRows(prefs.getString(
                                 PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]));
                             cols = PreferenceConstants.gridCols(prefs.getString(
@@ -151,8 +151,8 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    private void launchScan(IProgressMonitor monitor, String plateToScan,
-        boolean rescanMode) throws Exception {
+    private void launchScan(IProgressMonitor monitor, String plateToScan, boolean rescanMode)
+        throws Exception {
         monitor.subTask(
             // progress monitor text
             i18n.tr("Launching scan"));
@@ -166,7 +166,7 @@ public class PalletScanManagement {
                     // dialog title
                     i18n.tr("Scan error"),
                     // dialog message
-                    i18n.tr("Plate with barcode {0} is not enabled",plateToScan));
+                    i18n.tr("Plate with barcode {0} is not enabled", plateToScan));
                 return;
             }
             Set<DecodedWell> scanCells = null;
@@ -175,19 +175,19 @@ public class PalletScanManagement {
                 wells = PalletWell.convertArray(scanCells);
             } catch (Exception ex) {
                 BgcPlugin
-                .openAsyncError(
-                    // dialog title
-                    i18n.tr("Scan error"),
-                    ex,
-                    // dialog message
-                    i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
+                    .openAsyncError(
+                        // dialog title
+                        i18n.tr("Scan error"),
+                        ex,
+                        // dialog message
+                        i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
                 return;
             } finally {
                 scansCount++;
                 afterScanBeforeMerge();
             }
         } else {
-            wells = getFakeDecodedWells();
+            wells = getFakeDecodedWells(plateToScan);
             scansCount++;
             afterScanBeforeMerge();
         }
@@ -208,11 +208,11 @@ public class PalletScanManagement {
                             newScannedCell.getValue())) {
                         // Different values at same position
                         oldScannedCell
-                        .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
-                            .getInformation()
-                            : StringUtil.EMPTY_STRING)
-                            + " "
-                            + i18n.tr("Rescanned value is different"));
+                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
+                                .getInformation()
+                                : StringUtil.EMPTY_STRING)
+                                + " "
+                                + i18n.tr("Rescanned value is different"));
                         oldScannedCell.setStatus(CellInfoStatus.ERROR);
                         rescanDifferent = true;
 
@@ -379,7 +379,8 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
+    @SuppressWarnings("unused")
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
         return null;
     }
 

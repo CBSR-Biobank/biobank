@@ -552,8 +552,13 @@ public class LinkFormPatientManagement {
         }
     }
 
+    @SuppressWarnings("nls")
     public List<AliquotedSpecimen> getAuthorizedActiveAliquotedTypes(StudyWrapper study,
         List<SpecimenType> authorizedTypes) throws ApplicationException {
+
+        if (authorizedTypes == null) {
+            throw new NullPointerException("authorizedTypes is null");
+        }
 
         Set<AliquotedSpecimen> aliquotedSpecTypes = SessionManager.getAppService().doAction(
             new StudyGetAliquotedSpecimensAction(study.getId())).getSet();
@@ -561,7 +566,7 @@ public class LinkFormPatientManagement {
         List<AliquotedSpecimen> result = new ArrayList<AliquotedSpecimen>();
         for (AliquotedSpecimen aqSpc : aliquotedSpecTypes) {
             SpecimenType spcType = aqSpc.getSpecimenType();
-            if (authorizedTypes == null || authorizedTypes.contains(spcType)) {
+            if (authorizedTypes.isEmpty() || authorizedTypes.contains(spcType)) {
                 result.add(aqSpc);
             }
         }

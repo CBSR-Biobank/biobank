@@ -691,14 +691,14 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple linking: return fake cells for testing
      */
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
         if (isFakeScanRandom) {
-            return PalletWell.getRandomScanLink();
+            return PalletWell.getRandomScanLink(plateToScan);
         }
         try {
             return PalletWell.getRandomScanLinkWithSpecimensAlreadyLinked(
                 SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId());
+                    .getId(), plateToScan);
         } catch (Exception ex) {
             BgcPlugin.openAsyncError("Fake Scan problem", ex);
         }

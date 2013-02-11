@@ -56,7 +56,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-BgcBaseDialog {
+    BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractScanDialog.class);
 
@@ -70,7 +70,7 @@ BgcBaseDialog {
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n
-    .tr("Processing position {0}");
+        .tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -117,9 +117,9 @@ BgcBaseDialog {
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
                 throws Exception {
-                return AbstractScanDialog.this.getFakeDecodedWells();
+                return AbstractScanDialog.this.getFakeDecodedWells(plateToScan);
             }
 
             @Override
@@ -178,7 +178,7 @@ BgcBaseDialog {
         return rescanMode;
     }
 
-    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells()
+    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
         throws Exception;
 
     protected void processScanResult(IProgressMonitor monitor,
@@ -222,7 +222,7 @@ BgcBaseDialog {
                         cells.put(pos, palletCell);
                     }
                     palletCell
-                    .merge(SessionManager.getAppService(), servercell);
+                        .merge(SessionManager.getAppService(), servercell);
                     specificScanPosProcess(palletCell);
                 }
             }
@@ -296,11 +296,11 @@ BgcBaseDialog {
         createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
         widgetCreator
-        .addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            scanOkValue,
-            i18n.tr("Error in scan result. Please keep only specimens with no errors."),
-            IStatus.ERROR);
+            .addBooleanBinding(
+                new WritableValue(Boolean.FALSE, Boolean.class),
+                scanOkValue,
+                i18n.tr("Error in scan result. Please keep only specimens with no errors."),
+                IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
             i18n.tr("Scan should be launched"), IStatus.ERROR);

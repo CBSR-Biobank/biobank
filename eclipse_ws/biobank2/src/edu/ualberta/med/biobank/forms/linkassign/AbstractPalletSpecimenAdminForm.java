@@ -56,7 +56,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
-AbstractSpecimenAdminForm {
+    AbstractSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -129,9 +129,9 @@ AbstractSpecimenAdminForm {
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
                 throws Exception {
-                return AbstractPalletSpecimenAdminForm.this.getFakeDecodedWells();
+                return AbstractPalletSpecimenAdminForm.this.getFakeDecodedWells(plateToScan);
             }
 
             @Override
@@ -192,7 +192,7 @@ AbstractSpecimenAdminForm {
             }
         };
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-        .addPropertyChangeListener(propertyListener);
+            .addPropertyChangeListener(propertyListener);
 
     }
 
@@ -208,7 +208,7 @@ AbstractSpecimenAdminForm {
     @Override
     public void dispose() {
         ScannerConfigPlugin.getDefault().getPreferenceStore()
-        .removePropertyChangeListener(propertyListener);
+            .removePropertyChangeListener(propertyListener);
         super.dispose();
     }
 
@@ -271,8 +271,8 @@ AbstractSpecimenAdminForm {
     }
 
     protected void launchScanAndProcessResult() {
-        palletScanManagement.launchScanAndProcessResult(plateToScanValue
-            .getValue().toString(), isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScanValue.getValue().toString(),
+            isRescanMode());
         refreshPalletDisplay();
     }
 
@@ -336,7 +336,8 @@ AbstractSpecimenAdminForm {
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
     }
 
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
+    @SuppressWarnings("unused")
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
         return null;
     }
 
@@ -485,8 +486,7 @@ AbstractSpecimenAdminForm {
     }
 
     /**
-     * go through cells retrieved from scan, set status and update the types
-     * combos components
+     * go through cells retrieved from scan, set status and update the types combos components
      */
     @SuppressWarnings("nls")
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
@@ -519,7 +519,7 @@ AbstractSpecimenAdminForm {
                     // TR: progress monitor message
                     i18n.tr("Processing position {0}",
                         palletScanManagement.getContainerType()
-                        .getPositionString(pos)));
+                            .getPositionString(pos)));
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) { // can happened if missing
@@ -568,7 +568,7 @@ AbstractSpecimenAdminForm {
         ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement
-            .initCellsWithContainer(currentMultipleContainer);
+                .initCellsWithContainer(currentMultipleContainer);
         }
     }
 
