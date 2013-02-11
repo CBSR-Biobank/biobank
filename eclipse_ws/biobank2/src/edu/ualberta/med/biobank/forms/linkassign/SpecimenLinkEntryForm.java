@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,7 +37,9 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypesGetForContainerTypesAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
@@ -49,6 +52,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -460,19 +464,25 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private List<SpecimenType> getSpecimenTypeForPalletScannable() throws ApplicationException {
-        List<SpecimenType> result = null;
-        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
-            int rows = PreferenceConstants.gridRows(gridDimensions);
-            int cols = PreferenceConstants.gridCols(gridDimensions);
-            if (result == null) {
-                result = SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
-                    .getAppService(), SessionManager.getUser().getCurrentWorkingSite(), rows,
-                    cols);
-            } else {
-                result.addAll(SpecimenTypeWrapper.getSpecimenTypeForPalletRowsCols(SessionManager
-                    .getAppService(), SessionManager.getUser().getCurrentWorkingSite(), rows, cols));
-            }
+        List<SpecimenType> result = new ArrayList<SpecimenType>();
+
+        SiteWrapper site = SessionManager.getUser().getCurrentWorkingSite();
+        if (site == null) {
+            // scan link being used when working center is a clinic, clinics do not have
+            // container types
+            return result;
         }
+
+        Set<Capacity> capacities = new HashSet<Capacity>();
+        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+            Capacity capacity = new Capacity();
+            capacity.setRowCapacity(PreferenceConstants.gridRows(gridDimensions));
+            capacity.setColCapacity(PreferenceConstants.gridCols(gridDimensions));
+            capacities.add(capacity);
+        }
+        result = SessionManager.getAppService().doAction(
+            new SpecimenTypesGetForContainerTypesAction(site.getWrappedObject(), capacities
+            )).getList();
         return result;
     }
 
@@ -536,11 +546,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
         List<AliquotedSpecimenResInfo> resList =
             SessionManager
-            .getAppService()
-            .doAction(
-                new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
-                    asiList)).getList();
+                .getAppService()
+                .doAction(
+                    new SpecimenLinkSaveAction(SessionManager.getUser().getCurrentWorkingCenter()
+                        .getId(), linkFormPatientManagement.getCurrentPatient().getStudy().getId(),
+                        asiList)).getList();
         printSaveMultipleLogMessage(resList);
     }
 
@@ -565,7 +575,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         appendLog(MessageFormat.format(
             "LINKING: {0} specimens linked to patient {1} on center {2}", resList.size(),
             linkFormPatientManagement.getCurrentPatient().getPnumber(), SessionManager.getUser()
-            .getCurrentWorkingCenter().getNameShort()));
+                .getCurrentWorkingCenter().getNameShort()));
     }
 
     @SuppressWarnings("nls")
@@ -688,7 +698,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         try {
             return PalletWell.getRandomScanLinkWithSpecimensAlreadyLinked(
                 SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingCenter()
-                .getId());
+                    .getId());
         } catch (Exception ex) {
             BgcPlugin.openAsyncError("Fake Scan problem", ex);
         }
@@ -732,7 +742,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            if (typesRows == null)  return;
+                            if (typesRows == null) return;
 
                             if (rowToProcess == null) {
                                 specimenTypesWidget.setCounts(typesRows);
@@ -824,7 +834,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 // if (selection != null) {
                 @SuppressWarnings("unchecked")
                 Map<RowColPos, PalletWell> cells =
-                (Map<RowColPos, PalletWell>) palletWidget.getCells();
+                    (Map<RowColPos, PalletWell>) palletWidget.getCells();
                 if (cells != null) {
                     for (RowColPos rcp : cells.keySet()) {
                         if (rcp.getRow() == event.getRowNumber()) {
