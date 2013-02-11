@@ -37,7 +37,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.LinkFormPatientManagement.CEventComboCallback;
@@ -439,7 +438,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         List<Specimen> availableSourceSpecimens =
             linkFormPatientManagement.getParentSpecimenForPEventAndCEvent();
 
-        if (authorizedTypesInContainers != null) {
+        if (!authorizedTypesInContainers.isEmpty()) {
             // availableSourceSpecimen should be parents of the authorized Types
             // !
             List<Specimen> filteredSpecs = new ArrayList<Specimen>();
@@ -452,11 +451,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
 
         // for single
-        List<AliquotedSpecimen> studiesAliquotedTypes = new ArrayList<AliquotedSpecimen>();
-        for (AliquotedSpecimenWrapper aqWrapper : studiesAliquotedTypes) {
-            studiesAliquotedTypes.add(aqWrapper.getWrappedObject());
-        }
-
         singleTypesWidget.resetValues(true, false);
         singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
         singleTypesWidget.setResultTypes(studiesAliquotedTypes);
