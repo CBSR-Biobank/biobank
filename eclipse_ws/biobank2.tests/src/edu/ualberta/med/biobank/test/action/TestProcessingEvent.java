@@ -10,7 +10,6 @@ import junit.framework.Assert;
 
 import org.hibernate.Transaction;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -19,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -267,55 +265,28 @@ public class TestProcessingEvent extends TestAction {
         Assert.assertNull(spc.getProcessingEvent());
     }
 
-    @Ignore
     @Test
     /*
      * Need way to create aliquoted specimens
      */
     public void deleteWithAliquotedSpecimens() throws Exception {
-        // add cevent and source specimens
-        Integer ceventId = CollectionEventHelper
-            .createCEventWithSourceSpecimens(getExecutor(),
-                provisioning.patientIds.get(0), provisioning.getSite());
-        List<SpecimenInfo> sourceSpecs = exec(
-            new CollectionEventGetSourceSpecimenListInfoAction(ceventId))
-            .getList();
-        Integer spcId = sourceSpecs.get(0).specimen.getId();
+        session.beginTransaction();
+        factory.createCollectionEvent();
+        factory.createParentSpecimen();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+        factory.createChildSpecimen();
+        session.getTransaction().commit();
 
-        // FIXME need to add a child to the source specimen
-
-        // create a processing event with one of the collection event source
-        // specimen.
-        Site site = (Site) session.load(Site.class, provisioning.siteId);
-        Integer pEventId = exec(new ProcessingEventSaveAction(
-            null, site, Utils.getRandomDate(),
-            Utils.getRandomString(50), ActivityStatus.ACTIVE, null,
-            new HashSet<Integer>(Arrays.asList(spcId)),
-            new HashSet<Integer>())).getId();
-
-        Specimen spc = (Specimen) session.load(Specimen.class, spcId);
-        Assert.assertNotNull(spc);
-        Assert.assertNotNull(spc.getProcessingEvent());
-        Assert.assertEquals(pEventId, spc.getProcessingEvent().getId());
-
-        // delete this processing event. Can do it since the specimen has no
-        // children
-        ProcessingEvent pevent = (ProcessingEvent)
-            session.get(ProcessingEvent.class, pEventId);
-        PEventInfo peventInfo =
-            exec(new ProcessingEventGetInfoAction(pevent));
         try {
-            exec(new ProcessingEventDeleteAction(peventInfo.pevent));
-            Assert
-                .fail("one of the source specimen of this pevent has children. "
-                    + "Can't delete the processing event");
+            exec(new ProcessingEventDeleteAction(pevent));
+            Assert.fail("the parent specimen of this pevent has children. "
+                + "Can't delete the processing event");
         } catch (Exception e) {
-            Assert.assertTrue(true);
+            // do nothing
         }
 
-        ProcessingEvent pe =
-            (ProcessingEvent) session.load(ProcessingEvent.class,
-                pEventId);
+        ProcessingEvent pe = (ProcessingEvent) session.load(ProcessingEvent.class,
+            pevent.getId());
         Assert.assertNotNull(pe);
     }
 
