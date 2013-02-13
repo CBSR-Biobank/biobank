@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -20,26 +22,15 @@ public class ClinicGetStudyInfoAction implements
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String CLINIC_STUDIES_HQL =
-        "SELECT studies"
-            + " FROM " + Clinic.class.getName() + " clinic"
-            + " INNER JOIN clinic.originInfos oi"
-            + " INNER JOIN oi.specimens spcs"
-            + " INNER JOIN spcs.collectionEvent cevents"
-            + " INNER JOIN cevents.patient patients"
-            + " INNER JOIN patients.study studies"
-            + " WHERE clinic.id=?";
-
-    @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL =
         "SELECT clinics.id,studies.id,COUNT(DISTINCT patients),"
             + " COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinics"
-            + " INNER JOIN clinics.originInfos oi"
-            + " INNER JOIN oi.specimens spcs"
-            + " INNER JOIN spcs.collectionEvent cevents"
-            + " INNER JOIN cevents.patient patients"
-            + " INNER JOIN patients.study studies"
+            + " LEFT JOIN clinics.originInfos oi"
+            + " LEFT JOIN oi.specimens spcs"
+            + " LEFT JOIN spcs.collectionEvent cevents"
+            + " LEFT JOIN cevents.patient patients"
+            + " LEFT JOIN patients.study studies"
             + " WHERE clinics.id=?"
             + " GROUP BY clinics.id,studies.id";
 
@@ -58,7 +49,7 @@ public class ClinicGetStudyInfoAction implements
         return true;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     @Override
     public ListResult<StudyCountInfo> run(ActionContext context)
         throws ActionException {
@@ -66,15 +57,18 @@ public class ClinicGetStudyInfoAction implements
 
         Map<Integer, Study> studiesById = new HashMap<Integer, Study>();
 
-        Query query = context.getSession().createQuery(CLINIC_STUDIES_HQL);
-        query.setParameter(0, clinicId);
+        List<Study> studies = context.getSession().createCriteria(Study.class, "study")
+            .createAlias("study.contacts", "contacts")
+            .createAlias("contacts.clinic", "clinic")
+            .setFetchMode("contacts", FetchMode.JOIN)
+            .setFetchMode("clinic", FetchMode.JOIN)
+            .add(Restrictions.eq("clinic.id", clinicId)).list();
 
-        List<Study> studies = query.list();
         for (Study study : studies) {
             studiesById.put(study.getId(), study);
         }
 
-        query = context.getSession().createQuery(STUDY_INFO_HQL);
+        Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         query.setParameter(0, clinicId);
 
         List<Object[]> results = query.list();
@@ -82,12 +76,10 @@ public class ClinicGetStudyInfoAction implements
             Study study = studiesById.get(row[1]);
 
             if (study == null) {
-                throw new NullPointerException(
-                    "study not found in query result"); //$NON-NLS-1$
+                throw new NullPointerException("study not found in query result"); //$NON-NLS-1$
             }
 
-            StudyCountInfo info =
-                new StudyCountInfo(study, (Long) row[2], (Long) row[3]);
+            StudyCountInfo info = new StudyCountInfo(study, (Long) row[2], (Long) row[3]);
             infos.add(info);
         }
 

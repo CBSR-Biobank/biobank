@@ -8,13 +8,13 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
 
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.center.CenterGetStudyListAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteA
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.SiteContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.info.SiteInfo;
@@ -47,6 +48,7 @@ import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -371,13 +373,15 @@ public class TestSite extends TestAction {
 
     @Test
     public void delete() {
-        Integer siteId = exec(siteSaveAction).getId();
-        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
-        exec(new SiteDeleteAction(siteInfo.getSite()));
+        session.beginTransaction();
+        Site site = factory.createSite();
+        session.getTransaction().commit();
+
+        exec(new SiteDeleteAction(site));
 
         @SuppressWarnings("unchecked")
-        List<Site> sites = session.createCriteria(Site.class).add(Restrictions.eq("id", siteId))
-        .list();
+        List<Site> sites = session.createCriteria(Site.class)
+            .add(Restrictions.eq("id", site.getId())).list();
         Assert.assertEquals(0, sites.size());
     }
 
@@ -474,17 +478,17 @@ public class TestSite extends TestAction {
         Integer peventId = exec(new ProcessingEventSaveAction(
             null, site, Utils.getRandomDate(), Utils.getRandomString(5,
                 8), ActivityStatus.ACTIVE, null,
-                new HashSet<Integer>(
-                    Arrays.asList(sourceSpecs.get(0).specimen.getId())),
-                    new HashSet<Integer>()))
-                    .getId();
+            new HashSet<Integer>(
+                Arrays.asList(sourceSpecs.get(0).specimen.getId())),
+            new HashSet<Integer>()))
+            .getId();
 
         SiteInfo siteInfo =
             exec(new SiteGetInfoAction(provisioning.siteId));
         try {
             exec(new SiteDeleteAction(siteInfo.getSite()));
             Assert
-            .fail(
+                .fail(
                 "should not be allowed to delete a site with processing events");
         } catch (ConstraintViolationException e) {
             Assert.assertTrue(true);
@@ -549,7 +553,7 @@ public class TestSite extends TestAction {
 
     @Test
     public void getStudyInfo() throws Exception {
-        Transaction tx = session.beginTransaction();
+        session.beginTransaction();
         factory.createSite();
         factory.getDefaultSite().getStudies().add(factory.createStudy());
         Set<Patient> patients = new HashSet<Patient>();
@@ -561,11 +565,11 @@ public class TestSite extends TestAction {
                 cevents.add(factory.createCollectionEvent());
             }
         }
-        tx.commit();
+        session.getTransaction().commit();
 
         List<StudyCountInfo> studyCountInfos =
             exec(new SiteGetStudyInfoAction(factory.getDefaultSite().getId()))
-            .getList();
+                .getList();
         Assert.assertEquals(1, studyCountInfos.size());
 
         StudyCountInfo studyCountInfo = studyCountInfos.get(0);
@@ -576,5 +580,56 @@ public class TestSite extends TestAction {
             .getCollectionEventCount().intValue());
         Assert.assertEquals(patients.size(), studyCountInfo.getPatientCount()
             .intValue());
+    }
+
+    @Test
+    public void getStudyList() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        Set<Study> studies = new HashSet<Study>();
+        Set<Study> studies2 = new HashSet<Study>();
+
+        studies.add(factory.createStudy());
+        studies.add(factory.createStudy());
+        studies2.add(factory.getDefaultStudy());
+        studies.add(factory.createStudy());
+
+        site.getStudies().addAll(studies);
+        session.getTransaction().commit();
+
+        List<Study> actionStudies = exec(new CenterGetStudyListAction(site)).getList();
+
+        Assert.assertEquals(studies.size(), actionStudies.size());
+        Assert.assertTrue(actionStudies.containsAll(studies));
+
+        session.beginTransaction();
+        Site site2 = factory.createSite();
+        site2.getStudies().addAll(studies2);
+        session.getTransaction().commit();
+
+        actionStudies = exec(new CenterGetStudyListAction(site2)).getList();
+        Assert.assertEquals(studies2.size(), actionStudies.size());
+        Assert.assertTrue(actionStudies.containsAll(studies2));
+
+        session.beginTransaction();
+        site.getStudies().remove(factory.getDefaultStudy());
+        session.getTransaction().commit();
+
+        actionStudies = exec(new CenterGetStudyListAction(site)).getList();
+        Assert.assertEquals(studies.size() - 1, actionStudies.size());
+    }
+
+    @Test
+    public void getStudyListSiteNull() {
+        // do not persist this site -> do not commit this transaction
+        session.beginTransaction();
+        Site site = factory.createSite();
+
+        try {
+            exec(new CenterGetStudyListAction(site)).getList();
+            Assert.fail("cannot call action for site not yet saved to DB");
+        } catch (ActionException e) {
+            // do nothing
+        }
     }
 }

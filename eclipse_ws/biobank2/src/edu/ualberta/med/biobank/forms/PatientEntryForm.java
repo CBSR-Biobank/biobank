@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.HasCreatedAt;
 import edu.ualberta.med.biobank.model.Patient;
@@ -48,19 +49,19 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-    "edu.ualberta.med.biobank.forms.PatientEntryForm";
+        "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
     @SuppressWarnings("nls")
     private static final String CREATED_AT_BINDING =
-    "patient-created-at-binding";
+        "patient-created-at-binding";
 
     @SuppressWarnings("nls")
     public static final String MSG_NEW_PATIENT_OK =
-    "Creating a new patient record.";
+        "Creating a new patient record.";
 
     @SuppressWarnings("nls")
     public static final String MSG_PATIENT_OK =
-    "Editing an existing patient record.";
+        "Editing an existing patient record.";
 
     private ComboViewer studiesViewer;
 
@@ -72,9 +73,9 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     private final NonEmptyStringValidator pnumberNonEmptyValidator =
-    new NonEmptyStringValidator(
-        // validation error message.
-        i18n.tr("Patient must have a patient number"));
+        new NonEmptyStringValidator(
+            // validation error message.
+            i18n.tr("Patient must have a patient number"));
 
     private PatientInfo patientInfo;
 
@@ -139,9 +140,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        Center center = SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject();
         List<Study> studies = SessionManager.getAppService().doAction(
-            new CenterGetStudyListAction(SessionManager.getUser().getCurrentWorkingCenter()))
-            .getList();
+            new CenterGetStudyListAction(center)).getList();
         Study selectedStudy = null;
         if (patientInfo == null) {
             if (studies.size() == 1) {
@@ -157,13 +158,13 @@ public class PatientEntryForm extends BiobankEntryForm {
             // validation error message.
             i18n.tr("A study should be selected"),
             new ComboSelectionUpdate() {
-            @Override
-            public void doSelection(Object selectedObject) {
-                patient.setStudy(new StudyWrapper(
-                    SessionManager.getAppService(),
-                    (Study) selectedObject));
-            }
-        });
+                @Override
+                public void doSelection(Object selectedObject) {
+                    patient.setStudy(new StudyWrapper(
+                        SessionManager.getAppService(),
+                        (Study) selectedObject));
+                }
+            });
         studiesViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {

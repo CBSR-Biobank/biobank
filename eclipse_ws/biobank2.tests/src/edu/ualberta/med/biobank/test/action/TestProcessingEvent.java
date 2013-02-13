@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimenListInfoAction;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimensAction;
 import edu.ualberta.med.biobank.common.action.exception.ModelNotFoundException;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
@@ -37,6 +39,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -266,9 +269,100 @@ public class TestProcessingEvent extends TestAction {
     }
 
     @Test
-    /*
-     * Need way to create aliquoted specimens
-     */
+    public void getCeventSouceSpecimenInfoEmpty() {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        List<SpecimenInfo> specimenData = exec(
+            new CollectionEventGetSourceSpecimenListInfoAction(cevent.getId())).getList();
+        Assert.assertEquals(0, specimenData.size());
+    }
+
+    @Test
+    public void getCeventSouceSpecimenInfo() {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        Set<Specimen> specimens = new HashSet<Specimen>();
+        specimens.add(factory.createParentSpecimen());
+        specimens.add(factory.createParentSpecimen());
+        specimens.add(factory.createParentSpecimen());
+        session.getTransaction().commit();
+
+        List<SpecimenInfo> specimensData = exec(
+            new CollectionEventGetSourceSpecimenListInfoAction(cevent.getId())).getList();
+        Assert.assertEquals(specimens.size(), specimensData.size());
+
+        for (SpecimenInfo spcInfo : specimensData) {
+            Assert.assertTrue(specimens.contains(spcInfo.specimen));
+        }
+    }
+
+    @Test
+    public void getCeventSouceSpecimensEmpty() {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+        session.getTransaction().commit();
+
+        List<Specimen> specimens = exec(
+            new CollectionEventGetSourceSpecimensAction(cevent, pevent)).getList();
+        Assert.assertEquals(0, specimens.size());
+    }
+
+    @Test
+    public void getCeventSouceSpecimen() {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        Set<Specimen> childSpecimens = new HashSet<Specimen>();
+
+        for (int i = 0; i < 3; ++i) {
+            parentSpecimens.add(factory.createParentSpecimen());
+            childSpecimens.add(factory.createChildSpecimen());
+        }
+        session.getTransaction().commit();
+
+        List<Specimen> specimens = exec(
+            new CollectionEventGetSourceSpecimensAction(cevent, pevent)).getList();
+        Assert.assertEquals(parentSpecimens.size(), specimens.size());
+        Assert.assertTrue(specimens.containsAll(parentSpecimens));
+    }
+
+    @Test
+    public void getCeventSouceSpecimenWithFlagged() {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        ProcessingEvent pevent = factory.createProcessingEvent();
+
+        Set<Specimen> parentSpecimens = new HashSet<Specimen>();
+        Set<Specimen> childSpecimens = new HashSet<Specimen>();
+
+        // set the second parent specimen to have a FLAGGED activity status
+        for (int i = 0; i < 3; ++i) {
+            Specimen parentSpecimen = factory.createParentSpecimen();
+            if (i == 2) {
+                parentSpecimen.setActivityStatus(ActivityStatus.FLAGGED);
+            }
+
+            parentSpecimens.add(parentSpecimen);
+            childSpecimens.add(factory.createChildSpecimen());
+        }
+        session.getTransaction().commit();
+
+        List<Specimen> specimens = exec(
+            new CollectionEventGetSourceSpecimensAction(cevent, pevent, true)).getList();
+        Assert.assertEquals(parentSpecimens.size() - 1, specimens.size());
+
+        for (Specimen parentSpecimen : parentSpecimens) {
+            if (parentSpecimen.getActivityStatus() == ActivityStatus.FLAGGED) continue;
+            Assert.assertTrue(specimens.contains(parentSpecimen));
+        }
+    }
+
+    @Test
     public void deleteWithAliquotedSpecimens() throws Exception {
         session.beginTransaction();
         factory.createCollectionEvent();

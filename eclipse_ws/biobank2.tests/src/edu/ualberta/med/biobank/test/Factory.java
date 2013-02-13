@@ -46,9 +46,8 @@ import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
 
 /**
- * Tries to make setting up test data easier by requiring the absolute minimum
- * amount of data and remembering the last created object and using that as a
- * default for other objects.
+ * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
+ * remembering the last created object and using that as a default for other objects.
  * 
  * @author Jonathan Ferland
  * 
@@ -108,8 +107,8 @@ public class Factory {
 
     /**
      * Made this public so that it can be used by other helpers. For example
-     * {@link SpecimenBatchOpPojoHelper} uses this to generate strings used as values
-     * for attributes.
+     * {@link SpecimenBatchOpPojoHelper} uses this to generate strings used as values for
+     * attributes.
      */
     public NameGenerator getNameGenerator() {
         return nameGenerator;
@@ -839,8 +838,7 @@ public class Factory {
         pevent.getSpecimens().add(childSpecimen);
 
         childSpecimen.setQuantity(getDefaultAliquotedSpecimen().getVolume());
-        parentSpecimen.getCollectionEvent().getAllSpecimens()
-        .add(childSpecimen);
+        parentSpecimen.getCollectionEvent().getAllSpecimens().add(childSpecimen);
 
         session.save(childSpecimen);
         session.flush();

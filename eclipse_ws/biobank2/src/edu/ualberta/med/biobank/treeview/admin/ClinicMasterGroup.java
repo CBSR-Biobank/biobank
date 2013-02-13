@@ -14,12 +14,12 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction.ClinicsInfo;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicCreatePermission;
 import edu.ualberta.med.biobank.common.permission.clinic.ClinicReadPermission;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 
@@ -31,7 +31,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
     private static BgcLogger LOGGER = BgcLogger
         .getLogger(ClinicMasterGroup.class.getName());
 
-    private ClinicsInfo clinicsInfo = null;
+    private List<Clinic> clinics = null;
 
     private final boolean createAllowed;
 
@@ -76,11 +76,11 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         throws Exception {
         if (!readAllowed) return null;
 
-        clinicsInfo = SessionManager.getAppService().doAction(
-            new ClinicGetAllAction());
+        clinics = SessionManager.getAppService().doAction(
+            new ClinicGetAllAction()).getList();
 
         return ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-            clinicsInfo.getClinics(), ClinicWrapper.class);
+            clinics, ClinicWrapper.class);
     }
 
     public void addClinic() {

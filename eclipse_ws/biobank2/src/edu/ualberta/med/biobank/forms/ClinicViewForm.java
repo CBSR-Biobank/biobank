@@ -94,9 +94,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         Assert.isNotNull(clinicInfo.clinic);
         clinic.setWrappedObject(clinicInfo.clinic);
 
-        studyCountInfo =
-            SessionManager.getAppService().doAction(
-                new ClinicGetStudyInfoAction(adapter.getId())).getList();
+        studyCountInfo = SessionManager.getAppService().doAction(
+            new ClinicGetStudyInfoAction(adapter.getId())).getList();
     }
 
     @SuppressWarnings("nls")
@@ -180,44 +179,32 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createStudiesSection() {
-        Composite client =
-            createSectionWithClient(Study.NAME.format(2).toString());
+        Composite client = createSectionWithClient(Study.NAME.format(2).toString());
 
         studiesTable = new ClinicStudyInfoTable(client, studyCountInfo);
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
-        studiesTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
-
-                @Override
-                public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
-                    Study s =
-                        ((StudyCountInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getStudy();
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new StudyAdapter(null,
-                                new StudyWrapper(SessionManager
-                                    .getAppService(), s))),
-                        StudyViewForm.ID);
-                }
-            });
-        studiesTable
-            .addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
-                @Override
-                public void editItem(InfoTableEvent<StudyCountInfo> event) {
-                    Study s =
-                        ((StudyCountInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getStudy();
-                    AdapterBase.openForm(
-                        new FormInput(
-                            new StudyAdapter(null,
-                                new StudyWrapper(SessionManager
-                                    .getAppService(), s))),
-                        StudyEntryForm.ID);
-                }
-            });
+        studiesTable.addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
+            @Override
+            public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection) event
+                    .getSelection()).getObject()).getStudy();
+                AdapterBase.openForm(new FormInput(new StudyAdapter(null,
+                    new StudyWrapper(SessionManager.getAppService(), s))),
+                    StudyViewForm.ID);
+            }
+        });
+        studiesTable.addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
+            @Override
+            public void editItem(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection) event
+                    .getSelection()).getObject()).getStudy();
+                AdapterBase.openForm(new FormInput(new StudyAdapter(null,
+                    new StudyWrapper(SessionManager.getAppService(), s))),
+                    StudyEntryForm.ID);
+            }
+        });
     }
 
     @SuppressWarnings("nls")

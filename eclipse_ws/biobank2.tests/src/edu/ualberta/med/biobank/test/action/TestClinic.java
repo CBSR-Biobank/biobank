@@ -1,26 +1,32 @@
 package edu.ualberta.med.biobank.test.action;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
+import edu.ualberta.med.biobank.common.action.center.CenterGetStudyListAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicDeleteAction;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
+import edu.ualberta.med.biobank.common.action.clinic.ContactsGetAllAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.ClinicHelper;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
@@ -87,6 +93,20 @@ public class TestClinic extends TestAction {
         Assert.assertEquals(1, clinicInfo.studyInfos.size());
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getAllAction() {
+        // ensure at least one clinic in the DB
+        session.beginTransaction();
+        factory.createClinic();
+        session.getTransaction().commit();
+
+        List<Clinic> expectedClinics = session.createCriteria(Clinic.class).list();
+        List<Clinic> actionClinics = exec(new ClinicGetAllAction()).getList();
+        Assert.assertEquals(expectedClinics, actionClinics);
+
+    }
+
     @Test
     public void comments() {
         // save with no comments
@@ -115,74 +135,95 @@ public class TestClinic extends TestAction {
         return exec(new ClinicGetInfoAction(clinicId));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
-    public void contacts() throws Exception {
-        Set<ContactSaveInfo> contactsAll = new HashSet<ContactSaveInfo>();
-        Set<ContactSaveInfo> set1 = new HashSet<ContactSaveInfo>();
-        Set<ContactSaveInfo> set2 = new HashSet<ContactSaveInfo>();
+    public void getInfoActionContacts() throws Exception {
+        Set<Contact> contactsAll = new HashSet<Contact>();
+        Set<Set<Contact>> contactSets = new HashSet<Set<Contact>>();
+        Set<Contact> set1 = new HashSet<Contact>();
+        Set<Contact> set2 = new HashSet<Contact>();
+        contactSets.add(set1);
+        contactSets.add(set2);
 
-        for (int i = 0; i < 10; ++i) {
-            ContactSaveInfo contactSaveInfo = new ContactSaveInfo();
-            contactSaveInfo.name = name + "_contact" + i;
-
-            contactsAll.add(contactSaveInfo);
-            if (i < 5) {
-                set1.add(contactSaveInfo);
-            } else {
-                set2.add(contactSaveInfo);
+        session.beginTransaction();
+        Clinic clinic = factory.createClinic();
+        for (Set<Contact> contactSet : contactSets) {
+            for (int i = 0; i < 5; ++i) {
+                Contact contact = factory.createContact();
+                contactsAll.add(contact);
+                contactSet.add(contact);
             }
         }
+        clinic.getContacts().addAll(contactsAll);
+        session.getTransaction().commit();
 
-        clinicSaveAction.setContactSaveInfos(contactsAll);
-        Integer clinicId = exec(clinicSaveAction).getId();
-
-        ClinicInfo clinicInfo =
-            exec(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(getContactNamesFromSaveInfo(contactsAll),
-            getContactNames(clinicInfo.contacts));
+        ClinicInfo clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
+        Assert.assertEquals(contactsAll.size(), clinicInfo.contacts.size());
+        Assert.assertTrue(clinicInfo.contacts.containsAll(contactsAll));
 
         // remove Set 2 from the clinic, Set 1 should be left
-        clinicSaveAction =
-            ClinicHelper.getSaveAction(clinicInfo);
-        clinicSaveAction.setContactSaveInfos(set1);
-        exec(clinicSaveAction);
+        session.beginTransaction();
+        for (Contact contact : set2) {
+            session.delete(contact);
+        }
+        clinic.getContacts().removeAll(set2);
+        session.update(clinic);
+        session.getTransaction().commit();
 
-        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
-        Assert.assertEquals(getContactNamesFromSaveInfo(set1),
-            getContactNames(clinicInfo.contacts));
+        clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
+        Assert.assertEquals(set1.size(), clinicInfo.contacts.size());
+        Assert.assertTrue(clinicInfo.contacts.containsAll(set1));
 
         // remove all
-        clinicSaveAction =
-            ClinicHelper.getSaveAction(clinicInfo);
-        clinicSaveAction.setContactSaveInfos(new HashSet<ContactSaveInfo>());
-        exec(clinicSaveAction);
+        session.beginTransaction();
+        for (Contact contact : set1) {
+            session.delete(contact);
+        }
+        clinic.getContacts().removeAll(set1);
+        session.update(clinic);
+        session.getTransaction().commit();
+        session.clear();
 
-        clinicInfo = exec(new ClinicGetInfoAction(clinicId));
-        Assert.assertTrue(clinicInfo.contacts.isEmpty());
+        clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
+        Assert.assertEquals(0, clinicInfo.contacts.size());
 
         // check that this clinic no longer has any contacts
-        Query q = session.createQuery("SELECT COUNT(*) FROM "
-            + Contact.class.getName()
-            + " ct WHERE ct.clinic.id=?");
-        q.setParameter(0, clinicId);
-        Assert.assertTrue(HibernateUtil.getCountFromQuery(q).equals(0L));
+        List<Contact> contacts = session.createCriteria(Contact.class)
+            .add(Restrictions.eq("clinic.id", clinic.getId())).list();
+        Assert.assertEquals(0, contacts.size());
     }
 
-    private Set<String> getContactNamesFromSaveInfo(
-        Collection<ContactSaveInfo> contactSaveInfos) {
-        Set<String> result = new HashSet<String>();
-        for (ContactSaveInfo contactSaveInfo : contactSaveInfos) {
-            result.add(contactSaveInfo.name);
-        }
-        return result;
-    }
+    @SuppressWarnings("unchecked")
+    @Test
+    public void contactsGetAll() throws Exception {
+        List<Contact> contactsBeforeTest = session.createCriteria(Contact.class).list();
 
-    private Set<String> getContactNames(Collection<Contact> contacts) {
-        Set<String> result = new HashSet<String>();
-        for (Contact contact : contacts) {
-            result.add(contact.getName());
+        Set<Clinic> clinics = new HashSet<Clinic>();
+        Set<Contact> contacts = new HashSet<Contact>();
+        session.beginTransaction();
+        for (int i = 0; i < 3; ++i) {
+            Clinic clinic = factory.createClinic();
+            for (int j = 0; j < 2; ++j) {
+                Contact contact = factory.createContact();
+                clinic.getContacts().add(contact);
+                contacts.add(contact);
+            }
+            clinics.add(clinic);
         }
-        return result;
+        session.getTransaction().commit();
+
+        List<Contact> actionContacts = exec(new ContactsGetAllAction()).getList();
+        Assert.assertEquals(contactsBeforeTest.size() + contacts.size(), actionContacts.size());
+        Assert.assertTrue(actionContacts.containsAll(contacts));
+
+        // remove all clinics
+        session.beginTransaction();
+        for (Clinic clinic : clinics) {
+            session.delete(clinic);
+        }
+        session.getTransaction().commit();
+        Assert.assertEquals(contactsBeforeTest.size(),
+            session.createCriteria(Contact.class).list().size());
     }
 
     @Test
@@ -200,5 +241,50 @@ public class TestClinic extends TestAction {
         Long result = HibernateUtil.getCountFromQuery(q);
 
         Assert.assertTrue(result.equals(0L));
+    }
+
+    @Test
+    public void getStudyList() {
+        session.beginTransaction();
+        Clinic clinic = factory.createClinic();
+        Set<Study> studies = new HashSet<Study>();
+
+        for (int i = 0; i < 3; ++i) {
+            Study study = factory.createStudy();
+            Contact contact = factory.createContact();
+            contact.getStudies().add(study);
+            study.getContacts().add(contact);
+            studies.add(study);
+            clinic.getContacts().add(contact);
+        }
+        session.getTransaction().commit();
+
+        List<Study> actionStudies = exec(new CenterGetStudyListAction(clinic)).getList();
+
+        Assert.assertEquals(studies.size(), actionStudies.size());
+        Assert.assertTrue(actionStudies.containsAll(studies));
+
+        // remove last study from contacts
+        session.beginTransaction();
+        Study study = factory.getDefaultStudy();
+        Contact contact = study.getContacts().iterator().next();
+        contact.getStudies().remove(study);
+        study.getContacts().remove(contact);
+        session.update(contact);
+        session.update(study);
+        session.getTransaction().commit();
+
+        actionStudies = exec(new CenterGetStudyListAction(clinic)).getList();
+        Assert.assertEquals(studies.size() - 1, actionStudies.size());
+    }
+
+    @Test
+    public void getStudyInfoNoStudies() {
+        session.beginTransaction();
+        Clinic clinic = factory.createClinic();
+        session.getTransaction().commit();
+
+        exec(new ClinicGetStudyInfoAction(clinic.getId()));
+
     }
 }

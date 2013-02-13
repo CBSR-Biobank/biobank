@@ -20,8 +20,7 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
 
     @SuppressWarnings("nls")
     private static final String CLINIC_INFO_HQL =
-        "SELECT DISTINCT clinic"
-            + " FROM " + Clinic.class.getName() + " clinic"
+        " FROM " + Clinic.class.getName() + " clinic"
             + " INNER JOIN FETCH clinic.address"
             + " LEFT JOIN FETCH clinic.contacts contacts"
             + " LEFT JOIN FETCH clinic.comments comments"

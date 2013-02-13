@@ -12,9 +12,6 @@ public abstract class CenterDeleteAction implements Action<EmptyResult> {
     protected final Integer centerId;
 
     public CenterDeleteAction(Center center) {
-        if (center == null) {
-            throw new IllegalArgumentException();
-        }
         this.centerId = center.getId();
     }
 
