@@ -21,6 +21,8 @@ public class TestDb extends BaseTest {
 
     static {
         SESSION_PROVIDER = new SessionProvider(Mode.RUN);
+        // SESSION_PROVIDER = new SessionProvider(Mode.DEBUG);
+
         GLOBAL_ADMIN = getOrCreateSuperUser();
     }
 
@@ -63,8 +65,8 @@ public class TestDb extends BaseTest {
         // check if user already exists
         @SuppressWarnings("unchecked")
         List<User> users = session.createCriteria(User.class)
-        .add(Restrictions.eq("login", GLOBAL_ADMIN_LOGIN))
-        .list();
+            .add(Restrictions.eq("login", GLOBAL_ADMIN_LOGIN))
+            .list();
 
         if (users.size() >= 1) return users.get(0);
 

@@ -3,7 +3,10 @@ package edu.ualberta.med.biobank.common.action.container;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +14,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -25,25 +26,13 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
     private static Logger log = LoggerFactory.getLogger(ContainerGetParentsByChildLabelAction.class
         .getName());
 
-    @SuppressWarnings("nls")
-    private static final String POSSIBLE_PARENTS_BASE_QRY = "SELECT DISTINCT(c) FROM "
-        + Container.class.getName() + " c" + " LEFT JOIN c.containerType.childContainerTypes ct"
-        + " WHERE c.site.id=? AND c.label in (";
-
-    @SuppressWarnings("nls")
-    private static final String POS_LABEL_LEN_QRY = "SELECT MIN(minChars), MAX(maxChars) FROM "
-        + ContainerLabelingScheme.class.getName();
-
-    @SuppressWarnings("nls")
-    private static final String CONTAINER_TYPE_APPEND_QRY = " AND ctype.id=?";
-
     private final String childLabel;
 
     private final Integer containerTypeId;
 
     private final Integer siteId;
 
-    private ActionContext context;
+    private Session session;
 
     /**
      * 
@@ -52,7 +41,8 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
      * @param containerType optional
      */
     @SuppressWarnings("nls")
-    public ContainerGetParentsByChildLabelAction(String label, Site site, ContainerType containerType) {
+    public ContainerGetParentsByChildLabelAction(String label, Site site,
+        ContainerType containerType) {
         log.debug("containerId={}", label);
         if (label == null) {
             throw new IllegalArgumentException();
@@ -70,6 +60,10 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         }
     }
 
+    public ContainerGetParentsByChildLabelAction(String label, Site site) {
+        this(label, site, null);
+    }
+
     @SuppressWarnings("nls")
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
@@ -78,98 +72,92 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         return result;
     }
 
-    @SuppressWarnings({ "nls", "unchecked" })
+    @SuppressWarnings("nls")
     @Override
     public ListResult<Container> run(ActionContext context) throws ActionException {
-        this.context = context;
         log.debug("run: containerId={} containerTypeId={}", childLabel, containerTypeId);
-
-        StringBuffer queryStrBuf = new StringBuffer();
-        queryStrBuf.append(CONTAINER_INFO_BASE_HQL);
-        if (containerTypeId != null) {
-            queryStrBuf.append(CONTAINER_TYPE_APPEND_QRY);
-        } else {
-            queryStrBuf.append(SITE_APPEND_QRY);
+        this.session = context.getSession();
+        List<Container> containers = getPossibleParents();
+        for (Container container : containers) {
+            container.getParentContainer().getContainerType().getChildLabelingScheme().getMaxRows();
+            container.getChildPositions().size();
+            container.getSpecimenPositions().size();
+            container.getContainerType().getSpecimenTypes().size();
+            for (ContainerType ctype : container.getContainerType().getChildContainerTypes()) {
+                ctype.getSpecimenTypes().size();
+            }
         }
-
-        Query query = context.getSession().createQuery(queryStrBuf.toString());
-        query.setParameter(0, childLabel);
-        query.setParameter(1, childLabel.substring(0, childLabel.length() - 2));
-        if (containerTypeId != null) {
-            query.setParameter(2, containerTypeId);
-        } else {
-            query.setParameter(2, siteId);
-        }
-        return new ListResult<Container>(query.list());
+        return new ListResult<Container>(containers);
     }
 
     /**
-     * Get containers with a given label that can have a child (container or
-     * specimen) with label 'childLabel'. If child is not null and is a
-     * container, then will check that the parent can contain this type of
-     * container
-     * 
-     * @param type if the child is a container, this is its type (if available)
-     * @throws BiobankException
+     * Get containers with a given label that can have a child (container or specimen) with label
+     * 'childLabel'. If child is not null and is a container, then will check that the parent can
+     * contain this type of container
      */
     @SuppressWarnings("nls")
-    private List<Container> getPossibleParents(ActionContext context) {
-        List<Integer> validLengths = getPossibleLabelLength(context);
-        List<String> validParents = new ArrayList<String>();
+    private List<Container> getPossibleParents() {
+        List<Integer> minMaxLengths = getMinMaxLabelLengths();
+        if (minMaxLengths.size() != 2) {
+            throw new IllegalStateException("invalid size in list");
+        }
 
-        for (Integer crop : validLengths) {
-            if (crop < childLabel.length()) {
-                validParents.add(new StringBuilder("'")
-                .append(childLabel.substring(0, childLabel.length() - crop)).append("'")
-                .toString());
-            }
+        List<String> possibleParentLabels = new ArrayList<String>();
+        int childLabelLength = childLabel.length();
+        for (int i = minMaxLengths.get(0), n = minMaxLengths.get(1); i <= n; ++i) {
+            if (i >= childLabelLength) break;
+            possibleParentLabels.add(childLabel.substring(0, childLabelLength - i));
         }
 
         List<Container> filteredContainers = new ArrayList<Container>();
-        if (validParents.size() > 0) {
-            List<Object> params = new ArrayList<Object>();
-            params.add(siteId);
-            StringBuilder parentQuery = new StringBuilder(POSSIBLE_PARENTS_BASE_QRY)
-            .append(StringUtil.join(validParents, ",")).append(")");
-            if (containerTypeId != null) {
-                parentQuery.append(" AND ct.id=?");
-                params.add(containerTypeId);
-            }
+        if (possibleParentLabels.isEmpty()) {
+            return filteredContainers;
+        }
 
-            Query query = context.getSession().createQuery(parentQuery.toString());
+        Criteria criteria = session.createCriteria(Container.class, "container")
+            .add(Restrictions.in("container.label", possibleParentLabels))
+            .add(Restrictions.eq("container.site.id", siteId));
+        if (containerTypeId != null) {
+            criteria.createAlias("container.containerType", "ctype");
+            criteria.add(Restrictions.eq("ctype.id", containerTypeId));
+        }
 
-            int paramCount = 0;
-            for (Object param : params) {
-                query.setParameter(paramCount, param);
-            }
-
-            @SuppressWarnings("unchecked")
-            List<Container> containers = query.list();
-            for (Container c : containers) {
-                ContainerType ct = c.getContainerType();
-                try {
-                    if (ct.getRowColFromPositionString(childLabel.substring(c.getLabel().length())) != null)
-                        filteredContainers.add(c);
-                } catch (Exception e) {
-                    // can't throw an exception: it means that this label is not
-                    // possible in this parent.
-                    // Maybe the next one in the list is ok
+        @SuppressWarnings("unchecked")
+        List<Container> containers = criteria.list();
+        for (Container c : containers) {
+            ContainerType ct = c.getContainerType();
+            try {
+                if (ct.getRowColFromPositionString(childLabel.substring(c.getLabel().length())) != null) {
+                    filteredContainers.add(c);
                 }
+            } catch (Exception e) {
+                // an exception means that this label is not possible for this container.
+                // Maybe the next one in the list is ok
             }
         }
         return filteredContainers;
     }
 
-    @SuppressWarnings("nls")
-    private List<Integer> getPossibleLabelLength(ActionContext context) {
-        Query query = context.getSession().createQuery(POS_LABEL_LEN_QRY);
+    @SuppressWarnings({ "nls", "unchecked" })
+    private List<Integer> getMinMaxLabelLengths() {
+        List<Object[]> minMax = session.createCriteria(ContainerLabelingScheme.class)
+            .setProjection(Projections.projectionList()
+                .add(Projections.min("minChars"))
+                .add(Projections.max("maxChars"))).list();
 
-        Object[] minMax = (Object[]) query.list().get(0);
-        List<Integer> validLengths = new ArrayList<Integer>();
-        for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {
-            validLengths.add(i);
+        // String POS_LABEL_LEN_QRY =
+        // "select min(minChars), max(maxChars) from "
+        // + ContainerLabelingScheme.class.getName();
+        // List<Object[]> minMax = session.createQuery(POS_LABEL_LEN_QRY).list();
+
+        if (minMax.isEmpty()) {
+            throw new IllegalStateException("could not get values from container labeling schemes");
         }
-        return validLengths;
-    }
 
+        List<Integer> possibleLengths = new ArrayList<Integer>();
+        for (Object obj : minMax.get(0)) {
+            possibleLengths.add((Integer) obj);
+        }
+        return possibleLengths;
+    }
 }

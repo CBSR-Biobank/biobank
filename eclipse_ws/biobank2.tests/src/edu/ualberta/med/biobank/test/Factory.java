@@ -427,6 +427,9 @@ public class Factory {
     }
 
     public Capacity getDefaultCapacity() {
+        if (defaultCapacity == null) {
+            defaultCapacity = createCapacity(); 
+        }
         return defaultCapacity;
     }
 
@@ -492,6 +495,13 @@ public class Factory {
 
     public void setDefaultShippingMethod(ShippingMethod shippingMethod) {
         this.defaultShippingMethod = shippingMethod;
+    }
+    
+    public Capacity createCapacity() {
+        Capacity capacity = new Capacity();
+        capacity.setRowCapacity(8);
+        capacity.setRowCapacity(12);
+        return capacity;
     }
 
     public Comment createComment() {
@@ -713,13 +723,13 @@ public class Factory {
 
         Container container = new Container();
         container.setSite(getDefaultSite());
-        if (!getDefaultTopContainerType().getSite().equals(
-            container.getSite())) {
+        if (!getDefaultTopContainerType().getSite().equals(container.getSite())) {
             // make sure sites match
             createTopContainerType();
         }
 
-        // FIXME: why assign to a top container type here?
+        // initialise container type to something for now, it is assigned the correct
+        // value below
         container.setContainerType(getDefaultTopContainerType());
         container.setLabel(label);
         container.setTopContainer(container);
@@ -1196,15 +1206,13 @@ public class Factory {
 
     public class ContainerLabelingSchemeGetter {
         public ContainerLabelingScheme getSbs() {
-            return (ContainerLabelingScheme) session
-                .createCriteria(ContainerLabelingScheme.class)
+            return (ContainerLabelingScheme) session.createCriteria(ContainerLabelingScheme.class)
                 .add(Restrictions.idEq(1))
                 .uniqueResult();
         }
 
         public ContainerLabelingScheme get2CharAlphabetic() {
-            return (ContainerLabelingScheme) session
-                .createCriteria(ContainerLabelingScheme.class)
+            return (ContainerLabelingScheme) session.createCriteria(ContainerLabelingScheme.class)
                 .add(Restrictions.idEq(6))
                 .uniqueResult();
         }

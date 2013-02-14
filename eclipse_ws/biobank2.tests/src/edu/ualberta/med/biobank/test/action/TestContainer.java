@@ -11,6 +11,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetParentsByChildLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -64,7 +65,7 @@ public class TestContainer extends TestAction {
 
         ContainerLabelingScheme labeling = (ContainerLabelingScheme)
             session.createCriteria(ContainerLabelingScheme.class)
-            .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
+                .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
 
         Capacity capacity = new Capacity();
         capacity.setRowCapacity(4);
@@ -138,7 +139,7 @@ public class TestContainer extends TestAction {
 
         ContainerLabelingScheme labeling = (ContainerLabelingScheme)
             session.createCriteria(ContainerLabelingScheme.class)
-            .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
+                .add(Restrictions.eq("name", "SBS Standard")).uniqueResult();
 
         Capacity capacity = new Capacity();
         capacity.setRowCapacity(4);
@@ -206,7 +207,7 @@ public class TestContainer extends TestAction {
 
             // check the path
             Assert
-            .assertEquals(expectedL2Path, containerInfo.container.getPath());
+                .assertEquals(expectedL2Path, containerInfo.container.getPath());
         }
     }
 
@@ -226,7 +227,7 @@ public class TestContainer extends TestAction {
             exec(new ContainerMoveAction(child1Container, topContainer2,
                 topContainer2.getLabel() + "A1"));
             Assert
-            .fail("should not be allowed to move a containers to occupied spot");
+                .fail("should not be allowed to move a containers to occupied spot");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
@@ -250,11 +251,56 @@ public class TestContainer extends TestAction {
             // use default labeling scheme
             exec(new ContainerMoveAction(childContainer, topContainerS2,
                 topContainerS2.getLabel() + "A1"));
-            Assert
-            .fail("should not be allowed to move containers between sites");
+            Assert.fail("should not be allowed to move containers between sites");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
+    }
+
+    /**
+     * Containers of different types can have the same labels
+     */
+    @Test
+    public void getParentsByChildLabelSingleContainer() {
+        session.beginTransaction();
+        factory.createTopContainerType();
+        Container topContainer = factory.createTopContainer();
+        topContainer.setLabel("C01");
+        factory.createContainerType();
+        Container childContainer = factory.createContainer();
+        childContainer.setLabel("C01A1");
+        session.getTransaction().commit();
+
+        List<Container> containers = exec(new ContainerGetParentsByChildLabelAction(
+            childContainer.getLabel() + "A1", childContainer.getSite(),
+            childContainer.getContainerType())).getList();
+
+        Assert.assertEquals(1, containers.size());
+    }
+
+    /**
+     * Containers of different types can have the same labels
+     */
+    @Test
+    public void getParentsByChildLabelMultipleContainers() {
+        session.beginTransaction();
+        Container topContainer = factory.createTopContainer();
+        topContainer.setLabel("C02");
+        Container childContainer = factory.createContainer();
+        childContainer.setLabel("C02A1");
+
+        factory.createTopContainerType();
+        Container topContainer2 = factory.createTopContainer();
+        topContainer2.setLabel("C02");
+        factory.createContainerType();
+        Container childContainer2 = factory.createContainer();
+        childContainer2.setLabel("C02A1");
+        session.getTransaction().commit();
+
+        List<Container> containers = exec(new ContainerGetParentsByChildLabelAction(
+            childContainer.getLabel() + "A1", childContainer.getSite())).getList();
+
+        Assert.assertEquals(2, containers.size());
     }
 }
