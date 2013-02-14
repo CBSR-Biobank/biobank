@@ -129,8 +129,9 @@ public class SelectClinicContactDialog extends BgcBaseDialog {
 
     protected void filterContacts(Clinic clinic) {
         Collection<Contact> clinicContacts = clinic.getContacts();
-        for (Contact contact : excludedContacts)
+        for (Contact contact : excludedContacts) {
             clinicContacts.remove(contact);
+        }
         contactInfoTable.setList(new ArrayList<Contact>(clinicContacts));
     }
 

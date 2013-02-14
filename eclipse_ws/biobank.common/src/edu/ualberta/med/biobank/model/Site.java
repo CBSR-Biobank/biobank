@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -22,11 +23,10 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
  * 
  * ET: The laboratory hosting the storage facilities
  * 
- * caTissue Term - Site: A physical location involved in biospecimen collection,
- * storage, processing, or utilization.
+ * caTissue Term - Site: A physical location involved in biospecimen collection, storage,
+ * processing, or utilization.
  * 
- * NCI Term - Repository: A facility where things can be deposited for storage
- * or safekeeping.
+ * NCI Term - Repository: A facility where things can be deposited for storage or safekeeping.
  */
 @Entity
 @DiscriminatorValue("Site")
@@ -80,4 +80,12 @@ public class Site extends Center {
         this.containers = containers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transient
+    public Set<Study> getStudiesInternal() {
+        return getStudies();
+    }
 }

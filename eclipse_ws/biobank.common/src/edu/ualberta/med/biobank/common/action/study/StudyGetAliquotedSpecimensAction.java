@@ -14,16 +14,15 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Study;
 
 public class StudyGetAliquotedSpecimensAction implements
-    Action<SetResult<AliquotedSpecimen>> {
+Action<SetResult<AliquotedSpecimen>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
     private static final String SELECT_ALIQUOTED_SPCS_HQL =
-        "SELECT srcspc"
-            + " FROM " + AliquotedSpecimen.class.getName() + " srcspc"
-            + " INNER JOIN FETCH srcspc.specimenType specimenType"
-            // + " LEFT JOIN FETCH specimenType.childSpecimenTypes"
-            + " WHERE srcspc.study.id = ?";
+    "SELECT aqspc"
+        + " FROM " + AliquotedSpecimen.class.getName() + " aqspc"
+        + " INNER JOIN FETCH aqspc.specimenType specimenType"
+        + " WHERE aqspc.study.id = ?";
 
     private final Integer studyId;
 

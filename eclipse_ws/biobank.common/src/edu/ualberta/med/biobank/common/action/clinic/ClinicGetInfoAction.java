@@ -85,9 +85,8 @@ public class ClinicGetInfoAction implements Action<ClinicInfo> {
         public Clinic clinic;
         public Long patientCount;
         public Long collectionEventCount;
-        public List<Contact> contacts = new ArrayList<Contact>();
-        public List<StudyCountInfo> studyInfos =
-            new ArrayList<StudyCountInfo>();
+        public List<Contact> contacts = new ArrayList<Contact>(0);
+        public List<StudyCountInfo> studyInfos = new ArrayList<StudyCountInfo>(0);
     }
 
 }

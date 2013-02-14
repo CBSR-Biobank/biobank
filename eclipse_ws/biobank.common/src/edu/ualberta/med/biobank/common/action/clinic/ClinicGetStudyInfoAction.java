@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.FetchMode;
 import org.hibernate.Query;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -20,26 +23,15 @@ public class ClinicGetStudyInfoAction implements
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String CLINIC_STUDIES_HQL =
-        "SELECT studies"
-            + " FROM " + Clinic.class.getName() + " clinic"
-            + " INNER JOIN clinic.originInfos oi"
-            + " INNER JOIN oi.specimens spcs"
-            + " INNER JOIN spcs.collectionEvent cevents"
-            + " INNER JOIN cevents.patient patients"
-            + " INNER JOIN patients.study studies"
-            + " WHERE clinic.id=?";
-
-    @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL =
-        "SELECT clinics.id,studies.id,COUNT(DISTINCT patients),"
+        "SELECT clinics.id,studies,COUNT(DISTINCT patients),"
             + " COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinics"
-            + " INNER JOIN clinics.originInfos oi"
-            + " INNER JOIN oi.specimens spcs"
-            + " INNER JOIN spcs.collectionEvent cevents"
-            + " INNER JOIN cevents.patient patients"
-            + " INNER JOIN patients.study studies"
+            + " LEFT JOIN clinics.originInfos oi"
+            + " LEFT JOIN oi.specimens spcs"
+            + " LEFT JOIN spcs.collectionEvent cevents"
+            + " LEFT JOIN cevents.patient patients"
+            + " LEFT JOIN patients.study studies"
             + " WHERE clinics.id=?"
             + " GROUP BY clinics.id,studies.id";
 
@@ -58,39 +50,45 @@ public class ClinicGetStudyInfoAction implements
         return true;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nls" })
     @Override
     public ListResult<StudyCountInfo> run(ActionContext context)
         throws ActionException {
-        ArrayList<StudyCountInfo> infos = new ArrayList<StudyCountInfo>();
+        List<Study> studies = context.getSession().createCriteria(Study.class, "study")
+            .createAlias("study.contacts", "contacts")
+            .createAlias("contacts.clinic", "clinic")
+            .setFetchMode("contacts", FetchMode.JOIN)
+            .setFetchMode("clinic", FetchMode.JOIN)
+            .add(Restrictions.eq("clinic.id", clinicId)).list();
 
-        Map<Integer, Study> studiesById = new HashMap<Integer, Study>();
-
-        Query query = context.getSession().createQuery(CLINIC_STUDIES_HQL);
-        query.setParameter(0, clinicId);
-
-        List<Study> studies = query.list();
+        Set<Study> studiesForClinic = new HashSet<Study>();
         for (Study study : studies) {
-            studiesById.put(study.getId(), study);
+            studiesForClinic.add(study);
         }
 
-        query = context.getSession().createQuery(STUDY_INFO_HQL);
+        Map<Study, StudyCountInfo> countInfoById = new HashMap<Study, StudyCountInfo>();
+
+        Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         query.setParameter(0, clinicId);
 
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-            Study study = studiesById.get(row[1]);
+            if (row[1] == null) continue;
 
-            if (study == null) {
-                throw new NullPointerException(
-                    "study not found in query result"); //$NON-NLS-1$
+            Study study = (Study) row[1];
+            if (!studiesForClinic.contains(study)) {
+                throw new IllegalStateException("study not associated with clinic");
             }
-
-            StudyCountInfo info =
-                new StudyCountInfo(study, (Long) row[2], (Long) row[3]);
-            infos.add(info);
+            countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
         }
 
-        return new ListResult<StudyCountInfo>(infos);
+        // set counts for studies with no patients and collection events
+        for (Study study : studiesForClinic) {
+            if (!countInfoById.containsKey(study)) {
+                countInfoById.put(study, new StudyCountInfo(study, 0L, 0L));
+            }
+        }
+
+        return new ListResult<StudyCountInfo>(countInfoById.values());
     }
 }

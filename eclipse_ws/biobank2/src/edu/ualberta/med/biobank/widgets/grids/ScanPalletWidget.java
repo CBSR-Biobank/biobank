@@ -26,16 +26,15 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
     }
 
     public boolean isEverythingTyped() {
-        if (cells != null) {
-            for (AbstractUIWell cell : cells.values()) {
-                PalletWell pCell = (PalletWell) cell;
-                if (PalletWell.hasValue(pCell) && pCell.getType() == null) {
-                    return false;
-                }
+        if (cells == null)  return false;
+
+        for (AbstractUIWell cell : cells.values()) {
+            PalletWell pCell = (PalletWell) cell;
+            if (PalletWell.hasValue(pCell) && pCell.getType() == null) {
+                return false;
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     @Override

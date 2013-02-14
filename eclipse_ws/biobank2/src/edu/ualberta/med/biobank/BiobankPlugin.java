@@ -32,6 +32,7 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
+import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.ExceptionHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
@@ -94,39 +95,25 @@ public class BiobankPlugin extends AbstractUIPlugin {
     private static Map<String, String> classToImageKey;
     static {
         classToImageKey = new HashMap<String, String>();
-        classToImageKey.put(SessionAdapter.class.getName(),
-            BgcPlugin.IMG_SESSIONS);
+        classToImageKey.put(SessionAdapter.class.getName(), BgcPlugin.IMG_SESSIONS);
         classToImageKey.put(SiteAdapter.class.getName(), BgcPlugin.IMG_SITE);
         classToImageKey.put(SiteGroup.class.getName(), BgcPlugin.IMG_SITES);
-        classToImageKey.put(AbstractClinicGroup.class.getName(),
-            BgcPlugin.IMG_CLINICS);
-        classToImageKey.put(AbstractStudyGroup.class.getName(),
-            BgcPlugin.IMG_STUDIES);
-        classToImageKey.put(ContainerTypeGroup.class.getName(),
-            BgcPlugin.IMG_CONTAINER_TYPES);
-        classToImageKey.put(ContainerGroup.class.getName(),
-            BgcPlugin.IMG_CONTAINERS);
-        classToImageKey
-            .put(ClinicAdapter.class.getName(), BgcPlugin.IMG_CLINIC);
+        classToImageKey.put(AbstractClinicGroup.class.getName(), BgcPlugin.IMG_CLINICS);
+        classToImageKey.put(AbstractStudyGroup.class.getName(), BgcPlugin.IMG_STUDIES);
+        classToImageKey.put(ContainerTypeGroup.class.getName(), BgcPlugin.IMG_CONTAINER_TYPES);
+        classToImageKey.put(ContainerGroup.class.getName(), BgcPlugin.IMG_CONTAINERS);
+        classToImageKey.put(ClinicAdapter.class.getName(), BgcPlugin.IMG_CLINIC);
         classToImageKey.put(StudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
-        classToImageKey.put(NewStudyAdapter.class.getName(),
-            BgcPlugin.IMG_STUDY);
-        classToImageKey.put(PatientAdapter.class.getName(),
-            BgcPlugin.IMG_PATIENT);
-        classToImageKey.put(CollectionEventAdapter.class.getName(),
-            BgcPlugin.IMG_COLLECTION_EVENT);
-        classToImageKey.put(ShipmentAdapter.class.getName(),
-            BgcPlugin.IMG_CLINIC_SHIPMENT);
-        classToImageKey.put(AbstractSearchedNode.class.getName(),
-            BgcPlugin.IMG_SEARCH);
-        classToImageKey.put(NewAbstractSearchedNode.class.getName(),
-            BgcPlugin.IMG_SEARCH);
-        classToImageKey.put(AbstractTodayNode.class.getName(),
-            BgcPlugin.IMG_TODAY);
+        classToImageKey.put(NewStudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
+        classToImageKey.put(PatientAdapter.class.getName(), BgcPlugin.IMG_PATIENT);
+        classToImageKey.put(CollectionEventAdapter.class.getName(), BgcPlugin.IMG_COLLECTION_EVENT);
+        classToImageKey.put(ShipmentAdapter.class.getName(), BgcPlugin.IMG_CLINIC_SHIPMENT);
+        classToImageKey.put(AbstractSearchedNode.class.getName(), BgcPlugin.IMG_SEARCH);
+        classToImageKey.put(NewAbstractSearchedNode.class.getName(), BgcPlugin.IMG_SEARCH);
+        classToImageKey.put(AbstractTodayNode.class.getName(), BgcPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(), BgcPlugin.IMG_CALENDAR);
         classToImageKey.put(OutgoingNode.class.getName(), BgcPlugin.IMG_SENT);
-        classToImageKey.put(IncomingNode.class.getName(),
-            BgcPlugin.IMG_RECEIVED);
+        classToImageKey.put(IncomingNode.class.getName(), BgcPlugin.IMG_RECEIVED);
         classToImageKey.put(InCreationDispatchGroup.class.getName(),
             BgcPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
         classToImageKey.put(ReceivingInTransitDispatchGroup.class.getName(),
@@ -137,33 +124,24 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BgcPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
         classToImageKey.put(ReceivingWithErrorsDispatchGroup.class.getName(),
             BgcPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
-        classToImageKey.put(DispatchAdapter.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT);
-        classToImageKey.put(DispatchCenterAdapter.class.getName(),
-            BgcPlugin.IMG_SITE);
-        classToImageKey.put(ReceivingRequestGroup.class.getName(),
-            BgcPlugin.IMG_REQUEST_SHIPPED);
-        classToImageKey.put(RequestAdapter.class.getName(),
-            BgcPlugin.IMG_REQUEST);
-        classToImageKey.put(SpecimenAdapter.class.getName(),
-            BgcPlugin.IMG_SPECIMEN);
-        classToImageKey.put(ProcessingEventAdapter.class.getName(),
-            BgcPlugin.IMG_PROCESSING_EVENT);
-        classToImageKey.put(ProcessingEventGroup.class.getName(),
-            BgcPlugin.IMG_PROCESSING);
-        classToImageKey.put(ResearchGroupAdapter.class.getName(),
-            BgcPlugin.IMG_RESEARCH_GROUP);
-        classToImageKey.put(ResearchGroupMasterGroup.class.getName(),
-            BgcPlugin.IMG_RESEARCH_GROUPS);
+        classToImageKey.put(DispatchAdapter.class.getName(), BgcPlugin.IMG_DISPATCH_SHIPMENT);
+        classToImageKey.put(DispatchCenterAdapter.class.getName(), BgcPlugin.IMG_SITE);
+        classToImageKey.put(ReceivingRequestGroup.class.getName(), BgcPlugin.IMG_REQUEST_SHIPPED);
+        classToImageKey.put(RequestAdapter.class.getName(), BgcPlugin.IMG_REQUEST);
+        classToImageKey.put(SpecimenAdapter.class.getName(), BgcPlugin.IMG_SPECIMEN);
+        classToImageKey.put(ProcessingEventAdapter.class.getName(), BgcPlugin.IMG_PROCESSING_EVENT);
+        classToImageKey.put(ProcessingEventGroup.class.getName(), BgcPlugin.IMG_PROCESSING);
+        classToImageKey.put(ResearchGroupAdapter.class.getName(), BgcPlugin.IMG_RESEARCH_GROUP);
+        classToImageKey
+        .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.IMG_RESEARCH_GROUPS);
     };
 
-    private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
-        BgcPlugin.IMG_BIN, BgcPlugin.IMG_BOX, BgcPlugin.IMG_CABINET,
-        BgcPlugin.IMG_DRAWER, BgcPlugin.IMG_FREEZER, BgcPlugin.IMG_HOTEL,
-        BgcPlugin.IMG_PALLET, };
+    private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] { BgcPlugin.IMG_BIN,
+        BgcPlugin.IMG_BOX, BgcPlugin.IMG_CABINET, BgcPlugin.IMG_DRAWER, BgcPlugin.IMG_FREEZER,
+        BgcPlugin.IMG_HOTEL, BgcPlugin.IMG_PALLET, };
 
-    public static final String BARCODES_FILE = BiobankPlugin.class.getPackage()
-        .getName() + ".barcode"; //$NON-NLS-1$
+    public static final String BARCODES_FILE = BiobankPlugin.class.getPackage().getName()
+        + ".barcode"; //$NON-NLS-1$
 
     // The shared instance
     private static BiobankPlugin plugin;
@@ -196,8 +174,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         // There will also have to be a perspective manager?
         // TODO: FormManager is pretty specific to eclipse, take out of mvp
         // plugin?
-        FormManagerPresenter formManagerPresenter = injector
-            .getInstance(FormManagerPresenter.class);
+        FormManagerPresenter formManagerPresenter =
+            injector.getInstance(FormManagerPresenter.class);
         formManagerPresenter.bind();
 
         injector.getInstance(ExceptionDisplay.class);
@@ -214,15 +192,12 @@ public class BiobankPlugin extends AbstractUIPlugin {
         @Override
         public void onException(ExceptionEvent event) {
             Throwable t = event.getThrowable();
-            Shell shell = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell();
+            Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
             IStatus status =
                 new Status(IStatus.ERROR, Application.PLUGIN_ID, IStatus.OK,
                     i18n.tr("Exception found."), t.getCause());
-            ErrorDialog.openError(shell, i18n.tr("Error"),
-                t.getLocalizedMessage(),
-                status);
+            ErrorDialog.openError(shell, i18n.tr("Error"), t.getLocalizedMessage(), status);
 
             t.printStackTrace();
         }
@@ -269,28 +244,23 @@ public class BiobankPlugin extends AbstractUIPlugin {
     }
 
     public boolean windowTitleShowVersionEnabled() {
-        return getPreferenceStore().getBoolean(
-            PreferenceConstants.GENERAL_SHOW_VERSION);
+        return getPreferenceStore().getBoolean(PreferenceConstants.GENERAL_SHOW_VERSION);
     }
 
     public boolean isCancelBarcode(String code) {
-        return getPreferenceStore().getString(
-            PreferenceConstants.GENERAL_CANCEL).equals(code);
+        return getPreferenceStore().getString(PreferenceConstants.GENERAL_CANCEL).equals(code);
     }
 
     public boolean isConfirmBarcode(String code) {
-        return getPreferenceStore().getString(
-            PreferenceConstants.GENERAL_CONFIRM).equals(code);
+        return getPreferenceStore().getString(PreferenceConstants.GENERAL_CONFIRM).equals(code);
     }
 
     public int getPlateNumber(String barcode) {
-        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode,
-            isRealScanEnabled());
+        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode, isRealScanEnabled());
     }
 
     public List<String> getPossibleBarcodes() {
-        return ScannerConfigPlugin.getDefault().getPossibleBarcodes(
-            isRealScanEnabled());
+        return ScannerConfigPlugin.getDefault().getPossibleBarcodes(isRealScanEnabled());
     }
 
     public static int getPlatesEnabledCount() {
@@ -303,24 +273,21 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public static String getActivityLogPath() {
         IPreferenceStore store = getDefault().getPreferenceStore();
-        boolean logToFile = store
-            .getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE);
+        boolean logToFile =
+            store.getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE);
         if (logToFile) {
-            return store
-                .getString(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
+            return store.getString(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
         }
         return null;
     }
 
     public static boolean isAskPrintActivityLog() {
         IPreferenceStore store = getDefault().getPreferenceStore();
-        return store
-            .getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT);
+        return store.getBoolean(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT);
     }
 
     public static boolean isRealScanEnabled() {
-        String realScan = Platform.getDebugOption(BiobankPlugin.PLUGIN_ID
-            + "/realScan"); //$NON-NLS-1$
+        String realScan = Platform.getDebugOption(BiobankPlugin.PLUGIN_ID + "/realScan"); //$NON-NLS-1$
         if (realScan != null) {
             return Boolean.valueOf(realScan);
         }
@@ -329,12 +296,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     public Image getImage(Object object) {
         String imageKey = null;
-        if (object == null)
-            return null;
+        if (object == null) return null;
         if (object instanceof AbstractAdapterBase) {
             Class<?> objectClass = object.getClass();
-            while (imageKey == null
-                && !objectClass.equals(AbstractAdapterBase.class)) {
+            while (imageKey == null && !objectClass.equals(AbstractAdapterBase.class)) {
                 imageKey = classToImageKey.get(objectClass.getName());
                 objectClass = objectClass.getSuperclass();
             }
@@ -343,11 +308,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 String ctName;
                 if (object instanceof ContainerAdapter) {
                     ContainerWrapper container =
-                        (ContainerWrapper) ((ContainerAdapter) object)
-                            .getModelObject();
-                    if (container == null
-                        || container.getContainerType() == null)
-                        return null;
+                        (ContainerWrapper) ((ContainerAdapter) object).getModelObject();
+                    if (container == null || container.getContainerType() == null) return null;
                     ctName = container.getContainerType().getName();
                 } else {
                     ctName = ((ContainerTypeAdapter) object).getLabel();
@@ -371,8 +333,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
             return null;
         }
         if (classToImageKey.containsKey(typeName)) {
-            return BgcPlugin.getDefault().getImageRegistry()
-                .get(classToImageKey.get(typeName));
+            return BgcPlugin.getDefault().getImageRegistry().get(classToImageKey.get(typeName));
         }
 
         String imageKey = null;
@@ -383,8 +344,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
             }
         }
 
-        if (imageKey == null)
-            imageKey = BgcPlugin.IMG_FREEZER;
+        if (imageKey == null) imageKey = BgcPlugin.IMG_FREEZER;
 
         classToImageKey.put(typeName, imageKey);
         return BgcPlugin.getDefault().getImageRegistry().get(imageKey);
@@ -396,8 +356,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * @param selection
      */
     public void updateHeapStatus(boolean selection) {
-        for (IWorkbenchWindow window : PlatformUI.getWorkbench()
-            .getWorkbenchWindows()) {
+        for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
             if (window instanceof WorkbenchWindow) {
                 ((WorkbenchWindow) window).showHeapStatus(selection);
             }
@@ -405,12 +364,30 @@ public class BiobankPlugin extends AbstractUIPlugin {
     }
 
     public static UserState getSessionStateSourceProvider() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        return (UserState) service
-            .getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
+        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ISourceProviderService service =
+            (ISourceProviderService) window.getService(ISourceProviderService.class);
+        return (UserState) service.getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
+    }
+
+    /**
+     * Returns a position object if {@link plateString} corresponds to a plate
+     * number defined in the preferences. Returns null if plateString is not
+     * found in the preferences.
+     */
+    public RowColPos getGridDimensions(String plateString) {
+        int plateNumber = getPlateNumber(plateString);
+
+        if (plateNumber < 0) return null;
+
+        String gridDimensions =
+            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
+
+        if (gridDimensions.isEmpty()) return null;
+
+        return new RowColPos(
+            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.gridRows(gridDimensions),
+            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.gridCols(gridDimensions));
     }
 
 }

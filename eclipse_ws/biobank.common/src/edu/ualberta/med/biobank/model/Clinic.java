@@ -9,6 +9,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
@@ -18,12 +19,10 @@ import edu.ualberta.med.biobank.validator.constraint.NotUsed;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 
 /**
- * A collection site that collects biospecimens and transports them to a
- * repository site. Biospecimens are collected from patients that are
- * participating in a study.
+ * A collection site that collects biospecimens and transports them to a repository site.
+ * Biospecimens are collected from patients that are participating in a study.
  * 
- * NCI Term: Collecting laboratory. The laboratory that collects specimens from
- * a study subject.
+ * NCI Term: Collecting laboratory. The laboratory that collects specimens from a study subject.
  */
 @Entity
 @DiscriminatorValue("Clinic")
@@ -68,5 +67,19 @@ public class Clinic extends Center {
 
     public void setContacts(Set<Contact> contacts) {
         this.contacts = contacts;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transient
+    public Set<Study> getStudiesInternal() {
+        // the same study could be associated with one or more contacts
+        Set<Study> studies = new HashSet<Study>(0);
+        for (Contact contact : getContacts()) {
+            studies.addAll(contact.getStudies());
+        }
+        return studies;
     }
 }

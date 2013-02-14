@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
@@ -29,21 +30,23 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetSourceSpecimensAction;
+import edu.ualberta.med.biobank.common.action.study.StudyGetAliquotedSpecimensAction;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -129,7 +132,7 @@ public class LinkFormPatientManagement {
             }
         });
         patientNumberText
-        .addKeyListener(specimenAdminForm.textFieldKeyListener);
+            .addKeyListener(specimenAdminForm.textFieldKeyListener);
         setFirstControl();
     }
 
@@ -268,17 +271,17 @@ public class LinkFormPatientManagement {
                 if (!SessionManager.getUser().getCurrentWorkingCenter()
                     .getStudyCollection().contains(currentPatient.getStudy())) {
                     BgcPlugin
-                    .openError(
-                        // TR: dialog title
-                        i18n.tr("Patient search error"),
-                        // TR: dialog message
-                        i18n.tr(
-                            "Patient {0} has been found but it is linked to the study {1}. The center {2} is not working with this study.",
-                            currentPatient.getPnumber(),
-                            currentPatient.getStudy().getNameShort(),
-                            SessionManager.getUser()
-                            .getCurrentWorkingCenter()
-                            .getNameShort()));
+                        .openError(
+                            // TR: dialog title
+                            i18n.tr("Patient search error"),
+                            // TR: dialog message
+                            i18n.tr(
+                                "Patient {0} has been found but it is linked to the study {1}. The center {2} is not working with this study.",
+                                currentPatient.getPnumber(),
+                                currentPatient.getStudy().getNameShort(),
+                                SessionManager.getUser()
+                                    .getCurrentWorkingCenter()
+                                    .getNameShort()));
                     currentPatient = null;
                 } else {
                     specimenAdminForm.appendLog("--------");
@@ -317,7 +320,7 @@ public class LinkFormPatientManagement {
     @SuppressWarnings("nls")
     public void setCurrentPatientPEventCEvent(PatientWrapper patient,
         ProcessingEventWrapper pEvent, CollectionEventWrapper cEvent)
-            throws Exception {
+        throws Exception {
         patient.reload();
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
@@ -397,17 +400,17 @@ public class LinkFormPatientManagement {
                                 .getUser().getCurrentWorkingCenter());
                     } catch (ApplicationException e) {
                         BgcPlugin
-                        .openAsyncError(
-                            // TR: dialog title
-                            i18n.tr("Problem retrieving processing events"),
-                            e);
+                            .openAsyncError(
+                                // TR: dialog title
+                                i18n.tr("Problem retrieving processing events"),
+                                e);
                     }
                 else
                     collection =
-                    currentPatient
-                    .getProcessingEventCollection(SessionManager
-                        .getUser().getCurrentWorkingCenter()
-                        , true);
+                        currentPatient
+                            .getProcessingEventCollection(SessionManager
+                                .getUser().getCurrentWorkingCenter()
+                                , true);
                 viewerProcessingEvents.setInput(collection);
                 viewerProcessingEvents.getCombo().setFocus();
                 if (collection != null && collection.size() == 1) {
@@ -437,18 +440,18 @@ public class LinkFormPatientManagement {
                 try {
                     collection =
                         currentPEventSelected
-                        .getCollectionEventFromSpecimensAndPatient(currentPatient);
+                            .getCollectionEventFromSpecimensAndPatient(currentPatient);
                 } catch (ApplicationException e) {
                     BgcPlugin
-                    .openAsyncError(
-                        // TR: dialog title
-                        i18n.tr("Problem retrieving collection events"),
-                        e);
+                        .openAsyncError(
+                            // TR: dialog title
+                            i18n.tr("Problem retrieving collection events"),
+                            e);
                 }
                 viewerCollectionEvents.setInput(collection);
                 if (collection != null && collection.size() == 1) {
                     viewerCollectionEvents
-                    .setSelection(new StructuredSelection(collection.get(0)));
+                        .setSelection(new StructuredSelection(collection.get(0)));
                     currentCEventSelected = collection.get(0);
                     cEventComboCallback.selectionChanged();
                 } else {
@@ -466,24 +469,26 @@ public class LinkFormPatientManagement {
     }
 
     @SuppressWarnings("nls")
-    protected List<SpecimenWrapper> getParentSpecimenForPEventAndCEvent() {
+    protected List<Specimen> getParentSpecimenForPEventAndCEvent() {
         if (currentCEventSelected == null || currentPEventSelected == null)
             return Collections.emptyList();
-        List<SpecimenWrapper> specs;
+        List<Specimen> specs;
         try {
-            specs = currentCEventSelected
-                .getSourceSpecimenCollectionInProcessNotFlagged(
-                    currentPEventSelected, true);
+            specs = SessionManager.getAppService().doAction(
+                new CollectionEventGetSourceSpecimensAction(
+                    currentCEventSelected.getWrappedObject(),
+                    currentPEventSelected.getWrappedObject(),
+                    true)).getList();
             if (specs.size() == 0) {
                 BgcPlugin
-                .openAsyncError(
-                    // TR: dialog title
-                    i18n.tr("Source specimens error"),
-                    // TR: dialog message
-                    i18n.tr("No source specimen of this collection event has been declared in a processing event."));
+                    .openAsyncError(
+                        // TR: dialog title
+                        i18n.tr("Source specimens error"),
+                        // TR: dialog message
+                        i18n.tr("No source specimen of this collection event has been declared in a processing event."));
             }
         } catch (ApplicationException e) {
-            specs = new ArrayList<SpecimenWrapper>();
+            specs = new ArrayList<Specimen>();
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Problem retrieveing source specimens"),
@@ -496,10 +501,10 @@ public class LinkFormPatientManagement {
      * get the list of aliquoted specimen type the study wants and that the container authorized
      */
     @SuppressWarnings("nls")
-    public List<AliquotedSpecimenWrapper> getStudyAliquotedTypes(
-        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
-        if (currentPatient == null)
-            return Collections.emptyList();
+    public List<AliquotedSpecimen> getStudyAliquotedTypes(
+        List<SpecimenType> authorizedSpecimenTypesInContainer) {
+        if (currentPatient == null) return Collections.emptyList();
+
         StudyWrapper study = currentPatient.getStudy();
         try {
             // need to reload study to avoid performance problem when using
@@ -512,18 +517,17 @@ public class LinkFormPatientManagement {
                 i18n.tr("Problem reloading study"), e);
         }
 
-        List<AliquotedSpecimenWrapper> studiesAliquotedTypes;
+        List<AliquotedSpecimen> studiesAliquotedTypes;
         try {
-            studiesAliquotedTypes =
-                study
-                .getAuthorizedActiveAliquotedTypes(authorizedSpecimenTypesInContainer);
+            studiesAliquotedTypes = getAuthorizedActiveAliquotedTypes(
+                study, authorizedSpecimenTypesInContainer);
+
             if (studiesAliquotedTypes.size() == 0) {
                 // TR: study name short
                 String studyNameShort = i18n.tr("unknown");
                 if (getCurrentPatient() != null)
                     studyNameShort = study.getNameShort();
-                BgcPlugin
-                .openAsyncError(
+                BgcPlugin.openAsyncError(
                     // TR: dialog title
                     i18n.tr("No specimen types"),
                     // TR: dialog message
@@ -532,7 +536,7 @@ public class LinkFormPatientManagement {
                         studyNameShort));
             }
         } catch (ApplicationException e) {
-            studiesAliquotedTypes = new ArrayList<AliquotedSpecimenWrapper>();
+            studiesAliquotedTypes = new ArrayList<AliquotedSpecimen>();
             BgcPlugin.openAsyncError(
                 // TR: dialog title
                 i18n.tr("Error retrieving available types"), e);
@@ -546,5 +550,26 @@ public class LinkFormPatientManagement {
         } else {
             pEventListCheckSelection = pEventListCheck.getSelection();
         }
+    }
+
+    @SuppressWarnings("nls")
+    public List<AliquotedSpecimen> getAuthorizedActiveAliquotedTypes(StudyWrapper study,
+        List<SpecimenType> authorizedTypes) throws ApplicationException {
+
+        if (authorizedTypes == null) {
+            throw new NullPointerException("authorizedTypes is null");
+        }
+
+        Set<AliquotedSpecimen> aliquotedSpecTypes = SessionManager.getAppService().doAction(
+            new StudyGetAliquotedSpecimensAction(study.getId())).getSet();
+
+        List<AliquotedSpecimen> result = new ArrayList<AliquotedSpecimen>();
+        for (AliquotedSpecimen aqSpc : aliquotedSpecTypes) {
+            SpecimenType spcType = aqSpc.getSpecimenType();
+            if (authorizedTypes.isEmpty() || authorizedTypes.contains(spcType)) {
+                result.add(aqSpc);
+            }
+        }
+        return result;
     }
 }

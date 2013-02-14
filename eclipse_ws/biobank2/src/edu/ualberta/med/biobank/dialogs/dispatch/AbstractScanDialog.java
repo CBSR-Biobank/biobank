@@ -53,12 +53,10 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-BgcBaseDialog {
+    BgcBaseDialog {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractScanDialog.class);
 
@@ -72,7 +70,7 @@ BgcBaseDialog {
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n
-    .tr("Processing position {0}");
+        .tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -95,6 +93,9 @@ BgcBaseDialog {
 
     protected CenterWrapper<?> currentSite;
 
+    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
+        RowColPos.COLS_DEFAULT);
+
     public AbstractScanDialog(Shell parentShell, final T currentShipment,
         CenterWrapper<?> currentSite) {
         super(parentShell);
@@ -116,9 +117,9 @@ BgcBaseDialog {
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeDecodedWells()
+            protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
                 throws Exception {
-                return AbstractScanDialog.this.getFakeDecodedWells();
+                return AbstractScanDialog.this.getFakeDecodedWells(plateToScan);
             }
 
             @Override
@@ -177,7 +178,7 @@ BgcBaseDialog {
         return rescanMode;
     }
 
-    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells()
+    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
         throws Exception;
 
     protected void processScanResult(IProgressMonitor monitor,
@@ -221,7 +222,7 @@ BgcBaseDialog {
                         cells.put(pos, palletCell);
                     }
                     palletCell
-                    .merge(SessionManager.getAppService(), servercell);
+                        .merge(SessionManager.getAppService(), servercell);
                     specificScanPosProcess(palletCell);
                 }
             }
@@ -268,22 +269,13 @@ BgcBaseDialog {
         plateToScanText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                int rows;
-                int cols;
-                int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
-                if (plateNumber == -1) {
-                    rows = RowColPos.ROWS_DEFAULT;
-                    cols = RowColPos.COLS_DEFAULT;
+                if (checkGridDimensionsChanged()) {
+                    spw.dispose();
+                    createScanPalletWidget(contents, currentGridDimensions.getRow(),
+                        currentGridDimensions.getCol());
+                    initializeBounds();
+                    contents.layout(true, true);
                 }
-                else {
-                    String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                    rows = PreferenceConstants.gridRows(gridDimensions);
-                    cols = PreferenceConstants.gridCols(gridDimensions);
-                }
-                spw.dispose();
-                createScanPalletWidget(contents, rows, cols);
-                initializeBounds();
-                contents.layout(true, true);
             }
         });
 
@@ -304,11 +296,11 @@ BgcBaseDialog {
         createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
         widgetCreator
-        .addBooleanBinding(
-            new WritableValue(Boolean.FALSE, Boolean.class),
-            scanOkValue,
-            i18n.tr("Error in scan result. Please keep only specimens with no errors."),
-            IStatus.ERROR);
+            .addBooleanBinding(
+                new WritableValue(Boolean.FALSE, Boolean.class),
+                scanOkValue,
+                i18n.tr("Error in scan result. Please keep only specimens with no errors."),
+                IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
             i18n.tr("Scan should be launched"), IStatus.ERROR);
@@ -520,5 +512,22 @@ BgcBaseDialog {
                     palletScanManagement.scanTubesManually(e);
             }
         });
+    }
+
+    /**
+     * Returns true if the grid dimensions have changed.
+     */
+    protected boolean checkGridDimensionsChanged() {
+        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
+            plateToScanText.getText());
+
+        if (plateDimensions == null) return false;
+
+        if (!currentGridDimensions.equals(plateDimensions)) {
+            currentGridDimensions = plateDimensions;
+            return true;
+        }
+
+        return false;
     }
 }

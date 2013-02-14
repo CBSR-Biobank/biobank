@@ -1,23 +1,22 @@
 package edu.ualberta.med.biobank.common.action.scanprocess;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
 
 public class SpecimenHierarchyInfo {
-    private SpecimenWrapper parentSpecimen;
-    private AliquotedSpecimenWrapper aliquotedSpecimenType;
+    private final Specimen parentSpecimen;
+    private final AliquotedSpecimen aliquotedSpecimenType;
 
-    public SpecimenHierarchyInfo(SpecimenWrapper parentSpecimen,
-        AliquotedSpecimenWrapper aliquotedSpecimenType) {
+    public SpecimenHierarchyInfo(Specimen parentSpecimen, AliquotedSpecimen aliquotedSpecimenType) {
         this.parentSpecimen = parentSpecimen;
         this.aliquotedSpecimenType = aliquotedSpecimenType;
     }
 
-    public SpecimenWrapper getParentSpecimen() {
+    public Specimen getParentSpecimen() {
         return parentSpecimen;
     }
 
-    public AliquotedSpecimenWrapper getAliquotedSpecimenType() {
+    public AliquotedSpecimen getAliquotedSpecimenType() {
         return aliquotedSpecimenType;
     }
 }

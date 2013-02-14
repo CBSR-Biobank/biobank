@@ -1,8 +1,9 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.specimentypeselection;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -11,6 +12,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -38,37 +40,39 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 /**
- * Create widgets to show types selection for specimens on a pallet: one label,
- * one combo with different source types, one combo with different result types
- * and one text showing total number of samples found
+ * Create widgets to show types selection for specimens on a pallet: one label, one combo with
+ * different source types, one combo with different result types and one text showing total number
+ * of samples found
  */
-public class AliquotedSpecimenSelectionWidget {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AliquotedSpecimenSelectionWidget.class);
+public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListener {
+    private static final I18n i18n = I18nFactory.getI18n(AliquotedSpecimenSelectionWidget.class);
+
+    private final Integer rowNumber;
     private ComboViewer cvSource;
     private ComboViewer cvResult;
     private ControlDecoration rowControlDecoration;
     private ControlDecoration sourceControlDecoration;
     private ControlDecoration resultControlDecoration;
+    private Label rowLabel;
     private Label textNumber;
     private Integer number;
 
-    private final IObservableValue bothSelected = new WritableValue(
-        Boolean.FALSE, Boolean.class);
+    private final IObservableValue bothSelected = new WritableValue(Boolean.FALSE, Boolean.class);
 
-    private final IObservableValue sourceSelected = new WritableValue(
-        Boolean.FALSE, Boolean.class);
+    private final IObservableValue sourceSelected = new WritableValue(Boolean.FALSE, Boolean.class);
 
-    private final IObservableValue resultSelected = new WritableValue(
-        Boolean.FALSE, Boolean.class);
+    private final IObservableValue resultSelected = new WritableValue(Boolean.FALSE, Boolean.class);
 
     private Binding oneRowBinding;
     private Binding sourceBinding;
@@ -80,115 +84,111 @@ public class AliquotedSpecimenSelectionWidget {
     private Label sourceLabel;
     private Label resultLabel;
 
-    private List<SpecimenTypeWrapper> sourceChildTypes =
-        new ArrayList<SpecimenTypeWrapper>();
+    private final ListenerList selectionChangedListeners = new ListenerList();
+
+    private Set<SpecimenType> sourceChildTypes = new HashSet<SpecimenType>();
 
     @SuppressWarnings("nls")
-    public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
+    public AliquotedSpecimenSelectionWidget(Composite parent, Integer rowNumber, Character letter,
         BgcWidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
         this.oneRow = oneRow;
+        this.rowNumber = rowNumber;
+
         if (letter != null) {
-            widgetCreator.getToolkit().createLabel(parent, letter.toString(),
-                SWT.LEFT);
+            rowLabel = widgetCreator.getToolkit().createLabel(parent, letter.toString(), SWT.LEFT);
         }
         if (!oneRow) {
-            sourceLabel =
-                widgetCreator
-                    .createLabel(
-                        parent,
-                        SourceSpecimen.NAME.singular().toString());
-            sourceControlDecoration =
-                BgcBaseWidget
-                    .createDecorator(
-                        sourceLabel,
-                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
+            sourceLabel = widgetCreator.createLabel(parent, SourceSpecimen.NAME.singular().toString());
+            sourceControlDecoration = BgcBaseWidget.createDecorator(sourceLabel,
+                i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
-        cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null, new BiobankLabelProvider());
+        cvSource = widgetCreator.createComboViewerWithoutLabel(parent, null, null,
+            new BiobankLabelProvider());
         setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                SpecimenWrapper spc = (SpecimenWrapper) element;
-                return spc.getSpecimenType().getNameShort() + " ("
-                    + spc.getInventoryId() + ")";
+                Specimen spc = (Specimen) element;
+                StringBuffer label = new StringBuffer();
+                label.append(spc.getSpecimenType().getNameShort());
+                label.append(" (");
+                label.append(spc.getInventoryId());
+                label.append(")");
+                return label.toString();
             }
         });
         cvSource.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 if (!event.getSelection().isEmpty()) {
-                    SpecimenWrapper spc =
-                        (SpecimenWrapper) ((IStructuredSelection) event
-                            .getSelection()).getFirstElement();
-                    sourceChildTypes = spc.getSpecimenType()
-                        .getChildSpecimenTypeCollection(false);
+                    Specimen spc = (Specimen) ((IStructuredSelection) event.getSelection()).getFirstElement();
+                    sourceChildTypes = spc.getSpecimenType().getChildSpecimenTypes();
                 }
-                if (cvResult != null)
-                    cvResult.refresh();
+                if (cvResult != null) cvResult.refresh();
             }
         });
 
         if (!oneRow) {
-            resultLabel = widgetCreator.createLabel(parent,
-                i18n.tr("Aliquoted specimen type"));
-            resultControlDecoration =
-                BgcBaseWidget
-                    .createDecorator(
-                        resultLabel,
-                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
+            resultLabel = widgetCreator.createLabel(parent, i18n.tr("Aliquoted specimen type"));
+            resultControlDecoration = BgcBaseWidget.createDecorator(resultLabel,
+                i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
-        cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null,
-            null, new BiobankLabelProvider());
+        cvResult = widgetCreator.createComboViewerWithoutLabel(parent, null, null,
+            new BiobankLabelProvider());
         setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((AliquotedSpecimenWrapper) element).getSpecimenType()
-                    .getName()
-                    + "("
-                    + ((AliquotedSpecimenWrapper) element).getVolume() + ")";
+                AliquotedSpecimen aqSpecimen = (AliquotedSpecimen) element;
+                StringBuffer label = new StringBuffer();
+                label.append(aqSpecimen.getSpecimenType().getName());
+                label.append("(");
+                label.append(aqSpecimen.getVolume());
+                label.append(")");
+                return label.toString();
             }
         });
         cvResult.addFilter(new ViewerFilter() {
             @Override
-            public boolean select(Viewer viewer, Object parentElement,
-                Object element) {
-                return (getSourceSelection() != null && getSourceSelection()
-                    .hasUnknownImportType())
-                    || sourceChildTypes
-                        .contains(((AliquotedSpecimenWrapper) element)
-                            .getSpecimenType());
+            public boolean select(Viewer viewer, Object parentElement, Object element) {
+                boolean filterBySource = false;
+
+                Specimen sourceSpecimen = getSourceSelection();
+                if (sourceSpecimen != null) {
+                    SpecimenType sourceType = sourceSpecimen.getSpecimenType();
+                    if (sourceType != null) {
+                        String name = sourceType.getName();
+                        if ((name != null) && name.equals(SpecimenTypeWrapper.UNKNOWN_IMPORT_NAME)) {
+                            filterBySource = true;
+                        }
+                    }
+                }
+
+                return (filterBySource
+                || sourceChildTypes.contains(((AliquotedSpecimen) element).getSpecimenType()));
             }
         });
         if (oneRow) {
-            textNumber =
-                widgetCreator.getToolkit().createLabel(parent,
-                    StringUtil.EMPTY_STRING,
-                    SWT.BORDER);
+            textNumber = widgetCreator.getToolkit().createLabel(parent, StringUtil.EMPTY_STRING, SWT.BORDER);
             GridData gd = new GridData();
             gd.widthHint = 20;
             gd.horizontalAlignment = SWT.LEFT;
             textNumber.setLayoutData(gd);
-            rowControlDecoration =
-                BgcBaseWidget
-                    .createDecorator(
-                        textNumber,
-                        i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
+            rowControlDecoration = BgcBaseWidget.createDecorator(textNumber,
+                i18n.tr("A source specimen type and an aliquoted specimen type should be selected"));
         }
+
+        cvSource.addSelectionChangedListener(this);
+        cvResult.addSelectionChangedListener(this);
     }
 
-    private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
-        final int selectionPosition) {
+    private void setComboProperties(ComboViewer cv, FormToolkit toolkit, final int selectionPosition) {
         GridData gd = new GridData(SWT.FILL, SWT.TOP, true, false);
-        int parentColumns = ((GridLayout) cv.getControl().getParent()
-            .getLayout()).numColumns;
+        int parentColumns = ((GridLayout) cv.getControl().getParent().getLayout()).numColumns;
         if (oneRow) {
-            if (selectionPosition == 0)
-                gd.widthHint = 300;
-        } else if (parentColumns > 2)
-            gd.horizontalSpan = parentColumns - 1;
+            if (selectionPosition == 0) gd.widthHint = 300;
+        } else if (parentColumns > 2) gd.horizontalSpan = parentColumns - 1;
         cv.getControl().setLayoutData(gd);
         toolkit.adapt(cv.getControl(), true, true);
         cv.setContentProvider(new ArrayContentProvider());
@@ -208,16 +208,14 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         cv.setComparator(new ViewerComparator());
-        if (selectionPosition != 0)
-            cv.getControl().addTraverseListener(new TraverseListener() {
-                @Override
-                public void keyTraversed(TraverseEvent e) {
-                    if (e.detail == SWT.TRAVERSE_TAB_NEXT
-                        || e.detail == SWT.TRAVERSE_RETURN) {
-                        e.doit = setNextFocus();
-                    }
+        if (selectionPosition != 0) cv.getControl().addTraverseListener(new TraverseListener() {
+            @Override
+            public void keyTraversed(TraverseEvent e) {
+                if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_RETURN) {
+                    e.doit = setNextFocus();
                 }
-            });
+            }
+        });
     }
 
     private boolean setNextFocus() {
@@ -226,45 +224,71 @@ public class AliquotedSpecimenSelectionWidget {
                 ((Control) nextWidget).setFocus();
                 return false; // cancel doit
             } else if (nextWidget instanceof AliquotedSpecimenSelectionWidget) {
-                ((AliquotedSpecimenSelectionWidget) nextWidget).cvSource
-                    .getControl().setFocus();
+                ((AliquotedSpecimenSelectionWidget) nextWidget).cvSource.getControl().setFocus();
             }
         }
         return true;
     }
 
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        cvSource.addSelectionChangedListener(listener);
-        cvResult.addSelectionChangedListener(listener);
+    public void addSelectionChangedListener(ISpecimenTypeSelectionChangedListener listener) {
+        selectionChangedListeners.add(listener);
     }
 
-    public void setNumber(Integer number) {
-        if (textNumber != null) {
-            this.number = number;
-            String text = StringUtil.EMPTY_STRING;
-            if (number != null) {
-                text = number.toString();
-            }
-            if (number == null || number == 0) {
-                cvSource.getControl().setEnabled(false);
-                sourceSelected.setValue(true);
-                cvResult.getControl().setEnabled(false);
-                resultSelected.setValue(true);
-                bothSelected.setValue(true);
-            } else {
-                cvSource.getControl().setEnabled(true);
-                sourceSelected.setValue(getSourceSelection() != null);
-                cvResult.getControl().setEnabled(true);
-                resultSelected.setValue(getResultTypeSelection() != null);
-                updateBothSelectedField();
-            }
-            textNumber.setText(text);
+    public void removeSelectionChangedListener(ISpecimenTypeSelectionChangedListener listener) {
+        selectionChangedListeners.remove(listener);
+    }
+
+    @Override
+    public void selectionChanged(SelectionChangedEvent event) {
+        // only report the event if the specimen type needs to be saved
+        if (!needToSave()) return;
+
+        Specimen specimen = getSourceSelection();
+        AliquotedSpecimen aliquotedSpecimen = getResultTypeSelection();
+
+        // do not report the event if one of the selections has not been made
+        if ((specimen == null) || (aliquotedSpecimen == null)) return;
+
+        SpecimenTypeSelectionEvent clientEvent = new SpecimenTypeSelectionEvent(
+            rowNumber, specimen, aliquotedSpecimen);
+        fireSelectionChanged(clientEvent);
+    }
+
+    protected void fireSelectionChanged(final SpecimenTypeSelectionEvent event) {
+        Object[] listeners = selectionChangedListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final ISpecimenTypeSelectionChangedListener l =
+                (ISpecimenTypeSelectionChangedListener) listeners[i];
+            l.selectionChanged(event);
         }
     }
 
+    public void setNumber(Integer number) {
+        if (textNumber == null) return;
+
+        this.number = number;
+        String text = StringUtil.EMPTY_STRING;
+        if (number != null) {
+            text = number.toString();
+        }
+        if (number == null || number == 0) {
+            cvSource.getControl().setEnabled(false);
+            sourceSelected.setValue(true);
+            cvResult.getControl().setEnabled(false);
+            resultSelected.setValue(true);
+            bothSelected.setValue(true);
+        } else {
+            cvSource.getControl().setEnabled(true);
+            sourceSelected.setValue(getSourceSelection() != null);
+            cvResult.getControl().setEnabled(true);
+            resultSelected.setValue(getResultTypeSelection() != null);
+            updateBothSelectedField();
+        }
+        textNumber.setText(text);
+    }
+
     public void increaseNumber() {
-        if (number == null)
-            number = 0;
+        if (number == null) number = 0;
         number++;
         setNumber(number);
         sourceSelected.setValue(getSourceSelection() != null);
@@ -291,14 +315,12 @@ public class AliquotedSpecimenSelectionWidget {
         return number > 0;
     }
 
-    private AliquotedSpecimenWrapper getResultTypeSelection() {
-        return (AliquotedSpecimenWrapper) ((StructuredSelection) cvResult
-            .getSelection()).getFirstElement();
+    private AliquotedSpecimen getResultTypeSelection() {
+        return (AliquotedSpecimen) ((StructuredSelection) cvResult.getSelection()).getFirstElement();
     }
 
-    private SpecimenWrapper getSourceSelection() {
-        return (SpecimenWrapper) ((StructuredSelection) cvSource.getSelection())
-            .getFirstElement();
+    private Specimen getSourceSelection() {
+        return (Specimen) ((StructuredSelection) cvSource.getSelection()).getFirstElement();
     }
 
     public void addBindings() {
@@ -306,9 +328,9 @@ public class AliquotedSpecimenSelectionWidget {
             if (oneRowBinding == null) {
                 UpdateValueStrategy rowUpdateValue =
                     createOneRowUpdateValueStrategy(rowControlDecoration);
-                oneRowBinding = widgetCreator.bindValue(new WritableValue(
-                    Boolean.FALSE, Boolean.class), bothSelected,
-                    rowUpdateValue, rowUpdateValue);
+                oneRowBinding =
+                    widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+                        bothSelected, rowUpdateValue, rowUpdateValue);
             } else {
                 widgetCreator.addBinding(oneRowBinding);
             }
@@ -316,14 +338,14 @@ public class AliquotedSpecimenSelectionWidget {
             if (sourceBinding == null || resultBinding == null) {
                 UpdateValueStrategy sourceUpdateValue =
                     createOneRowUpdateValueStrategy(sourceControlDecoration);
-                sourceBinding = widgetCreator.bindValue(new WritableValue(
-                    Boolean.FALSE, Boolean.class), sourceSelected,
-                    sourceUpdateValue, sourceUpdateValue);
+                sourceBinding =
+                    widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+                        sourceSelected, sourceUpdateValue, sourceUpdateValue);
                 UpdateValueStrategy resultUpdateValue =
                     createOneRowUpdateValueStrategy(resultControlDecoration);
-                resultBinding = widgetCreator.bindValue(new WritableValue(
-                    Boolean.FALSE, Boolean.class), resultSelected,
-                    resultUpdateValue, resultUpdateValue);
+                resultBinding =
+                    widgetCreator.bindValue(new WritableValue(Boolean.FALSE, Boolean.class),
+                        resultSelected, resultUpdateValue, resultUpdateValue);
             } else {
                 widgetCreator.addBinding(sourceBinding);
                 widgetCreator.addBinding(resultBinding);
@@ -331,8 +353,7 @@ public class AliquotedSpecimenSelectionWidget {
         }
     }
 
-    private UpdateValueStrategy createOneRowUpdateValueStrategy(
-        final ControlDecoration decoration) {
+    private UpdateValueStrategy createOneRowUpdateValueStrategy(final ControlDecoration decoration) {
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(new IValidator() {
             @SuppressWarnings("nls")
@@ -353,14 +374,11 @@ public class AliquotedSpecimenSelectionWidget {
 
     public void removeBindings() {
         bothSelected.setValue(true);
-        if (oneRowBinding != null)
-            widgetCreator.removeBinding(oneRowBinding);
+        if (oneRowBinding != null) widgetCreator.removeBinding(oneRowBinding);
         sourceSelected.setValue(true);
-        if (sourceBinding != null)
-            widgetCreator.removeBinding(sourceBinding);
+        if (sourceBinding != null) widgetCreator.removeBinding(sourceBinding);
         resultSelected.setValue(true);
-        if (resultBinding != null)
-            widgetCreator.removeBinding(resultBinding);
+        if (resultBinding != null) widgetCreator.removeBinding(resultBinding);
     }
 
     public void resetValues(boolean resetSelection, boolean resetNumber) {
@@ -374,8 +392,7 @@ public class AliquotedSpecimenSelectionWidget {
             setNumber(number); // to re-do the validation tests
     }
 
-    public void resetValues(final boolean resetSelection,
-        final boolean resetNumber, boolean async) {
+    public void resetValues(final boolean resetSelection, final boolean resetNumber, boolean async) {
         if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
@@ -392,12 +409,11 @@ public class AliquotedSpecimenSelectionWidget {
         this.nextWidget = nextWidget;
     }
 
-    public void setResultTypes(
-        List<AliquotedSpecimenWrapper> studiesAliquotedTypes) {
+    public void setResultTypes(List<AliquotedSpecimen> studiesAliquotedTypes) {
         cvResult.setInput(studiesAliquotedTypes);
     }
 
-    public void setSourceSpecimens(List<SpecimenWrapper> sourceSpecimens) {
+    public void setSourceSpecimens(List<Specimen> sourceSpecimens) {
         cvSource.setInput(sourceSpecimens);
     }
 
@@ -405,9 +421,6 @@ public class AliquotedSpecimenSelectionWidget {
         cvSource.getControl().setFocus();
     }
 
-    /**
-     * @return an array of [SpecimenLink (source), SpecimenType (result)]
-     */
     public SpecimenHierarchyInfo getSelection() {
         if (getSourceSelection() != null && getResultTypeSelection() != null)
             return new SpecimenHierarchyInfo(getSourceSelection(),
@@ -417,8 +430,7 @@ public class AliquotedSpecimenSelectionWidget {
 
     public void setSelection(SpecimenHierarchyInfo previousSelection) {
         if (previousSelection != null) {
-            cvSource.setSelection(new StructuredSelection(previousSelection
-                .getParentSpecimen()));
+            cvSource.setSelection(new StructuredSelection(previousSelection.getParentSpecimen()));
             cvResult.setSelection(new StructuredSelection(previousSelection
                 .getAliquotedSpecimenType()));
         }
@@ -435,16 +447,21 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void showWidget(boolean enabled) {
-        if (sourceLabel != null)
-            widgetCreator.showWidget(sourceLabel, enabled);
+        if (rowLabel != null) {
+            rowLabel.setVisible(enabled);
+        }
+
+        if (sourceLabel != null) widgetCreator.showWidget(sourceLabel, enabled);
         widgetCreator.showWidget(cvSource.getControl(), enabled);
-        if (resultLabel != null)
-            widgetCreator.showWidget(resultLabel, enabled);
+        if (resultLabel != null) widgetCreator.showWidget(resultLabel, enabled);
         widgetCreator.showWidget(cvResult.getControl(), enabled);
+
+        if (textNumber != null) {
+            textNumber.setVisible(enabled);
+        }
     }
 
-    public void setReadOnlySelections(SpecimenWrapper sourceSpecimen,
-        SpecimenTypeWrapper resultType) {
+    public void setReadOnlySelections(SpecimenWrapper sourceSpecimen, SpecimenTypeWrapper resultType) {
         cvSource.setInput(Arrays.asList(sourceSpecimen));
         cvSource.setSelection(new StructuredSelection(sourceSpecimen));
         cvResult.setInput(Arrays.asList(resultType));

@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Type;
@@ -32,9 +33,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * An abstract class that represents either a collection location, a research
- * location, or repository site. See \ref Clinic, \ref Site and \ref
- * ResearchGroup.
+ * An abstract class that represents either a collection location, a research location, or
+ * repository site. See \ref Clinic, \ref Site and \ref ResearchGroup.
  */
 @Entity
 @Table(name = "CENTER")
@@ -183,4 +183,16 @@ public class Center extends AbstractBiobankModel
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
+
+    /**
+     * Should only be used by the Action layer.
+     * 
+     * @return the studies this center is associated with.
+     */
+    @SuppressWarnings("nls")
+    @Transient
+    public Set<Study> getStudiesInternal() {
+        throw new IllegalStateException("should be implemented by derived classes");
+    }
+
 }

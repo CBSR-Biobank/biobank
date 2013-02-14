@@ -58,9 +58,9 @@ public class ContainerAdapter extends AdapterBase {
         super(parent, container);
         // if parent is null, the permissions have to be retrieved in the init() method
         if (parent != null) {
-            this.isDeletable = parent.isDeletable();
-            this.isReadable = parent.isReadable();
-            this.isEditable = parent.isEditable();
+        this.isDeletable = parent.isDeletable();
+        this.isReadable = parent.isReadable();
+        this.isEditable = parent.isEditable();
         }
 
         // assume it has children for now and set it appropriately when user
@@ -76,13 +76,13 @@ public class ContainerAdapter extends AdapterBase {
             // exit because the permissions were already retrieved in the constructor
             return;
         }
-        ContainerWrapper container = (ContainerWrapper) getModelObject();
-        Integer id = container.getId();
+            ContainerWrapper container = (ContainerWrapper) getModelObject();
+            Integer id = container.getId();
 
-        this.isDeletable = isAllowed(new ContainerDeletePermission(id));
-        this.isReadable =
-            isAllowed(new ContainerReadPermission(container.getSite().getId()));
-        this.isEditable = isAllowed(new ContainerUpdatePermission(id));
+            this.isDeletable = isAllowed(new ContainerDeletePermission(id));
+            this.isReadable =
+                isAllowed(new ContainerReadPermission(container.getSite().getId()));
+            this.isEditable = isAllowed(new ContainerUpdatePermission(id));
     }
 
     @Override

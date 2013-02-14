@@ -9,15 +9,20 @@ import javax.validation.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeGetAllAction;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypesGetForContainerTypesAction;
+import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
 
 public class TestSpecimenType extends TestAction {
 
-    //private static Logger log = LoggerFactory
-    //    .getLogger(TestSpecimenBatchOp.class.getName());
+    // private static Logger log = LoggerFactory
+    // .getLogger(TestSpecimenBatchOp.class.getName());
 
     @Test
     public void getAction() {
@@ -116,7 +121,7 @@ public class TestSpecimenType extends TestAction {
         session.getTransaction().commit();
 
         // delete the child types from the first parent
-        SpecimenType parentSpcType =  parentSpcTypes.iterator().next();
+        SpecimenType parentSpcType = parentSpcTypes.iterator().next();
         SpecimenTypeSaveAction saveAction = new SpecimenTypeSaveAction(parentSpcType.getName(),
             parentSpcType.getNameShort());
         saveAction.setId(parentSpcType.getId());
@@ -130,7 +135,7 @@ public class TestSpecimenType extends TestAction {
 
         // delete the child types from the second parent
         parentSpcTypes.remove(parentSpcType);
-        parentSpcType =  parentSpcTypes.iterator().next();
+        parentSpcType = parentSpcTypes.iterator().next();
         saveAction = new SpecimenTypeSaveAction(parentSpcType.getName(),
             parentSpcType.getNameShort());
         saveAction.setId(parentSpcType.getId());
@@ -227,5 +232,85 @@ public class TestSpecimenType extends TestAction {
             (SpecimenType) session.load(SpecimenType.class, typeId)));
 
         Assert.assertEquals(size, exec(new SpecimenTypeGetAllAction()).getList().size());
+    }
+
+    @Test
+    public void specimenTypesForContainerTypes() {
+        session.beginTransaction();
+        Set<SpecimenType> setA = new HashSet<SpecimenType>();
+        setA.add(factory.createSpecimenType());
+        setA.add(factory.createSpecimenType());
+
+        Set<SpecimenType> setB = new HashSet<SpecimenType>();
+        setA.add(factory.createSpecimenType());
+        setA.add(factory.createSpecimenType());
+
+        ContainerType ctype1 = factory.createContainerType();
+        Capacity capacity = new Capacity();
+        capacity.setRowCapacity(5);
+        capacity.setColCapacity(5);
+        ctype1.setCapacity(capacity);
+        ctype1.getSpecimenTypes().addAll(setA);
+
+        ContainerType ctype2 = factory.createContainerType();
+        capacity = new Capacity();
+        capacity.setRowCapacity(10);
+        capacity.setColCapacity(10);
+        ctype2.setCapacity(capacity);
+        ctype2.getSpecimenTypes().addAll(setB);
+
+        ContainerType ctype3 = factory.createContainerType();
+        capacity = new Capacity();
+        capacity.setRowCapacity(8);
+        capacity.setColCapacity(12);
+        ctype3.setCapacity(capacity);
+        session.getTransaction().commit();
+
+        Set<Capacity> capacities = new HashSet<Capacity>();
+        capacities.add(ctype1.getCapacity());
+        capacities.add(ctype2.getCapacity());
+
+        List<SpecimenType> specimenTypes = exec(
+            new SpecimenTypesGetForContainerTypesAction(ctype1.getSite(), capacities)).getList();
+
+        Assert.assertEquals(setA.size() + setB.size(), specimenTypes.size());
+        Assert.assertTrue(specimenTypes.containsAll(setA));
+        Assert.assertTrue(specimenTypes.containsAll(setB));
+
+        capacities = new HashSet<Capacity>();
+        capacities.add(ctype1.getCapacity());
+        capacities.add(ctype3.getCapacity());
+
+        specimenTypes = exec(new SpecimenTypesGetForContainerTypesAction(
+            ctype1.getSite(), capacities)).getList();
+
+        Assert.assertEquals(setA.size(), specimenTypes.size());
+        Assert.assertTrue(specimenTypes.containsAll(setA));
+
+        // test for empty list
+        capacities = new HashSet<Capacity>();
+        capacities.add(ctype3.getCapacity());
+
+        specimenTypes = exec(new SpecimenTypesGetForContainerTypesAction(
+            ctype3.getSite(), capacities)).getList();
+        Assert.assertEquals(0, specimenTypes.size());
+    }
+
+    @Test
+    public void specimenTypesForContainerTypesEmptyCapacity() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        session.getTransaction().commit();
+
+        // test empty capacity
+        Set<Capacity> capacities = new HashSet<Capacity>();
+
+        try {
+            exec(new SpecimenTypesGetForContainerTypesAction(site, capacities)).getList();
+            Assert.fail("should not be allowed run action without capacities");
+        } catch (ActionException e) {
+            // do nothing
+        }
+
     }
 }

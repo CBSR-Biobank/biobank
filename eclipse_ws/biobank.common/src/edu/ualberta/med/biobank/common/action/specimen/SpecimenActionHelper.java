@@ -97,20 +97,24 @@ public class SpecimenActionHelper {
         }
     }
 
+    @SuppressWarnings("nls")
     public static String getPositionString(Specimen specimen,
         boolean fullString, boolean addTopParentShortName) {
         if (specimen.getSpecimenPosition() == null)
             return null;
 
-        String position = specimen.getSpecimenPosition().getPositionString();
+        StringBuffer position = new StringBuffer();
+
+        position.append(specimen.getSpecimenPosition().getPositionString());
         if (fullString) {
-            position = specimen.getSpecimenPosition().getContainer().getLabel()
-                + position;
+            position.insert(0, specimen.getSpecimenPosition().getContainer().getLabel());
         }
-        if (addTopParentShortName)
-            position += " (" //$NON-NLS-1$ 
-                + specimen.getSpecimenPosition().getContainer()
-                    .getContainerType().getNameShort() + ")"; //$NON-NLS-1$
-        return position;
+        if (addTopParentShortName) {
+            position.append(" (");
+            position.append(specimen.getSpecimenPosition().getContainer()
+                .getContainerType().getNameShort());
+            position.append(")");
+        }
+        return position.toString();
     }
 }

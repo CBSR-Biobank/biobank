@@ -26,8 +26,9 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetParentsByChildLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoByLabelAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -46,8 +47,8 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
-public abstract class AbstractLinkAssignEntryForm
-extends AbstractPalletSpecimenAdminForm {
+public abstract class AbstractLinkAssignEntryForm extends
+    AbstractPalletSpecimenAdminForm {
     private static final I18n i18n = I18nFactory
         .getI18n(AbstractLinkAssignEntryForm.class);
 
@@ -99,6 +100,9 @@ extends AbstractPalletSpecimenAdminForm {
     protected ContainerDisplayWidget freezerWidget;
     protected ContainerDisplayWidget hotelWidget;
     protected ScanPalletWidget palletWidget;
+
+    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
+        RowColPos.COLS_DEFAULT);
 
     @SuppressWarnings("nls")
     @Override
@@ -394,8 +398,14 @@ extends AbstractPalletSpecimenAdminForm {
         palletLabel = toolkit.createLabel(palletComposite,
             // TR: label
             i18n.tr("Pallet"));
+        createScanPalletWidget(palletComposite, currentGridDimensions.getRow(),
+            currentGridDimensions.getCol());
+        showOnlyPallet(true);
+    }
+
+    protected ScanPalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols) {
         palletWidget = new ScanPalletWidget(palletComposite,
-            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -403,15 +413,13 @@ extends AbstractPalletSpecimenAdminForm {
                 manageDoubleClick(e);
             }
         });
-        showOnlyPallet(true);
+        return palletWidget;
     }
 
     protected void recreateScanPalletWidget(int rows, int cols) {
         Composite palletComposite = palletWidget.getParent();
         palletWidget.dispose();
-        palletWidget = new ScanPalletWidget(palletComposite,
-            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
-        toolkit.adapt(palletWidget);
+        createScanPalletWidget(palletComposite, rows, cols);
     }
 
     /**
@@ -614,7 +622,7 @@ extends AbstractPalletSpecimenAdminForm {
                         secondSingleParentWidget.setSelection(firstParent
                             .getPositionAsRowCol());
                         secondSingleParentLabel
-                        .setText(secondParent.getLabel());
+                            .setText(secondParent.getLabel());
                     }
                 }
             }
@@ -631,34 +639,29 @@ extends AbstractPalletSpecimenAdminForm {
      * @param isContainerPosition if true, the position is a full container position, if false, it
      *            is a full specimen position
      */
-    @SuppressWarnings({ "nls" })
+    @SuppressWarnings("unused")
     protected void initContainersFromPosition(BgcBaseText positionText,
         ContainerTypeWrapper type) {
         parentContainers = new ArrayList<ContainerWrapper>();
         try {
-            List<Container> foundContainers;
-
-            if (type == null) {
-                foundContainers = SessionManager.getAppService().doAction(
-                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
-                        SessionManager.getUser().getCurrentWorkingSite().getWrappedObject()))
-                        .getList();
-            } else {
-                foundContainers = SessionManager.getAppService().doAction(
-                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
-                        type.getWrappedObject()))
-                        .getList();
-            }
+            List<Container> foundContainers =
+                SessionManager.getAppService().doAction(
+                    new ContainerGetInfoByLabelAction(positionText.getText(),
+                        SessionManager.getUser().getCurrentWorkingSite()
+                            .getId())).getList();
             if (foundContainers.isEmpty())
-                BgcPlugin.openAsyncError(
-                    i18n.tr("Unable to find a container with label ", positionText.getText()));
+                BgcPlugin
+                    .openAsyncError(
+                    i18n.tr("Unable to find a container with label ", //$NON-NLS-1$
+                        positionText.getText()));
             else if (foundContainers.size() == 1) {
                 parentContainers.add(new ContainerWrapper(SessionManager
                     .getAppService(), foundContainers.get(0)));
             } else {
-                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow() .getShell(),
-                    foundContainers);
+                SelectParentContainerDialog dlg =
+                    new SelectParentContainerDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), foundContainers);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
@@ -675,7 +678,7 @@ extends AbstractPalletSpecimenAdminForm {
                 } else {
                     parentContainers.add(new ContainerWrapper(
                         SessionManager.getAppService(), dlg
-                        .getSelectedContainer()));
+                            .getSelectedContainer()));
                 }
             }
             updateAvailableSpecimenTypes();
@@ -730,7 +733,8 @@ extends AbstractPalletSpecimenAdminForm {
                     }
 
                     List<SpecimenTypeWrapper> specimenTypeCollection =
-                        container.getContainerType().getSpecimenTypeCollection();
+                        container.getContainerType()
+                            .getSpecimenTypeCollection();
 
                     if (specimenTypeCollection.isEmpty()) {
                         BgcPlugin.openError(
@@ -776,12 +780,12 @@ extends AbstractPalletSpecimenAdminForm {
                             i18n.tr(
                                 "Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                .getLabel()));
+                                    .getLabel()));
                         appendLog(NLS
                             .bind(
                                 "ERROR: Position {0} already in use in container {1}",
                                 positionString, parentContainers.get(0)
-                                .getLabel()));
+                                    .getLabel()));
                         focusControl(positionField);
                         return;
                     }
@@ -846,6 +850,23 @@ extends AbstractPalletSpecimenAdminForm {
     @Override
     protected void refreshPalletDisplay() {
         palletWidget.redraw();
+    }
+
+    /**
+     * Returns true if the grid dimensions have changed.
+     */
+    protected boolean checkGridDimensionsChanged() {
+        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
+            plateToScanText.getText());
+
+        if (plateDimensions == null) return false;
+
+        if (!currentGridDimensions.equals(plateDimensions)) {
+            currentGridDimensions = plateDimensions;
+            return true;
+        }
+
+        return false;
     }
 
 }

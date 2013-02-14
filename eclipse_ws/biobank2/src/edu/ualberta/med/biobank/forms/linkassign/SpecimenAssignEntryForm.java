@@ -699,23 +699,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         plateToScanText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                int rows;
-                int cols;
-                int plateNumber =
-                    BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
-                if (plateNumber == -1) {
-                    rows = RowColPos.ROWS_DEFAULT;
-                    cols = RowColPos.COLS_DEFAULT;
+                if (checkGridDimensionsChanged()) {
+                    recreateScanPalletWidget(currentGridDimensions.getRow(),
+                        currentGridDimensions.getCol());
+                    page.layout(true, true);
+                    book.reflow(true);
                 }
-                else {
-                    String gridDimensions =
-                        ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                    rows = PreferenceConstants.gridRows(gridDimensions);
-                    cols = PreferenceConstants.gridCols(gridDimensions);
-                }
-                recreateScanPalletWidget(rows, cols);
-                page.layout(true, true);
-                book.reflow(true);
             }
         });
 
@@ -1434,7 +1423,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells() throws Exception {
+    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
         if (currentMultipleContainer.hasSpecimens()) {
             Map<RowColPos, PalletWell> palletScanned =
                 new HashMap<RowColPos, PalletWell>();

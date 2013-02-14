@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.HasCreatedAt;
 import edu.ualberta.med.biobank.model.Patient;
@@ -139,9 +140,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        Center center = SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject();
         List<Study> studies = SessionManager.getAppService().doAction(
-            new CenterGetStudyListAction(SessionManager.getUser().getCurrentWorkingCenter()))
-            .getList();
+            new CenterGetStudyListAction(center)).getList();
         Study selectedStudy = null;
         if (patientInfo == null) {
             if (studies.size() == 1) {
@@ -179,7 +180,11 @@ public class PatientEntryForm extends BiobankEntryForm {
             SWT.NONE, pnumberLabel, null, new WritableValue(StringUtil.EMPTY_STRING, String.class),
             pnumberNonEmptyValidator);
 
-        pnumberText.setText(patient.getPnumber());
+        String pnumber = patient.getPnumber();
+        if (pnumber == null) {
+            pnumber = StringUtil.EMPTY_STRING;
+        }
+        pnumberText.setText(pnumber);
 
         createdAtLabel = widgetCreator.createLabel(client,
             HasCreatedAt.PropertyName.CREATED_AT.toString());

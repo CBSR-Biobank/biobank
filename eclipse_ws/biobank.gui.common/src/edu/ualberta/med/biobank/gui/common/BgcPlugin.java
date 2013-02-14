@@ -249,9 +249,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
      */
     @Override
     public void start(BundleContext context) throws Exception {
@@ -262,9 +260,7 @@ public class BgcPlugin extends AbstractUIPlugin {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
      */
     @Override
     public void stop(BundleContext context) throws Exception {
@@ -433,8 +429,7 @@ public class BgcPlugin extends AbstractUIPlugin {
      * Display remote access error message
      */
     public static void openAccessDeniedErrorMessage(Throwable ex) {
-        openAsyncError(ACCESS_DENIED_TITLE,
-            ACCESS_DENIED_MESSAGE);
+        openAsyncError(ACCESS_DENIED_TITLE, ACCESS_DENIED_MESSAGE);
         if (ex != null) {
             logger.error("Access denied", ex);
         }

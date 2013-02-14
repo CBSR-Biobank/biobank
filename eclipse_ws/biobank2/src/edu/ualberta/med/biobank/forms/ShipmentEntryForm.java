@@ -22,7 +22,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction;
-import edu.ualberta.med.biobank.common.action.clinic.ClinicGetAllAction.ClinicsInfo;
 import edu.ualberta.med.biobank.common.action.info.OriginInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentReadInfo;
@@ -51,6 +50,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.InfoTableEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.InfoTableSelection;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -203,28 +203,24 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        ClinicsInfo clinics = SessionManager
-            .getAppService().doAction(
-                new ClinicGetAllAction());
+        List<Clinic> clinics = SessionManager.getAppService().doAction(
+            new ClinicGetAllAction()).getList();
 
-        senderComboViewer =
-            createComboViewer(
-                client,
-                Dispatch.PropertyName.SENDER_CENTER.toString(),
-                ModelWrapper.wrapModelCollection(
-                    SessionManager.getAppService(), clinics.getClinics(),
-                    ClinicWrapper.class),
-                (ClinicWrapper) originInfo.getCenter(),
-                // validation error message.
-                i18n.tr("A sender center should be selected"),
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        originInfo.setCenter((CenterWrapper<?>) selectedObject);
-                        activateWidgets(((ClinicWrapper) selectedObject)
-                            .getSendsShipments());
-                    }
-                });
+        senderComboViewer = createComboViewer(client,
+            Dispatch.PropertyName.SENDER_CENTER.toString(),
+            ModelWrapper.wrapModelCollection(
+                SessionManager.getAppService(), clinics, ClinicWrapper.class),
+            (ClinicWrapper) originInfo.getCenter(),
+            // validation error message.
+            i18n.tr("A sender center should be selected"),
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    originInfo.setCenter((CenterWrapper<?>) selectedObject);
+                    activateWidgets(((ClinicWrapper) selectedObject)
+                        .getSendsShipments());
+                }
+            });
         setFirstControl(senderComboViewer.getControl());
 
         receiverComboViewer =
