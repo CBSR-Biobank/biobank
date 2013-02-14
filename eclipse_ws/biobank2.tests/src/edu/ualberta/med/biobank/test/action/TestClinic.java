@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.clinic.ClinicGetStudyInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicSaveAction.ContactSaveInfo;
 import edu.ualberta.med.biobank.common.action.clinic.ContactsGetAllAction;
+import edu.ualberta.med.biobank.common.action.info.StudyCountInfo;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
@@ -135,62 +136,18 @@ public class TestClinic extends TestAction {
         return exec(new ClinicGetInfoAction(clinicId));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void getInfoActionContacts() throws Exception {
-        Set<Contact> contactsAll = new HashSet<Contact>();
-        Set<Set<Contact>> contactSets = new HashSet<Set<Contact>>();
-        Set<Contact> set1 = new HashSet<Contact>();
-        Set<Contact> set2 = new HashSet<Contact>();
-        contactSets.add(set1);
-        contactSets.add(set2);
-
         session.beginTransaction();
         Clinic clinic = factory.createClinic();
-        for (Set<Contact> contactSet : contactSets) {
-            for (int i = 0; i < 5; ++i) {
-                Contact contact = factory.createContact();
-                contactsAll.add(contact);
-                contactSet.add(contact);
-            }
-        }
-        clinic.getContacts().addAll(contactsAll);
+        List<Contact> contacts = new ArrayList<Contact>();
+        contacts.add(factory.createContact());
+        contacts.add(factory.createContact());
         session.getTransaction().commit();
 
         ClinicInfo clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
-        Assert.assertEquals(contactsAll.size(), clinicInfo.contacts.size());
-        Assert.assertTrue(clinicInfo.contacts.containsAll(contactsAll));
-
-        // remove Set 2 from the clinic, Set 1 should be left
-        session.beginTransaction();
-        for (Contact contact : set2) {
-            session.delete(contact);
-        }
-        clinic.getContacts().removeAll(set2);
-        session.update(clinic);
-        session.getTransaction().commit();
-
-        clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
-        Assert.assertEquals(set1.size(), clinicInfo.contacts.size());
-        Assert.assertTrue(clinicInfo.contacts.containsAll(set1));
-
-        // remove all
-        session.beginTransaction();
-        for (Contact contact : set1) {
-            session.delete(contact);
-        }
-        clinic.getContacts().removeAll(set1);
-        session.update(clinic);
-        session.getTransaction().commit();
-        session.clear();
-
-        clinicInfo = exec(new ClinicGetInfoAction(clinic.getId()));
-        Assert.assertEquals(0, clinicInfo.contacts.size());
-
-        // check that this clinic no longer has any contacts
-        List<Contact> contacts = session.createCriteria(Contact.class)
-            .add(Restrictions.eq("clinic.id", clinic.getId())).list();
-        Assert.assertEquals(0, contacts.size());
+        Assert.assertEquals(contacts.size(), clinicInfo.contacts.size());
+        Assert.assertTrue(clinicInfo.contacts.containsAll(contacts));
     }
 
     @SuppressWarnings("unchecked")
@@ -284,7 +241,55 @@ public class TestClinic extends TestAction {
         Clinic clinic = factory.createClinic();
         session.getTransaction().commit();
 
-        exec(new ClinicGetStudyInfoAction(clinic.getId()));
+        List<StudyCountInfo> countData = exec(
+            new ClinicGetStudyInfoAction(clinic.getId())).getList();
+        Assert.assertEquals(0, countData.size());
+
+    }
+
+    @Test
+    public void getStudyInfoStudiesNoPatients() {
+        session.beginTransaction();
+        Clinic clinic = factory.createClinic();
+        Contact contact = factory.createContact();
+        Study study = factory.createStudy();
+        study.getContacts().add(contact);
+        session.update(study);
+        session.getTransaction().commit();
+
+        List<StudyCountInfo> countData = exec(
+            new ClinicGetStudyInfoAction(clinic.getId())).getList();
+        Assert.assertEquals(1, countData.size());
+
+        StudyCountInfo countInfo = countData.get(0);
+
+        Assert.assertEquals(study, countInfo.getStudy());
+        Assert.assertEquals(0L, countInfo.getPatientCount().longValue());
+        Assert.assertEquals(0L, countInfo.getCollectionEventCount().longValue());
+
+    }
+
+    @Test
+    public void getStudyInfoStudiesWithSpecimens() {
+        session.beginTransaction();
+        Clinic clinic = factory.createClinic();
+        Contact contact = factory.createContact();
+        Study study = factory.createStudy();
+        study.getContacts().add(contact);
+        factory.createCollectionEvent();
+        factory.createParentSpecimen();
+        session.update(study);
+        session.getTransaction().commit();
+
+        List<StudyCountInfo> countData = exec(
+            new ClinicGetStudyInfoAction(clinic.getId())).getList();
+        Assert.assertEquals(1, countData.size());
+
+        StudyCountInfo countInfo = countData.get(0);
+
+        Assert.assertEquals(study, countInfo.getStudy());
+        Assert.assertEquals(1L, countInfo.getPatientCount().longValue());
+        Assert.assertEquals(1L, countInfo.getCollectionEventCount().longValue());
 
     }
 }

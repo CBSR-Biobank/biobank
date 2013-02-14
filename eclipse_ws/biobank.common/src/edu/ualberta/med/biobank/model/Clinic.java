@@ -75,6 +75,7 @@ public class Clinic extends Center {
     @Override
     @Transient
     public Set<Study> getStudiesInternal() {
+        // the same study could be associated with one or more contacts
         Set<Study> studies = new HashSet<Study>(0);
         for (Contact contact : getContacts()) {
             studies.addAll(contact.getStudies());

@@ -509,10 +509,15 @@ public class Factory {
     public Contact createContact() {
         String name = nameGenerator.next(Contact.class);
         Contact contact = new Contact();
-        contact.setClinic(getDefaultClinic());
+
+        Clinic clinic = getDefaultClinic();
+        contact.setClinic(clinic);
         contact.setName(name);
 
         setDefaultContact(contact);
+
+        clinic.getContacts().add(contact);
+        session.update(clinic);
         session.save(contact);
         session.flush();
         return contact;

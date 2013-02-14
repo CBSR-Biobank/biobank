@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.common.action.clinic;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.FetchMode;
 import org.hibernate.Query;
@@ -23,7 +24,7 @@ public class ClinicGetStudyInfoAction implements
 
     @SuppressWarnings("nls")
     private static final String STUDY_INFO_HQL =
-        "SELECT clinics.id,studies.id,COUNT(DISTINCT patients),"
+        "SELECT clinics.id,studies,COUNT(DISTINCT patients),"
             + " COUNT(DISTINCT cevents)"
             + " FROM " + Clinic.class.getName() + " clinics"
             + " LEFT JOIN clinics.originInfos oi"
@@ -53,10 +54,6 @@ public class ClinicGetStudyInfoAction implements
     @Override
     public ListResult<StudyCountInfo> run(ActionContext context)
         throws ActionException {
-        ArrayList<StudyCountInfo> infos = new ArrayList<StudyCountInfo>();
-
-        Map<Integer, Study> studiesById = new HashMap<Integer, Study>();
-
         List<Study> studies = context.getSession().createCriteria(Study.class, "study")
             .createAlias("study.contacts", "contacts")
             .createAlias("contacts.clinic", "clinic")
@@ -64,25 +61,34 @@ public class ClinicGetStudyInfoAction implements
             .setFetchMode("clinic", FetchMode.JOIN)
             .add(Restrictions.eq("clinic.id", clinicId)).list();
 
+        Set<Study> studiesForClinic = new HashSet<Study>();
         for (Study study : studies) {
-            studiesById.put(study.getId(), study);
+            studiesForClinic.add(study);
         }
+
+        Map<Study, StudyCountInfo> countInfoById = new HashMap<Study, StudyCountInfo>();
 
         Query query = context.getSession().createQuery(STUDY_INFO_HQL);
         query.setParameter(0, clinicId);
 
         List<Object[]> results = query.list();
         for (Object[] row : results) {
-            Study study = studiesById.get(row[1]);
+            if (row[1] == null) continue;
 
-            if (study == null) {
-                throw new NullPointerException("study not found in query result"); //$NON-NLS-1$
+            Study study = (Study) row[1];
+            if (!studiesForClinic.contains(study)) {
+                throw new IllegalStateException("study not associated with clinic");
             }
-
-            StudyCountInfo info = new StudyCountInfo(study, (Long) row[2], (Long) row[3]);
-            infos.add(info);
+            countInfoById.put(study, new StudyCountInfo(study, (Long) row[2], (Long) row[3]));
         }
 
-        return new ListResult<StudyCountInfo>(infos);
+        // set counts for studies with no patients and collection events
+        for (Study study : studiesForClinic) {
+            if (!countInfoById.containsKey(study)) {
+                countInfoById.put(study, new StudyCountInfo(study, 0L, 0L));
+            }
+        }
+
+        return new ListResult<StudyCountInfo>(countInfoById.values());
     }
 }
