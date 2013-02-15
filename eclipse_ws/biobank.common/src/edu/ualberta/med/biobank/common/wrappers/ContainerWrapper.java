@@ -9,9 +9,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankRuntimeException;
@@ -47,23 +44,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerWrapper extends ContainerBaseWrapper {
     public static final String PATH_DELIMITER = "/";
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerWrapper.class);
-
-    private static final String CHILD_POSITION_CONFLICT_MSG =
-        i18n.tr("Position {0} of container {1} already contains container {2} when trying to add container {3}.");
-    private static final String OUT_OF_BOUNDS_POSITION_MSG =
-        i18n.tr("Position {0} is invalid. Row should be between 0 and {1} (exclusive) and column should be between 0 and {2} (exclusive).");
-    private static final String CANNOT_HOLD_SPECIMEN_TYPE_MSG =
-        i18n.tr("Container {0} does not allow inserts of type {1}.");
-    private static final String SAMPLE_EXISTS_AT_POSITION_MSG =
-        i18n.tr("Container {0} is already holding an specimen at position {1} {2}");
-    private static final String CONTAINER_AT_POSITION_MSG =
-        i18n.tr("Container {0} is already holding a container {1} at position {2}.");
-    private static final String INVALID_POSITION =
-        i18n.tr("Can't use position {0} in container {1} because its" +
-            " maximum capacity is {2} rows and {3} columns.");
-
     private Map<RowColPos, SpecimenWrapper> specimens;
     private Map<RowColPos, ContainerWrapper> children;
 
@@ -88,10 +68,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * Return the top {@code Container} of the top loaded {@code Container}.
-     * This will give the correct "in memory" answer of who the top
-     * {@code Container} is (whereas super.getTopContainer() will give the value
-     * from the underlying model).
+     * Return the top {@code Container} of the top loaded {@code Container}. This will give the
+     * correct "in memory" answer of who the top {@code Container} is (whereas
+     * super.getTopContainer() will give the value from the underlying model).
      */
     @Override
     public ContainerWrapper getTopContainer() {
@@ -109,8 +88,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     /**
      * @return the path, including this {@link Container}'s id.
-     * @throws BiobankRuntimeException if this or any parent is new (does not
-     *             have an id) as the path is then undefined.
+     * @throws BiobankRuntimeException if this or any parent is new (does not have an id) as the
+     *             path is then undefined.
      */
     @Override
     public String getPath() {
@@ -200,8 +179,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * This sets the parent bidirectionally. If this is not required then use
-     * setParentInternal().
+     * This sets the parent bidirectionally. If this is not required then use setParentInternal().
      */
     public void setParent(ContainerWrapper container, RowColPos position)
         throws BiobankCheckException {
@@ -268,9 +246,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * position is 2 letters, or 2 number or 1 letter and 1 number... this
-     * position string is used to get the correct row and column index the given
-     * position String.
+     * position is 2 letters, or 2 number or 1 letter and 1 number... this position string is used
+     * to get the correct row and column index the given position String.
      * 
      * @throws Exception
      */
@@ -279,17 +256,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         ContainerTypeWrapper type = getContainerType();
         RowColPos rcp = type.getRowColFromPositionString(position);
         if (rcp != null) {
-            if (rcp.getRow() >= type.getRowCapacity()
-                || rcp.getCol() >= type.getColCapacity()) {
-                // {0} container position
-                // {1} container label (container type)
-                // {2} row capacity
-                // {3} column capacity
-                throw new Exception(MessageFormat.format(INVALID_POSITION,
-                    position,
-                    getFullInfoLabel(),
-                    type.getRowCapacity(),
-                    type.getColCapacity()));
+            if ((rcp.getRow() >= type.getRowCapacity()) || (rcp.getCol() >= type.getColCapacity())) {
+                throw new Exception(MessageFormat.format(
+                    "Can't use position {0} in container {1} because its"
+                        + " maximum capacity is {2} rows and {3} columns.",
+                    position, getFullInfoLabel(), type.getRowCapacity(), type.getColCapacity()));
             }
         }
         return rcp;
@@ -323,8 +294,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return false;
     }
 
-    public SpecimenWrapper getSpecimen(Integer row, Integer col)
-        throws BiobankCheckException {
+    public SpecimenWrapper getSpecimen(Integer row, Integer col) {
         RowColPos pos = new RowColPos(row, col);
         checkPositionValid(pos);
         return getSpecimens().get(pos);
@@ -338,28 +308,25 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (!canHoldSpecimenType(specimen)) {
             String label = getFullInfoLabel();
             String specimenType = specimen.getSpecimenType().getName();
-            String msg = MessageFormat.format(CANNOT_HOLD_SPECIMEN_TYPE_MSG,
-                label, specimenType);
-            throw new BiobankCheckException(msg);
+            throw new BiobankCheckException(MessageFormat.format(
+                "Container {0} does not allow inserts of type {1}.", label, specimenType));
         }
 
         SpecimenWrapper sampleAtPosition = getSpecimen(row, col);
         if (sampleAtPosition != null) {
             String label = getFullInfoLabel();
             String posString = sampleAtPosition.getPositionString(false, false);
-            String msg = MessageFormat.format(SAMPLE_EXISTS_AT_POSITION_MSG,
-                label, posString, rowColPos);
-            throw new BiobankCheckException(msg);
+            throw new BiobankCheckException(MessageFormat.format(
+                "Container {0} is already holding an specimen at position {1} {2}",
+                label, posString, rowColPos));
         }
 
         specimen.setParent(this, rowColPos);
-
         getSpecimens().put(rowColPos, specimen);
     }
 
     /**
-     * @return a string with the label of this container + the short name of its
-     *         type
+     * @return a string with the label of this container + the short name of its type
      * 
      */
     public String getFullInfoLabel() {
@@ -379,17 +346,15 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public long getChildCount(boolean fast) throws BiobankException,
-    ApplicationException {
+        ApplicationException {
         return getPropertyCount(ContainerPeer.CHILD_POSITIONS, fast);
     }
 
     public Map<RowColPos, ContainerWrapper> getChildren() {
         if (children == null) {
-            Map<RowColPos, ContainerWrapper> children =
-                new TreeMap<RowColPos, ContainerWrapper>();
+            Map<RowColPos, ContainerWrapper> children = new TreeMap<RowColPos, ContainerWrapper>();
 
-            List<ContainerPositionWrapper> positions =
-                getChildPositionCollection(false);
+            List<ContainerPositionWrapper> positions = getChildPositionCollection(false);
             for (ContainerPositionWrapper position : positions) {
                 // explicitly set the parent container because (1) skip
                 // lazy-loading later and (2) will put the parentContainer
@@ -400,8 +365,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 //
                 // setWrappedProperty() is used because it does not
                 // bi-directionally set the property.
-                position.setWrappedProperty(
-                    ContainerPositionPeer.PARENT_CONTAINER, this);
+                position.setWrappedProperty(ContainerPositionPeer.PARENT_CONTAINER, this);
 
                 ContainerWrapper container = position.getContainer();
                 RowColPos rowColPos = getRowColPos(position);
@@ -409,10 +373,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 ContainerWrapper previous = children.put(rowColPos, container);
                 if (previous != null && !previous.equals(container)) {
                     // this shouldn't ever happen, but just in case
-                    String msg = MessageFormat.format(
-                        CHILD_POSITION_CONFLICT_MSG, rowColPos, this, previous,
-                        container);
-                    throw new BiobankRuntimeException(msg);
+                    throw new IllegalStateException(MessageFormat.format(
+                        "Position {0} of container {1} already contains container {2} "
+                            + "when trying to add container {3}.",
+                        rowColPos, this, previous, container));
                 }
             }
 
@@ -463,9 +427,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (containerAtPosition != null && !containerAtPosition.equals(child)) {
             String label = getFullInfoLabel();
             String existingContainerLabel = containerAtPosition.getLabel();
-            String msg = MessageFormat.format(CONTAINER_AT_POSITION_MSG, label,
-                existingContainerLabel, rowColPos);
-            throw new BiobankCheckException(msg);
+            throw new BiobankCheckException(MessageFormat.format(
+                "Container {0} is already holding a container {1} at position {2}.",
+                label, existingContainerLabel, rowColPos));
         }
 
         child.setParentInternal(this, rowColPos);
@@ -476,8 +440,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     /**
      * Add a child in this container
      * 
-     * @param positionString position where the child should be added. e.g. AA
-     *            or B12 or 15
+     * @param positionString position where the child should be added. e.g. AA or B12 or 15
      * @param child
      * @throws Exception
      */
@@ -513,8 +476,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * Get containers with a given label that can hold this type of container
-     * (in this container site)
+     * Get containers with a given label that can hold this type of container (in this container
+     * site)
      * 
      * @throws BiobankException
      */
@@ -530,15 +493,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + " as c left join c."
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CHILD_CONTAINER_TYPES)
-                + " as ct where c."
-                + ContainerPeer.SITE.getName() + "=? and c."
-                + ContainerPeer.LABEL.getName() + " in (";
+            + " as ct where c."
+            + ContainerPeer.SITE.getName() + "=? and c."
+            + ContainerPeer.LABEL.getName() + " in (";
 
     /**
-     * Get containers with a given label that can have a child (container or
-     * specimen) with label 'childLabel'. If child is not null and is a
-     * container, then will check that the parent can contain this type of
-     * container
+     * Get containers with a given label that can have a child (container or specimen) with label
+     * 'childLabel'. If child is not null and is a container, then will check that the parent can
+     * contain this type of container
      * 
      * @param type if the child is a container, this is its type (if available)
      * @throws BiobankException
@@ -546,7 +508,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
         SiteWrapper site, ContainerTypeWrapper type)
-            throws ApplicationException {
+        throws ApplicationException {
         List<Integer> validLengths = ContainerLabelingSchemeWrapper
             .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
@@ -554,10 +516,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
                 validParents
-                .add(new StringBuilder("'")
-                .append(
-                    childLabel.substring(0, childLabel.length() - crop))
-                    .append("'").toString());
+                    .add(new StringBuilder("'")
+                        .append(
+                            childLabel.substring(0, childLabel.length() - crop))
+                        .append("'").toString());
 
         List<ContainerWrapper> filteredWrappers =
             new ArrayList<ContainerWrapper>();
@@ -566,7 +528,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             params.add(site.getWrappedObject());
             StringBuilder parentQuery = new StringBuilder(
                 POSSIBLE_PARENTS_BASE_QRY).append(
-                    StringUtil.join(validParents, ",")).append(")");
+                StringUtil.join(validParents, ",")).append(")");
             if (type != null) {
                 parentQuery.append(" and ct.id=?");
                 params.add(type.getId());
@@ -581,7 +543,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     if (ct.getRowColFromPositionString(childLabel.substring(c
                         .getLabel().length())) != null)
                         filteredWrappers
-                        .add(new ContainerWrapper(appService, c));
+                            .add(new ContainerWrapper(appService, c));
                 } catch (Exception e) {
                     // can't throw an exception: it means that this label is not
                     // possible in this parent.
@@ -602,31 +564,29 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             + ".size = 0 and "
             + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
                 ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
-                + " >= ? and "
-                + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-                    ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
-                    + " >= ? and "
-                    + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
-                        ContainerTypePeer.ID)
-                        + " in (select ct."
-                        + ContainerTypePeer.ID.getName()
-                        + " from "
-                        + ContainerType.class.getName()
-                        + " as ct left join ct."
-                        + ContainerTypePeer.SPECIMEN_TYPES.getName()
-                        + " as sampleType where sampleType."
-                        + SpecimenTypePeer.ID.getName() + " in (";
+            + " >= ? and "
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
+            + " >= ? and "
+            + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+                ContainerTypePeer.ID)
+            + " in (select ct."
+            + ContainerTypePeer.ID.getName()
+            + " from "
+            + ContainerType.class.getName()
+            + " as ct left join ct."
+            + ContainerTypePeer.SPECIMEN_TYPES.getName()
+            + " as sampleType where sampleType."
+            + SpecimenTypePeer.ID.getName() + " in (";
 
     /**
-     * Retrieve a list of empty containers in a specific site. These containers
-     * should be able to hold specimens of type specimen type and should have a
-     * row capacity equals or greater than minRwCapacity and a column capacity
-     * equal or greater than minColCapacity.
+     * Retrieve a list of empty containers in a specific site. These containers should be able to
+     * hold specimens of type specimen type and should have a row capacity equals or greater than
+     * minRwCapacity and a column capacity equal or greater than minColCapacity.
      * 
      * @param appService
      * @param siteWrapper
-     * @param sampleTypes list of sample types the container should be able to
-     *            contain
+     * @param sampleTypes list of sample types the container should be able to contain
      * @param minRowCapacity min row capacity
      * @param minColCapacity min col capacity
      */
@@ -641,7 +601,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(
             EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
-        .append(StringUtil.join(typeIds, ",")).append("))").toString();
+            .append(StringUtil.join(typeIds, ",")).append("))").toString();
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
@@ -676,7 +636,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      */
     public static List<ContainerWrapper> getContainersByLabel(
         WritableApplicationService appService, String label)
-            throws ApplicationException {
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(CONTAINERS_BY_LABEL,
             Arrays.asList(new Object[] { label }));
         List<Container> containers = appService.query(criteria);
@@ -731,10 +691,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * Initialise children at given position with the given type. If the
-     * positions list is null, initialise all the children. <strong>If a
-     * position is already filled then it is skipped and no changes are made to
-     * it</strong>.
+     * Initialise children at given position with the given type. If the positions list is null,
+     * initialise all the children. <strong>If a position is already filled then it is skipped and
+     * no changes are made to it</strong>.
      * 
      * @return true if at least one children has been initialised
      * @throws BiobankCheckException
@@ -776,8 +735,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * Delete the children at positions of this container with the given type
-     * (or all if positions list is null)- If type== null, delete all types.
+     * Delete the children at positions of this container with the given type (or all if positions
+     * list is null)- If type== null, delete all types.
      * 
      * @return true if at least one children has been deleted
      * @throws Exception
@@ -842,7 +801,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @throws BiobankCheckException
      */
     public boolean isContainerFull() throws BiobankException,
-    ApplicationException {
+        ApplicationException {
         return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
@@ -851,16 +810,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * Search possible parents from the position text.
      * 
      * @param positionText the position to use for initialisation
-     * @param isContainerPosition if true, the position is a full container
-     *            position, if false, it is a full specimen position
-     * @param contType if is a container position, will check the type can be
-     *            used
+     * @param isContainerPosition if true, the position is a full container position, if false, it
+     *            is a full specimen position
+     * @param contType if is a container position, will check the type can be used
      * @throws BiobankException
      */
+    @Deprecated
     public static List<ContainerWrapper> getPossibleContainersFromPosition(
         BiobankApplicationService appService, SiteWrapper site,
         String positionText, ContainerTypeWrapper contType)
-            throws ApplicationException, BiobankException {
+        throws ApplicationException, BiobankException {
         List<ContainerWrapper> foundContainers;
         List<ContainerWrapper> possibles = getPossibleParents(appService,
             positionText, site, contType);
@@ -877,24 +836,19 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     res.append(", ");
 
                 if (crop < positionText.length()) {
-                    res.append(positionText.substring(0, positionText.length()
-                        - crop));
+                    res.append(positionText.substring(0, positionText.length() - crop));
                     res.append("(");
-                    res.append(positionText.substring(positionText.length()
-                        - crop));
+                    res.append(positionText.substring(positionText.length() - crop));
                     res.append(")");
                 }
             }
 
             String errorMsg;
             if (contType == null) {
-                // {0} possible labels
-                errorMsg = i18n.tr("Can''t find container that will" +
-                    " match these possible labels: {0}", res.toString());
+                errorMsg = MessageFormat.format(
+                    "Can''t find container that will match these possible labels: {0}", res.toString());
             } else {
-                // {0} container type short name
-                // {1} possible labels
-                errorMsg = i18n.tr("Can''t find container with type {0}" +
+                errorMsg = MessageFormat.format("Can''t find container with type {0}" +
                     " that will match these possible labels: {1}",
                     contType.getNameShort(), res.toString());
             }
@@ -916,12 +870,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.COL).getName()
         + "=? and "
         + SpecimenPeer.SPECIMEN_POSITION.to(SpecimenPositionPeer.CONTAINER)
-        .getName() + "=?";
+            .getName() + "=?";
 
     /**
-     * Method used to check if the current position of this Specimen is
-     * available on the container. Return true if the position is free, false
-     * otherwise
+     * Method used to check if the current position of this Specimen is available on the container.
+     * Return true if the position is free, false otherwise
      */
     public boolean isPositionFree(RowColPos position)
         throws ApplicationException {
@@ -974,8 +927,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     /**
-     * For updating children {@link Container}'s: (1) label, (2) path, and (3)
-     * top {@link Container} whenever the parent or label is changed.
+     * For updating children {@link Container}'s: (1) label, (2) path, and (3) top {@link Container}
+     * whenever the parent or label is changed.
      * <p>
      * 
      * @return
@@ -1014,18 +967,19 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
     }
 
-    private void checkPositionValid(RowColPos pos) throws BiobankCheckException {
+    private void checkPositionValid(RowColPos pos) {
         int maxRow = getRowCapacity();
         int maxCol = getColCapacity();
         if (pos.getRow() >= maxRow || pos.getCol() >= maxCol) {
-            String msg = MessageFormat.format(OUT_OF_BOUNDS_POSITION_MSG, pos,
-                maxRow, maxCol);
-            throw new BiobankCheckException(msg);
+            throw new IllegalStateException(MessageFormat.format(
+                "Position {0} is invalid. Row should be between 0 and {1} (exclusive) "
+                    + "and column should be between 0 and {2} (exclusive).", pos, maxRow, maxCol));
+
         }
     }
 
     private static class ResetUpdateChildrenFlagQueryTask extends
-    NoActionWrapperQueryTask<ContainerWrapper> {
+        NoActionWrapperQueryTask<ContainerWrapper> {
         public ResetUpdateChildrenFlagQueryTask(ContainerWrapper container) {
             super(container);
         }

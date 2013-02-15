@@ -50,18 +50,18 @@ public class PatientBatchOpAction implements Action<BooleanResult> {
         .getI18n(SpecimenBatchOpAction.class);
 
     public static final LString CSV_FILE_ERROR =
-        bundle.tr("CVS file not loaded").format();
+        bundle.tr("CSV file not loaded").format();
 
     public static final Tr CSV_STUDY_ERROR =
         bundle.tr("CSV study {0} does not exist");
 
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        new StrNotNullOrEmpty(),            // studyName
-        new Unique(),                       // patientNumber
-        new ParseDate("yyyy-MM-dd HH:mm")   // createdAt
+        new StrNotNullOrEmpty(), // studyName
+        new Unique(), // patientNumber
+        new ParseDate("yyyy-MM-dd HH:mm") // createdAt
     };
-    // @formatter:on    
+    // @formatter:on
 
     private final BatchOpInputErrorSet csvErrorList =
         new BatchOpInputErrorSet();

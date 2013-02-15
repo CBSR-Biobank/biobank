@@ -10,7 +10,7 @@ public class VersionFormatInvalidException extends BiobankServerException {
 
     @SuppressWarnings("nls")
     private static final LString MESSAGE =
-        bundle.tr("The version string is formatted incorrectly.").format();
+        bundle.tr("The software version string is formatted incorrectly.").format();
 
     public VersionFormatInvalidException() {
         super();

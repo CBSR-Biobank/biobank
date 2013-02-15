@@ -22,8 +22,8 @@ import edu.ualberta.med.biobank.model.Study;
 /**
  * Server side utility functions that load model objects from the database.
  * <p>
- * <strong>These methods should eventually be moved to DAO classes for the
- * individual model objects.</strong>
+ * <strong>These methods should eventually be moved to DAO classes for the individual model
+ * objects.</strong>
  * 
  * @author Nelson Loyola
  * 
@@ -34,7 +34,7 @@ public class BatchOpActionUtil {
     private static final Bundle bundle = new CommonBundle();
 
     public static final LString CSV_FILE_ERROR =
-        bundle.tr("CVS file not loaded").format();
+        bundle.tr("CSV file not loaded").format();
 
     public static final LString CSV_HEADER_ERROR =
         bundle.tr("invalid headers in CSV file").format();
@@ -55,8 +55,7 @@ public class BatchOpActionUtil {
     }
 
     /*
-     * Generates an action exception if specimen with inventory ID does not
-     * exist.
+     * Generates an action exception if specimen with inventory ID does not exist.
      */
     public static Specimen getSpecimen(ActionContext context, String inventoryId) {
         if (context == null) {

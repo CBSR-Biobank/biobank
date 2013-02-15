@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,9 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
@@ -31,10 +29,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientWrapper extends PatientBaseWrapper {
-    private static final I18n i18n = I18nFactory
-        .getI18n(PatientWrapper.class);
-    private static final PatientLogProvider LOG_PROVIDER =
-        new PatientLogProvider();
+    private static final PatientLogProvider LOG_PROVIDER = new PatientLogProvider();
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -76,12 +71,13 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     /**
-     * Search a patient in the site with the given number. Will return the
-     * patient only if the current user has read access on a site that works
-     * with this patient study
+     * Search a patient in the site with the given number. Will return the patient only if the
+     * current user has read access on a site that works with this patient study
      * 
      * @throws Exception
      */
+    @SuppressWarnings("nls")
+    @Deprecated
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber,
         UserWrapper user) throws Exception {
@@ -92,13 +88,10 @@ public class PatientWrapper extends PatientBaseWrapper {
                 study.getSiteCollection(false));
             centers.addAll(study.getClinicCollection());
             if (Collections.disjoint(centers, user.getWorkingCenters())) {
-                @SuppressWarnings("nls")
-                // {0} patient number
-                String msg = i18n.tr("Patient {0} exists" +
+                throw new ApplicationException(MessageFormat.format("Patient {0} exists" +
                     " but you don't have access to it. Check studies" +
                     " linked to the sites and clinics you can access.",
-                    patientNumber);
-                throw new ApplicationException(msg);
+                    patientNumber));
             }
         }
         return patient;

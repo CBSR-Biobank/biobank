@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7,9 +8,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -31,13 +29,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQueryResult;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
-    private static final I18n i18n = I18nFactory
-        .getI18n(DispatchWrapper.class);
-    private static final DispatchLogProvider LOG_PROVIDER =
-        new DispatchLogProvider();
+    private static final DispatchLogProvider LOG_PROVIDER = new DispatchLogProvider();
+
     private static final Property<String, Dispatch> WAYBILL_PROPERTY =
-        DispatchPeer.SHIPMENT_INFO
-            .to(ShipmentInfoPeer.WAYBILL);
+        DispatchPeer.SHIPMENT_INFO.to(ShipmentInfoPeer.WAYBILL);
+
     private static final Collection<Property<?, ? super Dispatch>> UNIQUE_WAYBILL_PER_SENDER_PROPERTIES =
         new ArrayList<Property<?, ? super Dispatch>>();
 
@@ -192,9 +188,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 }
             } else
                 // {0} specimen inventory ID
-                throw new BiobankCheckException(i18n.tr(
-                    "Specimen {0} does not belong to this sender.",
-                    specimen.getInventoryId()));
+                throw new BiobankCheckException(MessageFormat.format(
+                    "Specimen {0} does not belong to this sender.", specimen.getInventoryId()));
         }
         addToDispatchSpecimenCollection(newDispatchSpecimens);
         resetMap();

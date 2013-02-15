@@ -37,27 +37,18 @@ import org.hibernate.Hibernate;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 @SuppressWarnings("unused")
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ModelWrapper.class);
-    final Map<Property<?, ?>, Object> propertyCache =
-        new HashMap<Property<?, ?>, Object>();
+    final Map<Property<?, ?>, Object> propertyCache = new HashMap<Property<?, ?>, Object>();
 
     protected WritableApplicationService appService;
     protected E wrappedObject;
-    protected PropertyChangeSupport propertyChangeSupport =
-        new PropertyChangeSupport(
-            this);
+    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     protected HashMap<String, Object> cache = new HashMap<String, Object>();
 
-    private final List<WrapperListener> listeners =
-        new ArrayList<WrapperListener>();
-    private final ElementTracker<E> elementTracker =
-        new ElementTracker<E>(this);
+    private final List<WrapperListener> listeners = new ArrayList<WrapperListener>();
+    private final ElementTracker<E> elementTracker = new ElementTracker<E>(this);
     private final ElementQueue<E> elementQueue = new ElementQueue<E>(this);
     private final WrapperCascader<E> cascader = new WrapperCascader<E>(this);
     WrapperSession session;
@@ -65,7 +56,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public ModelWrapper(WritableApplicationService appService, E wrappedObject) {
         this.appService = appService;
         this.wrappedObject = wrappedObject;
-
         this.session = new WrapperSession(this);
     }
 
@@ -303,28 +293,23 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         try {
             id = getId();
 
-            DetachedCriteria c = DetachedCriteria.forClass(getWrappedClass())
-                .setResultTransformer(
-                    CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+            DetachedCriteria c = DetachedCriteria.forClass(getWrappedClass()).setResultTransformer(
+                CriteriaSpecification.DISTINCT_ROOT_ENTITY)
                 .add(Restrictions.idEq(id));
 
             list = appService.query(c);
         } catch (Exception ex) {
             throw new BiobankException(ex);
         }
-        if (list.size() == 0)
-            return null;
+
+        if (list.size() == 0) return null;
+
         if (list.size() == 1) {
             return list.get(0);
         }
-        // {0} number of objects found
-        // {1} object name
-        // {2} object id
-        throw new BiobankException(i18n.tr(
-            "Found {0} objects of type {1} with id={2}",
-            list.size(),
-            getWrappedClass().getName(),
-            id));
+
+        throw new BiobankException(MessageFormat.format("Found {0} objects of type {1} with id={2}",
+            list.size(), getWrappedClass().getName(), id));
     }
 
     public abstract Class<E> getWrappedClass();

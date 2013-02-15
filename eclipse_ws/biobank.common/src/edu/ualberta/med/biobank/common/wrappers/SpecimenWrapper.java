@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,7 +11,6 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -32,8 +32,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final I18n i18n = I18nFactory.getI18n(SpecimenWrapper.class);
+
     @SuppressWarnings("nls")
     private static final String DISPATCHS_CACHE_KEY = "dispatchs";
+
     private static final SpecimenLogProvider LOG_PROVIDER =
         new SpecimenLogProvider();
 
@@ -113,6 +115,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     /**
      * Set the position in the given container using the positionString
      */
+    @Deprecated
     @SuppressWarnings("nls")
     public void setParentFromPositionString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
@@ -122,8 +125,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
             setParent(parentContainer, rcp);
         } else {
-            // {0} position string, e.g. "AA" or "12"
-            throw new Exception(i18n.tr("Position \"{0}\" not valid.",
+            throw new Exception(MessageFormat.format("Position \"{0}\" not valid.",
                 positionString));
         }
     }
@@ -187,17 +189,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria(Specimen_QRY,
-            Arrays.asList(new Object[] { inventoryId }));
+        HQLCriteria criteria = new HQLCriteria(Specimen_QRY, Arrays.asList(
+            new Object[] { inventoryId }));
         List<Specimen> specimens = appService.query(criteria);
-        if (specimens == null || specimens.size() == 0)
-            return null;
-        if (specimens.size() == 1)
-            return new SpecimenWrapper(appService, specimens.get(0));
+
+        if (specimens == null || specimens.size() == 0) return null;
+        if (specimens.size() == 1) return new SpecimenWrapper(appService, specimens.get(0));
 
         // {0} number of specimens found
-        throw new BiobankCheckException(i18n.tr(
-            "Error retrieving specimens: found {0} results.",
+        throw new BiobankCheckException(i18n.tr("Error retrieving specimens: found {0} results.",
             specimens.size()));
     }
 
@@ -225,10 +225,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     @SuppressWarnings("nls")
     public static List<SpecimenWrapper> getSpecimensInSiteWithPositionLabel(
-        WritableApplicationService appService, SiteWrapper site,
-        String positionString) throws ApplicationException, BiobankException {
-        List<ContainerWrapper> possibleContainers = ContainerWrapper
-            .getPossibleParents(appService, positionString, site, null);
+        WritableApplicationService appService, SiteWrapper site, String positionString)
+        throws ApplicationException {
+        List<ContainerWrapper> possibleContainers = ContainerWrapper.getPossibleParents(
+            appService, positionString, site, null);
         List<SpecimenWrapper> Specimens = new ArrayList<SpecimenWrapper>();
         for (ContainerWrapper container : possibleContainers) {
             RowColPos rcp = null;
@@ -242,8 +242,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             }
             if (rcp != null) {
                 if ((rcp.getRow() > -1) && (rcp.getCol() > -1)) {
-                    SpecimenWrapper Specimen = container.getSpecimen(
-                        rcp.getRow(), rcp.getCol());
+                    SpecimenWrapper Specimen = container.getSpecimen(rcp.getRow(), rcp.getCol());
                     if (Specimen != null) {
                         Specimens.add(Specimen);
                     }
@@ -274,11 +273,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
 
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getDispatches() {
-        List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) cache
-            .get(DISPATCHS_CACHE_KEY);
+        List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) cache.get(DISPATCHS_CACHE_KEY);
         if (dispatchs == null) {
-            List<DispatchSpecimenWrapper> dsaList =
-                getDispatchSpecimenCollection();
+            List<DispatchSpecimenWrapper> dsaList = getDispatchSpecimenCollection();
             if (dsaList != null) {
                 dispatchs = new ArrayList<DispatchWrapper>();
                 for (DispatchSpecimenWrapper dsa : dsaList) {

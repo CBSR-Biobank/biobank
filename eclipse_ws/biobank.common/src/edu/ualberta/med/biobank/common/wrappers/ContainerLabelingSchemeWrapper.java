@@ -22,6 +22,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerLabelingSchemeWrapper extends
     ContainerLabelingSchemeBaseWrapper {
 
+    private static final I18n i18n = I18nFactory.getI18n(ContainerLabelingSchemeWrapper.class);
+
     public static final int SCHEME_SBS = 1;
 
     public static final int SCHEME_CBSR_2_CHAR_ALPHA = 2;
@@ -35,12 +37,10 @@ public class ContainerLabelingSchemeWrapper extends
     public static final int SCHEME_2_CHAR_ALPHA = 6;
 
     @SuppressWarnings("nls")
-    public static final String CBSR_2_CHAR_LABELLING_PATTERN =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    public static final String CBSR_2_CHAR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
     @SuppressWarnings("nls")
-    public static final String TWO_CHAR_LABELLING_PATTERN =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String TWO_CHAR_LABELLING_PATTERN = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     @SuppressWarnings("nls")
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
@@ -48,11 +48,7 @@ public class ContainerLabelingSchemeWrapper extends
     @SuppressWarnings("nls")
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerLabelingSchemeWrapper.class);
-
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes =
-        null;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes = null;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -69,8 +65,8 @@ public class ContainerLabelingSchemeWrapper extends
         WritableApplicationService appService) throws ApplicationException {
         if (allSchemes == null) {
             allSchemes = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
-            List<ContainerLabelingScheme> list =
-                appService.query(DetachedCriteria
+            List<ContainerLabelingScheme> list = appService
+                .query(DetachedCriteria
                     .forClass(ContainerLabelingScheme.class));
             if (list != null) {
                 for (ContainerLabelingScheme scheme : list) {
@@ -79,42 +75,48 @@ public class ContainerLabelingSchemeWrapper extends
                     case SCHEME_SBS:
                         if (!scheme.getName().equals("SBS Standard")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
                     case SCHEME_CBSR_2_CHAR_ALPHA:
                         if (!scheme.getName().equals("CBSR 2 char alphabetic")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
                     case SCHEME_2_CHAR_NUMERIC:
                         if (!scheme.getName().equals("2 char numeric")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
                     case SCHEME_DEWAR:
                         if (!scheme.getName().equals("Dewar")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
                     case SCHEME_CBSR_SBS:
                         if (!scheme.getName().equals("CBSR SBS")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
                     case SCHEME_2_CHAR_ALPHA:
                         if (!scheme.getName().equals("2 char alphabetic")) {
                             throw new ApplicationException(
-                                "labeling scheme is not " + scheme.getName());
+                                "labeling scheme is not "
+                                    + scheme.getName());
                         }
                         break;
 
@@ -138,8 +140,8 @@ public class ContainerLabelingSchemeWrapper extends
         getAllLabelingSchemesMap(appService);
         ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
         if (scheme == null) {
-            throw new ApplicationException(
-                i18n.tr("labeling scheme with id \"{0}\" does not exist", id));
+            throw new ApplicationException(i18n.tr(
+                "labeling scheme with id \"{0}\" does not exist", id));
         }
         return scheme;
     }
@@ -240,9 +242,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @SuppressWarnings("nls")
-    private static final String POS_LABEL_LEN_QRY =
-        "select min(minChars), max(maxChars) from "
-            + ContainerLabelingScheme.class.getName();
+    private static final String POS_LABEL_LEN_QRY = "select min(minChars), max(maxChars) from "
+        + ContainerLabelingScheme.class.getName();
 
     public static List<Integer> getPossibleLabelLength(
         WritableApplicationService appService) throws ApplicationException {
@@ -256,8 +257,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
-     * string position. Could be A2 or F12.
+     * Get the rowColPos corresponding to the given SBS standard 2 or 3 char string position. Could
+     * be A2 or F12.
      */
     @SuppressWarnings("nls")
     public static RowColPos sbsToRowCol(WritableApplicationService appService,
@@ -274,13 +275,14 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int row = SBS_ROW_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
-        if (row == -1 || col == -1) return null;
+        if (row == -1 || col == -1)
+            return null;
         return new RowColPos(row, col);
     }
 
     /**
-     * Get the rowColPos corresponding to the given CBSR SBS 2 char string
-     * position. Could be A2 or F9. (CBSR SBS skip I and O)
+     * Get the rowColPos corresponding to the given CBSR SBS 2 char string position. Could be A2 or
+     * F9. (CBSR SBS skip I and O)
      */
     @SuppressWarnings("nls")
     public static RowColPos cbsrSbsToRowCol(
@@ -296,15 +298,17 @@ public class ContainerLabelingSchemeWrapper extends
             throw new Exception("binPos has an invalid length: " + pos);
         }
         int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
-        if (row == -1) return null;
+        if (row == -1)
+            return null;
         int col = Integer.parseInt(pos.substring(1)) - 1;
-        if (row == -1 || col == -1) return null;
+        if (row == -1 || col == -1)
+            return null;
         return new RowColPos(row, col);
     }
 
     /**
-     * Get the string corresponding to the given RowColPos and using the SBS
-     * standard. 2:1 will return C2.
+     * Get the string corresponding to the given RowColPos and using the SBS standard. 2:1 will
+     * return C2.
      */
     public static String rowColToSbs(RowColPos rcp) {
         if (rcp.getRow() < 0
@@ -316,8 +320,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the string corresponding to the given RowColPos and using the SBS
-     * standard. 2:1 will return C2.
+     * Get the string corresponding to the given RowColPos and using the SBS standard. 2:1 will
+     * return C2.
      */
     private static String rowColtoCbsrSbs(RowColPos rcp) {
         if (rcp.getRow() < 0
@@ -329,8 +333,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * get the RowColPos in the given container corresponding to the given label
-     * AB and will return 1:0.
+     * get the RowColPos in the given container corresponding to the given label AB and will return
+     * 1:0.
      */
     @SuppressWarnings("nls")
     public static RowColPos cbsrTwoCharToRowCol(
@@ -339,39 +343,31 @@ public class ContainerLabelingSchemeWrapper extends
         ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
             appService, SCHEME_CBSR_2_CHAR_ALPHA);
         if (scheme == null) {
-            throw new BiobankCheckException(
-                "CBSR 2 char alphabetic labeling scheme not found.");
+            throw new BiobankCheckException("CBSR 2 char alphabetic labeling scheme not found.");
         }
         int len = label.length();
-        if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
-            throw new Exception(
-                i18n.tr("Label should be {0} characters.", scheme.getMinChars()));
+        if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars())) {
+            throw new Exception(i18n.tr("Label should be {0} characters.",
+                scheme.getMinChars()));
+        }
 
-        int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
-            .charAt(len - 2));
-        int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
-            .charAt(len - 1));
+        int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
+        int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
-            throw new Exception(
-                i18n.tr("Invalid characters in label. Are they in upper case?"));
+            throw new Exception(i18n.tr("Invalid characters in label. Are they in upper case?"));
         }
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper
-                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
-                    rowCap, colCap);
-            String msgStart =
-                i18n.tr("Label {0} does not exist in this scheme.",
-                    label);
-            if (containerTypeName != null)
-                msgStart =
-                    i18n.tr("Label {0} does not exist in {1}", label,
-                        containerTypeName);
-            String msgMax =
-                i18n.tr("Max value is {0}. (Max row: {1}. Max col: {2}.)",
-                    maxValue,
-                    rowCap, colCap);
+            String maxValue = ContainerLabelingSchemeWrapper.rowColToCbsrTwoChar(
+                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap);
+            String msgStart = i18n.tr("Label {0} does not exist in this labeling scheme.", label);
+            if (containerTypeName != null) {
+                msgStart = i18n.tr("Label {0} does not exist in container with type {1}",
+                    label, containerTypeName);
+            }
+            String msgMax = i18n.tr("Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                maxValue, rowCap, colCap);
             throw new BiobankCheckException(msgStart + " " + msgMax);
         }
         Integer row = pos % rowCap;
@@ -382,8 +378,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * get the RowColPos in the given container corresponding to the given label
-     * AB and will return 1:0.
+     * get the RowColPos in the given container corresponding to the given label AB and will return
+     * 1:0.
      */
     @SuppressWarnings("nls")
     public static RowColPos twoCharToRowCol(
@@ -397,9 +393,8 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
-            throw new Exception(
-                i18n.tr("Label should be {0} characters.",
-                    scheme.getMinChars()));
+            throw new Exception(i18n.tr("Label should be {0} characters.",
+                scheme.getMinChars()));
 
         int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
         int index2 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
@@ -413,16 +408,14 @@ public class ContainerLabelingSchemeWrapper extends
             String maxValue = ContainerLabelingSchemeWrapper
                 .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
                     rowCap, colCap);
-            String msgStart =
-                i18n.tr("Label {0} does not exist in this scheme.", label);
+            String msgStart = i18n.tr(
+                "Label {0} does not exist in this scheme.", label);
             if (containerTypeName != null)
                 msgStart = i18n.tr("Label {0} does not exist in {1}", label,
                     containerTypeName);
             String msgMax = i18n.tr(
                 "Max value is {0}. (Max row: {1}. Max col: {2}.)",
-                maxValue,
-                rowCap,
-                colCap);
+                maxValue, rowCap, colCap);
             throw new BiobankCheckException(msgStart + " " + msgMax);
         }
         Integer row = pos % rowCap;
@@ -433,8 +426,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the RowColPos in the given container corresponding to the given label
-     * using the 2 char numeric labelling.
+     * Get the RowColPos in the given container corresponding to the given label using the 2 char
+     * numeric labelling.
      */
     @SuppressWarnings("nls")
     public static RowColPos twoCharNumericToRowCol(
@@ -446,8 +439,8 @@ public class ContainerLabelingSchemeWrapper extends
             throw new BiobankCheckException(
                 i18n.tr("2 char numeric labeling scheme not found"));
         }
-        String errorMsg =
-            i18n.tr("Label {0} is incorrect: it should be 2 characters", label);
+        String errorMsg = i18n.tr(
+            "Label {0} is incorrect: it should be 2 characters", label);
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
             throw new Exception(errorMsg);
@@ -540,8 +533,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the RowColPos in the given container corresponding to the given label
-     * using the dewar labelling.
+     * Get the RowColPos in the given container corresponding to the given label using the dewar
+     * labelling.
      * 
      * @throws Exception
      */
@@ -557,16 +550,16 @@ public class ContainerLabelingSchemeWrapper extends
         }
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
-            throw new Exception(
-                i18n.tr("Label should be {0} characters.", scheme.getMinChars()));
+            throw new Exception(i18n.tr("Label should be {0} characters.",
+                scheme.getMinChars()));
 
         if (label.charAt(0) != label.charAt(1)) {
-            throw new Exception(
-                i18n.tr("Label should be double letter (BB)."));
+            throw new Exception(i18n.tr("Label should be double letter (BB)."));
         }
         // letters are double (BB). need only one
         int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0));
-        if (letterPosition == -1) return null;
+        if (letterPosition == -1)
+            return null;
         Integer row = letterPosition / totalCol;
         Integer col = letterPosition % totalCol;
         RowColPos rowColPos = new RowColPos(row, col);
@@ -574,11 +567,11 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the 2 char string corresponding to a RowColPos position given the
-     * container capacity
+     * Get the 2 char string corresponding to a RowColPos position given the container capacity
      */
     public static String getPositionString(RowColPos rcp,
-        Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
+        Integer childLabelingSchemeId, Integer rowCapacity,
+        Integer colCapacity) {
         switch (childLabelingSchemeId) {
         case 1:
             // SBS standard
@@ -603,13 +596,12 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the RowColPos position corresponding to the string position given the
-     * container capacity
+     * Get the RowColPos position corresponding to the string position given the container capacity
      */
     public static RowColPos getRowColFromPositionString(
         WritableApplicationService appService, String position,
-        Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity)
-        throws Exception {
+        Integer childLabelingSchemeId, Integer rowCapacity,
+        Integer colCapacity) throws Exception {
         switch (childLabelingSchemeId) {
         case 1:
             // SBS standard

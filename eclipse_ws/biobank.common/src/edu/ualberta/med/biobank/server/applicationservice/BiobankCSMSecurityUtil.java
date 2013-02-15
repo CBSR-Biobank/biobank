@@ -42,6 +42,7 @@ public class BiobankCSMSecurityUtil {
     @SuppressWarnings("nls")
     private static final Tr CSM_USER_ID_NOT_FOUND =
         bundle.tr("CSM Security user with id {0} not found.");
+
     @SuppressWarnings("nls")
     private static final LString UNEXPECTED_PROBLEM =
         bundle.tr("Unexpected problem while modifying user.").format();
