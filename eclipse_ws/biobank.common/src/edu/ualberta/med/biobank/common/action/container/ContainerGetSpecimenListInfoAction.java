@@ -7,9 +7,9 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenListGetInfoAction;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 
-public class ContainerGetSpecimenListInfoAction extends
-    SpecimenListGetInfoAction {
+public class ContainerGetSpecimenListInfoAction extends SpecimenListGetInfoAction {
 
     @SuppressWarnings("nls")
     private static final String SPEC_QRY =
@@ -32,8 +32,14 @@ public class ContainerGetSpecimenListInfoAction extends
     }
 
     @Override
-    public ListResult<SpecimenInfo> run(ActionContext context)
-        throws ActionException {
-        return run(context, SPEC_QRY, containerId);
+    public ListResult<SpecimenInfo> run(ActionContext context) throws ActionException {
+        ListResult<SpecimenInfo> spcData = run(context, SPEC_QRY, containerId);
+        for (SpecimenInfo spcInfo : spcData.getList()) {
+            ProcessingEvent pevent = spcInfo.specimen.getProcessingEvent();
+            if (pevent != null) {
+                pevent.getWorksheet();
+            }
+        }
+        return spcData;
     }
 }
