@@ -17,6 +17,8 @@ import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAc
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -156,5 +158,50 @@ public class TestSpecimen extends TestAction {
             spc.getInventoryId(), site.getId())).getList();
         Assert.assertEquals(1, actionResult.size());
         Assert.assertEquals(spc.getId(), actionResult.get(0));
+    }
+
+    @Test
+    public void getPossibleTypesParentSpecimen() {
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        session.beginTransaction();
+        factory.createStudy();
+        specimenTypes.add(factory.createSpecimenType());
+        factory.createSourceSpecimen();
+        specimenTypes.add(factory.createSpecimenType());
+        factory.createSourceSpecimen();
+        factory.createCollectionEvent();
+        Specimen specimen = factory.createParentSpecimen();
+        session.getTransaction().commit();
+
+        SpecimenTypeData SpecimenTypeData = exec(new SpecimenGetPossibleTypesAction(specimen));
+        Assert.assertEquals(specimenTypes.size(), SpecimenTypeData.getSpecimenTypes().size());
+        Assert.assertEquals(0, SpecimenTypeData.getVolumeMap().size());
+    }
+
+    @Test
+    public void getPossibleTypesChildSpecimen() {
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        session.beginTransaction();
+        factory.createStudy();
+
+        factory.createSpecimenType();
+        factory.createSourceSpecimen();
+        factory.createSpecimenType();
+        factory.createSourceSpecimen();
+
+        specimenTypes.add(factory.createSpecimenType());
+        factory.createAliquotedSpecimen();
+        specimenTypes.add(factory.createSpecimenType());
+        factory.createAliquotedSpecimen();
+
+        factory.createCollectionEvent();
+        factory.createParentSpecimen();
+        factory.createProcessingEvent();
+        Specimen specimen = factory.createChildSpecimen();
+        session.getTransaction().commit();
+
+        SpecimenTypeData SpecimenTypeData = exec(new SpecimenGetPossibleTypesAction(specimen));
+        Assert.assertEquals(specimenTypes.size(), SpecimenTypeData.getSpecimenTypes().size());
+        Assert.assertEquals(specimenTypes.size(), SpecimenTypeData.getVolumeMap().size());
     }
 }

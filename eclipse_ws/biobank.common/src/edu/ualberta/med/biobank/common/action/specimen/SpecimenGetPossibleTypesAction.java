@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenReadPermission;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.model.Study;
  * @author Nelson Loyola
  * 
  */
-public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeInfo> {
+public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeData> {
     private static final long serialVersionUID = 1L;
     private final Integer specimenId;
 
@@ -41,7 +41,7 @@ public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeInfo> 
     }
 
     @Override
-    public SpecimenTypeInfo run(ActionContext context) throws ActionException {
+    public SpecimenTypeData run(ActionContext context) throws ActionException {
         Specimen specimen = context.load(Specimen.class, specimenId);
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
 
@@ -65,7 +65,7 @@ public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeInfo> 
             specimenTypes.retainAll(container.getContainerType().getSpecimenTypes());
         }
 
-        return new SpecimenTypeInfo(specimenTypes, volumeMap);
+        return new SpecimenTypeData(specimenTypes, volumeMap);
     }
 
     /**
@@ -74,14 +74,14 @@ public class SpecimenGetPossibleTypesAction implements Action<SpecimenTypeInfo> 
      * @author Nelson Loyola
      * 
      */
-    public static class SpecimenTypeInfo implements ActionResult {
+    public static class SpecimenTypeData implements ActionResult {
         private static final long serialVersionUID = 1L;
 
         private final Set<SpecimenType> specimenTypes;
 
         private final Map<SpecimenType, BigDecimal> volumeMap;
 
-        public SpecimenTypeInfo(Set<SpecimenType> specimenTypes,
+        public SpecimenTypeData(Set<SpecimenType> specimenTypes,
             Map<SpecimenType, BigDecimal> volumeMap) {
             this.specimenTypes = specimenTypes;
             this.volumeMap = volumeMap;

@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
 import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
@@ -100,7 +100,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText sourceSpecimenField;
 
-    private SpecimenTypeInfo specimenTypeData;
+    private SpecimenTypeData specimenTypeData;
 
     private Label sourceSpecimenLabel;
 
