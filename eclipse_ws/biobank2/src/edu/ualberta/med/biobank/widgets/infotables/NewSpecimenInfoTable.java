@@ -124,8 +124,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                     return row.specimen.getActivityStatus().getName();
                 case 6:
                     ProcessingEvent pe = row.specimen.getProcessingEvent();
-                    return pe == null ? StringUtil.EMPTY_STRING : pe
-                        .getWorksheet();
+                    return pe == null ? StringUtil.EMPTY_STRING : pe.getWorksheet();
                 case 7:
                     OriginInfo oi = row.specimen.getOriginInfo();
                     return oi == null ? StringUtil.EMPTY_STRING : oi
@@ -230,9 +229,8 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
 
     private final ColumnsShown currentColumnsShowns;
 
-    public NewSpecimenInfoTable(Composite parent,
-        List<SpecimenInfo> specimenCollection, ColumnsShown columnsShown,
-        int rowsPerPage) {
+    public NewSpecimenInfoTable(Composite parent, List<SpecimenInfo> specimenCollection,
+        ColumnsShown columnsShown, int rowsPerPage) {
         super(parent, specimenCollection, columnsShown.getheadings(),
             rowsPerPage, SpecimenInfo.class);
         this.currentColumnsShowns = columnsShown;

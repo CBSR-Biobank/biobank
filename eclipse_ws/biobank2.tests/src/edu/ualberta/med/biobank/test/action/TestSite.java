@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolationException;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.center.CenterGetStudyListAction;
@@ -49,6 +48,7 @@ import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.test.NameGenerator;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
@@ -58,22 +58,11 @@ import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestSite extends TestAction {
 
-    private String name;
-
-    private SiteSaveAction siteSaveAction;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        name = getMethodNameR();
-
-        siteSaveAction =
-            SiteHelper.getSaveAction(name, name, ActivityStatus.ACTIVE);
-    }
-
     @Test
     public void saveNew() throws Exception {
+        NameGenerator nameGenerator = new NameGenerator("test_" + getMethodNameR());
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+
         // null name
         siteSaveAction.setName(null);
         try {
@@ -86,7 +75,7 @@ public class TestSite extends TestAction {
         }
 
         // null short name
-        siteSaveAction.setName(name);
+        siteSaveAction.setName(nameGenerator.next(String.class));
         siteSaveAction.setNameShort(null);
         try {
             exec(siteSaveAction);
@@ -96,7 +85,7 @@ public class TestSite extends TestAction {
             Assert.assertTrue(true);
         }
 
-        siteSaveAction.setNameShort(name);
+        siteSaveAction.setNameShort(nameGenerator.next(String.class));
         siteSaveAction.setActivityStatus(null);
         try {
             exec(siteSaveAction);
@@ -160,8 +149,7 @@ public class TestSite extends TestAction {
 
         Site site = factory.getDefaultSite();
 
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(factory.getDefaultSite().getId()));
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(factory.getDefaultSite().getId()));
 
         Assert.assertEquals(site.getAddress().getCity(), siteInfo.getSite()
             .getAddress().getCity());
@@ -174,40 +162,42 @@ public class TestSite extends TestAction {
 
     @Test
     public void nameChecks() throws Exception {
-        Integer siteId = exec(siteSaveAction).getId();
+        session.beginTransaction();
+        Site site = factory.createSite();
+        session.getTransaction().commit();
 
-        // ensure we can change name on existing clinic
-        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
-        siteInfo.getSite().setName(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
+        // ensure we can change name on existing site
+        String name = factory.getNameGenerator().next(String.class);
+        SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(
+            name, site.getNameShort(), ActivityStatus.ACTIVE);
+        siteSaveAction.setId(site.getId());
         exec(siteSaveAction);
 
         // ensure we can change short name on existing site
-        siteInfo = exec(new SiteGetInfoAction(siteId));
-        siteInfo.getSite().setNameShort(name + "_2");
-        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
+        siteSaveAction = SiteHelper.getSaveAction(
+            site.getName(), name, ActivityStatus.ACTIVE);
+        siteSaveAction.setId(site.getId());
         exec(siteSaveAction);
 
         // test for duplicate name
-        SiteSaveAction saveSite = SiteHelper.getSaveAction(name + "_2", name,
-            ActivityStatus.ACTIVE);
+        SiteSaveAction saveSite = SiteHelper.getSaveAction(
+            name, site.getNameShort(), ActivityStatus.ACTIVE);
         try {
             exec(saveSite);
             Assert.fail("should not be allowed to add site with same name");
         } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
+            // do nothing
         }
 
         // test for duplicate name short
-        saveSite.setName(Utils.getRandomString(5, 10));
-        saveSite.setNameShort(name + "_2");
+        saveSite.setName(factory.getNameGenerator().next(String.class));
+        saveSite.setNameShort(name);
 
         try {
             exec(saveSite);
-            Assert.fail(
-                "should not be allowed to add site with same name short");
+            Assert.fail("should not be allowed to add site with same name short");
         } catch (ConstraintViolationException e) {
-            Assert.assertTrue(true);
+            // do nothing
         }
     }
 

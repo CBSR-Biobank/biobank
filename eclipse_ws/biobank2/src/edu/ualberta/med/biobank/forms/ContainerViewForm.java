@@ -647,11 +647,9 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     private void createSpecimensSection() {
-        Composite parent =
-            createSectionWithClient(Specimen.NAME.plural().toString());
-        specimensWidget =
-            new NewSpecimenInfoTable(parent, specInfo,
-                ColumnsShown.CEVENT_SOURCE_SPECIMENS, 20);
+        Composite parent = createSectionWithClient(Specimen.NAME.plural().toString());
+        specimensWidget = new NewSpecimenInfoTable(parent, specInfo,
+            ColumnsShown.CEVENT_SOURCE_SPECIMENS, 20);
         specimensWidget.adaptToToolkit(toolkit, true);
         specimensWidget
             .addClickListener(new IInfoTableDoubleClickItemListener<SpecimenInfo>() {

@@ -23,6 +23,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
@@ -141,13 +142,20 @@ public class SearchView extends ViewPart {
             public void run() {
                 String searchString = searchText.getText().trim();
 
-                SearchType type =
-                    (SearchType) ((IStructuredSelection) searchTypeCombo
-                        .getSelection()).getFirstElement();
+                SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
+                    .getSelection()).getFirstElement();
                 try {
-                    List<ModelWrapper<?>> res = type.search(
-                        searchString, SessionManager.getUser()
-                            .getCurrentWorkingCenter());
+                    CenterWrapper<?> center = SessionManager.getUser().getCurrentWorkingCenter();
+                    if (center == null) {
+                        BgcPlugin.openAsyncError(
+                            // dialog title.
+                            i18n.tr("Cannot search"),
+                            // dialog message.
+                            i18n.tr("You have no working center selected"));
+                        return;
+                    }
+
+                    List<ModelWrapper<?>> res = type.search(searchString, center);
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {

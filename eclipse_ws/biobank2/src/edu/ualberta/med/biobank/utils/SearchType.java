@@ -40,8 +40,7 @@ public enum SearchType {
         public List<ModelWrapper<?>> search(String searchString,
             CenterWrapper<?> center) throws Exception {
             SpecimenByInventorySearchAction action =
-                new SpecimenByInventorySearchAction(searchString,
-                    center.getId());
+                new SpecimenByInventorySearchAction(searchString, center.getId());
             return wrapIds(SessionManager.getAppService()
                 .doAction(action).getList(), SpecimenWrapper.class);
         }

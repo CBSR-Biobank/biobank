@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesActi
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetDispatchesAction.SpecimenDispatchesInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -348,7 +349,7 @@ public class SpecimenViewForm extends BiobankViewForm {
             .getName());
         setTextValue(createdDateLabel, specimenWrapper.getFormattedCreatedAt());
         setTextValue(volumeLabel, specimenWrapper.getQuantity() == null ? null
-            : specimenWrapper.getQuantity().toString());
+            : NumberFormatter.format(specimenWrapper.getQuantity()));
         setTextValue(studyLabel, specimenWrapper.getCollectionEvent()
             .getPatient()
             .getStudy().getNameShort());

@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Status;
@@ -22,10 +20,11 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenUpdateAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyInfo;
+import edu.ualberta.med.biobank.common.formatters.NumberFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -51,7 +50,6 @@ import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
-import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
@@ -102,7 +100,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText sourceSpecimenField;
 
-    private List<SpecimenType> specimenTypes;
+    private SpecimenTypeInfo specimenTypeData;
 
     private Label sourceSpecimenLabel;
 
@@ -110,13 +108,17 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     private BgcBaseText parentPEventField;
 
-    private StudyInfo studyInfo;
-
     @SuppressWarnings("nls")
     @Override
     protected void init() throws Exception {
         updateSpecimenInfo(adapter.getId());
-        setPartName(i18n.tr("Specimen Entry"));
+
+        if (specimen.getId() != null) {
+            // {0} inventory ID
+            setPartName(i18n.tr("Specimen: {0}", specimen.getInventoryId()));
+        } else {
+            setPartName(i18n.tr("Specimen Entry"));
+        }
     }
 
     private void updateSpecimenInfo(Integer id) throws ApplicationException {
@@ -124,19 +126,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
             specimenInfo = SessionManager.getAppService().doAction(new SpecimenGetInfoAction(id));
             specimen.setWrappedObject(specimenInfo.getSpecimen());
 
-            studyInfo = SessionManager.getAppService().doAction(new StudyGetInfoAction(
-                specimenInfo.getSpecimen().getCollectionEvent().getPatient().getStudy()));
-
-            specimenTypes = new ArrayList<SpecimenType>();
-            if (specimen.getParentSpecimen() == null) {
-                for (SourceSpecimen sourceSpecimen : studyInfo.getSourceSpecimens()) {
-                    specimenTypes.add(sourceSpecimen.getSpecimenType());
-                }
-            } else {
-                for (AliquotedSpecimen aliquotedSpecimen : studyInfo.getAliquotedSpcs()) {
-                    specimenTypes.add(aliquotedSpecimen.getSpecimenType());
-                }
-            }
+            specimenTypeData = SessionManager.getAppService().doAction(
+                new SpecimenGetPossibleTypesAction(specimenInfo.getSpecimen()));
         }
         // not possible to have a specimen entry form with id=null
         comment.setWrappedObject(new Comment());
@@ -160,39 +151,19 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        if ((specimenInfo.getSpecimen().getSpecimenType() != null)
-            && !specimenTypes.contains(specimenInfo.getSpecimen().getSpecimenType())) {
-            specimenTypes.add(specimenInfo.getSpecimen().getSpecimenType());
-        }
-
         specimenTypeComboViewer = createComboViewer(client, i18n.tr("Type"),
             ModelWrapper.wrapModelCollection(SessionManager.getAppService(),
-                specimenTypes, SpecimenTypeWrapper.class),
+                specimenTypeData.getSpecimenTypes(), SpecimenTypeWrapper.class),
             specimen.getSpecimenType(),
             i18n.tr("Specimen must have a type"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     specimen.setSpecimenType((SpecimenTypeWrapper) selectedObject);
-                    specimen.setQuantity(setQuantityFromType(
-                        specimen.getSpecimenType().getWrappedObject()));
-                    BigDecimal volume = specimen.getQuantity();
-                    if (volumeField != null) {
-                        if (volume == null) {
-                            volumeField.setText(StringUtil.EMPTY_STRING);
-                        } else {
-                            volumeField.setText(volume.toString());
-                        }
-                    }
-                }
-
-                private BigDecimal setQuantityFromType(SpecimenType specimenType) {
-                    for (AliquotedSpecimen as : studyInfo.getAliquotedSpcs()) {
-                        if (as.getSpecimenType().equals(specimenType)) {
-                            return as.getVolume();
-                        }
-                    }
-                    return null;
+                    BigDecimal volume = specimenTypeData.getVolumeMap().get(
+                        specimen.getSpecimenType().getWrappedObject());
+                    specimen.setQuantity(volume);
+                    volumeField.setText(NumberFormatter.format(volume));
                 }
             });
 
@@ -201,7 +172,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
             AliquotedSpecimen.PropertyName.VOLUME.toString(),
-            specimen.getQuantity() == null ? null : specimen.getQuantity().toString());
+            specimen.getQuantity() == null ? null : NumberFormatter.format(specimen.getQuantity()));
 
         createReadOnlyLabelledField(client, SWT.NONE,
             Study.NAME.singular().toString(), specimen

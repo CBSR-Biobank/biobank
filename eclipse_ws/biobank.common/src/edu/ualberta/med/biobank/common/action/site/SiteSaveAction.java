@@ -29,10 +29,11 @@ public class SiteSaveAction extends CenterSaveAction {
     @Override
     public boolean isAllowed(ActionContext context) {
         Permission permission;
-        if (centerId == null)
+        if (centerId == null) {
             permission = new SiteCreatePermission();
-        else
+        } else {
             permission = new SiteUpdatePermission(centerId);
+        }
         return permission.isAllowed(context);
     }
 

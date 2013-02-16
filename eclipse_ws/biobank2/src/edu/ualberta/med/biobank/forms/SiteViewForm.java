@@ -85,20 +85,17 @@ public class SiteViewForm extends AddressViewFormCommon {
     @SuppressWarnings("nls")
     @Override
     public void init() throws Exception {
-        Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+        Assert.isTrue((adapter instanceof SiteAdapter), "Invalid editor input: object of type "
+            + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
         updateSiteInfo();
-        setPartName(i18n.tr("Repository site {0}",
-            siteInfo.getSite().getNameShort()));
+        setPartName(i18n.tr("Repository site {0}", siteInfo.getSite().getNameShort()));
     }
 
     private void updateSiteInfo() throws Exception {
         Assert.isNotNull(adapter.getId());
-        siteInfo = SessionManager.getAppService().doAction(
-            new SiteGetInfoAction(adapter.getId()));
+        siteInfo = SessionManager.getAppService().doAction(new SiteGetInfoAction(adapter.getId()));
         Assert.isNotNull(siteInfo.getSite());
         site.setWrappedObject(siteInfo.getSite());
     }
@@ -261,25 +258,25 @@ public class SiteViewForm extends AddressViewFormCommon {
                     siteAdapter.getContainersGroupNode().addContainer(
                         siteAdapter, true);
                 }
-            }, ContainerWrapper.class);
+            },
+            ContainerWrapper.class);
 
-        topContainersTable =
-            new ContainerInfoTable(section, siteAdapter,
-                siteInfo.getTopContainers());
+        topContainersTable = new ContainerInfoTable(section, siteAdapter,
+            siteInfo.getTopContainers());
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
-        topContainersTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<Container>() {
+        topContainersTable.addClickListener(new IInfoTableDoubleClickItemListener<Container>() {
 
-                @Override
-                public void doubleClick(InfoTableEvent<Container> event) {
-                    ContainerWrapper ct =
-                        (ContainerWrapper) ((InfoTableSelection) event
-                            .getSelection()).getObject();
-                    new ContainerAdapter(null, ct).openViewForm();
-                }
-            });
+            @Override
+            public void doubleClick(InfoTableEvent<Container> event) {
+                Container container = (Container) ((InfoTableSelection)
+                    event.getSelection()).getObject();
+                ContainerWrapper wrapper = new ContainerWrapper(
+                    SessionManager.getAppService(), container);
+                new ContainerAdapter(null, wrapper).openViewForm();
+            }
+        });
         section.setClient(topContainersTable);
     }
 
