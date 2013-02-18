@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -54,7 +55,6 @@ import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
-import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 public class TestSite extends TestAction {
 
@@ -203,129 +203,146 @@ public class TestSite extends TestAction {
 
     @Test
     public void comments() {
-        // save with no comments
-        Integer siteId = exec(siteSaveAction).getId();
-        SiteInfo siteInfo = exec(new SiteGetInfoAction(siteId));
-        Assert.assertEquals(0, siteInfo.getSite().getComments().size());
+        // start with no comments
+        session.beginTransaction();
+        Site site = factory.createSite();
+        session.getTransaction().commit();
 
-        siteInfo = addComment(siteId);
+        addComment(site.getId());
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(site.getId()));
         Assert.assertEquals(1, siteInfo.getSite().getComments().size());
 
-        siteInfo = addComment(siteId);
+        for (Comment comment : siteInfo.getSite().getComments()) {
+            Assert.assertEquals(getGlobalAdmin(), comment.getUser());
+        }
+
+        addComment(site.getId());
+        siteInfo = exec(new SiteGetInfoAction(site.getId()));
         Assert.assertEquals(2, siteInfo.getSite().getComments().size());
 
-        // TODO: check full name on each comment's user
-        // for (Comment comment : siteInfo.site.getCommentCollection()) {
-        //
-        // }
-
+        for (Comment comment : siteInfo.getSite().getComments()) {
+            Assert.assertEquals(getGlobalAdmin(), comment.getUser());
+        }
     }
 
-    private SiteInfo addComment(Integer siteId) {
+    private void addComment(Integer siteId) {
         SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(
             exec(new SiteGetInfoAction(siteId)));
-        siteSaveAction.setCommentText(Utils.getRandomString(20, 30));
+        siteSaveAction.setCommentText(factory.getNameGenerator().next(String.class));
         exec(siteSaveAction).getId();
-        return exec(new SiteGetInfoAction(siteId));
     }
 
     @Test
-    public void studyCollection() throws Exception {
-        Set<Integer> studyIds;
-        List<Integer> allStudyIds = new ArrayList<Integer>();
-        Set<Integer> studyIdsSet1 = new HashSet<Integer>();
-        Set<Integer> studyIdsSet2 = new HashSet<Integer>();
+    public void saveStudies() throws Exception {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        Set<Study> studies = new HashSet<Study>();
+        studies.add(factory.createStudy());
+        studies.add(factory.createStudy());
+        session.getTransaction().commit();
 
-        for (int i = 0; i < 20; ++i) {
-            Integer id = StudyHelper.createStudy(
-                getExecutor(), name + "_study" + i, ActivityStatus.ACTIVE);
-            allStudyIds.add(id);
-            if (i < 10) {
-                studyIdsSet1.add(id);
-            } else {
-                studyIdsSet2.add(id);
-            }
+        Set<Integer> studyIds = new HashSet<Integer>();
+        for (Study study : studies) {
+            studyIds.add(study.getId());
         }
 
-        // add study set 1 one by one
-        Integer siteId = exec(siteSaveAction).getId();
-        SiteInfo siteInfo =
-            exec(new SiteGetInfoAction(siteId));
-        Set<Integer> expectedStudyIds = new HashSet<Integer>();
-
-        for (Integer studyId : studyIdsSet1) {
-            expectedStudyIds.add(studyId);
-
-            SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-            studyIds = getStudyIds(siteInfo.getStudyCountInfos());
-            studyIds.add(studyId);
-            siteSaveAction.setStudyIds(studyIds);
-            exec(siteSaveAction);
-            siteInfo = exec(new SiteGetInfoAction(siteId));
-            Assert.assertEquals(expectedStudyIds,
-                getStudyIds(siteInfo.getStudyCountInfos()));
-        }
-
-        // create a second site, site 2, with the second set of studies
-        Integer siteId2 = SiteHelper.createSite(getExecutor(), name + "_2",
-            Utils.getRandomString(8, 12),
-            ActivityStatus.ACTIVE, studyIdsSet2);
-        siteInfo = exec(new SiteGetInfoAction(siteId2));
-        expectedStudyIds.clear();
-        expectedStudyIds.addAll(studyIdsSet2);
-        Assert.assertEquals(expectedStudyIds,
-            getStudyIds(siteInfo.getStudyCountInfos()));
-
-        // make sure site 1 still has same collection
-        siteInfo = exec(new SiteGetInfoAction(siteId));
-        expectedStudyIds.clear();
-        expectedStudyIds.addAll(studyIdsSet1);
-        Assert.assertEquals(expectedStudyIds,
-            getStudyIds(siteInfo.getStudyCountInfos()));
-
-        // delete studies one by one from Site 1
-        siteInfo = exec(new SiteGetInfoAction(siteId));
-        for (Integer studyId : studyIdsSet1) {
-            expectedStudyIds.remove(studyId);
-
-            siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-            studyIds = getStudyIds(siteInfo.getStudyCountInfos());
-            studyIds.remove(studyId);
-            siteSaveAction.setStudyIds(studyIds);
-            exec(siteSaveAction);
-            siteInfo = exec(new SiteGetInfoAction(siteId));
-            Assert.assertEquals(expectedStudyIds,
-                getStudyIds(siteInfo.getStudyCountInfos()));
-        }
-
-        // delete studies from Site 2
-        siteInfo = exec(new SiteGetInfoAction(siteId2));
-        studyIds = getStudyIds(siteInfo.getStudyCountInfos());
-        studyIds.removeAll(studyIdsSet2);
-        siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-        exec(siteSaveAction);
-        siteInfo = exec(new SiteGetInfoAction(siteId));
-        Assert.assertTrue(getStudyIds(siteInfo.getStudyCountInfos()).isEmpty());
-
-        // attempt to add an invalid study ID
-        siteInfo = exec(new SiteGetInfoAction(siteId));
-        SiteSaveAction siteSaveAction = SiteHelper.getSaveAction(siteInfo);
-        studyIds = getStudyIds(siteInfo.getStudyCountInfos());
-        studyIds.add(-1);
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        siteSaveAction.setId(site.getId());
+        siteSaveAction.setName(site.getName());
+        siteSaveAction.setNameShort(site.getNameShort());
+        siteSaveAction.setAddress(site.getAddress());
+        siteSaveAction.setActivityStatus(site.getActivityStatus());
         siteSaveAction.setStudyIds(studyIds);
-        try {
-            exec(siteSaveAction);
-            Assert.fail("should not be allowed to add an invalid study id");
-        } catch (ModelNotFoundException e) {
-            Assert.assertTrue(true);
+        exec(siteSaveAction);
+
+        session.clear();
+        Site siteAfterSave = (Site) session.load(Site.class, site.getId());
+        Assert.assertEquals(studies.size(), siteAfterSave.getStudies().size());
+        Assert.assertTrue(siteAfterSave.getStudies().containsAll(studies));
+    }
+
+    @Test
+    public void getStudies() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        Set<Study> studies = new HashSet<Study>();
+        studies.add(factory.createStudy());
+        studies.add(factory.createStudy());
+        site.getStudies().addAll(studies);
+        for (Study study : studies) {
+            study.getSites().add(site);
         }
+        session.getTransaction().commit();
+
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(site));
+        Assert.assertEquals(studies.size(), siteInfo.getSite().getStudies().size());
+        Assert.assertTrue(siteInfo.getSite().getStudies().containsAll(studies));
+    }
+
+    @Test
+    public void deleteAllStudies() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        Set<Study> studies = new HashSet<Study>();
+        studies.add(factory.createStudy());
+        studies.add(factory.createStudy());
+        site.getStudies().addAll(studies);
+        for (Study study : studies) {
+            study.getSites().add(site);
+        }
+        session.getTransaction().commit();
+
+        // create a new save action but so not assign the study ids
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        siteSaveAction.setId(site.getId());
+        siteSaveAction.setName(site.getName());
+        siteSaveAction.setNameShort(site.getNameShort());
+        siteSaveAction.setAddress(site.getAddress());
+        siteSaveAction.setActivityStatus(site.getActivityStatus());
+        exec(siteSaveAction);
+
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(site));
+        Assert.assertEquals(0, siteInfo.getSite().getStudies().size());
+    }
+
+    @Test
+    public void deleteOneStudy() {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        List<Study> studies = new ArrayList<Study>();
+        studies.add(factory.createStudy());
+        studies.add(factory.createStudy());
+        site.getStudies().addAll(studies);
+        for (Study study : studies) {
+            study.getSites().add(site);
+        }
+        session.getTransaction().commit();
+
+        Set<Integer> studyIdsToRemain = new HashSet<Integer>();
+        studyIdsToRemain.add(studies.get(0).getId());
+
+        // create a new save action but so not assign the study ids
+        SiteSaveAction siteSaveAction = new SiteSaveAction();
+        siteSaveAction.setId(site.getId());
+        siteSaveAction.setName(site.getName());
+        siteSaveAction.setNameShort(site.getNameShort());
+        siteSaveAction.setAddress(site.getAddress());
+        siteSaveAction.setActivityStatus(site.getActivityStatus());
+        siteSaveAction.setStudyIds(studyIdsToRemain);
+        exec(siteSaveAction);
+
+        SiteInfo siteInfo = exec(new SiteGetInfoAction(site));
+        Assert.assertEquals(studies.size() - 1, siteInfo.getSite().getStudies().size());
+        Assert.assertTrue(siteInfo.getSite().getStudies().contains(studies.get(0)));
     }
 
     @Test
     public void containerTypes() {
+        SiteSaveAction siteSaveAction =
+            SiteHelper.getSaveAction(getMethodNameR(), getMethodNameR(), ActivityStatus.ACTIVE);
         Integer siteId = exec(siteSaveAction).getId();
 
-        String ctName = name + "FREEZER01";
+        String ctName = getMethodName() + "FREEZER01";
 
         ContainerTypeSaveAction ctSaveAction = ContainerTypeHelper.getSaveAction(
             ctName, ctName, siteId, true, 6, 10, getLabelingSchemeWithLargerCapacity(1).getId(),
@@ -353,14 +370,6 @@ public class TestSite extends TestAction {
             .getContainerType().getName());
     }
 
-    private Set<Integer> getStudyIds(List<StudyCountInfo> studyCountInfo) {
-        Set<Integer> ids = new HashSet<Integer>();
-        for (StudyCountInfo info : studyCountInfo) {
-            ids.add(info.getStudy().getId());
-        }
-        return ids;
-    }
-
     @Test
     public void delete() {
         session.beginTransaction();
@@ -380,7 +389,7 @@ public class TestSite extends TestAction {
         Provisioning provisioning = new Provisioning(session, factory);
         session.getTransaction().commit();
 
-        provisioning.addContainerType(getExecutor(), name,
+        provisioning.addContainerType(getExecutor(), getMethodName(),
             getLabelingSchemeWithLargerCapacity(1).getId(), getR().nextDouble());
         return provisioning;
     }
