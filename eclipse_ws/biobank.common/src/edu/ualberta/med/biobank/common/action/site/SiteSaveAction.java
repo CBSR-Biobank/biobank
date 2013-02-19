@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.action.site;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -16,7 +17,7 @@ public class SiteSaveAction extends CenterSaveAction {
 
     private static final long serialVersionUID = 1L;
 
-    private Set<Integer> studyIds;
+    private Set<Integer> studyIds = new HashSet<Integer>(0);
 
     public void setStudyIds(Set<Integer> studyIds) {
         if (studyIds == null) {
