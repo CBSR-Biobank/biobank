@@ -122,7 +122,12 @@
 		<dependency>
 			<groupId>supercsv</groupId>
 			<artifactId>spiffy-all</artifactId>
-	<version>0.05</version>
+			<version>0.05</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>1.2.0.Final</version>
 		</dependency>
 	</dependencies>
 
@@ -141,36 +146,79 @@
 			<plugin>
 				<groupId>org.xnap.commons</groupId>
 				<artifactId>maven-gettext-plugin</artifactId>
-				<version>1.2.3</version>
 				<configuration>
 					<poDirectory>${basedir}/po</poDirectory>
 					<outputFormat>class</outputFormat>
 					<targetBundle>i18n.Messages</targetBundle>
 				</configuration>
 			</plugin>
-
-			<!-- gettext: To use the plugin goals in your POM or parent POM -->
 			<plugin>
-				<groupId>org.xnap.commons</groupId>
-				<artifactId>maven-gettext-plugin</artifactId>
-				<version>1.2.3</version>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<compilerArgument>-proc:none</compilerArgument>
+					<!-- compilerArguments>
+						<processor>
+							org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor
+						</processor>
+					</compilerArguments -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>2.0.2</version>
+				<executions>
+					<execution>
+						<id>process</id>
+						<goals>
+							<goal>process</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<!-- source output directory -->
+							<outputDirectory>target/metamodel</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>target/metamodel</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
 
 	<!-- To use the report goals in your POM or parent POM -->
 	<reporting>
-	<plugins>
-		<plugin>
-			<groupId>org.xnap.commons</groupId>
-			<artifactId>maven-gettext-plugin</artifactId>
-			<version>1.2.3</version>
-			<configuration>
-				<targetBundle>edu.ualberta.med.biobank.Messages</targetBundle>
-				<outputFormat>properties</outputFormat>
-			</configuration>
-		</plugin>
-	</plugins>
-</reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.xnap.commons</groupId>
+				<artifactId>maven-gettext-plugin</artifactId>
+				<version>1.2.3</version>
+				<configuration>
+					<targetBundle>edu.ualberta.med.biobank.Messages</targetBundle>
+					<outputFormat>properties</outputFormat>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>
