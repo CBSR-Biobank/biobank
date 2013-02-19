@@ -22,7 +22,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-core.jar" sourcepath="lib/client/hibernate-core-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-ehcache.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-envers.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-jpa-2.0-api.jar" sourcepath="lib/client/hibernate-jpa-2.0-api-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
