@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.specimentypeselection;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -141,10 +143,14 @@ public class AliquotedSpecimenSelectionWidget implements ISelectionChangedListen
             @Override
             public String getText(Object element) {
                 AliquotedSpecimen aqSpecimen = (AliquotedSpecimen) element;
+
+                DecimalFormat dm = new DecimalFormat("0.000#");
+                dm.setRoundingMode(RoundingMode.HALF_UP);
+
                 StringBuffer label = new StringBuffer();
                 label.append(aqSpecimen.getSpecimenType().getName());
-                label.append("(");
-                label.append(aqSpecimen.getVolume());
+                label.append(" (");
+                label.append(dm.format(aqSpecimen.getVolume()));
                 label.append(")");
                 return label.toString();
             }
