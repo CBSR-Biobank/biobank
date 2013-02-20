@@ -123,33 +123,24 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.PropertyName.NAME.toString());
-        nameShortLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasNameShort.PropertyName.NAME_SHORT.toString());
-        studyCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Total {0}", Study.NAME.plural().toString()));
-        containerTypeCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                ContainerType.NAME.plural().toString());
-        topContainerCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Top level containers"));
-        patientCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Total {0}", Patient.NAME.plural().toString()));
-        processingEventCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Total {0}", ProcessingEvent.NAME.plural().toString()));
-        specimenCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                i18n.tr("Total {0}", Specimen.NAME.plural().toString()));
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                ActivityStatus.NAME.singular().toString());
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            HasName.PropertyName.NAME.toString());
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            HasNameShort.PropertyName.NAME_SHORT.toString());
+        studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Total {0}", Study.NAME.plural().toString()));
+        containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            ContainerType.NAME.plural().toString());
+        topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Top level containers"));
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Total {0}", Patient.NAME.plural().toString()));
+        processingEventCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Total {0}", ProcessingEvent.NAME.plural().toString()));
+        specimenCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            i18n.tr("Total {0}", Specimen.NAME.plural().toString()));
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            ActivityStatus.NAME.singular().toString());
         setSiteSectionValues();
     }
 
@@ -157,59 +148,45 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(nameLabel, siteInfo.getSite().getName());
         setTextValue(nameShortLabel, siteInfo.getSite().getNameShort());
         setTextValue(studyCountLabel, siteInfo.getStudyCountInfos().size());
-        setTextValue(containerTypeCountLabel, siteInfo.getContainerTypeInfos()
-            .size());
+        setTextValue(containerTypeCountLabel, siteInfo.getContainerTypeInfos().size());
         setTextValue(topContainerCountLabel, siteInfo.getTopContainerCount());
         setTextValue(patientCountLabel, siteInfo.getPatientCount());
-        setTextValue(processingEventCountLabel,
-            siteInfo.getProcessingEventCount());
+        setTextValue(processingEventCountLabel, siteInfo.getProcessingEventCount());
         setTextValue(specimenCountLabel, siteInfo.getSpecimenCount());
-        setTextValue(activityStatusLabel, siteInfo.getSite()
-            .getActivityStatus()
-            .getName());
+        setTextValue(activityStatusLabel, siteInfo.getSite().getActivityStatus().getName());
     }
 
     private void createStudySection() {
         Section section = createSection(Study.NAME.plural().toString());
-        studiesTable =
-            new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
+        studiesTable = new NewStudyInfoTable(section, siteInfo.getStudyCountInfos());
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
+        studiesTable.addClickListener(new IInfoTableDoubleClickItemListener<StudyCountInfo>() {
 
-                @Override
-                public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
-                    Study s =
-                        ((StudyCountInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getStudy();
-                    new StudyAdapter(null,
-                        new StudyWrapper(SessionManager
-                            .getAppService(), s)).openViewForm();
+            @Override
+            public void doubleClick(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection)
+                    event.getSelection()).getObject()).getStudy();
+                new StudyAdapter(null, new StudyWrapper(
+                    SessionManager.getAppService(), s)).openViewForm();
 
-                }
-            });
-        studiesTable
-            .addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
-                @Override
-                public void editItem(InfoTableEvent<StudyCountInfo> event) {
-                    Study s =
-                        ((StudyCountInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getStudy();
-                    new StudyAdapter(null,
-                        new StudyWrapper(SessionManager
-                            .getAppService(), s)).openEntryForm();
-                }
-            });
+            }
+        });
+        studiesTable.addEditItemListener(new IInfoTableEditItemListener<StudyCountInfo>() {
+            @Override
+            public void editItem(InfoTableEvent<StudyCountInfo> event) {
+                Study s = ((StudyCountInfo) ((InfoTableSelection)
+                    event.getSelection()).getObject()).getStudy();
+                new StudyAdapter(null, new StudyWrapper(
+                    SessionManager.getAppService(), s)).openEntryForm();
+            }
+        });
 
         section.setClient(studiesTable);
     }
 
     private void createCommentsSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.plural().toString());
-        commentTable =
-            new CommentsInfoTable(client,
-                site.getCommentCollection(false));
+        Composite client = createSectionWithClient(Comment.NAME.plural().toString());
+        commentTable = new CommentsInfoTable(client, site.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
@@ -221,25 +198,22 @@ public class SiteViewForm extends AddressViewFormCommon {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    siteAdapter.getContainerTypesGroupNode().addContainerType(
-                        siteAdapter, true);
+                    siteAdapter.getContainerTypesGroupNode().addContainerType(siteAdapter, true);
                 }
             }, ContainerTypeWrapper.class);
 
-        containerTypesTable =
-            new ContainerTypeInfoTable(section, siteAdapter,
-                siteInfo.getContainerTypeInfos());
+        containerTypesTable = new ContainerTypeInfoTable(section, siteAdapter,
+            siteInfo.getContainerTypeInfos());
         containerTypesTable.adaptToToolkit(toolkit, true);
 
-        containerTypesTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<SiteContainerTypeInfo>() {
+        containerTypesTable.addClickListener(
+            new IInfoTableDoubleClickItemListener<SiteContainerTypeInfo>() {
 
                 @Override
                 public void doubleClick(
                     InfoTableEvent<SiteContainerTypeInfo> event) {
-                    ContainerType ct =
-                        ((SiteContainerTypeInfo) ((InfoTableSelection) event
-                            .getSelection()).getObject()).getContainerType();
+                    ContainerType ct = ((SiteContainerTypeInfo) ((InfoTableSelection)
+                        event.getSelection()).getObject()).getContainerType();
                     new ContainerTypeAdapter(null, new ContainerTypeWrapper(
                         SessionManager.getAppService(), ct)).openViewForm();
                 }
@@ -249,14 +223,12 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     @SuppressWarnings("nls")
     private void createContainerSection() {
-        Section section =
-            createSection(i18n.tr("Top level containers"));
+        Section section = createSection(i18n.tr("Top level containers"));
         addSectionToolbar(section, i18n.tr("Add container"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    siteAdapter.getContainersGroupNode().addContainer(
-                        siteAdapter, true);
+                    siteAdapter.getContainersGroupNode().addContainer(siteAdapter, true);
                 }
             },
             ContainerWrapper.class);

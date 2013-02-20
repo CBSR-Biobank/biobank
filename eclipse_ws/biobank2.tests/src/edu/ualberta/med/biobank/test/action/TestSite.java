@@ -458,6 +458,22 @@ public class TestSite extends TestAction {
     }
 
     @Test
+    public void getTopContainers() throws Exception {
+        session.beginTransaction();
+        Site site = factory.createSite();
+        Set<Container> containers = new HashSet<Container>();
+        containers.add(factory.createTopContainer());
+        factory.createContainer();
+        containers.add(factory.createTopContainer());
+        factory.createContainer();
+        session.getTransaction().commit();
+
+        List<Container> actionResult = exec(new SiteGetTopContainersAction(site.getId())).getList();
+        Assert.assertEquals(containers.size(), actionResult.size());
+        Assert.assertTrue(actionResult.containsAll(containers));
+    }
+
+    @Test
     public void deleteWithProcessingEvents() throws Exception {
         session.beginTransaction();
         Provisioning provisioning = new Provisioning(session, factory);
