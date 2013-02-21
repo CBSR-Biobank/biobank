@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.ListResult;
+import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
@@ -20,13 +21,13 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
-public class ContainerGetParentsByChildLabelAction implements Action<ListResult<Container>> {
+public class ContainerGetContainerOrParentsByLabelAction implements Action<ContainerData> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ContainerGetParentsByChildLabelAction.class
+    private static Logger log = LoggerFactory.getLogger(ContainerGetContainerOrParentsByLabelAction.class
         .getName());
 
-    private final String childLabel;
+    private final String label;
 
     private final Integer containerTypeId;
 
@@ -41,7 +42,7 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
      * @param containerType optional
      */
     @SuppressWarnings("nls")
-    public ContainerGetParentsByChildLabelAction(String label, Site site,
+    public ContainerGetContainerOrParentsByLabelAction(String label, Site site,
         ContainerType containerType) {
         log.debug("containerId={}", label);
         if (label == null) {
@@ -50,7 +51,7 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         if (site == null) {
             throw new IllegalArgumentException();
         }
-        this.childLabel = label;
+        this.label = label;
         this.siteId = site.getId();
 
         if (containerType != null) {
@@ -60,7 +61,7 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         }
     }
 
-    public ContainerGetParentsByChildLabelAction(String label, Site site) {
+    public ContainerGetContainerOrParentsByLabelAction(String label, Site site) {
         this(label, site, null);
     }
 
@@ -68,18 +69,35 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         boolean result = new ContainerReadPermission(siteId).isAllowed(context);
-        log.debug("isAllowed: containerId={} allowed={}", childLabel, result);
+        log.debug("isAllowed: containerId={} allowed={}", label, result);
         return result;
     }
 
-    @SuppressWarnings("nls")
+    @SuppressWarnings({ "nls", "unchecked" })
     @Override
-    public ListResult<Container> run(ActionContext context) throws ActionException {
-        log.debug("run: containerId={} containerTypeId={}", childLabel, containerTypeId);
+    public ContainerData run(ActionContext context) throws ActionException {
+        log.debug("run: containerId={} containerTypeId={}", label, containerTypeId);
         this.session = context.getSession();
-        List<Container> containers = getPossibleParents();
+
+        // first check if the label is for a top level container
+        List<Container> containers = session.createCriteria(Container.class)
+            .add(Restrictions.eq("label", label))
+            .add(Restrictions.eq("site.id", siteId)).list();
+
+        boolean isTopLevel = !containers.isEmpty();
+
+        if (!isTopLevel) {
+            // label was not for top level container, find possible parent containers
+            containers = getPossibleParents();
+        }
+
         for (Container container : containers) {
-            container.getParentContainer().getContainerType().getChildLabelingScheme().getMaxRows();
+            if (!isTopLevel) {
+                Container parentContainer = container.getParentContainer();
+                if (parentContainer != null) {
+                    parentContainer.getContainerType().getChildLabelingScheme().getMaxRows();
+                }
+            }
             container.getChildPositions().size();
             container.getSpecimenPositions().size();
             container.getContainerType().getSpecimenTypes().size();
@@ -87,7 +105,16 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
                 ctype.getSpecimenTypes().size();
             }
         }
-        return new ListResult<Container>(containers);
+
+        ContainerData containerData;
+
+        if (isTopLevel) {
+            containerData = new ContainerData(containers.get(0));
+        } else {
+            containerData = new ContainerData(containers);
+        }
+
+        return containerData;
     }
 
     /**
@@ -97,16 +124,13 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
      */
     @SuppressWarnings("nls")
     private List<Container> getPossibleParents() {
-        List<Integer> minMaxLengths = getMinMaxLabelLengths();
-        if (minMaxLengths.size() != 2) {
-            throw new IllegalStateException("invalid size in list");
-        }
+        MinMax minMax = getMinMaxLabelLengths();
 
         List<String> possibleParentLabels = new ArrayList<String>();
-        int childLabelLength = childLabel.length();
-        for (int i = minMaxLengths.get(0), n = minMaxLengths.get(1); i <= n; ++i) {
+        int childLabelLength = label.length();
+        for (int i = minMax.getMin(), n = minMax.getMax(); i <= n; ++i) {
             if (i >= childLabelLength) break;
-            possibleParentLabels.add(childLabel.substring(0, childLabelLength - i));
+            possibleParentLabels.add(label.substring(0, childLabelLength - i));
         }
 
         List<Container> filteredContainers = new ArrayList<Container>();
@@ -127,7 +151,7 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         for (Container c : containers) {
             ContainerType ct = c.getContainerType();
             try {
-                if (ct.getRowColFromPositionString(childLabel.substring(c.getLabel().length())) != null) {
+                if (ct.getRowColFromPositionString(label.substring(c.getLabel().length())) != null) {
                     filteredContainers.add(c);
                 }
             } catch (Exception e) {
@@ -138,26 +162,64 @@ public class ContainerGetParentsByChildLabelAction implements Action<ListResult<
         return filteredContainers;
     }
 
-    @SuppressWarnings({ "nls", "unchecked" })
-    private List<Integer> getMinMaxLabelLengths() {
-        List<Object[]> minMax = session.createCriteria(ContainerLabelingScheme.class)
+    @SuppressWarnings("nls")
+    private MinMax getMinMaxLabelLengths() {
+        Object[] minMaxArr = (Object[]) session.createCriteria(ContainerLabelingScheme.class)
             .setProjection(Projections.projectionList()
                 .add(Projections.min("minChars"))
-                .add(Projections.max("maxChars"))).list();
+                .add(Projections.max("maxChars"))).uniqueResult();
 
-        // String POS_LABEL_LEN_QRY =
-        // "select min(minChars), max(maxChars) from "
-        // + ContainerLabelingScheme.class.getName();
-        // List<Object[]> minMax = session.createQuery(POS_LABEL_LEN_QRY).list();
-
-        if (minMax.isEmpty()) {
+        if (minMaxArr == null) {
             throw new IllegalStateException("could not get values from container labeling schemes");
         }
 
-        List<Integer> possibleLengths = new ArrayList<Integer>();
-        for (Object obj : minMax.get(0)) {
-            possibleLengths.add((Integer) obj);
+        if (minMaxArr.length != 2) {
+            throw new IllegalStateException("query returned wrong number of results");
         }
-        return possibleLengths;
+        return new MinMax((Integer) minMaxArr[0], (Integer) minMaxArr[1]);
+    }
+
+    private static class MinMax {
+        private final Integer min;
+        private final Integer max;
+
+        public MinMax(Integer min, Integer max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        public Integer getMin() {
+            return min;
+        }
+
+        public Integer getMax() {
+            return max;
+        }
+    }
+
+    public static class ContainerData implements ActionResult {
+        private static final long serialVersionUID = 1L;
+
+        private final Container container;
+        private final List<Container> possibleParentContainers;
+
+        public ContainerData(Container container) {
+            this.container = container;
+            this.possibleParentContainers = null;
+        }
+
+        public ContainerData(List<Container> possibleParents) {
+            this.container = null;
+            this.possibleParentContainers = possibleParents;
+        }
+
+        public Container getContainer() {
+            return container;
+        }
+
+        public List<Container> getPossibleParentContainers() {
+            return possibleParentContainers;
+        }
+
     }
 }

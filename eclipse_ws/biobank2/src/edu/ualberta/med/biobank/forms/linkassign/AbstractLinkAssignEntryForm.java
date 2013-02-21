@@ -28,7 +28,8 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetParentsByChildLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -74,6 +75,8 @@ public abstract class AbstractLinkAssignEntryForm extends
     // multiple mode. First container, is the direct parent, second is the
     // parent parent, etc...
     protected List<ContainerWrapper> parentContainers;
+
+    protected ContainerWrapper container;
 
     // Single
     private Composite singleFieldsComposite;
@@ -637,43 +640,44 @@ public abstract class AbstractLinkAssignEntryForm extends
      * Search possible parents from the position text. Is used both by single and multiple assign.
      * 
      * @param positionText the position to use for initialisation
-     * @param isContainerPosition if true, the position is a full container position, if false, it
-     *            is a full specimen position
+     * @param type
      */
     @SuppressWarnings("nls")
-    protected void initContainersFromPosition(BgcBaseText positionText,
-        ContainerTypeWrapper type) {
+    protected void initContainersFromPosition(BgcBaseText positionText, ContainerTypeWrapper type) {
         parentContainers = new ArrayList<ContainerWrapper>();
         try {
-            List<Container> foundContainers;
             Site site = SessionManager.getUser().getCurrentWorkingSite().getWrappedObject();
 
-            if (type == null) {
-                foundContainers = SessionManager.getAppService().doAction(
-                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
-                        site)).getList();
-            } else {
-                foundContainers = SessionManager.getAppService().doAction(
-                    new ContainerGetParentsByChildLabelAction(positionText.getText(),
-                        site, type.getWrappedObject())).getList();
+            ContainerType rawType = null;
+            if (type != null) {
+                rawType = type.getWrappedObject();
             }
 
-            if (foundContainers.isEmpty())
+            ContainerData containerData = SessionManager.getAppService().doAction(
+                new ContainerGetContainerOrParentsByLabelAction(positionText.getText(),
+                    site, rawType));
+
+            List<Container> possibleParents = containerData.getPossibleParentContainers();
+
+            if (containerData.getContainer() != null) {
+                container = new ContainerWrapper(SessionManager.getAppService(),
+                    containerData.getContainer());
+            } else if (possibleParents.isEmpty()) {
                 BgcPlugin.openAsyncError(
                     // TR: dialog title
                     i18n.tr("Container label error"),
                     // TR: dialog message
                     i18n.tr("Unable to find a container with label {0}", positionText.getText()));
-            else if (foundContainers.size() == 1) {
+            } else if (possibleParents.size() == 1) {
                 parentContainers.add(new ContainerWrapper(SessionManager.getAppService(),
-                    foundContainers.get(0)));
+                    possibleParents.get(0)));
             } else {
                 SelectParentContainerDialog dlg = new SelectParentContainerDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), foundContainers);
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), possibleParents);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
                     StringBuffer sb = new StringBuffer();
-                    for (Container cont : foundContainers) {
+                    for (Container cont : possibleParents) {
                         sb.append(ContainerWrapper.getFullInfoLabel(cont));
                     }
                     BgcPlugin.openError(
@@ -710,8 +714,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 try {
                     appendLog("----");
                     String positionString = positionField.getText();
-                    if (parentContainers == null
-                        || parentContainers.size() == 0) {
+                    if ((parentContainers == null) || parentContainers.isEmpty()) {
                         displaySinglePositions(false);
                         return;
                     }
@@ -731,16 +734,14 @@ public abstract class AbstractLinkAssignEntryForm extends
                             i18n.tr(
                                 "Position {0} is invalid: no specimen position found that matches this label",
                                 positionString));
-                        appendLog(NLS
-                            .bind(
-                                "ERROR: Position {0} is invalid: no specimen position found that matches this label",
-                                positionString));
+                        appendLog(NLS.bind(
+                            "ERROR: Position {0} is invalid: no specimen position found that matches this label",
+                            positionString));
                         return;
                     }
 
                     List<SpecimenTypeWrapper> specimenTypeCollection =
-                        container.getContainerType()
-                            .getSpecimenTypeCollection();
+                        container.getContainerType().getSpecimenTypeCollection();
 
                     if (specimenTypeCollection.isEmpty()) {
                         BgcPlugin.openError(
@@ -760,15 +761,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                             // TR: dialog title
                             i18n.tr("Container error"),
                             // TR: dialog message
-                            i18n.tr(
-                                "Container {0} cannot hold specimens of type \"{1}\"",
-                                positionString,
-                                singleSpecimen.getSpecimenType()));
-                        appendLog(NLS
-                            .bind(
-                                "ERROR: Container {0} cannot hold specimens of type \"{1}\"",
-                                positionString,
-                                singleSpecimen.getSpecimenType()));
+                            i18n.tr("Container {0} cannot hold specimens of type \"{1}\"",
+                                positionString, singleSpecimen.getSpecimenType()));
+                        appendLog(NLS.bind(
+                            "ERROR: Container {0} cannot hold specimens of type \"{1}\"",
+                            positionString, singleSpecimen.getSpecimenType()));
                         focusControl(positionField);
                         return;
                     }
@@ -783,15 +780,11 @@ public abstract class AbstractLinkAssignEntryForm extends
                             // TR: dialog title
                             i18n.tr("Position not free"),
                             // TR: dialog message
-                            i18n.tr(
-                                "Position {0} already in use in container {1}",
-                                positionString, parentContainers.get(0)
-                                    .getLabel()));
-                        appendLog(NLS
-                            .bind(
-                                "ERROR: Position {0} already in use in container {1}",
-                                positionString, parentContainers.get(0)
-                                    .getLabel()));
+                            i18n.tr("Position {0} already in use in container {1}",
+                                positionString, parentContainers.get(0).getLabel()));
+                        appendLog(NLS.bind(
+                            "ERROR: Position {0} already in use in container {1}",
+                            positionString, parentContainers.get(0).getLabel()));
                         focusControl(positionField);
                         return;
                     }
