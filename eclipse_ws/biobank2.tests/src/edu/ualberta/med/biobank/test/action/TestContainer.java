@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenActi
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -119,17 +118,21 @@ public class TestContainer extends TestAction {
         Container container = factory.createContainer();
         session.getTransaction().commit();
 
-        ContainerInfo containerInfo = exec(new ContainerGetInfoAction(container.getId()));
+        List<Container> containers = exec(new ContainerGetInfoAction(container)).getList();
 
-        Assert.assertEquals(container.getLabel(), containerInfo.container.getLabel());
-        Assert.assertEquals(container.getContainerType().getName(), containerInfo.container
-            .getContainerType().getName());
-        Assert.assertEquals(ActivityStatus.ACTIVE, containerInfo.container.getActivityStatus());
+        Assert.assertEquals(1, containers.size());
+
+        Container actionContainer = containers.get(0);
+
+        Assert.assertEquals(container.getLabel(), actionContainer.getLabel());
+        Assert.assertEquals(container.getContainerType().getName(),
+            actionContainer.getContainerType().getName());
+        Assert.assertEquals(ActivityStatus.ACTIVE, actionContainer.getActivityStatus());
         Assert.assertEquals(container.getSite().getName(),
-            containerInfo.container.getSite().getName());
-        Assert.assertEquals(0, containerInfo.container.getChildPositions().size());
-        Assert.assertEquals(0, containerInfo.container.getSpecimenPositions().size());
-        Assert.assertEquals(0, containerInfo.container.getComments().size());
+            actionContainer.getSite().getName());
+        Assert.assertEquals(0, actionContainer.getChildPositions().size());
+        Assert.assertEquals(0, actionContainer.getSpecimenPositions().size());
+        Assert.assertEquals(0, actionContainer.getComments().size());
     }
 
     // TODO: need tests for container labels
@@ -184,9 +187,12 @@ public class TestContainer extends TestAction {
         exec(new ContainerMoveAction(childL1Container, topContainer2,
             topContainer2.getLabel() + "A1"));
 
-        ContainerInfo containerInfo =
-            exec(new ContainerGetInfoAction(childL1Container.getId()));
-        childL1Container = containerInfo.container;
+        Container qryContainer = new Container();
+        qryContainer.setId(childL1Container.getId());
+
+        List<Container> containers = exec(new ContainerGetInfoAction(qryContainer)).getList();
+        Assert.assertEquals(1, containers.size());
+        childL1Container = containers.get(0);
 
         Assert.assertEquals(topContainer2.getId(),
             childL1Container.getTopContainer().getId());
@@ -198,17 +204,18 @@ public class TestContainer extends TestAction {
 
         // check that children have correct settings too
         for (Container child : childL2Containers) {
-            containerInfo = exec(new ContainerGetInfoAction(child.getId()));
+            qryContainer = new Container();
+            qryContainer.setId(child.getId());
+
+            containers = exec(new ContainerGetInfoAction(qryContainer)).getList();
             Assert.assertEquals(topContainer2.getId(),
-                containerInfo.container.getTopContainer().getId());
+                containers.get(0).getTopContainer().getId());
 
             // ensure parent is still childL1Container
             Assert.assertEquals(childL1Container.getId(),
-                containerInfo.container.getParentContainer().getId());
+                containers.get(0).getParentContainer().getId());
 
-            // check the path
-            Assert
-                .assertEquals(expectedL2Path, containerInfo.container.getPath());
+            Assert.assertEquals(expectedL2Path, containers.get(0).getPath());
         }
     }
 

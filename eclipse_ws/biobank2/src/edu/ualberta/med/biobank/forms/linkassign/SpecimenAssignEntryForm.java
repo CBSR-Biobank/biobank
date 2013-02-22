@@ -895,8 +895,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean checkMultipleScanBarcode() {
         try {
             initWithProduct = false;
-            ContainerWrapper palletFoundWithProductBarcode = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(
+            ContainerWrapper palletFoundWithProductBarcode =
+                ContainerWrapper.getContainerWithProductBarcodeInSite(
                     SessionManager.getAppService(),
                     currentMultipleContainer.getSite(),
                     currentMultipleContainer.getProductBarcode());
