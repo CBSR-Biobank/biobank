@@ -669,8 +669,10 @@ public abstract class AbstractLinkAssignEntryForm extends
                     // TR: dialog message
                     i18n.tr("Unable to find a container with label {0}", positionText.getText()));
             } else if (possibleParents.size() == 1) {
+                Container parent = possibleParents.get(0);
                 parentContainers.add(new ContainerWrapper(SessionManager.getAppService(),
-                    possibleParents.get(0)));
+                    parent));
+                appendLog(i18n.tr("Parent container: {0}", parent.getLabel()));
             } else {
                 SelectParentContainerDialog dlg = new SelectParentContainerDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), possibleParents);

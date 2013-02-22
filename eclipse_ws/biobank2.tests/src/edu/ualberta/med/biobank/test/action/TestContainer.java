@@ -9,9 +9,10 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.action.container.ContainerGetChildrenAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerMoveAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -272,11 +273,11 @@ public class TestContainer extends TestAction {
         childContainer.setLabel("C01A1");
         session.getTransaction().commit();
 
-        List<Container> containers = exec(new ContainerGetContainerOrParentsByLabelAction(
+        ContainerData containerData = exec(new ContainerGetContainerOrParentsByLabelAction(
             childContainer.getLabel() + "A1", childContainer.getSite(),
-            childContainer.getContainerType())).getList();
+            childContainer.getContainerType()));
 
-        Assert.assertEquals(1, containers.size());
+        Assert.assertEquals(1, containerData.getPossibleParentContainers().size());
     }
 
     /**
@@ -298,9 +299,9 @@ public class TestContainer extends TestAction {
         childContainer2.setLabel("C02A1");
         session.getTransaction().commit();
 
-        List<Container> containers = exec(new ContainerGetContainerOrParentsByLabelAction(
-            childContainer.getLabel() + "A1", childContainer.getSite())).getList();
+        ContainerData containerData = exec(new ContainerGetContainerOrParentsByLabelAction(
+            childContainer.getLabel() + "A1", childContainer.getSite()));
 
-        Assert.assertEquals(2, containers.size());
+        Assert.assertEquals(2, containerData.getPossibleParentContainers().size());
     }
 }
