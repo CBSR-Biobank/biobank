@@ -65,8 +65,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 /**
  * Base class for data entry forms.
  * 
- * Notes: - saveForm() is called in it's own thread so making calls to the
- * database is possible.
+ * Notes: - saveForm() is called in it's own thread so making calls to the database is possible.
  * 
  */
 public abstract class BiobankEntryForm extends BiobankFormBase implements
@@ -208,8 +207,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     /**
-     * Called before the monitor start. Can be used to get values on the GUI
-     * objects.
+     * Called before the monitor start. Can be used to get values on the GUI objects.
      */
     protected void doBeforeSave() throws Exception {
         // do nothing by default
@@ -218,8 +216,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     /**
      * Invoked in GUI thread.
      * 
-     * Called after the monitor start. Can be used to get values on the GUI
-     * objects.
+     * Called after the monitor start. Can be used to get values on the GUI objects.
      */
     protected void doAfterSave() throws Exception {
         // default does nothing
@@ -336,8 +333,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
         statusObservable.addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus = (IObservableValue) event
-                    .getSource();
+                IObservableValue validationStatus = (IObservableValue) event.getSource();
                 handleStatusChanged((IStatus) validationStatus.getValue());
             }
         });
@@ -386,8 +382,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     /**
-     * Called to get the string to display when the for is not in an error
-     * state.
+     * Called to get the string to display when the for is not in an error state.
      * 
      * @return the string to display at the top of the form.
      */
@@ -491,8 +486,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase implements
     }
 
     /**
-     * Return the ID of the form that should be opened after the save action is
-     * performed and the current form closed
+     * Return the ID of the form that should be opened after the save action is performed and the
+     * current form closed
      */
     public abstract String getNextOpenedFormId();
 

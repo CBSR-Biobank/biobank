@@ -337,10 +337,10 @@ public class BgcWidgetCreator {
             // without validation and the text-field is bound to some observable
             // string whose sole purpose is to validate the text-field's value.
             dbc.bindValue(
-                SWTObservables.observeText(text.getTextBox(), SWT.Modify),
+                SWTObservables.observeText(text.getTextWidget(), SWT.Modify),
                 modelObservableValue, null, null);
             Binding binding = dbc
-                .bindValue(SWTObservables.observeText(text.getTextBox(),
+                .bindValue(SWTObservables.observeText(text.getTextWidget(),
                     SWT.Modify),
                     new WritableValue(modelObservableValue.getValue(),
                         String.class), uvs, null);

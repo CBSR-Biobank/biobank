@@ -8,11 +8,11 @@ public class CellInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer row;
+    private final Integer row;
 
-    private Integer col;
+    private final Integer col;
 
-    private String value;
+    private final String value;
 
     private CellInfoStatus status;
 
@@ -25,11 +25,7 @@ public class CellInfo implements Serializable {
 
     private Integer specimenId;
 
-    public CellInfo() {
-    }
-
     public CellInfo(int row, int col, String value, CellInfoStatus status) {
-        this();
         this.row = row;
         this.col = col;
         this.value = value;
@@ -72,24 +68,12 @@ public class CellInfo implements Serializable {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public static boolean hasValue(CellInfo cell) {
-        return cell != null && cell.getValue() != null;
-    }
-
-    public void setRow(Integer row) {
-        this.row = row;
+        return (cell != null) && (cell.getValue() != null);
     }
 
     public Integer getRow() {
         return row;
-    }
-
-    public void setCol(Integer col) {
-        this.col = col;
     }
 
     public Integer getCol() {

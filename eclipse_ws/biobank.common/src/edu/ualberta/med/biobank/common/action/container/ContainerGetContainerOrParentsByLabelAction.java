@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 
@@ -79,42 +80,54 @@ public class ContainerGetContainerOrParentsByLabelAction implements Action<Conta
         log.debug("run: containerId={} containerTypeId={}", label, containerTypeId);
         this.session = context.getSession();
 
-        // first check if the label is for a top level container
-        List<Container> containers = session.createCriteria(Container.class)
-            .add(Restrictions.eq("label", label))
-            .add(Restrictions.eq("site.id", siteId)).list();
+        // first check if the label is for an existing top level container
+        List<Container> containers = session.createCriteria(Container.class, "container")
+            .createAlias("container.containerType", "ctype")
+            .add(Restrictions.eq("container.label", label))
+            .add(Restrictions.eq("container.site.id", siteId))
+            .add(Restrictions.eq("ctype.topLevel", true)).list();
 
-        boolean isTopLevel = !containers.isEmpty();
-
-        if (!isTopLevel) {
-            // label was not for top level container, find possible parent containers
-            containers = getPossibleParents();
+        if (containers.size() == 1) {
+            ContainerData containerData = new ContainerData(containers.get(0));
+            loadAssociations(containers.get(0));
+            return containerData;
         }
 
-        for (Container container : containers) {
-            if (!isTopLevel) {
-                Container parentContainer = container.getParentContainer();
-                if (parentContainer != null) {
-                    parentContainer.getContainerType().getChildLabelingScheme().getMaxRows();
-                }
-            }
-            container.getChildPositions().size();
-            container.getSpecimenPositions().size();
-            container.getContainerType().getSpecimenTypes().size();
-            for (ContainerType ctype : container.getContainerType().getChildContainerTypes()) {
-                ctype.getSpecimenTypes().size();
-            }
-        }
-
-        ContainerData containerData;
-
-        if (isTopLevel) {
-            containerData = new ContainerData(containers.get(0));
-        } else {
-            containerData = new ContainerData(containers);
+        // top level container with the label was not found, find possible parent containers
+        ContainerData containerData = new ContainerData(getPossibleParents());
+        for (Container container : containerData.possibleParentContainers) {
+            loadAssociations(container);
         }
 
         return containerData;
+    }
+
+    private void loadAssociations(Container container) {
+        ContainerType ctype = container.getContainerType();
+        if (!ctype.getTopLevel()) {
+            Container parentContainer = container.getParentContainer();
+            if (parentContainer != null) {
+                ContainerType parentCtype = parentContainer.getContainerType();
+                parentCtype.getChildLabelingScheme().getMaxRows();
+                parentCtype.getChildContainerTypes().size();
+                for (ContainerType childCtype : parentCtype.getChildContainerTypes()) {
+                    childCtype.getSpecimenTypes().size();
+                }
+            }
+        }
+
+        container.getChildPositions().size();
+        for (ContainerPosition pos : container.getChildPositions()) {
+            pos.getContainer().getSpecimenPositions().size();
+        }
+
+        container.getSpecimenPositions().size();
+        container.getContainerType().getSpecimenTypes().size();
+        ctype.getChildContainerTypes().size();
+        for (ContainerType childCtype : ctype.getChildContainerTypes()) {
+            childCtype.getChildLabelingScheme().getMaxRows();
+            childCtype.getSpecimenTypes().size();
+        }
     }
 
     /**

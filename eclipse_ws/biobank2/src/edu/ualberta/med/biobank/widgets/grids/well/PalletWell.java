@@ -309,19 +309,17 @@ public class PalletWell extends AbstractUIWell {
 
     @SuppressWarnings("deprecation")
     public CellInfo transformIntoServerCell() {
-        CellInfo serverCell =
-            new CellInfo(getRow(), getCol(), getValue(),
-                getStatus() == null ? null : CellInfoStatus.valueOf(getStatus()
-                    .name()));
-        serverCell.setExpectedSpecimenId(getExpectedSpecimen() == null ? null
-            : getExpectedSpecimen().getId());
-        if (getStatus() != null)
+        CellInfo serverCell = new CellInfo(getRow(), getCol(), getValue(),
+            (getStatus() == null) ? null : CellInfoStatus.valueOf(getStatus().name()));
+        serverCell.setExpectedSpecimenId((getExpectedSpecimen() == null)
+            ? null : getExpectedSpecimen().getId());
+        if (getStatus() != null) {
             serverCell.setStatus(CellInfoStatus.valueOf(getStatus().name()));
-        if (getInformation() != null)
-            serverCell.setInformation(LString.lit(getInformation()
-                .toString()));
-        serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen()
-            .getId());
+        }
+        if (getInformation() != null) {
+            serverCell.setInformation(LString.lit(getInformation().toString()));
+        }
+        serverCell.setSpecimenId(getSpecimen() == null ? null : getSpecimen().getId());
         serverCell.setTitle(getTitle());
         return serverCell;
     }

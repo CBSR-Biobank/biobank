@@ -49,10 +49,9 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
-public abstract class AbstractLinkAssignEntryForm extends
-    AbstractPalletSpecimenAdminForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AbstractLinkAssignEntryForm.class);
+public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimenAdminForm {
+
+    private static final I18n i18n = I18nFactory.getI18n(AbstractLinkAssignEntryForm.class);
 
     enum Mode {
         SINGLE_NO_POSITION,
@@ -76,6 +75,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     // parent parent, etc...
     protected List<ContainerWrapper> parentContainers;
 
+    // the container that matches the label entered by the user
     protected ContainerWrapper container;
 
     // Single
@@ -107,6 +107,10 @@ public abstract class AbstractLinkAssignEntryForm extends
 
     protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
         RowColPos.COLS_DEFAULT);
+
+    // set to true when in scan link multiple and user enters barcodes using the
+    // handheld scanner
+    protected boolean scanMultipleWithHandheldInput = false;
 
     @SuppressWarnings("nls")
     @Override
@@ -248,11 +252,10 @@ public abstract class AbstractLinkAssignEntryForm extends
         buttonsComposite.setLayoutData(gd);
         toolkit.paintBordersFor(buttonsComposite);
         // radio button to choose single or multiple
-        radioSingle = toolkit
-            .createButton(buttonsComposite,
-                // TR: radio button label
-                i18n.trc("scan link assign", "Single"),
-                SWT.RADIO);
+        radioSingle = toolkit.createButton(buttonsComposite,
+            // TR: radio button label
+            i18n.trc("scan link assign", "Single"),
+            SWT.RADIO);
         // used only for linking (but faster and easier to add it in this class)
         radioSinglePosition = toolkit.createButton(buttonsComposite,
             // TR: radio button label
@@ -329,8 +332,9 @@ public abstract class AbstractLinkAssignEntryForm extends
         setBindings(single);
         showVisualisation(!single);
         Composite focusComposite = getFocusedComposite(single);
-        if (focusComposite != null)
+        if (focusComposite != null) {
             focusComposite.setFocus();
+        }
         page.layout(true, true);
         book.reflow(true);
     }
@@ -553,6 +557,7 @@ public abstract class AbstractLinkAssignEntryForm extends
     }
 
     protected void reset(boolean resetAll) {
+        container = null;
         cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLaunched(isSingleMode());
@@ -653,6 +658,7 @@ public abstract class AbstractLinkAssignEntryForm extends
                 rawType = type.getWrappedObject();
             }
 
+            container = null;
             ContainerData containerData = SessionManager.getAppService().doAction(
                 new ContainerGetContainerOrParentsByLabelAction(positionText.getText(),
                     site, rawType));
@@ -827,8 +833,9 @@ public abstract class AbstractLinkAssignEntryForm extends
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
         widgetCreator.removeBinding(canSaveSingleBinding);
-        if (isSingleMode)
+        if (isSingleMode) {
             widgetCreator.addBinding(canSaveSingleBinding);
+        }
         canSaveSingleSpecimen.setValue(true);
     }
 

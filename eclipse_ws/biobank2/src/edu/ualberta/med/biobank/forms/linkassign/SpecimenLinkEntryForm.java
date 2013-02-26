@@ -86,10 +86,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     private static Mode mode = Mode.MULTIPLE;
 
-    // set to true when in scan link multiple and user enters barcodes using the
-    // handheld scanner
-    private boolean scanMultipleWithHandheldInput = false;
-
     // TODO do not need a composite class anymore if only one link form is left
     private final LinkFormPatientManagement linkFormPatientManagement;
 

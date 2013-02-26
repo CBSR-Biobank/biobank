@@ -41,7 +41,7 @@ public class MatchingTextValidator extends AbstractValidator {
      */
     public static void addListener(BgcBaseText originalText,
         final BgcBaseText confirmationText) {
-        originalText.getTextBox().addListener(SWT.Modify, new Listener() {
+        originalText.getTextWidget().addListener(SWT.Modify, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 String originalText = confirmationText.getText();

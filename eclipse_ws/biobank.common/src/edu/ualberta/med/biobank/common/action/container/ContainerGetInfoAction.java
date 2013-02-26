@@ -73,7 +73,7 @@ public class ContainerGetInfoAction implements Action<ListResult<Container>> {
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         Integer siteId = this.siteId;
-        if (siteId != null) {
+        if (siteId == null) {
             Container c = context.load(Container.class, containerId);
             siteId = c.getSite().getId();
         }
