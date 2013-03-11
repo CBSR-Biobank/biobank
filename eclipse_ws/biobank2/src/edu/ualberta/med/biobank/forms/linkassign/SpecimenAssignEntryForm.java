@@ -26,6 +26,7 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -1573,5 +1574,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
         hideScannerBarcodeDecoration();
+    }
+
+    @Override
+    protected void scanTubesManually(MouseEvent e) {
+        palletScanManagement.scanTubesManually(e, true);
     }
 }

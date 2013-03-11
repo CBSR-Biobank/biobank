@@ -71,11 +71,6 @@ public class ScanTubesManuallyWizard extends Wizard {
     }
 
     @Override
-    public boolean canFinish() {
-        return true;
-    }
-
-    @Override
     public boolean needsPreviousAndNextButtons() {
         return true;
     }
@@ -95,6 +90,22 @@ public class ScanTubesManuallyWizard extends Wizard {
     public String getWindowTitle() {
         // TR: dialog title area title
         return i18n.tr("Scan tubes manually");
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public boolean canFinish() {
+        for (IWizardPage page : this.getPages()) {
+            ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
+            log.debug("canFinish: label: " + tubePage.labelToScan + ", canFlipToNextPage: "
+                + page.canFlipToNextPage());
+
+            // the last page may be blank, skip it if it is
+            if (tubePage.inventoryId == null) continue;
+
+            if (!page.canFlipToNextPage()) return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("nls")
@@ -132,6 +143,7 @@ public class ScanTubesManuallyWizard extends Wizard {
             // TR: wizard dialog dialog page description message
             setDescription(i18n.tr("Scan the tube at position {0}", labelToScan));
             setControl(text);
+            setPageComplete(false);
         }
 
         @SuppressWarnings("nls")
@@ -155,7 +167,6 @@ public class ScanTubesManuallyWizard extends Wizard {
 
             setControl(area);
             text.setFocus();
-            setPageComplete(false);
         }
 
         @SuppressWarnings("nls")
@@ -179,7 +190,7 @@ public class ScanTubesManuallyWizard extends Wizard {
                 setMessage(null);
                 setPageComplete(!inventoryId.isEmpty());
             }
-
+            getWizard().getContainer().updateButtons();
         }
     }
 }

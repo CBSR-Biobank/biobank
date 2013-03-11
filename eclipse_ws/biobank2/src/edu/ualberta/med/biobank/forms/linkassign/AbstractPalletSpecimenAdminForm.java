@@ -92,7 +92,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     private boolean rescanMode = false;
 
-    private PalletScanManagement palletScanManagement;
+    protected PalletScanManagement palletScanManagement;
 
     protected ComboViewer profilesCombo;
 
@@ -433,7 +433,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     protected void scanTubesManually(MouseEvent e) {
-        palletScanManagement.scanTubesManually(e);
+        palletScanManagement.scanTubesManually(e, false);
     }
 
     @SuppressWarnings("nls")

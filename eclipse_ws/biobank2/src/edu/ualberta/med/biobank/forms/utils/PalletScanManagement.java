@@ -240,7 +240,7 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    public void scanTubesManually(MouseEvent event) {
+    public void scanTubesManually(MouseEvent event, boolean allowDuplicates) {
         RowColPos startPos = ((ScanPalletWidget) event.widget).getPositionAtCoordinates(
             event.x, event.y);
 
@@ -251,7 +251,7 @@ public class PalletScanManagement {
 
         Set<PalletWell> manuallyEnteredCells = new HashSet<PalletWell>();
 
-        for (Entry<RowColPos, String> entry : scanTubesManually(startPos).entrySet()) {
+        for (Entry<RowColPos, String> entry : scanTubesManually(startPos, allowDuplicates).entrySet()) {
             RowColPos pos = entry.getKey();
             int row = pos.getRow();
             int col = pos.getCol();
@@ -286,12 +286,15 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    private Map<RowColPos, String> scanTubesManually(RowColPos startPos) {
+    private Map<RowColPos, String> scanTubesManually(RowColPos startPos, boolean allowDuplicates) {
         Map<String, String> existingInventoryIdsByLabel = new HashMap<String, String>();
-        for (PalletWell well : wells.values()) {
-            String inventoryId = well.getValue();
-            if ((inventoryId == null) || !inventoryId.isEmpty()) {
-                existingInventoryIdsByLabel.put(well.getLabel(), well.getValue());
+
+        if (!allowDuplicates) {
+            for (PalletWell well : wells.values()) {
+                String inventoryId = well.getValue();
+                if ((inventoryId == null) || !inventoryId.isEmpty()) {
+                    existingInventoryIdsByLabel.put(well.getLabel(), well.getValue());
+                }
             }
         }
 
