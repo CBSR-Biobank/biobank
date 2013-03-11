@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGet
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerDeleteAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
@@ -450,8 +449,10 @@ public class TestSite extends TestAction {
         Assert.assertEquals(1, topContainers.size());
 
         // delete container followed by site - should work now
-        ContainerInfo containerInfo = exec(new ContainerGetInfoAction(containerId));
-        exec(new ContainerDeleteAction(containerInfo.container));
+        Container qryContainer = new Container();
+        qryContainer.setId(containerId);
+        List<Container> containers = exec(new ContainerGetInfoAction(qryContainer)).getList();
+        exec(new ContainerDeleteAction(containers.get(0)));
         ContainerTypeInfo containerTypeInfo = exec(new ContainerTypeGetInfoAction(containerTypeId));
         exec(new ContainerTypeDeleteAction(containerTypeInfo.getContainerType()));
         exec(new SiteDeleteAction(siteInfo.getSite()));

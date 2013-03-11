@@ -133,8 +133,7 @@ public abstract class BgcFormBase extends EditorPart implements
     /**
      * The initialisation method for the derived form.
      * 
-     * @param adapter the corresponding model adapter the form is to edit /
-     *            view.
+     * @param adapter the corresponding model adapter the form is to edit / view.
      */
     protected abstract void init() throws Exception;
 
@@ -520,8 +519,7 @@ public abstract class BgcFormBase extends EditorPart implements
             init();
             setValues();
         } catch (Exception e) {
-            BgcPlugin.openAsyncError(RELOAD_ERROR_TITLE,
-                RELOAD_ERROR_MESSAGE);
+            BgcPlugin.openAsyncError(RELOAD_ERROR_TITLE, RELOAD_ERROR_MESSAGE);
             logger.error("Can't reload the form", e);
         }
     }

@@ -16,7 +16,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -93,8 +92,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean renamingChildren;
 
-    private ContainerInfo containerInfo;
-
     private CommentsInfoTable commentEntryTable;
 
     private final CommentWrapper comment = new CommentWrapper(
@@ -137,14 +134,20 @@ public class ContainerEntryForm extends BiobankEntryForm {
         setPartName(tabName);
     }
 
+    @SuppressWarnings("nls")
     private void updateContainerInfo(Integer id) throws ApplicationException {
         if (id != null) {
-            containerInfo =
-                SessionManager.getAppService().doAction(
-                    new ContainerGetInfoAction(id));
-            container.setWrappedObject(containerInfo.container);
+            Container qryContainer = new Container();
+            qryContainer.setId(id);
+            List<Container> containers = SessionManager.getAppService().doAction(
+                new ContainerGetInfoAction(qryContainer)).getList();
+            if (containers.size() != 1) {
+                throw new IllegalStateException(
+                    "query for single container returned unexpected results");
+            }
+
+            container.setWrappedObject(containers.get(0));
         } else {
-            containerInfo = new ContainerInfo();
             container.setWrappedObject((Container) containerAdapter
                 .getModelObject().getWrappedObject());
         }

@@ -20,7 +20,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class BgcBaseText extends BgcBaseWidget {
 
-    private Text text;
+    private Text textWidget;
     private boolean alreadyFocused;
 
     public BgcBaseText(Composite parent, int style) {
@@ -32,18 +32,18 @@ public class BgcBaseText extends BgcBaseWidget {
         super(parent, SWT.NONE);
         this.alreadyFocused = false;
         if (toolkit == null) {
-            this.text = new Text(this, style | SWT.BORDER);
+            this.textWidget = new Text(this, style | SWT.BORDER);
         } else {
-            this.text = toolkit.createText(this, "", style | SWT.BORDER);
+            this.textWidget = toolkit.createText(this, "", style | SWT.BORDER);
         }
-        this.text.addFocusListener(getFocusListener());
-        this.text.addMouseListener(getMouseListener());
-        this.text.addModifyListener(getModifyListener());
+        this.textWidget.addFocusListener(getFocusListener());
+        this.textWidget.addMouseListener(getMouseListener());
+        this.textWidget.addModifyListener(getModifyListener());
         GridLayout layout = new GridLayout();
         layout.marginWidth = 0;
         layout.marginHeight = 0;
         this.setLayout(layout);
-        text.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        textWidget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         layout();
     }
 
@@ -52,7 +52,7 @@ public class BgcBaseText extends BgcBaseWidget {
 
             @Override
             public void focusGained(FocusEvent e) {
-                text.selectAll();
+                textWidget.selectAll();
             }
 
             @Override
@@ -76,8 +76,8 @@ public class BgcBaseText extends BgcBaseWidget {
 
             @Override
             public void mouseUp(MouseEvent e) {
-                if (!alreadyFocused && text.getSelectionCount() == 0) {
-                    text.selectAll();
+                if (!alreadyFocused && textWidget.getSelectionCount() == 0) {
+                    textWidget.selectAll();
                     alreadyFocused = true;
                 } else
                     alreadyFocused = false;
@@ -98,99 +98,99 @@ public class BgcBaseText extends BgcBaseWidget {
 
     @Override
     public void setBackground(Color color) {
-        if (text == null)
+        if (textWidget == null)
             return;
-        text.setBackground(color);
+        textWidget.setBackground(color);
     }
 
     public void setText(String text) {
-        this.text.setText(text);
+        this.textWidget.setText(text);
     }
 
     public String getText() {
-        return text.getText().trim();
+        return textWidget.getText().trim();
     }
 
-    public Text getTextBox() {
-        return text;
+    public Text getTextWidget() {
+        return textWidget;
     }
 
     public void setSelection(int start, int end) {
-        text.setSelection(start, end);
+        textWidget.setSelection(start, end);
     }
 
     public void addSelectionListener(SelectionListener s) {
-        text.addSelectionListener(s);
+        textWidget.addSelectionListener(s);
     }
 
     public void removeSelectionListener(SelectionListener s) {
-        text.removeSelectionListener(s);
+        textWidget.removeSelectionListener(s);
     }
 
     public void addVerifyListener(VerifyListener v) {
-        text.addVerifyListener(v);
+        textWidget.addVerifyListener(v);
     }
 
     public void removeVerifyListener(VerifyListener v) {
-        text.removeVerifyListener(v);
+        textWidget.removeVerifyListener(v);
     }
 
     @Override
     public void addKeyListener(KeyListener listener) {
-        text.addKeyListener(listener);
+        textWidget.addKeyListener(listener);
     }
 
     @Override
     public void removeKeyListener(KeyListener listener) {
-        text.removeKeyListener(listener);
+        textWidget.removeKeyListener(listener);
     }
 
     @Override
     public void addListener(int eventType, Listener listener) {
-        if (text == null)
+        if (textWidget == null)
             return;
-        text.addListener(eventType, listener);
+        textWidget.addListener(eventType, listener);
     }
 
     @Override
     public void removeListener(int eventType, Listener listener) {
-        if (text == null)
+        if (textWidget == null)
             return;
-        text.removeListener(eventType, listener);
+        textWidget.removeListener(eventType, listener);
     }
 
     public void addModifyListener(ModifyListener modifyListener) {
-        text.addModifyListener(modifyListener);
+        textWidget.addModifyListener(modifyListener);
     }
 
     public void removeModifyListener(ModifyListener modifyListener) {
-        text.addModifyListener(modifyListener);
+        textWidget.addModifyListener(modifyListener);
     }
 
     public void selectAll() {
-        text.selectAll();
+        textWidget.selectAll();
     }
 
     public String getLineDelimiter() {
-        return text.getLineDelimiter();
+        return textWidget.getLineDelimiter();
     }
 
     public void setEditable(boolean b) {
-        text.setEditable(b);
+        textWidget.setEditable(b);
     }
 
     public void setTextLimit(int limit) {
-        text.setTextLimit(limit);
+        textWidget.setTextLimit(limit);
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        text.setEnabled(enabled);
+        textWidget.setEnabled(enabled);
         super.setEnabled(enabled);
     }
 
     @Override
     public void setToolTipText(String string) {
-        text.setToolTipText(string);
+        textWidget.setToolTipText(string);
     }
 }

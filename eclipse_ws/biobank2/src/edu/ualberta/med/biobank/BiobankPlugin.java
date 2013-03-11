@@ -133,7 +133,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(ProcessingEventGroup.class.getName(), BgcPlugin.IMG_PROCESSING);
         classToImageKey.put(ResearchGroupAdapter.class.getName(), BgcPlugin.IMG_RESEARCH_GROUP);
         classToImageKey
-        .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.IMG_RESEARCH_GROUPS);
+            .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.IMG_RESEARCH_GROUPS);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] { BgcPlugin.IMG_BIN,
@@ -157,9 +157,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
      */
     @Override
     public void start(BundleContext context) throws Exception {
@@ -206,9 +204,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext )
      */
     @Override
     public void stop(BundleContext context) throws Exception {
@@ -256,11 +252,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
     }
 
     public int getPlateNumber(String barcode) {
-        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode, isRealScanEnabled());
+        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode);
     }
 
     public List<String> getPossibleBarcodes() {
-        return ScannerConfigPlugin.getDefault().getPossibleBarcodes(isRealScanEnabled());
+        return ScannerConfigPlugin.getDefault().getPossibleBarcodes();
     }
 
     public static int getPlatesEnabledCount() {
@@ -371,9 +367,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns a position object if {@link plateString} corresponds to a plate
-     * number defined in the preferences. Returns null if plateString is not
-     * found in the preferences.
+     * Returns a position object if {@link plateString} corresponds to a plate number defined in the
+     * preferences. Returns null if plateString is not found in the preferences.
      */
     public RowColPos getGridDimensions(String plateString) {
         int plateNumber = getPlateNumber(plateString);

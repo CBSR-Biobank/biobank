@@ -17,21 +17,19 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public abstract class ServerProcessAction implements Action<ProcessResult> {
     private static final long serialVersionUID = 1L;
 
     protected Integer currentWorkingCenterId;
-    private List<String> logs;
+    private final List<String> logs;
     protected Locale locale;
     private Map<RowColPos, CellInfo> cells;
     private boolean isRescanMode = false;
-    private boolean processOneCell;
+    private final boolean processOneCell;
     private CellInfo cell;
 
-    protected User user;
     protected Session session;
     protected ActionContext actionContext;
 
@@ -63,14 +61,14 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
         throws ActionException {
         ProcessResult res;
 
-        this.user = context.getUser();
         this.session = context.getSession();
-        this.actionContext = new ActionContext(user, session, null);
+        this.actionContext = context;
 
-        if (processOneCell)
+        if (processOneCell) {
             res = getCellProcessResult(cell);
-        else
+        } else {
             res = getScanProcessResult(cells, isRescanMode);
+        }
         res.setLogs(logs);
         return res;
     }

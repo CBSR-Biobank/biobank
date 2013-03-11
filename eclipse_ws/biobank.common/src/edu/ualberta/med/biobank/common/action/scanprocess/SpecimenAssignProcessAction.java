@@ -103,8 +103,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             expectedSpecimen = actionContext.load(Specimen.class, scanCell.getExpectedSpecimenId());
         }
         String value = scanCell.getValue();
-        String positionString =
-            data.getPalletLabel(session)
+        String positionString = data.getPalletLabel(session)
             + data.getContainerType(session, actionContext).getPositionString(
                 new RowColPos(scanCell.getRow(), scanCell.getCol()));
         if (value == null) { // no specimen scanned
@@ -175,8 +174,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             appendNewLog(MessageFormat.format(
                 "MISSING in {0}: specimen ''{1}'' from visit {2} (patient {3}) missing", position,
                 missingSpecimen.getInventoryId(), missingSpecimen.getCollectionEvent()
-                .getVisitNumber(), missingSpecimen.getCollectionEvent().getPatient()
-                .getPnumber()));
+                    .getVisitNumber(), missingSpecimen.getCollectionEvent().getPatient()
+                    .getPnumber()));
             movedAndMissingSpecimensFromPallet.put(rcp, true);
         } else {
             movedAndMissingSpecimensFromPallet.remove(rcp);
@@ -213,8 +212,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             .format(
                 "ERROR in {0}: Expected inventoryId {1} from patient {2} -- Found inventoryId {3} from patient {4}",
                 position, expectedSpecimen.getInventoryId(), expectedSpecimen.getCollectionEvent()
-                .getPatient().getPnumber(), foundSpecimen.getInventoryId(), foundSpecimen
-                .getCollectionEvent().getPatient().getPnumber()));
+                    .getPatient().getPnumber(), foundSpecimen.getInventoryId(), foundSpecimen
+                    .getCollectionEvent().getPatient().getPnumber()));
     }
 
     /**
@@ -271,8 +270,8 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
         scanCell.setStatus(CellInfoStatus.MOVED);
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
         scanCell
-        .setInformation(bundle.tr("Specimen previously registered on another position: {0}")
-            .format(expectedPosition));
+            .setInformation(bundle.tr("Specimen previously registered on another position: {0}")
+                .format(expectedPosition));
 
         appendNewLog(MessageFormat.format(
             "MOVED in {0}: specimen ''{1}'' previously registered on another position: {2}",

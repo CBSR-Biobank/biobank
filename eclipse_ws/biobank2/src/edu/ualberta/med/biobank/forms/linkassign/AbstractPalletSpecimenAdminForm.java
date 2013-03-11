@@ -55,10 +55,13 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
-public abstract class AbstractPalletSpecimenAdminForm extends
-    AbstractSpecimenAdminForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AbstractPalletSpecimenAdminForm.class);
+public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
+    implements ModifyListener {
+
+    private static final I18n i18n = I18nFactory.getI18n(AbstractPalletSpecimenAdminForm.class);
+
+    // private static BgcLogger log =
+    // BgcLogger.getLogger(AbstractPalletSpecimenAdminForm.class.getName());
 
     @SuppressWarnings("nls")
     protected static final String PLATE_VALIDATOR = "plate-validator";
@@ -67,7 +70,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     private String scanButtonTitle;
 
     @SuppressWarnings("nls")
-    private final ScannerBarcodeValidator scannerBarcodeValidator = new ScannerBarcodeValidator(
+    protected final ScannerBarcodeValidator scannerBarcodeValidator = new ScannerBarcodeValidator(
         // TR: validation error message
         i18n.tr("Enter a valid plate barcode"));
 
@@ -77,14 +80,15 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     private final IObservableValue plateToScanValue = new WritableValue(
         plateToScanSessionString, String.class);
+
     private final IObservableValue canLaunchScanValue = new WritableValue(
         Boolean.TRUE, Boolean.class);
+
     private final IObservableValue scanHasBeenLaunchedValue =
-        new WritableValue(
-            Boolean.FALSE, Boolean.class);
+        new WritableValue(Boolean.FALSE, Boolean.class);
+
     private final IObservableValue scanValidValue = new WritableValue(
-        Boolean.TRUE,
-        Boolean.class);
+        Boolean.TRUE, Boolean.class);
 
     private boolean rescanMode = false;
 
@@ -95,6 +99,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     private IPropertyChangeListener propertyListener;
 
     protected String currentPlateToScan;
+
+    protected boolean plateMismatchErrorReported = false;
 
     // global state of the pallet process
     protected UICellStatus currentScanState = UICellStatus.NOT_INITIALIZED;
@@ -258,16 +264,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             canLaunchScanValue,
             // TR: validation error message
-            i18n.tr("Errors have been previously detected. Cannot launch scan."));
+            i18n.tr("Errors were detected. Cannot launch scan."));
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
             // TR: validation error message
-            i18n.tr("Scanner should be launched"));
+            i18n.tr("Flatbed scan required"));
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message
-            i18n.tr("Errors in scanning result"));
+            i18n.tr("Errors with flatbed scan result"));
     }
 
     protected void launchScanAndProcessResult() {
@@ -294,31 +300,34 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                 }
             }
         });
-        plateToScanText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                if (scanButton != null)
-                    scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid());
-            }
-        });
+        plateToScanText.addModifyListener(this);
+
         // TR: tooltip
         String tooltip =
             i18n.tr("No barcodes availables. See the preferences to complete the configuration.");
-        List<String> barcodes = BiobankPlugin.getDefault()
-            .getPossibleBarcodes();
+        List<String> barcodes = BiobankPlugin.getDefault().getPossibleBarcodes();
         if (barcodes.size() > 0) {
             // TR: tooltip
-            tooltip = i18n.tr("Available barcodes are: {0}",
-                StringUtil.join(barcodes, ", "));
+            tooltip = i18n.tr("Available barcodes are: {0}", StringUtil.join(barcodes, ", "));
         }
         plateToScanText.setToolTipText(tooltip);
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
-        int parentNumColumns =
-            ((GridLayout) fieldsComposite.getLayout()).numColumns;
-        if (parentNumColumns > 2)
+        int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
+        if (parentNumColumns > 2) {
             gd.horizontalSpan = parentNumColumns - 1;
+        }
         plateToScanText.setLayoutData(gd);
+    }
+
+    @Override
+    public void modifyText(ModifyEvent e) {
+        if (e.getSource() == plateToScanText.getTextWidget()) {
+            if (scanButton != null) {
+                scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid()
+                    && isPlateValid());
+            }
+        }
     }
 
     protected void showPlateToScanField(boolean show) {
@@ -349,13 +358,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             setConfirmEnabled(true);
             setDirty(true);
         } else {
-            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue()
-                && fieldsValid());
-            setFormHeaderErrorMessage(status.getMessage(),
-                IMessageProvider.ERROR);
+            setFormHeaderErrorMessage(status.getMessage(), IMessageProvider.ERROR);
             cancelConfirmWidget.setConfirmEnabled(false);
             setConfirmEnabled(false);
         }
+        scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && isPlateValid());
     }
 
     protected abstract boolean fieldsValid();
@@ -479,7 +486,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected void setUseScanner(boolean useScanner) {
         palletScanManagement.setUseScanner(useScanner);
         if (useScanner) {
-            currentScanState = null;
+            // currentScanState = null;
+            currentScanState = UICellStatus.EMPTY;
         } else {
             currentScanState = UICellStatus.EMPTY;
         }
@@ -503,11 +511,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
             }
         }
         // server side call
-        ScanProcessResult res = (ScanProcessResult) SessionManager
-            .getAppService().doAction(
-                getPalletProcessAction(SessionManager.getUser()
-                    .getCurrentWorkingCenter().getId(), serverCells,
-                    isRescanMode(), Locale.getDefault()));
+        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+            getPalletProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                serverCells, isRescanMode(), Locale.getDefault()));
         // print result logs
         appendLogs(res.getLogs());
 
@@ -564,11 +570,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         focusControl(plateToScanText);
     }
 
-    protected void initCellsWithContainer(
-        ContainerWrapper currentMultipleContainer) {
+    protected void initCellsWithContainer(ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
-            palletScanManagement
-                .initCellsWithContainer(currentMultipleContainer);
+            palletScanManagement.initCellsWithContainer(currentMultipleContainer);
         }
     }
 

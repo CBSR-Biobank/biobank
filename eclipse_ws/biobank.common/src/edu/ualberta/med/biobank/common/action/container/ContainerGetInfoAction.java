@@ -1,100 +1,155 @@
 package edu.ualberta.med.biobank.common.action.container;
 
-import org.hibernate.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
-import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction.ContainerInfo;
+import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.permission.container.ContainerReadPermission;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 
-public class ContainerGetInfoAction implements Action<ContainerInfo> {
+public class ContainerGetInfoAction implements Action<ListResult<Container>> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory
-        .getLogger(ContainerGetInfoAction.class.getName());
+    // private static Logger log = LoggerFactory
+    // .getLogger(ContainerGetInfoAction.class.getName());
 
-    // this query is ridiculous!
-    @SuppressWarnings("nls")
-    private static final String CONTAINER_INFO_HQL =
-        "SELECT DISTINCT container"
-            + " FROM " + Container.class.getName() + " container"
-            + " INNER JOIN FETCH container.containerType ctype"
-            + " LEFT JOIN FETCH ctype.childContainerTypes"
-            + " LEFT JOIN FETCH ctype.childLabelingScheme"
-            + " LEFT JOIN FETCH ctype.specimenTypes"
-            + " LEFT JOIN FETCH container.position"
-            + " INNER JOIN FETCH container.topContainer topContainer"
-            + " INNER JOIN FETCH topContainer.containerType topContainerType"
-            + " INNER JOIN FETCH topContainerType.childLabelingScheme"
-            + " INNER JOIN FETCH container.site"
-            + " LEFT JOIN FETCH container.childPositions childPos"
-            + " LEFT JOIN FETCH childPos.container"
-            + " LEFT JOIN FETCH container.specimenPositions spcPos"
-            + " LEFT JOIN FETCH spcPos.specimen specimen"
-            + " LEFT JOIN FETCH specimen.parentSpecimen parentSpecimen"
-            + " LEFT JOIN FETCH specimen.collectionEvent cevent"
-            + " LEFT JOIN FETCH cevent.patient patient"
-            + " LEFT JOIN FETCH patient.study"
-            + " LEFT JOIN FETCH parentSpecimen.processingEvent"
-            + " LEFT JOIN FETCH container.comments containerComments"
-            + " LEFT JOIN FETCH containerComments.user"
-            + " LEFT JOIN FETCH specimen.comments"
-            + " LEFT JOIN FETCH specimen.originInfo spcOriginInfo"
-            + " LEFT JOIN FETCH spcOriginInfo.center"
-            + " LEFT JOIN FETCH container.position position"
-            + " LEFT JOIN FETCH position.parentContainer parentContainer"
-            + " LEFT JOIN FETCH parentContainer.containerType parentCtype"
-            + " LEFT JOIN FETCH parentCtype.childLabelingScheme"
-            + " LEFT JOIN FETCH parentCtype.childContainerTypes"
-            + " WHERE container.id = ?";
-
-    public static class ContainerInfo implements ActionResult {
+    public static class ContainerData implements ActionResult {
         private static final long serialVersionUID = 1L;
         public Container container;
     }
 
+    private final Integer siteId;
+
     private final Integer containerId;
 
+    private final String label;
+
+    private final String productBarcode;
+
+    /**
+     * Can retrieve a container by it's ID, label, or product barcode.
+     * 
+     * @param container The container to return. If the ID field is not null then the container with
+     *            the corresponding ID is returned. The same for the label and product barcode
+     *            fields.
+     * @param site The site the container belongs to. Can be null.
+     */
     @SuppressWarnings("nls")
-    public ContainerGetInfoAction(Integer containerId) {
-        log.debug("containerId={}", containerId);
-        if (containerId == null) {
-            throw new IllegalArgumentException();
+    public ContainerGetInfoAction(Container container, Site site) {
+        this.containerId = container.getId();
+        this.label = container.getLabel();
+        this.productBarcode = container.getProductBarcode();
+        this.siteId = (site == null) ? null : site.getId();
+
+        if ((this.containerId == null) && (this.siteId == null)) {
+            throw new IllegalArgumentException("both container ID and site ID cannot be null");
         }
-        this.containerId = containerId;
     }
 
-    @SuppressWarnings("nls")
+    /**
+     * Can retrieve a container by it's ID, label, or product barcode.
+     * 
+     * @param container The container to return. If the ID field is not null then the container with
+     *            the corresponding ID is returned. The same for the label and product barcode
+     *            fields.
+     */
+    public ContainerGetInfoAction(Container container) {
+        this(container, null);
+    }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-
-        Container c = context.load(Container.class, containerId);
-        boolean result = new ContainerReadPermission(c.getSite().getId())
-            .isAllowed(context);
-        log.debug("isAllowed: containerId={} allowed={}", containerId, result);
-        return result;
+        Integer siteId = this.siteId;
+        if (siteId == null) {
+            Container c = context.load(Container.class, containerId);
+            siteId = c.getSite().getId();
+        }
+        return new ContainerReadPermission(siteId).isAllowed(context);
     }
 
     @SuppressWarnings("nls")
     @Override
-    public ContainerInfo run(ActionContext context) throws ActionException {
-        log.debug("run: containerId={}", containerId);
+    public ListResult<Container> run(ActionContext context) throws ActionException {
+        Criteria criteria = context.getSession().createCriteria(Container.class);
 
-        ContainerInfo containerInfo = new ContainerInfo();
-        Query query = context.getSession().createQuery(CONTAINER_INFO_HQL);
-        query.setParameter(0, containerId);
-
-        containerInfo.container = (Container) query.uniqueResult();
-        if (containerInfo.container == null) {
-            throw new IllegalStateException("container is null");
+        if (this.containerId != null) {
+            criteria.add(Restrictions.eq("id", this.containerId));
         }
 
-        return containerInfo;
+        if (this.label != null) {
+            criteria.add(Restrictions.eq("label", this.label));
+        }
+
+        if (this.productBarcode != null) {
+            criteria.add(Restrictions.eq("productBarcode", this.productBarcode));
+        }
+
+        if (this.siteId != null) {
+            criteria.add(Restrictions.eq("site.id", this.siteId));
+        }
+
+        @SuppressWarnings("unchecked")
+        List<Container> containers = criteria.list();
+
+        // load associations
+        for (Container container : containers) {
+            ContainerType ctype = container.getContainerType();
+            ctype.getChildContainerTypes().size();
+            ctype.getSpecimenTypes().size();
+            ctype.getChildLabelingScheme().getMaxCapacity();
+            container.getPosition();
+            container.getTopContainer();
+            container.getSite().getName();
+
+            ContainerType parentCtype = container.getTopContainer().getContainerType();
+            parentCtype.getChildLabelingScheme().getMaxCapacity();
+
+            ContainerPosition containerPos = container.getPosition();
+
+            if (containerPos != null) {
+                parentCtype = containerPos.getParentContainer().getContainerType();
+                parentCtype.getChildLabelingScheme().getMaxCapacity();
+                parentCtype.getChildContainerTypes().size();
+            }
+
+            for (ContainerPosition pos : container.getChildPositions()) {
+                pos.getContainer().getLabel();
+            }
+
+            for (SpecimenPosition pos : container.getSpecimenPositions()) {
+                Specimen specimen = pos.getSpecimen();
+                specimen.getParentSpecimen().getInventoryId();
+                specimen.getCollectionEvent().getPatient().getStudy().getName();
+                ProcessingEvent pevent = specimen.getProcessingEvent();
+                if (pevent != null) {
+                    pevent.getWorksheet();
+                }
+                specimen.getOriginInfo().getCenter().getName();
+
+                for (Comment comment : specimen.getComments()) {
+                    comment.getUser().getLogin();
+                }
+            }
+
+            for (Comment comment : container.getComments()) {
+                comment.getUser().getLogin();
+            }
+        }
+
+        return new ListResult<Container>(containers);
     }
 
 }

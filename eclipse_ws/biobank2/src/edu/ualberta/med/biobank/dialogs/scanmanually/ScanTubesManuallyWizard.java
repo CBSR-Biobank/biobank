@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.scanmanually;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,13 +29,13 @@ public class ScanTubesManuallyWizard extends Wizard {
 
     protected static BgcLogger log = BgcLogger.getLogger(ScanTubesManuallyWizard.class.getName());
 
-
     private final Set<String> labels;
     private final BidiMap existingInventoryIds = new DualHashBidiMap();
-    private final Map<String, String> resultIventoryIdsByLabel = new HashMap<String, String>();
+    private final Map<String, String> resultIventoryIdsByLabel = new LinkedHashMap<String, String>();
 
     /**
-     * This constructor is private. Use {@link #ScanTubesManuallyWizardDialog.getInventoryIds} to create this wizard.
+     * This constructor is private. Use {@link #ScanTubesManuallyWizardDialog.getInventoryIds} to create this
+     * wizard.
      * 
      * @param parentShell the parent SWT shell
      * @param labels the labels that the user should be prompted for. The order is important.
@@ -151,6 +151,7 @@ public class ScanTubesManuallyWizard extends Wizard {
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.addListener(SWT.KeyUp, this);
             text.addListener(SWT.Selection, this);
+            text.addListener(SWT.MouseUp, this);
 
             setControl(area);
             text.setFocus();
