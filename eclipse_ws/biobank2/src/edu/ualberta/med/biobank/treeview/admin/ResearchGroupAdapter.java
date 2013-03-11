@@ -29,14 +29,18 @@ public class ResearchGroupAdapter extends AbstractNewAdapterBase {
         ResearchGroupAdapterInfo rg) {
         super(parent, rg.id, rg.nameShort, null, false);
         this.rg = rg;
-        if (rg.id == null) init();
+        if (rg.id != null) {
+            init();
+        }
     }
 
     @Override
     public void setValue(Object value) {
         this.rg = (ResearchGroupAdapterInfo) value;
         setId(rg.id);
-        if (rg.id != null) init();
+        if (rg.id != null) {
+            init();
+        }
     }
 
     @Override
