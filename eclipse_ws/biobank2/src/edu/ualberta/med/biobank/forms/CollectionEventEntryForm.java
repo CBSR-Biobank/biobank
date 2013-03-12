@@ -370,26 +370,19 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     private void createSpecimensSection() {
-        Section section =
-            createSection(SourceSpecimen.NAME.format(2).toString());
-        specimensTable =
-            new CEventSpecimenEntryInfoTable(section, sourceSpecimens,
-                ceventCopy, ColumnsShown.CEVENT_SOURCE_SPECIMENS);
+        Section section = createSection(SourceSpecimen.NAME.format(2).toString());
+        specimensTable = new CEventSpecimenEntryInfoTable(section, sourceSpecimens,
+            ceventCopy, ColumnsShown.CEVENT_SOURCE_SPECIMENS);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
         try {
-            final List<SpecimenType> allSpecimenTypes =
-                SessionManager.getAppService()
-                    .doAction(new SpecimenTypeGetAllAction()).getList();
-            final Set<SourceSpecimen> studySourceSpecimens =
-                SessionManager
-                    .getAppService()
-                    .doAction(
-                        new StudyGetSourceSpecimensAction(ceventInfo.cevent
-                            .getPatient().getStudy().getId())).getSet();
+            final List<SpecimenType> allSpecimenTypes = SessionManager.getAppService().doAction(
+                new SpecimenTypeGetAllAction()).getList();
+            final Set<SourceSpecimen> studySourceSpecimens = SessionManager.getAppService().doAction(
+                new StudyGetSourceSpecimensAction(
+                    ceventInfo.cevent.getPatient().getStudy().getId())).getSet();
 
-            specimensTable.addEditSupport(studySourceSpecimens,
-                allSpecimenTypes);
+            specimensTable.addEditSupport(studySourceSpecimens, allSpecimenTypes);
             addSectionToolbar(section,
                 // label
                 i18n.tr("Add specimens"),
@@ -494,8 +487,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        List<SaveCEventSpecimenInfo> cevents =
-            new ArrayList<CollectionEventSaveAction.SaveCEventSpecimenInfo>();
+        List<SaveCEventSpecimenInfo> cevents = new ArrayList<SaveCEventSpecimenInfo>();
         for (SpecimenInfo o : specimensTable.getList()) {
             CommentedSpecimenInfo specInfo = (CommentedSpecimenInfo) o;
             cevents.add(new SaveCEventSpecimenInfo(
@@ -505,8 +497,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 specInfo.comments, specInfo.specimen.getQuantity()));
         }
 
-        List<CEventAttrSaveInfo> ceventAttrList =
-            new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
+        List<CEventAttrSaveInfo> ceventAttrList = new ArrayList<CEventAttrSaveInfo>();
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             ceventAttrList.add(new CEventAttrSaveInfo(
                 combinedPvInfo.getStudyEventAttrId(), combinedPvInfo.getType(),
@@ -516,11 +507,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         // save the collection event
         Integer savedCeventId = SessionManager.getAppService().doAction(
             new CollectionEventSaveAction(ceventCopy.getId(),
-                ceventCopy.getPatient().getId(), ceventCopy
-                    .getVisitNumber(), ceventCopy.getActivityStatus(),
-                comment.getMessage(), cevents, ceventAttrList,
-                SessionManager.getUser().getCurrentWorkingCenter()
-                    .getWrappedObject())
+                ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
+                ceventCopy.getActivityStatus(), comment.getMessage(), cevents, ceventAttrList,
+                SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject())
             ).getId();
         PatientGetSimpleCollectionEventInfosAction action =
             new PatientGetSimpleCollectionEventInfosAction(ceventCopy

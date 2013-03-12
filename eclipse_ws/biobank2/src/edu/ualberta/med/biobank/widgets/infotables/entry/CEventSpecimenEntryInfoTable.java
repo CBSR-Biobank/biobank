@@ -68,7 +68,7 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
         specimensAdded.setValue(getList().size() > 0);
     }
 
-    public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo si,
+    public void addOrEditSpecimen(boolean add, CommentedSpecimenInfo spcInfo,
         Set<SourceSpecimen> studySourceTypes,
         List<SpecimenType> allSpecimenTypes, final CollectionEvent cEvent,
         final Date defaultTimeDrawn) {
@@ -92,16 +92,16 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
                 }
             };
         } else {
-            inventoryIdExcludeList.remove(si.specimen.getInventoryId());
+            inventoryIdExcludeList.remove(spcInfo.specimen.getInventoryId());
         }
-        CEventSourceSpecimenDialog dlg =
-            new CEventSourceSpecimenDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), si == null ? null
-                : si, studySourceTypes,
-                allSpecimenTypes,
-                inventoryIdExcludeList, newListener, defaultTimeDrawn);
+        CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            spcInfo == null ? null : spcInfo,
+            studySourceTypes, allSpecimenTypes,
+            inventoryIdExcludeList, newListener, defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
+            tableViewer.refresh();
             notifyListeners();
         }
     }
@@ -112,11 +112,11 @@ public class CEventSpecimenEntryInfoTable extends NewSpecimenEntryInfoTable {
             addEditItemListener(new IInfoTableEditItemListener<SpecimenInfo>() {
                 @Override
                 public void editItem(InfoTableEvent<SpecimenInfo> event) {
-                    CommentedSpecimenInfo si =
-                        (CommentedSpecimenInfo) getSelection();
-                    if (si != null)
-                        addOrEditSpecimen(false, si, studySourceTypes,
-                            allSpecimenTypes, null, null);
+                    CommentedSpecimenInfo spcInfo = (CommentedSpecimenInfo) getSelection();
+                    if (spcInfo != null) {
+                        addOrEditSpecimen(false, spcInfo, studySourceTypes, allSpecimenTypes, null,
+                            null);
+                    }
                 }
             });
         }

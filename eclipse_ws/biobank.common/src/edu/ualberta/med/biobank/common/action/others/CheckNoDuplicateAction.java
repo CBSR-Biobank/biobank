@@ -29,8 +29,7 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
     @SuppressWarnings("nls")
     private static final String CHECK_NO_DUPLICATES =
-        "select count(o) from {0} "
-            + "as o where {1}=? {2}";
+        "SELECT COUNT(o) FROM {0} o WHERE {1}=? {2}";
 
     public CheckNoDuplicateAction(Class<?> objectClass, Integer objectId,
         String propertyName, String value) {
@@ -42,7 +41,6 @@ public class CheckNoDuplicateAction implements Action<BooleanResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        // TODO Auto-generated method stub
         return true;
     }
 

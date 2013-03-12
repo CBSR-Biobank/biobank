@@ -50,8 +50,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.CommentedSpecimenInfo;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CEventSourceSpecimenDialog extends PagedDialog {
-    private static final I18n i18n = I18nFactory
-        .getI18n(CEventSourceSpecimenDialog.class);
+    private static final I18n i18n = I18nFactory.getI18n(CEventSourceSpecimenDialog.class);
 
     private CommentedSpecimenInfo editedSpecimen;
 
@@ -115,7 +114,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 .getInventoryId());
             internalSpecimen.specimen.setQuantity(spec.specimen.getQuantity());
             internalSpecimen.specimen
-            .setCreatedAt(spec.specimen.getCreatedAt());
+                .setCreatedAt(spec.specimen.getCreatedAt());
             internalSpecimen.specimen.setActivityStatus(spec.specimen
                 .getActivityStatus());
             // comments is special
@@ -183,10 +182,17 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 if (inventoryIdWidget.getText().isEmpty()) return;
 
                 String inventoryId = inventoryIdWidget.getText();
+
+                if ((editedSpecimen.specimen != null)
+                    && editedSpecimen.specimen.getInventoryId().equals(inventoryId)) {
+                    return;
+                }
+
                 try {
                     Boolean duplicate = !SessionManager.getAppService().doAction(
                         new CheckNoDuplicateAction(Specimen.class,
                             null, SpecimenPeer.INVENTORY_ID.getName(), inventoryId)).isTrue();
+
                     if (duplicate || inventoryIdExcludeList.contains(inventoryId)) {
                         duplicateInventoryId = inventoryId;
                         uniqueInventoryId.setValue(false);
@@ -256,7 +262,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             new NotNullValidator(
                 // TR: validation error message
                 i18n.tr("Time drawn should be set")),
-                SWT.DATE | SWT.TIME, null);
+            SWT.DATE | SWT.TIME, null);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -266,16 +272,16 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             // TR: validation message if activity status not selected
             i18n.tr("An activity status should be selected"),
             new ComboSelectionUpdate() {
-            @Override
-            public void doSelection(Object selectedObject) {
-                internalSpecimen.specimen.setActivityStatus((ActivityStatus) selectedObject);
-            }
-        }, new BiobankLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return ((ActivityStatus) element).getName();
-            }
-        });
+                @Override
+                public void doSelection(Object selectedObject) {
+                    internalSpecimen.specimen.setActivityStatus((ActivityStatus) selectedObject);
+                }
+            }, new BiobankLabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    return ((ActivityStatus) element).getName();
+                }
+            });
         gd = (GridData) activityStatusComboViewer.getControl().getLayoutData();
         gd.horizontalSpan = 2;
 
@@ -331,30 +337,30 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
                 // TR: validation error message
                 i18n.tr("A specimen type should be selected"),
                 new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    if (selectedObject instanceof SourceSpecimen) {
-                        internalSpecimen
-                        .specimen
-                        .setSpecimenType(((SourceSpecimen) selectedObject)
-                            .getSpecimenType());
-                    } else {
-                        internalSpecimen
-                        .specimen
-                        .setSpecimenType(((SpecimenType) selectedObject));
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        if (selectedObject instanceof SourceSpecimen) {
+                            internalSpecimen
+                            .specimen
+                                .setSpecimenType(((SourceSpecimen) selectedObject)
+                                    .getSpecimenType());
+                        } else {
+                            internalSpecimen
+                            .specimen
+                                .setSpecimenType(((SpecimenType) selectedObject));
+                        }
+                        updateWidgetVisibilityAndValuesNoTimeReset();
                     }
-                    updateWidgetVisibilityAndValuesNoTimeReset();
-                }
-            }, new BiobankLabelProvider() {
-                @Override
-                public String getText(Object element) {
-                    if (element instanceof SourceSpecimen) {
-                        return ((SourceSpecimen) element).getSpecimenType()
-                            .getNameShort();
+                }, new BiobankLabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        if (element instanceof SourceSpecimen) {
+                            return ((SourceSpecimen) element).getSpecimenType()
+                                .getNameShort();
+                        }
+                        return ((SpecimenType) element).getNameShort();
                     }
-                    return ((SpecimenType) element).getNameShort();
-                }
-            });
+                });
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(
@@ -390,8 +396,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         boolean enableVolume =
             (type != null)
-            && (ss == null || Boolean.TRUE.equals(ss
-                .getNeedOriginalVolume()));
+                && (ss == null || Boolean.TRUE.equals(ss
+                    .getNeedOriginalVolume()));
         boolean isVolumeRequired =
             ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
 
@@ -421,8 +427,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         }
         boolean enableVolume =
             (type != null)
-            && (ss == null || Boolean.TRUE.equals(ss
-                .getNeedOriginalVolume()));
+                && (ss == null || Boolean.TRUE.equals(ss
+                    .getNeedOriginalVolume()));
         boolean isVolumeRequired =
             ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
 
@@ -470,7 +476,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         CommentedSpecimenInfo spec =
             (CommentedSpecimenInfo) newModelObject;
         spec.specimen
-        .setInventoryId(internalSpecimen.specimen.getInventoryId());
+            .setInventoryId(internalSpecimen.specimen.getInventoryId());
         spec.specimen.setSpecimenType(internalSpecimen.specimen
             .getSpecimenType());
         spec.specimen.setQuantity(internalSpecimen.specimen.getQuantity());
