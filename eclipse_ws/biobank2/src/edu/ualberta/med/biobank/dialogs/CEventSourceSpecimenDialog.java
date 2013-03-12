@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyEvent;
@@ -161,7 +162,7 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
 
     @SuppressWarnings("nls")
     @Override
-    protected void createDialogAreaInternal(Composite parent) {
+    protected void createDialogAreaInternal(final Composite parent) {
         Composite contents = new Composite(parent, SWT.NONE);
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -181,44 +182,50 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             public void focusLost(FocusEvent e) {
                 if (inventoryIdWidget.getText().isEmpty()) return;
 
-                String inventoryId = inventoryIdWidget.getText();
+                final String inventoryId = inventoryIdWidget.getText();
 
-                if ((editedSpecimen.specimen != null)
+                if ((editedSpecimen != null)
+                    && (editedSpecimen.specimen != null)
                     && editedSpecimen.specimen.getInventoryId().equals(inventoryId)) {
                     return;
                 }
 
-                try {
-                    Boolean duplicate = !SessionManager.getAppService().doAction(
-                        new CheckNoDuplicateAction(Specimen.class,
-                            null, SpecimenPeer.INVENTORY_ID.getName(), inventoryId)).isTrue();
+                BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Boolean duplicate = !SessionManager.getAppService().doAction(
+                                new CheckNoDuplicateAction(Specimen.class,
+                                    null, SpecimenPeer.INVENTORY_ID.getName(), inventoryId)).isTrue();
 
-                    if (duplicate || inventoryIdExcludeList.contains(inventoryId)) {
-                        duplicateInventoryId = inventoryId;
-                        uniqueInventoryId.setValue(false);
-                        inventoryIdValidator.showDecoration();
+                            if (duplicate || inventoryIdExcludeList.contains(inventoryId)) {
+                                duplicateInventoryId = inventoryId;
+                                uniqueInventoryId.setValue(false);
+                                inventoryIdValidator.showDecoration();
 
-                        if (duplicate) {
+                                if (duplicate) {
+                                    BgcPlugin.openAsyncError(
+                                        // TR: dialog title
+                                        i18n.tr("Specimen Inventory ID Error"),
+                                        // TR: dialog message
+                                        i18n.tr("The inventory ID {0} already exists in the system", inventoryId));
+                                } else {
+
+                                    BgcPlugin.openAsyncError(
+                                        // TR: dialog title
+                                        i18n.tr("Specimen Inventory ID Error"),
+                                        // TR: dialog message
+                                        i18n.tr("The inventory ID  {0} already exists in this collection event",
+                                            inventoryId));
+                                }
+                            }
+                        } catch (ApplicationException ex) {
                             BgcPlugin.openAsyncError(
-                                // TR: dialog title
-                                i18n.tr("Specimen Inventory ID Error"),
-                                // TR: dialog message
-                                i18n.tr("The inventory ID {0} already exists in the system", inventoryId));
-                        } else {
-
-                            BgcPlugin.openAsyncError(
-                                // TR: dialog title
-                                i18n.tr("Specimen Inventory ID Error"),
-                                // TR: dialog message
-                                i18n.tr("The inventory ID  {0} already exists in this collection event",
-                                    inventoryId));
+                                // dialog title.
+                                i18n.tr("Error checking inventory id"), ex);
                         }
                     }
-                } catch (ApplicationException ex) {
-                    BgcPlugin.openAsyncError(
-                        // dialog title.
-                        i18n.tr("Error checking inventory id"), ex);
-                }
+                });
 
             }
         });
@@ -492,5 +499,20 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         spec.specimen.setActivityStatus(internalSpecimen.specimen
             .getActivityStatus());
         inventoryIdExcludeList.add(internalSpecimen.specimen.getInventoryId());
+    }
+
+    private static class SleepThread extends Thread {
+        private final long ms;
+
+        public SleepThread(long ms) {
+            this.ms = ms;
+        }
+
+        public void run() {
+            try {
+                sleep(ms);
+            } catch (InterruptedException e) {
+            }
+        }
     }
 }
