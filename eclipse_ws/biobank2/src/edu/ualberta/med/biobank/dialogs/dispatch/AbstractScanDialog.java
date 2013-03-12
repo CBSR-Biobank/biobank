@@ -509,7 +509,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 if (isScanHasBeenLaunched())
-                    palletScanManagement.scanTubesManually(e);
+                    palletScanManagement.scanTubesManually(e, true);
             }
         });
     }

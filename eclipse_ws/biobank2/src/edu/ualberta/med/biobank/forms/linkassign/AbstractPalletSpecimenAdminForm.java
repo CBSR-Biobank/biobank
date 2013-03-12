@@ -124,11 +124,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             @Override
             protected void beforeScan() {
                 setScanHasBeenLaunched(false, true);
-                String msg =
-                    "----SCAN on plate {0}----";
+                String msg = "----SCAN on plate {0}----";
                 if (isRescanMode()) {
-                    msg =
-                        "----RESCAN on plate {0}----";
+                    msg = "----RESCAN on plate {0}----";
                 }
                 appendLog(NLS.bind(msg, currentPlateToScan));
 

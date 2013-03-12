@@ -78,7 +78,6 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -1061,32 +1060,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
-    @SuppressWarnings("nls")
-    private boolean matchedGridDimensions() {
-        int plateNumber = BiobankPlugin.getDefault().getPlateNumber(plateToScanText.getText());
-        if (plateNumber == -1) {
-            return true;
-        }
-
-        String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-        int rows = PreferenceConstants.gridRows(gridDimensions);
-        int cols = PreferenceConstants.gridCols(gridDimensions);
-
-        boolean match = currentMultipleContainer.isPalletRowsCols(rows, cols);
-
-        if (!match && !plateMismatchErrorReported) {
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("Grid dimensions mismatch"),
-                // TR: dialog message
-                i18n.tr("Container type and plate have different number of rows and/or columns"));
-            plateMismatchErrorReported = true;
-            return false;
-        }
-        plateMismatchErrorReported = false;
-        return true;
-    }
-
     @Override
     public void modifyText(ModifyEvent e) {
         super.modifyText(e);
@@ -1345,14 +1318,17 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected boolean canScanTubesManually(PalletWell cell) {
+        return fieldsValid() && (super.canScanTubesManually(cell)
+            || cell.getStatus() == UICellStatus.MISSING);
 
-        IStructuredSelection selection = (IStructuredSelection) palletTypesViewer.getSelection();
-        if (!selection.isEmpty()
-            && palletLabelValidator.validate(palletPositionText.getText()).equals(Status.OK_STATUS)) {
-            return super.canScanTubesManually(cell);
-        }
-
-        return false;
+        // IStructuredSelection selection = (IStructuredSelection) palletTypesViewer.getSelection();
+        // if (!selection.isEmpty()
+        // && palletLabelValidator.validate(palletPositionText.getText()).equals(Status.OK_STATUS))
+        // {
+        // return super.canScanTubesManually(cell);
+        // }
+        //
+        // return false;
     }
 
     /**
