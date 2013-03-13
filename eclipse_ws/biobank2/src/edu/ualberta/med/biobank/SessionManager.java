@@ -44,16 +44,13 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class SessionManager {
     private static final I18n i18n = I18nFactory.getI18n(SessionManager.class);
 
-    @SuppressWarnings("nls")
-    public static final String BIOBANK2_CONTEXT_LOGGED_OUT =
-        "biobank.context.loggedOut";
+    private static BgcLogger log = BgcLogger.getLogger(SessionManager.class.getName());
 
     @SuppressWarnings("nls")
-    public static final String BIOBANK2_CONTEXT_LOGGED_IN =
-        "biobank.context.loggedIn";
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank.context.loggedOut";
 
-    private static BgcLogger logger = BgcLogger.getLogger(SessionManager.class
-        .getName());
+    @SuppressWarnings("nls")
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank.context.loggedIn";
 
     private static SessionManager instance = null;
 
@@ -62,8 +59,7 @@ public class SessionManager {
     private final RootNode rootNode;
 
     /**
-     * Map a perspective ID to a AbstractViewWithTree instance visible when the
-     * perspective is set
+     * Map a perspective ID to a AbstractViewWithTree instance visible when the perspective is set
      */
     public Map<String, AbstractViewWithAdapterTree> possibleViewMap;
 
@@ -93,7 +89,7 @@ public class SessionManager {
     @SuppressWarnings("nls")
     public void addSession(final BiobankApplicationService appService,
         String serverName, UserWrapper user) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
+        log.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
@@ -291,9 +287,8 @@ public class SessionManager {
     /**
      * do an update on node holding the same wrapper than the given adapter.
      * 
-     * @param canReset if true, then the node found will be reloaded from the
-     *            database (might not want that if the object could be open in
-     *            an entry form).
+     * @param canReset if true, then the node found will be reloaded from the database (might not
+     *            want that if the object could be open in an entry form).
      * @param expandParent if true will expand the parent node of 'adapter'
      * 
      */
@@ -306,29 +301,29 @@ public class SessionManager {
                 try {
                     // add to the correct node if it is a new adapter:
                     AbstractAdapterBase parent = adapter.getParent();
-                    if (parent != null)
+                    if (parent != null) {
                         parent.addChild(adapter);
+                    }
                     Integer id = adapter.getId();
-                    List<AbstractAdapterBase> res =
-                        searchNodes(adapter.getClass(), id);
-                    final AbstractViewWithAdapterTree view =
-                        getCurrentAdapterViewWithTree();
+                    List<AbstractAdapterBase> res = searchNodes(adapter.getClass(), id);
+                    final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
                     if (view != null) {
                         for (AbstractAdapterBase ab : res) {
                             if (canReset)
                                 try {
                                     if (ab != adapter) {
-                                        if (ab instanceof AdapterBase)
+                                        if (ab instanceof AdapterBase) {
                                             ((AdapterBase) ab).resetObject();
+                                        }
                                     }
                                 } catch (Exception ex) {
-                                    logger.error("Problem reseting object", ex);
+                                    log.error("Problem reseting object", ex);
                                 }
                             view.getTreeViewer().update(ab, null);
                         }
                     }
                 } catch (Exception ex) {
-                    logger.error("Error updating tree nodes", ex);
+                    log.error("Error updating tree nodes", ex);
                 }
             }
         });
@@ -370,7 +365,7 @@ public class SessionManager {
                             .showPerspective(MainPerspective.ID,
                                 page.getWorkbenchWindow());
                     } catch (WorkbenchException e) {
-                        logger.error("Error opening main perspective", e);
+                        log.error("Error opening main perspective", e);
                     }
             }
         });

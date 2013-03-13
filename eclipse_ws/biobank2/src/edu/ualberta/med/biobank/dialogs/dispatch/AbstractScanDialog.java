@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -509,7 +510,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 if (isScanHasBeenLaunched())
-                    palletScanManagement.scanTubesManually(e, true);
+                    palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
             }
         });
     }

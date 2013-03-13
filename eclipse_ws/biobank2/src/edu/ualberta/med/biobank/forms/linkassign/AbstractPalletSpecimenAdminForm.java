@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResu
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -431,7 +432,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     protected void scanTubesManually(MouseEvent e) {
-        palletScanManagement.scanTubesManually(e, false);
+        palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
     }
 
     @SuppressWarnings("nls")
