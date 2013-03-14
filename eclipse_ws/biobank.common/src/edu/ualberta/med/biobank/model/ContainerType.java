@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Trnc;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validator.constraint.Empty;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -35,19 +36,18 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Describes a container configuration which may hold other child containers or
- * specimens. Container types are used to create a representation of a physical
- * container
+ * Describes a container configuration which may hold other child containers or specimens. Container
+ * types are used to create a representation of a physical container
  * 
- * ET: Describes various containers that can hold specimens, these container
- * types are used to build a container.
+ * ET: Describes various containers that can hold specimens, these container types are used to build
+ * a container.
  * 
  */
 @Entity
 @Table(name = "CONTAINER_TYPE",
-uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
-    @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "SITE_ID", "NAME" }),
+        @UniqueConstraint(columnNames = { "SITE_ID", "NAME_SHORT" }) })
 @Unique.List({
     @Unique(properties = { "site", "name" }, groups = PrePersist.class),
     @Unique(properties = { "site", "nameShort" }, groups = PrePersist.class)
@@ -63,7 +63,7 @@ uniqueConstraints = {
 })
 @ValidContainerType(groups = PrePersist.class)
 public class ContainerType extends AbstractBiobankModel
-implements HasName, HasNameShort, HasActivityStatus, HasComments {
+    implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private static final long serialVersionUID = 1L;
     private static final Bundle bundle = new CommonBundle();
 
@@ -100,6 +100,7 @@ implements HasName, HasNameShort, HasActivityStatus, HasComments {
     private ContainerLabelingScheme childLabelingScheme;
     private Set<ContainerType> parentContainerTypes =
         new HashSet<ContainerType>(0);
+    private LabelingLayout labelingLayout;
 
     @Override
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.ContainerType.name.NotEmpty}")
@@ -147,8 +148,8 @@ implements HasName, HasNameShort, HasActivityStatus, HasComments {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_SPECIMEN_TYPE",
-    joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-    inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "SPECIMEN_TYPE_ID", nullable = false, updatable = false) })
     public Set<SpecimenType> getSpecimenTypes() {
         return this.specimenTypes;
     }
@@ -158,17 +159,17 @@ implements HasName, HasNameShort, HasActivityStatus, HasComments {
     }
 
     /**
-     * The custom @SQLInsert allows a `SITE_ID` to be inserted into the
-     * correlation table so a foreign key can be created to ensure that
-     * {@link ContainerType}-s with the same {@link Site} can be related.
+     * The custom @SQLInsert allows a `SITE_ID` to be inserted into the correlation table so a
+     * foreign key can be created to ensure that {@link ContainerType}-s with the same {@link Site}
+     * can be related.
      * 
      * @return
      */
     @SQLInsert(sql = "INSERT INTO `CONTAINER_TYPE_CONTAINER_TYPE` (PARENT_CONTAINER_TYPE_ID, CHILD_CONTAINER_TYPE_ID, SITE_ID) SELECT ?, ID, SITE_ID FROM `CONTAINER_TYPE` WHERE ID = ?")
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_CONTAINER_TYPE",
-    joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-    inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "PARENT_CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "CHILD_CONTAINER_TYPE_ID", nullable = false, updatable = false) })
     @ForeignKey(name = "FK_ContainerType_childContainerTypes", inverseName = "FK_ContainerType_parentContainerTypes")
     public Set<ContainerType> getChildContainerTypes() {
         return this.childContainerTypes;
@@ -194,8 +195,8 @@ implements HasName, HasNameShort, HasActivityStatus, HasComments {
     @Override
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "CONTAINER_TYPE_COMMENT",
-    joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
-    inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
+        joinColumns = { @JoinColumn(name = "CONTAINER_TYPE_ID", nullable = false, updatable = false) },
+        inverseJoinColumns = { @JoinColumn(name = "COMMENT_ID", unique = true, nullable = false, updatable = false) })
     public Set<Comment> getComments() {
         return this.comments;
     }
@@ -270,5 +271,22 @@ implements HasName, HasNameShort, HasActivityStatus, HasComments {
     public RowColPos getRowColFromPositionString(String position) throws Exception {
         return getChildLabelingScheme().getRowColFromPositionString(
             position, getRowCapacity(), getColCapacity());
+    }
+
+    @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerLabelingScheme.labelingLayout.NotNull}")
+    @Column(name = "LABELING_LAYOUT")
+    @Type(type = "labelingLayout")
+    public LabelingLayout getLabelingLayout() {
+        return this.labelingLayout;
+    }
+
+    public void setLabelingLayout(LabelingLayout labelingLayout) {
+        this.labelingLayout = labelingLayout;
+    }
+
+    @Transient
+    public boolean hasMultipleLabelingLayout() {
+        return this.childLabelingScheme.getHasMultipleLayout()
+            && (getRowCapacity() > 1) && (getColCapacity() > 1);
     }
 }

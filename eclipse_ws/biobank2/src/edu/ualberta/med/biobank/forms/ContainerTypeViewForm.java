@@ -34,16 +34,13 @@ import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeViewForm extends BiobankViewForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerTypeViewForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(ContainerTypeViewForm.class);
 
     @SuppressWarnings("nls")
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeViewForm";
 
-    private final ContainerTypeWrapper containerType =
-        new ContainerTypeWrapper(
-            SessionManager.getAppService());
+    private final ContainerTypeWrapper containerType = new ContainerTypeWrapper(
+        SessionManager.getAppService());
 
     private BgcBaseText siteLabel;
 
@@ -59,7 +56,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private BgcBaseText defaultTempLabel;
 
-    private BgcBaseText numSchemeLabel;
+    private BgcBaseText labelingScheme;
+
+    private BgcBaseText labelingLayout = null;
 
     private BgcBaseText activityStatusLabel;
 
@@ -127,49 +126,42 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                Site.NAME.singular().toString());
-        nameLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasName.PropertyName.NAME.toString());
-        nameShortLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                HasNameShort.PropertyName.NAME_SHORT.toString());
-        isTopLevelButton =
-            (Button) createLabelledWidget(client, Button.class, SWT.NONE,
-                ContainerType.Property.TOP_LEVEL.toString());
-        rowCapacityLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Site.NAME.singular().toString());
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            HasName.PropertyName.NAME.toString());
+        nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            HasNameShort.PropertyName.NAME_SHORT.toString());
+        isTopLevelButton = (Button) createLabelledWidget(client, Button.class, SWT.NONE,
+            ContainerType.Property.TOP_LEVEL.toString());
+        rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            // label
+            i18n.tr("Rows"));
+        colCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            // label
+            i18n.tr("Columns"));
+        defaultTempLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            // label
+            i18n.tr("Default temperature\n(Celcius)"));
+        labelingScheme = createReadOnlyLabelledField(client, SWT.NONE,
+            // label
+            i18n.tr("Child labeling scheme"));
+
+        if (containerType.getWrappedObject().hasMultipleLabelingLayout()) {
+            labelingLayout = createReadOnlyLabelledField(client, SWT.NONE,
                 // label
-                i18n.tr("Rows"));
-        colCapacityLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                // label
-                i18n.tr("Columns"));
-        defaultTempLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                // label
-                i18n.tr("Default temperature\n(Celcius)"));
-        numSchemeLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                // label
-                i18n.tr("Child labeling scheme"));
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE,
-                ActivityStatus.NAME.format(1).toString());
+                i18n.tr("Labeling layout"));
+        }
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            ActivityStatus.NAME.format(1).toString());
 
         createCommentsSection();
-
         setContainerTypeValues();
     }
 
     private void createCommentsSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.format(2).toString());
-        commentTable =
-            new CommentsInfoTable(client,
-                containerType.getCommentCollection(false));
+        Composite client = createSectionWithClient(Comment.NAME.format(2).toString());
+        commentTable = new CommentsInfoTable(client, containerType.getCommentCollection(false));
         commentTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(commentTable);
     }
@@ -182,11 +174,12 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());
-        setTextValue(
-            numSchemeLabel,
-            containerType.getChildLabelingScheme() == null ? StringUtil.EMPTY_STRING
-                : containerType
-                    .getChildLabelingSchemeName());
+        setTextValue(labelingScheme,
+            containerType.getChildLabelingScheme() == null
+                ? StringUtil.EMPTY_STRING : containerType.getChildLabelingSchemeName());
+        if (labelingLayout != null) {
+            setTextValue(labelingLayout, containerType.getLabelingLayout().getLabel());
+        }
         setTextValue(activityStatusLabel, containerType.getActivityStatus());
     }
 

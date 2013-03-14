@@ -12,7 +12,8 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 
-// TODO: should be an enum? Maybe make types that require java code, but put parameters and names into the database?
+// TODO: should be an enum? Maybe make types that require java code, but put parameters and names
+// into the database?
 @Entity
 @Table(name = "CONTAINER_LABELING_SCHEME")
 public class ContainerLabelingScheme extends AbstractBiobankModel
@@ -39,6 +40,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     private Integer maxRows;
     private Integer maxCols;
     private Integer maxCapacity;
+    private boolean hasMultipleLayout = false;
 
     @Override
     @Column(name = "NAME", length = 50, unique = true)
@@ -96,6 +98,15 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         this.maxCapacity = maxCapacity;
     }
 
+    @Column(name = "HAS_MULTIPLE_LAYOUT")
+    public boolean getHasMultipleLayout() {
+        return hasMultipleLayout;
+    }
+
+    public void setHasMultipleLayout(boolean hasMultipleLayout) {
+        this.hasMultipleLayout = hasMultipleLayout;
+    }
+
     /**
      * Convert a position in row*column to two letter (in the CBSR way)
      * 
@@ -143,8 +154,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the string corresponding to the given RowColPos and using the SBS
-     * standard. 2:1 will return C2.
+     * Get the string corresponding to the given RowColPos and using the SBS standard. 2:1 will
+     * return C2.
      */
     private static String rowColtoCbsrSbs(RowColPos rcp) {
         return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow()) //$NON-NLS-1$
@@ -181,8 +192,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the 2 char string corresponding to a RowColPos position given the
-     * container capacity
+     * Get the 2 char string corresponding to a RowColPos position given the container capacity
      */
     public static String getPositionString(RowColPos rcp,
         Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
@@ -210,8 +220,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * get the RowColPos in the given container corresponding to the given label
-     * AB and will return 1:0.
+     * get the RowColPos in the given container corresponding to the given label AB and will return
+     * 1:0.
      */
     @SuppressWarnings("nls")
     public RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
@@ -258,8 +268,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the RowColPos in the given container corresponding to the given label
-     * using the 2 char numeric labelling.
+     * Get the RowColPos in the given container corresponding to the given label using the 2 char
+     * numeric labelling.
      */
     @SuppressWarnings("nls")
     public RowColPos twoCharNumericToRowCol(String label, int totalRows)
@@ -287,8 +297,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the RowColPos in the given container corresponding to the given label
-     * using the dewar labelling.
+     * Get the RowColPos in the given container corresponding to the given label using the dewar
+     * labelling.
      * 
      * @throws Exception
      */
@@ -315,8 +325,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the rowColPos corresponding to the given CBSR SBS 2 char string
-     * position. Could be A2 or F9. (CBSR SBS skip I and O)
+     * Get the rowColPos corresponding to the given CBSR SBS 2 char string position. Could be A2 or
+     * F9. (CBSR SBS skip I and O)
      */
     @SuppressWarnings("nls")
     public RowColPos cbsrSbsToRowCol(String pos)
@@ -331,8 +341,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * get the RowColPos in the given container corresponding to the given label
-     * AB and will return 1:0.
+     * get the RowColPos in the given container corresponding to the given label AB and will return
+     * 1:0.
      */
     @SuppressWarnings("nls")
     public RowColPos twoCharToRowCol(String label, int rowCap, int colCap,
@@ -377,8 +387,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     }
 
     /**
-     * Get the RowColPos position corresponding to the string position given the
-     * container capacity
+     * Get the RowColPos position corresponding to the string position given the container capacity
      */
     public RowColPos getRowColFromPositionString(String position,
         Integer rowCapacity, Integer colCapacity)

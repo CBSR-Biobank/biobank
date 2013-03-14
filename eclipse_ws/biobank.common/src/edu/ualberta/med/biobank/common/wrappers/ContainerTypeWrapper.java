@@ -24,13 +24,13 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@SuppressWarnings("nls")
 public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     public static final Property<Integer, ContainerType> ROW_CAPACITY =
-        ContainerTypePeer.CAPACITY
-            .wrap(CapacityPeer.ROW_CAPACITY);
+        ContainerTypePeer.CAPACITY.wrap(CapacityPeer.ROW_CAPACITY);
+
     public static final Property<Integer, ContainerType> COL_CAPACITY =
-        ContainerTypePeer.CAPACITY
-            .wrap(CapacityPeer.COL_CAPACITY);
+        ContainerTypePeer.CAPACITY.wrap(CapacityPeer.COL_CAPACITY);
 
     public static final List<Property<?, ? super ContainerType>> PROPERTIES;
     static {
@@ -40,7 +40,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         aList.add(ROW_CAPACITY);
         aList.add(COL_CAPACITY);
         aList.add(ContainerTypePeer.CHILD_LABELING_SCHEME.wrap(
-            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME)); //$NON-NLS-1$
+            "childLabelingSchemeName", ContainerLabelingSchemePeer.NAME));
         PROPERTIES = Collections.unmodifiableList(aList);
     };
 
@@ -60,8 +60,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     public Collection<ContainerTypeWrapper> getChildrenRecursively()
         throws ApplicationException {
-        List<ContainerTypeWrapper> allChildren =
-            new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
         List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
         if (children != null) {
             for (ContainerTypeWrapper type : children) {
@@ -139,8 +138,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public String getChildLabelingSchemeName() {
-        return getProperty(getChildLabelingScheme(),
-            ContainerLabelingSchemePeer.NAME);
+        return getProperty(getChildLabelingScheme(), ContainerLabelingSchemePeer.NAME);
     }
 
     public void setChildLabelingSchemeName(String name) throws Exception {
@@ -188,7 +186,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         if (!useStrictName) {
             nameComparison = "lower(name) like"; //$NON-NLS-1$
             containerNameParameter = new StringBuilder("%") //$NON-NLS-1$
-                .append(containerName.toLowerCase()).append("%").toString(); //$NON-NLS-1$
+            .append(containerName.toLowerCase()).append("%").toString(); //$NON-NLS-1$
         }
         StringBuilder query = new StringBuilder(SITE_CONTAINER_TYPES_QRY)
             .append(nameComparison).append(" ?"); //$NON-NLS-1$

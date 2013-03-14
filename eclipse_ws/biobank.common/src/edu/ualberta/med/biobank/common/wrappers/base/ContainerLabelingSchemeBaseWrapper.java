@@ -87,4 +87,7 @@ public class ContainerLabelingSchemeBaseWrapper extends ModelWrapper<ContainerLa
         setProperty(ContainerLabelingSchemePeer.MAX_COLS, maxCols);
     }
 
+    public boolean getHasMultipleLayout() {
+        return getProperty(ContainerLabelingSchemePeer.HAS_MULTIPLE_LAYOUT);
+    }
 }

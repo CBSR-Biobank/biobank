@@ -33,6 +33,13 @@
         defaultForType = RequestSpecimenState.class,
         parameters = {
             @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.RequestSpecimenState")
+        }),
+    @TypeDef(
+        name = "labelingLayout",
+        typeClass = GenericEnumUserType.class,
+        defaultForType = LabelingLayout.class,
+        parameters = {
+            @Parameter(name = "enumClass", value = "edu.ualberta.med.biobank.model.type.LabelingLayout")
         })
 })
 package edu.ualberta.med.biobank.model;
@@ -43,6 +50,7 @@ import org.hibernate.annotations.TypeDefs;
 
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.GenericEnumUserType;
 

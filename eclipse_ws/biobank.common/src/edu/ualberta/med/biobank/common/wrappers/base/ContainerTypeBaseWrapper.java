@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
@@ -38,7 +39,7 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-   protected ContainerType getNewObject() throws Exception {
+    protected ContainerType getNewObject() throws Exception {
         ContainerType newObject = super.getNewObject();
         newObject.setTopLevel(false);
         return newObject;
@@ -91,14 +92,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     public SiteWrapper getSite() {
         boolean notCached = !isPropertyCached(ContainerTypePeer.SITE);
         SiteWrapper site = getWrappedProperty(ContainerTypePeer.SITE, SiteWrapper.class);
-        if (site != null && notCached) ((SiteBaseWrapper) site).addToContainerTypeCollectionInternal(Arrays.asList(this));
+        if (site != null && notCached)
+            ((SiteBaseWrapper) site).addToContainerTypeCollectionInternal(Arrays.asList(this));
         return site;
     }
 
     public void setSite(SiteBaseWrapper site) {
         if (isInitialized(ContainerTypePeer.SITE)) {
             SiteBaseWrapper oldSite = getSite();
-            if (oldSite != null) oldSite.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
+            if (oldSite != null)
+                oldSite.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
         }
         if (site != null) site.addToContainerTypeCollectionInternal(Arrays.asList(this));
         setWrappedProperty(ContainerTypePeer.SITE, site);
@@ -121,6 +124,14 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME, childLabelingScheme);
     }
 
+    public LabelingLayout getLabelingLayout() {
+        return getProperty(ContainerTypePeer.LABELING_LAYOUT);
+    }
+
+    public void setLabelingLayout(LabelingLayout labelingLayout) {
+        setProperty(ContainerTypePeer.LABELING_LAYOUT, labelingLayout);
+    }
+
     public List<SpecimenTypeWrapper> getSpecimenTypeCollection(boolean sort) {
         boolean notCached = !isPropertyCached(ContainerTypePeer.SPECIMEN_TYPES);
         List<SpecimenTypeWrapper> specimenTypeCollection = getWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, SpecimenTypeWrapper.class, sort);
@@ -132,14 +143,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         return specimenTypeCollection;
     }
 
-    public void addToSpecimenTypeCollection(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
+    public void addToSpecimenTypeCollection(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
         addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.addToContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void addToSpecimenTypeCollectionInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
+    void addToSpecimenTypeCollectionInternal(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
         if (isInitialized(ContainerTypePeer.SPECIMEN_TYPES)) {
             addToWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         } else {
@@ -147,14 +160,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromSpecimenTypeCollection(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
+    public void removeFromSpecimenTypeCollection(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
         removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromSpecimenTypeCollectionInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
+    void removeFromSpecimenTypeCollectionInternal(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) {
         if (isPropertyCached(ContainerTypePeer.SPECIMEN_TYPES)) {
             removeFromWrapperCollection(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         } else {
@@ -162,14 +177,18 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromSpecimenTypeCollectionWithCheck(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) throws BiobankCheckException {
+    public void removeFromSpecimenTypeCollectionWithCheck(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
         for (SpecimenTypeBaseWrapper e : specimenTypeCollection) {
             e.removeFromContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromSpecimenTypeCollectionWithCheckInternal(List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection) throws BiobankCheckException {
+    void removeFromSpecimenTypeCollectionWithCheckInternal(
+        List<? extends SpecimenTypeBaseWrapper> specimenTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.SPECIMEN_TYPES, specimenTypeCollection);
     }
 
@@ -202,11 +221,13 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromCommentCollectionWithCheck(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
+    public void removeFromCommentCollectionWithCheck(
+        List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
-    void removeFromCommentCollectionWithCheckInternal(List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
+    void removeFromCommentCollectionWithCheckInternal(
+        List<? extends CommentBaseWrapper> commentCollection) throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.COMMENTS, commentCollection);
     }
 
@@ -237,14 +258,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         return childContainerTypeCollection;
     }
 
-    public void addToChildContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
+    public void addToChildContainerTypeCollection(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
         addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.addToParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void addToChildContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
+    void addToChildContainerTypeCollectionInternal(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
         if (isInitialized(ContainerTypePeer.CHILD_CONTAINER_TYPES)) {
             addToWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         } else {
@@ -252,14 +275,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromChildContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
+    public void removeFromChildContainerTypeCollection(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
         removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.removeFromParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromChildContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
+    void removeFromChildContainerTypeCollectionInternal(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) {
         if (isPropertyCached(ContainerTypePeer.CHILD_CONTAINER_TYPES)) {
             removeFromWrapperCollection(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         } else {
@@ -267,14 +292,18 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromChildContainerTypeCollectionWithCheck(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) throws BiobankCheckException {
+    public void removeFromChildContainerTypeCollectionWithCheck(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : childContainerTypeCollection) {
             e.removeFromParentContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromChildContainerTypeCollectionWithCheckInternal(List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection) throws BiobankCheckException {
+    void removeFromChildContainerTypeCollectionWithCheckInternal(
+        List<? extends ContainerTypeBaseWrapper> childContainerTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.CHILD_CONTAINER_TYPES, childContainerTypeCollection);
     }
 
@@ -289,14 +318,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         return parentContainerTypeCollection;
     }
 
-    public void addToParentContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
+    public void addToParentContainerTypeCollection(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
         addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.addToChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void addToParentContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
+    void addToParentContainerTypeCollectionInternal(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
         if (isInitialized(ContainerTypePeer.PARENT_CONTAINER_TYPES)) {
             addToWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         } else {
@@ -304,14 +335,16 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromParentContainerTypeCollection(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
+    public void removeFromParentContainerTypeCollection(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
         removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.removeFromChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromParentContainerTypeCollectionInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
+    void removeFromParentContainerTypeCollectionInternal(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) {
         if (isPropertyCached(ContainerTypePeer.PARENT_CONTAINER_TYPES)) {
             removeFromWrapperCollection(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         } else {
@@ -319,14 +352,18 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    public void removeFromParentContainerTypeCollectionWithCheck(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) throws BiobankCheckException {
+    public void removeFromParentContainerTypeCollectionWithCheck(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
         for (ContainerTypeBaseWrapper e : parentContainerTypeCollection) {
             e.removeFromChildContainerTypeCollectionInternal(Arrays.asList(this));
         }
     }
 
-    void removeFromParentContainerTypeCollectionWithCheckInternal(List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection) throws BiobankCheckException {
+    void removeFromParentContainerTypeCollectionWithCheckInternal(
+        List<? extends ContainerTypeBaseWrapper> parentContainerTypeCollection)
+        throws BiobankCheckException {
         removeFromWrapperCollectionWithCheck(ContainerTypePeer.PARENT_CONTAINER_TYPES, parentContainerTypeCollection);
     }
 
