@@ -500,19 +500,4 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
             .getActivityStatus());
         inventoryIdExcludeList.add(internalSpecimen.specimen.getInventoryId());
     }
-
-    private static class SleepThread extends Thread {
-        private final long ms;
-
-        public SleepThread(long ms) {
-            this.ms = ms;
-        }
-
-        public void run() {
-            try {
-                sleep(ms);
-            } catch (InterruptedException e) {
-            }
-        }
-    }
 }
