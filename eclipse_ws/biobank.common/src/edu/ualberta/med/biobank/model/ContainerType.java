@@ -84,6 +84,9 @@ public class ContainerType extends AbstractBiobankModel
         public static final LString TOP_LEVEL = bundle.trc(
             "model",
             "Top Level").format();
+        public static final LString LABELING_LAYOUT = bundle.trc(
+            "model",
+            "Labeling Layout").format();
     }
 
     private String name;

@@ -150,7 +150,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         if (containerType.getWrappedObject().hasMultipleLabelingLayout()) {
             labelingLayout = createReadOnlyLabelledField(client, SWT.NONE,
                 // label
-                i18n.tr("Labeling layout"));
+                ContainerType.Property.LABELING_LAYOUT.getString());
         }
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             ActivityStatus.NAME.format(1).toString());

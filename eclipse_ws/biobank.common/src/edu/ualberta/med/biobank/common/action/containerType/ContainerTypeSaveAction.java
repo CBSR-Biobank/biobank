@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 
 public class ContainerTypeSaveAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
@@ -30,6 +31,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private Integer colCapacity;
     private Double defaultTemperature;
     private Integer childLabelingSchemeId;
+    private LabelingLayout labelingLayout;
     private ActivityStatus activityStatus;
 
     private String commentMessage;
@@ -89,6 +91,14 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         this.childContainerTypeIds = childContainerTypeIds;
     }
 
+    public LabelingLayout getLabelingLayout() {
+        return labelingLayout;
+    }
+
+    public void setLabelingLayout(LabelingLayout labelingLayout) {
+        this.labelingLayout = labelingLayout;
+    }
+
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
         Permission permission;
@@ -104,14 +114,6 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         throws ActionException {
         ContainerType containerType = getContainerType(context);
 
-        // TODO:
-        //
-        // 1) capacity, top-level, and labeling scheme cannot be changed after
-        // containers have been assigned this type.
-        // 2) ensure the labeling scheme can label the capacity
-        // 3) ensure removed child container types are not in use
-        // 4) ensure removed specimen types are not in use
-
         containerType.setName(name);
         containerType.setNameShort(nameShort);
         containerType.setSite(context.load(Site.class, siteId));
@@ -120,6 +122,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);
         containerType.setActivityStatus(activityStatus);
+        containerType.setLabelingLayout(labelingLayout);
 
         addComment(context, containerType);
         setChildLabelingScheme(context, containerType);
@@ -145,8 +148,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         }
     }
 
-    private void setChildLabelingScheme(ActionContext context,
-        ContainerType containerType) {
+    private void setChildLabelingScheme(ActionContext context, ContainerType containerType) {
         ContainerLabelingScheme childLabelingScheme =
             context.load(ContainerLabelingScheme.class, childLabelingSchemeId);
         containerType.setChildLabelingScheme(childLabelingScheme);

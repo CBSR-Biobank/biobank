@@ -10,12 +10,15 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -38,29 +41,30 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcEntryFormWidgetListener;
 import edu.ualberta.med.biobank.gui.common.widgets.MultiSelectEvent;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.HasName;
 import edu.ualberta.med.biobank.model.HasNameShort;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
+import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerTypeEntryForm extends BiobankEntryForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerTypeEntryForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(ContainerTypeEntryForm.class);
 
     @SuppressWarnings("unused")
-    private static BgcLogger logger = BgcLogger
-        .getLogger(ContainerTypeEntryForm.class.getName());
+    private static BgcLogger logger = BgcLogger.getLogger(ContainerTypeEntryForm.class.getName());
 
     @SuppressWarnings("nls")
     public static final String ID =
@@ -111,6 +115,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private final CommentWrapper comment = new CommentWrapper(
         SessionManager.getAppService());
 
+    private LabelingLayoutWidget labelingLayoutWidget;
+
     public ContainerTypeEntryForm() {
         super();
         multiSelectListener = new BgcEntryFormWidgetListener() {
@@ -125,8 +131,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+            "Invalid editor input: object of type " + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         updateContainerTypeInfo(adapter.getId());
@@ -146,15 +151,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void updateContainerTypeInfo(Integer id)
         throws ApplicationException {
         if (id != null) {
-            containerTypeInfo =
-                SessionManager.getAppService().doAction(
-                    new ContainerTypeGetInfoAction(id));
-            containerType
-                .setWrappedObject(containerTypeInfo.getContainerType());
+            containerTypeInfo = SessionManager.getAppService().doAction(
+                new ContainerTypeGetInfoAction(id));
+            containerType.setWrappedObject(containerTypeInfo.getContainerType());
         } else {
             containerTypeInfo = new ContainerTypeInfo();
-            containerType.setWrappedObject((ContainerType) containerTypeAdapter
-                .getModelObject().getWrappedObject());
+            containerType.setWrappedObject((ContainerType)
+                containerTypeAdapter.getModelObject().getWrappedObject());
         }
 
         comment.setWrappedObject(new Comment());
@@ -177,14 +180,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     private void createCommentSection() {
-        Composite client =
-            createSectionWithClient(Comment.NAME.format(2).toString());
+        Composite client = createSectionWithClient(Comment.NAME.format(2).toString());
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable =
-            new CommentsInfoTable(client,
-                containerType.getCommentCollection(false));
+        commentEntryTable = new CommentsInfoTable(client, containerType.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -256,20 +256,35 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        BgcBaseText rowText = (BgcBaseText) createBoundWidgetWithLabel(
+            client, BgcBaseText.class, SWT.NONE,
             // label
             i18n.tr("Rows"), null, containerType,
             CapacityPeer.ROW_CAPACITY.getName(), new IntegerNumberValidator(
                 // validation error message
                 i18n.tr("Row capacity is not a valid number"), false));
+        rowText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                // containerType.setRowCapacity(capacity);
+                updatedLabelingLayoutWidget();
+            }
+        });
 
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+        BgcBaseText colText = (BgcBaseText) createBoundWidgetWithLabel(
+            client, BgcBaseText.class, SWT.NONE,
             // label
             i18n.tr("Columns"),
             null, containerType,
             CapacityPeer.COL_CAPACITY.getName(), new IntegerNumberValidator(
                 // validation error message
                 i18n.tr("Column capacity is not a valid number"), false));
+        colText.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                updatedLabelingLayoutWidget();
+            }
+        });
 
         createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             // label
@@ -286,27 +301,31 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getAllLabelingSchemesMap(SessionManager.getAppService()).values()) {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
-        labelingSchemeComboViewer =
-            createComboViewer(client,
-                ContainerType.Property.CHILD_LABELING_SCHEME.toString(),
-                labelingSchemeMap.values(), currentScheme,
-                // validation error message
-                i18n.tr("Select a child labeling scheme"),
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        try {
-                            containerType
-                                .setChildLabelingSchemeName((String) selectedObject);
-                        } catch (Exception e) {
-                            BgcPlugin
-                                .openAsyncError(
-                                    // dialog title
-                                    i18n.tr("Error setting the labeling scheme"),
-                                    e);
-                        }
+
+        labelingSchemeComboViewer = createComboViewer(client,
+            ContainerType.Property.CHILD_LABELING_SCHEME.toString(),
+            labelingSchemeMap.values(), currentScheme,
+            // validation error message
+            i18n.tr("Select a child labeling scheme"),
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    try {
+                        containerType.setChildLabelingSchemeName((String) selectedObject);
+                        updatedLabelingLayoutWidget();
+                    } catch (Exception e) {
+                        BgcPlugin
+                            .openAsyncError(
+                                // dialog title
+                                i18n.tr("Error setting the labeling scheme"),
+                                e);
                     }
-                });
+                }
+            });
+
+        labelingLayoutWidget = new LabelingLayoutWidget(client, widgetCreator,
+            containerType);
+        updatedLabelingLayoutWidget();
 
         activityStatusComboViewer =
             createComboViewer(client, ActivityStatus.NAME.format(1).toString(),
@@ -323,19 +342,24 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     }
 
+    private void updatedLabelingLayoutWidget() {
+        labelingLayoutWidget.setVisible(
+            containerType.getWrappedObject().hasMultipleLabelingLayout());
+        page.layout(true, true);
+        book.reflow(true);
+    }
+
     @SuppressWarnings("nls")
     private void createContainsSection() throws Exception {
         Composite client = createSectionWithClient(i18n.tr("Contents"));
-        hasContainersRadio =
-            toolkit.createButton(client,
-                // radio button label
-                i18n.tr("Contains Containers"),
-                SWT.RADIO);
-        hasSpecimensRadio =
-            toolkit.createButton(client,
-                // radio button label
-                i18n.tr("Contains Specimens"),
-                SWT.RADIO);
+        hasContainersRadio = toolkit.createButton(client,
+            // radio button label
+            i18n.tr("Contains Containers"),
+            SWT.RADIO);
+        hasSpecimensRadio = toolkit.createButton(client,
+            // radio button label
+            i18n.tr("Contains Specimens"),
+            SWT.RADIO);
         hasContainersRadio.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -373,22 +397,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     private void createSpecimenTypesSection(Composite parent) throws Exception {
-        allSpecimenTypes =
-            SpecimenTypeWrapper.getAllSpecimenTypes(
-                SessionManager.getAppService(), true);
+        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+            SessionManager.getAppService(), true);
 
-        specimensMultiSelect =
-            new MultiSelectWidget<SpecimenTypeWrapper>(parent, SWT.NONE,
-                // label
-                i18n.tr("Available specimen types"),
-                // label
-                i18n.tr("Selected specimen types"),
-                100) {
-                @Override
-                protected String getTextForObject(SpecimenTypeWrapper nodeObject) {
-                    return nodeObject.getName();
-                }
-            };
+        specimensMultiSelect = new MultiSelectWidget<SpecimenTypeWrapper>(parent, SWT.NONE,
+            // label
+            i18n.tr("Available specimen types"),
+            // label
+            i18n.tr("Selected specimen types"),
+            100) {
+            @Override
+            protected String getTextForObject(SpecimenTypeWrapper nodeObject) {
+                return nodeObject.getName();
+            }
+        };
         specimensMultiSelect.adaptToToolkit(toolkit, true);
         specimensMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -404,28 +426,25 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     private void createChildContainerTypesSection(Composite parent) {
-        childContainerTypesMultiSelect =
-            new MultiSelectWidget<ContainerTypeWrapper>(
-                parent,
-                SWT.NONE,
-                // label
-                i18n.tr("Available Sub-Container Types"),
-                // label
-                i18n.tr("Selected Sub-Container types"),
-                100) {
-                @Override
-                protected String getTextForObject(
-                    ContainerTypeWrapper nodeObject) {
-                    return nodeObject.getName();
-                }
-            };
+        childContainerTypesMultiSelect = new MultiSelectWidget<ContainerTypeWrapper>(
+            parent,
+            SWT.NONE,
+            // label
+            i18n.tr("Available Sub-Container Types"),
+            // label
+            i18n.tr("Selected Sub-Container types"),
+            100) {
+            @Override
+            protected String getTextForObject(
+                ContainerTypeWrapper nodeObject) {
+                return nodeObject.getName();
+            }
+        };
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         childContainerTypesMultiSelect.setLayoutData(gd);
-
-        childContainerTypesMultiSelect
-            .addSelectionChangedListener(multiSelectListener);
+        childContainerTypesMultiSelect.addSelectionChangedListener(multiSelectListener);
 
         setChildContainerTypeSelection();
     }
@@ -458,36 +477,29 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         ctSaveAction.setRowCapacity(containerType.getRowCapacity());
         ctSaveAction.setColCapacity(containerType.getColCapacity());
         ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
-        ctSaveAction.setDefaultTemperature(containerType
-            .getDefaultTemperature());
-        ctSaveAction.setChildLabelingSchemeId(containerType
-            .getChildLabelingSchemeId());
+        ctSaveAction.setDefaultTemperature(containerType.getDefaultTemperature());
+        ctSaveAction.setChildLabelingSchemeId(containerType.getChildLabelingSchemeId());
         ctSaveAction.setCommentMessage(comment.getMessage());
 
         ctSaveAction.setSpecimenTypeIds(getSpecimenTypeIds());
         ctSaveAction.setChildContainerTypeIds(getChildContainerTypeIds());
 
-        Integer id =
-            SessionManager.getAppService().doAction(ctSaveAction).getId();
+        Integer id = SessionManager.getAppService().doAction(ctSaveAction).getId();
         updateContainerTypeInfo(id);
     }
 
     private HashSet<Integer> getSpecimenTypeIds() {
         if (hasSpecimens) {
-            List<SpecimenTypeWrapper> addedSpcTypes =
-                specimensMultiSelect.getAddedToSelection();
-            List<SpecimenTypeWrapper> removedSpcTypes =
-                specimensMultiSelect.getRemovedFromSelection();
+            List<SpecimenTypeWrapper> addedSpcTypes = specimensMultiSelect.getAddedToSelection();
+            List<SpecimenTypeWrapper> removedSpcTypes = specimensMultiSelect.getRemovedFromSelection();
             containerType.addToSpecimenTypeCollection(addedSpcTypes);
             containerType.removeFromSpecimenTypeCollection(removedSpcTypes);
         } else {
-            containerType.removeFromSpecimenTypeCollection(containerType
-                .getSpecimenTypeCollection());
+            containerType.removeFromSpecimenTypeCollection(containerType.getSpecimenTypeCollection());
         }
 
         HashSet<Integer> result = new HashSet<Integer>();
-        for (SpecimenTypeWrapper spcType : containerType
-            .getSpecimenTypeCollection()) {
+        for (SpecimenTypeWrapper spcType : containerType.getSpecimenTypeCollection()) {
             result.add(spcType.getId());
         }
         return result;
@@ -507,8 +519,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
 
         HashSet<Integer> result = new HashSet<Integer>();
-        for (ContainerTypeWrapper childContainerType : containerType
-            .getChildContainerTypeCollection()) {
+        for (ContainerTypeWrapper childContainerType : containerType.getChildContainerTypeCollection()) {
             result.add(childContainerType.getId());
         }
         return result;
@@ -548,5 +559,42 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         showSpecimens(hasSpecimens);
         hasSpecimensRadio.setSelection(hasSpecimens);
         hasContainersRadio.setSelection(!hasSpecimens);
+    }
+
+    private static class LabelingLayoutWidget {
+
+        private final BgcWidgetCreator widgetCreator;
+
+        private final Label label;
+
+        private final ComboViewer comboViewer;
+
+        public LabelingLayoutWidget(Composite composite, BgcWidgetCreator widgetCreator,
+            final ContainerTypeWrapper containerType) {
+            this.widgetCreator = widgetCreator;
+            label = widgetCreator.createLabel(composite, ContainerType.Property.LABELING_LAYOUT.getString());
+            comboViewer = widgetCreator.createComboViewer(composite, label, LabelingLayout.valuesList(),
+                containerType.getLabelingLayout(), null, true, null,
+
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        LabelingLayout layout = (LabelingLayout) selectedObject;
+                        containerType.setLabelingLayout(layout);
+                    }
+                },
+                new BiobankLabelProvider() {
+                    @Override
+                    public String getText(Object element) {
+                        LabelingLayout layout = (LabelingLayout) element;
+                        return layout.getLabel();
+                    }
+                });
+        }
+
+        public void setVisible(boolean visible) {
+            widgetCreator.showWidget(label, visible);
+            widgetCreator.showWidget(comboViewer.getCombo(), visible);
+        }
     }
 }

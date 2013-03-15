@@ -41,12 +41,10 @@ import edu.ualberta.med.biobank.widgets.utils.GuiUtil;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEntryForm extends BiobankEntryForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerEntryForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(ContainerEntryForm.class);
 
     @SuppressWarnings("nls")
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ContainerEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerEntryForm";
 
     @SuppressWarnings("nls")
     // title area message
@@ -101,8 +99,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
-            "Invalid editor input: object of type "
-                + adapter.getClass().getName());
+            "Invalid editor input: object of type " + adapter.getClass().getName());
         containerAdapter = (ContainerAdapter) adapter;
         updateContainerInfo(adapter.getId());
 
@@ -123,9 +120,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         if (adapter.getParent() == null) {
-            SiteAdapter siteAdapter =
-                (SiteAdapter) SessionManager.searchFirstNode(Site.class,
-                    container.getSite().getId());
+            SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchFirstNode(Site.class,
+                container.getSite().getId());
             if (siteAdapter != null) {
                 adapter.setParent(siteAdapter.getContainersGroupNode());
             }
@@ -201,26 +197,23 @@ public class ContainerEntryForm extends BiobankEntryForm {
             setTextValue(l, container.getLabel());
         }
 
-        Control c =
-            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                Container.PropertyName.PRODUCT_BARCODE.toString(),
-                null, container,
-                ContainerPeer.PRODUCT_BARCODE.getName(), null);
+        Control c = createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
+            Container.PropertyName.PRODUCT_BARCODE.toString(),
+            null, container,
+            ContainerPeer.PRODUCT_BARCODE.getName(), null);
         if (!labelIsFirstControl) setFirstControl(c);
 
-        activityStatusComboViewer =
-            createComboViewer(client,
-                ActivityStatus.NAME.singular().toString(),
-                ActivityStatus.valuesList(), container.getActivityStatus(),
-                // validation error message
-                i18n.tr("Container must have an activity status"),
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        container
-                            .setActivityStatus((ActivityStatus) selectedObject);
-                    }
-                });
+        activityStatusComboViewer = createComboViewer(client,
+            ActivityStatus.NAME.singular().toString(),
+            ActivityStatus.valuesList(), container.getActivityStatus(),
+            // validation error message
+            i18n.tr("Container must have an activity status"),
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    container.setActivityStatus((ActivityStatus) selectedObject);
+                }
+            });
 
         createContainerTypesSection(client);
         createCommentSection();
@@ -230,46 +223,39 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private void createContainerTypesSection(Composite client) throws Exception {
         ContainerTypeWrapper currentType = container.getContainerType();
 
-        containerTypeComboViewer =
-            createComboViewer(client,
-                ContainerType.NAME.singular().toString(),
-                containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        ContainerTypeWrapper ct =
-                            (ContainerTypeWrapper) selectedObject;
-                        container.setContainerType(ct);
-                        if (temperatureWidget != null) {
-                            if (ct != null
-                                && Boolean.TRUE.equals(ct.getTopLevel())) {
-                                Double temp = ct.getDefaultTemperature();
-                                if (temp == null) {
-                                    temperatureWidget.setText(StringUtil.EMPTY_STRING);
-                                } else {
-                                    temperatureWidget.setText(temp.toString());
-                                }
+        containerTypeComboViewer = createComboViewer(client, ContainerType.NAME.singular().toString(),
+            containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    ContainerTypeWrapper ct = (ContainerTypeWrapper) selectedObject;
+                    container.setContainerType(ct);
+                    if (temperatureWidget != null) {
+                        if ((ct != null) && ct.getTopLevel().booleanValue()) {
+                            Double temp = ct.getDefaultTemperature();
+                            if (temp == null) {
+                                temperatureWidget.setText(StringUtil.EMPTY_STRING);
+                            } else {
+                                temperatureWidget.setText(temp.toString());
                             }
                         }
                     }
-                });
+                }
+            });
 
         // temperature is set for the toplevel container only.
         String tempProperty = ContainerPeer.TEMPERATURE.getName();
         if (container.hasParentContainer())
-            // subcontainer are using topcontainer temperature. This is display
-            // only.
-            tempProperty =
-                Property.concatNames(ContainerPeer.TOP_CONTAINER,
-                    ContainerPeer.TEMPERATURE);
-        temperatureWidget =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.NONE,
-                // label
-                i18n.tr("Temperature (Celcius)"), null,
-                container, tempProperty, new DoubleNumberValidator(
-                    // validation error message
-                    i18n.tr("Default temperature is not a valid number")));
+            // subcontainer are using topcontainer temperature. This is display only.
+            tempProperty = Property.concatNames(ContainerPeer.TOP_CONTAINER,
+                ContainerPeer.TEMPERATURE);
+        temperatureWidget = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.NONE,
+            // label
+            i18n.tr("Temperature (Celcius)"), null,
+            container, tempProperty, new DoubleNumberValidator(
+                // validation error message
+                i18n.tr("Default temperature is not a valid number")));
         if (container.hasParentContainer())
             temperatureWidget.setEnabled(false);
 

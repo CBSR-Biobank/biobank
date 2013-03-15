@@ -44,8 +44,7 @@ public class ValidContainerTypeValidator
     }
 
     @Override
-    public boolean isValidInEventSource(Object value,
-        ConstraintValidatorContext context) {
+    public boolean isValidInEventSource(Object value, ConstraintValidatorContext context) {
         if (value == null) return true;
         if (!(value instanceof ContainerType)) return false;
 
@@ -68,8 +67,7 @@ public class ValidContainerTypeValidator
         return isValid;
     }
 
-    private boolean checkChildrenTypes(ContainerType ct,
-        ConstraintValidatorContext context) {
+    private boolean checkChildrenTypes(ContainerType ct, ConstraintValidatorContext context) {
         // if either set is initialised we must load the other one to be sure,
         // otherwise assume this check passed before and still does
         if (Hibernate.isInitialized(ct.getChildContainerTypes()) ||
@@ -136,22 +134,22 @@ public class ValidContainerTypeValidator
 
         boolean isValid = true;
 
-        // TODO: should be able to change capacity and labeling scheme as long
-        // as it does not cause any existing containers or specimens to have a
-        // label change. For example, it is probably okay to add and remove
-        // rows, but not columns if more than one row is filled (assuming
-        // labeling is done row by row)
+        // TODO: should be able to change capacity, labeling scheme and labeling layout as long as
+        // it does not cause any existing containers or specimens to have a label change. For
+        // example, it is probably okay to add and remove rows, but not columns if more than one row
+        // is filled (assuming labeling is done row by row)
 
         isValid &= NullUtil.eq(ct.getCapacity(), oldCt.getCapacity());
         isValid &= NullUtil.eq(ct.getTopLevel(), oldCt.getTopLevel());
-        isValid &= NullUtil.eq(ct.getChildLabelingScheme(),
-            oldCt.getChildLabelingScheme());
+        isValid &= NullUtil.eq(ct.getChildLabelingScheme(), oldCt.getChildLabelingScheme());
+        isValid &= NullUtil.eq(ct.getLabelingLayout(), oldCt.getLabelingLayout());
 
         if (!isValid) {
             context.buildConstraintViolationWithTemplate(ILLEGAL_CHANGE)
                 .addNode("capacity")
                 .addNode("topLevel")
                 .addNode("childLabelingScheme")
+                .addNode("labelingLayout")
                 .addConstraintViolation();
         }
 

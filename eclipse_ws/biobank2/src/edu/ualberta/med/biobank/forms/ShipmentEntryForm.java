@@ -283,12 +283,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 // validation error message.
                 i18n.tr("Date Packed should be set"));
 
-        dateSentWidget =
-            createDateTimeWidget(client, departedLabel,
-                shipmentInfo.getPackedAt(),
-                shipmentInfo,
-                ShipmentInfoPeer.PACKED_AT.getName(), departedValidator,
-                SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
+        dateSentWidget = createDateTimeWidget(client, departedLabel,
+            shipmentInfo.getPackedAt(),
+            shipmentInfo,
+            ShipmentInfoPeer.PACKED_AT.getName(), departedValidator,
+            SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
         activateDepartedWidget(shipmentInfo.getShippingMethod() != null
             && shipmentInfo.getShippingMethod().needDate());
 
