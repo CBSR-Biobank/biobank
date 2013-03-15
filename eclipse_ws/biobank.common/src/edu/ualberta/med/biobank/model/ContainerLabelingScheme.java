@@ -9,6 +9,7 @@ import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 
@@ -114,16 +115,18 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 
      * @throws BiobankCheckException
      */
-    public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows,
-        int totalCols) {
+    public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows, int totalCols,
+        LabelingLayout labelingLayout) {
         int pos1, pos2, index;
         int lettersLength = CBSR_2_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
             index = rcp.getCol();
         } else if (totalCols == 1) {
             index = rcp.getRow();
-        } else {
+        } else if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
             index = totalRows * rcp.getCol() + rcp.getRow();
+        } else {
+            index = totalCols * rcp.getRow() + rcp.getCol();
         }
 
         pos1 = index / lettersLength;
@@ -139,9 +142,13 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     /**
      * Convert a position in row*column to two char numeric.
      */
-    public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows) {
-        return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol() //$NON-NLS-1$
-            + 1);
+    @SuppressWarnings("nls")
+    public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows, int totalCols,
+        LabelingLayout labelingLayout) {
+        if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+            return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol() + 1);
+        }
+        return String.format("%02d", rcp.getCol() + totalCols * rcp.getRow() + 1);
     }
 
     /**
@@ -169,16 +176,18 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 
      * @throws BiobankCheckException
      */
-    public static String rowColToTwoChar(RowColPos rcp, int totalRows,
-        int totalCols) {
+    public static String rowColToTwoChar(RowColPos rcp, int totalRows, int totalCols,
+        LabelingLayout labelingLayout) {
         int pos1, pos2, index;
         int lettersLength = TWO_CHAR_LABELLING_PATTERN.length();
         if (totalRows == 1) {
             index = rcp.getCol();
         } else if (totalCols == 1) {
             index = rcp.getRow();
-        } else {
+        } else if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
             index = totalRows * rcp.getCol() + rcp.getRow();
+        } else {
+            index = totalCols * rcp.getRow() + rcp.getCol();
         }
 
         pos1 = index / lettersLength;
@@ -193,19 +202,21 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
 
     /**
      * Get the 2 char string corresponding to a RowColPos position given the container capacity
+     * 
+     * @param labelingLayout
      */
-    public static String getPositionString(RowColPos rcp,
-        Integer childLabelingSchemeId, Integer rowCapacity, Integer colCapacity) {
+    public static String getPositionString(RowColPos rcp, Integer childLabelingSchemeId,
+        Integer rowCapacity, Integer colCapacity, LabelingLayout labelingLayout) {
         switch (childLabelingSchemeId) {
         case 1:
             // SBS standard
             return SbsLabeling.fromRowCol(rcp);
         case 2:
             // CBSR 2 char alphabetic
-            return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity);
+            return rowColToCbsrTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
         case 3:
             // 2 char numeric
-            return rowColToTwoCharNumeric(rcp, rowCapacity);
+            return rowColToTwoCharNumeric(rcp, rowCapacity, colCapacity, labelingLayout);
         case 4:
             // dewar
             return rowColToDewar(rcp, colCapacity);
@@ -214,7 +225,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             return rowColtoCbsrSbs(rcp);
         case 6:
             // 2 char alphabetic
-            return rowColToTwoChar(rcp, rowCapacity, colCapacity);
+            return rowColToTwoChar(rcp, rowCapacity, colCapacity, labelingLayout);
         }
         return null;
     }
@@ -224,20 +235,17 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 1:0.
      */
     @SuppressWarnings("nls")
-    public RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
-        int colCap, String containerTypeName)
+    public RowColPos cbsrTwoCharToRowCol(String label, int rowCap, int colCap,
+        String containerTypeName, LabelingLayout labelingLayout)
         throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
             throw new IllegalArgumentException(
-                MessageFormat.format("Label should be {0} characters.",
-                    getMinChars()));
+                MessageFormat.format("Label should be {0} characters.", getMinChars()));
         }
 
-        int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
-            .charAt(len - 2));
-        int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label
-            .charAt(len - 1));
+        int index1 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
+        int index2 = CBSR_2_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 1));
         if ((index1 < 0) || (index2 < 0)) {
             throw new IllegalArgumentException(
                 "Invalid characters in label. Are they in upper case?");
@@ -245,26 +253,27 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper
-                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
-                    rowCap, colCap);
-            String msgStart =
-                MessageFormat
-                    .format("Label {0} does not exist in this scheme", label);
+            String maxValue = ContainerLabelingSchemeWrapper.rowColToCbsrTwoChar(
+                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap);
+            String msgStart = MessageFormat.format("Label {0} does not exist in this scheme", label);
             if (containerTypeName != null) {
-                msgStart = MessageFormat.format(
-                    "Label {0} does not exist in {1}", label,
-                    containerTypeName);
+                msgStart = MessageFormat.format("Label {0} does not exist in {1}",
+                    label, containerTypeName);
             }
-            String msgMax = MessageFormat.format(
-                "Max value is {0}. (Max row: {1}. Max col: {2}.)", maxValue,
-                rowCap, colCap);
+            String msgMax = MessageFormat.format("Max value is {0}. (Max row: {1}. Max col: {2}.)",
+                maxValue, rowCap, colCap);
             throw new IllegalArgumentException(msgStart + " " + msgMax);
         }
-        Integer row = pos % rowCap;
-        Integer col = pos / rowCap;
-        RowColPos rowColPos = new RowColPos(row, col);
-        return rowColPos;
+
+        if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+            Integer row = pos % rowCap;
+            Integer col = pos / rowCap;
+            return new RowColPos(row, col);
+        }
+
+        Integer row = pos / colCap;
+        Integer col = pos % colCap;
+        return new RowColPos(row, col);
     }
 
     /**
@@ -272,12 +281,11 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * numeric labelling.
      */
     @SuppressWarnings("nls")
-    public RowColPos twoCharNumericToRowCol(String label, int totalRows)
+    public RowColPos twoCharNumericToRowCol(String label, int totalRows, int totalCols,
+        LabelingLayout labelingLayout)
         throws IllegalArgumentException {
-        String errorMsg =
-            MessageFormat
-                .format("Label {0} is incorrect: it should be 2 characters",
-                    label);
+        String errorMsg = MessageFormat.format("Label {0} is incorrect: it should be 2 characters",
+            label);
         int len = label.length();
 
         if ((len != getMinChars()) && (len != getMaxChars())) {
@@ -287,10 +295,16 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         try {
             int pos = Integer.parseInt(label) - 1;
             // has remove 1 because the two char numeric starts at 1
-            Integer row = pos % totalRows;
-            Integer col = pos / totalRows;
-            RowColPos rowColPos = new RowColPos(row, col);
-            return rowColPos;
+
+            if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                Integer row = pos % totalRows;
+                Integer col = pos / totalRows;
+                return new RowColPos(row, col);
+            }
+
+            Integer row = pos / totalCols;
+            Integer col = pos % totalCols;
+            return new RowColPos(row, col);
         } catch (NumberFormatException nbe) {
             throw new IllegalArgumentException(errorMsg);
         }
@@ -346,13 +360,12 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      */
     @SuppressWarnings("nls")
     public RowColPos twoCharToRowCol(String label, int rowCap, int colCap,
-        String containerTypeName)
+        String containerTypeName, LabelingLayout labelingLayout)
         throws IllegalArgumentException {
         int len = label.length();
         if ((len != getMinChars()) && (len != getMaxChars())) {
-            throw new IllegalArgumentException(
-                MessageFormat.format("Label should be {0} characters.",
-                    getMinChars()));
+            throw new IllegalArgumentException(MessageFormat.format("Label should be {0} characters.",
+                getMinChars()));
         }
 
         int index1 = TWO_CHAR_LABELLING_PATTERN.indexOf(label.charAt(len - 2));
@@ -380,28 +393,33 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
                 rowCap, colCap);
             throw new IllegalArgumentException(msgStart + " " + msgMax); //$NON-NLS-1$
         }
-        Integer row = pos % rowCap;
-        Integer col = pos / rowCap;
-        RowColPos rowColPos = new RowColPos(row, col);
-        return rowColPos;
+
+        if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+            Integer row = pos % rowCap;
+            Integer col = pos / rowCap;
+            return new RowColPos(row, col);
+        }
+
+        Integer row = pos / colCap;
+        Integer col = pos % colCap;
+        return new RowColPos(row, col);
     }
 
     /**
      * Get the RowColPos position corresponding to the string position given the container capacity
      */
-    public RowColPos getRowColFromPositionString(String position,
-        Integer rowCapacity, Integer colCapacity)
-        throws Exception {
+    public RowColPos getRowColFromPositionString(String position, Integer rowCapacity,
+        Integer colCapacity, LabelingLayout labelingLayout) throws Exception {
         switch (getId()) {
         case 1:
             // SBS standard
             return SbsLabeling.toRowCol(position);
         case 2:
             // CBSR 2 char alphabetic
-            return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null);
+            return cbsrTwoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
         case 3:
             // 2 char numeric
-            return twoCharNumericToRowCol(position, rowCapacity);
+            return twoCharNumericToRowCol(position, rowCapacity, colCapacity, labelingLayout);
         case 4:
             // Dewar
             return dewarToRowCol(position, colCapacity);
@@ -410,7 +428,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             return cbsrSbsToRowCol(position);
         case 6:
             // 2 char alphabetic
-            return twoCharToRowCol(position, rowCapacity, colCapacity, null);
+            return twoCharToRowCol(position, rowCapacity, colCapacity, null, labelingLayout);
         }
         return null;
     }

@@ -227,14 +227,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
 
-        BgcBaseText name =
-            (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
-                SWT.NONE,
-                HasName.PropertyName.NAME.toString(),
-                null, containerType,
-                ContainerTypePeer.NAME.getName(), new NonEmptyStringValidator(
-                    // validation error message
-                    i18n.tr("Container type must have a name")));
+        BgcBaseText name = (BgcBaseText) createBoundWidgetWithLabel(client, BgcBaseText.class,
+            SWT.NONE,
+            HasName.PropertyName.NAME.toString(),
+            null, containerType,
+            ContainerTypePeer.NAME.getName(), new NonEmptyStringValidator(
+                // validation error message
+                i18n.tr("Container type must have a name")));
 
         setFirstControl(name);
 
@@ -323,22 +322,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             });
 
-        labelingLayoutWidget = new LabelingLayoutWidget(client, widgetCreator,
-            containerType);
-        updatedLabelingLayoutWidget();
+        labelingLayoutWidget = new LabelingLayoutWidget(client, widgetCreator, containerType);
+        labelingLayoutWidget.setVisible(true);
 
-        activityStatusComboViewer =
-            createComboViewer(client, ActivityStatus.NAME.format(1).toString(),
-                ActivityStatus.valuesList(), containerType.getActivityStatus(),
-                // validation error message
-                i18n.tr("Container type must have an activity status"),
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        containerType
-                            .setActivityStatus((ActivityStatus) selectedObject);
-                    }
-                });
+        activityStatusComboViewer = createComboViewer(client, ActivityStatus.NAME.format(1).toString(),
+            ActivityStatus.valuesList(), containerType.getActivityStatus(),
+            // validation error message
+            i18n.tr("Container type must have an activity status"),
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    containerType
+                        .setActivityStatus((ActivityStatus) selectedObject);
+                }
+            });
 
     }
 
@@ -479,6 +476,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         ctSaveAction.setDefaultTemperature(containerType.getDefaultTemperature());
         ctSaveAction.setChildLabelingSchemeId(containerType.getChildLabelingSchemeId());
+        ctSaveAction.setLabelingLayout(containerType.getLabelingLayout());
         ctSaveAction.setCommentMessage(comment.getMessage());
 
         ctSaveAction.setSpecimenTypeIds(getSpecimenTypeIds());
@@ -553,9 +551,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void showContainersOrSpecimens() {
-        hasSpecimens =
-            containerType.getSpecimenTypeCollection() != null
-                && containerType.getSpecimenTypeCollection().size() > 0;
+        hasSpecimens = (containerType.getSpecimenTypeCollection() != null)
+            && !containerType.getSpecimenTypeCollection().isEmpty();
         showSpecimens(hasSpecimens);
         hasSpecimensRadio.setSelection(hasSpecimens);
         hasContainersRadio.setSelection(!hasSpecimens);
@@ -573,8 +570,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             final ContainerTypeWrapper containerType) {
             this.widgetCreator = widgetCreator;
             label = widgetCreator.createLabel(composite, ContainerType.Property.LABELING_LAYOUT.getString());
+
+            LabelingLayout labelingLayout = containerType.getLabelingLayout();
+            // if (labelingLayout == null) {
+            // labelingLayout = LabelingLayout.VERTICAL;
+            // }
+
             comboViewer = widgetCreator.createComboViewer(composite, label, LabelingLayout.valuesList(),
-                containerType.getLabelingLayout(), null, true, null,
+                labelingLayout, null, true, null,
 
                 new ComboSelectionUpdate() {
                     @Override

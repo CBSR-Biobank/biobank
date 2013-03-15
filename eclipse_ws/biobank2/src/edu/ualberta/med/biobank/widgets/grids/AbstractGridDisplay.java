@@ -17,8 +17,8 @@ import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
- * Draw a grid according to specific parameters : total number of rows, total
- * number of columns, width and height of the cells
+ * Draw a grid according to specific parameters : total number of rows, total number of columns,
+ * width and height of the cells
  */
 public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
@@ -60,17 +60,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
 
-                Color defaultColor = getDefaultBackgroundColor(e,
-                    displayWidget, rectangle, indexRow, indexCol);
-                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol,
-                    defaultColor);
-                String topText = getTopTextForBox(displayWidget.getCells(),
+                Color defaultColor = getDefaultBackgroundColor(e, displayWidget, rectangle,
                     indexRow, indexCol);
+                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol, defaultColor);
+                String topText = getTopTextForBox(displayWidget.getCells(), indexRow, indexCol);
                 if (topText != null) {
                     drawText(e, topText, rectangle, SWT.TOP);
                 }
-                String middleText = getMiddleTextForBox(
-                    displayWidget.getCells(), indexRow, indexCol);
+                String middleText = getMiddleTextForBox(displayWidget.getCells(), indexRow, indexCol);
                 if (middleText != null) {
                     drawText(e, middleText, rectangle, SWT.CENTER);
                 }
@@ -197,8 +194,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     /**
-     * Draw the text on the horizontal middle of the rectangle. Vertical
-     * alignment depend on the verticalPosition parameter.
+     * Draw the text on the horizontal middle of the rectangle. Vertical alignment depend on the
+     * verticalPosition parameter.
      */
     private void drawText(PaintEvent e, String text, Rectangle rectangle,
         int verticalPosition) {
@@ -264,9 +261,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     /**
-     * Modify only the number of rows and columns of the grid. If no max width
-     * and max height has been given to the grid, the default cell width and
-     * cell height will be used
+     * Modify only the number of rows and columns of the grid. If no max width and max height has
+     * been given to the grid, the default cell width and cell height will be used
      */
     @Override
     public void setStorageSize(int rows, int columns) {

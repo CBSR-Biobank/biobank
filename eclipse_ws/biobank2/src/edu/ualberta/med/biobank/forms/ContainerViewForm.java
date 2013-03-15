@@ -209,7 +209,7 @@ public class ContainerViewForm extends BiobankViewForm {
         createCommentsSection();
         setContainerValues();
 
-        if (container.getContainerType().getChildContainerTypes().size() > 0) {
+        if (!container.getContainerType().getChildContainerTypes().isEmpty()) {
             createVisualizeContainer();
         }
     }

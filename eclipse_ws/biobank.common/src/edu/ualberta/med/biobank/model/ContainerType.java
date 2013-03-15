@@ -266,7 +266,7 @@ public class ContainerType extends AbstractBiobankModel
     public String getPositionString(RowColPos position) {
         return ContainerLabelingScheme.getPositionString(position,
             getChildLabelingScheme().getId(), getRowCapacity(),
-            getColCapacity());
+            getColCapacity(), labelingLayout);
 
     }
 
@@ -289,6 +289,9 @@ public class ContainerType extends AbstractBiobankModel
 
     @Transient
     public boolean hasMultipleLabelingLayout() {
+        if (childLabelingScheme == null) {
+            return false;
+        }
         return this.childLabelingScheme.getHasMultipleLayout()
             && (getRowCapacity() > 1) && (getColCapacity() > 1);
     }

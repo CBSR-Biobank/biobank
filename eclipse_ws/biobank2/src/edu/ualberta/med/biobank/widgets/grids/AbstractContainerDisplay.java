@@ -14,8 +14,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
- * This class is there to give a common parent class to grid container widgets
- * and drawers widgets
+ * This class is there to give a common parent class to grid container widgets and drawers widgets
  */
 public abstract class AbstractContainerDisplay {
 
@@ -74,12 +73,11 @@ public abstract class AbstractContainerDisplay {
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
 
     /**
-     * Get the text to write inside the cell. This default implementation use
-     * the cell position and the containerType.
+     * Get the text to write inside the cell. This default implementation use the cell position and
+     * the containerType.
      */
     @SuppressWarnings("unused")
-    protected String getDefaultTextForBox(
-        Map<RowColPos, ? extends AbstractUIWell> cells,
+    protected String getDefaultTextForBox(Map<RowColPos, ? extends AbstractUIWell> cells,
         int indexRow, int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = StringUtil.EMPTY_STRING;
@@ -102,8 +100,8 @@ public abstract class AbstractContainerDisplay {
     }
 
     /**
-     * Modify dimensions of the grid. maxWidth and maxHeight are used to
-     * calculate the size of the cells
+     * Modify dimensions of the grid. maxWidth and maxHeight are used to calculate the size of the
+     * cells
      * 
      * @param maxWidth max width the grid should have
      * @param maxHeight max height the grid should have

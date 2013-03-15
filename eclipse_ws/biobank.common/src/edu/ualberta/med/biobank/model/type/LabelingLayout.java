@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 @SuppressWarnings("nls")
 public enum LabelingLayout implements Serializable, NotAProxy {
     VERTICAL(0, Loader.i18n.tr("Vertical")),
-    HORIZONTAL(0, Loader.i18n.tr("Horizontal"));
+    HORIZONTAL(1, Loader.i18n.tr("Horizontal"));
 
     private static final List<LabelingLayout> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));

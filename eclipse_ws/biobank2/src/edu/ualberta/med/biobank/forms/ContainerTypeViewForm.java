@@ -251,19 +251,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     @SuppressWarnings("nls")
     protected void createVisualizeContainer() {
-        Composite containerSection =
-            createSectionWithClient(
+        Composite containerSection = createSectionWithClient(
             // label
             i18n.tr("Container Visual"));
         containerSection.setLayout(new FillLayout());
-        ScrolledComposite sc =
-            new ScrolledComposite(containerSection, SWT.H_SCROLL);
+        ScrolledComposite sc = new ScrolledComposite(containerSection, SWT.H_SCROLL);
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
         Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
-        ContainerDisplayWidget containerDisplay =
-            new ContainerDisplayWidget(client);
+        ContainerDisplayWidget containerDisplay = new ContainerDisplayWidget(client);
         containerDisplay.setContainerType(containerType);
         toolkit.adapt(containerSection);
         toolkit.adapt(sc);

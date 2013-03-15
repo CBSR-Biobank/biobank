@@ -44,9 +44,8 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getDefaultTextForBox(
-        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
-        int indexCol) {
+    protected String getDefaultTextForBox(Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow, int indexCol) {
         String text = super.getDefaultTextForBox(cells, indexRow, indexCol);
         if (text.isEmpty()) {
             return StringUtil.EMPTY_STRING;
@@ -59,9 +58,8 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected String getBottomTextForBox(
-        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
-        int indexCol) {
+    protected String getBottomTextForBox(Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow, int indexCol) {
         if (getCellHeight() > HEIGHT_TWO_LINES) {
             return getContainerTypeText(cells, indexRow, indexCol);
         }
@@ -69,22 +67,21 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @SuppressWarnings("nls")
-    protected String getContainerTypeText(
-        Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
-        int indexCol) {
-        String sname = StringUtil.EMPTY_STRING;
+    protected String getContainerTypeText(Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow, int indexCol) {
+        StringBuffer sname = new StringBuffer();
         if (cells != null) {
-            ContainerCell cell = (ContainerCell) cells.get(new RowColPos(
-                indexRow, indexCol));
+            ContainerCell cell = (ContainerCell) cells.get(new RowColPos(indexRow, indexCol));
             if ((cell != null)
                 && (cell.getContainer() != null)
                 && (cell.getContainer().getContainerType() != null)
                 && (cell.getContainer().getContainerType().getNameShort() != null))
-                sname = "("
-                    + cell.getContainer().getContainerType().getNameShort()
-                    + ")";
+                sname
+                    .append("(")
+                    .append(cell.getContainer().getContainerType().getNameShort())
+                    .append(")");
         }
-        return sname;
+        return sname.toString();
     }
 
     public void setDefaultStatus(UICellStatus status) {

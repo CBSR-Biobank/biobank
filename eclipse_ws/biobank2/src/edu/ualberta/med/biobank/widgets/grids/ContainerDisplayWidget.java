@@ -20,8 +20,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
- * This class is there to give a common parent class to grid container widgets
- * and drawers widgets
+ * This class is there to give a common parent class to grid container widgets and drawers widgets
  */
 public class ContainerDisplayWidget extends Canvas {
 
@@ -36,12 +35,11 @@ public class ContainerDisplayWidget extends Canvas {
     protected boolean displayFullInfoString = false;
 
     /**
-     * if we don't want to display information for cells, can specify a selected
-     * box to highlight
+     * if we don't want to display information for cells, can specify a selected box to highlight
      */
     protected RowColPos selection;
 
-    private MultiSelectionManager multiSelectionManager;
+    private final MultiSelectionManager multiSelectionManager;
 
     private AbstractContainerDisplay containerDisplay;
 
@@ -55,14 +53,13 @@ public class ContainerDisplayWidget extends Canvas {
      */
     protected int maxHeight = -1;
 
-    private List<UICellStatus> cellStatus;
+    private final List<UICellStatus> cellStatus;
 
     public ContainerDisplayWidget(Composite parent) {
         this(parent, null);
     }
 
-    public ContainerDisplayWidget(Composite parent,
-        List<UICellStatus> cellStatus) {
+    public ContainerDisplayWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(parent, SWT.DOUBLE_BUFFERED);
         addPaintListener(new PaintListener() {
             @Override
@@ -105,9 +102,8 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     /**
-     * Modify only the number of rows and columns of the grid. If no max width
-     * and max height has been given to the grid, the default cell width and
-     * cell height will be used
+     * Modify only the number of rows and columns of the grid. If no max width and max height has
+     * been given to the grid, the default cell width and cell height will be used
      */
     public void setStorageSize(int rows, int columns) {
         if (containerDisplay != null) {
@@ -117,8 +113,8 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     /**
-     * Modify dimensions of the grid. maxWidth and maxHeight are used to
-     * calculate the size of the cells
+     * Modify dimensions of the grid. maxWidth and maxHeight are used to calculate the size of the
+     * cells
      * 
      * @param maxWidth max width the grid should have
      * @param maxHeight max height the grid should have
@@ -174,8 +170,7 @@ public class ContainerDisplayWidget extends Canvas {
         setContainerType(type.getWrappedObject());
     }
 
-    public void setContainerType(ContainerType type,
-        boolean createDefaultContainer) {
+    public void setContainerType(ContainerType type, boolean createDefaultContainer) {
         this.containerType = type;
         initDisplayFromType(createDefaultContainer);
     }
@@ -189,24 +184,22 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
-        initDisplayFromType(createDefaultContainer,
-            ScanPalletDisplay.SAMPLE_WIDTH);
+        initDisplayFromType(createDefaultContainer, ScanPalletDisplay.SAMPLE_WIDTH);
     }
 
-    public void initDisplayFromType(boolean createDefaultContainer,
-        Integer cellSize) {
+    public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
         AbstractContainerDisplay display = null;
         if (containerType == null) {
             if (createDefaultContainer) {
                 display = new GridContainerDisplay();
                 display.setStorageSize(3, 5);
             }
-        } else if (containerType.getName().equals(
-            Drawer36Display.CONTAINER_NAME)) {
+        } else if (containerType.getName().equals(Drawer36Display.CONTAINER_NAME)) {
             display = new Drawer36Display();
         } else {
             display = new GridContainerDisplay();
         }
+
         if (display != null) {
             display.setDisplaySize(maxWidth, maxHeight);
             if (containerType != null) {
