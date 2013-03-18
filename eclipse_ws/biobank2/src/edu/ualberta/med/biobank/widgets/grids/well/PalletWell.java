@@ -67,7 +67,7 @@ public class PalletWell extends AbstractUIWell {
         int maxRows = PreferenceConstants.gridRows(gridDimensions);
         int maxCols = PreferenceConstants.gridCols(gridDimensions);
 
-        int maxMissed = 2;
+        int maxMissed = 4;
         int totMissed = 0;
 
         Random random = new Random();

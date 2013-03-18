@@ -23,7 +23,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
     private static final I18n i18n = I18nFactory
         .getI18n(CancelConfirmWidget.class);
 
-    private static BgcLogger logger = BgcLogger
+    private static BgcLogger log = BgcLogger
         .getLogger(CancelConfirmWidget.class.getName());
 
     private BgcBaseText confirmCancelText;
@@ -75,7 +75,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
                         form.setValues();
                         form.setAfterKeyCancel();
                     } catch (Exception ex) {
-                        logger.error("Error while reseting pallet values", ex);
+                        log.error("Error while reseting pallet values", ex);
                     }
                 }
             }
@@ -90,7 +90,7 @@ public class CancelConfirmWidget extends BgcBaseWidget {
                 try {
                     form.setValues();
                 } catch (Exception ex) {
-                    logger.error("Error while reseting pallet values", ex);
+                    log.error("Error while reseting pallet values", ex);
                 }
             }
         });
