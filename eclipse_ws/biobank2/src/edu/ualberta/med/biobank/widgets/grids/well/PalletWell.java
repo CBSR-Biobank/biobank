@@ -67,17 +67,23 @@ public class PalletWell extends AbstractUIWell {
         int maxRows = PreferenceConstants.gridRows(gridDimensions);
         int maxCols = PreferenceConstants.gridCols(gridDimensions);
 
+        int maxMissed = 2;
+        int totMissed = 0;
+
         Random random = new Random();
         for (int indexRow = 0; indexRow < maxRows; indexRow++) {
             for (int indexCol = 0; indexCol < maxCols; indexCol++) {
                 StringBuffer digits = new StringBuffer();
-                if (random.nextBoolean()) {
-                    for (int i = 0; i < 10; i++) {
-                        digits.append(random.nextInt(10));
-                    }
-                    result.add(new DecodedWell(SbsLabeling.fromRowCol(indexRow,
-                        indexCol), digits.toString()));
+                if (random.nextBoolean() && (totMissed < maxMissed)) {
+                    ++totMissed;
+                    continue;
                 }
+
+                for (int i = 0; i < 10; i++) {
+                    digits.append(random.nextInt(10));
+                }
+                result.add(new DecodedWell(SbsLabeling.fromRowCol(indexRow,
+                    indexCol), digits.toString()));
             }
         }
         return result;

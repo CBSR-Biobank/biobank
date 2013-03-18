@@ -103,7 +103,7 @@ public class ScanTubesManuallyWizard extends Wizard {
             // the last page may be blank, skip it if it is
             if (tubePage.inventoryId == null) continue;
 
-            if (!page.canFlipToNextPage()) return false;
+            if (!page.isPageComplete()) return false;
         }
         return true;
     }
