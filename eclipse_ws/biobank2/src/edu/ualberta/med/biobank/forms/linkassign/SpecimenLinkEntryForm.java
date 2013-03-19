@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -71,7 +73,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     private static final I18n i18n = I18nFactory.getI18n(SpecimenLinkEntryForm.class);
 
-    protected static BgcLogger log = BgcLogger.getLogger(SpecimenLinkEntryForm.class.getName());
+    private static Logger log = LoggerFactory.getLogger(SpecimenLinkEntryForm.class.getName());
 
     @SuppressWarnings("nls")
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";

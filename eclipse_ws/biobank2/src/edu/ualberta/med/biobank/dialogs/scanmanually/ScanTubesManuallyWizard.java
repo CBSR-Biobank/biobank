@@ -18,16 +18,17 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.model.Specimen;
 
 public class ScanTubesManuallyWizard extends Wizard {
     private static final I18n i18n = I18nFactory.getI18n(ScanTubesManuallyWizard.class);
 
-    protected static BgcLogger log = BgcLogger.getLogger(ScanTubesManuallyWizard.class.getName());
+    private static Logger log = LoggerFactory.getLogger(ScanTubesManuallyWizard.class.getName());
 
     private final Set<String> labels;
     private final BidiMap existingInventoryIds = new DualHashBidiMap();
@@ -97,7 +98,7 @@ public class ScanTubesManuallyWizard extends Wizard {
     public boolean canFinish() {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
-            log.debug("canFinish: label: " + tubePage.labelToScan + ", canFlipToNextPage: "
+            log.trace("canFinish: label: " + tubePage.labelToScan + ", canFlipToNextPage: "
                 + page.canFlipToNextPage());
 
             // the last page may be blank, skip it if it is
@@ -114,7 +115,7 @@ public class ScanTubesManuallyWizard extends Wizard {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
             resultIventoryIdsByLabel.put(tubePage.labelToScan, tubePage.inventoryId);
-            log.debug("performFinish: label: " + tubePage.labelToScan + ", inventoryId: "
+            log.trace("performFinish: label: " + tubePage.labelToScan + ", inventoryId: "
                 + tubePage.inventoryId);
         }
         return true;
@@ -176,7 +177,7 @@ public class ScanTubesManuallyWizard extends Wizard {
 
             // check if this value already exists
             String label = (String) existingInventoryIds.getKey(inventoryId);
-            log.debug("handleEvent: existing inventory id found: label: " + label
+            log.trace("handleEvent: existing inventory id found: label: " + label
                 + ", inventoryId: " + inventoryId);
 
             if ((label != null) && !label.equals(labelToScan)) {

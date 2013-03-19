@@ -14,7 +14,7 @@ public class BgcLogger {
 
     private static Map<String, BgcLogger> loggers = new HashMap<String, BgcLogger>();
 
-    private String name;
+    private final String name;
 
     public BgcLogger(String name) {
         this.name = name;
@@ -45,10 +45,12 @@ public class BgcLogger {
         addRcpLogStatus(IStatus.INFO, message, e);
     }
 
+    @SuppressWarnings("nls")
     public void addRcpLogStatus(int severity, String message, Throwable e) {
         ILog rcpLogger = BgcPlugin.getDefault().getLog();
-        IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID, name + ": " //$NON-NLS-1$
-            + message, e);
+        StringBuffer sb = new StringBuffer();
+        sb.append(name).append(": ").append(message);
+        IStatus status = new Status(severity, BgcPlugin.PLUGIN_ID, sb.toString(), e);
         rcpLogger.log(status);
     }
 
