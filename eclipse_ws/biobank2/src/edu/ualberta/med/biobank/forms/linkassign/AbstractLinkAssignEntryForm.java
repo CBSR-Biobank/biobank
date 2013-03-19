@@ -117,11 +117,15 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected void init() throws Exception {
         super.init();
         singleSpecimen = new SpecimenWrapper(SessionManager.getAppService());
+
+        // creates the binding, and enables it by default. However, it should not be enabled
+        // until it is needed.
         canSaveSingleBinding = widgetCreator.addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             canSaveSingleSpecimen,
             // TR: validation error message
             i18n.tr("Please fill in the fields and hit enter or tab or resolve previous errors"));
+        widgetCreator.removeBinding(canSaveSingleBinding);
     }
 
     protected abstract String getFormTitle();
@@ -548,8 +552,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     @Override
     public void setValues() throws Exception {
         super.setValues();
-        singleSpecimen.initObjectWith(new SpecimenWrapper(SessionManager
-            .getAppService()));
+        singleSpecimen.initObjectWith(new SpecimenWrapper(SessionManager.getAppService()));
         singleSpecimen.reset();
         setDirty(false);
         reset(true);

@@ -1321,15 +1321,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean canScanTubesManually(PalletWell cell) {
         return fieldsValid() && (super.canScanTubesManually(cell)
             || cell.getStatus() == UICellStatus.MISSING);
-
-        // IStructuredSelection selection = (IStructuredSelection) palletTypesViewer.getSelection();
-        // if (!selection.isEmpty()
-        // && palletLabelValidator.validate(palletPositionText.getText()).equals(Status.OK_STATUS))
-        // {
-        // return super.canScanTubesManually(cell);
-        // }
-        //
-        // return false;
     }
 
     /**

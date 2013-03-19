@@ -451,9 +451,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             currentScanState = currentScanState.mergeWith(palletCell.getStatus());
             setScanValid(getCells() != null && !getCells().isEmpty()
                 && currentScanState != UICellStatus.ERROR);
-            // boolean ok = isScanValid()
-            // && (palletCell.getStatus() != UICellStatus.ERROR);
-            // setScanValid(ok);
             afterScanAndProcess(palletCell.getRow());
             setScanHasBeenLaunched(true);
         }
