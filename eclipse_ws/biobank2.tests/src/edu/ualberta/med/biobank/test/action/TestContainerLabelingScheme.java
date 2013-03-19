@@ -8,16 +8,21 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction.ContainerLabelingSchemeInfo;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 
 public class TestContainerLabelingScheme extends TestAction {
+
+    private static Logger log = LoggerFactory.getLogger(TestContainerLabelingScheme.class.getName());
 
     private static final Map<Integer, String> ALPHA;
     static {
@@ -130,158 +135,307 @@ public class TestContainerLabelingScheme extends TestAction {
     }
 
     @Test
-    public void testTwoCharNumeric() throws Exception {
-        int totalRows = 5 + getR().nextInt(5);
+    public void posToLabelTwoCharNumeric() throws Exception {
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
 
-        for (int i = 0; i < totalRows; ++i) {
-            Integer row = i % totalRows;
-            Integer col = i / totalRows;
-            RowColPos pos = new RowColPos(row, col);
-            String result = ContainerLabelingSchemeWrapper
-                .rowColToTwoCharNumeric(pos, totalRows);
-            Assert.assertEquals(result.length(), 2);
-            Assert.assertEquals(new Integer(pos.getRow() + 1).toString(),
-                result.substring(1, 2));
-            Assert
-                .assertEquals(pos.getCol().toString(), result.substring(0, 1));
-        }
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int row = 0; row < totalRows; ++row) {
+                for (int col = 0; col < totalCols; ++col) {
+                    RowColPos pos = new RowColPos(row, col);
+                    String result = ContainerLabelingScheme.rowColToTwoCharNumeric(
+                        pos, totalRows, totalCols, labelingLayout);
 
-        for (int i = 0; i < totalRows; ++i) {
-            Integer row = (i % totalRows) + 1;
-            Integer col = i / totalRows;
-            String label = col.toString() + row.toString();
-            RowColPos pos = ContainerLabelingSchemeWrapper
-                .twoCharNumericToRowCol(appService, label, totalRows);
-            Assert.assertEquals(pos.getRow(), new Integer(row - 1));
-            Assert.assertEquals(pos.getCol(), col);
+                    // log.debug("pos:{}, result:{}", pos, result);
+
+                    Assert.assertEquals(result.length(), 2);
+                    if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                        Assert.assertEquals(String.format("%02d", col * totalRows + row + 1), result);
+                    } else {
+                        Assert.assertEquals(String.format("%02d", row * totalCols + col + 1), result);
+                    }
+                }
+            }
         }
     }
 
     @Test
-    public void testTwoCharAlpha() throws Exception {
-        int totalRows = 3 + getR().nextInt(3);
-        int totalCols = 5 + getR().nextInt(5);
+    public void posToLabelTwoCharNumericBadParams() throws Exception {
+        RowColPos pos = new RowColPos(10, 10);
 
-        String cbsrString;
+        try {
+            ContainerLabelingScheme.rowColToTwoCharNumeric(pos, 10, 10, LabelingLayout.VERTICAL);
+            Assert.fail("should not allow labeling more than 2 digits");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+    }
 
-        for (int col = 0; col < totalCols; ++col) {
-            for (int row = 0; row < totalRows; ++row) {
-                RowColPos pos = new RowColPos(row, col);
-                cbsrString = ContainerLabelingSchemeWrapper.rowColToTwoChar(
-                    pos, totalRows, totalCols);
-                Assert.assertTrue(cbsrString.length() == 2);
-                Assert.assertEquals(
-                    ALPHA.get((row + (col * totalRows)) % ALPHA.size()),
-                    cbsrString.substring(1));
-                Assert.assertEquals(
-                    ALPHA.get((row + (col * totalRows)) / ALPHA.size()),
-                    cbsrString.substring(0, 1));
+    @Test
+    public void labelToPosTwoCharNumeric() throws Exception {
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
+
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("2 char numeric")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int i = 0, n = totalRows * totalCols; i < n; ++i) {
+                String label = String.format("%02d", i + 1);
+
+                RowColPos pos = labelingScheme.twoCharNumericToRowCol(
+                    label, totalRows, totalCols, labelingLayout);
+
+                // log.debug("index:{}, layout:{}, label:{}, pos:{}", new Object[] {
+                // i, labelingLayout, label, pos });
+
+                if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                    Assert.assertEquals(pos.getRow().intValue(), i % totalRows);
+                    Assert.assertEquals(pos.getCol().intValue(), i / totalRows);
+                } else {
+                    Assert.assertEquals(pos.getRow().intValue(), i / totalCols);
+                    Assert.assertEquals(pos.getCol().intValue(), i % totalCols);
+                }
             }
         }
+    }
 
-        for (int col = 0; col < (totalCols); ++col) {
-            for (int row = 0; row < (totalRows); ++row) {
-                cbsrString = ALPHA
-                    .get((row + (col * totalRows)) / ALPHA.size())
-                    + ALPHA.get((row + (col * totalRows)) % ALPHA.size());
+    @Test
+    public void labelToPosTwoCharNumericBadParams() throws Exception {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("2 char numeric")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
 
-                RowColPos pos = ContainerLabelingSchemeWrapper.twoCharToRowCol(
-                    appService, cbsrString, totalRows, totalCols, "test");
-                Assert.assertEquals(new Integer(row), pos.getRow());
-                Assert.assertEquals(new Integer(col), pos.getCol());
-            }
+        try {
+            labelingScheme.twoCharNumericToRowCol("100", 10, 10, LabelingLayout.VERTICAL);
+            Assert.fail("should not allow a labeling of length greater than 2");
+        } catch (IllegalArgumentException e) {
+            // do nothing
         }
 
         try {
-            cbsrString = ALPHA.get(((totalRows - 1)
-                + ((totalCols - 1) * totalRows) + 15)
-                / ALPHA.size())
-                + ALPHA
-                    .get(((totalRows - 1) + ((totalCols - 1) * totalRows) + 15)
-                        % ALPHA.size());
-            ContainerLabelingSchemeWrapper.twoCharToRowCol(appService,
-                cbsrString, totalRows, totalCols, "test");
+            labelingScheme.twoCharNumericToRowCol("0", 10, 10, LabelingLayout.VERTICAL);
+            Assert.fail("should not allow a labeling of length less than 2");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+    }
+
+    @Test
+    public void posToLabelTwoCharAlpha() throws Exception {
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
+        String label;
+
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int col = 0; col < totalCols; ++col) {
+                for (int row = 0; row < totalRows; ++row) {
+                    RowColPos pos = new RowColPos(row, col);
+                    label = ContainerLabelingScheme.rowColToTwoChar(
+                        pos, totalRows, totalCols, labelingLayout);
+
+                    Assert.assertEquals(label.length(), 2);
+                    if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                        Assert.assertEquals(ALPHA.get((col * totalRows + row) % ALPHA.size()),
+                            label.substring(1));
+                        Assert.assertEquals(ALPHA.get((col * totalRows + row) / ALPHA.size()),
+                            label.substring(0, 1));
+                    } else {
+                        Assert.assertEquals(ALPHA.get((row * totalCols + col) % ALPHA.size()),
+                            label.substring(1));
+                        Assert.assertEquals(ALPHA.get((row * totalCols + col) / ALPHA.size()),
+                            label.substring(0, 1));
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void posToLabelTwoCharAlphaBadPos() throws Exception {
+        try {
+            ContainerLabelingScheme.rowColToTwoChar(
+                new RowColPos(10, 10), 10, 10, LabelingLayout.VERTICAL);
+            Assert.fail("should not allow labeling more than 2 digits");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+    }
+
+    @Test
+    public void labelToPosTwoCharAlpha() throws Exception {
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
+        String label;
+
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("2 char alphabetic")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int i = 0, n = totalRows * totalCols; i < n; ++i) {
+                label = ALPHA.get(i / ALPHA.size()) + ALPHA.get(i % ALPHA.size());
+
+                RowColPos pos = labelingScheme.twoCharToRowCol(
+                    label, totalRows, totalCols, "test", labelingLayout);
+                if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                    Assert.assertEquals(i % totalRows, pos.getRow().intValue());
+                    Assert.assertEquals(i / totalRows, pos.getCol().intValue());
+                } else {
+                    Assert.assertEquals(i / totalCols, pos.getRow().intValue());
+                    Assert.assertEquals(i % totalCols, pos.getCol().intValue());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void labelToPosTwoCharAlphaBadLabel() throws Exception {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("2 char alphabetic")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+        try {
+            labelingScheme.twoCharToRowCol("100", 10, 10, "test", LabelingLayout.VERTICAL);
             Assert.fail("Should not be allowed to go out of bounds.");
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
+        } catch (IllegalArgumentException e) {
+            // do nothing
         }
 
         try {
-            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
-                appService, "aa", totalRows, totalCols, "test");
+            labelingScheme.cbsrTwoCharToRowCol("aa", 10, 10, "test", LabelingLayout.VERTICAL);
+            Assert.fail("should not be allowed to use lower case characters");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void labelToPosCbsrTwoChar() throws Exception {
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
+        String label;
+
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int col = 0; col < totalCols; ++col) {
+                for (int row = 0; row < totalRows; ++row) {
+                    RowColPos pos = new RowColPos(row, col);
+                    label = ContainerLabelingScheme.rowColToCbsrTwoChar(
+                        pos, totalRows, totalCols, labelingLayout);
+                    Assert.assertEquals(label.length(), 2);
+                    if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                        Assert.assertEquals(
+                            CBSR_ALPHA.get((row + (col * totalRows)) % CBSR_ALPHA.size()),
+                            label.substring(1));
+                        Assert.assertEquals(
+                            CBSR_ALPHA.get((row + (col * totalRows)) / CBSR_ALPHA.size()),
+                            label.substring(0, 1));
+                    } else {
+                        Assert.assertEquals(
+                            CBSR_ALPHA.get((row * totalCols + col) % CBSR_ALPHA.size()),
+                            label.substring(1));
+                        Assert.assertEquals(
+                            CBSR_ALPHA.get((row * totalCols + col) / CBSR_ALPHA.size()),
+                            label.substring(0, 1));
+
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void posToLabelCbsrTwoCharBadPos() throws Exception {
+        try {
+            ContainerLabelingScheme.rowColToCbsrTwoChar(
+                new RowColPos(10, 10), 10, 10, LabelingLayout.VERTICAL);
+            Assert.fail("should not allow labeling more than 2 digits");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+    }
+
+    @Test
+    public void posToLabelCbsrTwoChar() {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("CBSR 2 char alphabetic")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
+        // can only label between "01" to "99"
+        int totalRows = 9;
+        int totalCols = 10;
+        String label;
+
+        for (LabelingLayout labelingLayout : LabelingLayout.values()) {
+            for (int i = 0, n = totalRows * totalCols; i < n; ++i) {
+                label = CBSR_ALPHA.get(i / CBSR_ALPHA.size())
+                    + CBSR_ALPHA.get(i % CBSR_ALPHA.size());
+                RowColPos pos = labelingScheme.cbsrTwoCharToRowCol(
+                    label, totalRows, totalCols, "test", labelingLayout);
+                if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+                    Assert.assertEquals(i % totalRows, pos.getRow().intValue());
+                    Assert.assertEquals(i / totalRows, pos.getCol().intValue());
+                } else {
+                    Assert.assertEquals(i / totalCols, pos.getRow().intValue());
+                    Assert.assertEquals(i % totalCols, pos.getCol().intValue());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void labelToPosCbsrTwoCharBadLabel() {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("CBSR 2 char alphabetic")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+        try {
+            labelingScheme.cbsrTwoCharToRowCol("100", 10, 10, "test", LabelingLayout.VERTICAL);
+            Assert.fail("Should not be allowed to go out of bounds.");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            labelingScheme.cbsrTwoCharToRowCol(
+                "aa", 10, 10, "test", LabelingLayout.VERTICAL);
             Assert.fail("should not be allowed to use lower case characters");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
     }
 
-    @Test
-    public void testCbsr() throws Exception {
-        int totalRows = 3 + getR().nextInt(3);
-        int totalCols = 5 + getR().nextInt(5);
+    private static class Dimensions {
+        int totalRows;
+        int totalCols;
 
-        String cbsrString;
-
-        for (int col = 0; col < totalCols; ++col) {
-            for (int row = 0; row < totalRows; ++row) {
-                RowColPos pos = new RowColPos(row, col);
-                cbsrString = ContainerLabelingSchemeWrapper
-                    .rowColToCbsrTwoChar(pos, totalRows, totalCols);
-                Assert.assertTrue(cbsrString.length() == 2);
-                Assert.assertEquals(
-                    CBSR_ALPHA.get((row + (col * totalRows))
-                        % CBSR_ALPHA.size()), cbsrString.substring(1));
-                Assert.assertEquals(
-                    CBSR_ALPHA.get((row + (col * totalRows))
-                        / CBSR_ALPHA.size()), cbsrString.substring(0, 1));
-            }
-        }
-
-        for (int col = 0; col < totalCols; ++col) {
-            for (int row = 0; row < totalRows; ++row) {
-                cbsrString = CBSR_ALPHA.get((row + (col * totalRows))
-                    / CBSR_ALPHA.size())
-                    + CBSR_ALPHA.get((row + (col * totalRows))
-                        % CBSR_ALPHA.size());
-                RowColPos pos = ContainerLabelingSchemeWrapper
-                    .cbsrTwoCharToRowCol(appService, cbsrString, totalRows,
-                        totalCols, "test");
-                Assert.assertEquals(new Integer(row), pos.getRow());
-                Assert.assertEquals(new Integer(col), pos.getCol());
-            }
-        }
-
-        try {
-            ContainerLabelingSchemeWrapper.cbsrTwoCharToRowCol(
-                appService, "aa", totalRows, totalCols, "test");
-            Assert.fail("should not be allowed to use lower case characters");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
+        Dimensions(int totalRows, int totalCols) {
+            this.totalRows = totalRows;
+            this.totalCols = totalCols;
         }
     }
 
     @Test
     public void testSbs() throws Exception {
-        int totalRows;
-        int totalCols;
         String posString;
 
-        for (int i = 1; i <= 2; ++i) {
-            switch (i) {
-            case 1:
-                totalRows = 9;
-                totalCols = 9;
-                break;
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("SBS Standard")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
 
-            case 2:
-            default:
-                totalRows = 8;
-                totalCols = 12;
-                break;
-            }
+        Dimensions[] containerDimensions = new Dimensions[] {
+            new Dimensions(9, 9),
+            new Dimensions(10, 10),
+            new Dimensions(8, 12)
+        };
 
-            for (int col = 0; col < totalCols; ++col) {
-                for (int row = 0; row < totalRows; ++row) {
+        for (Dimensions dimensions : containerDimensions) {
+            for (int col = 0; col < dimensions.totalCols; ++col) {
+                for (int row = 0; row < dimensions.totalRows; ++row) {
                     RowColPos pos = new RowColPos(row, col);
                     posString = ContainerLabelingSchemeWrapper.rowColToSbs(pos);
                     if (col >= 9) {
@@ -289,22 +443,50 @@ public class TestContainerLabelingScheme extends TestAction {
                     } else {
                         Assert.assertTrue(posString.length() == 2);
                     }
-                    Assert.assertEquals(SBS_ALPHA.get(row).charAt(0),
-                        posString.charAt(0));
-                    Assert.assertEquals(col + 1,
-                        Integer.valueOf(posString.substring(1)).intValue());
+                    Assert.assertEquals(SBS_ALPHA.get(row).charAt(0), posString.charAt(0));
+                    Assert.assertEquals(col + 1, Integer.valueOf(posString.substring(1)).intValue());
                 }
             }
 
-            for (int col = 0; col < totalCols; ++col) {
-                for (int row = 0; row < totalRows; ++row) {
-                    RowColPos pos = ContainerLabelingSchemeWrapper.sbsToRowCol(
-                        appService,
+            for (int col = 0; col < dimensions.totalCols; ++col) {
+                for (int row = 0; row < dimensions.totalRows; ++row) {
+                    RowColPos pos = SbsLabeling.toRowCol(
                         String.format("%s%02d", SBS_ALPHA.get(row), col + 1));
                     Assert.assertEquals(row, pos.getRow().intValue());
                     Assert.assertEquals(col, pos.getCol().intValue());
                 }
             }
+        }
+    }
+
+    @Test
+    public void sbsBounds() throws Exception {
+        try {
+            SbsLabeling.fromRowCol(new RowColPos(16, 23));
+            Assert.fail("SBS cannot label more than 16 rows");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            SbsLabeling.fromRowCol(new RowColPos(15, 24));
+            Assert.fail("SBS cannot label more than 16 rows");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            SbsLabeling.toRowCol("R12");
+            Assert.fail("invalid row in label");
+        } catch (IllegalArgumentException e) {
+            // do nothing
+        }
+
+        try {
+            SbsLabeling.toRowCol("P25");
+            Assert.fail("invalid column in label");
+        } catch (IllegalArgumentException e) {
+            // do nothing
         }
     }
 
@@ -315,6 +497,10 @@ public class TestContainerLabelingScheme extends TestAction {
     @Test
     public void testDewar() throws Exception {
         String posString;
+
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("Dewar")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
 
         for (int row = 0; row < DEWAR_MAX_ROWS; ++row) {
             for (int col = 0; col < DEWAR_MAX_COLS; ++col) {
@@ -334,8 +520,7 @@ public class TestContainerLabelingScheme extends TestAction {
             for (int col = 0; col < DEWAR_MAX_COLS; ++col) {
                 String label = DEWAR_ALPHA.get((row * DEWAR_MAX_COLS) + col);
                 label += label;
-                RowColPos pos = ContainerLabelingSchemeWrapper.dewarToRowCol(
-                    appService, label, DEWAR_MAX_COLS);
+                RowColPos pos = labelingScheme.dewarToRowCol(label, DEWAR_MAX_COLS);
                 Assert.assertEquals(row, pos.getRow().intValue());
                 Assert.assertEquals(col, pos.getCol().intValue());
             }
@@ -345,19 +530,12 @@ public class TestContainerLabelingScheme extends TestAction {
 
     @Test
     public void testBounds() throws Exception {
+        ContainerLabelingScheme labelingScheme = exec(
+            new ContainerLabelingSchemeGetInfoAction("SBS Standard")).getLabelingScheme();
+        Assert.assertNotNull(labelingScheme);
+
         if (ContainerLabelingSchemeWrapper.checkBounds(appService,
             ContainerLabelingSchemeWrapper.SCHEME_DEWAR, 9, 1) == true)
-            Assert.fail("Should be out of bounds");
-        else if (ContainerLabelingSchemeWrapper.checkBounds(appService,
-            ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS, 8, 13) == true)
-            Assert.fail("Should be out of bounds");
-        else if (ContainerLabelingSchemeWrapper.getLabelingSchemeById(
-            appService, ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS)
-            .checkBounds(14, 1) == true)
-            Assert.fail("Should be out of bounds");
-        else if (ContainerLabelingSchemeWrapper.getLabelingSchemeById(
-            appService, ContainerLabelingSchemeWrapper.SCHEME_CBSR_SBS)
-            .checkBounds(8, 13) == true)
             Assert.fail("Should be out of bounds");
 
         // test canlabel

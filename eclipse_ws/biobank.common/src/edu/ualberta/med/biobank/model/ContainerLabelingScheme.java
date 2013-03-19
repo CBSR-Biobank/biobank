@@ -115,6 +115,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 
      * @throws BiobankCheckException
      */
+    @SuppressWarnings("nls")
     public static String rowColToCbsrTwoChar(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         int pos1, pos2, index;
@@ -127,6 +128,10 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             index = totalRows * rcp.getCol() + rcp.getRow();
         } else {
             index = totalCols * rcp.getRow() + rcp.getCol();
+        }
+
+        if ((index < 0) || (index >= 99)) {
+            throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
         pos1 = index / lettersLength;
@@ -146,6 +151,12 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     public static String rowColToTwoCharNumeric(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         if (labelingLayout.equals(LabelingLayout.VERTICAL)) {
+            int index = rcp.getCol() * totalRows + totalRows + 1;
+
+            if ((index < 0) || (index >= 99)) {
+                throw new IllegalArgumentException("position is invalid: " + rcp);
+            }
+
             return String.format("%02d", rcp.getRow() + totalRows * rcp.getCol() + 1);
         }
         return String.format("%02d", rcp.getCol() + totalCols * rcp.getRow() + 1);
@@ -176,6 +187,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
      * 
      * @throws BiobankCheckException
      */
+    @SuppressWarnings("nls")
     public static String rowColToTwoChar(RowColPos rcp, int totalRows, int totalCols,
         LabelingLayout labelingLayout) {
         int pos1, pos2, index;
@@ -188,6 +200,10 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             index = totalRows * rcp.getCol() + rcp.getRow();
         } else {
             index = totalCols * rcp.getRow() + rcp.getCol();
+        }
+
+        if ((index < 0) || (index >= 99)) {
+            throw new IllegalArgumentException("position is invalid: " + rcp);
         }
 
         pos1 = index / lettersLength;

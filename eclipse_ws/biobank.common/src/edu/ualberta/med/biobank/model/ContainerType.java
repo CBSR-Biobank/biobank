@@ -273,7 +273,7 @@ public class ContainerType extends AbstractBiobankModel
     @Transient
     public RowColPos getRowColFromPositionString(String position) throws Exception {
         return getChildLabelingScheme().getRowColFromPositionString(
-            position, getRowCapacity(), getColCapacity());
+            position, getRowCapacity(), getColCapacity(), getLabelingLayout());
     }
 
     @NotNull(message = "{edu.ualberta.med.biobank.model.ContainerLabelingScheme.labelingLayout.NotNull}")

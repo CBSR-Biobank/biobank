@@ -18,14 +18,18 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
 
     @SuppressWarnings("nls")
     public RowColPos(Integer row, Integer col) {
-        if (row == null)
+        if (row == null) {
             throw new IllegalArgumentException("row is null");
-        if (row < 0)
-            throw new IllegalArgumentException("row is negative");
-        if (col == null)
+        }
+        if (row < 0) {
+            throw new IllegalArgumentException("row is negative: " + row);
+        }
+        if (col == null) {
             throw new IllegalArgumentException("column is null");
-        if (col < 0)
-            throw new IllegalArgumentException("column is negative");
+        }
+        if (col < 0) {
+            throw new IllegalArgumentException("column is negative: " + col);
+        }
 
         this.row = row;
         this.col = col;
