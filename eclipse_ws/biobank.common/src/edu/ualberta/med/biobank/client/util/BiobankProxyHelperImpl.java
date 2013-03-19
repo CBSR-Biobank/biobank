@@ -35,8 +35,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {
         if (obj instanceof AbstractBiobankListProxy) {
-            return convertListProxyToProxy(as,
-                (AbstractBiobankListProxy<?>) obj);
+            return convertListProxyToProxy(as, (AbstractBiobankListProxy<?>) obj);
         } else if (obj instanceof NotAProxy) {
             return obj;
         } else if (obj instanceof BigDecimal) {
@@ -138,45 +137,34 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                                     + objectProxy.getListChunk().size() + ".");
                         }
                     }
-                    log.debug("invoking {} on class {}", method.getName(),
-                        plainObject.getClass());
-                    String setterMethodName = "set"
-                        + method.getName().substring(3);
-                    if (childObject instanceof List
-                        && !(childObject instanceof Set)) {
-                        Object plainObjectCollection =
-                            convertProxyToObject(childObject);
-                        Collection<Object> objects =
-                            (Collection<Object>) plainObjectCollection;
-                        Collection<Object> tempObjects =
-                            new ArrayList<Object>();
+                    log.trace("invoking {} on class {}", method.getName(), plainObject.getClass());
+                    String setterMethodName = "set" + method.getName().substring(3);
+                    if (childObject instanceof List && !(childObject instanceof Set)) {
+                        Object plainObjectCollection = convertProxyToObject(childObject);
+                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
+                        Collection<Object> tempObjects = new ArrayList<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
                             tempObjects.add(child);
                         }
-                        Method setterMethod = plainObject.getClass().getMethod(
-                            setterMethodName,
+                        Method setterMethod = plainObject.getClass().getMethod(setterMethodName,
                             new Class[] { method.getReturnType() });
                         setterMethod.invoke(plainObject, tempObjects);
                     } else if (childObject instanceof Collection) {
-                        Object plainObjectCollection =
-                            convertProxyToObject(childObject);
-                        Collection<Object> objects =
-                            (Collection<Object>) plainObjectCollection;
+                        Object plainObjectCollection = convertProxyToObject(childObject);
+                        Collection<Object> objects = (Collection<Object>) plainObjectCollection;
                         Collection<Object> tempObjects = new HashSet<Object>();
                         for (Object object : objects) {
                             Object child = convertToObject(map, object);
                             tempObjects.add(child);
                         }
-                        Method setterMethod = plainObject.getClass().getMethod(
-                            setterMethodName,
+                        Method setterMethod = plainObject.getClass().getMethod(setterMethodName,
                             new Class[] { method.getReturnType() });
                         setterMethod.invoke(plainObject, tempObjects);
                     } else {
                         try {
-                            Method setterMethod = plainObject.getClass()
-                                .getMethod(setterMethodName,
-                                    new Class[] { method.getReturnType() });
+                            Method setterMethod = plainObject.getClass().getMethod(setterMethodName,
+                                new Class[] { method.getReturnType() });
                             Object child = convertToObject(map, childObject);
                             setterMethod.invoke(plainObject, child);
                         } catch (Exception e) {
