@@ -15,7 +15,6 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.export.Data;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
@@ -138,14 +138,11 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
                         SessionManager.getAppService(), inventoryId);
                     String cell[] =
                         new String[] {
-                            ContainerLabelingSchemeWrapper.rowColToSbs(pos),
-                            inventoryId,
-                            specimen.getCollectionEvent().getPatient()
-                                .getPnumber(),
+                            SbsLabeling.fromRowCol(pos), inventoryId,
+                            specimen.getCollectionEvent().getPatient().getPnumber(),
                             specimen.getSpecimenType().getNameShort(),
-                            DateFormatter.formatAsDate(specimen
-                                .getTopSpecimen()
-                                .getCreatedAt()) };
+                            DateFormatter.formatAsDate(
+                                specimen.getTopSpecimen().getCreatedAt()) };
                     output.add(cell);
                 }
                 Data data = new Data();

@@ -200,8 +200,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             getOrCreatePosition().setParent(container, position);
         }
 
-        ContainerWrapper topContainer = container == null ? this : container
-            .getTopContainer();
+        ContainerWrapper topContainer = (container == null)
+            ? this : container.getTopContainer();
         setTopContainerInternal(topContainer, true);
     }
 

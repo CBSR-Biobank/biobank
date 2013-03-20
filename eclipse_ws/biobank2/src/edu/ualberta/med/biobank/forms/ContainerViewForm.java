@@ -242,7 +242,6 @@ public class ContainerViewForm extends BiobankViewForm {
                 childrenMap.put(
                     new RowColPos(position.getRow(), position.getCol()),
                     new ContainerWrapper(SessionManager.getAppService(), position.getContainer()));
-
             }
             for (int i = 0; i < rowCap; i++) {
                 for (int j = 0; j < colCap; j++) {

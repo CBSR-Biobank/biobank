@@ -4,11 +4,11 @@ import java.util.Collection;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
@@ -66,10 +66,9 @@ public class SpecimenActionHelper {
 
         pos.setContainer(container);
         ContainerType type = container.getContainerType();
-        String positionString = ContainerLabelingSchemeWrapper
-            .getPositionString(rcp, type.getChildLabelingScheme().getId(),
-                type.getCapacity().getRowCapacity(), type.getCapacity()
-                    .getColCapacity());
+        String positionString = ContainerLabelingScheme.getPositionString(
+            rcp, type.getChildLabelingScheme().getId(), type.getCapacity().getRowCapacity(),
+            type.getCapacity().getColCapacity(), type.getLabelingLayout());
         pos.setPositionString(positionString);
     }
 

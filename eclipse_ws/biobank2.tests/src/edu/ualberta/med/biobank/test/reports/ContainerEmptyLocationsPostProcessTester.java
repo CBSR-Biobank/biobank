@@ -1,9 +1,10 @@
 package edu.ualberta.med.biobank.test.reports;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -21,11 +22,10 @@ public class ContainerEmptyLocationsPostProcessTester implements
 
         for (Object c : results) {
             try {
-                ContainerWrapper container = new ContainerWrapper(appService,
-                    (Container) c);
+                ContainerWrapper container = new ContainerWrapper(appService, (Container) c);
+                ContainerTypeWrapper ctype = container.getContainerType();
 
-                Map<RowColPos, SpecimenWrapper> aliquots = container
-                    .getSpecimens();
+                Map<RowColPos, SpecimenWrapper> aliquots = container.getSpecimens();
 
                 for (int i = 0, numRows = container.getRowCapacity(); i < numRows; i++) {
                     for (int j = 0, numCols = container.getColCapacity(); j < numCols; j++) {
@@ -33,11 +33,9 @@ public class ContainerEmptyLocationsPostProcessTester implements
                         if (!aliquots.containsKey(rowColPos)) {
                             processedResults.add(new Object[] {
                                 container.getLabel()
-                                    + ContainerLabelingSchemeWrapper
-                                        .getPositionString(rowColPos, container
-                                            .getContainerType()
-                                            .getChildLabelingSchemeId(),
-                                            numRows, numCols),
+                                    + ContainerLabelingScheme.getPositionString(
+                                        rowColPos, ctype.getChildLabelingSchemeId(),
+                                        numRows, numCols, ctype.getLabelingLayout()),
                                 container.getContainerType().getNameShort() });
                         }
                     }

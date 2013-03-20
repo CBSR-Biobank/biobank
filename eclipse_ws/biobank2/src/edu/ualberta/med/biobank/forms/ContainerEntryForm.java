@@ -120,8 +120,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         if (adapter.getParent() == null) {
-            SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchFirstNode(Site.class,
-                container.getSite().getId());
+            SiteAdapter siteAdapter = (SiteAdapter) SessionManager.searchFirstNode(
+                Site.class, container.getSite().getId());
             if (siteAdapter != null) {
                 adapter.setParent(siteAdapter.getContainersGroupNode());
             }
@@ -144,8 +144,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
             container.setWrappedObject(containers.get(0));
         } else {
-            container.setWrappedObject((Container) containerAdapter
-                .getModelObject().getWrappedObject());
+            container.setWrappedObject((Container)
+                containerAdapter.getModelObject().getWrappedObject());
         }
 
         comment.setWrappedObject(new Comment());
@@ -161,8 +161,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createButtonsSection();
 
         if (container.isNew()) {
-            GuiUtil.reset(containerTypeComboViewer,
-                container.getContainerType());
+            GuiUtil.reset(containerTypeComboViewer, container.getContainerType());
         }
 
         setValues();
@@ -180,9 +179,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         setFirstControl(client);
 
         boolean labelIsFirstControl = false;
-        if ((container.isNew() && container.getParentContainer() == null)
-            || (container.getContainerType() != null && Boolean.TRUE
-                .equals(container.getContainerType().getTopLevel()))) {
+        if ((container.isNew() && (container.getParentContainer() == null))
+            || ((container.getContainerType() != null)
+            && container.getContainerType().getTopLevel().booleanValue())) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
                 BgcBaseText.class, SWT.NONE,
@@ -191,16 +190,14 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     MSG_CONTAINER_NAME_EMPTY)));
             labelIsFirstControl = true;
         } else {
-            BgcBaseText l =
-                createReadOnlyLabelledField(client, SWT.NONE,
-                    Container.PropertyName.LABEL.toString());
+            BgcBaseText l = createReadOnlyLabelledField(client, SWT.NONE,
+                Container.PropertyName.LABEL.toString());
             setTextValue(l, container.getLabel());
         }
 
         Control c = createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Container.PropertyName.PRODUCT_BARCODE.toString(),
-            null, container,
-            ContainerPeer.PRODUCT_BARCODE.getName(), null);
+            null, container, ContainerPeer.PRODUCT_BARCODE.getName(), null);
         if (!labelIsFirstControl) setFirstControl(c);
 
         activityStatusComboViewer = createComboViewer(client,
@@ -369,18 +366,15 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         if (!container.hasParentContainer()) {
-            containerTypes =
-                ContainerTypeWrapper.getTopContainerTypesInSite(
-                    SessionManager.getAppService(), container.getSite());
+            containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
+                SessionManager.getAppService(), container.getSite());
         } else {
-            containerTypes =
-                container.getParentContainer().getContainerType()
-                    .getChildContainerTypeCollection();
+            containerTypes = container.getParentContainer().getContainerType()
+                .getChildContainerTypeCollection();
         }
         containerTypeComboViewer.setInput(containerTypes);
         if (container.isNew() && containerTypes.size() == 1)
-            containerTypeComboViewer.setSelection(new StructuredSelection(
-                containerTypes.get(0)));
+            containerTypeComboViewer.setSelection(new StructuredSelection(containerTypes.get(0)));
 
         GuiUtil.reset(activityStatusComboViewer, container.getActivityStatus());
         GuiUtil.reset(containerTypeComboViewer, container.getContainerType());

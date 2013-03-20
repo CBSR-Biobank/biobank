@@ -8,7 +8,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
@@ -289,8 +288,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         int pos = index1 * CBSR_2_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper.rowColToCbsrTwoChar(
-                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap);
+            String maxValue = rowColToCbsrTwoChar(
+                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap, labelingLayout);
             String msgStart = MessageFormat.format("Label {0} does not exist in this scheme", label);
             if (containerTypeName != null) {
                 msgStart = MessageFormat.format("Label {0} does not exist in {1}",
@@ -413,9 +412,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         int pos = index1 * TWO_CHAR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            String maxValue = ContainerLabelingSchemeWrapper
-                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
-                    rowCap, colCap);
+            String maxValue = rowColToCbsrTwoChar(
+                new RowColPos(rowCap - 1, colCap - 1), rowCap, colCap, labelingLayout);
             String msgStart =
                 MessageFormat
                     .format("Label {0} does not exist in this scheme.", label);

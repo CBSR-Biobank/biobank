@@ -5,30 +5,38 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerReport2 extends AbstractReport {
 
-    // @formatter:off 
+    // @formatter:off
     @SuppressWarnings("nls")
-    private static final String QUERY = "SELECT c" 
-        + " FROM " + Container.class.getName() + " c "  
-        + "    inner join fetch c.containerType" 
-        + "    ," + Container.class.getName() + " parent "  
-        + " WHERE parent.id in (" + CONTAINER_LIST + ")"  
-        + "    and (c.path LIKE if(length(parent.path),parent.path || '/','') || parent.id || '/%' "  
-        + "         OR c.id=parent.id) " 
-        + "    and c.label LIKE ? || '%' " 
-        + "    and c.containerType.specimenTypes.size > 0" 
-        + "    and (c.containerType.capacity.rowCapacity "  
-        + "         * c.containerType.capacity.colCapacity)" 
-        + "        > c.specimenPositions.size"; 
-    // @formatter:on 
+    private static final String QUERY = "SELECT c"
+        + " FROM "
+        + Container.class.getName()
+        + " c "
+        + "    inner join fetch c.containerType"
+        + "    ,"
+        + Container.class.getName()
+        + " parent "
+        + " WHERE parent.id in ("
+        + CONTAINER_LIST
+        + ")"
+        + "    and (c.path LIKE if(length(parent.path),parent.path || '/','') || parent.id || '/%' "
+        + "         OR c.id=parent.id) "
+        + "    and c.label LIKE ? || '%' "
+        + "    and c.containerType.specimenTypes.size > 0"
+        + "    and (c.containerType.capacity.rowCapacity "
+        + "         * c.containerType.capacity.colCapacity)"
+        + "        > c.specimenPositions.size";
+
+    // @formatter:on
 
     public ContainerReport2(BiobankReport report) {
         super(QUERY, report);
@@ -40,8 +48,8 @@ public class ContainerReport2 extends AbstractReport {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
 
-            ContainerWrapper container = new ContainerWrapper(appService,
-                (Container) c);
+            ContainerWrapper container = new ContainerWrapper(appService, (Container) c);
+            ContainerTypeWrapper ctype = container.getContainerType();
             try {
                 container.reload();
             } catch (Exception e) {
@@ -59,11 +67,9 @@ public class ContainerReport2 extends AbstractReport {
                         if (!aliquots.containsKey(pos))
                             processedResults.add(new Object[] {
                                 container.getLabel()
-                                    + ContainerLabelingSchemeWrapper
-                                        .getPositionString(pos, container
-                                            .getContainerType()
-                                            .getChildLabelingSchemeId(), rows,
-                                            cols),
+                                    + ContainerLabelingScheme.getPositionString(
+                                        pos, ctype.getChildLabelingSchemeId(),
+                                        rows, cols, ctype.getLabelingLayout()),
                                 container.getContainerType().getNameShort() });
 
                     }

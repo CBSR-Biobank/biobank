@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -267,15 +268,15 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public String getPositionString(RowColPos position) {
-        return ContainerLabelingSchemeWrapper.getPositionString(position,
-            getChildLabelingSchemeId(), getRowCapacity(), getColCapacity());
+        return ContainerLabelingScheme.getPositionString(position,
+            getChildLabelingSchemeId(), getRowCapacity(), getColCapacity(), getLabelingLayout());
     }
 
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
-        return ContainerLabelingSchemeWrapper.getRowColFromPositionString(
-            getAppService(), position, getChildLabelingSchemeId(),
-            getRowCapacity(), getColCapacity());
+        ContainerLabelingScheme containerLabelingScheme = new ContainerLabelingScheme();
+        return containerLabelingScheme.getRowColFromPositionString(
+            position, getRowCapacity(), getColCapacity(), getLabelingLayout());
     }
 
     public boolean isPallet96() {

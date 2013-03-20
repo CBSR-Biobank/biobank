@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -71,6 +70,7 @@ public class TestSpecimen extends TestAction {
     public void checkGetActionWithPosition() throws Exception {
         session.beginTransaction();
         Container specimenContainer = createContainer();
+        ContainerType ctype = specimenContainer.getContainerType();
         factory.createParentSpecimen();
         factory.createProcessingEvent();
         session.flush();
@@ -84,7 +84,6 @@ public class TestSpecimen extends TestAction {
 
             if (i == 0) {
                 childSpecimenType = childSpecimen.getSpecimenType();
-                ContainerType ctype = specimenContainer.getContainerType();
                 ctype.getSpecimenTypes().add(childSpecimenType);
                 session.update(ctype);
                 session.flush();
@@ -95,10 +94,9 @@ public class TestSpecimen extends TestAction {
             specimenPosition.setCol(0);
 
             RowColPos pos = new RowColPos(i, 0);
-            String positionString = ContainerLabelingSchemeWrapper.getPositionString(pos,
-                specimenContainer.getContainerType().getChildLabelingScheme().getId(),
-                specimenContainer.getContainerType().getCapacity().getRowCapacity(),
-                specimenContainer.getContainerType().getCapacity().getColCapacity());
+            String positionString = ContainerLabelingScheme.getPositionString(
+                pos, ctype.getChildLabelingScheme().getId(), ctype.getCapacity().getRowCapacity(),
+                ctype.getCapacity().getColCapacity(), ctype.getLabelingLayout());
             specimenPosition.setPositionString(positionString);
             specimenPosString.put(childSpecimen, positionString);
 

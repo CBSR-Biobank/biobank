@@ -17,12 +17,12 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenHierarchyInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 
 public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     implements ISpecimenTypeSelectionChangedListener {
@@ -68,7 +68,7 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
 
         for (int i = 0; i < maxRows; i++) {
             final AliquotedSpecimenSelectionWidget widget = new AliquotedSpecimenSelectionWidget(
-                this, i, ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN.charAt(i),
+                this, i, SbsLabeling.SBS_ROW_LABELLING_PATTERN.charAt(i),
                 widgetCreator, true);
             widget.addSelectionChangedListener(this);
             widget.addBindings();

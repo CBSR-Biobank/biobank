@@ -41,7 +41,6 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResu
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
@@ -213,7 +212,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     .getCells().entrySet()) {
                     RowColPos pos = entry.getKey();
                     monitor.subTask(MessageFormat.format(MONITOR_PROCESSING,
-                        ContainerLabelingSchemeWrapper.rowColToSbs(pos)));
+                        SbsLabeling.fromRowCol(pos)));
                     PalletWell palletCell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
                     if (palletCell == null) { // can happened if missing

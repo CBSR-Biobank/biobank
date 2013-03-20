@@ -14,10 +14,10 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
-import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.util.SbsLabeling;
 
 public class SpecimenLinkProcessAction extends ServerProcessAction {
     private static final long serialVersionUID = 1L;
@@ -34,7 +34,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     // single cell link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId, CellInfo cell,
+    public SpecimenLinkProcessAction(Integer currentWorkingCenterId, Integer studyId,
+        CellInfo cell,
         Locale locale) {
         super(currentWorkingCenterId, cell, locale);
         this.studyId = studyId;
@@ -64,12 +65,10 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                 if (cell != null) {
                     CellInfo otherValue = allValues.get(cell.getValue());
                     if (otherValue != null) {
-                        String thisPosition = ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(cell.getRow(), cell
-                                .getCol()));
-                        String otherPosition = ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(otherValue.getRow(),
-                                otherValue.getCol()));
+                        String thisPosition = SbsLabeling.fromRowCol(new RowColPos(
+                            cell.getRow(), cell.getCol()));
+                        String otherPosition = SbsLabeling.fromRowCol(new RowColPos(
+                            otherValue.getRow(), otherValue.getCol()));
                         cell.setInformation(bundle
                             .tr(
                                 "Value ''{0}'' has already been scanned in position {1}")
@@ -129,8 +128,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                 cell.setStatus(CellInfoStatus.ERROR);
                 cell.setInformation(bundle
                     .tr("Specimen already in database").format());
-                String palletPosition = ContainerLabelingSchemeWrapper
-                    .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
+                String palletPosition = SbsLabeling.fromRowCol(
+                    new RowColPos(cell.getRow(), cell.getCol()));
                 if (foundSpecimen.getParentSpecimen() == null)
                     appendNewLog(MessageFormat
                         .format(
