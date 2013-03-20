@@ -50,7 +50,7 @@ public class RowColPos implements Comparable<RowColPos>, Serializable {
     @Override
     @SuppressWarnings("nls")
     public String toString() {
-        return "RowColPos [row=" + row + ", col=" + col + "]";
+        return "RowColPos: {row:" + row + ", col:" + col + "}";
     }
 
     @Override

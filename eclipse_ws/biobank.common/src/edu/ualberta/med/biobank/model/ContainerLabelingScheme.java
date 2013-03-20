@@ -26,7 +26,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
         "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
     @SuppressWarnings("nls")
-    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
+    public static String CBSR_SBS_LABELLING_PATTERN = "ABCDEFGHJ";
 
     @SuppressWarnings("nls")
     public static final String TWO_CHAR_LABELLING_PATTERN =
@@ -34,6 +34,8 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
 
     @SuppressWarnings("nls")
     public static final String DEWAR_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
+
+    public static final int CBSR_SBS_MAX_COLUMN = 9;
 
     private String name;
     private Integer minChars;
@@ -165,19 +167,37 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
     /**
      * Convert a position in row*column to Dewar labelling (AA, BB, CC...).
      */
+    @SuppressWarnings("nls")
     public static String rowColToDewar(RowColPos rcp, Integer colCapacity) {
-        int pos = rcp.getCol() + (colCapacity * rcp.getRow());
-        String letter = String.valueOf(DEWAR_ROW_LABELLING_PATTERN.charAt(pos));
-        return letter + letter;
+        int pos = colCapacity * rcp.getRow() + rcp.getCol();
+        if (pos >= DEWAR_ROW_LABELLING_PATTERN.length()) {
+            throw new IllegalArgumentException("position exceeds capacity: " + rcp);
+        }
+        StringBuffer result = new StringBuffer();
+        char letter = DEWAR_ROW_LABELLING_PATTERN.charAt(pos);
+        result.append(String.valueOf(letter));
+        result.append(String.valueOf(letter));
+        return result.toString();
     }
 
     /**
      * Get the string corresponding to the given RowColPos and using the SBS standard. 2:1 will
      * return C2.
      */
-    private static String rowColtoCbsrSbs(RowColPos rcp) {
-        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.getRow()) //$NON-NLS-1$
-            + (rcp.getCol() + 1);
+    @SuppressWarnings("nls")
+    public static String rowColtoCbsrSbs(RowColPos rcp) {
+        int row = rcp.getRow();
+        int col = rcp.getCol();
+        if (row > CBSR_SBS_LABELLING_PATTERN.length()) {
+            throw new IllegalArgumentException("row is invalid: " + row);
+        }
+        if (col >= CBSR_SBS_MAX_COLUMN) {
+            throw new IllegalArgumentException("column is invalid: " + col);
+        }
+        StringBuffer result = new StringBuffer();
+        result.append(CBSR_SBS_LABELLING_PATTERN.charAt(row));
+        result.append(col + 1);
+        return result.toString();
     }
 
     /**
@@ -365,7 +385,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             throw new IllegalArgumentException("binPos has an invalid length: "
                 + pos);
         }
-        int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
+        int row = CBSR_SBS_LABELLING_PATTERN.indexOf(pos.charAt(0));
         int col = Integer.parseInt(pos.substring(1)) - 1;
         return new RowColPos(row, col);
     }
@@ -440,7 +460,7 @@ public class ContainerLabelingScheme extends AbstractBiobankModel
             // Dewar
             return dewarToRowCol(position, colCapacity);
         case 5:
-            // Box81
+            // CBSR SBS
             return cbsrSbsToRowCol(position);
         case 6:
             // 2 char alphabetic

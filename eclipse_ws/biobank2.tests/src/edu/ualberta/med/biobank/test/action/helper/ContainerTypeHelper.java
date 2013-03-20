@@ -7,6 +7,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAct
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 
 public class ContainerTypeHelper {
 
@@ -25,54 +26,42 @@ public class ContainerTypeHelper {
         ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);
         ctSaveAction.setDefaultTemperature(defaultTemp);
         ctSaveAction.setChildLabelingSchemeId(childLabelingSchemeId);
+        ctSaveAction.setLabelingLayout(LabelingLayout.VERTICAL);
 
         return ctSaveAction;
     }
 
-    public static ContainerTypeSaveAction getSaveAction(
-        ContainerTypeInfo containerTypeInfo) {
-        ContainerTypeSaveAction containerTypeSaveAction =
-            new ContainerTypeSaveAction();
-        containerTypeSaveAction
-            .setId(containerTypeInfo.getContainerType().getId());
-        containerTypeSaveAction.setName(containerTypeInfo.getContainerType()
-            .getName());
-        containerTypeSaveAction.setNameShort(containerTypeInfo
-            .getContainerType()
-            .getNameShort());
-        containerTypeSaveAction.setSiteId(containerTypeInfo.getContainerType()
-            .getSite().getId());
-        containerTypeSaveAction.setTopLevel(containerTypeInfo
-            .getContainerType()
-            .getTopLevel());
+    public static ContainerTypeSaveAction getSaveAction(ContainerTypeInfo ctypeInfo) {
+        ContainerTypeSaveAction containerTypeSaveAction = new ContainerTypeSaveAction();
+        containerTypeSaveAction.setId(ctypeInfo.getContainerType().getId());
+        containerTypeSaveAction.setName(ctypeInfo.getContainerType().getName());
+        containerTypeSaveAction.setNameShort(ctypeInfo.getContainerType().getNameShort());
+        containerTypeSaveAction.setSiteId(ctypeInfo.getContainerType().getSite().getId());
+        containerTypeSaveAction.setTopLevel(ctypeInfo.getContainerType().getTopLevel());
 
-        containerTypeSaveAction.setRowCapacity(containerTypeInfo
-            .getContainerType()
-            .getCapacity().getRowCapacity());
-        containerTypeSaveAction.setColCapacity(containerTypeInfo
-            .getContainerType()
-            .getCapacity().getColCapacity());
+        containerTypeSaveAction.setRowCapacity(
+            ctypeInfo.getContainerType().getCapacity().getRowCapacity());
+        containerTypeSaveAction.setColCapacity(
+            ctypeInfo.getContainerType().getCapacity().getColCapacity());
 
         containerTypeSaveAction.setDefaultTemperature(
-            containerTypeInfo.getContainerType().getDefaultTemperature());
+            ctypeInfo.getContainerType().getDefaultTemperature());
         containerTypeSaveAction.setChildLabelingSchemeId(
-            containerTypeInfo.getContainerType().getChildLabelingScheme()
-                .getId());
+            ctypeInfo.getContainerType().getChildLabelingScheme().getId());
+        containerTypeSaveAction.setLabelingLayout(
+            ctypeInfo.getContainerType().getLabelingLayout());
 
         containerTypeSaveAction.setActivityStatus(
-            containerTypeInfo.getContainerType().getActivityStatus());
+            ctypeInfo.getContainerType().getActivityStatus());
 
         HashSet<Integer> ids = new HashSet<Integer>();
-        for (SpecimenType specimenType : containerTypeInfo.getContainerType()
-            .getSpecimenTypes()) {
+        for (SpecimenType specimenType : ctypeInfo.getContainerType().getSpecimenTypes()) {
             ids.add(specimenType.getId());
         }
         containerTypeSaveAction.setSpecimenTypeIds(ids);
 
         ids = new HashSet<Integer>();
-        for (ContainerType childContainerType : containerTypeInfo
-            .getContainerType()
-            .getChildContainerTypes()) {
+        for (ContainerType childContainerType : ctypeInfo.getContainerType().getChildContainerTypes()) {
             ids.add(childContainerType.getId());
         }
         containerTypeSaveAction.setChildContainerTypeIds(ids);

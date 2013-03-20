@@ -82,18 +82,15 @@ public class TestContainerType extends TestAction {
     @Test
     public void nameChecks() throws Exception {
         // ensure we can change name on existing container type
-        Integer containerTypeId =
-            exec(containerTypeSaveAction).getId();
+        Integer containerTypeId = exec(containerTypeSaveAction).getId();
 
-        containerTypeSaveAction =
-            ContainerTypeHelper.getSaveAction(
-                exec(new ContainerTypeGetInfoAction(containerTypeId)));
+        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
+            exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setName("FREEZER_4x12");
         exec(containerTypeSaveAction);
 
-        containerTypeSaveAction =
-            ContainerTypeHelper.getSaveAction(
-                exec(new ContainerTypeGetInfoAction(containerTypeId)));
+        containerTypeSaveAction = ContainerTypeHelper.getSaveAction(
+            exec(new ContainerTypeGetInfoAction(containerTypeId)));
         containerTypeSaveAction.setNameShort("FR4x12");
         exec(containerTypeSaveAction);
     }
@@ -329,8 +326,7 @@ public class TestContainerType extends TestAction {
     @Test
     public void delete() {
         // save with no comments
-        Integer containerTypeId =
-            exec(containerTypeSaveAction).getId();
+        Integer containerTypeId = exec(containerTypeSaveAction).getId();
         ContainerTypeInfo containerTypeInfo =
             exec(new ContainerTypeGetInfoAction(containerTypeId));
         exec(new ContainerTypeDeleteAction(containerTypeInfo

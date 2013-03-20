@@ -19,6 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+@Deprecated
 public class ContainerLabelingSchemeWrapper extends
     ContainerLabelingSchemeBaseWrapper {
 

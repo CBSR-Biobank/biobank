@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 
 /**
  * Tries to make setting up test data easier by requiring the absolute minimum amount of data and
@@ -428,7 +429,7 @@ public class Factory {
 
     public Capacity getDefaultCapacity() {
         if (defaultCapacity == null) {
-            defaultCapacity = createCapacity(); 
+            defaultCapacity = createCapacity();
         }
         return defaultCapacity;
     }
@@ -496,7 +497,7 @@ public class Factory {
     public void setDefaultShippingMethod(ShippingMethod shippingMethod) {
         this.defaultShippingMethod = shippingMethod;
     }
-    
+
     public Capacity createCapacity() {
         Capacity capacity = new Capacity();
         capacity.setRowCapacity(8);
@@ -698,6 +699,7 @@ public class Factory {
         containerType.setSite(getDefaultSite());
         containerType.setCapacity(new Capacity(getDefaultCapacity()));
         containerType.setChildLabelingScheme(getDefaultContainerLabelingScheme());
+        containerType.setLabelingLayout(LabelingLayout.VERTICAL);
 
         setDefaultContainerType(containerType);
         session.save(containerType);
