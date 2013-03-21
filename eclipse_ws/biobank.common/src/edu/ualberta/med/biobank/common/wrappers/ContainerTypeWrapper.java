@@ -274,8 +274,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
-        ContainerLabelingScheme containerLabelingScheme = new ContainerLabelingScheme();
-        return containerLabelingScheme.getRowColFromPositionString(
+        return getChildLabelingScheme().getWrappedObject().getRowColFromPositionString(
             position, getRowCapacity(), getColCapacity(), getLabelingLayout());
     }
 

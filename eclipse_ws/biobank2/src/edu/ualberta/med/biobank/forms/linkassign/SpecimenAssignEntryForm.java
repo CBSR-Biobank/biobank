@@ -86,10 +86,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private static final I18n i18n = I18nFactory.getI18n(SpecimenAssignEntryForm.class);
 
+    private static BgcLogger log = BgcLogger.getLogger(SpecimenAssignEntryForm.class.getName());
+
     @SuppressWarnings("nls")
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenAssignEntryForm";
-
-    private static BgcLogger log = BgcLogger.getLogger(SpecimenAssignEntryForm.class.getName());
 
     private static Mode mode = Mode.MULTIPLE;
 

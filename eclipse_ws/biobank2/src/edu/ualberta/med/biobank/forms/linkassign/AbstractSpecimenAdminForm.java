@@ -34,8 +34,7 @@ import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
 public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AbstractSpecimenAdminForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(AbstractSpecimenAdminForm.class);
 
     @SuppressWarnings("nls")
     private static final String FILE_NAME_SEPARATOR = "_";
@@ -51,8 +50,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     private static final String JASPER_FORM_NAME = "ActivityReportForm";
     @SuppressWarnings("nls")
     private static final SimpleDateFormat fileDateFormatter =
-        new SimpleDateFormat(
-            "yyyy-MM-dd_HHmmss");
+        new SimpleDateFormat("yyyy-MM-dd_HHmmss");
 
     protected boolean finished = true;
     protected boolean printed = false;
@@ -80,8 +78,7 @@ public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
     @Override
     protected synchronized void init() throws Exception {
         if (activityLogger == null) {
-            activityLogger = Logger.getLogger(ActivityLogAppender.class
-                .getPackage().getName());
+            activityLogger = Logger.getLogger(ActivityLogAppender.class.getPackage().getName());
             activityLogger.setLevel(Level.TRACE);
         }
         if (appender == null) {
