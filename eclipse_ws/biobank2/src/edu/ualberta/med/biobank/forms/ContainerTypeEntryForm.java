@@ -266,7 +266,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             @Override
             public void focusLost(FocusEvent e) {
                 // containerType.setRowCapacity(capacity);
-                updatedLabelingLayoutWidget();
+                updateLabelingLayoutWidget();
             }
         });
 
@@ -281,7 +281,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         colText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                updatedLabelingLayoutWidget();
+                updateLabelingLayoutWidget();
             }
         });
 
@@ -311,13 +311,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 public void doSelection(Object selectedObject) {
                     try {
                         containerType.setChildLabelingSchemeName((String) selectedObject);
-                        updatedLabelingLayoutWidget();
+                        updateLabelingLayoutWidget();
                     } catch (Exception e) {
-                        BgcPlugin
-                            .openAsyncError(
-                                // dialog title
-                                i18n.tr("Error setting the labeling scheme"),
-                                e);
+                        BgcPlugin.openAsyncError(
+                            // dialog title
+                            i18n.tr("Error setting the labeling scheme"),
+                            e);
                     }
                 }
             });
@@ -339,7 +338,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     }
 
-    private void updatedLabelingLayoutWidget() {
+    private void updateLabelingLayoutWidget() {
         labelingLayoutWidget.setVisible(
             containerType.getWrappedObject().hasMultipleLabelingLayout());
         page.layout(true, true);
@@ -566,19 +565,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         private final ComboViewer comboViewer;
 
+        @SuppressWarnings("nls")
+        private static final String LABELING_LAYOUT_BINDING = "labelingLayout-binding";
+
+        @SuppressWarnings("nls")
         public LabelingLayoutWidget(Composite composite, BgcWidgetCreator widgetCreator,
             final ContainerTypeWrapper containerType) {
             this.widgetCreator = widgetCreator;
             label = widgetCreator.createLabel(composite, ContainerType.Property.LABELING_LAYOUT.getString());
 
             LabelingLayout labelingLayout = containerType.getLabelingLayout();
-            // if (labelingLayout == null) {
-            // labelingLayout = LabelingLayout.VERTICAL;
-            // }
 
             comboViewer = widgetCreator.createComboViewer(composite, label, LabelingLayout.valuesList(),
-                labelingLayout, null, true, null,
-
+                labelingLayout,
+                // validation error message
+                i18n.tr("Select a labeling layout"),
+                true,
+                LABELING_LAYOUT_BINDING,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -598,6 +601,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         public void setVisible(boolean visible) {
             widgetCreator.showWidget(label, visible);
             widgetCreator.showWidget(comboViewer.getCombo(), visible);
+            if (visible) {
+                widgetCreator.addBinding(LABELING_LAYOUT_BINDING);
+            } else {
+                widgetCreator.removeBinding(LABELING_LAYOUT_BINDING);
+            }
         }
     }
 }

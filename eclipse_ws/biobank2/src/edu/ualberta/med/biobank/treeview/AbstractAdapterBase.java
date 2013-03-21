@@ -21,6 +21,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -43,13 +45,14 @@ import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Base class for all "Session" tree view nodes. Generally, most of the nodes in
- * the tree are adapters for classes in the ORM model.
+ * Base class for all "Session" tree view nodes. Generally, most of the nodes in the tree are
+ * adapters for classes in the ORM model.
  */
 public abstract class AbstractAdapterBase implements
     Comparable<AbstractAdapterBase> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AbstractAdapterBase.class);
+    private static final I18n i18n = I18nFactory.getI18n(AbstractAdapterBase.class);
+
+    private static Logger log = LoggerFactory.getLogger(AbstractAdapterBase.class.getName());
 
     @SuppressWarnings("nls")
     // dialog title.
@@ -448,8 +451,7 @@ public abstract class AbstractAdapterBase implements
     protected abstract AbstractAdapterBase createChildNode(Object child);
 
     /**
-     * get the list of this model object children that this node should have as
-     * children nodes.
+     * get the list of this model object children that this node should have as children nodes.
      * 
      * @throws Exception
      */
@@ -518,15 +520,16 @@ public abstract class AbstractAdapterBase implements
     public abstract List<AbstractAdapterBase> search(Class<?> searchedClass,
         Integer objectId);
 
-    protected List<AbstractAdapterBase> searchChildren(Class<?> searchedClass,
-        Integer objectId) {
-        loadChildren(false);
+    @SuppressWarnings("nls")
+    protected List<AbstractAdapterBase> searchChildren(Class<?> searchedClass, Integer objectId) {
+        log.debug("searchChildren: class:{}, id:{}", searchedClass.getName(), objectId);
+        // loadChildren(false);
         List<AbstractAdapterBase> result = new ArrayList<AbstractAdapterBase>();
         for (AbstractAdapterBase child : getChildren()) {
-            List<AbstractAdapterBase> tmpRes = child.search(searchedClass,
-                objectId);
-            if (tmpRes.size() > 0)
+            List<AbstractAdapterBase> tmpRes = child.search(searchedClass, objectId);
+            if (!tmpRes.isEmpty()) {
                 result.addAll(tmpRes);
+            }
         }
         return result;
     }

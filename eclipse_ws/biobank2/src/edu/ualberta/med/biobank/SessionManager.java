@@ -216,8 +216,7 @@ public class SessionManager {
         return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static List<AbstractAdapterBase> searchNodes(Class<?> searchedClass,
-        Integer objectId) {
+    public static List<AbstractAdapterBase> searchNodes(Class<?> searchedClass, Integer objectId) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             return view.searchNode(searchedClass, objectId);

@@ -43,8 +43,7 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    public List<AbstractAdapterBase> search(Class<?> searchedClass,
-        Integer objectId) {
+    public List<AbstractAdapterBase> search(Class<?> searchedClass, Integer objectId) {
         return findChildFromClass(searchedClass, objectId, StudyWrapper.class);
     }
 

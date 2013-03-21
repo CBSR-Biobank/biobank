@@ -37,8 +37,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-grid-remoting.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-security.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-writable-client-framework.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-api.jar" sourcepath="lib/client/slf4j-api-source.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12.jar" sourcepath="lib/client/slf4j-log4j12-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/spring.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/validation-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/xercesImpl.jar"/>

@@ -27,8 +27,8 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 /**
- * Base class for all "Session" tree view nodes. Generally, most of the nodes in
- * the tree are adapters for classes in the ORM model.
+ * Base class for all "Session" tree view nodes. Generally, most of the nodes in the tree are
+ * adapters for classes in the ORM model.
  */
 public abstract class AdapterBase extends AbstractAdapterBase {
     private static final I18n i18n = I18nFactory
@@ -78,8 +78,8 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     /**
-     * Derived classes should not override this method. Instead they should
-     * implement getNameInternal().
+     * Derived classes should not override this method. Instead they should implement
+     * getNameInternal().
      * 
      * @return the name for the node.
      */
@@ -92,11 +92,9 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     /**
-     * Derived classses should implement this method instead of overriding
-     * getName().
+     * Derived classses should implement this method instead of overriding getName().
      * 
-     * @return the name of the node. The name is the label displayed in the
-     *         treeview.
+     * @return the name of the node. The name is the label displayed in the treeview.
      */
     protected abstract String getLabelInternal();
 
@@ -174,8 +172,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
             @Override
             public void run() {
                 try {
-                    Collection<? extends ModelWrapper<?>> children =
-                        getWrapperChildren();
+                    Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
                     if (children != null) {
                         for (ModelWrapper<?> child : children) {
                             AbstractAdapterBase node = getChild(child.getId());
@@ -204,8 +201,7 @@ public abstract class AdapterBase extends AbstractAdapterBase {
     }
 
     /**
-     * get the list of this model object children that this node should have as
-     * children nodes.
+     * get the list of this model object children that this node should have as children nodes.
      * 
      * @throws Exception
      */
