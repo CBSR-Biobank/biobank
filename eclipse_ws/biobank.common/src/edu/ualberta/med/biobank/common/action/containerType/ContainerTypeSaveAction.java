@@ -122,7 +122,13 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);
         containerType.setActivityStatus(activityStatus);
-        containerType.setLabelingLayout(labelingLayout);
+
+        if (labelingLayout != null) {
+            containerType.setLabelingLayout(labelingLayout);
+        } else {
+            // assign to default value
+            containerType.setLabelingLayout(LabelingLayout.VERTICAL);
+        }
 
         addComment(context, containerType);
         setChildLabelingScheme(context, containerType);
