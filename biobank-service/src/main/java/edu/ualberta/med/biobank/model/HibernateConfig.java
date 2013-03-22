@@ -5,7 +5,6 @@ import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactoryBean;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
@@ -19,8 +18,12 @@ import edu.ualberta.med.biobank.model.context.ExecutingUser;
 /**
  * 
  * @author Jonathan Ferland
- * @see http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-part-one-configuration/
- * @see http://www.baeldung.com/2011/12/02/the-persistence-layer-with-spring-3-1-and-hibernate/
+ * @see http
+ *      ://www.petrikainulainen.net/programming/spring-framework/spring-data-
+ *      jpa-tutorial-part-one-configuration/
+ * @see http
+ *      ://www.baeldung.com/2011/12/02/the-persistence-layer-with-spring-3-1-
+ *      and-hibernate/
  */
 @Configuration
 @EnableTransactionManagement
@@ -30,11 +33,11 @@ public class HibernateConfig {
 		return new LocalSessionFactoryBuilder(datasource())
 				// TODO: improve speed by using explicit classes
 				.scanPackages("edu.ualberta.med.biobank.model",
-							  "edu.ualberta.med.biobank.model.center",
-							  "edu.ualberta.med.biobank.model.envers",
-							  "edu.ualberta.med.biobank.model.report",
-							  "edu.ualberta.med.biobank.model.security",
-							  "edu.ualberta.med.biobank.model.study")
+						"edu.ualberta.med.biobank.model.center",
+						"edu.ualberta.med.biobank.model.envers",
+						"edu.ualberta.med.biobank.model.report",
+						"edu.ualberta.med.biobank.model.security",
+						"edu.ualberta.med.biobank.model.study")
 				.buildSessionFactory();
 	}
 
@@ -50,13 +53,13 @@ public class HibernateConfig {
 		databasePopulator.addScript(new ClassPathResource(
 				"hibernate/config/java/schema.sql"));
 		bean.setDatabasePopulator(databasePopulator);
-		
+
 		/* necessary because EmbeddedDatabaseFactoryBean is a FactoryBean */
 		bean.afterPropertiesSet();
-		
+
 		return bean.getObject();
 	}
-	
+
 	@Bean
 	public ExecutingUser executingUser() {
 		return null;

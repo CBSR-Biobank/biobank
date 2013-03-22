@@ -8,19 +8,18 @@ import org.junit.Before;
 import edu.ualberta.med.biobank.DbTest;
 
 public class LoggingTest extends DbTest {
-    protected AuditReader auditReader;
+	protected AuditReader auditReader;
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        auditReader = AuditReaderFactory.get(session);
-    }
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		auditReader = AuditReaderFactory
+				.get(sessionFactory.getCurrentSession());
+	}
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        auditReader = null;
-        super.tearDown();
-    }
+	@After
+	public void tearDown() throws Exception {
+		auditReader = null;
+	}
 }
