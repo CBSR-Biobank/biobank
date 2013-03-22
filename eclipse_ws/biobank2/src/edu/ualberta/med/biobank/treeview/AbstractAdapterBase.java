@@ -522,7 +522,7 @@ public abstract class AbstractAdapterBase implements
 
     @SuppressWarnings("nls")
     protected List<AbstractAdapterBase> searchChildren(Class<?> searchedClass, Integer objectId) {
-        log.debug("searchChildren: class:{}, id:{}", searchedClass.getName(), objectId);
+        log.trace("searchChildren: class:{}, id:{}", searchedClass.getName(), objectId);
         loadChildren(false);
         List<AbstractAdapterBase> result = new ArrayList<AbstractAdapterBase>();
         for (AbstractAdapterBase child : getChildren()) {
