@@ -99,6 +99,8 @@
 		<mapping class="edu.ualberta.med.biobank.model.security.Membership" />
 		<mapping class="edu.ualberta.med.biobank.model.security.Principal" />
 		<mapping class="edu.ualberta.med.biobank.model.security.Role" />
+        <mapping class="edu.ualberta.med.biobank.model.security.CenterRole" />
+        <mapping class="edu.ualberta.med.biobank.model.security.StudyRole" />
 		<mapping class="edu.ualberta.med.biobank.model.security.User" />
 		<mapping class="edu.ualberta.med.biobank.model.security.UserGroup" />
 		<mapping class="edu.ualberta.med.biobank.model.study.CollectionEvent" />

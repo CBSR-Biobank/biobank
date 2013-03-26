@@ -12,16 +12,6 @@
 
 	<name>Biobank Service</name>
 
-	<repositories>
-		<repository>
-			<id>aicml-site</id>
-			<url>http://aicml-med.cs.ualberta.ca/biobank_maven2_repo/</url>
-			<releases>
-				<updatePolicy>daily</updatePolicy>
-			</releases>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -47,7 +37,7 @@
 		<dependency>
 			<groupId>org.xnap.commons</groupId>
 			<artifactId>gettext-commons</artifactId>
-			<version>0.9.6</version>
+			<version>0.9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>ognl</groupId>
@@ -131,21 +121,23 @@
 		</dependency>
 	</dependencies>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>gettext-commons-site</id>
+			<url>http://gettext-commons-maven-repository.googlecode.com/svn/repository/</url>
+			<releases>
+				<updatePolicy>daily</updatePolicy>
+			</releases>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<build>
 		<!-- To define the plugin version in your parent POM -->
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.xnap.commons</groupId>
-					<artifactId>maven-gettext-plugin</artifactId>
-					<version>1.2.3</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.xnap.commons</groupId>
 				<artifactId>maven-gettext-plugin</artifactId>
+				<version>1.2.3</version>
 				<configuration>
 					<poDirectory>${basedir}/po</poDirectory>
 					<outputFormat>class</outputFormat>
@@ -158,7 +150,7 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
-                    <compilerArgument>-proc:none</compilerArgument>
+					<compilerArgument>-proc:none</compilerArgument>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -173,10 +165,10 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-                            <compilerArguments>-AaddSuppressWarningsAnnotation=true</compilerArguments>
-						    <processors>
-						        <processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-                            </processors>
+							<compilerArguments>-AaddSuppressWarningsAnnotation=true</compilerArguments>
+							<processors>
+								<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+							</processors>
 						</configuration>
 					</execution>
 				</executions>

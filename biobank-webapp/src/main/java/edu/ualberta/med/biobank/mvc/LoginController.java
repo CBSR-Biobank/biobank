@@ -8,21 +8,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class LoginController {
 
-    @RequestMapping(value="/login", method = RequestMethod.GET)
-    public String handleRequest(){
-        return "login"; //$NON-NLS-1$
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String handleRequest() {
+        return "login";
     }
 
     /** Login form with error. */
-    @RequestMapping(value="/login-error", method = RequestMethod.GET)
+    @RequestMapping(value = "/login-error", method = RequestMethod.GET)
     public String loginError(Model model) {
-        model.addAttribute("loginError", true); //$NON-NLS-1$
-        return "login"; //$NON-NLS-1$
+        model.addAttribute("loginError", true);
+        return "login";
     }
 
-    @RequestMapping(value="/logout", method = RequestMethod.GET)
+    @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout() {
-        return "login"; //$NON-NLS-1$
+        return "login";
 
     }
 

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -31,6 +32,7 @@ public abstract class Role<T extends Permission>
         this.name = name;
     }
 
+    @Transient
     public abstract Set<T> getPermissions();
 
     public abstract void setPermissions(Set<T> roles);

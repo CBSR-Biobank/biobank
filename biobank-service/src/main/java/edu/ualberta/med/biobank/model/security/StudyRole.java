@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+@Audited
 @Entity
 @Table(name = "STUDY_ROLE")
 @Unique(properties = "name", groups = PrePersist.class)
@@ -32,16 +34,17 @@ public class StudyRole
 
     @Override
     @ElementCollection(targetClass = StudyPermission.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "STUDY_ROLE_PERMISSION", joinColumns = @JoinColumn(name = "STUDY_ROLE_ID"))
+    @CollectionTable(name = "STUDY_ROLE_PERMISSION",
+        joinColumns = @JoinColumn(name = "STUDY_ROLE_ID"))
+    @Column(name = "STUDY_PERMISSION_ID", nullable = false)
     @Type(
         type = "edu.ualberta.med.biobank.model.util.CustomEnumType",
         parameters = {
             @Parameter(
                 name = CustomEnumType.ENUM_CLASS_NAME_PARAM,
-                value = "edu.ualberta.med.biobank.model.securityStudyPermission"
+                value = "edu.ualberta.med.biobank.model.security.StudyPermission"
             )
         })
-    @Column(name = "STUDY_PERMISSION_ID", nullable = false)
     public Set<StudyPermission> getPermissions() {
         return this.perms;
     }

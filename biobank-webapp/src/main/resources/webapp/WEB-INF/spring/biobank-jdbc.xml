@@ -27,7 +27,7 @@
         <!-- Setting up the data source as defined in an external context file: applicationContext-jdbc.xml -->
         <property name="dataSource" ref="dataSource"/>
 
-        <!-- property name="packagesToScan" value="com.yourpackagename.yourwebproject.model"/ -->
+        <property name="packagesToScan" value="edu.ualberta.med.biobank.model"/>
 
         <!-- Setting the Hibernate config file path for linking up the entity POJOs -->
         <property name="configLocation" value="classpath:hibernate.cfg.xml"/>

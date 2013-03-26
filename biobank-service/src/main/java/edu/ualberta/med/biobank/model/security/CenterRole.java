@@ -13,6 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 
 import edu.ualberta.med.biobank.model.util.CustomEnumType;
 import edu.ualberta.med.biobank.validator.constraint.NotUsed;
@@ -20,6 +21,7 @@ import edu.ualberta.med.biobank.validator.constraint.Unique;
 import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
+@Audited
 @Entity
 @Table(name = "CENTER_ROLE")
 @Unique(properties = "name", groups = PrePersist.class)
@@ -32,7 +34,9 @@ public class CenterRole
 
     @Override
     @ElementCollection(targetClass = CenterPermission.class, fetch = FetchType.LAZY)
-    @CollectionTable(name = "CENTER_ROLE_PERMISSION", joinColumns = @JoinColumn(name = "CENTER_ROLE_ID"))
+    @CollectionTable(name = "CENTER_ROLE_PERMISSION",
+        joinColumns = @JoinColumn(name = "CENTER_ROLE_ID"))
+    @Column(name = "CENTER_PERMISSION_ID", nullable = false)
     @Type(
         type = "edu.ualberta.med.biobank.model.util.CustomEnumType",
         parameters = {
@@ -41,7 +45,6 @@ public class CenterRole
                 value = "edu.ualberta.med.biobank.model.security.CenterPermission"
             )
         })
-    @Column(name = "CENTER_PERMISSION_ID", nullable = false)
     public Set<CenterPermission> getPermissions() {
         return this.perms;
     }

@@ -8,6 +8,7 @@ public class OutputSchema {
     public static void main(String[] args) {
         Configuration config = new Configuration().configure();
         SchemaExport schemaExport = new EnversSchemaGenerator(config).export();
+        schemaExport.setOutputFile("schema.sql");
         schemaExport.drop(true, false);
         schemaExport.create(true, false);
     }
