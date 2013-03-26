@@ -1,80 +1,68 @@
 package edu.ualberta.med.biobank;
 
-import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.NCSARequestLog;
-import org.eclipse.jetty.server.RequestLog;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.eclipse.jetty.util.thread.ThreadPool;
-import org.eclipse.jetty.webapp.WebAppContext;
+import config.RootConfiguration;
 
+
+/**
+ * Application entry point.
+ * 
+ * This class implements and bootstraps the Spring application context. It also listens for
+ * application events to ensure the SpringMVC application context is successfully loaded.
+ */
 public class BiobankServer {
-	// private static final Logger log =
-	// LoggerFactory.getLogger(BiobankServer.class);
 
-	// TODO: You should configure this appropriately for your environment
-	private static final String LOG_PATH = "logs/access/yyyy_mm_dd.request.log";
+    /**
+     * Flag that will be set to true when the web application context (SpringMVC) is refreshed.
+     */
+    static boolean webApplicationContextInitialized = false;
 
-	final Server server;
+    public static void main(String[] args) throws Exception {
 
-	public static void main(final String[] arguments) {
-		new BiobankServer();
-	}
+        final Logger logger = LoggerFactory.getLogger("main");
 
-	private BiobankServer() {
-		server = new Server(8080);
-		server.setThreadPool(createThreadPool());
-		server.setHandler(createHandlers());
-		server.setStopAtShutdown(true);
+        try {
+            AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
 
-		try {
-			server.start();
-			server.join();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            /*
+             * One problem with SpringMVC is it creates its own application context, and so it can
+             * end up failing but our application will keep running.
+             * 
+             * To detect the case where the SpringMVC's web application context fails we'll listen
+             * for ContextRefreshEvents and set a flag when we see one.
+             */
+            applicationContext.addApplicationListener(
+                new ApplicationListener<ContextRefreshedEvent>() {
+                    @Override
+                    public void onApplicationEvent(
+                        ContextRefreshedEvent event) {
+                        ApplicationContext ctx = event.getApplicationContext();
+                        if (ctx instanceof AnnotationConfigWebApplicationContext) {
+                            webApplicationContextInitialized = true;
+                        }
+                    }
+                });
 
-	private ThreadPool createThreadPool() {
-		// TODO: You should configure these appropriately
-		// for your environment - this is an example only
-		final QueuedThreadPool threadPool = new QueuedThreadPool();
-		threadPool.setMinThreads(10);
-		threadPool.setMaxThreads(100);
-		return threadPool;
-	}
+            applicationContext.registerShutdownHook();
+            applicationContext.register(RootConfiguration.class);
+            applicationContext.refresh();
 
-	private HandlerCollection createHandlers() {
-		WebAppContext context = new WebAppContext();
-		context.setContextPath("/");
-		context.setWar("src/main/resources/webapp");
+            if (!webApplicationContextInitialized) {
+                logger.error("Web application context not initialized. Exiting.");
+                System.exit(1);
+            }
 
-		RequestLogHandler log = new RequestLogHandler();
-		log.setRequestLog(createRequestLog());
-
-		HandlerCollection result = new HandlerCollection();
-		result.setHandlers(new Handler[] { context, log });
-
-		return result;
-	}
-
-	private RequestLog createRequestLog() {
-		NCSARequestLog log = new NCSARequestLog();
-
-		File logPath = new File(LOG_PATH);
-		logPath.getParentFile().mkdirs();
-
-		log.setFilename(logPath.getPath());
-		log.setRetainDays(90);
-		log.setExtended(false);
-		log.setAppend(true);
-		log.setLogTimeZone("GMT");
-		log.setLogLatency(true);
-		return log;
-	}
+            logger.info("Running.");
+        } catch (Exception e) {
+            logger.error("Error starting application", e);
+            System.exit(1);
+        }
+    }
 }
