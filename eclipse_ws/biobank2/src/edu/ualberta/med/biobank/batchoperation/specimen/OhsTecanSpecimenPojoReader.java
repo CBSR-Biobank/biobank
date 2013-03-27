@@ -92,6 +92,10 @@ public class OhsTecanSpecimenPojoReader implements
     @SuppressWarnings("nls")
     private static final String TYPE_URINE_SECONDARY = "Urine-Secondary";
     @SuppressWarnings("nls")
+    private static final String TYPE_BUFFY_COAT_PRIMARY = "Buffy-Coat-Primary";
+    @SuppressWarnings("nls")
+    private static final String TYPE_BUFFY_COAT_SECONDARY = "Buffy-Coat-Secondary";
+    @SuppressWarnings("nls")
     private static final String TYPE_BUFFY = "Buffy";
     @SuppressWarnings("nls")
     private static final String TYPE_RBC_PRIMARY = "RBC-Primary";
@@ -115,6 +119,8 @@ public class OhsTecanSpecimenPojoReader implements
     private static final String[] ALIQUOT_TYPES = new String[] {
         TYPE_URINE_PRIMARY,
         TYPE_URINE_SECONDARY,
+        TYPE_BUFFY_COAT_PRIMARY,
+        TYPE_BUFFY_COAT_SECONDARY,
         TYPE_BUFFY,
         TYPE_RBC_PRIMARY,
         TYPE_RBC_SECONDARY,
@@ -419,8 +425,10 @@ public class OhsTecanSpecimenPojoReader implements
                     continue;
                 }
 
-                if (batchOpPojo.getSpecimenType().equals(TYPE_BUFFY)) {
-                    hasBuffy = true;
+                if (batchOpPojo.getSpecimenType().equals(TYPE_BUFFY)
+                    || batchOpPojo.getSpecimenType().equals(TYPE_BUFFY_COAT_PRIMARY)
+                    || batchOpPojo.getSpecimenType().equals(TYPE_BUFFY_COAT_SECONDARY)) {
+                    hasBuffy = true;  // hasBuffy==true iff EDTA type csv file
                 }
 
                 // technician ID for processing event
