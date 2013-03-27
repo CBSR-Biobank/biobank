@@ -1,5 +1,5 @@
 For translations:
    Update pot and po files:
    	  mvn gettext:merge
-   Create properties/classs files:
+   Create properties/class files:
    	  mvn gettext:dist

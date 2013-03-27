@@ -10,7 +10,6 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 import config.RootConfiguration;
 
-
 /**
  * Application entry point.
  * 
@@ -41,8 +40,7 @@ public class BiobankServer {
             applicationContext.addApplicationListener(
                 new ApplicationListener<ContextRefreshedEvent>() {
                     @Override
-                    public void onApplicationEvent(
-                        ContextRefreshedEvent event) {
+                    public void onApplicationEvent(ContextRefreshedEvent event) {
                         ApplicationContext ctx = event.getApplicationContext();
                         if (ctx instanceof AnnotationConfigWebApplicationContext) {
                             webApplicationContextInitialized = true;
