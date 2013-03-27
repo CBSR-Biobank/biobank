@@ -16,6 +16,9 @@ import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
+/**
+ * Performs most of the work normally done by a web.xml file.
+ */
 public class WebInitializer implements WebApplicationInitializer,
     ServletContextListener {
 
@@ -30,11 +33,8 @@ public class WebInitializer implements WebApplicationInitializer,
     }
 
     @Override
-    public void onStartup(ServletContext servletContext)
-        throws ServletException {
-
-        servletContext.setAttribute(
-            WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
+    public void onStartup(ServletContext servletContext) throws ServletException {
+        servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE,
             rootWebApplicationContext);
 
         addSpringDispatcherServlet(servletContext);
@@ -46,16 +46,13 @@ public class WebInitializer implements WebApplicationInitializer,
             new AnnotationConfigWebApplicationContext();
         mvcApplicationContext.register(MvcConfiguration.class);
         ServletRegistration.Dynamic dispatcherServlet =
-            sc.addServlet(
-                "spring-dispatcher",
-                new DispatcherServlet(mvcApplicationContext));
+            sc.addServlet("spring-dispatcher", new DispatcherServlet(mvcApplicationContext));
         dispatcherServlet.setLoadOnStartup(1);
         dispatcherServlet.addMapping("/");
     }
 
     private void addSpringSecurityFilter(ServletContext sc) {
-        sc.addFilter("springSecurityFilterChain",
-            new DelegatingFilterProxy())
+        sc.addFilter("springSecurityFilterChain", new DelegatingFilterProxy())
             .addMappingForUrlPatterns(null, false, "/*");
     }
 

@@ -17,9 +17,7 @@ import org.springframework.stereotype.Controller;
  */
 @Configuration
 @ImportResource({ "classpath:META-INF/spring/root-context.xml",
-    "classpath:META-INF/spring/security.xml",
-// "classpath:META-INF/spring/biobank-jdbc.xml"
-})
+    "classpath:META-INF/spring/security.xml" })
 @Import({ config.JettyConfiguration.class })
 @ComponentScan(basePackages = { "edu.ualberta.med.biobank" },
     excludeFilters = { @ComponentScan.Filter(Controller.class) })

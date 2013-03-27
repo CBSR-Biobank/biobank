@@ -1,12 +1,6 @@
 MySQL SERVER
   - my.cnf must have "lower_case_table_names=1" in the [mysqld] section
 
-GIT REPOSITORY LOCATION
-  ssh://biobank@aicml-med.cs.ualberta.ca/home/biobank/gitrepo/biobank2.git
-
-BBPDB EXPORT
-  - use Bullzip Access to MySQL to export data to MySQL
-
 INSTALL GETTEXT
   Gettext is used for i18n, it must be installed.
 
@@ -19,3 +13,17 @@ BUILD ECLIPSE PROJECTS
   To also download available sources for libraries, instead run:
 
   mvn eclipse:eclipse -DdownloadSources=true
+
+  
+RUNNING
+
+  WITH MAVEN
+    From the biobank-webapp project use the command:
+  
+      mvn exec:java -Dexec.mainClass=edu.ualberta.med.biobank.BiobankServer  
+      
+  SHADED JAR
+    From the biobank-webapp project use the commands:
+    
+        mvn package java -jar target/biobank-webapp-4.0-SNAPSHOT.jar
+        
