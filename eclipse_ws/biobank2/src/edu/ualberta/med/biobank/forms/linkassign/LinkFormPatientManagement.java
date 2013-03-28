@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.BgcWidgetCreator;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -561,7 +562,7 @@ public class LinkFormPatientManagement {
         }
 
         Set<AliquotedSpecimen> aliquotedSpecTypes = SessionManager.getAppService().doAction(
-            new StudyGetAliquotedSpecimensAction(study.getId())).getSet();
+            new StudyGetAliquotedSpecimensAction(study.getId(), ActivityStatus.ACTIVE)).getSet();
 
         List<AliquotedSpecimen> result = new ArrayList<AliquotedSpecimen>();
         for (AliquotedSpecimen aqSpc : aliquotedSpecTypes) {
