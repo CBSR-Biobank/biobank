@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  */
 @Audited
 @Entity
-@Table(name = "ANOTOMICAL_SOURCE")
+@Table(name = "ANATOMICAL_SOURCE")
 @Unique(properties = "name", groups = PrePersist.class)
 @NotUsed.List({
     @NotUsed(by = SpecimenGroup.class, property = "anatomicalSource", groups = PreDelete.class)

@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -62,9 +63,10 @@ public class HibernateConfig {
         //
         // return bean.getObject();
 
-        return new EmbeddedDatabaseBuilder()
-            // .setType(EmbeddedDatabaseType.HSQL)
-            .addDefaultScripts().build();
+        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+        builder.setType(EmbeddedDatabaseType.HSQL);
+        builder.addDefaultScripts();
+        return builder.build();
     }
 
     @Bean

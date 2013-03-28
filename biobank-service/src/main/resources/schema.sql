@@ -1,3 +1,5 @@
+SET DATABASE SQL SYNTAX MYS TRUE;
+
 create table ANNOTATION_OPTION (
          ID integer not null,
          TIME_INSERTED bigint not null,
@@ -8,7 +10,7 @@ create table ANNOTATION_OPTION (
          UPDATED_BY_USER_ID integer,
          ANNOTATION_TYPE_ID integer not null,
          primary key (ID)
-     );
+     )
 
     create table ANNOTATION_OPTION_AUD (
         ID integer not null,
@@ -48,19 +50,19 @@ create table ANNOTATION_OPTION (
         primary key (ID, REV)
     )
 
-    create table ANOTOMICAL_SOURCE (
+    create table ANATOMICAL_SOURCE (
         ID integer not null,
         TIME_INSERTED bigint not null,
         TIME_UPDATED bigint not null,
         VERSION integer not null,
-        DESCRIPTION LONGVARCHAR,
+        DESCRIPTION TEXT,
         NAME varchar(100) not null,
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
         primary key (ID)
     )
 
-    create table ANOTOMICAL_SOURCE_AUD (
+    create table ANATOMICAL_SOURCE_AUD (
         ID integer not null,
         REV bigint not null,
         REVTYPE tinyint,
@@ -239,7 +241,7 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         DECIMAL_SCALE integer not null,
-        DECIMAL_VALUE numeric not null,
+        DECIMAL_VALUE numeric(27,9) not null,
         STRING_VALUE varchar(100),
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
@@ -254,7 +256,7 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         DECIMAL_SCALE integer,
-        DECIMAL_VALUE numeric,
+        DECIMAL_VALUE numeric(27,9),
         STRING_VALUE varchar(100),
         SELECTED_VALUE integer,
         ANNOTATION_TYPE_ID integer,
@@ -501,7 +503,7 @@ create table ANNOTATION_OPTION (
         TIME_INSERTED bigint not null,
         TIME_UPDATED bigint not null,
         VERSION integer not null,
-        TEMPERATURE numeric not null,
+        TEMPERATURE numeric(5,2) not null,
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
         CENTER_LOCATION_ID integer not null,
@@ -513,7 +515,7 @@ create table ANNOTATION_OPTION (
         ID integer not null,
         REV bigint not null,
         REVTYPE tinyint,
-        TEMPERATURE numeric,
+        TEMPERATURE numeric(5,2),
         CENTER_LOCATION_ID integer,
         OWNING_CENTER_ID integer,
         primary key (ID, REV)
@@ -604,7 +606,7 @@ create table ANNOTATION_OPTION (
         primary key (ID)
     )
 
-    create table `Group` (
+    create table "Group" (
         NAME varchar(255) not null,
         ID integer not null,
         primary key (ID)
@@ -635,7 +637,7 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         DECIMAL_SCALE integer not null,
-        DECIMAL_VALUE numeric not null,
+        DECIMAL_VALUE numeric(27,9) not null,
         STRING_VALUE varchar(100),
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
@@ -650,7 +652,7 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         DECIMAL_SCALE integer,
-        DECIMAL_VALUE numeric,
+        DECIMAL_VALUE numeric(27,9),
         STRING_VALUE varchar(100),
         SELECTED_VALUE integer,
         ANNOTATION_TYPE_ID integer,
@@ -1103,7 +1105,7 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         AMOUNT_SCALE integer,
-        AMOUNT_VALUE numeric,
+        AMOUNT_VALUE numeric(19,2),
         TIME_CREATED bigint not null,
         IS_USABLE boolean not null,
         INSERTED_BY_USER_ID integer,
@@ -1121,7 +1123,7 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         AMOUNT_SCALE integer,
-        AMOUNT_VALUE numeric,
+        AMOUNT_VALUE numeric(19,2),
         TIME_CREATED bigint,
         IS_USABLE boolean,
         CONTAINER_ID integer,
@@ -1174,7 +1176,7 @@ create table ANNOTATION_OPTION (
         ANATOMICAL_SOURCE_ID varbinary(255) not null,
         DESCRIPTION TEXT,
         NAME varchar(50) not null,
-        TEMPERATURE numeric not null,
+        TEMPERATURE numeric(5,2) not null,
         PRESERVATION_TYPE_ID varbinary(255) not null,
         SPECIMEN_TYPE_ID varbinary(255) not null,
         STUDY_ID varbinary(255) not null,
@@ -1191,7 +1193,7 @@ create table ANNOTATION_OPTION (
         ANATOMICAL_SOURCE_ID varbinary(255),
         DESCRIPTION TEXT,
         NAME varchar(50),
-        TEMPERATURE numeric,
+        TEMPERATURE numeric(5,2),
         PRESERVATION_TYPE_ID varbinary(255),
         SPECIMEN_TYPE_ID varbinary(255),
         STUDY_ID varbinary(255),
@@ -1205,7 +1207,7 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         DECIMAL_SCALE integer not null,
-        DECIMAL_VALUE numeric not null,
+        DECIMAL_VALUE numeric(27,9) not null,
         "COUNT" integer,
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
@@ -1220,7 +1222,7 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         DECIMAL_SCALE integer,
-        DECIMAL_VALUE numeric,
+        DECIMAL_VALUE numeric(27,9),
         "COUNT" integer,
         SPECIMEN_CONTAINER_TYPE_ID integer,
         SPECIMEN_GROUP_ID integer,
@@ -1234,9 +1236,9 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         ACTUAL_INPUT_CHANGE_SCALE integer,
-        ACTUAL_INPUT_CHANGE_VALUE numeric,
+        ACTUAL_INPUT_CHANGE_VALUE numeric(19,2),
         ACTUAL_OUTPUT_CHANGE_SCALE integer,
-        ACTUAL_OUTPUT_CHANGE_VALUE numeric,
+        ACTUAL_OUTPUT_CHANGE_VALUE numeric(19,2),
         TIME_DONE bigint not null,
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
@@ -1253,7 +1255,7 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         DECIMAL_SCALE integer not null,
-        DECIMAL_VALUE numeric not null,
+        DECIMAL_VALUE numeric(27,9) not null,
         STRING_VALUE varchar(100),
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
@@ -1268,7 +1270,7 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         DECIMAL_SCALE integer,
-        DECIMAL_VALUE numeric,
+        DECIMAL_VALUE numeric(27,9),
         STRING_VALUE varchar(100),
         SELECTED_VALUE integer,
         ANNOTATION_TYPE_ID integer,
@@ -1281,9 +1283,9 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         ACTUAL_INPUT_CHANGE_SCALE integer,
-        ACTUAL_INPUT_CHANGE_VALUE numeric,
+        ACTUAL_INPUT_CHANGE_VALUE numeric(19,2),
         ACTUAL_OUTPUT_CHANGE_SCALE integer,
-        ACTUAL_OUTPUT_CHANGE_VALUE numeric,
+        ACTUAL_OUTPUT_CHANGE_VALUE numeric(19,2),
         TIME_DONE bigint,
         INPUT_SPECIMEN_ID integer,
         OUTPUT_SPECIMEN_ID integer,
@@ -1298,9 +1300,9 @@ create table ANNOTATION_OPTION (
         TIME_UPDATED bigint not null,
         VERSION integer not null,
         EXPECTED_INPUT_CHANGE_SCALE integer,
-        EXPECTED_INPUT_CHANGE_VALUE numeric,
+        EXPECTED_INPUT_CHANGE_VALUE numeric(19,2),
         EXPECTED_OUTPUT_CHANGE_SCALE integer,
-        EXPECTED_OUTPUT_CHANGE_VALUE numeric,
+        EXPECTED_OUTPUT_CHANGE_VALUE numeric(19,2),
         inputContainerType varbinary(255),
         INPUT_COUNT integer,
         OUTPUT_CONTAINER_TYPE_ID varbinary(255),
@@ -1341,9 +1343,9 @@ create table ANNOTATION_OPTION (
         REV bigint not null,
         REVTYPE tinyint,
         EXPECTED_INPUT_CHANGE_SCALE integer,
-        EXPECTED_INPUT_CHANGE_VALUE numeric,
+        EXPECTED_INPUT_CHANGE_VALUE numeric(19,2),
         EXPECTED_OUTPUT_CHANGE_SCALE integer,
-        EXPECTED_OUTPUT_CHANGE_VALUE numeric,
+        EXPECTED_OUTPUT_CHANGE_VALUE numeric(19,2),
         inputContainerType varbinary(255),
         INPUT_COUNT integer,
         OUTPUT_CONTAINER_TYPE_ID varbinary(255),
@@ -1539,6 +1541,24 @@ create table ANNOTATION_OPTION (
         primary key (ID, REV)
     )
 
+    alter table ANATOMICAL_SOURCE 
+        add constraint NAME_ unique (NAME)
+
+    alter table ANATOMICAL_SOURCE 
+        add constraint FK222949178B8015DC 
+        foreign key (INSERTED_BY_USER_ID) 
+        references User
+
+    alter table ANATOMICAL_SOURCE 
+        add constraint FK22294917C579A659 
+        foreign key (UPDATED_BY_USER_ID) 
+        references User
+
+    alter table ANATOMICAL_SOURCE_AUD 
+        add constraint FKEBCD1368A9D79CA8 
+        foreign key (REV) 
+        references REVISION
+
     alter table ANNOTATION_OPTION 
         add constraint key1 unique (ANNOTATION_TYPE_ID, VALUE)
 
@@ -1582,24 +1602,6 @@ create table ANNOTATION_OPTION (
 
     alter table ANNOTATION_TYPE_AUD 
         add constraint FK332871BA9D79CA8 
-        foreign key (REV) 
-        references REVISION
-
-    alter table ANOTOMICAL_SOURCE 
-        add constraint NAME_ unique (NAME)
-
-    alter table ANOTOMICAL_SOURCE 
-        add constraint FKC2918A58B8015DC 
-        foreign key (INSERTED_BY_USER_ID) 
-        references User
-
-    alter table ANOTOMICAL_SOURCE 
-        add constraint FKC2918A5C579A659 
-        foreign key (UPDATED_BY_USER_ID) 
-        references User
-
-    alter table ANOTOMICAL_SOURCE_AUD 
-        add constraint FK2B1E6BF6A9D79CA8 
         foreign key (REV) 
         references REVISION
 
@@ -1963,7 +1965,7 @@ create table ANNOTATION_OPTION (
     alter table CONTAINER_CONSTRAINTS_ANATOMICAL_SOURCE 
         add constraint FK65FD3FD01F8C95AC 
         foreign key (ANATOMICAL_SOURCE_ID) 
-        references ANOTOMICAL_SOURCE
+        references ANATOMICAL_SOURCE
 
     alter table CONTAINER_CONSTRAINTS_ANATOMICAL_SOURCE 
         add constraint FK65FD3FD0AE8281E5 
