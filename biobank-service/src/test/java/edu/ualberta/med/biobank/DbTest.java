@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.model.provider.Mother;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = HibernateConfig.class)
+@ActiveProfiles("dev")
 public class DbTest
     extends BaseTest {
     protected SessionFactory sessionFactory;

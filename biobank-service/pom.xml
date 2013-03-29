@@ -78,11 +78,12 @@
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Needed for in-memory database/data source -->
+		<!--dependency> <groupId>org.hsqldb</groupId> <artifactId>hsqldb</artifactId> 
+			<version>2.2.9</version> <scope>runtime</scope> </dependency -->
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>2.2.9</version>
-			<scope>runtime</scope>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.3.170</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
