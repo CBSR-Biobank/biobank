@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -29,6 +30,7 @@ import edu.ualberta.med.biobank.model.context.ExecutingUser;
  */
 @Configuration
 @EnableTransactionManagement
+@Import(PropertyPlaceholderConfig.class)
 @Profile("dev")
 public class HibernateConfig {
 
@@ -38,15 +40,18 @@ public class HibernateConfig {
     @Value("${jdbc.url}")
     private String url;
 
-    @Value("${jdbc.username}")
+    @Value("${database.username}")
     private String username;
-    @Value("${jdbc.password}")
+
+    @Value("${database.password}")
     private String password;
 
     @Value("${hibernate.dialect}")
     private String hibernateDialect;
+
     @Value("${hibernate.show_sql}")
     private String hibernateShowSql;
+
     @Value("${hibernate.hbm2ddl.auto}")
     private String hibernateHbm2ddlAuto;
 
@@ -83,7 +88,7 @@ public class HibernateConfig {
         result.setPackagesToScan(new String[] { "edu.ualberta.med.biobank.model" });
 
         Properties properties = new Properties();
-        properties.setProperty("connection.url", "jdbc:mysql://localhost:3306/biobank");
+        properties.setProperty("connection.url", "jdbc:mysql://localhost:3306/biobank_v4");
         // properties.setProperty("connection.url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
         properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 

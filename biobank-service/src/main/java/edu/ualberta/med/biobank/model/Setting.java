@@ -30,10 +30,9 @@ public class Setting implements Serializable {
     public static final int MAX_VALUE_LENGTH = 1000;
 
     /**
-     * Change these enum's names all you want, but be careful about changing
-     * their {@link #id}, as the {@link #id} is persisted and could be
-     * referenced by key name elsewhere, such as, through scripts. The
-     * {@link #id} should remain <em>constant</em>.
+     * Change these enum's names all you want, but be careful about changing their {@link #id}, as
+     * the {@link #id} is persisted and could be referenced by key name elsewhere, such as, through
+     * scripts. The {@link #id} should remain <em>constant</em>.
      * 
      * @author Jonathan Ferland
      */
@@ -81,7 +80,7 @@ public class Setting implements Serializable {
                 value = "edu.ualberta.med.biobank.model.Setting$SettingKey"
             )
         })
-    @Column(name = "KEY", nullable = false, length = SettingKey.MAX_KEY_LENGTH)
+    @Column(name = "`KEY`", nullable = false, length = SettingKey.MAX_KEY_LENGTH)
     public SettingKey getKey() {
         return key;
     }

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model.security;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import org.hibernate.envers.Audited;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -13,7 +14,8 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 @Audited
 @Entity
-@DiscriminatorValue("GRUP")
+@Table(name = "`GROUP`")
+@DiscriminatorValue("GROUP")
 @Unique(properties = "name", groups = PrePersist.class)
 public class Group extends Principal
     implements HasName {

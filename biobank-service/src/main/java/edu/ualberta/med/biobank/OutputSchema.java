@@ -6,34 +6,32 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.EnversSchemaGenerator;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.hbm2ddl.SchemaExport.Type;
+import org.hibernate.tool.hbm2ddl.Target;
 
 public class OutputSchema {
 
     public static void main(String[] args) {
         Configuration config = new Configuration();
 
-        Properties properties = new Properties();
-
-        properties.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
-        properties.put("hibernate.show_sql", "true");
-        config.setProperties(properties);
+        config.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+        config.setProperty("hibernate.show_sql", "true");
+        config.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 
         config.addPackage("edu.ualberta.med.biobank.model");
-
         List<Class<?>> modelClasses = getClasses("edu.ualberta.med.biobank.model");
         for (Class<?> modelClass : modelClasses) {
             config.addAnnotatedClass(modelClass);
         }
 
         SchemaExport schemaExport = new EnversSchemaGenerator(config).export();
+        schemaExport.setDelimiter(";");
         schemaExport.setOutputFile("schema.sql");
-        // schemaExport.drop(false, false);
-        schemaExport.create(true, false);
+        schemaExport.execute(Target.NONE, Type.CREATE);
     }
 
     /**

@@ -21,7 +21,6 @@ public class JettyConfiguration {
 
     @Bean
     public WebAppContext jettyWebAppContext() throws IOException {
-
         WebAppContext ctx = new WebAppContext();
         ctx.setContextPath("/");
         ctx.setWar(new ClassPathResource("webapp").getURI().toString());

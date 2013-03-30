@@ -22,20 +22,6 @@ public class TestStudy extends DbTest {
 
         Date date = new Date();
 
-        // User user = new User();
-        // user.setAdmin(Boolean.TRUE);
-        // user.setEnabled(Boolean.TRUE);
-        // user.setLogin("tester");
-        // user.setFullName("tester");
-        // user.setEmail("tester@biobank.com");
-        // user.setTimeInserted(date.getTime());
-        // user.setTimeUpdated(date.getTime());
-        // user.setPasswordChangeNeeded(Boolean.FALSE);
-        // user.setMailingListSubscriber(Boolean.TRUE);
-        // user.setInsertedBy(user);
-        // user.setUpdatedBy(user);
-        // session.save(user);
-
         User superadmin = (User) session.load(User.class, 1);
 
         Study study = new Study();
