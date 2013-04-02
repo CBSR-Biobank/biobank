@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.model.provider.EntityProvider;
 import edu.ualberta.med.biobank.model.provider.Mother;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HibernateConfig.class)
+@ContextConfiguration(classes = HibernateConfigDev.class)
 @ActiveProfiles("dev")
 public class DbTest
     extends BaseTest {

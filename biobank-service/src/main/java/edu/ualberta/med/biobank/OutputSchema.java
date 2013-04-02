@@ -18,7 +18,8 @@ public class OutputSchema {
     public static void main(String[] args) {
         Configuration config = new Configuration();
 
-        config.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+        // config.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+        config.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         config.setProperty("hibernate.show_sql", "true");
         config.setProperty("hibernate.hbm2ddl.auto", "create-drop");
 
@@ -30,8 +31,9 @@ public class OutputSchema {
 
         SchemaExport schemaExport = new EnversSchemaGenerator(config).export();
         schemaExport.setDelimiter(";");
-        schemaExport.setOutputFile("schema.sql");
+        schemaExport.setOutputFile("src/main/resources/h2-schema.sql");
         schemaExport.execute(Target.NONE, Type.CREATE);
+        // schemaExport.create(true, false);
     }
 
     /**

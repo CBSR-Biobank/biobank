@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.model;
 
 import java.util.Date;
 
+import junit.framework.Assert;
+
 import org.hibernate.Session;
 import org.junit.Test;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -11,7 +13,6 @@ import edu.ualberta.med.biobank.DbTest;
 import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.model.study.Study;
 
-// @RunWith(SpringJUnit4ClassRunner.class)
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
 @Transactional()
 public class TestStudy extends DbTest {
@@ -23,6 +24,7 @@ public class TestStudy extends DbTest {
         Date date = new Date();
 
         User superadmin = (User) session.load(User.class, 1);
+        Assert.assertEquals("superadmin", superadmin.getLogin());
 
         Study study = new Study();
         study.setName("test");

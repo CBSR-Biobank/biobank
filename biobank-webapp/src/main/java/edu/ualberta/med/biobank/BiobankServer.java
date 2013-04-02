@@ -30,6 +30,8 @@ public class BiobankServer {
         try {
             AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
 
+            applicationContext.getEnvironment().setActiveProfiles("prod");
+
             /*
              * One problem with SpringMVC is it creates its own application context, and so it can
              * end up failing but our application will keep running.
