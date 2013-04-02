@@ -25,7 +25,7 @@
         TIME_INSERTED bigint not null,
         TIME_UPDATED bigint not null,
         VERSION integer not null,
-        VALUE varchar(50) not null,
+        "VALUE" varchar(50) not null,
         INSERTED_BY_USER_ID integer,
         UPDATED_BY_USER_ID integer,
         ANNOTATION_TYPE_ID integer not null,
@@ -36,7 +36,7 @@
         ID integer not null,
         REV bigint not null,
         REVTYPE tinyint,
-        VALUE varchar(50),
+        "VALUE" varchar(50),
         ANNOTATION_TYPE_ID integer,
         primary key (ID, REV)
     );
@@ -1541,7 +1541,7 @@
     );
 
     alter table ANATOMICAL_SOURCE 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_ANATOMICAL_SOURCE_1 unique (NAME);
 
     alter table ANATOMICAL_SOURCE 
         add constraint FK222949178B8015DC 
@@ -1559,7 +1559,7 @@
         references REVISION;
 
     alter table ANNOTATION_OPTION 
-        add constraint key1 unique (ANNOTATION_TYPE_ID, VALUE);
+        add constraint UK_ANNOTATION_OPTION_1 unique (ANNOTATION_TYPE_ID, "VALUE");
 
     alter table ANNOTATION_OPTION 
         add constraint FK997AFF858B8015DC 
@@ -1582,7 +1582,7 @@
         references REVISION;
 
     alter table ANNOTATION_TYPE 
-        add constraint ANNOTATION_TYPE_KEY unique (STUDY_ID, NAME);
+        add constraint UK_ANNOTATION_TYPE_1 unique (STUDY_ID, NAME);
 
     alter table ANNOTATION_TYPE 
         add constraint FKB2EA8E4A8B8015DC 
@@ -1605,7 +1605,7 @@
         references REVISION;
 
     alter table CENTER 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_CENTER_1 unique (NAME);
 
     alter table CENTER 
         add constraint FK7645C0558B8015DC 
@@ -1643,7 +1643,7 @@
         references CENTER;
 
     alter table CENTER_LOCATION 
-        add constraint CENTER_LOCATION_KEY unique (CENTER_ID, NAME);
+        add constraint UK_CENTER_LOCATION_1 unique (CENTER_ID, NAME);
 
     alter table CENTER_LOCATION 
         add constraint FK9DEF905F8B8015DC 
@@ -1666,7 +1666,7 @@
         references REVISION;
 
     alter table CENTER_MEMBERSHIP 
-        add constraint key1 unique (PRINCIPAL_ID, CENTER_ID);
+        add constraint UK_CENTER_MEMBERSHIP_1 unique (PRINCIPAL_ID, CENTER_ID);
 
     alter table CENTER_MEMBERSHIP 
         add constraint FK3483F2008B8015DC 
@@ -1724,7 +1724,7 @@
         references REVISION;
 
     alter table CENTER_ROLE 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_CENTER_ROLE_1 unique (NAME);
 
     alter table CENTER_ROLE 
         add constraint FKE5BF5E208B8015DC 
@@ -1747,7 +1747,7 @@
         references REVISION;
 
     alter table COLLECTION_EVENT 
-        add constraint key1 unique (PATIENT_ID, COLLECTION_EVENT_TYPE_ID, VISIT_NUMBER);
+        add constraint UK_COLLECTION_EVENT_1 unique (PATIENT_ID, COLLECTION_EVENT_TYPE_ID, VISIT_NUMBER);
 
     alter table COLLECTION_EVENT 
         add constraint FKEDAD89998B8015DC 
@@ -1825,7 +1825,7 @@
         references COLLECTION_EVENT;
 
     alter table COLLECTION_EVENT_TYPE 
-        add constraint key1 unique (STUDY_ID, NAME);
+        add constraint UK_COLLECTION_EVENT_TYPE_1 unique (STUDY_ID, NAME);
 
     alter table COLLECTION_EVENT_TYPE 
         add constraint FK68D7CE208B8015DC 
@@ -1843,7 +1843,7 @@
         references STUDY;
 
     alter table COLLECTION_EVENT_TYPE_ANNOTATION_TYPE 
-        add constraint key1 unique (COLLECTION_EVENT_TYPE_ID, ANNOTATION_TYPE_ID);
+        add constraint UK_COLLECTION_EVENT_TYPE_ANNOTATION_TYPE_1 unique (COLLECTION_EVENT_TYPE_ID, ANNOTATION_TYPE_ID);
 
     alter table COLLECTION_EVENT_TYPE_ANNOTATION_TYPE 
         add constraint FK8C3722B8B8015DC 
@@ -1878,13 +1878,13 @@
         references REVISION;
 
     alter table CONTAINER 
-        add constraint CONTAINER_KEY_2 unique (CONTAINER_TREE_ID, LABEL);
+        add constraint UK_CONTAINER_2 unique (CONTAINER_TREE_ID, LABEL);
 
     alter table CONTAINER 
-        add constraint CONTAINER_KEY_3 unique (PARENT_CONTAINER_ID, CONTAINER_SCHEMA_POSITION_ID);
+        add constraint UK_CONTAINER_3 unique (PARENT_CONTAINER_ID, CONTAINER_SCHEMA_POSITION_ID);
 
     alter table CONTAINER 
-        add constraint INVENTORY_ID_ unique (INVENTORY_ID);
+        add constraint uc_CONTAINER_1 unique (INVENTORY_ID);
 
     alter table CONTAINER 
         add constraint FK8D995C618B8015DC 
@@ -2012,7 +2012,7 @@
         references REVISION;
 
     alter table CONTAINER_SCHEMA 
-        add constraint CONTAINER_SCHEMA_KEY unique (CENTER_ID, NAME);
+        add constraint UK_CONTAINER_SCHEMA_1 unique (CENTER_ID, NAME);
 
     alter table CONTAINER_SCHEMA 
         add constraint FK1F9D4B3F8B8015DC 
@@ -2035,7 +2035,7 @@
         references REVISION;
 
     alter table CONTAINER_SCHEMA_POSITION 
-        add constraint key1 unique (CONTAINER_SCHEMA_ID, LABEL);
+        add constraint UK_CONTAINER_SCHEMA_POSITION_1 unique (CONTAINER_SCHEMA_ID, LABEL);
 
     alter table CONTAINER_SCHEMA_POSITION 
         add constraint FK23D7A6298B8015DC 
@@ -2078,7 +2078,7 @@
         references REVISION;
 
     alter table CONTAINER_TYPE 
-        add constraint key1 unique (CENTER_ID, NAME);
+        add constraint UK_CONTAINER_TYPE_1 unique (CENTER_ID, NAME);
 
     alter table CONTAINER_TYPE 
         add constraint FKB2C878588B8015DC 
@@ -2166,7 +2166,7 @@
         references PRINCIPAL_AUD;
 
     alter table PATIENT 
-        add constraint key1 unique (STUDY_ID, PNUMBER);
+        add constraint UK_PATIENT_1 unique (STUDY_ID, PNUMBER);
 
     alter table PATIENT 
         add constraint FKFB9F76E58B8015DC 
@@ -2239,7 +2239,7 @@
         references PATIENT;
 
     alter table PRESERVATION_TYPE 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_PRESERVATION_TYPE_1 unique (NAME);
 
     alter table PRESERVATION_TYPE 
         add constraint FKD7BEB43D8B8015DC 
@@ -2312,7 +2312,7 @@
         references PROCESSING_EVENT;
 
     alter table PROCESSING_EVENT_INPUT_SPECIMEN 
-        add constraint key1 unique (SPECIMEN_ID, PROCESSING_EVENT_ID);
+        add constraint UK_PROCESSING_EVENT_INPUT_SPECIMEN_1 unique (SPECIMEN_ID, PROCESSING_EVENT_ID);
 
     alter table PROCESSING_EVENT_INPUT_SPECIMEN 
         add constraint FK1BA3EE0E8B8015DC 
@@ -2335,7 +2335,7 @@
         references REVISION;
 
     alter table PROCESSING_TYPE 
-        add constraint key1 unique (STUDY_ID, NAME);
+        add constraint UK_PROCESSING_TYPE_1 unique (STUDY_ID, NAME);
 
     alter table PROCESSING_TYPE 
         add constraint FKAF1318E68B8015DC 
@@ -2453,7 +2453,7 @@
         references REVISION;
 
     alter table REQUEST_SHIPMENT 
-        add constraint SHIPMENT_ID_ unique (SHIPMENT_ID);
+        add constraint uc_REQUEST_SHIPMENT_1 unique (SHIPMENT_ID);
 
     alter table REQUEST_SHIPMENT 
         add constraint FKB7EFE16AD4E0C28 
@@ -2561,7 +2561,7 @@
         references SHIPMENT;
 
     alter table SHIPMENT_CONTAINER 
-        add constraint key1 unique (SHIPMENT_ID, CONTAINER_ID);
+        add constraint UK_SHIPMENT_CONTAINER_1 unique (SHIPMENT_ID, CONTAINER_ID);
 
     alter table SHIPMENT_CONTAINER 
         add constraint FK7347FFFC8B8015DC 
@@ -2609,7 +2609,7 @@
         references SHIPMENT_CONTAINER;
 
     alter table SHIPMENT_SPECIMEN 
-        add constraint key1 unique (SHIPMENT_ID, SPECIMEN_ID);
+        add constraint UK_SHIPMENT_SPECIMEN_1 unique (SHIPMENT_ID, SPECIMEN_ID);
 
     alter table SHIPMENT_SPECIMEN 
         add constraint FKD7F5F00D8B8015DC 
@@ -2662,7 +2662,7 @@
         references SHIPMENT_SPECIMEN;
 
     alter table SHIPPING_METHOD 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_SHIPPING_METHOD_1 unique (NAME);
 
     alter table SHIPPING_METHOD 
         add constraint FK68E3D4928B8015DC 
@@ -2680,7 +2680,7 @@
         references REVISION;
 
     alter table SPECIMEN 
-        add constraint key1 unique (CONTAINER_ID, CONTAINER_SCHEMA_POSITION_ID);
+        add constraint UK_SPECIMEN_1 unique (CONTAINER_ID, CONTAINER_SCHEMA_POSITION_ID);
 
     alter table SPECIMEN 
         add constraint FKAF84F3088B8015DC 
@@ -2723,7 +2723,7 @@
         references REVISION;
 
     alter table SPECIMEN_COLLECTION_EVENT 
-        add constraint key1 unique (SPECIMEN_ID, COLLECTION_EVENT_ID);
+        add constraint UK_SPECIMEN_COLLECTION_EVENT_1 unique (SPECIMEN_ID, COLLECTION_EVENT_ID);
 
     alter table SPECIMEN_COLLECTION_EVENT 
         add constraint FK43E569F08B8015DC 
@@ -2771,7 +2771,7 @@
         references SPECIMEN;
 
     alter table SPECIMEN_GROUP 
-        add constraint key1 unique (STUDY_ID, NAME);
+        add constraint UK_SPECIMEN_GROUP_1 unique (STUDY_ID, NAME);
 
     alter table SPECIMEN_GROUP 
         add constraint FKD41FEE688B8015DC 
@@ -2804,7 +2804,7 @@
         references REVISION;
 
     alter table SPECIMEN_GROUP_COLLECTION_EVENT_TYPE 
-        add constraint key1 unique (COLLECTION_EVENT_TYPE_ID, SPECIMEN_GROUP_ID);
+        add constraint UK_SPECIMEN_GROUP_COLLECTION_EVENT_TYPE_1 unique (COLLECTION_EVENT_TYPE_ID, SPECIMEN_GROUP_ID);
 
     alter table SPECIMEN_GROUP_COLLECTION_EVENT_TYPE 
         add constraint FKF7F7BF898B8015DC 
@@ -2837,7 +2837,7 @@
         references REVISION;
 
     alter table SPECIMEN_LINK 
-        add constraint key1 unique (INPUT_SPECIMEN_ID, OUTPUT_SPECIMEN_ID, TIME_DONE);
+        add constraint UK_SPECIMEN_LINK_1 unique (INPUT_SPECIMEN_ID, OUTPUT_SPECIMEN_ID, TIME_DONE);
 
     alter table SPECIMEN_LINK 
         add constraint FK1FA012D18B8015DC 
@@ -2905,7 +2905,7 @@
         references REVISION;
 
     alter table SPECIMEN_LINK_TYPE 
-        add constraint key1 unique (PROCESSING_TYPE_ID, INPUT_SPECIMEN_GROUP_ID, OUTPUT_SPECIMEN_GROUP_ID);
+        add constraint UK_SPECIMEN_LINK_TYPE_1 unique (PROCESSING_TYPE_ID, INPUT_SPECIMEN_GROUP_ID, OUTPUT_SPECIMEN_GROUP_ID);
 
     alter table SPECIMEN_LINK_TYPE 
         add constraint FKC5A247E88B8015DC 
@@ -2933,7 +2933,7 @@
         references PROCESSING_TYPE;
 
     alter table SPECIMEN_LINK_TYPE_ANNOTATION_TYPE 
-        add constraint key1 unique (SPECIMEN_LINK_TYPE_ID, ANNOTATION_TYPE_ID);
+        add constraint UK_SPECIMEN_LINK_TYPE_ANNOTATION_TYPE_1 unique (SPECIMEN_LINK_TYPE_ID, ANNOTATION_TYPE_ID);
 
     alter table SPECIMEN_LINK_TYPE_ANNOTATION_TYPE 
         add constraint FKE0315BF38B8015DC 
@@ -2968,7 +2968,7 @@
         references REVISION;
 
     alter table SPECIMEN_TYPE 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_SPECIMEN_TYPE_1 unique (NAME);
 
     alter table SPECIMEN_TYPE 
         add constraint FK1FA3F2118B8015DC 
@@ -2986,7 +2986,7 @@
         references REVISION;
 
     alter table STUDY 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_STUDY_1 unique (NAME);
 
     alter table STUDY 
         add constraint FK4B915A98B8015DC 
@@ -3019,7 +3019,7 @@
         references REVISION;
 
     alter table STUDY_MEMBERSHIP 
-        add constraint key1 unique (PRINCIPAL_ID, STUDY_ID);
+        add constraint UK_STUDY_MEMBERSHIP_1 unique (PRINCIPAL_ID, STUDY_ID);
 
     alter table STUDY_MEMBERSHIP 
         add constraint FKB263C02C8B8015DC 
@@ -3072,7 +3072,7 @@
         references REVISION;
 
     alter table STUDY_ROLE 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_STUDY_ROLE_1 unique (NAME);
 
     alter table STUDY_ROLE 
         add constraint FK2703D4C8B8015DC 
@@ -3095,7 +3095,7 @@
         references REVISION;
 
     alter table USER_GROUP 
-        add constraint key1 unique (USER_ID, GROUP_ID);
+        add constraint UK_USER_GROUP_1 unique (USER_ID, GROUP_ID);
 
     alter table USER_GROUP 
         add constraint FKC62E00EB8B8015DC 
@@ -3118,10 +3118,10 @@
         references REVISION;
 
     alter table User 
-        add constraint EMAIL_ unique (EMAIL);
+        add constraint uc_User_1 unique (EMAIL);
 
     alter table User 
-        add constraint LOGIN_ unique (LOGIN);
+        add constraint uc_User_2 unique (LOGIN);
 
     alter table User 
         add constraint FK285FEB53BDE4C6 
@@ -3134,7 +3134,7 @@
         references PRINCIPAL_AUD;
 
     alter table "GROUP" 
-        add constraint NAME_ unique (NAME);
+        add constraint uc_GROUP_1 unique (NAME);
 
     alter table "GROUP" 
         add constraint FK40EFE5F53BDE4C6 

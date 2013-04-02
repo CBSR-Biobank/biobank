@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank;
 
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -9,11 +8,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jdbc.datasource.init.DatabasePopulator;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -46,9 +42,9 @@ public class HibernateConfigDev {
 
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
         builder.setType(EmbeddedDatabaseType.H2);
+        builder.setName("test");
         builder.addScript("classpath:h2-schema.sql");
         builder.addScript("classpath:test-data.sql");
-        builder.setName("test");
         return builder.build();
     }
 
@@ -60,8 +56,7 @@ public class HibernateConfigDev {
         result.setPackagesToScan(new String[] { "edu.ualberta.med.biobank.model" });
 
         Properties properties = new Properties();
-        // properties.setProperty("connection.url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-        properties.setProperty("connection.url", "jdbc:h2:~/test");
+        properties.setProperty("connection.url", "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
         // properties.setProperty("hibernate.hbm2ddl.auto", "create");
 
         result.setHibernateProperties(properties);
@@ -85,16 +80,16 @@ public class HibernateConfigDev {
         return null;
     }
 
-    @Bean
-    public DatabasePopulator databasePopulator(DataSource dataSource) {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.setContinueOnError(true);
-        populator.setIgnoreFailedDrops(true);
-        populator.addScript(new ClassPathResource("test-data.sql"));
-        try {
-            populator.populate(dataSource.getConnection());
-        } catch (SQLException ignored) {
-        }
-        return populator;
-    }
+    // @Bean
+    // public DatabasePopulator databasePopulator(DataSource dataSource) {
+    // ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+    // populator.setContinueOnError(true);
+    // populator.setIgnoreFailedDrops(true);
+    // populator.addScript(new ClassPathResource("test-data.sql"));
+    // try {
+    // populator.populate(dataSource.getConnection());
+    // } catch (SQLException ignored) {
+    // }
+    // return populator;
+    // }
 }

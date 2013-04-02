@@ -17,10 +17,10 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Defines a single option for the
- * {@link edu.ualberta.med.biobank.model.type.AnnotationValueType#SELECT select}
- * types of {@link edu.ualberta.med.biobank.model.AnnotationType
- * annotation type}s. For example, this would be used to determine values a user
- * chooses from a drop-down, such as, "small", "medium", and "large".
+ * {@link edu.ualberta.med.biobank.model.type.AnnotationValueType#SELECT select} types of
+ * {@link edu.ualberta.med.biobank.model.AnnotationType annotation type}s. For example, this would
+ * be used to determine values a user chooses from a drop-down, such as, "small", "medium", and
+ * "large".
  * 
  * @author Jonathan Ferland
  */
@@ -28,7 +28,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 @Entity
 @Table(name = "ANNOTATION_OPTION",
     uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "ANNOTATION_TYPE_ID", "VALUE" })
+        @UniqueConstraint(columnNames = { "ANNOTATION_TYPE_ID", "`VALUE`" })
     })
 @Unique(properties = { "type", "value" }, groups = PrePersist.class)
 public class AnnotationOption
@@ -41,8 +41,7 @@ public class AnnotationOption
     private String value;
 
     /**
-     * @return the type of annotation (i.e the name or label) that this is an
-     *         option for.
+     * @return the type of annotation (i.e the name or label) that this is an option for.
      */
     @NotNull(message = "{AnnotationOption.type.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,12 +55,12 @@ public class AnnotationOption
     }
 
     /**
-     * @return the value that can be selected (think drop-down, combo-box, or
-     *         radio selection option).
+     * @return the value that can be selected (think drop-down, combo-box, or radio selection
+     *         option).
      */
     @NotNull(message = "{AnnotationOption.value.NotNull}")
     @Size(max = VALUE_MAX_LENGTH, message = "{AnnotationOption.value.Size}")
-    @Column(name = "VALUE", nullable = false, length = VALUE_MAX_LENGTH)
+    @Column(name = "`VALUE`", nullable = false, length = VALUE_MAX_LENGTH)
     public String getValue() {
         return value;
     }
