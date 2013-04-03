@@ -88,12 +88,11 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 text.append(container.getFullInfoLabel());
                 ContainerWrapper parent = container.getParentContainer();
                 boolean hasParents = parent != null;
-                if (hasParents)
-                    text.append(" (")
-                        .append(
-                            i18n.trc("Select Parent Container Option Label",
-                                "Parents"))
+                if (hasParents) {
+                    text.append(" (").append(
+                        i18n.trc("Select Parent Container Option Label", "Parents"))
                         .append(": ");
+                }
                 while (parent != null) {
                     text.append(parent.getFullInfoLabel());
                     parent = parent.getParentContainer();
@@ -105,13 +104,12 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
                 return text.toString();
             }
         });
-        comboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    saveSelectedContainer();
-                }
-            });
+        comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                saveSelectedContainer();
+            }
+        });
     }
 
     private void saveSelectedContainer() {

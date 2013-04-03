@@ -567,6 +567,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         if (resetAll) {
             resetPlateToScan();
         }
+        currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
     }
 
     @Override

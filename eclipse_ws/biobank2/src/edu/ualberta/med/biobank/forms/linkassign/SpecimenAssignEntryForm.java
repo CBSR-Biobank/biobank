@@ -618,6 +618,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!checkingMultipleContainerPosition) {
                     palletproductBarcodeTextModified = true;
                     palletTypesViewer.setInput(null);
+                    log.debug("clearing selections in palletTypesViewer");
                     currentMultipleContainer.setContainerType(null);
                     palletPositionText.setEnabled(true);
                     palletPositionText.setText(StringUtil.EMPTY_STRING);
@@ -639,21 +640,22 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (palletPositionText.isEnabled() && palletPositionTextModified
                     && palletLabelValidator.validate(palletPositionText.getText())
                         .equals(Status.OK_STATUS)) {
-                    BusyIndicator.showWhile(Display.getDefault(),
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                boolean ok = (initWithProduct || checkMultipleContainerPosition());
-                                setCanLaunchScan(ok);
-                                initCellsWithContainer(currentMultipleContainer);
-                                currentMultipleContainer.setLabel(palletPositionText.getText());
-                                if (!ok) {
-                                    focusControl(palletPositionText);
-                                    showOnlyPallet(true);
-                                }
-                                palletPositionTextModified = false;
+                    BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean ok = (initWithProduct || checkMultipleContainerPosition());
+                            setCanLaunchScan(ok);
+                            initCellsWithContainer(currentMultipleContainer);
+                            currentMultipleContainer.setLabel(palletPositionText.getText());
+                            if (!ok) {
+                                focusControl(palletPositionText);
+                                showOnlyPallet(true);
+                            } else if (palletTypesViewer.getCombo().getEnabled()) {
+                                focusControl(palletTypesViewer.getCombo());
                             }
-                        });
+                            palletPositionTextModified = false;
+                        }
+                    });
                 }
                 palletPositionTextModified = false;
             }
@@ -664,6 +666,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!isModifyingMultipleFields) {
                     palletPositionTextModified = true;
                     palletTypesViewer.setInput(null);
+                    log.debug("clearing selections in palletTypesViewer");
                     currentMultipleContainer.setContainerType(null);
                 }
             }
@@ -753,7 +756,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             palletTypesViewer.getCombo().setEnabled(enableTypesCombo);
             palletTypesViewer.setInput(possibleTypes);
-            if (possibleTypes.size() == 0) {
+            if (possibleTypes.isEmpty()) {
                 BgcPlugin.openAsyncError(
                     // TR: dialog title
                     i18n.tr("Containers Error"),
@@ -763,6 +766,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 typeSelection = null;
                 return false;
             }
+            palletTypesViewer.getCombo().setEnabled(possibleTypes.size() > 1);
+
             if (typeSelection == null) {
                 palletTypesViewer.getCombo().deselectAll();
             } else {
@@ -1516,6 +1521,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         scannerBarcodeValidator.setValidPlateDimensions(plateDimensions);
 
         if (!currentGridDimensions.equals(plateDimensions)) {
+            currentGridDimensions = plateDimensions;
             recreateScanPalletWidget(ctype.getCapacity().getRowCapacity(),
                 ctype.getCapacity().getColCapacity());
             page.layout(true, true);
