@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The databases "biobank_v320_de" and "biobank_v360_de" must first be populated on the host machine
@@ -52,13 +54,13 @@ public class V360DoubleEntryStats {
     public static final String DATE_END = "2013-03-27 22:00";
 
     private static class DoubleEntryData {
-        int studies;
-        int centres;
-        int patients;
-        int cevents;
-        int pevents;
+        int studyCount;
+        int centreCount;
+        int peventCount;
         int specimensCreated;
         int specimensScanAssigned;
+        Set<String> patients;
+        Set<String> cevents;
         Map<String, Object[]> specimens;
     }
 
@@ -80,46 +82,126 @@ public class V360DoubleEntryStats {
         System.out.println();
 
         System.out.println(",Production,Test");
-        System.out.println("studies," + prodData.studies + "," + testData.studies);
-        System.out.println("centres," + prodData.centres + "," + testData.centres);
-        System.out.println("patients," + prodData.patients + "," + testData.patients);
-        System.out.println("collection events," + prodData.cevents + "," + testData.cevents);
-        System.out.println("processing events," + prodData.pevents + "," + testData.pevents);
+        System.out.println("studies," + prodData.studyCount + "," + testData.studyCount);
+        System.out.println("centres," + prodData.centreCount + "," + testData.centreCount);
+        System.out.println("patients," + prodData.patients.size() + "," + testData.patients.size());
+        System.out.println("collection events," + prodData.cevents.size() + ","
+            + testData.cevents.size());
+        System.out.println("processing events," + prodData.peventCount + "," + testData.peventCount);
         System.out.println("specimens created," + prodData.specimensCreated + ","
             + testData.specimensCreated);
         System.out.println("scan assigned specimens," + prodData.specimensScanAssigned + ","
             + testData.specimensScanAssigned);
         System.out.println();
 
-        Map<String, Object[]> specimensNotInTestDb = new LinkedHashMap<String, Object[]>();
-        Map<String, Object[]> specimensNotInProdDb = new LinkedHashMap<String, Object[]>();
+        printPatientDelta(prodData, testData);
+        printCeventDelta(prodData, testData);
+        printSpecimenDelta(prodData, testData);
+    }
+
+    private void printPatientDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+        Set<String> notInTestDb = new LinkedHashSet<String>();
+        Set<String> notInProdDb = new LinkedHashSet<String>();
+
+        // check for patients in production db and not in test db
+        for (String inventoryId : prodData.patients) {
+            if (!testData.patients.contains(inventoryId)) {
+                notInTestDb.add(inventoryId);
+            }
+        }
+
+        // check for patients in production db and not in test db
+        for (String inventoryId : testData.patients) {
+            if (!prodData.patients.contains(inventoryId)) {
+                notInProdDb.add(inventoryId);
+            }
+        }
+
+        if (notInTestDb.size() > 0) {
+            System.out.println("Patients not in Test DB: (" + notInTestDb.size() + ")");
+            for (String inventoryId : notInTestDb) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+
+        if (notInProdDb.size() > 0) {
+            System.out.println("Patients not in Production DB: (" + notInProdDb.size()
+                + ")");
+            for (String inventoryId : notInProdDb) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+    }
+
+    private void printCeventDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+        Set<String> notInTestDb = new LinkedHashSet<String>();
+        Set<String> notInProdDb = new LinkedHashSet<String>();
+
+        // check for cevents in production db and not in test db
+        for (String inventoryId : prodData.cevents) {
+            if (!testData.cevents.contains(inventoryId)) {
+                notInTestDb.add(inventoryId);
+            }
+        }
+
+        // check for cevents in production db and not in test db
+        for (String inventoryId : testData.cevents) {
+            if (!prodData.cevents.contains(inventoryId)) {
+                notInProdDb.add(inventoryId);
+            }
+        }
+
+        if (notInTestDb.size() > 0) {
+            System.out.println("Collection events not in Test DB: (" + notInTestDb.size() + ")");
+            for (String inventoryId : notInTestDb) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+
+        if (notInProdDb.size() > 0) {
+            System.out.println("Collection events not in Production DB: (" + notInProdDb.size()
+                + ")");
+            for (String inventoryId : notInProdDb) {
+                System.out.println(inventoryId);
+            }
+            System.out.println();
+        }
+
+    }
+
+    private void printSpecimenDelta(DoubleEntryData prodData, DoubleEntryData testData) {
+        Map<String, Object[]> notInTestDb = new LinkedHashMap<String, Object[]>();
+        Map<String, Object[]> notInProdDb = new LinkedHashMap<String, Object[]>();
 
         // check for specimens in production db and not in test db
         for (String inventoryId : prodData.specimens.keySet()) {
             if (!testData.specimens.containsKey(inventoryId)) {
-                specimensNotInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
+                notInTestDb.put(inventoryId, prodData.specimens.get(inventoryId));
             }
         }
 
         // check for specimens in production db and not in test db
         for (String inventoryId : testData.specimens.keySet()) {
             if (!prodData.specimens.containsKey(inventoryId)) {
-                specimensNotInProdDb.put(inventoryId, testData.specimens.get(inventoryId));
+                notInProdDb.put(inventoryId, testData.specimens.get(inventoryId));
             }
         }
 
-        if (specimensNotInTestDb.size() > 0) {
-            System.out.println("Specimens not in Test DB: (" + specimensNotInTestDb.size() + ")");
-            for (String inventoryId : specimensNotInTestDb.keySet()) {
+        if (notInTestDb.size() > 0) {
+            System.out.println("Specimens not in Test DB: (" + notInTestDb.size() + ")");
+            for (String inventoryId : notInTestDb.keySet()) {
                 System.out.println(inventoryId);
             }
             System.out.println();
         }
 
-        if (specimensNotInProdDb.size() > 0) {
-            System.out.println("Specimens not in Production DB: (" + specimensNotInProdDb.size()
+        if (notInProdDb.size() > 0) {
+            System.out.println("Specimens not in Production DB: (" + notInProdDb.size()
                 + ")");
-            for (String inventoryId : specimensNotInProdDb.keySet()) {
+            for (String inventoryId : notInProdDb.keySet()) {
                 System.out.println(inventoryId);
             }
             System.out.println();
@@ -132,11 +214,11 @@ public class V360DoubleEntryStats {
 
         DoubleEntryData deData = new DoubleEntryData();
 
-        deData.studies = getStudiesCount(BASE_QRY, dbCon);
-        deData.centres = getOriginCentersCount(BASE_QRY, dbCon);
-        deData.patients = getPatientsCount(BASE_QRY, dbCon);
-        deData.cevents = getCeventCount(BASE_QRY, dbCon);
-        deData.pevents = getPeventCount(BASE_QRY, dbCon);
+        deData.studyCount = getStudiesCount(BASE_QRY, dbCon);
+        deData.centreCount = getOriginCentersCount(BASE_QRY, dbCon);
+        deData.patients = getPatients(BASE_QRY, dbCon);
+        deData.cevents = getCevents(BASE_QRY, dbCon);
+        deData.peventCount = getPeventCount(BASE_QRY, dbCon);
         deData.specimensCreated = getSpecimensCreatedCount(BASE_QRY, dbCon);
         deData.specimensScanAssigned = getSpecimensScanAssignedCount(BASE_QRY, dbCon);
         deData.specimens = getSpecimens(BASE_QRY, dbCon);
@@ -158,18 +240,27 @@ public class V360DoubleEntryStats {
         return rs.getInt(1);
     }
 
-    private int getPatientsCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT p.id) " + baseQry);
+    private Set<String> getPatients(String baseQry, Connection dbCon) throws SQLException {
+        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT p.pnumber " + baseQry);
         ResultSet rs = doQuery(ps);
-        rs.next();
-        return rs.getInt(1);
+
+        Set<String> results = new LinkedHashSet<String>();
+        while (rs.next()) {
+            results.add(rs.getString(1));
+        }
+        return results;
     }
 
-    private int getCeventCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT ce.id) " + baseQry);
+    private Set<String> getCevents(String baseQry, Connection dbCon) throws SQLException {
+        PreparedStatement ps = dbCon.prepareCall("SELECT DISTINCT ce.visit_number, p.pnumber "
+            + baseQry);
         ResultSet rs = doQuery(ps);
-        rs.next();
-        return rs.getInt(1);
+
+        Set<String> results = new LinkedHashSet<String>();
+        while (rs.next()) {
+            results.add(rs.getString(2) + "-" + rs.getString(1));
+        }
+        return results;
     }
 
     private int getPeventCount(String baseQry, Connection dbCon) throws SQLException {
@@ -187,9 +278,8 @@ public class V360DoubleEntryStats {
     }
 
     private int getSpecimensScanAssignedCount(String baseQry, Connection dbCon) throws SQLException {
-        PreparedStatement ps =
-            dbCon.prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry
-                + " AND spos.id is not null");
+        PreparedStatement ps = dbCon.prepareCall("SELECT COUNT(DISTINCT spc.id) " + baseQry
+            + " AND spos.id is not null");
         ResultSet rs = doQuery(ps);
         rs.next();
         return rs.getInt(1);
@@ -202,8 +292,7 @@ public class V360DoubleEntryStats {
 
         Map<String, Object[]> results = new LinkedHashMap<String, Object[]>();
         while (rs.next()) {
-            results.put(
-                rs.getString(7),
+            results.put(rs.getString(7),
                 new Object[] { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
                     rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8),
                     rs.getString(9), rs.getString(10), rs.getString(11), rs.getString(12),
