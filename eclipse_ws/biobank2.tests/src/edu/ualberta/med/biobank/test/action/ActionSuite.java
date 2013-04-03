@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.test.action;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import edu.ualberta.med.biobank.test.action.batchoperation.patient.TestPatientCsvImport;
+import edu.ualberta.med.biobank.test.action.batchoperation.patient.TestPatientBatchOp;
 import edu.ualberta.med.biobank.test.action.batchoperation.shipment.TestShipmentCsvInfo;
 import edu.ualberta.med.biobank.test.action.batchoperation.specimen.TestSpecimenBatchOp;
 import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
     TestContainerType.class,
     TestDispatch.class,
     TestPatient.class,
-    TestPatientCsvImport.class,
+    TestPatientBatchOp.class,
     TestProcessingEvent.class,
     TestRequest.class,
     TestResearchGroup.class,

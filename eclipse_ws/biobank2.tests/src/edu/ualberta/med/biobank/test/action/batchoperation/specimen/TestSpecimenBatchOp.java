@@ -412,7 +412,7 @@ public class TestSpecimenBatchOp extends TestAction {
                     new File(CSV_NAME));
             exec(importAction);
             Assert
-            .fail("should not be allowed to create aliquot specimens with no parent specimens");
+                .fail("should not be allowed to create aliquot specimens with no parent specimens");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException().withMessage(
                 SpecimenBatchOpAction.CSV_PARENT_SPC_INV_ID_ERROR.format());
@@ -440,11 +440,11 @@ public class TestSpecimenBatchOp extends TestAction {
                     new File(CSV_NAME));
             exec(importAction);
             Assert
-            .fail("should not be allowed to create aliquot specimens with no collection events");
+                .fail("should not be allowed to create aliquot specimens with no collection events");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-            .withMessage(SpecimenBatchOpAction.CSV_CEVENT_ERROR
-                .format());
+                .withMessage(SpecimenBatchOpAction.CSV_CEVENT_ERROR
+                    .format());
         }
     }
 
@@ -476,11 +476,11 @@ public class TestSpecimenBatchOp extends TestAction {
                     new File(CSV_NAME));
             exec(importAction);
             Assert
-            .fail("should not be allowed to create aliquot specimens with invalid patients");
+                .fail("should not be allowed to create aliquot specimens with invalid patients");
         } catch (BatchOpErrorsException e) {
             new AssertBatchOpException()
-            .withMessage(SpecimenBatchOpAction.CSV_PATIENT_NUMBER_INVALID_ERROR
-                .format());
+                .withMessage(SpecimenBatchOpAction.CSV_PATIENT_NUMBER_INVALID_ERROR
+                    .format());
         }
     }
 
@@ -514,7 +514,7 @@ public class TestSpecimenBatchOp extends TestAction {
                     new File(CSV_NAME));
             exec(importAction);
             Assert
-            .fail("should not be allowed to import spcecimens when patient number is missing");
+                .fail("should not be allowed to import spcecimens when patient number is missing");
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
         }
@@ -550,9 +550,8 @@ public class TestSpecimenBatchOp extends TestAction {
 
         session.getTransaction().commit();
 
-        ArrayList<SpecimenBatchOpInputPojo> csvInfos =
-            specimenCsvHelper.createAliquotedSpecimens(
-                factory.getDefaultStudy(), parentSpecimens);
+        List<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAliquotedSpecimens(
+            factory.getDefaultStudy(), parentSpecimens);
         specimenCsvHelper.addComments(csvInfos);
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -652,9 +651,9 @@ public class TestSpecimenBatchOp extends TestAction {
                 factory.getDefaultStudy().getSourceSpecimens());
 
         specimenCsvHelper
-        .fillContainersWithSpecimenBatchOpPojos(
-            new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
-            childL2Containers);
+            .fillContainersWithSpecimenBatchOpPojos(
+                new ArrayList<SpecimenBatchOpInputPojo>(csvInfos),
+                childL2Containers);
 
         SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
 
@@ -673,7 +672,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void withExistingPevents() throws IOException,
-    NoSuchAlgorithmException {
+        NoSuchAlgorithmException {
         Set<Patient> patients = new HashSet<Patient>();
         Set<Specimen> parentSpecimens = new HashSet<Specimen>();
         Map<String, ProcessingEvent> peventMap =
@@ -732,7 +731,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
     @Test
     public void aliquotsWithNoParentSpc() throws IOException,
-    NoSuchAlgorithmException {
+        NoSuchAlgorithmException {
         Set<Patient> patients = new HashSet<Patient>();
 
         for (int i = 0; i < 3; i++) {
@@ -770,8 +769,7 @@ public class TestSpecimenBatchOp extends TestAction {
         checkCsvInfoAgainstDb(csvInfos);
     }
 
-    private void checkCsvInfoAgainstDb(
-        ArrayList<SpecimenBatchOpInputPojo> csvInfos) {
+    private void checkCsvInfoAgainstDb(List<SpecimenBatchOpInputPojo> csvInfos) {
         for (SpecimenBatchOpInputPojo csvInfo : csvInfos) {
             log.trace("checking specimen against db: inventory id {}",
                 csvInfo.getInventoryId());
@@ -841,8 +839,7 @@ public class TestSpecimenBatchOp extends TestAction {
 
             }
 
-            if ((csvInfo.getComment() != null)
-                && !csvInfo.getComment().isEmpty()) {
+            if ((csvInfo.getComment() != null) && !csvInfo.getComment().isEmpty()) {
                 Assert.assertEquals(1, specimen.getComments().size());
                 Assert.assertEquals(csvInfo.getComment(),
                     specimen.getComments().iterator().next().getMessage());

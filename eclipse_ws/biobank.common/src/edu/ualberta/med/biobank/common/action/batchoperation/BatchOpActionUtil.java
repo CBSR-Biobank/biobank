@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
+import java.util.Date;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
@@ -7,9 +9,11 @@ import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
+import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -36,11 +40,7 @@ public class BatchOpActionUtil {
     public static final LString CSV_FILE_ERROR =
         bundle.tr("CSV file not loaded").format();
 
-    public static final LString CSV_HEADER_ERROR =
-        bundle.tr("invalid headers in CSV file").format();
-
-    public static final String CSV_PARSE_ERROR =
-        "Parse error at line {0}\n{1}";
+    public static final String CSV_PARSE_ERROR = "Parse error at line {0}\n{1}";
 
     public static Patient getPatient(ActionContext context, String pnumber) {
         if (context == null) {
@@ -48,15 +48,11 @@ public class BatchOpActionUtil {
                 "should only be called once the context is initialized");
         }
 
-        Criteria c = context.getSession().createCriteria(Patient.class)
-            .add(Restrictions.eq("pnumber", pnumber));
-
-        return (Patient) c.uniqueResult();
+        Patient patient = (Patient) context.getSession().createCriteria(Patient.class)
+            .add(Restrictions.eq("pnumber", pnumber)).uniqueResult();
+        return patient;
     }
 
-    /*
-     * Generates an action exception if specimen with inventory ID does not exist.
-     */
     public static Specimen getSpecimen(ActionContext context, String inventoryId) {
         if (context == null) {
             throw new NullPointerException(
@@ -69,9 +65,6 @@ public class BatchOpActionUtil {
         return (Specimen) c.uniqueResult();
     }
 
-    /*
-     * Generates an action exception if specimen type does not exist.
-     */
     public static SpecimenType getSpecimenType(ActionContext context,
         String name) {
         if (context == null) {
@@ -85,9 +78,6 @@ public class BatchOpActionUtil {
         return (SpecimenType) c.uniqueResult();
     }
 
-    /*
-     * Generates an action exception if centre with name does not exist.
-     */
     public static Study getStudy(ActionContext context, String nameShort) {
         if (context == null) {
             throw new NullPointerException(
@@ -99,9 +89,6 @@ public class BatchOpActionUtil {
         return (Study) c.uniqueResult();
     }
 
-    /*
-     * Generates an action exception if centre with name does not exist.
-     */
     public static Center getCenter(ActionContext context, String nameShort) {
         if (context == null) {
             throw new NullPointerException(
@@ -114,9 +101,6 @@ public class BatchOpActionUtil {
         return (Center) c.uniqueResult();
     }
 
-    /*
-     * Generates an action exception if centre with name does not exist.
-     */
     public static Site getSite(ActionContext context, String nameShort) {
         if (context == null) {
             throw new NullPointerException(
@@ -130,9 +114,6 @@ public class BatchOpActionUtil {
         return (Site) c.uniqueResult();
     }
 
-    /*
-     * 
-     */
     public static Container getContainer(ActionContext context, String label) {
         if (context == null) {
             throw new NullPointerException(
@@ -194,5 +175,20 @@ public class BatchOpActionUtil {
             .createCriteria(ProcessingEvent.class)
             .add(Restrictions.eq("worksheet", worksheetNumber))
             .uniqueResult();
+    }
+
+    public static BatchOperation createBatchOperation(ActionContext context,
+        final FileData fileData) {
+        BatchOperation batchOperation = new BatchOperation();
+
+        batchOperation.setInput(fileData);
+        batchOperation.setExecutedBy(context.getUser());
+        batchOperation.setTimeExecuted(new Date());
+        batchOperation.setInput(fileData);
+        batchOperation.setTimeExecuted(new Date());
+
+        context.getSession().saveOrUpdate(fileData);
+        context.getSession().saveOrUpdate(batchOperation);
+        return batchOperation;
     }
 }

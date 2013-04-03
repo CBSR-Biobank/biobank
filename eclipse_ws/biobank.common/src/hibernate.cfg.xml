@@ -16,17 +16,17 @@
 		<property name="org.hibernate.envers.audit_table_suffix">_audit</property>
 		<property name="org.hibernate.envers.revision_field_name">REVISION</property>
 		<property name="org.hibernate.envers.revision_type_field_name">REVISION_TYPE</property>
-		<!-- Note that as of 3.6.10 the following configuration options were added 
+		<!-- Note that as of 3.6.10 the following configuration options were added
 			and should be regarded as experimental only... -->
 		<property name="org.hibernate.envers.audit_strategy">org.hibernate.envers.strategy.ValidityAuditStrategy</property>
 		<property
 			name="org.hibernate.envers.audit_strategy_validity_end_rev_field_name">END_REVISION</property>
 		<property
 			name="org.hibernate.envers.audit_strategy_validity_revend_timestamp_field_name">END_REVISION_TIME</property>
-		<!-- Turn off default Hibernate Bean Validator, only apply constraints 
+		<!-- Turn off default Hibernate Bean Validator, only apply constraints
 			to the database schema when generated with Hibernate -->
 		<property name="javax.persistence.validation.mode">ddl</property>
-		<!-- Mapped package loads package-info.java, which contains package-wide 
+		<!-- Mapped package loads package-info.java, which contains package-wide
 			information, such as, @TypeDefs -->
 		<mapping package="edu.ualberta.med.biobank.model" />
 		<!-- Mapped classes -->
@@ -34,6 +34,7 @@
 		<mapping class="edu.ualberta.med.biobank.model.Address" />
 		<mapping class="edu.ualberta.med.biobank.model.AliquotedSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.BatchOperation" />
+		<mapping class="edu.ualberta.med.biobank.model.BatchOperationPatient" />
 		<mapping class="edu.ualberta.med.biobank.model.BatchOperationProcessingEvent" />
 		<mapping class="edu.ualberta.med.biobank.model.BatchOperationSpecimen" />
 		<mapping class="edu.ualberta.med.biobank.model.Group" />

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,8 +43,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
- * This action takes a list of Specimen Batch Operation beans as input, verifies
- * that the data is valid, and if valid saves the data to the database.
+ * This action takes a list of Specimen Batch Operation beans as input, verifies that the data is
+ * valid, and if valid saves the data to the database.
  * 
  * @author Nelson Loyola
  * 
@@ -56,8 +55,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private static final Bundle bundle = new CommonBundle();
 
-    private static Logger log = LoggerFactory
-        .getLogger(SpecimenBatchOpAction.class);
+    private static Logger log = LoggerFactory.getLogger(SpecimenBatchOpAction.class);
 
     public static final int SIZE_LIMIT = 1000;
 
@@ -82,7 +80,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     private static final LString CSV_PALLET_POS_ERROR =
         bundle.tr("pallet position defined but not product barcode or label")
-        .format();
+            .format();
 
     private static final LString CSV_PROD_BARCODE_NO_POS_ERROR =
         bundle.tr("pallet product barcode defined but not position").format();
@@ -116,10 +114,9 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private final Integer workingCenterId;
 
     private Center workingCenterOnServerSide;
-    private CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList =
-        null;
+    private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> compressedList;
 
-    private FileData fileData = null;
+    private final FileData fileData;
 
     private ArrayList<SpecimenBatchOpInputPojo> pojos = null;
 
@@ -132,7 +129,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     public SpecimenBatchOpAction(Center workingCenter,
         List<SpecimenBatchOpInputPojo> batchOpSpecimens, File inputFile)
-            throws NoSuchAlgorithmException, IOException {
+        throws NoSuchAlgorithmException, IOException {
         if (batchOpSpecimens.isEmpty()) {
             throw new IllegalArgumentException("pojo list is empty");
         }
@@ -144,10 +141,9 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         this.workingCenterId = workingCenter.getId();
         this.fileData = FileData.fromFile(inputFile);
 
-        compressedList =
-            new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
-                new ArrayList<SpecimenBatchOpInputPojo>(batchOpSpecimens));
-        log.debug("SpecimenBatchOpAction: constructor");
+        compressedList = new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
+            new ArrayList<SpecimenBatchOpInputPojo>(batchOpSpecimens));
+        log.debug("constructor exit");
     }
 
     private void decompressData() {
@@ -167,7 +163,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        log.debug("SpecimenBatchOpAction: isAllowed: start");
+        log.debug("isAllowed: start");
         if (compressedList == null) {
             throw new IllegalStateException("compressed list is null");
         }
@@ -193,8 +189,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     }
 
     /*
-     * Returns a list of studies that existing specimens and patients in the
-     * pojo data belong to.
+     * Returns a list of studies that existing specimens and patients in the pojo data belong to.
      */
     private Set<Study> getStudies(ActionContext context) {
         Set<Specimen> existingSpecimens = new HashSet<Specimen>();
@@ -203,8 +198,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         for (SpecimenBatchOpInputPojo pojo : pojos) {
             String parentInvId = pojo.getParentInventoryId();
             if ((parentInvId == null) || parentInvId.isEmpty()) continue;
-            Specimen specimen =
-                BatchOpActionUtil.getSpecimen(context, parentInvId);
+            Specimen specimen = BatchOpActionUtil.getSpecimen(context, parentInvId);
             if (specimen != null) {
                 existingSpecimens.add(specimen);
             }
@@ -326,7 +320,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        BatchOperation batchOp = createBatchOperation(context);
+        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(context, fileData);
 
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
@@ -377,20 +371,6 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         log.debug("SpecimenBatchOpAction:end");
         return new IdResult(batchOp.getId());
-    }
-
-    private BatchOperation createBatchOperation(ActionContext context) {
-        BatchOperation batchOperation = new BatchOperation();
-
-        batchOperation.setInput(fileData);
-        batchOperation.setExecutedBy(context.getUser());
-        batchOperation.setTimeExecuted(new Date());
-        batchOperation.setInput(fileData);
-        batchOperation.setTimeExecuted(new Date());
-
-        context.getSession().saveOrUpdate(fileData);
-        context.getSession().saveOrUpdate(batchOperation);
-        return batchOperation;
     }
 
     private void validatePojo(SpecimenBatchOpInputPojo pojo) {
@@ -450,8 +430,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo inputPojo,
         SpecimenBatchOpInputPojo parentInputPojo) {
-        Specimen spc =
-            BatchOpActionUtil.getSpecimen(context, inputPojo.getInventoryId());
+        Specimen spc = BatchOpActionUtil.getSpecimen(context, inputPojo.getInventoryId());
         if (spc != null) {
             errorSet.addError(inputPojo.getLineNumber(),
                 SPC_ALREADY_EXISTS_ERROR);

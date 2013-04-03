@@ -40,13 +40,11 @@ class SpecimenBatchOpPojoHelper {
     }
 
     /**
-     * Creates specimen BatchOp pojos with source specimens and aliquoted
-     * specimens.
+     * Creates specimen BatchOp pojos with source specimens and aliquoted specimens.
      * 
      * @param csvname the file name to save the data to.
-     * @param study the study the the patients belong to. Note that the study
-     *            must have valid source specimens and aliquoted specimens
-     *            defined.
+     * @param study the study the the patients belong to. Note that the study must have valid source
+     *            specimens and aliquoted specimens defined.
      * @param originCenter the center where the specimens came from.
      * @param currentCenter the center where the specimens are stored.
      * @param patients the patients that these specimens will belong to.
@@ -108,8 +106,8 @@ class SpecimenBatchOpPojoHelper {
     }
 
     /**
-     * Creates CSV specimens with only aliquoted specimens. Note that parent
-     * specimens must already be present in the database.
+     * Creates CSV specimens with only aliquoted specimens. Note that parent specimens must already
+     * be present in the database.
      */
     ArrayList<SpecimenBatchOpInputPojo> createAliquotedSpecimens(Study study,
         Collection<Specimen> parentSpecimens) {
@@ -231,7 +229,7 @@ class SpecimenBatchOpPojoHelper {
         }
     }
 
-    public void addComments(ArrayList<SpecimenBatchOpInputPojo> specimenCsvInfos) {
+    public void addComments(List<SpecimenBatchOpInputPojo> specimenCsvInfos) {
         for (SpecimenBatchOpInputPojo specimenCsvInfo : specimenCsvInfos) {
             specimenCsvInfo.setComment(nameGenerator.next(String.class));
         }

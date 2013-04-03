@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.action.batchoperation.shipment;
 
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpPojoHelper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.User;
  * 
  */
 @SuppressWarnings("nls")
-public class ShipmentBatchOpHelper implements IBatchOpHelper {
+public class ShipmentBatchOpHelper implements IBatchOpPojoHelper {
 
     private final ShipmentBatchOpInputRow csvInfo;
     private ShippingMethod shippingMethod;

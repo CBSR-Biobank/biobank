@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
-import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpHelper;
+import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpPojoHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
  * 
  */
 @SuppressWarnings("nls")
-public class SpecimenBatchOpPojoData implements IBatchOpHelper {
+public class SpecimenBatchOpPojoData implements IBatchOpPojoHelper {
 
     private static Logger log = LoggerFactory
         .getLogger(SpecimenBatchOpPojoData.class.getName());

@@ -1,38 +1,37 @@
 package edu.ualberta.med.biobank.common.action.batchoperation.patient;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
-import org.supercsv.cellprocessor.constraint.Unique;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.exception.SuperCSVException;
-import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.prefs.CsvPreference;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
-import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
-import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
+import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.BatchOperationPatient;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Comment;
+import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
@@ -41,128 +40,194 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class PatientBatchOpAction implements Action<BooleanResult> {
+public class PatientBatchOpAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory.getLogger(PatientBatchOpAction.class);
 
     private static final Bundle bundle = new CommonBundle();
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenBatchOpAction.class);
+    public static final int SIZE_LIMIT = 1000;
 
     public static final LString CSV_FILE_ERROR =
-        bundle.tr("CSV file not loaded").format();
+        bundle.tr("file not loaded").format();
 
     public static final Tr CSV_STUDY_ERROR =
-        bundle.tr("CSV study {0} does not exist");
+        bundle.tr("study {0} does not exist");
 
-    // @formatter:off
-    private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
-        new StrNotNullOrEmpty(), // studyName
-        new Unique(), // patientNumber
-        new ParseDate("yyyy-MM-dd HH:mm") // createdAt
-    };
-    // @formatter:on
+    private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
-    private final BatchOpInputErrorSet csvErrorList =
-        new BatchOpInputErrorSet();
+    private final CompressedReference<ArrayList<PatientBatchOpInputPojo>> compressedList;
 
-    private CompressedReference<ArrayList<PatientBatchOpInputRow>> compressedList =
-        null;
+    private final FileData fileData;
 
-    private final Set<PatientBatchOpHelper> patientImportInfos =
-        new HashSet<PatientBatchOpHelper>(0);
+    private ArrayList<PatientBatchOpInputPojo> pojos = null;
 
-    public PatientBatchOpAction(String filename) throws IOException {
-        setCsvFile(filename);
-    }
+    private final Integer workingCenterId;
 
-    private void setCsvFile(String filename) throws IOException {
-        ICsvBeanReader reader = new CsvBeanReader(
-            new FileReader(filename), CsvPreference.EXCEL_PREFERENCE);
+    private Center workingCenterOnServerSide;
 
-        final String[] header = new String[] {
-            "studyName",
-            "patientNumber",
-            "createdAt"
-        };
+    public PatientBatchOpAction(Center workingCenter,
+        Set<PatientBatchOpInputPojo> inputPojos, File inputFile)
+        throws IOException, NoSuchAlgorithmException {
 
-        try {
-            ArrayList<PatientBatchOpInputRow> patientCsvInfos =
-                new ArrayList<PatientBatchOpInputRow>(0);
-
-            PatientBatchOpInputRow patientCsvInfo;
-            reader.getCSVHeader(true);
-            while ((patientCsvInfo =
-                reader.read(PatientBatchOpInputRow.class, header, PROCESSORS)) != null) {
-                patientCsvInfos.add(patientCsvInfo);
-            }
-
-            compressedList =
-                new CompressedReference<ArrayList<PatientBatchOpInputRow>>(
-                    patientCsvInfos);
-
-        } catch (SuperCSVException e) {
-            throw new IllegalStateException(
-                i18n.tr(BatchOpActionUtil.CSV_PARSE_ERROR, e.getMessage(),
-                    e.getCsvContext()));
-        } finally {
-            reader.close();
+        if (inputPojos.size() > SIZE_LIMIT) {
+            throw new IllegalArgumentException("pojo list size exceeds maximum");
         }
+
+        this.workingCenterId = workingCenter.getId();
+        this.fileData = FileData.fromFile(inputFile);
+
+        compressedList = new CompressedReference<ArrayList<PatientBatchOpInputPojo>>(
+            new ArrayList<PatientBatchOpInputPojo>(inputPojos));
+        log.debug("constructor exit");
     }
 
-    @Override
-    public boolean isAllowed(ActionContext context) throws ActionException {
-        return PermissionEnum.BATCH_OPERATIONS.isAllowed(context.getUser());
-    }
-
-    @Override
-    public BooleanResult run(ActionContext context) throws ActionException {
+    private void decompressData() {
         if (compressedList == null) {
-            throw new LocalizedException(CSV_FILE_ERROR);
+            throw new IllegalStateException("compressed list is null");
         }
 
-        boolean result = false;
-
-        ArrayList<PatientBatchOpInputRow> patientCsvInfos;
-
         try {
-            patientCsvInfos = compressedList.get();
+            pojos = compressedList.get();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
 
-        for (PatientBatchOpInputRow csvInfo : patientCsvInfos) {
-            Study study =
-                BatchOpActionUtil.getStudy(context, csvInfo.getStudyName());
+    }
 
-            if (study == null) {
-                csvErrorList.addError(csvInfo.getLineNumber(),
-                    CSV_STUDY_ERROR.format(csvInfo.getStudyName()));
+    @Override
+    public boolean isAllowed(ActionContext context) throws ActionException {
+        log.debug("isAllowed: start");
+        if (compressedList == null) {
+            throw new IllegalStateException("compressed list is null");
+        }
+
+        decompressData();
+        User user = context.getUser();
+        workingCenterOnServerSide = context.load(Center.class, workingCenterId);
+
+        return PermissionEnum.BATCH_OPERATIONS.isAllowed(user, workingCenterOnServerSide)
+            && hasPermissionOnStudies(user, getStudiesForValidNames(context));
+    }
+
+    private boolean hasPermissionOnStudies(User user, Set<Study> studies) {
+        for (Study study : studies) {
+            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+     * Returns the studies for the valid names only
+     */
+    private Set<Study> getStudiesForValidNames(ActionContext context) {
+        Set<String> namesNotFound = new HashSet<String>();
+        Map<String, Study> studiesByName = new HashMap<String, Study>();
+
+        // the set will yield only the unique names
+        for (PatientBatchOpInputPojo pojo : pojos) {
+            String studyName = pojo.getStudyName();
+
+            if (studiesByName.containsKey(studyName) || namesNotFound.contains(studyName)) {
                 continue;
             }
 
-            PatientBatchOpHelper importInfo = new PatientBatchOpHelper(csvInfo);
-            importInfo.setStudy(study);
-            patientImportInfos.add(importInfo);
+            Study study = BatchOpActionUtil.getStudy(context, studyName);
+
+            if (study == null) {
+                namesNotFound.add(studyName);
+            } else {
+                studiesByName.put(pojo.getStudyName(), study);
+            }
         }
 
-        if (!csvErrorList.isEmpty()) {
-            throw new BatchOpErrorsException(csvErrorList.getErrors());
+        return new HashSet<Study>(studiesByName.values());
+
+    }
+
+    @Override
+    public IdResult run(ActionContext context) throws ActionException {
+        log.debug("run: entry");
+
+        if (fileData == null) {
+            throw new IllegalStateException("file data is null");
         }
 
-        for (PatientBatchOpHelper importInfo : patientImportInfos) {
-            addPatient(context, importInfo);
+        if (pojos == null) {
+            throw new IllegalStateException("pojos were not decompressed");
         }
 
-        return new BooleanResult(result);
+        if (pojos.isEmpty()) {
+            throw new IllegalStateException("pojo list is empty");
+        }
+
+        Map<String, PatientBatchOpPojoData> pojoDataMap =
+            new HashMap<String, PatientBatchOpPojoData>(0);
+
+        for (PatientBatchOpInputPojo pojo : pojos) {
+            PatientBatchOpPojoData pojoData = getDbInfo(context, pojo);
+
+            if (pojoData != null) {
+                pojoDataMap.put(pojo.getPatientNumber(), pojoData);
+            }
+        }
+
+        if (!errorSet.isEmpty()) {
+            throw new BatchOpErrorsException(errorSet.getErrors());
+        }
+
+        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(context, fileData);
+
+        for (PatientBatchOpPojoData pojoData : pojoDataMap.values()) {
+            addPatient(context, batchOp, pojoData);
+        }
+
+        log.debug("run: exit");
+        return new IdResult(batchOp.getId());
+    }
+
+    private PatientBatchOpPojoData getDbInfo(ActionContext context, PatientBatchOpInputPojo pojo) {
+        Study study = BatchOpActionUtil.getStudy(context, pojo.getStudyName());
+        if (study == null) {
+            errorSet.addError(pojo.getLineNumber(),
+                CSV_STUDY_ERROR.format(pojo.getStudyName()));
+        }
+
+        PatientBatchOpPojoData pojoData = new PatientBatchOpPojoData(pojo);
+        pojoData.setUser(context.getUser());
+        pojoData.setStudy(study);
+        return pojoData;
     }
 
     private void addPatient(ActionContext context,
-        PatientBatchOpHelper importInfo) {
-        Patient patient = importInfo.getNewPatient();
-        context.getSession().saveOrUpdate(patient);
-    }
+        BatchOperation batchOp, PatientBatchOpPojoData pojoData) {
+        if (context == null) {
+            throw new NullPointerException("context is null");
+        }
 
+        if (workingCenterOnServerSide == null) {
+            // workingCenterOnServerSide is assigned when isAllowed() is called
+            throw new IllegalStateException("workingCenterOnServerSide is null");
+        }
+
+        Patient patient = pojoData.getNewPatient();
+
+        // check if this patient has a comment and if so save it to DB
+        if (!patient.getComments().isEmpty()) {
+            Comment comment = patient.getComments().iterator().next();
+            context.getSession().save(comment);
+        }
+
+        context.getSession().save(patient);
+
+        BatchOperationPatient batchOpPt = new BatchOperationPatient();
+        batchOpPt.setBatch(batchOp);
+        batchOpPt.setPatient(patient);
+        context.getSession().save(batchOpPt);
+    }
 }

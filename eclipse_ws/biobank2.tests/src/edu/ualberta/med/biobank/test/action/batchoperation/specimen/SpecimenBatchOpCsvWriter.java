@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.supercsv.cellprocessor.ConvertNullTo;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -31,8 +31,7 @@ class SpecimenBatchOpCsvWriter {
      * @throws IOException If the file could not be saved.
      */
     @SuppressWarnings("nls")
-    static void write(String filename,
-        ArrayList<SpecimenBatchOpInputPojo> specimenInfos)
+    static void write(String filename, List<SpecimenBatchOpInputPojo> specimenInfos)
         throws IOException {
         final String[] header = new String[] {
             "inventoryId",
