@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.batchoperation.specimen;
+package edu.ualberta.med.biobank.batchoperation.patient;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,12 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseBigDecimal;
-import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
-import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
 import org.supercsv.exception.SuperCSVReflectionException;
@@ -25,38 +21,21 @@ import edu.ualberta.med.biobank.batchoperation.ClientBatchOpInputErrorList;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.IdResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputPojo;
 import edu.ualberta.med.biobank.model.Center;
 
-/**
- * Reads a CSV file containing specimen information and returns the file as a list of
- * SpecimenBatchOpInputPojo.
- * 
- * @author Nelson Loyola
- * 
- */
-@SuppressWarnings("nls")
-public class SpecimenBatchOpPojoReader implements
-    IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
+public class PatientBatchOpPojoReader implements
+    IBatchOpPojoReader<PatientBatchOpInputPojo> {
 
-    private static final String CSV_FIRST_HEADER = "Inventory ID";
+    @SuppressWarnings("nls")
+    private static final String CSV_FIRST_HEADER = "Study";
 
+    @SuppressWarnings("nls")
     private static final String[] NAME_MAPPINGS = new String[] {
-        "inventoryId",
-        "parentInventoryId",
-        "volume",
-        "specimenType",
-        "createdAt",
+        "studyName",
         "patientNumber",
-        "visitNumber",
-        "waybill",
-        "sourceSpecimen",
-        "worksheet",
-        "palletProductBarcode",
-        "rootContainerType",
-        "palletLabel",
-        "palletPosition",
+        "enrollmentDate",
         "comment"
     };
 
@@ -67,33 +46,22 @@ public class SpecimenBatchOpPojoReader implements
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
 
-    private final Set<SpecimenBatchOpInputPojo> pojos =
-        new HashSet<SpecimenBatchOpInputPojo>(0);
+    private final Set<PatientBatchOpInputPojo> pojos =
+        new HashSet<PatientBatchOpInputPojo>(0);
 
-    public SpecimenBatchOpPojoReader(Center workingCenter, String filename) {
+    public PatientBatchOpPojoReader(Center workingCenter, String filename) {
         this.workingCenter = workingCenter;
         this.filename = filename;
     }
 
     // cell processors have to be recreated every time the file is read
+    @SuppressWarnings("nls")
     public CellProcessor[] getCellProcessors() {
-        Map<String, CellProcessor> aMap =
-            new LinkedHashMap<String, CellProcessor>();
+        Map<String, CellProcessor> aMap = new LinkedHashMap<String, CellProcessor>();
 
-        aMap.put("inventoryId", new Unique());
-        aMap.put("parentInventoryId", new Optional());
-        aMap.put("volume", new Optional(new ParseBigDecimal()));
-        aMap.put("specimenType", new StrNotNullOrEmpty());
-        aMap.put("createdAt", new ParseDate("yyyy-MM-dd HH:mm"));
-        aMap.put("patientNumber", new Optional());
-        aMap.put("visitNumber", new Optional(new ParseInt()));
-        aMap.put("waybill", new Optional());
-        aMap.put("sourceSpecimen", new ParseBool());
-        aMap.put("worksheet", new Optional());
-        aMap.put("palletProductBarcode", new Optional());
-        aMap.put("rootContainerType", new Optional());
-        aMap.put("palletLabel", new Optional());
-        aMap.put("palletPosition", new Optional());
+        aMap.put("studyName", new StrNotNullOrEmpty());
+        aMap.put("patientNumber", new StrNotNullOrEmpty());
+        aMap.put("enrollmentDate", new Optional(new ParseDate("yyyy-MM-dd HH:mm")));
         aMap.put("comment", new Optional());
 
         if (aMap.size() != NAME_MAPPINGS.length) {
@@ -110,16 +78,16 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public Set<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
-        throws ClientBatchOpErrorsException {
+    public Set<PatientBatchOpInputPojo> readPojos(ICsvBeanReader reader)
+        throws ClientBatchOpErrorsException, IOException {
 
-        SpecimenBatchOpInputPojo csvPojo;
+        PatientBatchOpInputPojo csvPojo;
 
         CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
             while ((csvPojo =
-                reader.read(SpecimenBatchOpInputPojo.class,
+                reader.read(PatientBatchOpInputPojo.class,
                     NAME_MAPPINGS, cellProcessors)) != null) {
 
                 csvPojo.setLineNumber(reader.getLineNumber());
@@ -142,9 +110,9 @@ public class SpecimenBatchOpPojoReader implements
     }
 
     @Override
-    public Action<IdResult> getAction() throws NoSuchAlgorithmException,
-        IOException {
-        return new SpecimenBatchOpAction(workingCenter, pojos,
+    public Action<IdResult> getAction() throws NoSuchAlgorithmException, IOException {
+        return new PatientBatchOpAction(workingCenter, pojos,
             new File(filename));
     }
+
 }

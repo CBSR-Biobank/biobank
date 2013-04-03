@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.test.action.batchoperation.specimen;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,7 +49,7 @@ class SpecimenBatchOpPojoHelper {
      * @param currentCenter the center where the specimens are stored.
      * @param patients the patients that these specimens will belong to.
      */
-    ArrayList<SpecimenBatchOpInputPojo> createAllSpecimens(Study study,
+    Set<SpecimenBatchOpInputPojo> createAllSpecimens(Study study,
         Set<OriginInfo> originInfos, Set<Patient> patients) {
         if (study.getSourceSpecimens().size() == 0) {
             throw new IllegalStateException(
@@ -61,9 +61,8 @@ class SpecimenBatchOpPojoHelper {
                 "study does not have any source specimens");
         }
 
-        ArrayList<SpecimenBatchOpInputPojo> specimenInfos =
-            sourceSpecimensCreate(
-                originInfos, patients, study.getSourceSpecimens());
+        Set<SpecimenBatchOpInputPojo> specimenInfos =
+            sourceSpecimensCreate(originInfos, patients, study.getSourceSpecimens());
 
         Map<String, String> parentSpecimenInfoMap =
             new HashMap<String, String>();
@@ -78,11 +77,11 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfos;
     }
 
-    ArrayList<SpecimenBatchOpInputPojo> sourceSpecimensCreate(
+    Set<SpecimenBatchOpInputPojo> sourceSpecimensCreate(
         Set<OriginInfo> originInfos,
         Set<Patient> patients, Set<SourceSpecimen> sourceSpecimens) {
-        ArrayList<SpecimenBatchOpInputPojo> specimenInfos =
-            new ArrayList<SpecimenBatchOpInputPojo>();
+        Set<SpecimenBatchOpInputPojo> specimenInfos =
+            new HashSet<SpecimenBatchOpInputPojo>();
 
         // add parent specimens first
         for (SourceSpecimen ss : sourceSpecimens) {
@@ -109,7 +108,7 @@ class SpecimenBatchOpPojoHelper {
      * Creates CSV specimens with only aliquoted specimens. Note that parent specimens must already
      * be present in the database.
      */
-    ArrayList<SpecimenBatchOpInputPojo> createAliquotedSpecimens(Study study,
+    Set<SpecimenBatchOpInputPojo> createAliquotedSpecimens(Study study,
         Collection<Specimen> parentSpecimens) {
         if (study.getAliquotedSpecimens().size() == 0) {
             throw new IllegalStateException("study does not have any aliquoted specimens");
@@ -129,11 +128,11 @@ class SpecimenBatchOpPojoHelper {
      * 
      * specimenInfoMap is a map of: specimen inventory id => patient number
      */
-    private ArrayList<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
+    private Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
         Map<String, String> parentSpecimenInfoMap,
         Set<AliquotedSpecimen> aliquotedSpecimens) {
-        ArrayList<SpecimenBatchOpInputPojo> specimenInfos =
-            new ArrayList<SpecimenBatchOpInputPojo>();
+        Set<SpecimenBatchOpInputPojo> specimenInfos =
+            new HashSet<SpecimenBatchOpInputPojo>();
 
         for (Entry<String, String> parentSpecimenInfo : parentSpecimenInfoMap
             .entrySet()) {
@@ -147,10 +146,10 @@ class SpecimenBatchOpPojoHelper {
         return specimenInfos;
     }
 
-    public ArrayList<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
+    public Set<SpecimenBatchOpInputPojo> aliquotedSpecimensCreate(
         Set<Patient> patients, Set<AliquotedSpecimen> aliquotedSpecimens) {
-        ArrayList<SpecimenBatchOpInputPojo> specimenInfos =
-            new ArrayList<SpecimenBatchOpInputPojo>();
+        Set<SpecimenBatchOpInputPojo> specimenInfos =
+            new HashSet<SpecimenBatchOpInputPojo>();
 
         for (AliquotedSpecimen as : aliquotedSpecimens) {
             for (Patient patient : patients) {
@@ -229,7 +228,7 @@ class SpecimenBatchOpPojoHelper {
         }
     }
 
-    public void addComments(List<SpecimenBatchOpInputPojo> specimenCsvInfos) {
+    public void addComments(Set<SpecimenBatchOpInputPojo> specimenCsvInfos) {
         for (SpecimenBatchOpInputPojo specimenCsvInfo : specimenCsvInfos) {
             specimenCsvInfo.setComment(nameGenerator.next(String.class));
         }

@@ -18,22 +18,20 @@ import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
-import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Reads a CSV file containing specimen information and returns a list of
- * {@link SpecimenBatchOpInputPojo} that can be passed to the action
- * {@link SpecimenBatchOpAction} to persist to the database.
+ * {@link SpecimenBatchOpInputPojo} that can be passed to the action {@link SpecimenBatchOpAction}
+ * to persist to the database.
  * 
  * @author Nelson Loyola
  * 
  */
 public class SpecimenBatchOpInterpreter {
-    private static final I18n i18n = I18nFactory
-        .getI18n(DecodeImageForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(SpecimenBatchOpInterpreter.class);
 
     private IBatchOpPojoReader<SpecimenBatchOpInputPojo> pojoReader;
 

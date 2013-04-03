@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
@@ -28,8 +27,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
 /**
- * This action creates aliquot specimens,
- * creates a processing event and updates source specimens.
+ * This action creates aliquot specimens, creates a processing event and updates source specimens.
  * 
  * @author Brian Allen
  * 
@@ -39,7 +37,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
 
     private static Logger log = LoggerFactory
         .getLogger(OhsTecanSpecimenBatchOpAction.class.getName());
-    
+
     @SuppressWarnings("nls")
     private static final String PROCESSING_EVENT_COUNT_HQL =
         "SELECT COUNT(*)"
@@ -61,15 +59,15 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
     private final String technician;
 
     private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> sourceCompressedList;
-    
+
     private final SpecimenBatchOpAction coreAction;
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
     public OhsTecanSpecimenBatchOpAction(Center workingCenter,
-        List<SpecimenBatchOpInputPojo> aliquotBatchOpSpecimens,
+        Set<SpecimenBatchOpInputPojo> aliquotBatchOpSpecimens,
         File importFile,
-        List<SpecimenBatchOpInputPojo> sourceBatchOpSpecimens,
+        Set<SpecimenBatchOpInputPojo> sourceBatchOpSpecimens,
         String worksheet,
         Date timestamp,
         String technician) throws NoSuchAlgorithmException, IOException {
@@ -85,7 +83,7 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
 
         this.coreAction = new SpecimenBatchOpAction(workingCenter,
             aliquotBatchOpSpecimens, importFile);
-        
+
         log.debug("SpecimenBatchOpAction: constructor"); //$NON-NLS-1$
     }
 
@@ -108,13 +106,13 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
-        
+
         // was preExecution
         Query query = null;
         log.debug("run: worksheet={}", worksheet); //$NON-NLS-1$
         query = context.getSession().createQuery(PROCESSING_EVENT_COUNT_HQL);
         query.setParameter(0, worksheet);
-        if ((Long)(query.list().get(0)) > 0) {
+        if ((Long) (query.list().get(0)) > 0) {
             throw new ActionException("File name has been used - probably already imported"); //$NON-NLS-1$
         }
 
@@ -122,13 +120,13 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
             log.debug("run: inventoryId={}", sourcePojo.getInventoryId()); //$NON-NLS-1$
             query = context.getSession().createQuery(SPECIMEN_PROCESSED_COUNT_HQL);
             query.setParameter(0, sourcePojo.getInventoryId());
-            if ((Long)(query.list().get(0)) > 0) {
+            if ((Long) (query.list().get(0)) > 0) {
                 throw new ActionException("Source specimen " //$NON-NLS-1$
                     + sourcePojo.getInventoryId() + " has already been processed"); //$NON-NLS-1$
             }
         }
         // end preExecution
-        
+
         IdResult coreIdResult = coreAction.run(context);
 
         // was postExecution

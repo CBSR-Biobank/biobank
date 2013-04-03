@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.constraint.Unique;
@@ -32,8 +32,8 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 import edu.ualberta.med.biobank.model.Center;
 
 /**
- * Reads a TECAN CSV file containing specimen information and returns the file
- * as a list of SpecimenBatchOpInputPojo.
+ * Reads a TECAN CSV file containing specimen information and returns the file as a list of
+ * SpecimenBatchOpInputPojo.
  * 
  * @author Nelson Loyola
  * 
@@ -239,8 +239,8 @@ public class CbsrTecanSpecimenPojoReader implements
 
     private final String filename;
 
-    List<SpecimenBatchOpInputPojo> convertedPojos =
-        new ArrayList<SpecimenBatchOpInputPojo>();
+    Set<SpecimenBatchOpInputPojo> convertedPojos =
+        new HashSet<SpecimenBatchOpInputPojo>();
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();
@@ -294,7 +294,7 @@ public class CbsrTecanSpecimenPojoReader implements
     }
 
     @Override
-    public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
+    public Set<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
         if (reader == null) {
             throw new NullPointerException("CSV reader is null");

@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -31,8 +31,8 @@ import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
- * Reads an OHS TECAN CSV file containing specimen information and returns the
- * file as a list of SpecimenBatchOpInputPojo.
+ * Reads an OHS TECAN CSV file containing specimen information and returns the file as a list of
+ * SpecimenBatchOpInputPojo.
  * 
  * @author Brian Allen
  * 
@@ -115,7 +115,7 @@ public class OhsTecanSpecimenPojoReader implements
     private static final String TYPE_PRIMARY_MATRIX = "Primary Matrix";
     @SuppressWarnings("nls")
     private static final String TYPE_SECONDARY_MATRIX = "Secondary Matrix";
-        
+
     private static final String[] ALIQUOT_TYPES = new String[] {
         TYPE_URINE_PRIMARY,
         TYPE_URINE_SECONDARY,
@@ -137,8 +137,8 @@ public class OhsTecanSpecimenPojoReader implements
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
         new SimpleDateFormat("yyyyMMdd_HHmmss");
 
-    private List<SpecimenBatchOpInputPojo> aliquotSpecimens;
-    private List<SpecimenBatchOpInputPojo> sourceSpecimens;
+    private Set<SpecimenBatchOpInputPojo> aliquotSpecimens;
+    private Set<SpecimenBatchOpInputPojo> sourceSpecimens;
     private Date timestamp;
     private String technicianId;
 
@@ -336,7 +336,7 @@ public class OhsTecanSpecimenPojoReader implements
 
     // cell processors have to be recreated every time the file is read
     @SuppressWarnings("nls")
-        public CellProcessor[] getCellProcessors() {
+    public CellProcessor[] getCellProcessors() {
 
         Map<String, CellProcessor> aMap =
             new LinkedHashMap<String, CellProcessor>();
@@ -384,11 +384,11 @@ public class OhsTecanSpecimenPojoReader implements
 
     @SuppressWarnings("nls")
     @Override
-    public List<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
+    public Set<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
 
-        aliquotSpecimens = new ArrayList<SpecimenBatchOpInputPojo>(0);
-        sourceSpecimens = new ArrayList<SpecimenBatchOpInputPojo>(0);
+        aliquotSpecimens = new HashSet<SpecimenBatchOpInputPojo>(0);
+        sourceSpecimens = new HashSet<SpecimenBatchOpInputPojo>(0);
         timestamp = new Date();
         technicianId = null;
 
@@ -428,7 +428,7 @@ public class OhsTecanSpecimenPojoReader implements
                 if (batchOpPojo.getSpecimenType().equals(TYPE_BUFFY)
                     || batchOpPojo.getSpecimenType().equals(TYPE_BUFFY_COAT_PRIMARY)
                     || batchOpPojo.getSpecimenType().equals(TYPE_BUFFY_COAT_SECONDARY)) {
-                    hasBuffy = true;  // hasBuffy==true iff EDTA type csv file
+                    hasBuffy = true; // hasBuffy==true iff EDTA type csv file
                 }
 
                 // technician ID for processing event
@@ -609,12 +609,12 @@ public class OhsTecanSpecimenPojoReader implements
 
         return batchOpPojo;
     }
-    
+
     @Override
     public Action<IdResult> getAction() throws NoSuchAlgorithmException,
         IOException {
         return new OhsTecanSpecimenBatchOpAction(workingCenter, aliquotSpecimens,
-            new File(filename), sourceSpecimens, 
+            new File(filename), sourceSpecimens,
             new File(filename).getName(),
             timestamp,
             technicianId);

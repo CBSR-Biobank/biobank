@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.batchoperation;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.Set;
 
 import org.supercsv.io.ICsvBeanReader;
 
@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 
 public interface IBatchOpPojoReader<T extends IBatchOpInputPojo> {
 
-    public List<T> readPojos(ICsvBeanReader reader)
+    public Set<T> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException;
 
     public ClientBatchOpInputErrorList getErrorList();

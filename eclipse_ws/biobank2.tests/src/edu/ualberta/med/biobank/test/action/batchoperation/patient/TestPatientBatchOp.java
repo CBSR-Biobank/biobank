@@ -70,7 +70,7 @@ public class TestPatientBatchOp extends TestAction {
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(pojos);
+        checkPojosAgainstDb(pojos);
     }
 
     @Test
@@ -140,11 +140,11 @@ public class TestPatientBatchOp extends TestAction {
             Assert.fail("errors in CVS data: " + e.getMessage());
         }
 
-        checkCsvInfoAgainstDb(pojos);
+        checkPojosAgainstDb(pojos);
 
     }
 
-    private void checkCsvInfoAgainstDb(Set<PatientBatchOpInputPojo> pojos) {
+    private void checkPojosAgainstDb(Set<PatientBatchOpInputPojo> pojos) {
         for (PatientBatchOpInputPojo pojo : pojos) {
             Criteria c = session.createCriteria(Patient.class, "p")
                 .add(Restrictions.eq("pnumber", pojo.getPatientNumber()));
