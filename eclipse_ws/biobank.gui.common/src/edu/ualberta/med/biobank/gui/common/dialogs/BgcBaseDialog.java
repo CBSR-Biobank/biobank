@@ -104,12 +104,9 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
     @Override
     protected Control createDialogArea(Composite parent) {
-        // add a separator below the title area (look better that way)
-        Label separator1 = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
-        separator1.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
-            | GridData.GRAB_HORIZONTAL));
+        Composite parentComposite = (Composite) super.createDialogArea(parent);
 
-        Composite contents = new Composite(parent, SWT.NONE);
+        Composite contents = new Composite(parentComposite, SWT.NONE);
         GridLayout layout = new GridLayout();
         layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
         layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);

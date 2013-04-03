@@ -113,13 +113,18 @@ public class SelectParentContainerDialog extends BgcBaseDialog {
     }
 
     private void saveSelectedContainer() {
-        selectedContainer =
-            (Container) ((IStructuredSelection) comboViewer
-                .getSelection()).getFirstElement();
+        selectedContainer = (Container) ((IStructuredSelection)
+            comboViewer.getSelection()).getFirstElement();
     }
 
     public Container getSelectedContainer() {
         return selectedContainer;
+    }
+
+    @Override
+    protected void cancelPressed() {
+        super.cancelPressed();
+        selectedContainer = null;
     }
 
 }

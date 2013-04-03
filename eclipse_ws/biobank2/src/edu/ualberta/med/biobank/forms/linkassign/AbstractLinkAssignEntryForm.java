@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -688,15 +691,15 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), possibleParents);
                 dlg.open();
                 if (dlg.getSelectedContainer() == null) {
-                    StringBuffer sb = new StringBuffer();
+                    Set<String> labelData = new HashSet<String>();
                     for (Container cont : possibleParents) {
-                        sb.append(ContainerWrapper.getFullInfoLabel(cont));
+                        labelData.add(ContainerWrapper.getFullInfoLabel(cont));
                     }
                     BgcPlugin.openError(
                         // TR: dialog title
                         i18n.tr("Container problem"),
                         // TR: dialog message
-                        i18n.tr("More than one container found matching {0}", sb.toString()));
+                        i18n.tr("More than one container found matching {0}", StringUtils.join(labelData, ", ")));
                     focusControl(positionText);
                 } else {
                     parentContainers.add(new ContainerWrapper(SessionManager.getAppService(),
