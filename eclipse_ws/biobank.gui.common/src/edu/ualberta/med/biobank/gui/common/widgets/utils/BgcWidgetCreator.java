@@ -177,12 +177,12 @@ public class BgcWidgetCreator {
             uvs.setAfterGetValidator(validator);
         }
         if (widgetClass == BgcBaseText.class) {
-            return createText(composite, widgetOptions, modelObservableValue,uvs, bindingKey);
+            return createText(composite, widgetOptions, modelObservableValue, uvs, bindingKey);
         } else if (widgetClass == Combo.class) {
             return createCombo(composite, widgetOptions, widgetValues, modelObservableValue, uvs,
                 bindingKey);
         } else if (widgetClass == Button.class) {
-            return createButton(composite, modelObservableValue, uvs,bindingKey);
+            return createButton(composite, modelObservableValue, uvs, bindingKey);
         } else {
             Assert.isTrue(false, "invalid widget class " + widgetClass.getName());
         }
@@ -305,8 +305,8 @@ public class BgcWidgetCreator {
             public void keyPressed(KeyEvent e) {
                 if ((modelObservableValue != null)
                     && (modelObservableValue.getValueType().equals(Integer.class)
-                        || modelObservableValue.getValueType().equals(Double.class))
-                        && Character.isLetter(e.character))
+                    || modelObservableValue.getValueType().equals(Double.class))
+                    && Character.isLetter(e.character))
                     e.doit = false;
             }
         });
@@ -380,8 +380,7 @@ public class BgcWidgetCreator {
     }
 
     /**
-     * Create combo viewer with no validator on selection and with the default
-     * comparator.
+     * Create combo viewer with no validator on selection and with the default comparator.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<T> input, T selection,
@@ -391,8 +390,8 @@ public class BgcWidgetCreator {
     }
 
     /**
-     * Create a combo viewer with a validator when selection is null using
-     * errorMessage and using the default comparator.
+     * Create a combo viewer with a validator when selection is null using errorMessage and using
+     * the default comparator.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<? extends T> input, T selection,
@@ -403,9 +402,8 @@ public class BgcWidgetCreator {
     }
 
     /**
-     * Create a combo viewer with a validator when selection is null using
-     * errorMessage and using the default comparator if useDefaultComparator is
-     * set to true.
+     * Create a combo viewer with a validator when selection is null using errorMessage and using
+     * the default comparator if useDefaultComparator is set to true.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<? extends T> input, T selection,
@@ -415,6 +413,22 @@ public class BgcWidgetCreator {
             errorMessage, useDefaultComparator, null, csu, labelProvider);
     }
 
+    /**
+     * Create a combo viewer with a validator when selection is null using errorMessage and using
+     * the default comparator if useDefaultComparator is set to true.
+     * 
+     * @param parent the parent composite.
+     * @param fieldLabel the label to be displayed to the left of the combo box.
+     * @param input the items to select from.
+     * @param selection the default selection.
+     * @param errorMessage the error message to display if nothing is selected.
+     * @param useDefaultComparator set to true to sort the selection list.
+     * @param bindingKey the binding key to be used to enable or disable data binding.
+     * @param csu when not null, the callback interface to invoke when an item is selected.
+     * @param labelProvider the label provider for the combo input.
+     * 
+     * @return The combo viewer.
+     */
     public <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
@@ -427,9 +441,8 @@ public class BgcWidgetCreator {
     }
 
     /**
-     * Create a combo using ArrayContentProvider as content provider and
-     * BiobankLabelProvider as Label provider. You should use
-     * comboViewer.getSelection() to update datas.
+     * Create a combo using ArrayContentProvider as content provider and BiobankLabelProvider as
+     * Label provider. You should use comboViewer.getSelection() to update datas.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         Label fieldLabel, Collection<? extends T> input, T selection,
@@ -468,14 +481,11 @@ public class BgcWidgetCreator {
 
         }
         if (csu != null) {
-
-            comboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
+            comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection =
-                        (IStructuredSelection) comboViewer
-                        .getSelection();
+                    IStructuredSelection selection = (IStructuredSelection)
+                        comboViewer.getSelection();
                     if ((selection != null) && (selection.size() > 0)) {
                         csu.doSelection(selection.getFirstElement());
                     } else {
