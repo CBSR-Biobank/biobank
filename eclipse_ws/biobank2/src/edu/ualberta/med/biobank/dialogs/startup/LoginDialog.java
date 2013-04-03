@@ -473,17 +473,18 @@ public class LoginDialog extends TitleAreaDialog {
                 if (!sessionHelper.getUser().isSuperAdmin())
                     // cannot access the application.
                     BgcPlugin
-                    .openError(
-                        // TR: error dialog title
-                        i18n.tr("Problem getting user working centers"),
-                        // TR: error dialog message
-                        i18n.tr("No working center has been found for this user. Check with your manager or application administrator for user rights."));
+                        .openError(
+                            // TR: error dialog title
+                            i18n.tr("Problem getting user working centers"),
+                            // TR: error dialog message
+                            i18n.tr("No working center has been found for this user. Check with your manager or application administrator for user rights."));
             } else if (workingCenters.size() == 1)
                 sessionHelper.getUser().setCurrentWorkingCenter(
                     workingCenters.get(0));
-            else
+            else {
                 new WorkingCenterSelectDialog(getShell(),
                     sessionHelper.getUser(), workingCenters).open();
+            }
         }
 
         if (sessionHelper.getUser().getCurrentWorkingCenter() == null
@@ -491,11 +492,11 @@ public class LoginDialog extends TitleAreaDialog {
             if (sessionHelper.getUser().isSuperAdmin()) {
                 // connect in admin mode
                 BgcPlugin
-                .openInformation(
-                    // TR: information dialog title
-                    i18n.tr("Super administrator mode"),
-                    // TR: information dialog message
-                    i18n.tr("No working center has been found or selected for this user. You are super administrator, so you will be logged on with no working center. Only non center specific actions will be available. "));
+                    .openInformation(
+                        // TR: information dialog title
+                        i18n.tr("Super administrator mode"),
+                        // TR: information dialog message
+                        i18n.tr("No working center has been found or selected for this user. You are super administrator, so you will be logged on with no working center. Only non center specific actions will be available. "));
                 // open the administration perspective if another
                 // perspective is open
                 IWorkbench workbench = PlatformUI.getWorkbench();
@@ -516,11 +517,11 @@ public class LoginDialog extends TitleAreaDialog {
             } else {
                 // can't connect without a working center
                 BgcPlugin
-                .openAsyncError(
-                    // error dialog title
-                    i18n.tr("Working center selection"),
-                    // error dialog message
-                    i18n.tr("You need to select the center you want to work with."));
+                    .openAsyncError(
+                        // error dialog title
+                        i18n.tr("Working center selection"),
+                        // error dialog message
+                        i18n.tr("You need to select the center you want to work with."));
             }
         }
 

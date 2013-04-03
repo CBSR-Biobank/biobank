@@ -18,8 +18,22 @@ import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class WorkingCenterSelectDialog extends BgcBaseDialog {
-    private static final I18n i18n = I18nFactory
-        .getI18n(WorkingCenterSelectDialog.class);
+    private static final I18n i18n = I18nFactory.getI18n(WorkingCenterSelectDialog.class);
+
+    @SuppressWarnings("nls")
+    // TR: select working center title area title
+    private static final String TITLE = i18n.tr("Working center selection");
+
+    @SuppressWarnings("nls")
+    // TR: select working center title area message
+    private static final String TITLE_MSG = i18n.tr("Choose the center you will work with.");
+
+    @SuppressWarnings("nls")
+    private static final String NO_CENTER_STRING = i18n.tr("-- no center selection --");
+
+    @SuppressWarnings("nls")
+    // TR: no center selection combo box option
+    private static final String COMBO_LABEL = i18n.tr("Available centers");
 
     private final UserWrapper user;
     private CenterWrapper<?> currentCenter;
@@ -32,28 +46,21 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         this.availableCenters = availableCenters;
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaMessage() {
-        // TR: select working center title area message
-        return i18n.tr("Choose the center you will work with.");
+        return TITLE_MSG;
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getTitleAreaTitle() {
-        // TR: select working center title area title
-        return i18n.tr("Working center selection");
+        return TITLE;
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getDialogShellTitle() {
-        // TR: select working center shell title
-        return i18n.tr("Working center selection");
+        return TITLE;
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
@@ -61,14 +68,11 @@ public class WorkingCenterSelectDialog extends BgcBaseDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         List<Object> objectList = new ArrayList<Object>(availableCenters);
-        // TR: no center selection combo box option
-        String noCenterString = i18n.tr("-- no center selection --");
-        if (user.isSuperAdmin())
-            objectList.add(noCenterString);
-        widgetCreator.createComboViewer(contents,
-            // TR: select working center combo box label
-            i18n.tr("Available centers"),
-            objectList, noCenterString, null, new ComboSelectionUpdate() {
+        if (user.isSuperAdmin()) {
+            objectList.add(NO_CENTER_STRING);
+        }
+        widgetCreator.createComboViewer(contents, COMBO_LABEL,
+            objectList, NO_CENTER_STRING, null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     if (selectedObject instanceof CenterWrapper<?>)

@@ -618,7 +618,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!checkingMultipleContainerPosition) {
                     palletproductBarcodeTextModified = true;
                     palletTypesViewer.setInput(null);
-                    log.debug("clearing selections in palletTypesViewer");
+                    // log.debug("clearing selections in palletTypesViewer");
                     currentMultipleContainer.setContainerType(null);
                     palletPositionText.setEnabled(true);
                     palletPositionText.setText(StringUtil.EMPTY_STRING);
@@ -666,7 +666,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 if (!isModifyingMultipleFields) {
                     palletPositionTextModified = true;
                     palletTypesViewer.setInput(null);
-                    log.debug("clearing selections in palletTypesViewer");
+                    // log.debug("clearing selections in palletTypesViewer");
                     currentMultipleContainer.setContainerType(null);
                 }
             }

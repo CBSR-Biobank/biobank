@@ -134,7 +134,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
         bindChangeListener();
         setupFinished = true;
-        return parent;
+        return parentComposite;
     }
 
     protected abstract void createDialogAreaInternal(Composite parent)
