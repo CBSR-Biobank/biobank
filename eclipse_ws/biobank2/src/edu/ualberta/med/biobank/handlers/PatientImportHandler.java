@@ -9,24 +9,21 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.forms.batchop.SpecimenImportForm;
+import edu.ualberta.med.biobank.forms.batchop.PatientImportForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
-public class SpecimenImportHandler extends AbstractHandler {
-    private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenImportHandler.class);
+public class PatientImportHandler extends AbstractHandler {
+    private static final I18n i18n = I18nFactory.getI18n(PatientImportHandler.class);
 
     @SuppressWarnings("nls")
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SessionAdapter sessionAdapter = SessionManager.getInstance()
-            .getSession();
+        SessionAdapter sessionAdapter = SessionManager.getInstance().getSession();
         Assert.isNotNull(sessionAdapter);
         try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().openEditor(new FormInput(sessionAdapter),
-                    SpecimenImportForm.ID, false, 0);
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(
+                new FormInput(sessionAdapter), PatientImportForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException(
                 // exception message

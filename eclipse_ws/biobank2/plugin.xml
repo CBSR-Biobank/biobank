@@ -266,6 +266,11 @@
        </command>
        <command
              categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.patient.import"
+             name="%PatientImport.command">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
              id="edu.ualberta.med.biobank.commands.specimen.import"
              name="%SpecimenImport.command">
        </command>
@@ -759,6 +764,25 @@
          </enabledWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.PatientImportHandler"
+            commandId="edu.ualberta.med.biobank.commands.patient.import">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.batchOperationPermission">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.SpecimenImportHandler"
             commandId="edu.ualberta.med.biobank.commands.specimen.import">
          <activeWhen>
@@ -947,6 +971,11 @@
                   name="biobank.separator3"
                   visible="true">
             </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patient.import"
+                  icon="icons/database_go.png"
+                  style="push">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.specimen.import"
                   icon="icons/database_go.png"
@@ -1787,13 +1816,25 @@
       name="%SpecimenLink.editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.SpecimenImportForm"
+      class="edu.ualberta.med.biobank.forms.batchop.PatientImportForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.PatientImportForm"
+      name="%PatientImport.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.batchop.SpecimenImportForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenImportForm"
       name="%SpecimenImport.editor">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
+      class="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.PatientBatchOpViewForm"
+      name="%PatientImport.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.batchop.SpecimenBatchOpViewForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm"
       name="%SpecimenImport.editor">

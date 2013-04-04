@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.batchop;
 
 import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpException;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.forms.BiobankViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.FileBrowser;
@@ -48,11 +49,17 @@ import edu.ualberta.med.biobank.widgets.infotables.BatchOpExceptionTable;
 public abstract class ImportForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory.getI18n(ImportForm.class);
 
+    private final String formTitle;
+
     private FileBrowser fileBrowser;
     private Button importButton;
     private BatchOpExceptionTable errorsTable;
     private Label errorsLabel;
     private Composite client;
+
+    public ImportForm(String formTitle) {
+        this.formTitle = formTitle;
+    }
 
     @Override
     public void init() throws Exception {
@@ -60,14 +67,12 @@ public abstract class ImportForm extends BiobankViewForm {
 
     @Override
     protected Image getFormImage() {
-        return BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_DATABASE_GO);
+        return BgcPlugin.getDefault().getImageRegistry().get(BgcPlugin.IMG_DATABASE_GO);
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(i18n.tr("Specimen Import"));
+        form.setText(formTitle);
         page.setLayout(new GridLayout(1, false));
 
         client = toolkit.createComposite(page);
@@ -184,7 +189,7 @@ public abstract class ImportForm extends BiobankViewForm {
                             if (success.getValue()) {
                                 AdapterBase.closeEditor((FormInput) getEditorInput());
                                 try {
-                                    SpecimenBatchOpViewForm.openForm(batchOpId.getValue(), true);
+                                    openForm(batchOpId.getValue(), true);
                                 } catch (PartInitException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -212,6 +217,9 @@ public abstract class ImportForm extends BiobankViewForm {
                 i18n.tr("Import Error"), e);
         }
     }
+
+    public abstract void openForm(Integer batchOpId, boolean focusOnEditor)
+        throws PartInitException;
 
     private void updateErrorsTable(List<BatchOpException<?>> errors) {
         createErrorsTable(client, errors);

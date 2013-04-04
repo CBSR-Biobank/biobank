@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.forms;
+package edu.ualberta.med.biobank.forms.batchop;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBa
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.file.FileDataGetAction;
 import edu.ualberta.med.biobank.common.util.Holder;
+import edu.ualberta.med.biobank.forms.BiobankViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -38,13 +39,10 @@ import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.widgets.infotables.SimpleSpecimenTable;
 
-public class SpecimenBatchOpViewForm extends BiobankViewForm {
-    private static final I18n i18n = I18nFactory
-        .getI18n(SpecimenBatchOpViewForm.class);
+public class BatchOpViewForm extends BiobankViewForm {
+    private static final I18n i18n = I18nFactory.getI18n(BatchOpViewForm.class);
 
-    @SuppressWarnings("nls")
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.SpecimenBatchOpViewForm";
+    private final String formTitle;
 
     private BgcBaseText executedByText;
     private BgcBaseText timeExecutedText;
@@ -59,24 +57,25 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
     private SpecimenBatchOpGetResult result;
     private Integer batchId;
 
+    public BatchOpViewForm(String formTitle) {
+        this.formTitle = formTitle;
+    }
+
     @Override
     protected Image getFormImage() {
-        return BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_DATABASE_GO);
+        return BgcPlugin.getDefault().getImageRegistry().get(BgcPlugin.IMG_DATABASE_GO);
     }
 
     @Override
     protected void init() throws Exception {
-        batchId =
-            ((SpecimenBatchOpViewFormInput) getEditorInput()).getBatchOpId();
-        result = SessionManager.getAppService().doAction(
-            new SpecimenBatchOpGetAction(batchId));
+        batchId = ((SpecimenBatchOpViewFormInput) getEditorInput()).getBatchOpId();
+        result = SessionManager.getAppService().doAction(new SpecimenBatchOpGetAction(batchId));
     }
 
     @SuppressWarnings("nls")
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(i18n.tr("Specimen Import"));
+        form.setText(formTitle);
         page.setLayout(new GridLayout(1, false));
 
         Composite client = toolkit.createComposite(page);
@@ -86,10 +85,8 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        executedByText = createReadOnlyLabelledField(client, SWT.NONE,
-            i18n.tr("Executed By"));
-        timeExecutedText = createReadOnlyLabelledField(client, SWT.NONE,
-            i18n.tr("Time Executed"));
+        executedByText = createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("Executed By"));
+        timeExecutedText = createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("Time Executed"));
 
         createFileInfo();
         createSpecimenTable();
@@ -103,10 +100,8 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         inputSection = (Section) client.getParent();
         inputSection.setExpanded(true);
 
-        fileNameText = createReadOnlyLabelledField(client, SWT.NONE,
-            i18n.tr("File Name"));
-        fileSizeText = createReadOnlyLabelledField(client, SWT.NONE,
-            i18n.tr("Size"));
+        fileNameText = createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("File Name"));
+        fileSizeText = createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("Size"));
 
         new Label(client, SWT.NONE);
 
@@ -130,14 +125,12 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                     if (!file.exists()) {
                         file.createNewFile();
                     } else {
-                        boolean overwrite =
-                            MessageDialog.openConfirm(
-                                PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getShell(),
-                                i18n.tr("File Already Exists"),
-                                MessageFormat.format(
-                                    i18n.tr("The file {0} already exists. Would you like to overwrite it?"),
-                                    path));
+                        boolean overwrite = MessageDialog.openConfirm(
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                            i18n.tr("File Already Exists"),
+                            MessageFormat.format(
+                                i18n.tr("The file {0} already exists. Would you like to overwrite it?"),
+                                path));
                         if (!overwrite) return;
                     }
 
@@ -151,11 +144,8 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
 
                             SimpleResult<FileData> dataResult;
                             try {
-                                dataResult =
-                                    SessionManager.getAppService()
-                                        .doAction(
-                                            new FileDataGetAction(result
-                                                .getInput()));
+                                dataResult = SessionManager.getAppService().doAction(
+                                    new FileDataGetAction(result.getInput()));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -165,14 +155,11 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
                         }
                     };
 
-                    new ProgressMonitorDialog(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell()).run(true,
-                        false,
-                        op);
+                    new ProgressMonitorDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell()).run(true, false, op);
 
                     // write data to file.
-                    BufferedOutputStream bos =
-                        new BufferedOutputStream(new FileOutputStream(file));
+                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
                     bos.write(data.getValue().getBytes());
                     bos.flush();
                     bos.close();
@@ -225,18 +212,15 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre =
-            (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
-    public static void openForm(Integer batchOpId, boolean focusOnEditor)
+    protected static void openForm(Integer batchOpId, String formId, boolean focusOnEditor)
         throws PartInitException {
-        SpecimenBatchOpViewFormInput input =
-            new SpecimenBatchOpViewFormInput(batchOpId);
-        PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage()
-            .openEditor(input, ID, focusOnEditor);
+        SpecimenBatchOpViewFormInput input = new SpecimenBatchOpViewFormInput(batchOpId);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+            .openEditor(input, formId, focusOnEditor);
     }
 
     public static class SpecimenBatchOpViewFormInput
@@ -258,8 +242,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result
-                + ((batchOpId == null) ? 0 : batchOpId.hashCode());
+            result = prime * result + ((batchOpId == null) ? 0 : batchOpId.hashCode());
             return result;
         }
 
@@ -268,8 +251,7 @@ public class SpecimenBatchOpViewForm extends BiobankViewForm {
             if (this == obj) return true;
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
-            SpecimenBatchOpViewFormInput other =
-                (SpecimenBatchOpViewFormInput) obj;
+            SpecimenBatchOpViewFormInput other = (SpecimenBatchOpViewFormInput) obj;
             if (batchOpId == null) {
                 if (other.batchOpId != null) return false;
             } else if (!batchOpId.equals(other.batchOpId)) return false;
