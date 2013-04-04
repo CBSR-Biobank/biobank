@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.batchoperation.specimen;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class SpecimenBatchOpPojoReader implements
         new ClientBatchOpInputErrorList();
 
     private final Set<SpecimenBatchOpInputPojo> pojos =
-        new HashSet<SpecimenBatchOpInputPojo>(0);
+        new LinkedHashSet<SpecimenBatchOpInputPojo>(0);
 
     public SpecimenBatchOpPojoReader(Center workingCenter, String filename) {
         this.workingCenter = workingCenter;

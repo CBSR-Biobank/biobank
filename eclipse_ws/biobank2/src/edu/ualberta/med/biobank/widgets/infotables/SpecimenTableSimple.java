@@ -22,10 +22,10 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SimpleSpecimenTable
+public class SpecimenTableSimple
     extends DefaultAbstractInfoTableWidget<Specimen> {
     public static final I18n i18n = I18nFactory
-        .getI18n(SimpleSpecimenTable.class);
+        .getI18n(SpecimenTableSimple.class);
 
     public static final int ROWS_PER_PAGE = 10;
 
@@ -33,7 +33,7 @@ public class SimpleSpecimenTable
     private static final String[] HEADINGS = new String[] {
         i18n.tr("Inventory ID") };
 
-    public SimpleSpecimenTable(Composite parent, List<Specimen> specimens) {
+    public SpecimenTableSimple(Composite parent, List<Specimen> specimens) {
         super(parent, HEADINGS, ROWS_PER_PAGE);
 
         setList(specimens);
@@ -90,5 +90,5 @@ public class SimpleSpecimenTable
     protected Boolean canView(Specimen target)
         throws ApplicationException {
         return true;
-    };
+    }
 }

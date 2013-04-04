@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.batchoperation.patient;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +47,7 @@ public class PatientBatchOpPojoReader implements
         new ClientBatchOpInputErrorList();
 
     private final Set<PatientBatchOpInputPojo> pojos =
-        new HashSet<PatientBatchOpInputPojo>(0);
+        new LinkedHashSet<PatientBatchOpInputPojo>(0);
 
     public PatientBatchOpPojoReader(Center workingCenter, String filename) {
         this.workingCenter = workingCenter;

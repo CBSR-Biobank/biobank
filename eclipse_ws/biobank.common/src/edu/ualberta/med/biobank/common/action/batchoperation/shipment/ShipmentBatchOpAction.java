@@ -67,13 +67,13 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
     // @formatter:off
     private static final CellProcessor[] PROCESSORS = new CellProcessor[] {
         new ParseDate("yyyy-MM-dd HH:mm"), // dateReceived
-        new StrNotNullOrEmpty(),           // sendingCenter
-        new StrNotNullOrEmpty(),           // receivingCenter
-        new StrNotNullOrEmpty(),           // shippingMethod
-        new StrNotNullOrEmpty(),           // waybill
-        null                               // comment
-    }; 
-    // @formatter:on    
+        new StrNotNullOrEmpty(), // sendingCenter
+        new StrNotNullOrEmpty(), // receivingCenter
+        new StrNotNullOrEmpty(), // shippingMethod
+        new StrNotNullOrEmpty(), // waybill
+        null // comment
+    };
+    // @formatter:on
 
     private final BatchOpInputErrorSet errorList = new BatchOpInputErrorSet();
 
@@ -184,7 +184,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         info.setUser(context.getUser());
 
         Center sendingCenter =
-            BatchOpActionUtil.getCenter(context, csvInfo.getSendingCenter());
+            BatchOpActionUtil.getCenter(context.getSession(), csvInfo.getSendingCenter());
         if (sendingCenter == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_SENDING_CENTER_ERROR.format(csvInfo.getSendingCenter()));
@@ -193,7 +193,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         }
 
         Site receivingSite =
-            BatchOpActionUtil.getSite(context, csvInfo.getReceivingCenter());
+            BatchOpActionUtil.getSite(context.getSession(), csvInfo.getReceivingCenter());
         if (receivingSite == null) {
             errorList.addError(csvInfo.getLineNumber(),
                 CSV_RECEIVING_CENTER_ERROR.format(csvInfo
@@ -203,7 +203,7 @@ public class ShipmentBatchOpAction implements Action<BooleanResult> {
         }
 
         ShippingMethod shippingMethod =
-            BatchOpActionUtil.getShippingMethod(context,
+            BatchOpActionUtil.getShippingMethod(context.getSession(),
                 csvInfo.getShippingMethod());
         if (shippingMethod == null) {
             errorList.addError(csvInfo.getLineNumber(),

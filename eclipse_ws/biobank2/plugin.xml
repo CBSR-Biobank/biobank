@@ -1818,7 +1818,13 @@
 <editor
       class="edu.ualberta.med.biobank.forms.batchop.PatientImportForm"
       default="false"
-      id="edu.ualberta.med.biobank.forms.PatientImportForm"
+      id="edu.ualberta.med.biobank.forms.batchop.PatientImportForm"
+      name="%PatientImport.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
       name="%PatientImport.editor">
 </editor>
 <editor
@@ -1826,12 +1832,6 @@
       default="false"
       id="edu.ualberta.med.biobank.forms.SpecimenImportForm"
       name="%SpecimenImport.editor">
-</editor>
-<editor
-      class="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
-      default="false"
-      id="edu.ualberta.med.biobank.forms.PatientBatchOpViewForm"
-      name="%PatientImport.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.batchop.SpecimenBatchOpViewForm"

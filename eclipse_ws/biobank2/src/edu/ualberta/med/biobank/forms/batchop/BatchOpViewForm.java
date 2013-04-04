@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.MessageFormat;
+import java.util.Date;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -27,8 +28,6 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.SimpleResult;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
-import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.file.FileDataGetAction;
 import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.forms.BiobankViewForm;
@@ -37,12 +36,16 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
-import edu.ualberta.med.biobank.widgets.infotables.SimpleSpecimenTable;
 
-public class BatchOpViewForm extends BiobankViewForm {
+public abstract class BatchOpViewForm extends BiobankViewForm {
     private static final I18n i18n = I18nFactory.getI18n(BatchOpViewForm.class);
 
     private final String formTitle;
+
+    private Integer batchId;
+    private String executedBy;
+    private Date timeExecuted;
+    private FileMetaData fileMetaData;
 
     private BgcBaseText executedByText;
     private BgcBaseText timeExecutedText;
@@ -51,11 +54,7 @@ public class BatchOpViewForm extends BiobankViewForm {
     private BgcBaseText fileSizeText;
     private Button fileDownloadButton;
 
-    private SimpleSpecimenTable specimenTable;
     private Section inputSection;
-
-    private SpecimenBatchOpGetResult result;
-    private Integer batchId;
 
     public BatchOpViewForm(String formTitle) {
         this.formTitle = formTitle;
@@ -64,12 +63,6 @@ public class BatchOpViewForm extends BiobankViewForm {
     @Override
     protected Image getFormImage() {
         return BgcPlugin.getDefault().getImageRegistry().get(BgcPlugin.IMG_DATABASE_GO);
-    }
-
-    @Override
-    protected void init() throws Exception {
-        batchId = ((SpecimenBatchOpViewFormInput) getEditorInput()).getBatchOpId();
-        result = SessionManager.getAppService().doAction(new SpecimenBatchOpGetAction(batchId));
     }
 
     @SuppressWarnings("nls")
@@ -89,8 +82,7 @@ public class BatchOpViewForm extends BiobankViewForm {
         timeExecutedText = createReadOnlyLabelledField(client, SWT.NONE, i18n.tr("Time Executed"));
 
         createFileInfo();
-        createSpecimenTable();
-
+        createFormContents();
         setValues();
     }
 
@@ -115,7 +107,7 @@ public class BatchOpViewForm extends BiobankViewForm {
                     FileDialog fd = new FileDialog(PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getShell(), SWT.SAVE);
                     fd.setText(i18n.tr("Download the file to..."));
-                    fd.setFileName(result.getInput().getName());
+                    fd.setFileName(fileMetaData.getName());
 
                     final String path = fd.open();
                     if (path == null || path.isEmpty()) return;
@@ -145,7 +137,7 @@ public class BatchOpViewForm extends BiobankViewForm {
                             SimpleResult<FileData> dataResult;
                             try {
                                 dataResult = SessionManager.getAppService().doAction(
-                                    new FileDataGetAction(result.getInput()));
+                                    new FileDataGetAction(fileMetaData));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -176,35 +168,21 @@ public class BatchOpViewForm extends BiobankViewForm {
         });
     }
 
-    @SuppressWarnings("nls")
-    private void createSpecimenTable() {
-        Composite client = createSectionWithClient(i18n.tr("Imported Specimens"));
-        Section section = (Section) client.getParent();
-        section.setExpanded(true);
-
-        specimenTable = new SimpleSpecimenTable(client, result.getSpecimens());
-        specimenTable.layout(true, true);
-
-        section.layout(true, true);
-    }
+    protected abstract void createFormContents();
 
     @Override
     public void setValues() throws Exception {
-        setTextValue(executedByText, result.getExecutedBy());
-        setTextValue(timeExecutedText, result.getTimeExecuted());
+        setTextValue(executedByText, executedBy);
+        setTextValue(timeExecutedText, timeExecuted);
 
-        FileMetaData input = result.getInput();
-        if (input != null) {
+        if (fileMetaData != null) {
             inputSection.setVisible(true);
-            setTextValue(fileNameText, input.getName());
+            setTextValue(fileNameText, fileMetaData.getName());
             setTextValue(fileSizeText,
-                humanReadableByteCount(input.getSize(), false));
+                humanReadableByteCount(fileMetaData.getSize(), false));
         } else {
             inputSection.setVisible(false);
         }
-
-        specimenTable.setCollection(result.getSpecimens());
-        specimenTable.reload();
     }
 
     @SuppressWarnings("nls")
@@ -221,6 +199,38 @@ public class BatchOpViewForm extends BiobankViewForm {
         SpecimenBatchOpViewFormInput input = new SpecimenBatchOpViewFormInput(batchOpId);
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
             .openEditor(input, formId, focusOnEditor);
+    }
+
+    public Integer getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(Integer batchId) {
+        this.batchId = batchId;
+    }
+
+    public String getExecutedBy() {
+        return executedBy;
+    }
+
+    public void setExecutedBy(String executedBy) {
+        this.executedBy = executedBy;
+    }
+
+    public Date getTimeExecuted() {
+        return timeExecuted;
+    }
+
+    public void setTimeExecuted(Date timeExecuted) {
+        this.timeExecuted = timeExecuted;
+    }
+
+    public FileMetaData getFileMetaData() {
+        return fileMetaData;
+    }
+
+    public void setFileMetaData(FileMetaData fileMetaData) {
+        this.fileMetaData = fileMetaData;
     }
 
     public static class SpecimenBatchOpViewFormInput

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
+package edu.ualberta.med.biobank.common.action.batchoperation.patient;
 
 import java.util.List;
 
@@ -9,21 +9,21 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.BatchOperation;
-import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
-import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.BatchOperationPatient;
+import edu.ualberta.med.biobank.model.Patient;
 
-public class SpecimenBatchOpGetAction
-    implements Action<BatchOpGetResult<Specimen>> {
+public class PatientBatchOpGetAction
+    implements Action<BatchOpGetResult<Patient>> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String SPECIMEN_QRY = "SELECT bos.specimen " +
-        " FROM " + BatchOperationSpecimen.class.getName() + " bos" +
+    private static final String PATIENT_QRY = "SELECT bos.patient " +
+        " FROM " + BatchOperationPatient.class.getName() + " bos" +
         " WHERE bos.batch.id = ?";
 
     private final Integer id;
 
-    public SpecimenBatchOpGetAction(Integer batchOperationId) {
+    public PatientBatchOpGetAction(Integer batchOperationId) {
         this.id = batchOperationId;
     }
 
@@ -33,20 +33,17 @@ public class SpecimenBatchOpGetAction
     }
 
     @Override
-    public BatchOpGetResult<Specimen> run(ActionContext context)
+    public BatchOpGetResult<Patient> run(ActionContext context)
         throws ActionException {
         Session session = context.getSession();
 
         BatchOperation batch = context.load(BatchOperation.class, id);
 
         @SuppressWarnings("unchecked")
-        List<Specimen> specimens = session
-            .createQuery(SPECIMEN_QRY)
-            .setParameter(0, id)
-            .list();
+        List<Patient> patients = session.createQuery(PATIENT_QRY).setParameter(0, id).list();
 
-        BatchOpGetResult<Specimen> result = new BatchOpGetResult<Specimen>(
-            batch, batch.getInput().getMetaData(), specimens);
+        BatchOpGetResult<Patient> result = new BatchOpGetResult<Patient>(
+            batch, batch.getInput().getMetaData(), patients);
 
         return result;
     }

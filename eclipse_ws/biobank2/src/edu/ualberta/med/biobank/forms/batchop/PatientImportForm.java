@@ -13,7 +13,7 @@ public class PatientImportForm extends ImportForm {
     private static final I18n i18n = I18nFactory.getI18n(PatientImportForm.class);
 
     @SuppressWarnings("nls")
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientImportForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.batchop.PatientImportForm";
 
     @SuppressWarnings("nls")
     private static final String FORM_TITLE = i18n.tr("Patient Import");

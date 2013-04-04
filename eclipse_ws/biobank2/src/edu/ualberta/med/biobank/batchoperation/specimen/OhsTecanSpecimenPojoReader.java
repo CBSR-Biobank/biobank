@@ -7,8 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -387,8 +387,8 @@ public class OhsTecanSpecimenPojoReader implements
     public Set<SpecimenBatchOpInputPojo> readPojos(ICsvBeanReader reader)
         throws ClientBatchOpErrorsException, IOException {
 
-        aliquotSpecimens = new HashSet<SpecimenBatchOpInputPojo>(0);
-        sourceSpecimens = new HashSet<SpecimenBatchOpInputPojo>(0);
+        aliquotSpecimens = new LinkedHashSet<SpecimenBatchOpInputPojo>(0);
+        sourceSpecimens = new LinkedHashSet<SpecimenBatchOpInputPojo>(0);
         timestamp = new Date();
         technicianId = null;
 

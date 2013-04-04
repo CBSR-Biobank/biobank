@@ -1,31 +1,30 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.specimen;
+package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.model.AbstractBiobankModel;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.FileMetaData;
-import edu.ualberta.med.biobank.model.Specimen;
 
-public class SpecimenBatchOpGetResult
+public class BatchOpGetResult<T extends AbstractBiobankModel>
     implements ActionResult {
     private static final long serialVersionUID = 1L;
 
     private final String executedBy;
     private final Date timeExecuted;
     private final FileMetaData input;
-    private final List<Specimen> specimens = new ArrayList<Specimen>();
+    private final List<T> modelObjects = new ArrayList<T>();
 
-    SpecimenBatchOpGetResult(BatchOperation batch,
-        FileMetaData input, List<Specimen> specimens) {
+    public BatchOpGetResult(BatchOperation batch, FileMetaData input, List<T> modelObjects) {
         this.executedBy = batch.getExecutedBy().getLogin();
         this.timeExecuted = batch.getTimeExecuted();
         this.input = input;
-        this.specimens.addAll(specimens);
+        this.modelObjects.addAll(modelObjects);
     }
-    
+
     public String getExecutedBy() {
         return executedBy;
     }
@@ -38,7 +37,7 @@ public class SpecimenBatchOpGetResult
         return input;
     }
 
-    public List<Specimen> getSpecimens() {
-        return specimens;
+    public List<T> getModelObjects() {
+        return modelObjects;
     }
 }

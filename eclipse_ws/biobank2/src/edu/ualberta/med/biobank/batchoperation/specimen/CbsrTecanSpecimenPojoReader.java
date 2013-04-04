@@ -7,8 +7,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -240,7 +240,7 @@ public class CbsrTecanSpecimenPojoReader implements
     private final String filename;
 
     Set<SpecimenBatchOpInputPojo> convertedPojos =
-        new HashSet<SpecimenBatchOpInputPojo>();
+        new LinkedHashSet<SpecimenBatchOpInputPojo>();
 
     private final ClientBatchOpInputErrorList errorList =
         new ClientBatchOpInputErrorList();

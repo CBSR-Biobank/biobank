@@ -3,10 +3,11 @@ package edu.ualberta.med.biobank.common.action.batchoperation;
 import java.util.Date;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
-import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.BatchOperation;
@@ -14,6 +15,7 @@ import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.FileData;
+import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -22,6 +24,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.User;
 
 /**
  * Server side utility functions that load model objects from the database.
@@ -42,99 +45,91 @@ public class BatchOpActionUtil {
 
     public static final String CSV_PARSE_ERROR = "Parse error at line {0}\n{1}";
 
-    public static Patient getPatient(ActionContext context, String pnumber) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Patient getPatient(Session session, String pnumber) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Patient patient = (Patient) context.getSession().createCriteria(Patient.class)
+        Patient patient = (Patient) session.createCriteria(Patient.class)
             .add(Restrictions.eq("pnumber", pnumber)).uniqueResult();
         return patient;
     }
 
-    public static Specimen getSpecimen(ActionContext context, String inventoryId) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Specimen getSpecimen(Session session, String inventoryId) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession().createCriteria(Specimen.class)
+        Criteria c = session.createCriteria(Specimen.class)
             .add(Restrictions.eq("inventoryId", inventoryId));
 
         return (Specimen) c.uniqueResult();
     }
 
-    public static SpecimenType getSpecimenType(ActionContext context,
+    public static SpecimenType getSpecimenType(Session session,
         String name) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession().createCriteria(SpecimenType.class)
+        Criteria c = session.createCriteria(SpecimenType.class)
             .add(Restrictions.eq("name", name));
 
         return (SpecimenType) c.uniqueResult();
     }
 
-    public static Study getStudy(ActionContext context, String nameShort) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Study getStudy(Session session, String nameShort) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
-        Criteria c = context.getSession().createCriteria(Study.class)
+        Criteria c = session.createCriteria(Study.class)
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Study) c.uniqueResult();
     }
 
-    public static Center getCenter(ActionContext context, String nameShort) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Center getCenter(Session session, String nameShort) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession().createCriteria(Center.class)
+        Criteria c = session.createCriteria(Center.class)
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Center) c.uniqueResult();
     }
 
-    public static Site getSite(ActionContext context, String nameShort) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Site getSite(Session session, String nameShort) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession()
+        Criteria c = session
             .createCriteria(Site.class, "s")
             .add(Restrictions.eq("nameShort", nameShort));
 
         return (Site) c.uniqueResult();
     }
 
-    public static Container getContainer(ActionContext context, String label) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static Container getContainer(Session session, String label) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession()
+        Criteria c = session
             .createCriteria(Container.class, "c")
             .add(Restrictions.eq("label", label));
 
         return (Container) c.uniqueResult();
     }
 
-    public static OriginInfo getOriginInfo(ActionContext context,
+    public static OriginInfo getOriginInfo(Session session,
         String waybill) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        Criteria c = context.getSession()
+        Criteria c = session
             .createCriteria(OriginInfo.class, "oi")
             .createAlias("oi.shipmentInfo", "si")
             .add(Restrictions.eq("si.waybill", waybill));
@@ -145,22 +140,23 @@ public class BatchOpActionUtil {
     /*
      * 
      */
-    public static ShippingMethod getShippingMethod(ActionContext context,
-        String name) {
-        if (context == null) {
-            throw new NullPointerException(
-                "should only be called once the context is initialized");
+    public static ShippingMethod getShippingMethod(Session session, String name) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
         }
 
-        return (ShippingMethod) context.getSession()
+        return (ShippingMethod) session
             .createCriteria(ShippingMethod.class)
             .add(Restrictions.eq("name", name)).uniqueResult();
     }
 
-    public static CollectionEvent getCollectionEvent(ActionContext context,
+    public static CollectionEvent getCollectionEvent(Session session,
         String patientNumber, Integer visitNumber) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
 
-        return (CollectionEvent) context.getSession()
+        return (CollectionEvent) session
             .createCriteria(CollectionEvent.class, "ce")
             .createAlias("ce.patient", "pt")
             .add(Restrictions.eq("ce.visitNumber", visitNumber))
@@ -168,27 +164,54 @@ public class BatchOpActionUtil {
             .uniqueResult();
     }
 
-    public static ProcessingEvent getProcessingEvent(ActionContext context,
-        String worksheetNumber) {
+    public static ProcessingEvent getProcessingEvent(Session session, String worksheetNumber) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
 
-        return (ProcessingEvent) context.getSession()
+        return (ProcessingEvent) session
             .createCriteria(ProcessingEvent.class)
             .add(Restrictions.eq("worksheet", worksheetNumber))
             .uniqueResult();
     }
 
-    public static BatchOperation createBatchOperation(ActionContext context,
+    public static BatchOperation createBatchOperation(Session session, User user,
         final FileData fileData) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+        if (user == null) {
+            throw new NullPointerException("user is null");
+        }
+        if (fileData == null) {
+            throw new NullPointerException("fileData is null");
+        }
         BatchOperation batchOperation = new BatchOperation();
 
         batchOperation.setInput(fileData);
-        batchOperation.setExecutedBy(context.getUser());
+        batchOperation.setExecutedBy(user);
         batchOperation.setTimeExecuted(new Date());
         batchOperation.setInput(fileData);
         batchOperation.setTimeExecuted(new Date());
 
-        context.getSession().saveOrUpdate(fileData);
-        context.getSession().saveOrUpdate(batchOperation);
+        session.saveOrUpdate(fileData);
+        session.saveOrUpdate(batchOperation);
         return batchOperation;
+    }
+
+    public static FileMetaData getFileMetaData(Session session, Integer batchOpId) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+        if (batchOpId == null) {
+            throw new NullPointerException("batchOpId is null");
+        }
+        FileMetaData metaData = (FileMetaData) session
+            .createCriteria(BatchOperation.class, "batchOp")
+            .createAlias("batchOp.input", "input")
+            .setProjection(Projections.property("input.metaData"))
+            .add(Restrictions.eq("id", batchOpId))
+            .uniqueResult();
+        return metaData;
     }
 }

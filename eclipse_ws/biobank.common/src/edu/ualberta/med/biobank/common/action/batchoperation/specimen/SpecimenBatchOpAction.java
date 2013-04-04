@@ -197,7 +197,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         for (SpecimenBatchOpInputPojo pojo : pojos) {
             String parentInvId = pojo.getParentInventoryId();
             if ((parentInvId == null) || parentInvId.isEmpty()) continue;
-            Specimen specimen = BatchOpActionUtil.getSpecimen(context, parentInvId);
+            Specimen specimen = BatchOpActionUtil.getSpecimen(context.getSession(), parentInvId);
             if (specimen != null) {
                 existingSpecimens.add(specimen);
             }
@@ -206,7 +206,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         for (SpecimenBatchOpInputPojo pojo : pojos) {
             String pnumber = pojo.getPatientNumber();
             if ((pnumber == null) || pnumber.isEmpty()) continue;
-            Patient patient = BatchOpActionUtil.getPatient(context, pnumber);
+            Patient patient = BatchOpActionUtil.getPatient(context.getSession(), pnumber);
             if (patient != null) {
                 existingPatients.add(patient);
             }
@@ -319,7 +319,8 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(context, fileData);
+        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(
+            context.getSession(), context.getUser(), fileData);
 
         // add all source specimens first
         log.debug("SpecimenBatchOpAction: adding source specimens");
@@ -429,7 +430,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
     private SpecimenBatchOpPojoData getDbInfo(ActionContext context,
         SpecimenBatchOpInputPojo inputPojo,
         SpecimenBatchOpInputPojo parentInputPojo) {
-        Specimen spc = BatchOpActionUtil.getSpecimen(context, inputPojo.getInventoryId());
+        Specimen spc = BatchOpActionUtil.getSpecimen(context.getSession(), inputPojo.getInventoryId());
         if (spc != null) {
             errorSet.addError(inputPojo.getLineNumber(),
                 SPC_ALREADY_EXISTS_ERROR);
@@ -445,7 +446,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         Patient patient = null;
 
         if (inputPojo.getParentInventoryId() != null) {
-            parentSpecimen = BatchOpActionUtil.getSpecimen(context,
+            parentSpecimen = BatchOpActionUtil.getSpecimen(context.getSession(),
                 inputPojo.getParentInventoryId());
 
             if (parentSpecimen != null) {
@@ -455,7 +456,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
         }
 
         if (pojoData.isSourceSpecimen()) {
-            patient = BatchOpActionUtil.getPatient(context, inputPojo.getPatientNumber());
+            patient = BatchOpActionUtil.getPatient(context.getSession(), inputPojo.getPatientNumber());
             if (patient == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
                     CSV_PATIENT_NUMBER_INVALID_ERROR.format());
@@ -487,7 +488,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         if (inputPojo.getWaybill() != null) {
             OriginInfo originInfo =
-                BatchOpActionUtil.getOriginInfo(context, inputPojo.getWaybill());
+                BatchOpActionUtil.getOriginInfo(context.getSession(), inputPojo.getWaybill());
             if (originInfo == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
                     CSV_WAYBILL_ERROR.format(inputPojo.getWaybill()));
@@ -498,7 +499,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         if (inputPojo.getWorksheet() != null) {
             ProcessingEvent pevent = BatchOpActionUtil.getProcessingEvent(
-                context, inputPojo.getWorksheet());
+                context.getSession(), inputPojo.getWorksheet());
             if (pevent != null) {
                 pojoData.setPevent(pevent);
                 log.trace("found processing event: invId={} worksheet={}",
@@ -506,7 +507,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             }
         }
 
-        SpecimenType spcType = BatchOpActionUtil.getSpecimenType(context,
+        SpecimenType spcType = BatchOpActionUtil.getSpecimenType(context.getSession(),
             inputPojo.getSpecimenType());
         if (spcType == null) {
             errorSet.addError(inputPojo.getLineNumber(),
@@ -519,7 +520,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
 
         // only get container information if defined for this row
         if (pojoData.hasPosition()) {
-            Container container = BatchOpActionUtil.getContainer(context,
+            Container container = BatchOpActionUtil.getContainer(context.getSession(),
                 inputPojo.getPalletLabel());
             if (container == null) {
                 errorSet.addError(inputPojo.getLineNumber(),
@@ -561,7 +562,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
             // if this is a source specimen then see if the patient has the
             // collection event
             if (pojoData.getPojo().getSourceSpecimen()) {
-                cevent = BatchOpActionUtil.getCollectionEvent(context,
+                cevent = BatchOpActionUtil.getCollectionEvent(context.getSession(),
                     pojoData.getPojo().getPatientNumber(),
                     pojoData.getPojo().getVisitNumber());
 
@@ -619,7 +620,7 @@ public class SpecimenBatchOpAction implements Action<IdResult> {
                 return null;
             }
 
-            cevent = BatchOpActionUtil.getCollectionEvent(context,
+            cevent = BatchOpActionUtil.getCollectionEvent(context.getSession(),
                 inputPojo.getPatientNumber(), inputPojo.getVisitNumber());
             return cevent;
         }

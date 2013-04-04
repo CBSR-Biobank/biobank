@@ -55,6 +55,9 @@ public class PatientBatchOpAction implements Action<IdResult> {
     public static final Tr CSV_STUDY_ERROR =
         bundle.tr("study {0} does not exist");
 
+    private static final LString PATIENT_ALREADY_EXISTS_ERROR =
+        bundle.tr("patient already exists").format();
+
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
     private final CompressedReference<ArrayList<PatientBatchOpInputPojo>> compressedList;
@@ -137,7 +140,7 @@ public class PatientBatchOpAction implements Action<IdResult> {
                 continue;
             }
 
-            Study study = BatchOpActionUtil.getStudy(context, studyName);
+            Study study = BatchOpActionUtil.getStudy(context.getSession(), studyName);
 
             if (study == null) {
                 namesNotFound.add(studyName);
@@ -181,7 +184,8 @@ public class PatientBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
-        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(context, fileData);
+        BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(
+            context.getSession(), context.getUser(), fileData);
 
         for (PatientBatchOpPojoData pojoData : pojoDataMap.values()) {
             addPatient(context, batchOp, pojoData);
@@ -192,7 +196,13 @@ public class PatientBatchOpAction implements Action<IdResult> {
     }
 
     private PatientBatchOpPojoData getDbInfo(ActionContext context, PatientBatchOpInputPojo pojo) {
-        Study study = BatchOpActionUtil.getStudy(context, pojo.getStudyName());
+        Patient spc = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
+        if (spc != null) {
+            errorSet.addError(pojo.getLineNumber(), PATIENT_ALREADY_EXISTS_ERROR);
+            return null;
+        }
+
+        Study study = BatchOpActionUtil.getStudy(context.getSession(), pojo.getStudyName());
         if (study == null) {
             errorSet.addError(pojo.getLineNumber(),
                 CSV_STUDY_ERROR.format(pojo.getStudyName()));

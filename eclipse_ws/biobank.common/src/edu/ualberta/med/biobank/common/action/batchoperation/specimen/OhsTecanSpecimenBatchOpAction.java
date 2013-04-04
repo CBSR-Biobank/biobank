@@ -133,8 +133,8 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         Set<Integer> addedSpecimenIds = new HashSet<Integer>();
         Set<Integer> removedSpecimenIds = new HashSet<Integer>();
         for (SpecimenBatchOpInputPojo sourcePojo : sourcePojos) {
-            Specimen specimen =
-                BatchOpActionUtil.getSpecimen(context, sourcePojo.getInventoryId());
+            Specimen specimen = BatchOpActionUtil.getSpecimen(
+                context.getSession(), sourcePojo.getInventoryId());
             specimen.setQuantity(sourcePojo.getVolume());
             specimen.setActivityStatus(ActivityStatus.CLOSED);
             context.getSession().saveOrUpdate(specimen);
