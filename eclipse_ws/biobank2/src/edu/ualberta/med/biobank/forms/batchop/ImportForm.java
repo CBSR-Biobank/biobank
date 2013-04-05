@@ -161,11 +161,9 @@ public abstract class ImportForm extends BiobankViewForm {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @Override
             public void run(IProgressMonitor monitor) {
-                monitor.beginTask(i18n.tr("Importing Specimens..."),
-                    IProgressMonitor.UNKNOWN);
+                monitor.beginTask(i18n.tr("Importing Specimens..."), IProgressMonitor.UNKNOWN);
 
-                final List<BatchOpException<?>> errors =
-                    new ArrayList<BatchOpException<?>>();
+                final List<BatchOpException<?>> errors = new ArrayList<BatchOpException<?>>();
                 final Holder<Boolean> success = new Holder<Boolean>(false);
                 final Holder<Integer> batchOpId = new Holder<Integer>(null);
 
@@ -240,11 +238,14 @@ public abstract class ImportForm extends BiobankViewForm {
 
             Center currentWorkingCenter = SessionManager.getUser()
                 .getCurrentWorkingCenter().getWrappedObject();
+            IBatchOpPojoReader<? extends IBatchOpInputPojo> pojoReader =
+                getCsvPojoReader(currentWorkingCenter, filename, csvHeaders);
 
-            IBatchOpPojoReader<? extends IBatchOpInputPojo> pojoReader = getCsvPojoReader(
-                currentWorkingCenter, filename, csvHeaders);
+            if (pojoReader == null) {
+                throw new ClientBatchOpErrorsException("invalid headers or number of columns in file");
+            }
+
             pojoReader.readPojos(reader);
-
             ClientBatchOpInputErrorList errorList = pojoReader.getErrorList();
 
             if (!errorList.isEmpty()) {

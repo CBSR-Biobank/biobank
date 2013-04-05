@@ -17,9 +17,10 @@ public class PatientBatchOpGetAction
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String PATIENT_QRY = "SELECT bos.patient " +
-        " FROM " + BatchOperationPatient.class.getName() + " bos" +
-        " WHERE bos.batch.id = ?";
+    private static final String PATIENT_QRY = "SELECT bos.patient "
+        + " FROM " + BatchOperationPatient.class.getName() + " bos"
+        + " WHERE bos.batch.id = ? "
+        + " ORDER BY bos.patient.pnumber";
 
     private final Integer id;
 

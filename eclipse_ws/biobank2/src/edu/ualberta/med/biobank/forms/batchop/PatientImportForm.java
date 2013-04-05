@@ -25,7 +25,10 @@ public class PatientImportForm extends ImportForm {
     @Override
     protected IBatchOpPojoReader<? extends IBatchOpInputPojo> getCsvPojoReader(Center center,
         String csvFilename, String[] csvHeaders) {
-        return new PatientBatchOpPojoReader(center, csvFilename);
+        if (PatientBatchOpPojoReader.isHeaderValid(csvHeaders)) {
+            return new PatientBatchOpPojoReader(center, csvFilename);
+        }
+        return null;
     }
 
     @Override

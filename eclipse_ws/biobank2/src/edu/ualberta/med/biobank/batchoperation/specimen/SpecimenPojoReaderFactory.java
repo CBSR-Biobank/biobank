@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.batchoperation.specimen;
 
+import edu.ualberta.med.biobank.batchoperation.ClientBatchOpErrorsException;
 import edu.ualberta.med.biobank.batchoperation.IBatchOpPojoReader;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.model.Center;
@@ -7,8 +8,8 @@ import edu.ualberta.med.biobank.model.Center;
 /**
  * Creates a IBatchOpPojoReader instance based on the headers in the CSV file.
  * 
- * @param csvHeaders the column names contained in the first row of the CSV file
- *            as an array of String.
+ * @param csvHeaders the column names contained in the first row of the CSV file as an array of
+ *            String.
  * 
  * @author Nelson Loyola
  * 
@@ -23,13 +24,11 @@ public class SpecimenPojoReaderFactory {
         if (SpecimenBatchOpPojoReader.isHeaderValid(csvHeaders)) {
             pojoReader = new SpecimenBatchOpPojoReader(workingCenter, filename);
         } else if (CbsrTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-            pojoReader =
-                new CbsrTecanSpecimenPojoReader(workingCenter, filename);
+            pojoReader = new CbsrTecanSpecimenPojoReader(workingCenter, filename);
         } else if (OhsTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
-            pojoReader =
-                new OhsTecanSpecimenPojoReader(workingCenter, filename);
+            pojoReader = new OhsTecanSpecimenPojoReader(workingCenter, filename);
         } else {
-            throw new IllegalStateException("no batchOp pojo reader found");
+            throw new ClientBatchOpErrorsException("invalid headers or number of columns in file");
         }
 
         return pojoReader;

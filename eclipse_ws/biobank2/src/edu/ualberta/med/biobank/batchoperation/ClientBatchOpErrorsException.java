@@ -33,6 +33,15 @@ public class ClientBatchOpErrorsException extends RuntimeException {
         errors.add(exception);
     }
 
+    /**
+     * Used as an error for the overall file
+     * 
+     * @param error The message to display to the user.
+     */
+    public ClientBatchOpErrorsException(String error) {
+        this.errors.add(new BatchOpException<String>(1, error));
+    }
+
     public ClientBatchOpErrorsException(IOException e) {
         super(e);
     }

@@ -86,9 +86,8 @@ public class PatientBatchOpPojoReader implements
         CellProcessor[] cellProcessors = getCellProcessors();
 
         try {
-            while ((csvPojo =
-                reader.read(PatientBatchOpInputPojo.class,
-                    NAME_MAPPINGS, cellProcessors)) != null) {
+            while ((csvPojo = reader.read(PatientBatchOpInputPojo.class,
+                NAME_MAPPINGS, cellProcessors)) != null) {
 
                 csvPojo.setLineNumber(reader.getLineNumber());
                 pojos.add(csvPojo);
