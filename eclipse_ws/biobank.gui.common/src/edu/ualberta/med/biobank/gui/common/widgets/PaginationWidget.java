@@ -64,9 +64,8 @@ public class PaginationWidget extends Composite {
 
     protected PageInformation pageInfo;
 
-    public PaginationWidget(Composite parent, int style,
-        IInfoTablePagination paginator, int buttonsEnabledOnInit,
-        int rowsPerPage) {
+    public PaginationWidget(Composite parent, int style, IInfoTablePagination paginator,
+        int buttonsEnabledOnInit, int rowsPerPage) {
         super(parent, style);
         this.paginator = paginator;
 
@@ -241,6 +240,7 @@ public class PaginationWidget extends Composite {
             pageLabel.setText(MessageFormat.format(PAGE_X_OF_Y,
                 pageInfo.page + 1, pageInfo.pageTotal));
         }
+        layout(true);
     }
 
     public int getCurrentPage() {
