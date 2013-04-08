@@ -35,6 +35,11 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-search</artifactId>
+            <version>4.1.1.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>org.xnap.commons</groupId>
 			<artifactId>gettext-commons</artifactId>
 			<version>0.9.7</version>

@@ -16,9 +16,8 @@ import org.hibernate.id.enhanced.TableGenerator;
 import edu.ualberta.med.biobank.model.security.User;
 
 /**
- * A superlcass that entities can extend if they want an automatically generated
- * id, determined by a table generation strategy (nearly equivalent to
- * sequences, but table based).
+ * A superlcass that entities can extend if they want an automatically generated id, determined by a
+ * table generation strategy (nearly equivalent to sequences, but table based).
  * 
  * @author Jonathan Ferland
  */
@@ -27,7 +26,7 @@ public abstract class LongIdModel
     implements IBiobankModel, HasTimeInserted, HasInsertedBy {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
     private Long timeInserted;
     private User insertedBy;
 
@@ -40,20 +39,19 @@ public abstract class LongIdModel
         strategy = "edu.ualberta.med.biobank.model.id.CustomTableGenerator",
         parameters = @Parameter(name = TableGenerator.INCREMENT_PARAM, value = "50"))
     @Column(name = "ID", nullable = false)
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
     @Override
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Overridden only for documentation. Note that Hibernate guarantees that,
-     * within the same session, referential equality exists between entities.
-     * Therefore, it is easiest to use the default implementations of
-     * {@link #equals(Object)} and {@link #hashCode()}.
+     * Overridden only for documentation. Note that Hibernate guarantees that, within the same
+     * session, referential equality exists between entities. Therefore, it is easiest to use the
+     * default implementations of {@link #equals(Object)} and {@link #hashCode()}.
      * 
      * {@inheritDoc}
      * 

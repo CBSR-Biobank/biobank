@@ -14,6 +14,10 @@ import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import edu.ualberta.med.biobank.dao.StudyDao;
+import edu.ualberta.med.biobank.dao.UserDao;
+import edu.ualberta.med.biobank.dao.hibernate.StudyDaoHibernate;
+import edu.ualberta.med.biobank.dao.hibernate.UserDaoHibernate;
 import edu.ualberta.med.biobank.model.context.ExecutingUser;
 
 /**
@@ -92,4 +96,14 @@ public class HibernateConfigDev {
     // }
     // return populator;
     // }
+
+    @Bean
+    public UserDao getUserDao() {
+        return new UserDaoHibernate();
+    }
+
+    @Bean
+    public StudyDao getStudyDao() {
+        return new StudyDaoHibernate();
+    }
 }

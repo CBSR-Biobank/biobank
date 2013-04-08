@@ -2,10 +2,10 @@ package edu.ualberta.med.biobank.model;
 
 import java.io.Serializable;
 
-public interface IBiobankModel extends Serializable, HasId<Integer> {
+public interface IBiobankModel extends Serializable, HasId<Long> {
     @Override
-    public Integer getId();
+    public Long getId();
 
     @Override
-    public void setId(Integer id);
+    public void setId(Long id);
 }

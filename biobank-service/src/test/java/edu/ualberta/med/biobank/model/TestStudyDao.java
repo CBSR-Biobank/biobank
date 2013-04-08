@@ -4,26 +4,33 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.hibernate.Session;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.ualberta.med.biobank.DbTest;
+import edu.ualberta.med.biobank.dao.StudyDao;
+import edu.ualberta.med.biobank.dao.UserDao;
 import edu.ualberta.med.biobank.model.security.User;
 import edu.ualberta.med.biobank.model.study.Study;
 
-@TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
+@TransactionConfiguration(transactionManager = "transactionManager",
+    defaultRollback = false)
 @Transactional()
-public class TestStudy extends DbTest {
+public class TestStudyDao extends DbTest {
+
+    @Autowired
+    StudyDao studyDao;
+
+    @Autowired
+    UserDao userDao;
 
     @Test
-    public void test() {
-        Session session = sessionFactory.getCurrentSession();
-
+    public void get() {
         Date date = new Date();
 
-        User superadmin = (User) session.load(User.class, 1);
+        User superadmin = userDao.get(1L);
         Assert.assertEquals("superadmin", superadmin.getLogin());
 
         Study study = new Study();
@@ -34,7 +41,7 @@ public class TestStudy extends DbTest {
         study.setTimeUpdated(date.getTime());
         study.setInsertedBy(superadmin);
         study.setUpdatedBy(superadmin);
-        session.save(study);
+        studyDao.save(study);
 
     }
 }
