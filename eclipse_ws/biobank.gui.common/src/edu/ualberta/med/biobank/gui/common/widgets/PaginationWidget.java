@@ -15,7 +15,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
-public class PaginationWidget extends Composite {
+public class PaginationWidget extends BgcBaseWidget {
     private static final I18n i18n = I18nFactory
         .getI18n(PaginationWidget.class);
 

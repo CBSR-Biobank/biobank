@@ -144,8 +144,7 @@ public abstract class ImportForm extends BiobankViewForm {
         errorsTable = new BatchOpExceptionTable(parent, errors);
         gd = (GridData) errorsTable.getLayoutData();
         gd.horizontalSpan = 2;
-
-        toolkit.adapt(errorsTable);
+        errorsTable.adaptToToolkit(toolkit, false);
         book.reflow(true);
         form.layout(true, true);
     }

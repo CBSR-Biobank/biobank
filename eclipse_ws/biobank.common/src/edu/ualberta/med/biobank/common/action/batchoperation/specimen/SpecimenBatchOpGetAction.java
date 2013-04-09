@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.BatchOperation;
@@ -17,9 +18,10 @@ public class SpecimenBatchOpGetAction
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
-    private static final String SPECIMEN_QRY = "SELECT bos.specimen " +
-        " FROM " + BatchOperationSpecimen.class.getName() + " bos" +
-        " WHERE bos.batch.id = ?";
+    private static final String SPECIMEN_QRY = "SELECT bos.specimen "
+        + " FROM " + BatchOperationSpecimen.class.getName() + " bos"
+        + " WHERE bos.batch.id = ?"
+        + " ORDER BY bos.specimen.inventory_id";
 
     private final Integer id;
 
@@ -46,7 +48,7 @@ public class SpecimenBatchOpGetAction
             .list();
 
         BatchOpGetResult<Specimen> result = new BatchOpGetResult<Specimen>(
-            batch, batch.getInput().getMetaData(), specimens);
+            batch, BatchOpActionUtil.getFileMetaData(session, id), specimens);
 
         return result;
     }

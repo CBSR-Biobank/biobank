@@ -6,6 +6,7 @@ import org.hibernate.Session;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.model.BatchOperation;
@@ -44,7 +45,7 @@ public class PatientBatchOpGetAction
         List<Patient> patients = session.createQuery(PATIENT_QRY).setParameter(0, id).list();
 
         BatchOpGetResult<Patient> result = new BatchOpGetResult<Patient>(
-            batch, batch.getInput().getMetaData(), patients);
+            batch, BatchOpActionUtil.getFileMetaData(session, id), patients);
 
         return result;
     }

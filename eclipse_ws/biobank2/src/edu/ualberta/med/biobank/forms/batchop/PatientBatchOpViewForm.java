@@ -50,6 +50,7 @@ public class PatientBatchOpViewForm extends BatchOpViewForm {
         section.setExpanded(true);
 
         patientTable = new PatientTableSimple(client, result.getModelObjects());
+        patientTable.adaptToToolkit(toolkit, true);
         patientTable.layout(true, true);
 
         section.layout(true, true);
