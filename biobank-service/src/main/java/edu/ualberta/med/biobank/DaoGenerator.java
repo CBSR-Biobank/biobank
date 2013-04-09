@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.hibernate.cfg.Configuration;
-import org.hibernate.tool.EnversSchemaGenerator;
-import org.hibernate.tool.hbm2ddl.SchemaExport;
-import org.hibernate.tool.hbm2ddl.SchemaExport.Type;
-import org.hibernate.tool.hbm2ddl.Target;
+import org.hibernate.mapping.PersistentClass;
 
-public class OutputSchema {
+public class DaoGenerator {
 
     public static void main(String[] args) {
         Configuration config = new Configuration();
@@ -24,10 +24,19 @@ public class OutputSchema {
             config.addAnnotatedClass(modelClass);
         }
 
-        SchemaExport schemaExport = new EnversSchemaGenerator(config).export();
-        schemaExport.setDelimiter(";");
-        schemaExport.setOutputFile("src/main/resources/h2-schema.sql");
-        schemaExport.execute(Target.NONE, Type.CREATE);
-        // schemaExport.create(true, false);
+        config.buildMappings();
+
+        Set<String> classes = new TreeSet<String>();
+
+        for (Iterator<PersistentClass> it = config.getClassMappings(); it.hasNext();) {
+            PersistentClass pc = it.next();
+            classes.add(pc.getEntityName());
+        }
+
+        for (String className : classes) {
+            System.out.println(className);
+        }
+
     }
+
 }

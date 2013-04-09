@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search</artifactId>
-            <version>4.1.1.Final</version>
+			<version>4.1.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.xnap.commons</groupId>
@@ -83,8 +83,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Needed for in-memory database/data source -->
-		<!--dependency> <groupId>org.hsqldb</groupId> <artifactId>hsqldb</artifactId> 
-			<version>2.2.9</version> <scope>runtime</scope> </dependency -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
