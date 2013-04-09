@@ -20,6 +20,15 @@ public class V1_2__Biobank_v360 implements SpringJdbcMigration {
         jdbcTemplate.execute("ALTER TABLE container_type ADD COLUMN LABELING_LAYOUT INT(11) "
             + "NOT NULL COMMENT ''");
         jdbcTemplate.execute("UPDATE container_type SET labeling_layout=0");
+
+        // for patient batchOp
+        jdbcTemplate.execute("CREATE TABLE `batch_operation_patient` ("
+            + "`PROCESSING_EVENT_ID` int(11) NOT NULL,"
+            + "  `BATCH_OPERATION_ID` int(11) NOT NULL,"
+            + "  PRIMARY KEY (`PROCESSING_EVENT_ID`,`BATCH_OPERATION_ID`),"
+            + "  KEY `FK69FFC208D3BA0590` (`BATCH_OPERATION_ID`),"
+            + "  CONSTRAINT `FK69FFC208D3BA0590` FOREIGN KEY (`BATCH_OPERATION_ID`) REFERENCES `batch_operation` (`ID`)"
+            + ") ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs");
     }
 
 }
