@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.tools.testconfig;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -13,11 +15,18 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Capacity;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
+import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -45,8 +54,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
  */
 public class TestConfigCreate {
 
-    private static String USAGE =
-        "Usage: testconfigcreate\n\n"
+    private static String USAGE = "Usage: testconfigcreate\n\n"
             + "\tReads options from db.properties file.";
 
     private static final Logger log = LoggerFactory.getLogger(TestConfigCreate.class);
@@ -83,7 +91,8 @@ public class TestConfigCreate {
         sessionProvider = new SessionProvider(Mode.RUN);
         session = sessionProvider.openSession();
 
-        globalAdminUser = (User) session.createCriteria(User.class)
+        globalAdminUser =
+            (User) session.createCriteria(User.class)
             .add(Restrictions.eq("login", globalAdminUserLogin)).uniqueResult();
 
         if (globalAdminUser == null) {
@@ -95,14 +104,16 @@ public class TestConfigCreate {
         Clinic clinic = createClinic("Clinic1", "CL1");
         Study study = createStudy("Study1", "ST1", clinic.getContacts().iterator().next());
 
-        createPatientWithCollectionEvent(study, clinic);
-
         Set<Study> studies = new HashSet<Study>();
         studies.add(study);
 
-        createSite("Site1", "Site1", studies);
+        Site site1 = createSite("Site1", "Site1", studies);
         createSite("Site2", "Site2", studies);
 
+        createPatientWithProcessingEvent(study, site1);
+        log.info("testing configuration created");
+
+        createFreezer(site1);
     }
 
     private Clinic createClinic(String name, String nameShort) {
@@ -184,7 +195,8 @@ public class TestConfigCreate {
     }
 
     private SpecimenType getSpecimenType(String specimenTypeName) {
-        SpecimenType specimenType = (SpecimenType) session.createCriteria(SpecimenType.class)
+        SpecimenType specimenType =
+            (SpecimenType) session.createCriteria(SpecimenType.class)
             .add(Restrictions.eq("name", specimenTypeName)).uniqueResult();
 
         if (specimenType == null) {
@@ -194,13 +206,16 @@ public class TestConfigCreate {
         return specimenType;
     }
 
-    private void createPatientWithCollectionEvent(Study study, Clinic clinic) {
+    private void createPatientWithProcessingEvent(Study study, Center center) {
         if (session == null) {
             throw new IllegalStateException("session not initialized");
         }
         if (study == null) {
             throw new IllegalStateException("study is null");
         }
+
+        session.beginTransaction();
+
         Patient patient = new Patient();
         patient.setPnumber("1100");
         patient.setCreatedAt(new Date());
@@ -209,7 +224,6 @@ public class TestConfigCreate {
 
         CollectionEvent collectionEvent = new CollectionEvent();
         collectionEvent.setPatient(patient);
-
         collectionEvent.setVisitNumber(1);
         patient.getCollectionEvents().add(collectionEvent);
 
@@ -217,22 +231,31 @@ public class TestConfigCreate {
         session.update(patient);
 
         OriginInfo originInfo = new OriginInfo();
-        originInfo.setCenter(clinic);
+        originInfo.setCenter(center);
         session.save(originInfo);
+
+        ProcessingEvent processingEvent = new ProcessingEvent();
+        processingEvent.setWorksheet("A100");
+        processingEvent.setCenter(center);
+        processingEvent.setCreatedAt(new Date());
+        session.save(processingEvent);
 
         Specimen specimen = new Specimen();
         specimen.setInventoryId("A100");
         specimen.setSpecimenType(getSpecimenType(SOURCE_SPC_TYPE_NAME));
-        specimen.setCurrentCenter(clinic);
+        specimen.setCurrentCenter(center);
         specimen.setCollectionEvent(collectionEvent);
         specimen.setOriginInfo(originInfo);
         specimen.setCreatedAt(new Date());
         specimen.setOriginalCollectionEvent(collectionEvent);
+        specimen.setProcessingEvent(processingEvent);
 
         collectionEvent.getOriginalSpecimens().add(specimen);
         collectionEvent.getAllSpecimens().add(specimen);
-        session.save(specimen);
         session.update(collectionEvent);
+        session.save(specimen);
+
+        session.getTransaction().commit();
     }
 
     private Site createSite(String name, String nameShort, Set<Study> studies) {
@@ -261,4 +284,107 @@ public class TestConfigCreate {
         return site;
     }
 
+    private void createFreezer(Site site) {
+        if (session == null) {
+            throw new IllegalStateException("session not initialized");
+        }
+        if (site == null) {
+            throw new IllegalStateException("studies is null");
+        }
+
+        session.beginTransaction();
+        List<ContainerType> containerTypes = createContainerTypes(site);
+        createContainers(containerTypes, "01");
+        session.getTransaction().commit();
+    }
+
+    private List<ContainerType> createContainerTypes(Site site) {
+        ContainerType pallet96 = createContainerType(site, "Pallet96", "P96", 8, 12,
+            getContainerLabelingScheme("SBS Standard"));
+        pallet96.getSpecimenTypes().add(getSpecimenType(ALQ_SPC_TYPE_NAME));
+        session.update(pallet96);
+
+        ContainerType hotel19 = createContainerType(site, "Hotel19", "H19", 19, 1,
+            getContainerLabelingScheme("2 char numeric"));
+        hotel19.getChildContainerTypes().add(pallet96);
+        session.update(hotel19);
+
+        ContainerType freezer = createContainerType(site, "Freezer4x10", "FR4x10", 4, 10,
+            getContainerLabelingScheme("2 char alphabetic"));
+        freezer.setTopLevel(true);
+        freezer.getChildContainerTypes().add(hotel19);
+        session.update(freezer);
+
+        return Arrays.asList(freezer, hotel19, pallet96);
+    }
+
+    /**
+     * Creates top level container and the first level child at the first position.
+     * 
+     * containerTypes is a list with 3 items where item 0 is the top level container, 1 the first
+     * level child and 2 the second level child.
+     */
+    private void createContainers(List<ContainerType> containerTypes, String topLevelLabel) {
+        if (containerTypes.size() != 3) {
+            throw new IllegalStateException("invalid number of items in containerTypes list");
+        }
+
+        Container topContainer = createContainer(containerTypes.get(0));
+        topContainer.setLabel(topLevelLabel);
+        session.save(topContainer);
+        session.flush();
+
+        Container childContainer = createContainer(containerTypes.get(1));
+        childContainer.setLabel("01AA");
+        session.save(childContainer);
+
+        ContainerPosition pos = new ContainerPosition();
+        pos.setRow(0);
+        pos.setCol(0);
+        pos.setContainer(childContainer);
+        childContainer.setPosition(pos);
+        childContainer.setTopContainer(topContainer);
+        session.update(childContainer);
+
+        pos.setParentContainer(topContainer);
+        topContainer.getChildPositions().add(pos);
+        session.update(topContainer);
+    }
+
+    private ContainerType createContainerType(Site site, String name, String nameShort,
+        Integer rowCapacity, Integer colCapacity, ContainerLabelingScheme labelingScheme) {
+        Capacity capacity = new Capacity();
+        capacity.setRowCapacity(rowCapacity);
+        capacity.setColCapacity(colCapacity);
+
+        ContainerType containerType = new ContainerType();
+        containerType.setName(name);
+        containerType.setNameShort(nameShort);
+        containerType.setSite(site);
+        containerType.setCapacity(capacity);
+        containerType.setChildLabelingScheme(labelingScheme);
+        session.save(containerType);
+
+        return containerType;
+    }
+
+    private Container createContainer(ContainerType containerType) {
+        Container container = new Container();
+        container.setSite(containerType.getSite());
+        container.setContainerType(containerType);
+        container.setTopContainer(container);
+        return container;
+    }
+
+    private ContainerLabelingScheme getContainerLabelingScheme(String schemeName) {
+        ContainerLabelingScheme scheme =
+            (ContainerLabelingScheme) session.createCriteria(ContainerLabelingScheme.class)
+                .add(Restrictions.eq("name", schemeName)).uniqueResult();
+
+        if (scheme == null) {
+            throw new IllegalStateException("specimen type not found: " + schemeName);
+        }
+
+        return scheme;
+    }
 }
