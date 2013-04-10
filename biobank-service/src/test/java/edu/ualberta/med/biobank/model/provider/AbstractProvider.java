@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.model.provider;
 
-public abstract class AbstractProvider<T>
+import edu.ualberta.med.biobank.model.VersionedLongIdModel;
+
+public abstract class AbstractProvider<T extends VersionedLongIdModel>
     implements EntityProvider<T> {
+
+    protected final Mother mother;
 
     private T provided;
     private EntityProcessor<T> processor;
-    protected final Mother mother;
 
     protected AbstractProvider(Mother mother) {
         this.mother = mother;

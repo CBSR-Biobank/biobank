@@ -51,6 +51,12 @@ public class GenericDaoHibernate<T extends VersionedLongIdModel>
     }
 
     @Override
+    public void update(T object) {
+        sessionFactory.getCurrentSession().update(object);
+        sessionFactory.getCurrentSession().flush();
+    }
+
+    @Override
     public void delete(T object) {
         sessionFactory.getCurrentSession().delete(object);
     }

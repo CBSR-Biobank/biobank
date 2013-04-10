@@ -5,13 +5,14 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import javax.persistence.Version;
 
 import edu.ualberta.med.biobank.model.security.User;
 
 /**
- * Super class that allows derived classes to automatically inherit a version, a
- * last update time, and a last updated by user.
+ * Super class that allows derived classes to automatically inherit a version, a last update time,
+ * and a last updated by user.
  * 
  * @author Jonathan Ferland
  */
@@ -32,8 +33,7 @@ public abstract class VersionedLongIdModel
     }
 
     /**
-     * DO NOT CALL this method unless, maybe, for tests. Hibernate manages
-     * setting this value.
+     * DO NOT CALL this method unless, maybe, for tests. Hibernate manages setting this value.
      * 
      * @param version
      */
@@ -62,5 +62,23 @@ public abstract class VersionedLongIdModel
     @Override
     public void setUpdatedBy(User updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    @Transient
+    public void setInserted(User user, Long time) {
+        setInsertedBy(user);
+        setTimeInserted(time);
+    }
+
+    @Transient
+    public void setUpdated(User user, Long time) {
+        setUpdatedBy(user);
+        setTimeUpdated(time);
+    }
+
+    @Transient
+    public void setInsertedAndUpdated(User user, Long time) {
+        setInserted(user, time);
+        setUpdated(user, time);
     }
 }
