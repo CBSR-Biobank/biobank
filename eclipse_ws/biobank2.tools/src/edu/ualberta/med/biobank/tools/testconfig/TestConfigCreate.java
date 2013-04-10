@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.User;
+import edu.ualberta.med.biobank.model.type.LabelingLayout;
 import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.SessionProvider;
 import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
@@ -55,7 +56,7 @@ import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 public class TestConfigCreate {
 
     private static String USAGE = "Usage: testconfigcreate\n\n"
-            + "\tReads options from db.properties file.";
+        + "\tReads options from db.properties file.";
 
     private static final Logger log = LoggerFactory.getLogger(TestConfigCreate.class);
 
@@ -93,7 +94,7 @@ public class TestConfigCreate {
 
         globalAdminUser =
             (User) session.createCriteria(User.class)
-            .add(Restrictions.eq("login", globalAdminUserLogin)).uniqueResult();
+                .add(Restrictions.eq("login", globalAdminUserLogin)).uniqueResult();
 
         if (globalAdminUser == null) {
             throw new RuntimeException(globalAdminUserLogin + " user not found");
@@ -197,7 +198,7 @@ public class TestConfigCreate {
     private SpecimenType getSpecimenType(String specimenTypeName) {
         SpecimenType specimenType =
             (SpecimenType) session.createCriteria(SpecimenType.class)
-            .add(Restrictions.eq("name", specimenTypeName)).uniqueResult();
+                .add(Restrictions.eq("name", specimenTypeName)).uniqueResult();
 
         if (specimenType == null) {
             throw new IllegalStateException("specimen type not found: " + specimenTypeName);
@@ -363,6 +364,7 @@ public class TestConfigCreate {
         containerType.setSite(site);
         containerType.setCapacity(capacity);
         containerType.setChildLabelingScheme(labelingScheme);
+        containerType.setLabelingLayout(LabelingLayout.VERTICAL);
         session.save(containerType);
 
         return containerType;
