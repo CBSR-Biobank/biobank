@@ -11,6 +11,7 @@
 	<properties>
 		<org.springframework.version>3.1.4.RELEASE</org.springframework.version>
 		<org.hibernate.version>4.1.11.Final</org.hibernate.version>
+		<org.slf4j.version>1.7.5</org.slf4j.version>
 		<!-- jetty.version>9.0.0.v20130308</jetty.version -->
 		<jetty.version>8.1.8.v20121106</jetty.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
