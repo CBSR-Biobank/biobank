@@ -3,7 +3,7 @@
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.CenterLocation" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/CenterLocation.java" binary="false">    
-    <position height="-1" width="-1" x="114" y="451"/>    
+    <position height="-1" width="-1" x="114" y="345"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -12,7 +12,7 @@
   <class id="2" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.CenterComment" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/CenterComment.java" binary="false">    
-    <position height="-1" width="-1" x="420" y="125"/>    
+    <position height="-1" width="-1" x="383" y="283"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -27,18 +27,52 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <association id="4">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="5" name="center"/>      
-      <multiplicity id="6" minimum="0" maximum="1"/>    
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.StudyCenter" 
+    project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/StudyCenter.java" binary="false">    
+    <position height="-1" width="-1" x="382" y="126"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Study" 
+    project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Study.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="624" y="126"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <association id="6">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="7" name="center"/>      
+      <multiplicity id="8" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="7">    
+  <association id="9">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="8" name="center"/>      
-      <multiplicity id="9" minimum="0" maximum="1"/>    
+      <attribute id="10" name="center"/>      
+      <multiplicity id="11" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="12">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="13" name="study"/>      
+      <multiplicity id="14" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="15">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="16" name="center"/>      
+      <multiplicity id="17" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  

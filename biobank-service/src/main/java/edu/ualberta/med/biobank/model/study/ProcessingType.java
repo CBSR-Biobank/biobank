@@ -20,11 +20,9 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * Describes a regularly performed procedure with a unique name (within its
- * {@link Study}). There should be one or more associated
- * {@link SpecimenProcesingType}s and {@link SpecimenProcesingLinkType}s that
- * (1) further define legal procedures and (2) allow logging of procedures
- * performed on different types of {@link Specimen}s.
+ * Describes a regularly performed procedure with a unique name (within its {@link Study}). There
+ * should be one or more associated {@link SpecimenProcesingLinkType}s that (1) further define legal
+ * procedures and (2) allow logging of procedures performed on different types of {@link Specimen}s.
  * 
  * @author Jonathan Ferland
  * @see SpecimenLinkType
@@ -59,8 +57,8 @@ public class ProcessingType
     }
 
     /**
-     * @return a short name that uniquely identifies a {@link ProcessingType}
-     *         within a {@link Study}.
+     * @return a short name that uniquely identifies a {@link ProcessingType} within a {@link Study}
+     *         .
      */
     @NotEmpty(message = "{ProcessingType.name.NotEmpty")
     @Size(max = 50, message = "{ProcessingType.name.Size}")
@@ -74,8 +72,7 @@ public class ProcessingType
     }
 
     /**
-     * @return an optional detailed description of the {@link ProcessingType},
-     *         or null.
+     * @return an optional detailed description of the {@link ProcessingType}, or null.
      */
     @Size(max = 10000, message = "{ProcessingType.description.Size}")
     @Column(name = "DESCRIPTION", length = 10000)
@@ -88,9 +85,9 @@ public class ProcessingType
     }
 
     /**
-     * @return true if this {@link ProcessingType} is still being performed, or
-     *         false if this {@link ProcessingType} is no longer being carried
-     *         out, but exists for historical and record-keeping purposes.
+     * @return true if this {@link ProcessingType} is still being performed, or false if this
+     *         {@link ProcessingType} is no longer being carried out, but exists for historical and
+     *         record-keeping purposes.
      */
     @NotNull(message = "{ProcessingType.enabled.NotNull}")
     public Boolean isEnabled() {

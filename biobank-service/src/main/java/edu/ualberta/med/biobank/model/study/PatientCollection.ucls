@@ -5,69 +5,30 @@
     binary="false">    
     <position height="-1" width="-1" x="153" y="59"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
+      <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="2" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEventType" 
-    project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventType.java" binary="false">    
-    <position height="-1" width="-1" x="152" y="321"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="3" corner="BOTTOM_RIGHT" language="java" 
-    name="edu.ualberta.med.biobank.model.study.CollectionEventAnnotation" project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventAnnotation.java" 
-    binary="false">    
-    <position height="-1" width="-1" x="543" y="583"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="4" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEvent" 
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEvent" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEvent.java" binary="false">    
-    <position height="-1" width="-1" x="440" y="321"/>    
+    <position height="-1" width="-1" x="440" y="304"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" 
-    name="edu.ualberta.med.biobank.model.study.CollectionEventAnnotationType" project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventAnnotationType.java" 
-    binary="false">    
-    <position height="-1" width="-1" x="153" y="635"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="6" corner="BOTTOM_RIGHT" language="java" 
-    name="edu.ualberta.med.biobank.model.study.CollectionEventTypeAnnotationType" project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventTypeAnnotationType.java" 
-    binary="false">    
-    <position height="-1" width="-1" x="153" y="487"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="7" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEventComment" 
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEventComment" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventComment.java" 
     binary="false">    
-    <position height="-1" width="-1" x="361" y="586"/>    
+    <position height="-1" width="-1" x="753" y="264"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="8" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Patient" 
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Patient" 
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Patient.java" 
     binary="false">    
     <position height="-1" width="-1" x="440" y="59"/>    
@@ -76,139 +37,191 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="9" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientAnnotation" 
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientAnnotation" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/PatientAnnotation.java" binary="false">    
-    <position height="-1" width="-1" x="752" y="196"/>    
+    <position height="-1" width="-1" x="754" y="143"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientComment" 
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientComment" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/PatientComment.java" binary="false">    
-    <position height="-1" width="-1" x="752" y="58"/>    
+    <position height="-1" width="-1" x="754" y="58"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" 
+    name="edu.ualberta.med.biobank.model.study.SpecimenCollectionEvent" project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenCollectionEvent.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="440" y="487"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Specimen" 
+    project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Specimen.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="67" y="488"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" 
+    name="edu.ualberta.med.biobank.model.study.CollectionEventAnnotation" project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventAnnotation.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="755" y="356"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEventType" 
+    project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEventType.java" binary="false">    
+    <position height="-1" width="-1" x="280" y="168"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
   <class id="11" corner="BOTTOM_RIGHT" language="java" 
-    name="edu.ualberta.med.biobank.model.study.SpecimenCollectionEvent" project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenCollectionEvent.java" 
+    name="edu.ualberta.med.biobank.model.study.SpecimenGroupCollectionEventType" project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenGroupCollectionEventType.java" 
     binary="false">    
-    <position height="-1" width="-1" x="752" y="320"/>    
+    <position height="-1" width="-1" x="215" y="326"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
+      <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="12" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Specimen" 
-    project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Specimen.java" 
-    binary="false">    
-    <position height="-1" width="-1" x="752" y="541"/>    
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.SpecimenGroup" 
+    project="biobank-service" 
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenGroup.java" binary="false">    
+    <position height="-1" width="-1" x="67" y="168"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
+      <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
   <association id="13">    
-    <bendpoint x="544" y="454"/>    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="14" name="collectionEvent"/>      
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="14" name="type"/>      
       <multiplicity id="15" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
+    <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="16">    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="17" name="annotationType"/>      
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="17" name="collectionEvent"/>      
       <multiplicity id="18" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="19">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="20" name="study"/>      
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="20" name="collectionEvent"/>      
       <multiplicity id="21" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="22">    
-    <bendpoint x="361" y="449"/>    
-    <end type="SOURCE" refId="7" navigable="false">      
-      <attribute id="23" name="collectionEvent"/>      
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="23" name="patient"/>      
       <multiplicity id="24" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="25">    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="26" name="collectionEvent"/>      
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="26" name="patient"/>      
       <multiplicity id="27" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="28">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="29" name="patient"/>      
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="29" name="collectionEvent"/>      
       <multiplicity id="30" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="31">    
-    <end type="SOURCE" refId="4" navigable="false">      
+    <end type="SOURCE" refId="11" navigable="false">      
       <attribute id="32" name="type"/>      
       <multiplicity id="33" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
+    <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="34">    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="35" name="collectionEventType"/>      
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="35" name="patient"/>      
       <multiplicity id="36" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
+    <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="37">    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="38" name="patient"/>      
-      <multiplicity id="39" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="40">    
     <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="41" name="specimen"/>      
-      <multiplicity id="42" minimum="0" maximum="1"/>    
+      <attribute id="38" name="group"/>      
+      <multiplicity id="39" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="12" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <association id="40">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="41" name="study"/>      
+      <multiplicity id="42" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="43">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="44" name="patient"/>      
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="44" name="study"/>      
       <multiplicity id="45" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
+    <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="46">    
-    <end type="SOURCE" refId="2" navigable="false">      
+    <end type="SOURCE" refId="4" navigable="false">      
       <attribute id="47" name="study"/>      
       <multiplicity id="48" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="49">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="50" name="specimen"/>      
+      <multiplicity id="51" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="52">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="53" name="group"/>      
+      <multiplicity id="54" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
