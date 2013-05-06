@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
  * <p>
  * It would not make sense for multiple {@link Study}s to each have their own {@link Preservation}
  * and {@link SpecimenType} data on a {@link Specimen} as this could quickly go out-of-date when the
- * {@link Specimen}s are further processed. It only makes sense for their to be one
+ * {@link Specimen}s are further processed. It only makes sense for there to be one
  * {@link SpecimenGroup} per {@link Specimen}.
  * 
  * @author Jonathan Ferland

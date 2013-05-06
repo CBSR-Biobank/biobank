@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
  * Describes a regularly performed procedure with a unique name (within its {@link Study}). There
- * should be one or more associated {@link SpecimenProcesingLinkType}s that (1) further define legal
+ * should be one or more associated {@link SpecimenLinkType}s that (1) further define legal
  * procedures and (2) allow logging of procedures performed on different types of {@link Specimen}s.
  * 
  * @author Jonathan Ferland
