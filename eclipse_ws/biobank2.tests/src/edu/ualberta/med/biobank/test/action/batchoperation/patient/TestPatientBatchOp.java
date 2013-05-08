@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -165,5 +167,26 @@ public class TestPatientBatchOp extends TestAction {
 
             }
         }
+    }
+
+    @Test
+    public void patientBatchOpGetAction() throws Exception {
+        session.getTransaction().commit();
+
+        Set<PatientBatchOpInputPojo> pojos = patientPojoHelper.createPatients(
+            factory.getDefaultStudy().getNameShort(), 100);
+        patientPojoHelper.addComments(pojos);
+        PatientCsvWriter.write(CSV_NAME, pojos);
+
+        PatientBatchOpAction importAction = new PatientBatchOpAction(
+            factory.getDefaultSite(), pojos, new File(CSV_NAME));
+        Integer bachOpId = exec(importAction).getId();
+
+        checkPojosAgainstDb(pojos);
+
+        BatchOpGetResult<Patient> batchOpResult =
+            exec(new PatientBatchOpGetAction(bachOpId));
+
+        Assert.assertEquals(pojos.size(), batchOpResult.getModelObjects().size());
     }
 }
