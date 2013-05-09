@@ -6789,7 +6789,7 @@ msgstr "Ошибка при создании пути"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/FilePromptUtil.java:44
 #, java-format
 msgid "An error occurred. Could not create path {0}."
-msgstr "Произошла ошибка. Невозможно создать путь (0"
+msgstr "Произошла ошибка. Невозможно создать путь {0}"
 
 #. dialog message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/FilePromptUtil.java:55
@@ -6957,7 +6957,7 @@ msgstr "Не найдено текущих событий для рабочег�
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/ProcessingView.java:205
 #, java-format
 msgid "No Processing Events found for patient {0}"
-msgstr "Не найдено текущих событий для пациента 0)"
+msgstr "Не найдено текущих событий для пациента {0}"
 
 #. dialog message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/ProcessingView.java:209
@@ -7404,7 +7404,7 @@ msgstr "Открыть пользователя"
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/UserInfoTable.java:104
 #, java-format
 msgid "Cannot unlock user {0}."
-msgstr "Невозможно открыть пользователя (0"
+msgstr "Невозможно открыть пользователя {0}"
 
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/UserInfoTable.java:193
@@ -7680,7 +7680,7 @@ msgstr "Допущена ошибка при удалении экземпляр
 #, java-format
 msgid ""
 "Cannot delete specimen type \"{0}\" since specimens or studies are using it."
-msgstr "Невозможно удалить экземпляр типа    Так как экземпляры или исследования его используют."
+msgstr "Невозможно удалить экземпляр типа Так как экземпляры или исследования его используют."
 
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/infos/SpecimenTypeEntryInfoTree.java:172
