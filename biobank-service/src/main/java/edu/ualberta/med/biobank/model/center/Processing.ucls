@@ -3,7 +3,7 @@
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.Center" 
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/Center.java" 
     binary="false">    
-    <position height="-1" width="-1" x="101" y="50"/>    
+    <position height="-1" width="-1" x="539" y="518"/>
     <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -13,7 +13,7 @@
     name="edu.ualberta.med.biobank.model.center.ProcessingEventInputSpecimen" project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/ProcessingEventInputSpecimen.java" 
     binary="false">    
-    <position height="-1" width="-1" x="456" y="206"/>    
+    <position height="-1" width="-1" x="539" y="265"/>
     <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -22,7 +22,7 @@
   <class id="3" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.ProcessingEvent" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/ProcessingEvent.java" binary="false">    
-    <position height="-1" width="-1" x="303" y="50"/>    
+    <position height="-1" width="-1" x="539" y="414"/>
     <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -32,7 +32,7 @@
     name="edu.ualberta.med.biobank.model.center.ProcessingEventComment" project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/ProcessingEventComment.java" 
     binary="false">    
-    <position height="-1" width="-1" x="590" y="50"/>    
+    <position height="-1" width="-1" x="796" y="414"/>
     <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -41,78 +41,197 @@
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Specimen" 
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Specimen.java" 
     binary="false">    
-    <position height="68" width="186" x="222" y="334"/>    
+    <position height="179" width="201" x="187" y="13"/>
     <display autosize="false" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
+      <attributes public="true" package="true" protected="true" private="true"/>
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
   <class id="6" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.SpecimenLink" 
     project="biobank-service" 
     file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenLink.java" binary="false">    
-    <position height="-1" width="-1" x="144" y="206"/>    
+    <position height="-1" width="-1" x="314" y="291"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="true" package="true" protected="true" private="true"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.SpecimenContainer"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/SpecimenContainer.java" binary="false">
+    <position height="-1" width="-1" x="546" y="102"/>
     <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <association id="7">    
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.center.Container"
+    project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/center/Container.java"
+    binary="false">
+    <position height="-1" width="-1" x="795" y="245"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="true" package="true" protected="true" private="true"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.SpecimenLinkType"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenLinkType.java" binary="false">
+    <position height="-1" width="-1" x="314" y="418"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="false" package="false" protected="false" private="false"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.ProcessingType"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/ProcessingType.java" binary="false">
+    <position height="-1" width="-1" x="314" y="500"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="false" package="false" protected="false" private="false"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.CollectionEvent"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/CollectionEvent.java" binary="false">
+    <position height="-1" width="-1" x="103" y="345"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="false" package="false" protected="false" private="false"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="12" corner="BOTTOM_RIGHT" language="java"
+    name="edu.ualberta.med.biobank.model.study.SpecimenCollectionEvent" project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/SpecimenCollectionEvent.java"
+    binary="false">
+    <position height="-1" width="-1" x="103" y="254"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="false" package="false" protected="false" private="false"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.Patient"
+    project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/Patient.java"
+    binary="false">
+    <position height="-1" width="-1" x="103" y="439"/>
+    <display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" visibility="true">
+      <attributes public="false" package="false" protected="false" private="false"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <association id="14">
+    <end type="SOURCE" refId="2" navigable="false">
+      <attribute id="15" name="specimen"/>
+      <multiplicity id="16" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="5" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="17">
+    <end type="SOURCE" refId="4" navigable="false">
+      <attribute id="18" name="processingEvent"/>
+      <multiplicity id="19" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="3" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="20">
+    <end type="SOURCE" refId="5" navigable="false">
+      <attribute id="21" name="container"/>
+      <multiplicity id="22" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="7" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="23">
     <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="8" name="center"/>      
-      <multiplicity id="9" minimum="0" maximum="1"/>    
+      <attribute id="24" name="center"/>
+      <multiplicity id="25" minimum="0" maximum="1"/>
     </end>    
     <end type="TARGET" refId="1" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="10">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="11" name="processingEvent"/>      
-      <multiplicity id="12" minimum="0" maximum="1"/>    
+  <association id="26">
+    <bendpoint x="357" y="216"/>
+    <end type="SOURCE" refId="6" navigable="false">
+      <attribute id="27" name="input"/>
+      <multiplicity id="28" minimum="0" maximum="1"/>
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="29">
+    <end type="SOURCE" refId="12" navigable="false">
+      <attribute id="30" name="collectionEvent"/>
+      <multiplicity id="31" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="11" navigable="true"/>
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="32">
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="33" name="type"/>
+      <multiplicity id="34" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="9" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="35">
+    <bendpoint x="409" y="414"/>
+    <end type="SOURCE" refId="6" navigable="false">
+      <attribute id="36" name="processingEvent"/>
+      <multiplicity id="37" minimum="0" maximum="1"/>
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="13">    
+  <association id="38">
+    <end type="SOURCE" refId="9" navigable="false">
+      <attribute id="39" name="type"/>
+      <multiplicity id="40" minimum="0" maximum="1"/>
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="41">
+    <bendpoint x="215" y="218"/>
     <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="14" name="processingEvent"/>      
-      <multiplicity id="15" minimum="0" maximum="1"/>    
+      <attribute id="42" name="output"/>
+      <multiplicity id="43" minimum="0" maximum="1"/>
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="44">
+    <bendpoint x="104" y="144"/>
+    <end type="SOURCE" refId="12" navigable="false">
+      <attribute id="45" name="specimen"/>
+      <multiplicity id="46" minimum="0" maximum="1"/>
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="47">
+    <end type="SOURCE" refId="11" navigable="false">
+      <attribute id="48" name="patient"/>
+      <multiplicity id="49" minimum="0" maximum="1"/>
+    </end>
+    <end type="TARGET" refId="13" navigable="true"/>
+    <display labels="true" multiplicity="true"/>
+  </association>
+  <association id="50">
+    <end type="SOURCE" refId="2" navigable="false">
+      <attribute id="51" name="processingEvent"/>
+      <multiplicity id="52" minimum="0" maximum="1"/>
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="16">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="17" name="specimen"/>      
-      <multiplicity id="18" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="19">    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="20" name="input"/>      
-      <multiplicity id="21" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="22">    
-    <bendpoint x="144" y="368"/>    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="23" name="output"/>      
-      <multiplicity id="24" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="25">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="26" name="processingEvent"/>      
-      <multiplicity id="27" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
+  <generalization id="53">
+    <end type="SOURCE" refId="7"/>
+    <end type="TARGET" refId="8"/>
+  </generalization>
   <classifier-display autosize="true" stereotype="true" package="false" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="false" package="false" protected="false" private="false"/>    

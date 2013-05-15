@@ -3,7 +3,7 @@
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.Annotation" 
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/Annotation.java" 
     binary="false">    
-    <position height="-1" width="-1" x="131" y="104"/>    
+    <position height="-1" width="-1" x="131" y="106"/>
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -12,52 +12,91 @@
   <class id="2" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.AnnotationOption" 
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/AnnotationOption.java" 
     binary="false">    
-    <position height="-1" width="-1" x="383" y="103"/>    
+    <position height="-1" width="-1" x="383" y="105"/>
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="3" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.AnnotationType" 
+  <enumeration id="3" corner="BOTTOM_RIGHT" language="java"
+    name="edu.ualberta.med.biobank.model.type.AnnotationValueType" project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/type/AnnotationValueType.java" binary="false">
+    <position height="-1" width="-1" x="639" y="363"/>
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">
+      <attributes public="true" package="true" protected="true" private="true"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </enumeration>
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.AnnotationType"
     project="biobank-service" file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/AnnotationType.java" 
     binary="false">    
-    <position height="-1" width="-1" x="650" y="103"/>    
+    <position height="-1" width="-1" x="639" y="106"/>
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <enumeration id="4" corner="BOTTOM_RIGHT" language="java" 
-    name="edu.ualberta.med.biobank.model.type.AnnotationValueType" project="biobank-service" 
-    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/type/AnnotationValueType.java" binary="false">    
-    <position height="88" width="164" x="567" y="319"/>    
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.StudyAnnotationType"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/StudyAnnotationType.java" binary="false">
+    <position height="-1" width="-1" x="374" y="274"/>
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
-  </enumeration>  
-  <association id="5">    
-    <end type="SOURCE" refId="2" navigable="false">      
-      <attribute id="6" name="type"/>      
-      <multiplicity id="7" minimum="0" maximum="1"/>    
+  </class>
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientAnnotation"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/PatientAnnotation.java" binary="false">
+    <position height="-1" width="-1" x="131" y="427"/>
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">
+      <attributes public="true" package="true" protected="true" private="true"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="edu.ualberta.med.biobank.model.study.PatientAnnotationType"
+    project="biobank-service"
+    file="/biobank-service/src/main/java/edu/ualberta/med/biobank/model/study/PatientAnnotationType.java" binary="false">
+    <position height="-1" width="-1" x="374" y="425"/>
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">
+      <attributes public="true" package="true" protected="true" private="true"/>
+      <operations public="false" package="false" protected="false" private="false"/>
+    </display>
+  </class>
+  <generalization id="8">
+    <end type="SOURCE" refId="7"/>
+    <end type="TARGET" refId="5"/>
+  </generalization>
+  <association id="9">
+    <end type="SOURCE" refId="4" navigable="false">
+      <attribute id="10" name="valueType"/>
+      <multiplicity id="11" minimum="0" maximum="1"/>
     </end>    
     <end type="TARGET" refId="3" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="8">    
-    <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="9" name="valueType"/>      
-      <multiplicity id="10" minimum="0" maximum="1"/>    
+  <generalization id="12">
+    <end type="SOURCE" refId="5"/>
+    <end type="TARGET" refId="4"/>
+  </generalization>
+  <generalization id="13">
+    <end type="SOURCE" refId="6"/>
+    <end type="TARGET" refId="1"/>
+  </generalization>
+  <association id="14">
+    <end type="SOURCE" refId="1" navigable="false">
+      <attribute id="15" name="selectedValue"/>
+      <multiplicity id="16" minimum="0" maximum="1"/>
     </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="11">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="12" name="selectedValue"/>      
-      <multiplicity id="13" minimum="0" maximum="1"/>    
+  <association id="17">
+    <end type="SOURCE" refId="2" navigable="false">
+      <attribute id="18" name="type"/>
+      <multiplicity id="19" minimum="0" maximum="1"/>
     </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
+    <end type="TARGET" refId="4" navigable="true"/>
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
