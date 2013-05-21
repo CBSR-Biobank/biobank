@@ -62,6 +62,9 @@
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <!-- pathelement location="${eclipse.proj.dir.common}/lib/client" / -->
         <pathelement location="${eclipse.proj.dir.tests}/lib/junit.jar" />
+	<fileset dir="${eclipse.proj.dir.tools}/lib">
+	  <include name="*.jar" />
+	</fileset>
       </classpath>
       <classpath refid="biobank.common.build.classpath" />
     </javac>
