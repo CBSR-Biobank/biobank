@@ -43,7 +43,7 @@ public class StudyGetInfoAction implements Action<StudyInfo> {
         this.studyId = studyId;
 
         getClinicInfo = new StudyGetClinicInfoAction(studyId);
-        getSourceSpecimens = new StudyGetSourceSpecimensAction(studyId);
+        getSourceSpecimens = new StudyGetSourceSpecimensAction(studyId, false);
         getAliquotedSpecimens = new StudyGetAliquotedSpecimensAction(studyId);
         getStudyEventAttrs = new StudyGetStudyEventAttrsAction(studyId);
     }
