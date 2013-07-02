@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
@@ -213,5 +215,14 @@ public class BatchOpActionUtil {
             .add(Restrictions.eq("id", batchOpId))
             .uniqueResult();
         return metaData;
+    }
+
+    public static boolean hasPermissionOnStudies(User user, Set<Study> studies) {
+        for (Study study : studies) {
+            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
