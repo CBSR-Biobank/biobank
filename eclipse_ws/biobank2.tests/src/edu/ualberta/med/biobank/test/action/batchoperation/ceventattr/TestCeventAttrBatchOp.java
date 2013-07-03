@@ -98,6 +98,11 @@ public class TestCeventAttrBatchOp extends TestAction {
                 .add(Restrictions.eq("gea.label", pojo.getAttrName()))
                 .uniqueResult();
 
+            log.debug("checking event attr: pnumber: {}, visitNumber: {}, attrName: {}, attrValue: {}",
+                new Object[] { pojo.getPatientNumber(), pojo.getVisitNumber(), pojo.getAttrName(),
+                    pojo.getAttrValue() });
+
+            Assert.assertNotNull(eventAttr);
             Assert.assertEquals(pojo.getAttrValue(), eventAttr.getValue());
         }
     }

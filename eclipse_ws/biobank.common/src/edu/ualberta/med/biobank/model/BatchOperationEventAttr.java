@@ -43,7 +43,7 @@ public class BatchOperationEventAttr
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @ForeignKey(name = "none")
-    @JoinColumn(name = "PROCESSING_EVENT_ID", nullable = false)
+    @JoinColumn(name = "EVENT_ATTR_ID", nullable = false)
     public EventAttr getEventAttr() {
         return eventAttr;
     }
