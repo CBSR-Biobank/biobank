@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -23,7 +25,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
-import edu.ualberta.med.biobank.model.EventAttrType;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
@@ -58,6 +60,8 @@ import edu.ualberta.med.biobank.model.type.LabelingLayout;
  */
 public class Factory {
     private static final Random R = new Random();
+
+    public static final String STUDY_EVENT_ATTR_SELECT_PERMISSIBLE = "Option1;Option2;Option3";
 
     private final ContainerLabelingSchemeGetter schemeGetter;
     private final NameGenerator nameGenerator;
@@ -99,9 +103,10 @@ public class Factory {
     private ShipmentInfo defaultShipmentInfo;
     private ShippingMethod defaultShippingMethod;
 
-    private EventAttrType defaultEventAttrType;
+    private EventAttrTypeEnum defaultEventAttrTypeEnum;
     private GlobalEventAttr defaultGlobalEventAttr;
     private StudyEventAttr defaultStudyEventAttr;
+    private EventAttr defaultCeventEventAttr;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -998,45 +1003,123 @@ public class Factory {
         return shippingMethod;
     }
 
-    public EventAttrType getEventAttrType() {
-        return defaultEventAttrType;
+    public EventAttrTypeEnum getDefaultEventAttrTypeEnum() {
+        if (defaultEventAttrTypeEnum == null) {
+            defaultEventAttrTypeEnum = EventAttrTypeEnum.TEXT;
+        }
+        return defaultEventAttrTypeEnum;
     }
 
-    public void setEventAttrType(EventAttrType eventAttrType) {
-        defaultEventAttrType = eventAttrType;
+    public void setDefaultEventAttrTypeEnum(EventAttrTypeEnum eventAttrTypeEnum) {
+        defaultEventAttrTypeEnum = eventAttrTypeEnum;
     }
 
-    public GlobalEventAttr getGlobalEventAttr() {
+    public GlobalEventAttr getDefaultGlobalEventAttr() {
+        getDefaultEventAttrTypeEnum();
+        @SuppressWarnings("unchecked")
+        List<GlobalEventAttr> list = session.createCriteria(GlobalEventAttr.class).list();
+        for (GlobalEventAttr gea : list) {
+            if (EventAttrTypeEnum.getEventAttrType(
+                gea.getEventAttrType().getName()).equals(defaultEventAttrTypeEnum)) {
+                defaultGlobalEventAttr = gea;
+            }
+        }
         if (defaultGlobalEventAttr == null) {
-            defaultGlobalEventAttr = GlobalEventAttr.
+            throw new IllegalStateException("could not find global event attr type");
         }
         return defaultGlobalEventAttr;
     }
 
-    public void setGlobalEventAttr(GlobalEventAttr globalEventAttr) {
+    public void setDefaultGlobalEventAttr(GlobalEventAttr globalEventAttr) {
         this.defaultGlobalEventAttr = globalEventAttr;
     }
 
-    public StudyEventAttr getStudyEventAttr() {
+    public StudyEventAttr getDefautlStudyEventAttr() {
         if (defaultStudyEventAttr == null) {
             defaultStudyEventAttr = createStudyEventAttr();
         }
         return defaultStudyEventAttr;
     }
 
-    public void setStudyEventAttr(StudyEventAttr globalEventAttr) {
-        this.defaultStudyEventAttr = globalEventAttr;
+    public void setDefaultStudyEventAttr(StudyEventAttr studyEventAttr) {
+        this.defaultStudyEventAttr = studyEventAttr;
     }
 
     public StudyEventAttr createStudyEventAttr() {
-        String label = nameGenerator.next(StudyEventAttr.class);
+        String permissible = null;
         StudyEventAttr studyEventAttr = new StudyEventAttr();
-        studyEventAttr.setGlobalEventAttr(this.defaultGlobalEventAttr);
+        studyEventAttr.setStudy(getDefaultStudy());
+        studyEventAttr.setGlobalEventAttr(getDefaultGlobalEventAttr());
+
+        String eventAttrTypeName = getDefaultGlobalEventAttr().getEventAttrType().getName();
+        switch (EventAttrTypeEnum.getEventAttrType(eventAttrTypeName)) {
+        case SELECT_SINGLE:
+        case SELECT_MULTIPLE:
+            permissible = STUDY_EVENT_ATTR_SELECT_PERMISSIBLE;
+            break;
+        case NUMBER:
+        case DATE_TIME:
+        case TEXT:
+            // do nothing
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeName);
+        }
+
+        studyEventAttr.setPermissible(permissible);
 
         setDefaultStudyEventAttr(studyEventAttr);
-        session.save(StudyEventAttr);
+        session.save(studyEventAttr);
         session.flush();
-        return StudyEventAttr;
+        return studyEventAttr;
+    }
+
+    public EventAttr getDefautlCeventEventAttr() {
+        if (defaultCeventEventAttr == null) {
+            defaultCeventEventAttr = createCeventEventAttr();
+        }
+        return defaultCeventEventAttr;
+    }
+
+    public void setDefaultCeventEventAttr(EventAttr ceventEventAttr) {
+        this.defaultCeventEventAttr = ceventEventAttr;
+    }
+
+    public EventAttr createCeventEventAttr() {
+        String value = nameGenerator.next(EventAttr.class);
+        EventAttr ceventEventAttr = new EventAttr();
+        StudyEventAttr studyEventAttr = getDefautlStudyEventAttr();
+        ceventEventAttr.setStudyEventAttr(studyEventAttr);
+        ceventEventAttr.setCollectionEvent(getDefaultCollectionEvent());
+
+        String eventAttrTypeName = studyEventAttr.getGlobalEventAttr().getEventAttrType().getName();
+        switch (EventAttrTypeEnum.getEventAttrType(eventAttrTypeName)) {
+        case SELECT_SINGLE:
+            value = defaultStudyEventAttr.getPermissible().split(";")[0];
+            break;
+        case SELECT_MULTIPLE:
+            value = defaultStudyEventAttr.getPermissible().split(";")[0]
+                + defaultStudyEventAttr.getPermissible().split(";")[1];
+            break;
+        case NUMBER:
+            value = "1.0";
+            break;
+        case DATE_TIME:
+            value = "2000-01-01 00:00";
+            break;
+        case TEXT:
+            // do nothing
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeName);
+        }
+
+        ceventEventAttr.setValue(value);
+
+        setDefaultCeventEventAttr(ceventEventAttr);
+        session.save(ceventEventAttr);
+        session.flush();
+        return ceventEventAttr;
     }
 
     public User createUser() {
