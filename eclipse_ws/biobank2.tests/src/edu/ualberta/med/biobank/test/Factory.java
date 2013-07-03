@@ -1024,7 +1024,9 @@ public class Factory {
                 defaultGlobalEventAttr = gea;
             }
         }
-        if (defaultGlobalEventAttr == null) {
+        if ((defaultGlobalEventAttr == null)
+            ||
+            !defaultEventAttrTypeEnum.getName().equals(defaultGlobalEventAttr.getEventAttrType().getName())) {
             throw new IllegalStateException("could not find global event attr type");
         }
         return defaultGlobalEventAttr;
@@ -1062,7 +1064,8 @@ public class Factory {
             // do nothing
             break;
         default:
-            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeName);
+            throw new IllegalStateException("invalid event attribute type: "
+                + getDefaultEventAttrTypeEnum());
         }
 
         studyEventAttr.setPermissible(permissible);

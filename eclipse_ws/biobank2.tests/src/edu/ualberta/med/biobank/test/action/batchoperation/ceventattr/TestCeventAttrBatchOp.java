@@ -58,8 +58,9 @@ public class TestCeventAttrBatchOp extends TestAction {
         factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.NUMBER);
         factory.createStudyEventAttr();
 
-        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.DATE_TIME);
-        factory.createStudyEventAttr();
+        // uncomment when a date-time global event attribute is added
+        // factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.DATE_TIME);
+        // factory.createStudyEventAttr();
     }
 
     @Test
