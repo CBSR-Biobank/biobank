@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -26,6 +27,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 /**
@@ -68,8 +70,7 @@ public class BatchOpActionUtil {
         return (Specimen) c.uniqueResult();
     }
 
-    public static SpecimenType getSpecimenType(Session session,
-        String name) {
+    public static SpecimenType getSpecimenType(Session session, String name) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }
@@ -125,8 +126,7 @@ public class BatchOpActionUtil {
         return (Container) c.uniqueResult();
     }
 
-    public static OriginInfo getOriginInfo(Session session,
-        String waybill) {
+    public static OriginInfo getOriginInfo(Session session, String waybill) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }
@@ -174,6 +174,34 @@ public class BatchOpActionUtil {
         return (ProcessingEvent) session
             .createCriteria(ProcessingEvent.class)
             .add(Restrictions.eq("worksheet", worksheetNumber))
+            .uniqueResult();
+    }
+
+    public static StudyEventAttr getStudyEventAttr(Session session, Study study,
+        String eventAttrName) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        return (StudyEventAttr) session
+            .createCriteria(StudyEventAttr.class, "sea")
+            .createAlias("sea.globalEventAttr", "gea")
+            .createAlias("sea.study", "study")
+            .add(Restrictions.eq("study.id", study.getId()))
+            .add(Restrictions.eq("gea.label", eventAttrName))
+            .uniqueResult();
+    }
+
+    public static EventAttr getEventAttr(Session session, CollectionEvent cevent,
+        StudyEventAttr studyEventAttr) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        return (EventAttr) session
+            .createCriteria(EventAttr.class)
+            .add(Restrictions.eq("collectionEvent.id", cevent.getId()))
+            .add(Restrictions.eq("studyEventAttr.id", studyEventAttr.getId()))
             .uniqueResult();
     }
 

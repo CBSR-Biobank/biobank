@@ -8,8 +8,8 @@ import org.hibernate.Query;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.MapResult;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.EventAttr;
 
 public class CollectionEventGetEventAttrInfoAction implements

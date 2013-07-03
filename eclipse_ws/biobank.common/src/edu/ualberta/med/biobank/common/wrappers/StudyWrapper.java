@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
@@ -109,8 +110,8 @@ public class StudyWrapper extends StudyBaseWrapper {
      * 
      * @param label The label to be used by the attribute.
      * @return Semicolon separated list of allowed values.
-     * @throws Exception hrown if there is no patient visit information item
-     *             with the label specified.
+     * @throws Exception hrown if there is no patient visit information item with the label
+     *             specified.
      */
     public String[] getStudyEventAttrPermissible(String label) throws Exception {
         String joinedPossibleValues = getStudyEventAttr(label).getPermissible();
@@ -120,8 +121,8 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     /**
-     * Retrieves the activity status for a patient visit attribute. If locked,
-     * patient visits will not allow information to be saved for this attribute.
+     * Retrieves the activity status for a patient visit attribute. If locked, patient visits will
+     * not allow information to be saved for this attribute.
      * 
      * @param label
      * @return True if the attribute is locked. False otherwise.
@@ -137,9 +138,9 @@ public class StudyWrapper extends StudyBaseWrapper {
      * 
      * @param label The label used for the attribute.
      * @param type The string corresponding to the type of the attribute.
-     * @param permissibleValues If the attribute is of type "select_single" or
-     *            "select_multiple" this array contains the possible values as a
-     *            String array. Otherwise, this parameter should be set to null.
+     * @param permissibleValues If the attribute is of type "select_single" or "select_multiple"
+     *            this array contains the possible values as a String array. Otherwise, this
+     *            parameter should be set to null.
      * 
      * @throws Exception Thrown if the attribute type does not exist.
      */
@@ -147,7 +148,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         String[] permissibleValues) throws Exception {
         Map<String, EventAttrTypeWrapper> EventAttrTypeMap =
             EventAttrTypeWrapper
-            .getAllEventAttrTypesMap(appService);
+                .getAllEventAttrTypesMap(appService);
         EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
             .getName());
         if (EventAttrType == null) {
@@ -192,8 +193,7 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @param label The label to be used for the attribute.
      * @param type The string corresponding to the type of the attribute.
      * 
-     * @throws Exception Thrown if there is no possible patient visit with the
-     *             label specified.
+     * @throws Exception Thrown if there is no possible patient visit with the label specified.
      */
     public void setStudyEventAttr(String label, EventAttrTypeEnum type)
         throws Exception {
@@ -201,12 +201,10 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     /**
-     * Used to enable or disable the locked status of a patient visit attribute.
-     * If an attribute is locked the patient visits will not allow information
-     * to be saved for this attribute.
+     * Used to enable or disable the locked status of a patient visit attribute. If an attribute is
+     * locked the patient visits will not allow information to be saved for this attribute.
      * 
-     * @param label The label used for the attribute. Note: the label must
-     *            already exist.
+     * @param label The label used for the attribute. Note: the label must already exist.
      * @param enable True to enable the lock, false otherwise.
      * 
      * @throws Exception if attribute with label does not exist.
@@ -270,7 +268,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     public long getPatientCount(boolean fast) throws ApplicationException,
-    BiobankException {
+        BiobankException {
         return getPropertyCount(StudyPeer.PATIENTS, fast);
     }
 
@@ -297,17 +295,16 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     public static final String IS_LINKED_TO_CLINIC_QRY =
-    "select count(clinics) from "
-        + Contact.class.getName()
-        + " as contacts join contacts."
-        + ContactPeer.CLINIC.getName()
-        + " as clinics where contacts."
-        + Property.concatNames(ContactPeer.STUDIES, StudyPeer.ID)
-        + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
+        "select count(clinics) from "
+            + Contact.class.getName()
+            + " as contacts join contacts."
+            + ContactPeer.CLINIC.getName()
+            + " as clinics where contacts."
+            + Property.concatNames(ContactPeer.STUDIES, StudyPeer.ID)
+            + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
 
     /**
-     * return true if this study is linked to the given clinic (through
-     * contacts)
+     * return true if this study is linked to the given clinic (through contacts)
      */
     public boolean isLinkedToClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankException {
@@ -348,15 +345,15 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     private static final String COLLECTION_EVENT_COUNT_QRY =
-    "select count(distinct ce) from "
-        + CollectionEvent.class.getName()
-        + " as ce where ce."
-        + Property.concatNames(CollectionEventPeer.PATIENT,
-            PatientPeer.STUDY,
-            StudyPeer.ID) + "=?";
+        "select count(distinct ce) from "
+            + CollectionEvent.class.getName()
+            + " as ce where ce."
+            + Property.concatNames(CollectionEventPeer.PATIENT,
+                PatientPeer.STUDY,
+                StudyPeer.ID) + "=?";
 
     public long getCollectionEventCount() throws ApplicationException,
-    BiobankException {
+        BiobankException {
         HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, c);
@@ -399,19 +396,19 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @SuppressWarnings("nls")
     private static final String ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY =
-    "select aspec from "
-        + AliquotedSpecimen.class.getName()
-        + " as aspec where aspec."
-        + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
-        + " = ? and aspec.activityStatus = "
-        + ActivityStatus.ACTIVE.getId();
+        "select aspec from "
+            + AliquotedSpecimen.class.getName()
+            + " as aspec where aspec."
+            + Property.concatNames(AliquotedSpecimenPeer.STUDY, StudyPeer.ID)
+            + " = ? and aspec.activityStatus = "
+            + ActivityStatus.ACTIVE.getId();
 
     @Deprecated
     public List<AliquotedSpecimenWrapper> getAuthorizedActiveAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedTypes) throws ApplicationException {
         List<AliquotedSpecimen> raw = appService.query(new HQLCriteria(
             ACTIVE_ALIQUOTED_SPECIMENS_TYPE_QRY, Arrays
-            .asList(new Object[] { getId() })));
+                .asList(new Object[] { getId() })));
         if (raw == null) {
             return new ArrayList<AliquotedSpecimenWrapper>();
         }

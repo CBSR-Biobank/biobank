@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -328,20 +329,17 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     /**
-     * Assigns a value to a patient visit attribute. The value is parsed for
-     * correctness.
+     * Assigns a value to a patient visit attribute. The value is parsed for correctness.
      * 
      * @param label The attribute's label.
      * @param value The value to assign.
-     * @throws Exception when assigning a label of type "select_single" or
-     *             "select_multiple" and the value is not one of the permissible
-     *             ones.
-     * @throws NumberFormatException when assigning a label of type "number" and
-     *             the value is not a valid double number.
-     * @throws ParseException when assigning a label of type "date_time" and the
-     *             value is not a valid date and time.
-     * @see edu.ualberta.med.biobank
-     *      .common.formatters.DateFormatter.DATE_TIME_FORMAT
+     * @throws Exception when assigning a label of type "select_single" or "select_multiple" and the
+     *             value is not one of the permissible ones.
+     * @throws NumberFormatException when assigning a label of type "number" and the value is not a
+     *             valid double number.
+     * @throws ParseException when assigning a label of type "date_time" and the value is not a
+     *             valid date and time.
+     * @see edu.ualberta.med.biobank .common.formatters.DateFormatter.DATE_TIME_FORMAT
      */
     public void setEventAttrValue(String label, String value) throws Exception {
         getEventAttrMap();
@@ -445,7 +443,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         throws Exception {
         HQLCriteria c = new HQLCriteria("select max(ce.visitNumber) from " //$NON-NLS-1$
             + CollectionEvent.class.getName() + " ce where ce.patient.id=?", //$NON-NLS-1$
-            Arrays.asList(cevent.getPatient().getId()));
+        Arrays.asList(cevent.getPatient().getId()));
         List<Object> result = appService.query(c);
         if (result == null || result.size() == 0 || result.get(0) == null)
             return 1;

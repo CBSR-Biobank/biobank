@@ -3,13 +3,11 @@ package edu.ualberta.med.biobank.common.action.batchoperation.eventattr;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpPojoHelper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
-import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 
 public class CeventAttrBatchOpPojoData implements IBatchOpPojoHelper {
 
     private final CeventAttrBatchOpInputPojo pojo;
-    private Patient patient;
     private CollectionEvent collectionEvent;
     private StudyEventAttr studyEventAttr;
 
@@ -20,14 +18,6 @@ public class CeventAttrBatchOpPojoData implements IBatchOpPojoHelper {
     @Override
     public int getCsvLineNumber() {
         return pojo.getLineNumber();
-    }
-
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
     }
 
     public CollectionEvent getCollectionEvent() {
@@ -46,8 +36,7 @@ public class CeventAttrBatchOpPojoData implements IBatchOpPojoHelper {
         this.studyEventAttr = studyEventAttr;
     }
 
-    @SuppressWarnings("nls")
     public EventAttr getCeventEventAttr() {
-
+        return null;
     }
 }

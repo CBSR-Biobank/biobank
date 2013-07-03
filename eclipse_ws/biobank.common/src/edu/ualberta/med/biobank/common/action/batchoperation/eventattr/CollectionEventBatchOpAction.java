@@ -18,18 +18,20 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
-import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpPojoData;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
-import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.i18n.Tr;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.util.CompressedReference;
 
@@ -48,11 +50,17 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
 
     public static final int SIZE_LIMIT = 1000;
 
-    public static final Tr CSV_STUDY_ERROR =
-        bundle.tr("patient {0} does not exist");
+    private static final Tr CEVENT_ERROR =
+        bundle.tr("collection event does not exist for patient \"{0}\" and visit number {1}");
 
-    private static final LString EVENT_ATTR_ALREADY_EXISTS_ERROR =
-        bundle.tr("patient already exists").format();
+    private static final Tr STUDY_EVENT_ATTR_EXISTS_ERROR =
+        bundle.tr("event attribute with name \"{0}\" not defined in study for patient \"{0}\" and visit number {1}");
+
+    private static final Tr STUDY_EVENT_ATTR_LOCKED_ERROR =
+        bundle.tr("event attribute with name \"{0}\" is locked in study for patient \"{0}\" and visit number {1}");
+
+    private static final Tr EVENT_ATTR_ALREADY_EXISTS_ERROR =
+        bundle.tr("event attribute already exists for patient \"{0}\" and visit number {1}");
 
     private final CompressedReference<ArrayList<CeventAttrBatchOpInputPojo>> compressedList;
 
@@ -156,8 +164,8 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
             throw new IllegalStateException("pojo list is empty");
         }
 
-        Map<String, CeventAttrBatchOpInputPojo> pojoDataMap =
-            new HashMap<String, CeventAttrBatchOpInputPojo>(0);
+        Map<String, CeventAttrBatchOpPojoData> pojoDataMap =
+            new HashMap<String, CeventAttrBatchOpPojoData>(0);
 
         for (CeventAttrBatchOpInputPojo pojo : pojos) {
             CeventAttrBatchOpPojoData pojoData = getDbInfo(context, pojo);
@@ -174,8 +182,8 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
         BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(
             context.getSession(), context.getUser(), fileData);
 
-        for (CeventAttrBatchOpInputPojo pojoData : pojoDataMap.values()) {
-            addPatient(context, batchOp, pojoData);
+        for (CeventAttrBatchOpPojoData pojoData : pojoDataMap.values()) {
+            addEventAttr(context, batchOp, pojoData);
         }
 
         log.debug("run: exit");
@@ -184,12 +192,45 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
 
     private CeventAttrBatchOpPojoData getDbInfo(ActionContext context,
         CeventAttrBatchOpInputPojo pojo) {
-        Patient spc = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
+        CollectionEvent cevent = BatchOpActionUtil.getCollectionEvent(context.getSession(),
+            pojo.getPatientNumber(), pojo.getVisitNumber());
+        if (cevent == null) {
+            errorSet.addError(pojo.getLineNumber(),
+                CEVENT_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+            return null;
+        }
 
-        PatientBatchOpPojoData pojoData = new PatientBatchOpPojoData(pojo);
-        pojoData.setUser(context.getUser());
-        pojoData.setStudy(study);
+        StudyEventAttr studyEventAttr = BatchOpActionUtil.getStudyEventAttr(context.getSession(),
+            cevent.getPatient().getStudy(), pojo.getAttrName());
+        if (studyEventAttr == null) {
+            errorSet.addError(pojo.getLineNumber(),
+                STUDY_EVENT_ATTR_EXISTS_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+            return null;
+        }
+
+        if (studyEventAttr.getActivityStatus() != ActivityStatus.ACTIVE) {
+            errorSet.addError(pojo.getLineNumber(),
+                STUDY_EVENT_ATTR_LOCKED_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+            return null;
+        }
+
+        EventAttr eventAttr = BatchOpActionUtil.getEventAttr(context.getSession(),
+            cevent, studyEventAttr);
+        if (eventAttr != null) {
+            errorSet.addError(pojo.getLineNumber(),
+                EVENT_ATTR_ALREADY_EXISTS_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+            return null;
+        }
+
+        CeventAttrBatchOpPojoData pojoData = new CeventAttrBatchOpPojoData(pojo);
+        pojoData.setCollectionEvent(cevent);
+        pojoData.setStudyEventAttr(studyEventAttr);
         return pojoData;
+    }
+
+    private void addEventAttr(ActionContext context,
+        BatchOperation batchOp, CeventAttrBatchOpPojoData pojoData) {
+
     }
 
 }

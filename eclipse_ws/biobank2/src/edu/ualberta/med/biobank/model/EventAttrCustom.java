@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 
 public class EventAttrCustom {
 

@@ -23,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.dialogs.ListAddDialog;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
@@ -54,31 +54,31 @@ public class EventAttrWidget extends BgcBaseWidget {
 
     @SuppressWarnings("nls")
     private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
-    new HashMap<String, LabelDialogInfo>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(i18n.tr("Patient Type"),
-                new LabelDialogInfo(
-                    i18n.tr("Patient Type Values"),
-                    i18n.tr("Please enter a patient type:"),
-                    i18n.tr("To enter multiple patient type values, separate with semicolon.")));
-            put(i18n.tr("Visit Type"),
-                new LabelDialogInfo(
-                    i18n.tr("Visit Type Values"),
-                    i18n.tr("Please enter a visit type:"),
-                    i18n.tr("To enter multiple visit type values, separate with semicolon.")));
-            put(i18n.tr("Consent"),
-                new LabelDialogInfo(
-                    i18n.tr("Consent Types"),
-                    i18n.tr("Please enter a consent type:"),
-                    i18n.tr("To enter multiple consent values, separate with semicolon.")));
-            put(i18n.tr("Gender"),
-                new LabelDialogInfo(
-                    i18n.tr("Gender"),
-                    i18n.tr("Please enter the valid genders:"),
-                    i18n.tr("To enter multiple consent values, separate with semicolon.")));
-        }
-    };
+        new HashMap<String, LabelDialogInfo>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put(i18n.tr("Patient Type"),
+                    new LabelDialogInfo(
+                        i18n.tr("Patient Type Values"),
+                        i18n.tr("Please enter a patient type:"),
+                        i18n.tr("To enter multiple patient type values, separate with semicolon.")));
+                put(i18n.tr("Visit Type"),
+                    new LabelDialogInfo(
+                        i18n.tr("Visit Type Values"),
+                        i18n.tr("Please enter a visit type:"),
+                        i18n.tr("To enter multiple visit type values, separate with semicolon.")));
+                put(i18n.tr("Consent"),
+                    new LabelDialogInfo(
+                        i18n.tr("Consent Types"),
+                        i18n.tr("Please enter a consent type:"),
+                        i18n.tr("To enter multiple consent values, separate with semicolon.")));
+                put(i18n.tr("Gender"),
+                    new LabelDialogInfo(
+                        i18n.tr("Gender"),
+                        i18n.tr("Please enter the valid genders:"),
+                        i18n.tr("To enter multiple consent values, separate with semicolon.")));
+            }
+        };
 
     @SuppressWarnings("nls")
     public EventAttrWidget(Composite parent, int style,

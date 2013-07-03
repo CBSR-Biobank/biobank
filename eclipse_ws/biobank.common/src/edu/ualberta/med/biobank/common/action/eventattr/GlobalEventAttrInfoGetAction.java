@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.action.MapResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.EventAttrTypePeer;
 import edu.ualberta.med.biobank.common.peer.GlobalEventAttrPeer;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 
 public class GlobalEventAttrInfoGetAction implements

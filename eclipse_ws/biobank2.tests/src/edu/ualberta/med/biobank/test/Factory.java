@@ -23,6 +23,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.EventAttrType;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -43,6 +45,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.type.LabelingLayout;
 
@@ -95,6 +98,10 @@ public class Factory {
     private Comment defaultComment;
     private ShipmentInfo defaultShipmentInfo;
     private ShippingMethod defaultShippingMethod;
+
+    private EventAttrType defaultEventAttrType;
+    private GlobalEventAttr defaultGlobalEventAttr;
+    private StudyEventAttr defaultStudyEventAttr;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -989,6 +996,47 @@ public class Factory {
         session.save(shippingMethod);
         session.flush();
         return shippingMethod;
+    }
+
+    public EventAttrType getEventAttrType() {
+        return defaultEventAttrType;
+    }
+
+    public void setEventAttrType(EventAttrType eventAttrType) {
+        defaultEventAttrType = eventAttrType;
+    }
+
+    public GlobalEventAttr getGlobalEventAttr() {
+        if (defaultGlobalEventAttr == null) {
+            defaultGlobalEventAttr = GlobalEventAttr.
+        }
+        return defaultGlobalEventAttr;
+    }
+
+    public void setGlobalEventAttr(GlobalEventAttr globalEventAttr) {
+        this.defaultGlobalEventAttr = globalEventAttr;
+    }
+
+    public StudyEventAttr getStudyEventAttr() {
+        if (defaultStudyEventAttr == null) {
+            defaultStudyEventAttr = createStudyEventAttr();
+        }
+        return defaultStudyEventAttr;
+    }
+
+    public void setStudyEventAttr(StudyEventAttr globalEventAttr) {
+        this.defaultStudyEventAttr = globalEventAttr;
+    }
+
+    public StudyEventAttr createStudyEventAttr() {
+        String label = nameGenerator.next(StudyEventAttr.class);
+        StudyEventAttr studyEventAttr = new StudyEventAttr();
+        studyEventAttr.setGlobalEventAttr(this.defaultGlobalEventAttr);
+
+        setDefaultStudyEventAttr(studyEventAttr);
+        session.save(StudyEventAttr);
+        session.flush();
+        return StudyEventAttr;
     }
 
     public User createUser() {

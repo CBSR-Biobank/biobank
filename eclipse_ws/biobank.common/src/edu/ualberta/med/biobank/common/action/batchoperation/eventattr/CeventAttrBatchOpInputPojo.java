@@ -12,7 +12,7 @@ public class CeventAttrBatchOpInputPojo implements IBatchOpInputPojo {
 
     private int lineNumber;
     private String patientNumber;
-    private String visitNumber;
+    private Integer visitNumber;
     private String attrName;
     private String attrValue;
 
@@ -34,11 +34,11 @@ public class CeventAttrBatchOpInputPojo implements IBatchOpInputPojo {
         this.patientNumber = patientNumber;
     }
 
-    public String getVisitNumber() {
+    public Integer getVisitNumber() {
         return visitNumber;
     }
 
-    public void setVisitNumber(String visitNumber) {
+    public void setVisitNumber(Integer visitNumber) {
         this.visitNumber = visitNumber;
     }
 

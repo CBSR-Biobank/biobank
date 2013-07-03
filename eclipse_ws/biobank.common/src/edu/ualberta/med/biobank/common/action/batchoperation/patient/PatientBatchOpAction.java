@@ -187,8 +187,8 @@ public class PatientBatchOpAction implements Action<IdResult> {
     }
 
     private PatientBatchOpPojoData getDbInfo(ActionContext context, PatientBatchOpInputPojo pojo) {
-        Patient spc = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
-        if (spc != null) {
+        Patient patient = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
+        if (patient != null) {
             errorSet.addError(pojo.getLineNumber(), PATIENT_ALREADY_EXISTS_ERROR);
             return null;
         }

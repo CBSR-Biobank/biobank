@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
@@ -33,13 +34,13 @@ import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveActio
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
 import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.util.MathUtil;
 import edu.ualberta.med.biobank.test.Utils;
@@ -95,7 +96,7 @@ public class TestCollectionEvent extends TestAction {
                 visitNumber, ActivityStatus.ACTIVE, commentText,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
                 provisioning.getClinic()))
-                .getId();
+            .getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -124,7 +125,8 @@ public class TestCollectionEvent extends TestAction {
             }
         }
 
-        // Save the same cevent with only one kept from previous list (and modified) and with a new one
+        // Save the same cevent with only one kept from previous list (and modified) and with a new
+        // one
         List<SaveCEventSpecimenInfo> newSpecList = new ArrayList<SaveCEventSpecimenInfo>();
 
         SaveCEventSpecimenInfo spcInfoToCopy = specs.values().iterator().next();
@@ -147,7 +149,7 @@ public class TestCollectionEvent extends TestAction {
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert
-        .assertEquals(visitNumber + 1, cevent.getVisitNumber().intValue());
+            .assertEquals(visitNumber + 1, cevent.getVisitNumber().intValue());
         Assert.assertEquals(2, cevent.getAllSpecimens().size());
         Assert.assertEquals(2, cevent.getOriginalSpecimens().size());
         for (Iterator<Specimen> iter =
@@ -172,16 +174,16 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertEquals(modifiedSpec.inventoryId,
                     sp.getInventoryId());
                 Assert
-                .assertTrue(MathUtil.equals(modifiedSpec.quantity,
-                    sp.getQuantity()));
+                    .assertTrue(MathUtil.equals(modifiedSpec.quantity,
+                        sp.getQuantity()));
             }
         }
     }
 
     /*
-     * Creates a colleciton event with parent specimens and child specimens, then re-saves
-     * the collection event with the action and then verifies that the current centre on the
-     * specimens has not changed.
+     * Creates a colleciton event with parent specimens and child specimens, then re-saves the
+     * collection event with the action and then verifies that the current centre on the specimens
+     * has not changed.
      */
     @Test
     public void checkSpecimenCurrentCenter() throws Exception {
@@ -232,7 +234,7 @@ public class TestCollectionEvent extends TestAction {
 
         @SuppressWarnings("unchecked")
         List<Specimen> list = session.createCriteria(Specimen.class)
-        .add(Restrictions.eq("collectionEvent.id", cevent.getId())).list();
+            .add(Restrictions.eq("collectionEvent.id", cevent.getId())).list();
 
         Assert.assertEquals(allSpecimens.size(), list.size());
 
@@ -329,7 +331,7 @@ public class TestCollectionEvent extends TestAction {
         CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(phlebotomistStudyAttr.getId(),
             EventAttrTypeEnum.getEventAttrType(
                 phlebotomistStudyAttr.getGlobalEventAttr().getEventAttrType().getName()),
-                value1);
+            value1);
         attrs.add(attrInfo);
 
         // Save a new cevent
@@ -410,17 +412,14 @@ public class TestCollectionEvent extends TestAction {
                     "Visit Type")));
 
         StudyEventAttrSaveAction seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("PBMC Count (x10^6)").attr
-            .getId());
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel.get("PBMC Count (x10^6)").attr.getId());
         seAttrSave.setRequired(true);
         seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         exec(seAttrSave);
 
         seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Consent").attr.getId());
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel.get("Consent").attr.getId());
         seAttrSave.setRequired(false);
         seAttrSave.setPermissible("c1;c2;c3");
         seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
@@ -428,16 +427,14 @@ public class TestCollectionEvent extends TestAction {
         exec(seAttrSave);
 
         seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Patient Type").attr.getId());
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel.get("Patient Type").attr.getId());
         seAttrSave.required = true;
         seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
         exec(seAttrSave);
 
         seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Visit Type").attr.getId());
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel.get("Visit Type").attr.getId());
         seAttrSave.required = false;
         seAttrSave.setPermissible("v1;v2;v3;v4");
         seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
@@ -445,8 +442,7 @@ public class TestCollectionEvent extends TestAction {
         exec(seAttrSave);
 
         seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Phlebotomist").attr.getId());
+        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel.get("Phlebotomist").attr.getId());
         seAttrSave.required = false;
         seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
         seAttrSave.setStudyId(studyId);
@@ -470,13 +466,14 @@ public class TestCollectionEvent extends TestAction {
         Assert.assertNull(cevent);
     }
 
-    @SuppressWarnings("nls")
     @Test
-    public void gsetEventAttrInfos() throws Exception {
+    public void getEventAttrInfos() throws Exception {
+        Study study = factory.createStudy();
+        factory.create
+        
         // add specimen type
         setEventAttrs(provisioning.studyId);
-        StudyInfo studyInfo =
-            exec(new StudyGetInfoAction(provisioning.studyId));
+        StudyInfo studyInfo = exec(new StudyGetInfoAction(provisioning.studyId));
         Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
 
         StudyEventAttr phlebotomistStudyAttr = null;
@@ -487,9 +484,8 @@ public class TestCollectionEvent extends TestAction {
         }
         Assert.assertNotNull(phlebotomistStudyAttr);
 
-        EventAttrTypeEnum eventAttrType =
-            EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
-                .getGlobalEventAttr().getEventAttrType().getName());
+        EventAttrTypeEnum eventAttrType = EventAttrTypeEnum.getEventAttrType(
+            phlebotomistStudyAttr.getGlobalEventAttr().getEventAttrType().getName());
         List<CEventAttrSaveInfo> attrs =
             new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
         String value = "abcdefghi";
@@ -502,9 +498,8 @@ public class TestCollectionEvent extends TestAction {
             null, null, attrs, provisioning.getClinic())).getId();
 
         // Call get eventAttr infos action
-        Map<Integer, EventAttrInfo> infos =
-            exec(new CollectionEventGetEventAttrInfoAction(
-                ceventId)).getMap();
+        Map<Integer, EventAttrInfo> infos = exec(
+            new CollectionEventGetEventAttrInfoAction(ceventId)).getMap();
         Assert.assertEquals(1, infos.size());
         EventAttrInfo info = infos.values().iterator().next();
         Assert.assertNotNull(info.attr);
