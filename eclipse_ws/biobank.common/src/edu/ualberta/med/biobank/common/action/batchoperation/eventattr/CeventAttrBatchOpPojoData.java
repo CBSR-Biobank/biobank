@@ -37,6 +37,10 @@ public class CeventAttrBatchOpPojoData implements IBatchOpPojoHelper {
     }
 
     public EventAttr getCeventEventAttr() {
-        return null;
+        EventAttr eventAttr = new EventAttr();
+        eventAttr.setCollectionEvent(collectionEvent);
+        eventAttr.setStudyEventAttr(studyEventAttr);
+        eventAttr.setValue(pojo.getAttrValue());
+        return eventAttr;
     }
 }

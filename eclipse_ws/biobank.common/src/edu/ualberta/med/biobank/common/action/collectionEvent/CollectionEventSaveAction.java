@@ -272,19 +272,16 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         }
     }
 
-    @SuppressWarnings("nls")
     public void setEventAttrs(ActionContext context, Study study,
         CollectionEvent cevent) throws ActionException {
 
         if ((ceAttrList == null) || ceAttrList.isEmpty()) return;
 
-        Map<Integer, EventAttrInfo> ceventAttrList =
-            new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(context).getMap();
+        Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
+            ceventId).run(context).getMap();
 
-        Map<Integer, StudyEventAttrInfo> studyEventList =
-            new StudyGetEventAttrInfoAction(
-                study.getId()).run(context).getMap();
+        Map<Integer, StudyEventAttrInfo> studyEventList = new StudyGetEventAttrInfoAction(
+            study.getId()).run(context).getMap();
 
         Set<EventAttr> eventAttrs = new HashSet<EventAttr>(ceAttrList.size());
 

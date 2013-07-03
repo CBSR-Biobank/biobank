@@ -18,16 +18,21 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpActionUtil;
 import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpInputErrorSet;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.i18n.Bundle;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.BatchOperationEventAttr;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.FileData;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.Study;
@@ -222,6 +227,17 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
             return null;
         }
 
+        try {
+            GlobalEventAttr globalEventAttr = studyEventAttr.getGlobalEventAttr();
+            EventAttrUtil.validateValue(
+                EventAttrTypeEnum.getEventAttrType(globalEventAttr.getEventAttrType().getName()),
+                globalEventAttr.getLabel(),
+                studyEventAttr.getPermissible(),
+                pojo.getAttrValue());
+        } catch (LocalizedException e) {
+            errorSet.addError(pojo.getLineNumber(), e.getLocalizedString());
+        }
+
         CeventAttrBatchOpPojoData pojoData = new CeventAttrBatchOpPojoData(pojo);
         pojoData.setCollectionEvent(cevent);
         pojoData.setStudyEventAttr(studyEventAttr);
@@ -230,7 +246,22 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
 
     private void addEventAttr(ActionContext context,
         BatchOperation batchOp, CeventAttrBatchOpPojoData pojoData) {
+        if (context == null) {
+            throw new NullPointerException("context is null");
+        }
+
+        if (workingCenterOnServerSide == null) {
+            // workingCenterOnServerSide is assigned when isAllowed() is called
+            throw new IllegalStateException("workingCenterOnServerSide is null");
+        }
+
+        EventAttr eventAttr = pojoData.getCeventEventAttr();
+        context.getSession().save(eventAttr);
+
+        BatchOperationEventAttr batchOpPt = new BatchOperationEventAttr();
+        batchOpPt.setBatch(batchOp);
+        batchOpPt.setEventAttr(eventAttr);
+        context.getSession().save(batchOpPt);
 
     }
-
 }
