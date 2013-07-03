@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.permission.specimen;
 
-import org.hibernate.Query;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.permission.Permission;
@@ -11,15 +12,6 @@ import edu.ualberta.med.biobank.model.Study;
 
 public class SpecimenReadPermission implements Permission {
     private static final long serialVersionUID = 1L;
-    
-    @SuppressWarnings("nls")
-    private static final String HQL_QRY = 
-        "FROM "+ Specimen.class.getName() + " spec " 
-            + "INNER JOIN FETCH spec.currentCenter " 
-            + "INNER JOIN FETCH spec.collectionEvent ce " 
-            + "INNER JOIN FETCH ce.patient p " 
-            + "INNER JOIN FETCH p.study " 
-            + "WHERE spec.inventoryId=?";
 
     private final Integer specimenId;
     private final String inventoryId;
@@ -40,13 +32,15 @@ public class SpecimenReadPermission implements Permission {
         if (specimenId != null) {
             specimen = context.get(Specimen.class, specimenId);
         } else {
-            Query q = context.getSession().createQuery(HQL_QRY);
-            q.setParameter(0, inventoryId);
-            specimen = (Specimen) q.uniqueResult();
+            @SuppressWarnings("nls")
+            Criteria criteria = context.getSession()
+                .createCriteria(Specimen.class)
+                .add(Restrictions.eq("inventoryId", inventoryId));
+            specimen = (Specimen) criteria.uniqueResult();
         }
 
         if (specimen == null) return true;
-        
+
         Center center = specimen.getCurrentCenter();
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
 

@@ -45,7 +45,7 @@ public class CollectionEventGetSourceSpecimensAction implements Action<ListResul
     @Override
     public ListResult<Specimen> run(ActionContext context) throws ActionException {
         Criteria criteria = context.getSession().createCriteria(Specimen.class, "spc")
-            .createAlias("spc.originalCollectionEvent", "cevent")
+            .createAlias("spc.collectionEvent", "cevent")
             .add(Restrictions.eq("cevent.id", ceventId))
             .createAlias("spc.processingEvent", "pevent")
             .add(Restrictions.eq("pevent.id", peventId));
@@ -61,6 +61,7 @@ public class CollectionEventGetSourceSpecimensAction implements Action<ListResul
             for (SpecimenType spcType : spc.getSpecimenType().getChildSpecimenTypes()) {
                 spcType.getName();
             }
+            spc.getTopSpecimen().getOriginInfo().getCenter().getName();
         }
 
         return new ListResult<Specimen>(specimens);

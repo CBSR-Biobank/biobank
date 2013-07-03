@@ -380,7 +380,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new SpecimenTypeGetAllAction()).getList();
             final Set<SourceSpecimen> studySourceSpecimens = SessionManager.getAppService().doAction(
                 new StudyGetSourceSpecimensAction(
-                    ceventInfo.cevent.getPatient().getStudy().getId())).getSet();
+                    ceventInfo.cevent.getPatient().getStudy().getId(), true)).getSet();
 
             specimensTable.addEditSupport(studySourceSpecimens, allSpecimenTypes);
             addSectionToolbar(section,
