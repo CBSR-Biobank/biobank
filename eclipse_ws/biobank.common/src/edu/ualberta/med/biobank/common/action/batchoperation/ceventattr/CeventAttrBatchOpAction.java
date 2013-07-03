@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.eventattr;
+package edu.ualberta.med.biobank.common.action.batchoperation.ceventattr;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,10 +46,10 @@ import edu.ualberta.med.biobank.util.CompressedReference;
  * 
  */
 @SuppressWarnings("nls")
-public class CollectionEventBatchOpAction implements Action<IdResult> {
+public class CeventAttrBatchOpAction implements Action<IdResult> {
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(CollectionEventBatchOpAction.class);
+    private static Logger log = LoggerFactory.getLogger(CeventAttrBatchOpAction.class);
 
     private static final Bundle bundle = new CommonBundle();
 
@@ -79,7 +79,7 @@ public class CollectionEventBatchOpAction implements Action<IdResult> {
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
 
-    public CollectionEventBatchOpAction(Center workingCenter,
+    public CeventAttrBatchOpAction(Center workingCenter,
         Set<CeventAttrBatchOpInputPojo> inputPojos, File inputFile)
         throws IOException, NoSuchAlgorithmException {
 

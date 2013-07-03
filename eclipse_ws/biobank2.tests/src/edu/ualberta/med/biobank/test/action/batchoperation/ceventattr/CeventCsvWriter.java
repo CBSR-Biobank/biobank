@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action.batchoperation.patient;
+package edu.ualberta.med.biobank.test.action.batchoperation.ceventattr;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,29 +11,24 @@ import org.supercsv.io.CsvMapWriter;
 import org.supercsv.io.ICsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.common.action.batchoperation.patient.PatientBatchOpInputPojo;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpInputPojo;
 
 /**
- * Used for testing the Patient CSV file Legacy Import feature.
+ * Used for testing the Collection Event Attribute CSV Import feature.
  * 
  * @author Nelson Loyola
  * 
  */
-class PatientCsvWriter {
+public class CeventCsvWriter {
 
     /**
-     * Generates a Patient CSV file with patient numbers.
-     * 
-     * @param filename The name of the CSV file to be saved.
-     * @param patientInfos set of beans containing the information for each row.
-     * @throws IOException If the file could not be saved.
+     * Generates a Collection Event Attribute CSV file with patient numbers.
      */
-    static void write(String filename, Set<PatientBatchOpInputPojo> patientInfos)
+    static void write(String filename, Set<CeventAttrBatchOpInputPojo> pojos)
         throws IOException {
 
         final String[] header = new String[] {
-            "Study", "Patient Number", "Enrollment Date", "Comment"
+            "Patient Number", "Visit Number", "Attribute Name", "Attribute Value"
         };
 
         ICsvMapWriter writer = new CsvMapWriter(new FileWriter(filename),
@@ -49,12 +44,12 @@ class PatientCsvWriter {
         try {
             writer.writeHeader(header);
 
-            for (PatientBatchOpInputPojo info : patientInfos) {
+            for (CeventAttrBatchOpInputPojo pojo : pojos) {
                 final HashMap<String, ? super Object> data = new HashMap<String, Object>();
-                data.put(header[0], info.getStudyName());
-                data.put(header[1], info.getPatientNumber());
-                data.put(header[2], DateFormatter.formatAsDateTime(info.getEnrollmentDate()));
-                data.put(header[3], info.getComment());
+                data.put(header[0], pojo.getPatientNumber());
+                data.put(header[1], pojo.getVisitNumber());
+                data.put(header[2], pojo.getAttrName());
+                data.put(header[3], pojo.getAttrValue());
                 writer.write(data, header, processing);
             }
         } finally {

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.common.action.batchoperation.eventattr;
+package edu.ualberta.med.biobank.common.action.batchoperation.ceventattr;
 
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 

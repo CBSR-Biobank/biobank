@@ -1019,8 +1019,8 @@ public class Factory {
         @SuppressWarnings("unchecked")
         List<GlobalEventAttr> list = session.createCriteria(GlobalEventAttr.class).list();
         for (GlobalEventAttr gea : list) {
-            if (EventAttrTypeEnum.getEventAttrType(
-                gea.getEventAttrType().getName()).equals(defaultEventAttrTypeEnum)) {
+            String name = gea.getEventAttrType().getName();
+            if (defaultEventAttrTypeEnum.getName().equals(name)) {
                 defaultGlobalEventAttr = gea;
             }
         }
@@ -1051,8 +1051,7 @@ public class Factory {
         studyEventAttr.setStudy(getDefaultStudy());
         studyEventAttr.setGlobalEventAttr(getDefaultGlobalEventAttr());
 
-        String eventAttrTypeName = getDefaultGlobalEventAttr().getEventAttrType().getName();
-        switch (EventAttrTypeEnum.getEventAttrType(eventAttrTypeName)) {
+        switch (getDefaultEventAttrTypeEnum()) {
         case SELECT_SINGLE:
         case SELECT_MULTIPLE:
             permissible = STUDY_EVENT_ATTR_SELECT_PERMISSIBLE;
@@ -1069,6 +1068,7 @@ public class Factory {
         studyEventAttr.setPermissible(permissible);
 
         setDefaultStudyEventAttr(studyEventAttr);
+        getDefaultStudy().getStudyEventAttrs().add(studyEventAttr);
         session.save(studyEventAttr);
         session.flush();
         return studyEventAttr;

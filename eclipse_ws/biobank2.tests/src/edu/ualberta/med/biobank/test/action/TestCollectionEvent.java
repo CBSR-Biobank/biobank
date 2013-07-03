@@ -395,7 +395,6 @@ public class TestCollectionEvent extends TestAction {
         saveWithEventAttr(EventAttrTypeEnum.SELECT_MULTIPLE);
         saveWithEventAttr(EventAttrTypeEnum.NUMBER);
         saveWithEventAttr(EventAttrTypeEnum.DATE_TIME);
-        saveWithEventAttr(EventAttrTypeEnum.TEXT);
     }
 
     @Test
