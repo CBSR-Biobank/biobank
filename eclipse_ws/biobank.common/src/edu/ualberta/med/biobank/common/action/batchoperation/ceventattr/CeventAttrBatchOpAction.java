@@ -58,7 +58,7 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
     private static final Tr CEVENT_ERROR =
         bundle.tr("collection event does not exist for patient \"{0}\" and visit number {1}");
 
-    private static final Tr STUDY_EVENT_ATTR_EXISTS_ERROR =
+    private static final Tr STUDY_EVENT_ATTR_INVALID_ERROR =
         bundle.tr("event attribute with name \"{0}\" not defined in study for patient \"{0}\" and visit number {1}");
 
     private static final Tr STUDY_EVENT_ATTR_LOCKED_ERROR =
@@ -169,14 +169,16 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
             throw new IllegalStateException("pojo list is empty");
         }
 
-        Map<String, CeventAttrBatchOpPojoData> pojoDataMap =
-            new HashMap<String, CeventAttrBatchOpPojoData>(0);
+        log.debug("run: checking for errors, possible event attrs {}",
+            pojos.size());
+
+        Set<CeventAttrBatchOpPojoData> pojoDataSet = new HashSet<CeventAttrBatchOpPojoData>(0);
 
         for (CeventAttrBatchOpInputPojo pojo : pojos) {
             CeventAttrBatchOpPojoData pojoData = getDbInfo(context, pojo);
 
             if (pojoData != null) {
-                pojoDataMap.put(pojo.getPatientNumber(), pojoData);
+                pojoDataSet.add(pojoData);
             }
         }
 
@@ -184,10 +186,13 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
             throw new BatchOpErrorsException(errorSet.getErrors());
         }
 
+        log.debug("run: no errors found, adding {} event attrs to database",
+            pojoDataSet.size());
+
         BatchOperation batchOp = BatchOpActionUtil.createBatchOperation(
             context.getSession(), context.getUser(), fileData);
 
-        for (CeventAttrBatchOpPojoData pojoData : pojoDataMap.values()) {
+        for (CeventAttrBatchOpPojoData pojoData : pojoDataSet) {
             addEventAttr(context, batchOp, pojoData);
         }
 
@@ -209,7 +214,7 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
             cevent.getPatient().getStudy(), pojo.getAttrName());
         if (studyEventAttr == null) {
             errorSet.addError(pojo.getLineNumber(),
-                STUDY_EVENT_ATTR_EXISTS_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+                STUDY_EVENT_ATTR_INVALID_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
             return null;
         }
 
@@ -236,6 +241,7 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
                 pojo.getAttrValue());
         } catch (LocalizedException e) {
             errorSet.addError(pojo.getLineNumber(), e.getLocalizedString());
+            return null;
         }
 
         CeventAttrBatchOpPojoData pojoData = new CeventAttrBatchOpPojoData(pojo);
@@ -257,6 +263,12 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
 
         EventAttr eventAttr = pojoData.getCeventEventAttr();
         context.getSession().save(eventAttr);
+
+        log.trace("added event attr: pnumber: {}, visitNumber: {}, attrName: {}, attrValue: {}",
+            new Object[] { eventAttr.getCollectionEvent().getPatient().getPnumber(),
+                eventAttr.getCollectionEvent().getVisitNumber(),
+                eventAttr.getStudyEventAttr().getGlobalEventAttr().getLabel(),
+                eventAttr.getValue() });
 
         BatchOperationEventAttr batchOpPt = new BatchOperationEventAttr();
         batchOpPt.setBatch(batchOp);

@@ -46,6 +46,10 @@ public class TestCeventAttrBatchOp extends TestAction {
         session.beginTransaction();
         factory.createSite();
         study = factory.createStudy();
+    }
+
+    @Test
+    public void noErrors() throws Exception {
         factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
         factory.createStudyEventAttr();
 
@@ -61,10 +65,7 @@ public class TestCeventAttrBatchOp extends TestAction {
         // uncomment when a date-time global event attribute is added
         // factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.DATE_TIME);
         // factory.createStudyEventAttr();
-    }
 
-    @Test
-    public void noErrors() throws Exception {
         Set<Patient> patients = new HashSet<Patient>();
         patients.add(factory.createPatient());
         factory.createCollectionEvent();
@@ -84,6 +85,34 @@ public class TestCeventAttrBatchOp extends TestAction {
         }
 
         checkPojosAgainstDb(pojos);
+    }
+
+    @Test
+    public void ceventError() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+
+        // change visit number
+        for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            pojo.setVisitNumber(pojo.getVisitNumber() + 1);
+        }
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with invalid collection event");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
     }
 
     private void checkPojosAgainstDb(Set<CeventAttrBatchOpInputPojo> pojos) {
