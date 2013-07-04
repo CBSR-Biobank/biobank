@@ -8,6 +8,7 @@ import junit.framework.Assert;
 
 import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,12 @@ import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAt
 import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.action.TestAction;
 import edu.ualberta.med.biobank.test.action.batchoperation.CsvUtil;
 
@@ -49,7 +53,7 @@ public class TestCeventAttrBatchOp extends TestAction {
     }
 
     @Test
-    public void noErrors() throws Exception {
+    public void successPath() throws Exception {
         factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
         factory.createStudyEventAttr();
 
@@ -110,6 +114,171 @@ public class TestCeventAttrBatchOp extends TestAction {
                 factory.getDefaultSite(), pojos, new File(CSV_NAME));
             exec(importAction);
             Assert.fail("should not be allowed to import with invalid collection event");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
+    public void invalidAttributeName() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+
+        // change to invalid date value
+        for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            pojo.setAttrName(getMethodNameR());
+        }
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with invalid attribute name");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
+    public void studyAttributeLocked() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        studyEventAttr.setActivityStatus(ActivityStatus.CLOSED);
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with a locked study event attributename");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
+    public void eventAttrExists() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        factory.createCeventEventAttr();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with a locked study event attributename");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
+    public void selectSingleError() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_SINGLE);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+
+        // change selection
+        for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            pojo.setAttrValue(getMethodNameR());
+        }
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with invalid select single value");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    @Test
+    public void selectMultipleError() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_MULTIPLE);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+
+        // change selection
+        for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            pojo.setAttrValue(String.format("%s;%s",
+                Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[1], getMethodNameR()));
+        }
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with invalid select multiple value");
+        } catch (BatchOpErrorsException e) {
+            CsvUtil.showErrorsInLog(log, e);
+        }
+    }
+
+    /*
+     * Enable this test when global eventa attribute of type "DATE_TIME" is defined.
+     */
+    @Ignore
+    @Test
+    public void invalidDateFormat() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.DATE_TIME);
+        factory.createStudyEventAttr();
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+
+        // change to invalid date value
+        for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            pojo.setAttrValue(getMethodNameR());
+        }
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        try {
+            CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+                factory.getDefaultSite(), pojos, new File(CSV_NAME));
+            exec(importAction);
+            Assert.fail("should not be allowed to import with invalid date-time value");
         } catch (BatchOpErrorsException e) {
             CsvUtil.showErrorsInLog(log, e);
         }

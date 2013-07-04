@@ -59,10 +59,10 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
         bundle.tr("collection event does not exist for patient \"{0}\" and visit number {1}");
 
     private static final Tr STUDY_EVENT_ATTR_INVALID_ERROR =
-        bundle.tr("event attribute with name \"{0}\" not defined in study for patient \"{0}\" and visit number {1}");
+        bundle.tr("event attribute with name \"{0}\" not defined in study");
 
     private static final Tr STUDY_EVENT_ATTR_LOCKED_ERROR =
-        bundle.tr("event attribute with name \"{0}\" is locked in study for patient \"{0}\" and visit number {1}");
+        bundle.tr("event attribute with name \"{0}\" is locked in study");
 
     private static final Tr EVENT_ATTR_ALREADY_EXISTS_ERROR =
         bundle.tr("event attribute already exists for patient \"{0}\" and visit number {1}");
@@ -214,13 +214,13 @@ public class CeventAttrBatchOpAction implements Action<IdResult> {
             cevent.getPatient().getStudy(), pojo.getAttrName());
         if (studyEventAttr == null) {
             errorSet.addError(pojo.getLineNumber(),
-                STUDY_EVENT_ATTR_INVALID_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+                STUDY_EVENT_ATTR_INVALID_ERROR.format(pojo.getAttrName()));
             return null;
         }
 
         if (studyEventAttr.getActivityStatus() != ActivityStatus.ACTIVE) {
             errorSet.addError(pojo.getLineNumber(),
-                STUDY_EVENT_ATTR_LOCKED_ERROR.format(pojo.getPatientNumber(), pojo.getVisitNumber()));
+                STUDY_EVENT_ATTR_LOCKED_ERROR.format(pojo.getAttrName()));
             return null;
         }
 
