@@ -13,6 +13,8 @@ import junit.framework.Assert;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
@@ -23,6 +25,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
@@ -38,6 +41,8 @@ import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestCollectionEvent extends TestAction {
+
+    private static Logger log = LoggerFactory.getLogger(TestCollectionEvent.class);
 
     private Provisioning provisioning;
 
@@ -301,8 +306,8 @@ public class TestCollectionEvent extends TestAction {
             value = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[0];
             break;
         case SELECT_MULTIPLE:
-            value = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[1] + ";"
-                + Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[2];
+            String[] options = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";");
+            value = options[1] + ";" + options[2];
             break;
         case NUMBER:
             value = "12.34";
@@ -410,7 +415,7 @@ public class TestCollectionEvent extends TestAction {
         session.getTransaction().commit();
 
         List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
-        String value = getMethodNameR();
+        String value = null;
 
         switch (eventAttrTypeEnum) {
         case SELECT_MULTIPLE:
@@ -429,17 +434,9 @@ public class TestCollectionEvent extends TestAction {
             factory.getDefaultEventAttrTypeEnum(), value);
         attrs.add(attrInfo);
 
-        // Save a new cevent
-        Integer visitNumber = 1;
-
-        try {
-            exec(new CollectionEventSaveAction(
-                null, patient.getId(), visitNumber, ActivityStatus.ACTIVE, getMethodNameR(), null,
-                attrs, factory.getDefaultCenter())).getId();
-            Assert.fail("should not be allowed to save event attributes with invalid values");
-        } catch (Exception e) {
-            // do nothing
-        }
+        exec(new CollectionEventSaveAction(
+            null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+            attrs, factory.getDefaultCenter())).getId();
     }
 
     /*
@@ -447,12 +444,102 @@ public class TestCollectionEvent extends TestAction {
      */
     @Test
     public void badEventAttrValue() throws Exception {
-        badEventAttrValue(EventAttrTypeEnum.SELECT_SINGLE);
-        badEventAttrValue(EventAttrTypeEnum.SELECT_MULTIPLE);
-        badEventAttrValue(EventAttrTypeEnum.NUMBER);
+        try {
+            badEventAttrValue(EventAttrTypeEnum.SELECT_SINGLE);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+
+        try {
+            badEventAttrValue(EventAttrTypeEnum.SELECT_MULTIPLE);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+
+        try {
+            badEventAttrValue(EventAttrTypeEnum.NUMBER);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (NumberFormatException e) {
+            log.debug(e.getMessage());
+        }
 
         // no global event attribute types of type DATE_TIME defined yet
         // badEventAttrValue(EventAttrTypeEnum.DATE_TIME);
+    }
+
+    @Test
+    public void noStudyEventAttr() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        session.getTransaction().commit();
+
+        // assign a bad study event attribute ID
+        String value = getMethodNameR();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId() + 1,
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to save with an invalid study event attribute");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void lockedStudyEventAttr() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        studyEventAttr.setActivityStatus(ActivityStatus.CLOSED);
+        session.getTransaction().commit();
+
+        String value = getMethodNameR();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to save with an locked study event attribute");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void multipleOnSelectSingle() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_SINGLE);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        session.getTransaction().commit();
+
+        String[] options = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";");
+        String value = options[1] + ";" + options[2];
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to select multiple values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
     }
 
     @Test

@@ -17,7 +17,7 @@ public class EventAttrUtil {
 
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG =
-        bundle.tr("Value \"{0}\" is invalid for label \"{1}\", valid are \"{2}\".");
+        bundle.tr("Value \"{0}\" is invalid for label \"{1}\", valid is one of \"{2}\".");
 
     @SuppressWarnings("nls")
     public static final Tr INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG =
