@@ -394,7 +394,65 @@ public class TestCollectionEvent extends TestAction {
         saveWithEventAttr(EventAttrTypeEnum.SELECT_SINGLE);
         saveWithEventAttr(EventAttrTypeEnum.SELECT_MULTIPLE);
         saveWithEventAttr(EventAttrTypeEnum.NUMBER);
-        saveWithEventAttr(EventAttrTypeEnum.DATE_TIME);
+
+        // no global event attribute types of type DATE_TIME defined yet
+        // badEventAttrValue(EventAttrTypeEnum.DATE_TIME);
+    }
+
+    /*
+     * EventAttrTypeEnum.TEXT does not have invalid input, therefore not tested.
+     */
+    public void badEventAttrValue(EventAttrTypeEnum eventAttrTypeEnum) throws Exception {
+        session.beginTransaction();
+        factory.setDefaultEventAttrTypeEnum(eventAttrTypeEnum);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        Patient patient = factory.createPatient();
+        session.getTransaction().commit();
+
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        String value = getMethodNameR();
+
+        switch (eventAttrTypeEnum) {
+        case SELECT_MULTIPLE:
+            value = getMethodNameR() + ";" + getMethodNameR();
+            break;
+        case SELECT_SINGLE:
+        case NUMBER:
+        case DATE_TIME:
+            value = getMethodNameR();
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeEnum);
+        }
+
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        // Save a new cevent
+        Integer visitNumber = 1;
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), visitNumber, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
+
+    /*
+     * EventAttrTypeEnum.TEXT does not have invalid input, therefore not tested.
+     */
+    @Test
+    public void badEventAttrValue() throws Exception {
+        badEventAttrValue(EventAttrTypeEnum.SELECT_SINGLE);
+        badEventAttrValue(EventAttrTypeEnum.SELECT_MULTIPLE);
+        badEventAttrValue(EventAttrTypeEnum.NUMBER);
+
+        // no global event attribute types of type DATE_TIME defined yet
+        // badEventAttrValue(EventAttrTypeEnum.DATE_TIME);
     }
 
     @Test
