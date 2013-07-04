@@ -117,6 +117,10 @@ public class TestCeventAttrBatchOp extends TestAction {
 
     private void checkPojosAgainstDb(Set<CeventAttrBatchOpInputPojo> pojos) {
         for (CeventAttrBatchOpInputPojo pojo : pojos) {
+            log.debug("checking event attr: pnumber: {}, visitNumber: {}, attrName: {}, attrValue: {}",
+                new Object[] { pojo.getPatientNumber(), pojo.getVisitNumber(), pojo.getAttrName(),
+                    pojo.getAttrValue() });
+
             EventAttr eventAttr = (EventAttr) session.createCriteria(EventAttr.class, "ea")
                 .createAlias("ea.studyEventAttr", "sea")
                 .createAlias("sea.globalEventAttr", "gea")
@@ -126,10 +130,6 @@ public class TestCeventAttrBatchOp extends TestAction {
                 .add(Restrictions.eq("cevent.visitNumber", pojo.getVisitNumber()))
                 .add(Restrictions.eq("gea.label", pojo.getAttrName()))
                 .uniqueResult();
-
-            log.debug("checking event attr: pnumber: {}, visitNumber: {}, attrName: {}, attrValue: {}",
-                new Object[] { pojo.getPatientNumber(), pojo.getVisitNumber(), pojo.getAttrName(),
-                    pojo.getAttrValue() });
 
             Assert.assertNotNull(eventAttr);
             Assert.assertEquals(pojo.getAttrValue(), eventAttr.getValue());
