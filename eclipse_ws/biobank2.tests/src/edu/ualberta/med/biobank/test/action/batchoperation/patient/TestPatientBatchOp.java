@@ -180,12 +180,12 @@ public class TestPatientBatchOp extends TestAction {
 
         PatientBatchOpAction importAction = new PatientBatchOpAction(
             factory.getDefaultSite(), pojos, new File(CSV_NAME));
-        Integer bachOpId = exec(importAction).getId();
+        Integer batchOpId = exec(importAction).getId();
 
         checkPojosAgainstDb(pojos);
 
         BatchOpGetResult<Patient> batchOpResult =
-            exec(new PatientBatchOpGetAction(bachOpId));
+            exec(new PatientBatchOpGetAction(batchOpId));
 
         Assert.assertEquals(pojos.size(), batchOpResult.getModelObjects().size());
     }

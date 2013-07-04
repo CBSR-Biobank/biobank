@@ -13,7 +13,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.ceventattr.CeventAttrBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
@@ -303,6 +305,45 @@ public class TestCeventAttrBatchOp extends TestAction {
             Assert.assertNotNull(eventAttr);
             Assert.assertEquals(pojo.getAttrValue(), eventAttr.getValue());
         }
+    }
+
+    @Test
+    public void CeventAttrBatchOpGetAction() throws Exception {
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.TEXT);
+        factory.createStudyEventAttr();
+
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_SINGLE);
+        factory.createStudyEventAttr();
+
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_MULTIPLE);
+        factory.createStudyEventAttr();
+
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.NUMBER);
+        factory.createStudyEventAttr();
+
+        // uncomment when a date-time global event attribute is added
+        // factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.DATE_TIME);
+        // factory.createStudyEventAttr();
+
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        factory.createCollectionEvent();
+        session.getTransaction().commit();
+
+        Set<CeventAttrBatchOpInputPojo> pojos =
+            pojoHelper.createCeventAttrs(study.getStudyEventAttrs(), patients);
+        CeventCsvWriter.write(CSV_NAME, pojos);
+
+        CeventAttrBatchOpAction importAction = new CeventAttrBatchOpAction(
+            factory.getDefaultSite(), pojos, new File(CSV_NAME));
+        Integer batchOpId = exec(importAction).getId();
+
+        checkPojosAgainstDb(pojos);
+
+        BatchOpGetResult<EventAttr> batchOpResult =
+            exec(new CeventAttrBatchOpGetAction(batchOpId));
+
+        Assert.assertEquals(pojos.size(), batchOpResult.getModelObjects().size());
     }
 
 }

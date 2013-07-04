@@ -271,6 +271,11 @@
        </command>
        <command
              categoryId="org.eclipse.ui.category.window"
+             id="edu.ualberta.med.biobank.commands.ceventattr.import"
+             name="%CeventAttrImport.command">
+       </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
              id="edu.ualberta.med.biobank.commands.specimen.import"
              name="%SpecimenImport.command">
        </command>
@@ -340,7 +345,7 @@
                </reference>
             </and>
          </activeWhen>
-      </handler>   
+      </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.PrintHandler"
             commandId="edu.ualberta.med.biobank.commands.print">
@@ -493,7 +498,7 @@
             commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd">
          <activeWhen>
             <and>
-              <reference	
+              <reference
                     definitionId="biobank.processingPerspectiveSelected">
               </reference>
               <reference
@@ -595,7 +600,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"      
+            class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"
             commandId="edu.ualberta.med.biobank.commands.deleteSelection">
          <enabledWhen>
             <and>
@@ -766,6 +771,25 @@
       <handler
             class="edu.ualberta.med.biobank.handlers.PatientImportHandler"
             commandId="edu.ualberta.med.biobank.commands.patient.import">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.batchOperationPermission">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.CeventAttrImportHandler"
+            commandId="edu.ualberta.med.biobank.commands.ceventattr.import">
          <activeWhen>
             <and>
                <reference
@@ -977,6 +1001,11 @@
                   style="push">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.ceventattr.import"
+                  icon="icons/database_go.png"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.specimen.import"
                   icon="icons/database_go.png"
                   style="push">
@@ -1069,7 +1098,7 @@
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorB"
                   visible="true">
-            </separator>  
+            </separator>
             <command
                   commandId="edu.ualberta.med.biobank.commands.cbsrHelp"
                   label="%CbsrHelp.command"
@@ -1078,7 +1107,7 @@
             <separator
                   name="edu.ualberta.med.biobank.menu.update.separatorC"
                   visible="true">
-            </separator>  
+            </separator>
             <command
                   commandId="org.eclipse.ui.help.aboutAction"
                   label="%About.command"
@@ -1644,7 +1673,7 @@
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ShipmentViewForm"
-            default="false" 
+            default="false"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
             name="%ShipmentView.editor">
@@ -1723,7 +1752,7 @@
             default="false"
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.SpecimenTypeReport1Editor"
-            name="SpecimenTypeReport1Editor">            
+            name="SpecimenTypeReport1Editor">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.reports.SpecimenReport2Editor"
@@ -1822,10 +1851,22 @@
       name="%PatientImport.editor">
 </editor>
 <editor
+      class="edu.ualberta.med.biobank.forms.batchop.CeventAttrImportForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.batchop.CeventAttrImportForm"
+      name="%CeventAttrImport.editor">
+</editor>
+<editor
       class="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
       default="false"
       id="edu.ualberta.med.biobank.forms.batchop.PatientBatchOpViewForm"
       name="%PatientImport.editor">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.batchop.CeventAttrBatchOpViewForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.batchop.CeventAttrBatchOpViewForm"
+      name="%CeventAttrImport.editor">
 </editor>
 <editor
       class="edu.ualberta.med.biobank.forms.batchop.SpecimenImportForm"
@@ -1997,19 +2038,19 @@
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank.scheme"
             sequence="M3+L">
-      </key>    
+      </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank.scheme"
             sequence="M3+M">
-      </key> 
+      </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.changePassword"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank.scheme"
             sequence="M3+P">
-      </key>  
+      </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.userManagement"
             contextId="edu.ualberta.med.biobank.perspective.main"
@@ -2021,24 +2062,24 @@
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank.scheme"
             sequence="M3+M">
-      </key>      
+      </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.deleteSelection"
             schemeId="biobank.scheme"
             sequence="M3+Delete">
-      </key>   
+      </key>
 	  <key
          commandId="edu.ualberta.med.biobank.commands.print"
          contextId="edu.ualberta.med.biobank.perspective.linkAssign"
          schemeId="biobank.scheme"
          sequence="M1+P">
-      </key>    
+      </key>
 	  <key
          commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
          contextId="edu.ualberta.med.biobank.perspective.processing"
          schemeId="biobank.scheme"
          sequence="M3+S">
-      </key>    
+      </key>
 	  <key
          commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
          contextId="edu.ualberta.med.biobank.perspective.processing"
@@ -2326,15 +2367,15 @@
       <context
             id="not.edu.ualberta.med.biobank.perspective.processing"
             name="Not in Processing">
-      </context>    
+      </context>
 	  <context
             id="not.edu.ualberta.med.biobank.perspective.reports"
             name="Not in Reports">
-      </context>  
+      </context>
    <context
          id="edu.ualberta.med.biobank.perspective.linkAssign"
          name="Link or Assign perspective">
-   </context>  
+   </context>
    </extension>
    <extension
          id="product1"
