@@ -306,7 +306,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 throw new LocalizedException(LOCKED_LABEL_ERRMSG.format(label));
             }
 
-            if (attrInfo.value != null) {
+            if ((attrInfo.value != null) && !attrInfo.value.trim().isEmpty()) {
                 // the following method throws an exeption if value is invalid
                 EventAttrUtil.validateValue(attrInfo.type, sAttr.getGlobalEventAttr().getLabel(),
                     sAttr.getPermissible(), attrInfo.value);

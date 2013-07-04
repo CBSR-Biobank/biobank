@@ -33,7 +33,7 @@ public class CeventAttrImportForm extends ImportForm {
 
     @Override
     public void openForm(Integer batchOpId, boolean focusOnEditor) throws PartInitException {
-        PatientBatchOpViewForm.openForm(batchOpId, focusOnEditor);
+        CeventAttrBatchOpViewForm.openForm(batchOpId, focusOnEditor);
     }
 
 }

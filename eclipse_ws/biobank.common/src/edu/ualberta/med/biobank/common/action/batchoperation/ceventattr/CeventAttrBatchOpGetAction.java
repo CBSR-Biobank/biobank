@@ -41,7 +41,8 @@ public class CeventAttrBatchOpGetAction
         @SuppressWarnings("unchecked")
         List<BatchOperationEventAttr> batchOpEventAttrs =
             session.createCriteria(BatchOperationEventAttr.class, "boea")
-                .add(Restrictions.eq("boea.batch.id", this.batchOperationId)).list();
+                .add(Restrictions.eq("boea.batch.id", this.batchOperationId))
+                .list();
 
         List<EventAttr> eventAttrs = new ArrayList<EventAttr>();
         for (BatchOperationEventAttr batchOpEventAttr : batchOpEventAttrs) {

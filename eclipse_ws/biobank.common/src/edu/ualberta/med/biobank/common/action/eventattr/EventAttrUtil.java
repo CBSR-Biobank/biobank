@@ -45,6 +45,8 @@ public class EventAttrUtil {
     public static void validateValue(EventAttrTypeEnum type, String label,
         String permissibleValues, String value)
         throws LocalizedException {
+        String trimmedValue = value.trim();
+
         List<String> permValuesSplit = new ArrayList<String>(0);
 
         if (type.isSelectType()) {
