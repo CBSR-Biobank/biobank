@@ -59,10 +59,10 @@ public class PatientBatchOpPojoReader implements
     public CellProcessor[] getCellProcessors() {
         Map<String, CellProcessor> aMap = new LinkedHashMap<String, CellProcessor>();
 
-        aMap.put("studyName", new StrNotNullOrEmpty());
-        aMap.put("patientNumber", new StrNotNullOrEmpty());
-        aMap.put("enrollmentDate", new Optional(new ParseDate("yyyy-MM-dd HH:mm")));
-        aMap.put("comment", new Optional());
+        aMap.put(NAME_MAPPINGS[0], new StrNotNullOrEmpty());
+        aMap.put(NAME_MAPPINGS[1], new StrNotNullOrEmpty());
+        aMap.put(NAME_MAPPINGS[2], new Optional(new ParseDate("yyyy-MM-dd HH:mm")));
+        aMap.put(NAME_MAPPINGS[3], new Optional());
 
         if (aMap.size() != NAME_MAPPINGS.length) {
             throw new IllegalStateException(

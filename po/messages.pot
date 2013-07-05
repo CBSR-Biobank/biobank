@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-15 10:22-0700\n"
+"POT-Creation-Date: 2013-05-09 09:45-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,18 +19,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/BatchOpActionUtil.java:37
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/patient/PatientBatchOpAction.java:53
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/BatchOpActionUtil.java:44
 msgid "CSV file not loaded"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/BatchOpActionUtil.java:40
-msgid "invalid headers in CSV file"
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/patient/PatientBatchOpAction.java:53
+msgid "file not loaded"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/patient/PatientBatchOpAction.java:56
 #, java-format
-msgid "CSV study {0} does not exist"
+msgid "study {0} does not exist"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/patient/PatientBatchOpAction.java:59
+msgid "patient already exists"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/shipment/ShipmentBatchOpAction.java:53
@@ -58,75 +61,75 @@ msgstr ""
 msgid "shipping method \"{0}\" does not exist"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:65
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:62
 msgid "specimen already exists"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:68
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:65
 #, java-format
 msgid ""
 "collection event for patient {0} with visit number \"{1}\" does not exist"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:72
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:69
 msgid "specimen declared a source specimen but parent inventory ID present"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:76
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:73
 #, java-format
 msgid "parent inventory id does not exist: {0}"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:79
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:76
 msgid ""
 "when parent inventory id is not specified, patient number, and visit number "
 "are required"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:84
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:81
 msgid "pallet position defined but not product barcode or label"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:88
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:85
 msgid "pallet product barcode defined but not position"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:91
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:88
 msgid "pallet label defined but not container type"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:94
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:91
 #, java-format
 msgid "waybill \"{0}\" does not exist"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:97
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:94
 #, java-format
 msgid "specimen type with name \"{0}\" does not exist"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:100
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:97
 #, java-format
 msgid "container with label \"{0}\" does not exist"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:103
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:100
 #, java-format
 msgid "specimen position with label \"{0}\" is invalid"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:106
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:103
 msgid "patient number is invalid"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:109
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:106
 #, java-format
 msgid ""
 "patient number \"{0}\" does not match the patient on the source specimen "
 "\"{1}\""
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:113
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/batchoperation/specimen/SpecimenBatchOpAction.java:110
 #, java-format
 msgid ""
 "collection event with visit number \"{0}\" does match the source specimen's "
@@ -178,7 +181,7 @@ msgstr ""
 msgid "Unknown Event Attribute Type \"{0}\"."
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:269
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/collectionEvent/CollectionEventSaveAction.java:262
 #, java-format
 msgid ""
 "Specimen {0} has children and cannot be deleted. Instead, move it to a "
@@ -186,7 +189,7 @@ msgid ""
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/container/ContainerActionHelper.java:17
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenActionHelper.java:95
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/specimen/SpecimenActionHelper.java:94
 msgid "Parent container and position should either both be set or both be null"
 msgstr ""
 
@@ -302,12 +305,12 @@ msgstr ""
 msgid "Specimen should not be in shipment"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:170
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:169
 #, java-format
 msgid "Missing specimen \"{0}\"."
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:195
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:194
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchReceivingEntryForm.java:198
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/RequestEntryForm.java:192
 msgid "Specimen not found"
@@ -317,15 +320,15 @@ msgstr ""
 #. TR: dialog title
 #. dialog title
 #. dialog title.
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:210
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:209
 #: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/BgcPlugin.java:364
 #: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcFormBase.java:68
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:200
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:198
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/MoveSpecimensToDialog.java:176
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/StudyAliquotedSpecimenDialog.java:234
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:443
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:774
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:59
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:801
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:63
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/RequestTableGroup.java:67
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/grids/well/UICellStatus.java:24
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/ReportTreeWidget.java:235
@@ -334,31 +337,31 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:274
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:273
 #, java-format
 msgid "Specimen previously registered on another position: {0}"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:293
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:292
 #, java-format
 msgid "Specimen has a position in another site (site {0})"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:312
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:311
 #, java-format
 msgid "This pallet type {0} can''t hold a specimen of type {1}"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:327
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenAssignProcessAction.java:326
 msgid "Cannot assign position to a specimen that in dispatch transit"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:75
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:74
 #, java-format
 msgid "Value ''{0}'' has already been scanned in position {1}"
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:131
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/action/scanprocess/SpecimenLinkProcessAction.java:130
 msgid "Specimen already in database"
 msgstr ""
 
@@ -436,64 +439,9 @@ msgstr ""
 msgid "Cannot add multiple study event attributes with the same id (\"{0}\")."
 msgstr ""
 
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:144
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:141
 #, java-format
 msgid "labeling scheme with id \"{0}\" does not exist"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:350
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:396
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:553
-#, java-format
-msgid "Label should be {0} characters."
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:357
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:403
-msgid "Invalid characters in label. Are they in upper case?"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:364
-#, java-format
-msgid "Label {0} does not exist in this labeling scheme."
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:366
-#, java-format
-msgid "Label {0} does not exist in container with type {1}"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:369
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:417
-#, java-format
-msgid "Max value is {0}. (Max row: {1}. Max col: {2}.)"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:412
-#, java-format
-msgid "Label {0} does not exist in this scheme."
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:414
-#, java-format
-msgid "Label {0} does not exist in {1}"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:440
-msgid "2 char numeric labeling scheme not found"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:443
-#, java-format
-msgid "Label {0} is incorrect: it should be 2 characters"
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:549
-msgid "CBSR 2 char alphabetic labeling scheme not found."
-msgstr ""
-
-#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/wrappers/ContainerLabelingSchemeWrapper.java:557
-msgid "Label should be double letter (BB)."
 msgstr ""
 
 #. {0} number of specimens found
@@ -785,6 +733,11 @@ msgstr ""
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/ContainerType.java:86
 msgctxt "model"
 msgid "Top Level"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/ContainerType.java:89
+msgctxt "model"
+msgid "Labeling Layout"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/Dispatch.java:41
@@ -1100,7 +1053,7 @@ msgstr ""
 #. TR: dialog title
 #. tooltip.
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/PermissionEnum.java:41
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:193
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:190
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/SpecimenAssignHandler.java:29
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/processing/SpecimenAssignAdapter.java:32
 msgid "Specimen Assign"
@@ -1571,7 +1524,7 @@ msgstr ""
 #. label.
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchSpecimenState.java:24
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:28
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:310
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:309
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentViewForm.java:191
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SpecimenTransitView.java:307
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/grids/well/UICellStatus.java:30
@@ -1599,6 +1552,14 @@ msgstr ""
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/DispatchState.java:30
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchViewForm.java:257
 msgid "Lost"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/LabelingLayout.java:26
+msgid "Vertical"
+msgstr ""
+
+#: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/LabelingLayout.java:27
+msgid "Horizontal"
 msgstr ""
 
 #: eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/model/type/RequestSpecimenState.java:23
@@ -1795,7 +1756,7 @@ msgstr ""
 #. dialog title
 #: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/forms/BgcEntryFormActions.java:31
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:119
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:130
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:127
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/ReportsEditor.java:146
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/PrintHandler.java:28
 msgid "Print"
@@ -1835,7 +1796,7 @@ msgstr ""
 
 #. menu item label.
 #: eclipse_ws/biobank.gui.common/src/edu/ualberta/med/biobank/gui/common/widgets/AbstractInfoTableWidget.java:68
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:418
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:386
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/report/ReportAdapter.java:68
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/DispatchSpecimensTreeTable.java:248
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/infos/InfoTreeWidget.java:383
@@ -2086,11 +2047,11 @@ msgstr ""
 msgid "Enter text to filter the list:"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:199
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/BiobankPlugin.java:197
 msgid "Exception found."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/SessionManager.java:361
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/SessionManager.java:355
 msgid "Error displaying available actions"
 msgstr ""
 
@@ -2138,7 +2099,8 @@ msgstr ""
 msgid "multiple volumes for same source specimen"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/batchoperation/specimen/SpecimenBatchOpInterpreter.java:51
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/batchoperation/specimen/SpecimenBatchOpInterpreter.java:49
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:235
 msgid "Invalid headers in CSV file."
 msgstr ""
 
@@ -2172,93 +2134,93 @@ msgid "Enter a specimen inventory ID"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:198
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:205
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:209
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:216
 msgid "Specimen Inventory ID Error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:200
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:211
 #, java-format
 msgid "The inventory ID {0} already exists in the system"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:207
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:218
 #, java-format
 msgid "The inventory ID  {0} already exists in this collection event"
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:214
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:225
 msgid "Error checking inventory id"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:243
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:256
 msgid "Inventory ID already exists"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:249
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:262
 msgctxt "label"
 msgid "Time drawn"
 msgstr ""
 
 #. TR: source specimen time drawn tooltip
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:252
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:265
 msgid ""
 "If the study doesn't require a specific time drawn, then the default time "
 "drawn is used"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:258
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:271
 msgid "Time drawn should be set"
 msgstr ""
 
 #. TR: validation message if activity status not selected
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:267
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:280
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/StudyAliquotedSpecimenDialog.java:158
 msgid "An activity status should be selected"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:284
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:297
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:45
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:161
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:160
 msgid "Quantity (ml)"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:288
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:301
 msgid "Quantity is required."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:304
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:317
 msgctxt "label"
 msgid "Add a comment"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:332
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:345
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/StudyAliquotedSpecimenDialog.java:136
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/StudySourceSpecimenDialog.java:103
 msgid "A specimen type should be selected"
 msgstr ""
 
 #. TR: checkbox text
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:367
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:380
 msgid "Show only study source specimens"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:483
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:466
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/SpecimenEntryWidget.java:185
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/CollectionEventInfoTable.java:102
 msgctxt "yes abbeviation"
 msgid "Y"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:485
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/CEventSourceSpecimenDialog.java:468
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/SpecimenEntryWidget.java:184
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/CollectionEventInfoTable.java:101
 msgctxt "no abbeviation"
@@ -2630,7 +2592,7 @@ msgstr ""
 
 #. TR: button text
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:66
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:230
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:235
 msgid "Retry scan"
 msgstr ""
 
@@ -2644,20 +2606,20 @@ msgstr ""
 
 #. TR: progress monitor message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:73
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:520
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:522
 #, java-format
 msgid "Processing position {0}"
 msgstr ""
 
 #. TR: label;
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:258
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:285
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:290
 msgid "Plate to scan"
 msgstr ""
 
 #. TR: validation error message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/AbstractScanDialog.java:260
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:72
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:76
 msgid "Enter a valid plate barcode"
 msgstr ""
 
@@ -2694,7 +2656,7 @@ msgstr ""
 
 #. TR: validation error message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/DispatchCreateScanDialog.java:104
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:589
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:570
 msgid "Enter product barcode"
 msgstr ""
 
@@ -2717,7 +2679,7 @@ msgstr ""
 
 #. label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/DispatchCreateScanDialog.java:195
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:395
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:388
 msgid "Add specimens"
 msgstr ""
 
@@ -2789,7 +2751,7 @@ msgstr ""
 #. exported report column name, for positions of specimens
 #. according to a labeling scheme
 #. table column name
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:155
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:152
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/LoggingForm.java:104
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/LoggingForm.java:153
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/ContainerReport2Editor.java:132
@@ -2801,26 +2763,26 @@ msgid "Location"
 msgstr ""
 
 #. exported report column name, for specimen's specimen type
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:159
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:156
 msgid "Sample Type"
 msgstr ""
 
 #. exported report column name, for specimen's date drawn
 #. table column name
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:161
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:158
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/SpecimenReport1Editor.java:80
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/SpecimenReport3Editor.java:109
 msgid "Date Drawn"
 msgstr ""
 
 #. exported report description
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:164
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:161
 #, java-format
 msgid "Barcode: {0}"
 msgstr ""
 
 #. exported report title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:170
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/dispatch/ReceiveScanDialog.java:167
 msgid "Pallet Info Sheet"
 msgstr ""
 
@@ -2857,23 +2819,23 @@ msgid "Time packed must be set"
 msgstr ""
 
 #. TR: dialog title area title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:97
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:93
 msgid "Scan tubes manually"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:130
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:142
 #, java-format
 msgid "Position {0}"
 msgstr ""
 
 #. TR: wizard dialog dialog page description message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:133
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:145
 #, java-format
 msgid "Scan the tube at position {0}"
 msgstr ""
 
 #. TR: wizard page error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:172
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/scanmanually/ScanTubesManuallyWizard.java:185
 #, java-format
 msgid "The value entered already exists at position {0}"
 msgstr ""
@@ -2914,31 +2876,31 @@ msgid "Add a clinic contact to study"
 msgstr ""
 
 #. select parent container dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:48
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:34
 msgid "Select Parent Container"
 msgstr ""
 
-#. select parent container dialog title area message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:55
-msgid "Select the appropriate parent container"
-msgstr ""
-
 #. select parent container dialog title area title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:62
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:38
 msgid "Multiple parent containers are possible"
 msgstr ""
 
+#. select parent container dialog title area message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:42
+msgid "Select the appropriate parent container"
+msgstr ""
+
 #. select parent container combo box label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:74
-msgid "Select parent"
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:46
+msgid "Parent container"
 msgstr ""
 
 #. parent container required validation message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:78
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:86
 msgid "A container should be selected"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:95
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/select/SelectParentContainerDialog.java:100
 msgctxt "Select Parent Container Option Label"
 msgid "Parents"
 msgstr ""
@@ -3045,7 +3007,7 @@ msgstr ""
 #. error dialog title
 #. TR: error dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:407
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:512
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:513
 msgid "Error while opening main perspective"
 msgstr ""
 
@@ -3063,12 +3025,12 @@ msgid ""
 msgstr ""
 
 #. TR: information dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:496
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:497
 msgid "Super administrator mode"
 msgstr ""
 
 #. TR: information dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:498
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:499
 msgid ""
 "No working center has been found or selected for this user. You are super "
 "administrator, so you will be logged on with no working center. Only non "
@@ -3077,35 +3039,32 @@ msgstr ""
 
 #. error dialog title
 #. TR: select working center title area title
-#. TR: select working center shell title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:521
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:46
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:53
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:522
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:25
 msgid "Working center selection"
 msgstr ""
 
 #. error dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:523
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:524
 msgid "You need to select the center you want to work with."
 msgstr ""
 
 #. TR: error dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:547
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/LoginDialog.java:548
 msgid "Problem getting user create permissions"
 msgstr ""
 
 #. TR: select working center title area message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:39
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:29
 msgid "Choose the center you will work with."
 msgstr ""
 
-#. TR: no center selection combo box option
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:65
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:32
 msgid "-- no center selection --"
 msgstr ""
 
-#. TR: select working center combo box label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:70
+#. TR: no center selection combo box option
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/dialogs/startup/WorkingCenterSelectDialog.java:36
 msgid "Available centers"
 msgstr ""
 
@@ -3525,18 +3484,18 @@ msgid "Enter a city"
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:144
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:143
 msgid "Form state"
 msgstr ""
 
 #. dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:146
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:145
 msgid "Form in invalid state, save failed."
 msgstr ""
 
 #. progress monitor message
 #. progress message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:167
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/BiobankEntryForm.java:166
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchViewForm.java:387
 msgid "Saving..."
 msgstr ""
@@ -3642,7 +3601,7 @@ msgstr ""
 #. label
 #. label.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:234
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:296
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:282
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:195
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchReceivingEntryForm.java:127
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DispatchSendingEntryForm.java:171
@@ -3650,15 +3609,15 @@ msgstr ""
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientMergeForm.java:140
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:221
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ResearchGroupEntryForm.java:223
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:501
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:500
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteEntryForm.java:156
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:474
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:373
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyEntryForm.java:256
 msgid "Add a comment"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:279
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:274
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:203
 msgid "Change Source"
 msgstr ""
 
@@ -3680,12 +3639,12 @@ msgid ""
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:408
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:401
 msgid "Error retrieving source specimens"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:423
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/CollectionEventEntryForm.java:416
 msgid "You should select a valid number"
 msgstr ""
 
@@ -3704,102 +3663,102 @@ msgstr ""
 msgid "Collection Event for visit {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:55
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:52
 msgid "Creating a new storage container."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:60
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:57
 msgid "Editing an existing storage container."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:65
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:62
 msgid "Container must have a name"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:70
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:67
 msgid "Container must have a container type"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:75
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:72
 msgid "Position is empty or not a valid number"
 msgstr ""
 
 #. tab name, {0} is the container label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:124
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:118
 #, java-format
 msgid "Container {0}"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:213
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:207
 msgid "Container must have an activity status"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:266
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:252
 msgid "Temperature (Celcius)"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:269
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:281
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:255
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:295
 msgid "Default temperature is not a valid number"
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:329
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:315
 msgid "Renaming container"
 msgstr ""
 
 #. dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:331
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerEntryForm.java:317
 msgid ""
 "This container has been renamed. Its children will also be renamed. Are you "
 "sure you want to continue ?"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:72
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:76
 msgid "Creating a new storage type."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:77
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:81
 msgid "Editing an existing storage type."
 msgstr ""
 
 #. tab name
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:137
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:142
 msgid "New Container Type"
 msgstr ""
 
 #. tab name
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:141
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:146
 #, java-format
 msgid "Container Type {0} "
 msgstr ""
 
 #. form title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:169
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:172
 msgid "Container Type Information"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:237
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:236
 msgid "Container type must have a name"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:247
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:246
 msgid "Container type must have a short name"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:254
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:253
 msgid "Top Level Container"
 msgstr ""
 
 #. label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:261
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:145
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:139
 msgid "Rows"
 msgstr ""
 
@@ -3809,191 +3768,196 @@ msgid "Row capacity is not a valid number"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:268
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:149
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:276
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:142
 msgid "Columns"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:272
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:280
 msgid "Column capacity is not a valid number"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:276
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:290
 msgid ""
 "Default Temperature\n"
 "(Celcius)"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:294
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:308
 msgid "Select a child labeling scheme"
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:305
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:318
 msgid "Error setting the labeling scheme"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:315
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:330
 msgid "Container type must have an activity status"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:328
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:350
 msgid "Contents"
 msgstr ""
 
 #. radio button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:332
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:353
 msgid "Contains Containers"
 msgstr ""
 
 #. radio button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:337
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:357
 msgid "Contains Specimens"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:383
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:401
 msgid "Available specimen types"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:385
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:403
 msgid "Selected specimen types"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:412
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:429
 msgid "Available Sub-Container Types"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:414
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:431
 msgid "Selected Sub-Container types"
+msgstr ""
+
+#. validation error message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeEntryForm.java:582
+msgid "Select a labeling layout"
 msgstr ""
 
 #. tab name
 #. form title
 #. part name.
 #. form title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:88
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:103
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:300
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:303
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:87
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:102
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:290
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:293
 #, java-format
 msgid "Container Type {0}"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:153
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:145
 msgid ""
 "Default temperature\n"
 "(Celcius)"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:157
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:148
 msgid "Child labeling scheme"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:197
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:190
 msgid "Contains specimens"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:206
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:199
 msgid "Specimens types:"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:237
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:230
 msgid "Contains Container Types"
 msgstr ""
 
 #. label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:245
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:238
 msgid "Container types:"
 msgstr ""
 
 #. label
 #. section label.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:264
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:297
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerTypeViewForm.java:256
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:280
 msgid "Container Visual"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:143
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:168
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:694
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:139
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:175
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:621
 #, java-format
 msgid "Container {0} ({1})"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:278
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:261
 msgid "Positions errors"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:279
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:262
 msgid "Some child container has wrong position number"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:318
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:297
 msgid "Error in container children : can't display those initialized"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:378
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:355
 msgid "Initialize selection to"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:386
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:360
 msgid "Initialize"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:410
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:380
 msgid "Delete selected containers of type"
 msgstr ""
 
 #. tree node label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:412
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:705
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:382
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:630
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/RequestTableGroup.java:47
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/MembershipInfoTable.java:146
 msgid "All"
 msgstr ""
 
 #. dialog
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:429
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:372
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:394
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:375
 msgid "Confirm Delete"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:430
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:395
 msgid "Are you sure you want to delete these containers?"
 msgstr ""
 
 #. progress monitor message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:467
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:430
 msgid "Initializing..."
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:479
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:497
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:439
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:455
 msgid "Error while creating children"
 msgstr ""
 
 #. progress monitor message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:527
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:483
 msgid "Deleting..."
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:541
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:558
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:493
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ContainerViewForm.java:510
 msgid "Can't Delete Containers"
 msgstr ""
 
@@ -4061,7 +4025,7 @@ msgstr ""
 #. progress monitor text
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/DecodePlateForm.java:193
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ScanPlateForm.java:187
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:158
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:162
 msgid "Launching scan"
 msgstr ""
 
@@ -4209,18 +4173,18 @@ msgstr ""
 msgid "Logging: Browse through your search results"
 msgstr ""
 
-#. TR: label
+#. TR: form label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/LoggingForm.java:95
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/LoggingForm.java:150
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:204
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:191
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:361
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:154
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:193
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:349
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/grids/well/UICellStatus.java:26
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/DispatchSpecimenListInfoTable.java:55
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/LoggingInfoTable.java:31
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:42
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:100
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:157
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:156
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/DispatchSpecimensTreeTable.java:88
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/trees/RequestSpecimensTreeTable.java:82
 msgid "Type"
@@ -4403,10 +4367,10 @@ msgstr ""
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientViewForm.java:136
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientViewForm.java:139
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/PatientViewForm.java:144
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:131
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:137
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:146
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:149
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:152
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:139
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:141
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyViewForm.java:135
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/StudyViewForm.java:137
 #, java-format
@@ -4471,7 +4435,7 @@ msgstr ""
 
 #. exception message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:274
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:413
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:412
 msgid "No specimen found for that inventory id."
 msgstr ""
 
@@ -4500,13 +4464,13 @@ msgstr ""
 
 #. exception message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:306
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:425
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:424
 msgid "Specimen is currently listed in a dispatch."
 msgstr ""
 
 #. exception message.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ProcessingEventEntryForm.java:311
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:429
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:428
 msgid "Specimen is currently listed as stored in a container."
 msgstr ""
 
@@ -4748,7 +4712,7 @@ msgstr ""
 #. dialog title
 #. label
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ResearchGroupViewForm.java:121
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:64
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:93
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/SpecimenReport3Editor.java:49
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/reports/SpecimenReport3Editor.java:123
 msgid "CSV File"
@@ -4797,8 +4761,8 @@ msgstr ""
 #. dialog title.
 #. dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ScanPlateForm.java:170
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:127
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:133
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:131
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:137
 msgid "Scan result error"
 msgstr ""
 
@@ -4839,33 +4803,33 @@ msgstr ""
 msgid "Date Packed should be set"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:297
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:296
 msgid "Box Number"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:314
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:313
 msgid "Date Received should be set"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:400
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:399
 msgid "Specimens should be added to a shipment"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:419
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:418
 #, java-format
 msgid ""
 "Specimen ''{0}'' is currently in center ''{1}''. You can create shipments "
 "only for specimens that are currently in you center."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:437
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:436
 #, java-format
 msgid ""
 "Specimen is currently part of another shipment: {0}. You must remove this "
 "specimen from that shipment before it can be added to this one."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:459
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/ShipmentEntryForm.java:458
 msgid "Must select a new center for this specimen to originate from."
 msgstr ""
 
@@ -4907,10 +4871,10 @@ msgid "New repository site"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteEntryForm.java:106
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:94
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:109
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:289
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:291
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:93
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:106
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:258
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:260
 #, java-format
 msgid "Repository site {0}"
 msgstr ""
@@ -4935,162 +4899,91 @@ msgstr ""
 msgid "Add Study "
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:143
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:256
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:135
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:226
 msgid "Top level containers"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:223
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:197
 msgid "Add container type"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:257
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SiteViewForm.java:227
 msgid "Add container"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:79
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:247
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:128
-msgid "Specimen Import"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:90
-msgid "Executed By"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:92
-msgid "Time Executed"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:102
-msgid "File Input"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:107
-msgid "File Name"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:109
-msgid "Size"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:114
-msgid "Download"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:122
-msgid "Download the file to..."
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:137
-msgid "File Already Exists"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:139
-#, java-format
-msgid "The file {0} already exists. Would you like to overwrite it?"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:149
-msgid "Downloading file..."
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:182
-msgid "Problem downloading file"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenBatchOpViewForm.java:194
-msgid "Imported Specimens"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:75
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:69
 msgid "Edit specimen"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:126
+#. {0} inventory ID
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:118
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:123
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:139
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:339
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:341
+#, java-format
+msgid "Specimen: {0}"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:120
 msgid "Specimen Entry"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:168
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:141
 #, java-format
 msgid "Specimen {0} Information"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:206
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:158
 msgid "Specimen must have a type"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:239
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:193
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:170
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:195
 msgid "Created"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:330
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:435
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:450
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:390
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:401
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:248
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:340
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:354
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:392
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:403
 #, java-format
 msgid "worksheet: {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:342
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:201
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:258
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:203
 msgid "Origin center"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:346
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:203
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:260
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:205
 msgid "Current center"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:363
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:273
 msgid "Source Inventory ID"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:387
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:229
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:295
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:231
 msgid "Children #"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:393
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:301
 msgid "Specimen must have an activity status"
 msgstr ""
 
 #. TODO should never see that ? should never retrieve a Specimen which
 #. site cannot be displayed ?
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:415
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:322
 msgid "CANNOT DISPLAY INFORMATION"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:426
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenEntryForm.java:333
 msgid "Source Processing Event"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:84
-msgid "Import"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:113
-msgid "The following errors occurred when attempting to import:"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:153
-msgid "Importing Specimens..."
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:165
-msgid "Processing file..."
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:176
-msgid "You don't have permission to do this."
-msgstr ""
-
-#. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:209
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenImportForm.java:214
-msgid "Import Error"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenTypesViewForm.java:43
@@ -5114,53 +5007,45 @@ msgstr ""
 msgid "Cannot access Specimen Type editor. Access Denied."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:121
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:137
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:337
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:339
-#, java-format
-msgid "Specimen: {0}"
-msgstr ""
-
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:152
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:154
 msgid "Dispatch History"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:210
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:212
 msgid "Originating Specimen"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:214
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:216
 msgid "Parent Specimen"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:221
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:223
 msgid "Created in Processing Event"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:234
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:236
 msgid "Plate Errors"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:236
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:238
 msgid "Sample Errors"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:261
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:263
 msgid "View Import"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:294
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:296
 msgid "Container Visualization"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:368
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:370
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/MembershipInfoTable.java:175
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/SourceSpecimenInfoTable.java:91
 msgid "Yes"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:369
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/SpecimenViewForm.java:371
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/MembershipInfoTable.java:176
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/SourceSpecimenInfoTable.java:92
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/SourceSpecimenInfoTable.java:93
@@ -5262,136 +5147,233 @@ msgstr ""
 msgid "Study does not collect additional patient visit information"
 msgstr ""
 
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:81
+msgid "Executed By"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:82
+msgid "Time Executed"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:91
+msgid "File Input"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:95
+msgid "File Name"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:96
+msgid "Size"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:101
+msgid "Download"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:109
+msgid "Download the file to..."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:122
+msgid "File Already Exists"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:124
+#, java-format
+msgid "The file {0} already exists. Would you like to overwrite it?"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:134
+msgid "Downloading file..."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:161
+msgid "Problem downloading file"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/BatchOpViewForm.java:241
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/SpecimenBatchOpViewForm.java:23
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/SpecimenImportForm.java:19
+msgid "Specimen Import"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:113
+msgid "Import"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:141
+msgid "The following errors occurred when attempting to import:"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:163
+msgid "Importing Specimens..."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:170
+msgid "Processing file..."
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:179
+msgid "You don't have permission to do this."
+msgstr ""
+
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:210
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/ImportForm.java:214
+msgid "Import Error"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/PatientBatchOpViewForm.java:23
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/PatientImportForm.java:19
+msgid "Patient Import"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/PatientBatchOpViewForm.java:26
+msgid "Imported Patients"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/batchop/SpecimenBatchOpViewForm.java:26
+msgid "Imported Specimens"
+msgstr ""
+
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:117
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:130
 msgid ""
 "Please fill in the fields and hit enter or tab or resolve previous errors"
 msgstr ""
 
 #. TR: radio button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:251
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:264
 msgctxt "scan link assign"
 msgid "Single"
 msgstr ""
 
 #. TR: radio button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:256
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:269
 msgctxt "scan link assign"
 msgid "Single with position"
 msgstr ""
 
 #. TR: radio button label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:259
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:272
 msgctxt "scan link assign"
 msgid "Multiple"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:367
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:381
 msgid "Freezer"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:384
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:398
 msgid "Hotel"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:401
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1258
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:415
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1267
 msgid "Pallet"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:664
-msgid "Container label error"
-msgstr ""
-
-#. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:666
-#, java-format
-msgid "Unable to find a container with label {0}"
-msgstr ""
-
-#. TR: dialog title
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:681
-msgid "Container problem"
+msgid "Container label error"
 msgstr ""
 
 #. TR: dialog message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:683
 #, java-format
+msgid "Unable to find a container with label {0}"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:688
+#, java-format
+msgid "Parent container: {0}"
+msgstr ""
+
+#. TR: dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:700
+msgid "Container problem"
+msgstr ""
+
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:702
+#, java-format
 msgid "More than one container found matching {0}"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:694
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:713
 msgid "Init container from position"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:729
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:744
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:747
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:822
 msgid "Position error"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:732
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:750
 #, java-format
 msgid ""
 "Position {0} is invalid: no specimen position found that matches this label"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:748
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:761
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:764
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:777
 msgid "Container error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:750
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:766
 #, java-format
 msgid "Container cannot hold specimens: {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:764
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:779
 #, java-format
 msgid "Container {0} cannot hold specimens of type \"{1}\""
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:784
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:796
 msgid "Position not free"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:787
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:798
 #, java-format
 msgid "Position {0} already in use in container {1}"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:804
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:812
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractLinkAssignEntryForm.java:820
 msgid "Error while checking position"
 msgstr ""
 
 #. TR: button text
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:241
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:246
 msgid "Launch scan"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:261
-msgid "Errors have been previously detected. Cannot launch scan."
-msgstr ""
-
-#. TR: validation error message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:266
-msgid "Scanner should be launched"
+msgid "Errors were detected. Cannot launch scan."
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:270
-msgid "Errors in scanning result"
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:271
+msgid "Flatbed scan required"
+msgstr ""
+
+#. TR: validation error message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:275
+msgid "Errors with flatbed scan result"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:306
@@ -5400,60 +5382,60 @@ msgid ""
 msgstr ""
 
 #. TR: tooltip
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:311
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractPalletSpecimenAdminForm.java:310
 #, java-format
 msgid "Available barcodes are: {0}"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:132
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:129
 msgid "Do you want to print information?"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:155
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:178
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:152
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:175
 msgid "Print error"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:156
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/AbstractSpecimenAdminForm.java:153
 msgid "Can't print: log error."
 msgstr ""
 
 #. TR: validation error message
 #. tooltip.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:101
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:102
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/CollectionView.java:123
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/wizards/pages/EnterPnumberPage.java:29
 msgid "Enter a patient number"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:151
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:152
 msgid "A processing event should be selected"
 msgstr ""
 
 #. TR: checkbox text
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:194
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:195
 msgid "Last 7 days"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:222
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:223
 msgid "Collection visit#"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:226
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:227
 msgid "A collection event should be selected"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:276
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:296
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:277
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:297
 msgid "Patient search error"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:279
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:280
 #, java-format
 msgid ""
 "Patient {0} has been found but it is linked to the study {1}. The center {2} "
@@ -5461,48 +5443,48 @@ msgid ""
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:405
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:406
 msgid "Problem retrieving processing events"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:448
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:449
 msgid "Problem retrieving collection events"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:486
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:487
 msgid "Source specimens error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:488
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:489
 msgid ""
 "No source specimen of this collection event has been declared in a "
 "processing event."
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:494
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:495
 msgid "Problem retrieveing source specimens"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:517
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:518
 msgid "Problem reloading study"
 msgstr ""
 
 #. TR: study name short
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:527
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:528
 msgid "unknown"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:532
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:533
 msgid "No specimen types"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:535
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:536
 #, java-format
 msgid ""
 "There are no specimen types that are defined in study {0} and that are "
@@ -5510,211 +5492,203 @@ msgid ""
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:542
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/LinkFormPatientManagement.java:543
 msgid "Error retrieving available types"
 msgstr ""
 
 #. TR: form title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:205
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:202
 msgid "Assign position or move specimens"
 msgstr ""
 
 #. TR: title area message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:230
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:227
 msgid "Assign position to specimens or move specimens"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:270
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:265
 msgid "Cabinet specimen"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:277
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:270
 msgid ""
 "Old cabinet specimen with 4 letters were transformed to 5 letters (C"
 "+4letters)."
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:319
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:308
 msgid "Move - specimen error"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:337
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:344
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:325
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:332
 msgid "Enter a valid inventory ID"
 msgstr ""
 
-#. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:367
+#. TR: form label
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:355
 msgid "Collection date"
 msgstr ""
 
 #. TR: exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:404
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:393
 #, java-format
 msgid "No specimen found with inventoryId {0}"
 msgstr ""
 
 #. TR: exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:413
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:402
 msgid "This specimen is currently in transit in a dispatch."
 msgstr ""
 
 #. TR: exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:420
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:409
 #, java-format
 msgid "This specimen is currently in center ''{0}''."
 msgstr ""
 
 #. TR: text box text
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:430
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:419
 msgctxt "position string"
 msgid "none"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:452
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:441
 msgid "Old position"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:465
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:454
 msgid "Old position check"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:469
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:457
 msgid "Enter correct old position"
 msgstr ""
 
 #. TR: label
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:507
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:317
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:492
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:315
 msgid "Enter a position"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:562
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:544
 msgid "New position:"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:565
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:547
 msgid "Position:"
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:593
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:573
 msgid "Enter label"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:597
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:577
 msgid "Use flatbed scanner"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:611
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:90
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:589
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:89
 msgid "Container product barcode"
 msgstr ""
 
 #. TR: label
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:653
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:68
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:632
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:67
 msgid "Container label"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:747
-#, java-format
-msgid ""
-"There is already a different pallet (product barcode = {0}) in this position "
-"of site {1}"
-msgstr ""
-
-#. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:776
-msgid "Container found but can't hold specimens"
+#. TR: dialog title
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:715
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:779
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:946
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:959
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:971
+msgid "Values validation"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:796
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:762
 msgid "Containers Error"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:798
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:764
 msgid ""
 "No container type that can hold specimens has been found (if scanner is "
 "used, the container should be of size 8*12 or 10*10)"
 msgstr ""
 
-#. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:811
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:873
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:886
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:927
-msgid "Values validation"
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:803
+msgid "Container selected can't hold specimens"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:875
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:824
+#, java-format
+msgid ""
+"A pallet with product barcode \"{0}\" is already at position {1}(site {2})"
+msgstr ""
+
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:961
 msgid ""
 "A container with this barcode exists but is not a 8*12 or 10*10 container."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:889
+#. TR: dialog message
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:973
 #, java-format
 msgid "A pallet with barcode {0} is already used in position {1}."
 msgstr ""
 
 #. TR: validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:987
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1029
 msgid "A pallet type should be selected"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1027
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1063
 msgid "No Pallet defined?"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1029
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1065
 msgid ""
 "No child container types found with 8 rows and 12 columns or 10 rows and 10 "
 "columns"
 msgstr ""
 
-#. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1046
-msgid "Grid dimensions mismatch"
-msgstr ""
-
-#. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1048
-msgid "Container type and plate have different number of rows and/or columns"
-msgstr ""
-
 #. TR: exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1146
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1161
 msgid "problem with parent container creation"
 msgstr ""
 
 #. TR: exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1194
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1203
 msgid "result problem"
 msgstr ""
 
 #. TR: dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1445
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1446
 msgid "Really save?"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1447
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenAssignEntryForm.java:1448
 msgid ""
 "Specimens are missing from this pallet, are you sure you want to save? These "
 "specimens will still be registered at their current position."
@@ -5732,34 +5706,34 @@ msgstr ""
 
 #. TR: title
 #. TR: form title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:129
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:137
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:127
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:135
 msgid "Linking specimens"
 msgstr ""
 
 #. TR: title area message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:172
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:170
 msgid "Link specimens to their source specimens"
 msgstr ""
 
 #. validation error message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:274
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:272
 msgid "Inventory ID cannot be empty"
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:366
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:364
 msgid "InventoryId error"
 msgstr ""
 
 #. dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:368
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:366
 #, java-format
 msgid "InventoryId {0} already exists."
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:374
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/linkassign/SpecimenLinkEntryForm.java:372
 msgid "Error checking inventoryId"
 msgstr ""
 
@@ -5976,45 +5950,45 @@ msgid "Non processed"
 msgstr ""
 
 #. TR: dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:61
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:65
 msgid "Unable to load pallet type 8*12"
 msgstr ""
 
 #. progress monitor message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:98
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:102
 msgid "Scan and process..."
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:167
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:180
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:171
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:184
 msgid "Scan error"
 msgstr ""
 
 #. dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:169
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:173
 #, java-format
 msgid "Plate with barcode {0} is not enabled"
 msgstr ""
 
 #. dialog message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:183
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:187
 msgid "Barcodes can still be scanned with the handheld 2D scanner."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:215
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:219
 msgid "Rescanned value is different"
 msgstr ""
 
 #. exception message
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:237
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:241
 msgid ""
 "Scan error: Previously scanned specimens has been replaced. Please cancel "
 "and start again."
 msgstr ""
 
 #. dialog title
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:278
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/forms/utils/PalletScanManagement.java:282
 msgid "Scan tube error"
 msgstr ""
 
@@ -6059,6 +6033,7 @@ msgstr ""
 
 #. exception message
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/EditSpecimenTypesHandler.java:37
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/PatientImportHandler.java:30
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/ShippingMethodsEditHandler.java:37
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/handlers/SpecimenImportHandler.java:33
 msgid "Could not execute handler."
@@ -6367,54 +6342,54 @@ msgid "Select a file location to export the printed page."
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:56
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:59
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/DispatchSpecimenListInfoTable.java:106
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/entry/StudyAddInfoTable.java:111
 msgid "Delete failed"
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:95
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:98
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/entry/CEventSpecimenEntryInfoTable.java:60
 msgid "Permission Error"
 msgstr ""
 
 #. dialog message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:97
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:100
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/entry/CEventSpecimenEntryInfoTable.java:61
 msgid "Unable to retrieve user permissions"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:171
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:174
 #, java-format
 msgid "New {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:316
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:319
 #, java-format
 msgid "Edit {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:333
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:336
 #, java-format
 msgid "View {0}"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:350
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:353
 #, java-format
 msgid "Delete {0}"
 msgstr ""
 
 #. dialog message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:401
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:404
 msgid "delete not allowed"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:426
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:429
 msgid "Programming Error"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:427
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/AbstractAdapterBase.java:430
 msgid "This adapter is missing its implementation for runDelete()"
 msgstr ""
 
@@ -6479,10 +6454,11 @@ msgid "Problem while moving container"
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ContainerAdapter.java:299
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ContainerAdapter.java:300
 msgid "Container Move Error"
 msgstr ""
 
+#. dialog message. {0}=label.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ContainerAdapter.java:302
 #, java-format
 msgid "A parent container with child \"{0}\" does not exist."
@@ -6516,7 +6492,7 @@ msgstr ""
 msgid "Are you sure you want to delete this study?"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ResearchGroupAdapter.java:74
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/admin/ResearchGroupAdapter.java:78
 msgid "Are you sure you want to delete this research group?"
 msgstr ""
 
@@ -6777,26 +6753,26 @@ msgstr ""
 msgid "An error occurred. Unable to write to path {0}."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:52
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:51
 msgid "Specimen position"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:127
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:126
 msgid "Processing Events List"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:142
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:141
 #, java-format
 msgid "Can''t open form with id {0}"
 msgstr ""
 
 #. dialog title.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:172
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:156
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:171
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:164
 msgid "Search Result"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:175
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/utils/SearchType.java:174
 #, java-format
 msgid "Found {0} results. Do you want to open all of them?"
 msgstr ""
@@ -6807,13 +6783,17 @@ msgid ""
 "Enter Inventory ID (6 letters for new samples, 4 allowed for old samples)"
 msgstr ""
 
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/validators/ScannerBarcodeValidator.java:48
+msgid "Invalid plate dimensions"
+msgstr ""
+
 #. dialog title.
 #. dialog title
 #. dialog title.
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/AbstractTodaySearchAdministrationView.java:61
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/CollectionView.java:172
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/ProcessingView.java:224
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:163
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:171
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SpecimenTransitView.java:246
 msgid "Search error"
 msgstr ""
@@ -6948,13 +6928,23 @@ msgid "Unable to place report node: {0}"
 msgstr ""
 
 #. button label.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:109
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:110
 msgctxt "search (verb)"
 msgid "Search"
 msgstr ""
 
+#. dialog title.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:152
+msgid "Cannot search"
+msgstr ""
+
 #. dialog message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:158
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:154
+msgid "You have no working center selected"
+msgstr ""
+
+#. dialog message.
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/views/SearchView.java:166
 msgid "no result"
 msgstr ""
 
@@ -7311,18 +7301,22 @@ msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:49
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:106
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:163
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:162
 msgid "Origin Center"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:50
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:107
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:164
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:163
 msgid "Current Center"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:159
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/NewSpecimenInfoTable.java:158
 msgid "Source worksheet"
+msgstr ""
+
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/PatientTableSimple.java:31
+msgid "Patient Number"
 msgstr ""
 
 #: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/PeListInfoTable.java:48
@@ -7348,7 +7342,7 @@ msgstr ""
 msgid "Unable to delete role."
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/SimpleSpecimenTable.java:34
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/infotables/SpecimenTableSimple.java:34
 msgid "Inventory ID"
 msgstr ""
 
@@ -7577,19 +7571,19 @@ msgstr ""
 msgid "For string values, use '%' as a wildcard character"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:104
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:135
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:179
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:106
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:137
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:185
 msgid ""
 "A source specimen type and an aliquoted specimen type should be selected"
 msgstr ""
 
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:133
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:135
 msgid "Aliquoted specimen type"
 msgstr ""
 
 #. validation error message.
-#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:366
+#: eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/specimentypeselection/AliquotedSpecimenSelectionWidget.java:372
 msgid "Type should be selected"
 msgstr ""
 
@@ -8544,8 +8538,7 @@ msgid "plate id is invalid: "
 msgstr ""
 
 #: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:385
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:400
-#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:416
+#: eclipse_ws/scannerConfig/src/edu/ualberta/med/scannerconfig/ScannerConfigPlugin.java:401
 msgid "preference not assigned"
 msgstr ""
 

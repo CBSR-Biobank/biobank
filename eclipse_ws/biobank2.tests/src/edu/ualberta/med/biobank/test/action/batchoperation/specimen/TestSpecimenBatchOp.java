@@ -18,7 +18,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ualberta.med.biobank.common.action.batchoperation.BatchOpGetResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpAction;
+import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpGetAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
@@ -865,5 +867,47 @@ public class TestSpecimenBatchOp extends TestAction {
         result.add(factory.createContainer());
 
         return result;
+    }
+
+    @Test
+    public void specimenBatchOpGetAction() throws Exception {
+        Set<Patient> patients = new HashSet<Patient>();
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+        patients.add(factory.createPatient());
+
+        Set<SourceSpecimen> sourceSpecimens = new HashSet<SourceSpecimen>();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSpecimenType();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+        factory.createSpecimenType();
+        sourceSpecimens.add(factory.createSourceSpecimen());
+
+        // create a new specimen type for the aliquoted specimens
+        factory.createSpecimenType();
+        Set<AliquotedSpecimen> aliquotedSpecimens = new HashSet<AliquotedSpecimen>();
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+        aliquotedSpecimens.add(factory.createAliquotedSpecimen());
+
+        session.getTransaction().commit();
+
+        Set<SpecimenBatchOpInputPojo> csvInfos = specimenCsvHelper.createAllSpecimens(
+            factory.getDefaultStudy(), originInfos, patients);
+
+        // write out to CSV file so we can view data
+        SpecimenBatchOpCsvWriter.write(CSV_NAME, csvInfos);
+
+        SpecimenBatchOpAction importAction =
+            new SpecimenBatchOpAction(factory.getDefaultSite(), csvInfos,
+                new File(CSV_NAME));
+        Integer bachOpId = exec(importAction).getId();
+
+        checkCsvInfoAgainstDb(csvInfos);
+
+        BatchOpGetResult<Specimen> batchOpResult =
+            exec(new SpecimenBatchOpGetAction(bachOpId));
+
+        Assert.assertEquals(csvInfos.size(), batchOpResult.getModelObjects().size());
     }
 }

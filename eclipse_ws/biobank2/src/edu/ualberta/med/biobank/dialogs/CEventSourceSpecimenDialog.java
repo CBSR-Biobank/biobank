@@ -392,34 +392,11 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         allSpecimenTypesCheckBox.setSelection(useStudyOnlySourceSpecimens);
     }
 
-    @SuppressWarnings("nls")
     public void updateWidgetVisibilityAndValues() {
-        if (!dialogCreated) return;
-
-        SourceSpecimen ss = null;
-        SpecimenType type = internalSpecimen.specimen.getSpecimenType();
-        if (type != null) {
-            ss = mapStudySourceSpecimen.get(type.getName());
-        }
-        boolean enableVolume =
-            (type != null)
-                && (ss == null || Boolean.TRUE.equals(ss
-                    .getNeedOriginalVolume()));
-        boolean isVolumeRequired =
-            ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
+        updateWidgetVisibilityAndValuesNoTimeReset();
 
         if (defaultTimeDrawn != null) {
             timeDrawnWidget.setDate(defaultTimeDrawn);
-        }
-
-        quantityLabel.setVisible(enableVolume);
-        quantityText.setVisible(enableVolume);
-        quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
-        String originalText = quantityText.getText();
-        quantityText.setText(originalText + "*");
-        quantityText.setText(originalText);
-        if (!enableVolume) {
-            internalSpecimen.specimen.setQuantity(null);
         }
     }
 
@@ -432,12 +409,8 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         if (type != null) {
             ss = mapStudySourceSpecimen.get(type.getName());
         }
-        boolean enableVolume =
-            (type != null)
-                && (ss == null || Boolean.TRUE.equals(ss
-                    .getNeedOriginalVolume()));
-        boolean isVolumeRequired =
-            ss != null && Boolean.TRUE.equals(ss.getNeedOriginalVolume());
+        boolean enableVolume = ((type != null) && ((ss == null) || ss.getNeedOriginalVolume()));
+        boolean isVolumeRequired = ((ss != null) && ss.getNeedOriginalVolume());
 
         quantityLabel.setVisible(enableVolume);
         quantityText.setVisible(enableVolume);
@@ -445,9 +418,6 @@ public class CEventSourceSpecimenDialog extends PagedDialog {
         String originalText = quantityText.getText();
         quantityText.setText(originalText + "*");
         quantityText.setText(originalText);
-        if (!enableVolume) {
-            internalSpecimen.specimen.setQuantity(null);
-        }
     }
 
     /**

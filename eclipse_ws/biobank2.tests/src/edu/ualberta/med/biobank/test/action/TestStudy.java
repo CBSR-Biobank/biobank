@@ -53,8 +53,8 @@ import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 import edu.ualberta.med.biobank.test.action.helper.StudyHelper;
 
 /**
- * This test suite assumes that the association between Sites and Studies is
- * tested in the Site test class.
+ * This test suite assumes that the association between Sites and Studies is tested in the Site test
+ * class.
  * 
  */
 public class TestStudy extends TestAction {

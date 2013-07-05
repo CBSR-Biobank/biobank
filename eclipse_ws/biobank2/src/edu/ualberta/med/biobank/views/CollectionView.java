@@ -10,6 +10,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientSearchAction.SearchedPatientInfo;
 import edu.ualberta.med.biobank.common.permission.patient.PatientCreatePermission;
@@ -166,6 +167,11 @@ public class CollectionView extends AbstractAdministrationView {
                 showSearchedObjectsInTree(pinfo.patient.getId(),
                     pinfo.patient.getPnumber(), false, true);
             }
+        } catch (AccessDeniedException e) {
+            BgcPlugin.openAsyncError(
+                // dialog title.
+                i18n.tr("You don't have permission to do this."),
+                e.getLocalizedMessage());
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 // dialog title.
@@ -190,7 +196,7 @@ public class CollectionView extends AbstractAdministrationView {
             adapter.rebuild();
         try {
             setSearchFieldsEnablement(SessionManager.getAppService().isAllowed(
-                new PatientReadPermission(null)));
+                new PatientReadPermission()));
         } catch (ApplicationException e) {
             BgcPlugin.openAccessDeniedErrorMessage();
         }

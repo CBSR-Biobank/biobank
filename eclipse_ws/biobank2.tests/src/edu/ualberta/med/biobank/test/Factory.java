@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -23,6 +25,8 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.EventAttr;
+import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import edu.ualberta.med.biobank.model.Group;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.OriginInfo;
@@ -43,6 +47,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 import edu.ualberta.med.biobank.model.type.LabelingLayout;
 
@@ -55,6 +60,8 @@ import edu.ualberta.med.biobank.model.type.LabelingLayout;
  */
 public class Factory {
     private static final Random R = new Random();
+
+    public static final String STUDY_EVENT_ATTR_SELECT_PERMISSIBLE = "Option1;Option2;Option3";
 
     private final ContainerLabelingSchemeGetter schemeGetter;
     private final NameGenerator nameGenerator;
@@ -95,6 +102,11 @@ public class Factory {
     private Comment defaultComment;
     private ShipmentInfo defaultShipmentInfo;
     private ShippingMethod defaultShippingMethod;
+
+    private EventAttrTypeEnum defaultEventAttrTypeEnum;
+    private GlobalEventAttr defaultGlobalEventAttr;
+    private StudyEventAttr defaultStudyEventAttr;
+    private EventAttr defaultCeventEventAttr;
 
     public Factory(Session session) {
         this(session, new BigInteger(130, R).toString(32));
@@ -1006,6 +1018,128 @@ public class Factory {
         session.save(shippingMethod);
         session.flush();
         return shippingMethod;
+    }
+
+    public EventAttrTypeEnum getDefaultEventAttrTypeEnum() {
+        if (defaultEventAttrTypeEnum == null) {
+            defaultEventAttrTypeEnum = EventAttrTypeEnum.TEXT;
+        }
+        return defaultEventAttrTypeEnum;
+    }
+
+    public void setDefaultEventAttrTypeEnum(EventAttrTypeEnum eventAttrTypeEnum) {
+        defaultEventAttrTypeEnum = eventAttrTypeEnum;
+    }
+
+    public GlobalEventAttr getDefaultGlobalEventAttr() {
+        getDefaultEventAttrTypeEnum();
+        @SuppressWarnings("unchecked")
+        List<GlobalEventAttr> list = session.createCriteria(GlobalEventAttr.class).list();
+        for (GlobalEventAttr gea : list) {
+            String name = gea.getEventAttrType().getName();
+            if (defaultEventAttrTypeEnum.getName().equals(name)) {
+                defaultGlobalEventAttr = gea;
+            }
+        }
+        if ((defaultGlobalEventAttr == null)
+            ||
+            !defaultEventAttrTypeEnum.getName().equals(defaultGlobalEventAttr.getEventAttrType().getName())) {
+            throw new IllegalStateException("could not find global event attr type");
+        }
+        return defaultGlobalEventAttr;
+    }
+
+    public void setDefaultGlobalEventAttr(GlobalEventAttr globalEventAttr) {
+        this.defaultGlobalEventAttr = globalEventAttr;
+    }
+
+    public StudyEventAttr getDefautlStudyEventAttr() {
+        if (defaultStudyEventAttr == null) {
+            defaultStudyEventAttr = createStudyEventAttr();
+        }
+        return defaultStudyEventAttr;
+    }
+
+    public void setDefaultStudyEventAttr(StudyEventAttr studyEventAttr) {
+        this.defaultStudyEventAttr = studyEventAttr;
+    }
+
+    public StudyEventAttr createStudyEventAttr() {
+        String permissible = null;
+        StudyEventAttr studyEventAttr = new StudyEventAttr();
+        studyEventAttr.setStudy(getDefaultStudy());
+        studyEventAttr.setGlobalEventAttr(getDefaultGlobalEventAttr());
+
+        switch (getDefaultEventAttrTypeEnum()) {
+        case SELECT_SINGLE:
+        case SELECT_MULTIPLE:
+            permissible = STUDY_EVENT_ATTR_SELECT_PERMISSIBLE;
+            break;
+        case NUMBER:
+        case DATE_TIME:
+        case TEXT:
+            // do nothing
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: "
+                + getDefaultEventAttrTypeEnum());
+        }
+
+        studyEventAttr.setPermissible(permissible);
+
+        setDefaultStudyEventAttr(studyEventAttr);
+        getDefaultStudy().getStudyEventAttrs().add(studyEventAttr);
+        session.save(studyEventAttr);
+        session.flush();
+        return studyEventAttr;
+    }
+
+    public EventAttr getDefautlCeventEventAttr() {
+        if (defaultCeventEventAttr == null) {
+            defaultCeventEventAttr = createCeventEventAttr();
+        }
+        return defaultCeventEventAttr;
+    }
+
+    public void setDefaultCeventEventAttr(EventAttr ceventEventAttr) {
+        this.defaultCeventEventAttr = ceventEventAttr;
+    }
+
+    public EventAttr createCeventEventAttr() {
+        String value = nameGenerator.next(EventAttr.class);
+        EventAttr ceventEventAttr = new EventAttr();
+        StudyEventAttr studyEventAttr = getDefautlStudyEventAttr();
+        ceventEventAttr.setStudyEventAttr(studyEventAttr);
+        ceventEventAttr.setCollectionEvent(getDefaultCollectionEvent());
+
+        String eventAttrTypeName = studyEventAttr.getGlobalEventAttr().getEventAttrType().getName();
+        switch (EventAttrTypeEnum.getEventAttrType(eventAttrTypeName)) {
+        case SELECT_SINGLE:
+            value = defaultStudyEventAttr.getPermissible().split(";")[0];
+            break;
+        case SELECT_MULTIPLE:
+            value = defaultStudyEventAttr.getPermissible().split(";")[0]
+                + defaultStudyEventAttr.getPermissible().split(";")[1];
+            break;
+        case NUMBER:
+            value = "1.0";
+            break;
+        case DATE_TIME:
+            value = "2000-01-01 00:00";
+            break;
+        case TEXT:
+            // do nothing
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeName);
+        }
+
+        ceventEventAttr.setValue(value);
+
+        setDefaultCeventEventAttr(ceventEventAttr);
+        session.save(ceventEventAttr);
+        session.flush();
+        return ceventEventAttr;
     }
 
     public User createUser() {

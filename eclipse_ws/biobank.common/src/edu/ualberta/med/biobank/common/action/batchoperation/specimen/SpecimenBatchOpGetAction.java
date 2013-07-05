@@ -21,7 +21,7 @@ public class SpecimenBatchOpGetAction
     private static final String SPECIMEN_QRY = "SELECT bos.specimen "
         + " FROM " + BatchOperationSpecimen.class.getName() + " bos"
         + " WHERE bos.batch.id = ?"
-        + " ORDER BY bos.specimen.inventory_id";
+        + " ORDER BY bos.specimen.inventoryId";
 
     private final Integer id;
 

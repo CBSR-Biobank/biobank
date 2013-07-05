@@ -25,8 +25,8 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
             + " WHERE p.id=?"
             + " GROUP BY p.id";
 
-    private String pnumber;
-    private Integer patientId;
+    private final String pnumber;
+    private final Integer patientId;
 
     public static class SearchedPatientInfo implements ActionResult {
         private static final long serialVersionUID = 1L;
@@ -37,15 +37,20 @@ public class PatientSearchAction implements Action<SearchedPatientInfo> {
 
     public PatientSearchAction(String pnumber) {
         this.pnumber = pnumber;
+        this.patientId = null;
     }
 
     public PatientSearchAction(Integer id) {
         this.patientId = id;
+        this.pnumber = null;
     }
 
     @Override
     public boolean isAllowed(ActionContext context) {
-        return new PatientReadPermission(patientId).isAllowed(context);
+        if (patientId != null) {
+            return new PatientReadPermission(patientId).isAllowed(context);
+        }
+        return new PatientReadPermission(pnumber).isAllowed(context);
     }
 
     @Override

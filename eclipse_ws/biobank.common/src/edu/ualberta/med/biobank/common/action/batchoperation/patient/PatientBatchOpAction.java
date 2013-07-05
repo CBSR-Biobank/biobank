@@ -113,16 +113,7 @@ public class PatientBatchOpAction implements Action<IdResult> {
         workingCenterOnServerSide = context.load(Center.class, workingCenterId);
 
         return PermissionEnum.BATCH_OPERATIONS.isAllowed(user, workingCenterOnServerSide)
-            && hasPermissionOnStudies(user, getStudiesForValidNames(context));
-    }
-
-    private boolean hasPermissionOnStudies(User user, Set<Study> studies) {
-        for (Study study : studies) {
-            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
-                return false;
-            }
-        }
-        return true;
+            && BatchOpActionUtil.hasPermissionOnStudies(user, getStudiesForValidNames(context));
     }
 
     /*
@@ -196,8 +187,8 @@ public class PatientBatchOpAction implements Action<IdResult> {
     }
 
     private PatientBatchOpPojoData getDbInfo(ActionContext context, PatientBatchOpInputPojo pojo) {
-        Patient spc = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
-        if (spc != null) {
+        Patient patient = BatchOpActionUtil.getPatient(context.getSession(), pojo.getPatientNumber());
+        if (patient != null) {
             errorSet.addError(pojo.getLineNumber(), PATIENT_ALREADY_EXISTS_ERROR);
             return null;
         }

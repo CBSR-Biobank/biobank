@@ -102,6 +102,14 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
             }
             topSpecimen.getOriginInfo().getCenter().getName();
         }
+        Specimen parentSpecimen = specimen.getParentSpecimen();
+        if (parentSpecimen != null) {
+            ProcessingEvent parentPevent = parentSpecimen.getProcessingEvent();
+            if (parentPevent != null) {
+                parentPevent.getCenter();
+            }
+            parentSpecimen.getOriginInfo().getCenter().getName();
+        }
 
         // get all parent containers - can be used for visualisation
         Stack<Container> parents = new Stack<Container>();

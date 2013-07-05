@@ -36,6 +36,7 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction;
 import edu.ualberta.med.biobank.common.action.patient.PatientGetSimpleCollectionEventInfosAction.SimpleCEventInfo;
 import edu.ualberta.med.biobank.common.action.patient.PatientNextVisitNumberAction;
@@ -50,7 +51,6 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
@@ -380,7 +380,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 new SpecimenTypeGetAllAction()).getList();
             final Set<SourceSpecimen> studySourceSpecimens = SessionManager.getAppService().doAction(
                 new StudyGetSourceSpecimensAction(
-                    ceventInfo.cevent.getPatient().getStudy().getId())).getSet();
+                    ceventInfo.cevent.getPatient().getStudy().getId(), true)).getSet();
 
             specimensTable.addEditSupport(studySourceSpecimens, allSpecimenTypes);
             addSectionToolbar(section,

@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.test.action;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,10 +10,11 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventDeleteAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetEventAttrInfoAction;
@@ -25,28 +24,25 @@ import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSav
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
-import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfo;
-import edu.ualberta.med.biobank.common.action.eventattr.GlobalEventAttrInfoGetAction;
-import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction;
-import edu.ualberta.med.biobank.common.action.patient.PatientGetInfoAction.PatientInfo;
-import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudyEventAttrSaveAction;
-import edu.ualberta.med.biobank.common.action.study.StudyGetInfoAction;
-import edu.ualberta.med.biobank.common.action.study.StudyInfo;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.EventAttr;
+import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.util.MathUtil;
+import edu.ualberta.med.biobank.test.Factory;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.action.helper.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.action.helper.SiteHelper.Provisioning;
 
 public class TestCollectionEvent extends TestAction {
+
+    private static Logger log = LoggerFactory.getLogger(TestCollectionEvent.class);
 
     private Provisioning provisioning;
 
@@ -95,7 +91,7 @@ public class TestCollectionEvent extends TestAction {
                 visitNumber, ActivityStatus.ACTIVE, commentText,
                 new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
                 provisioning.getClinic()))
-                .getId();
+            .getId();
 
         // Check CollectionEvent is in database with correct values
         CollectionEvent cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
@@ -124,7 +120,8 @@ public class TestCollectionEvent extends TestAction {
             }
         }
 
-        // Save the same cevent with only one kept from previous list (and modified) and with a new one
+        // Save the same cevent with only one kept from previous list (and modified) and with a new
+        // one
         List<SaveCEventSpecimenInfo> newSpecList = new ArrayList<SaveCEventSpecimenInfo>();
 
         SaveCEventSpecimenInfo spcInfoToCopy = specs.values().iterator().next();
@@ -147,7 +144,7 @@ public class TestCollectionEvent extends TestAction {
             (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert
-        .assertEquals(visitNumber + 1, cevent.getVisitNumber().intValue());
+            .assertEquals(visitNumber + 1, cevent.getVisitNumber().intValue());
         Assert.assertEquals(2, cevent.getAllSpecimens().size());
         Assert.assertEquals(2, cevent.getOriginalSpecimens().size());
         for (Iterator<Specimen> iter =
@@ -172,16 +169,16 @@ public class TestCollectionEvent extends TestAction {
                 Assert.assertEquals(modifiedSpec.inventoryId,
                     sp.getInventoryId());
                 Assert
-                .assertTrue(MathUtil.equals(modifiedSpec.quantity,
-                    sp.getQuantity()));
+                    .assertTrue(MathUtil.equals(modifiedSpec.quantity,
+                        sp.getQuantity()));
             }
         }
     }
 
     /*
-     * Creates a colleciton event with parent specimens and child specimens, then re-saves
-     * the collection event with the action and then verifies that the current centre on the
-     * specimens has not changed.
+     * Creates a colleciton event with parent specimens and child specimens, then re-saves the
+     * collection event with the action and then verifies that the current centre on the specimens
+     * has not changed.
      */
     @Test
     public void checkSpecimenCurrentCenter() throws Exception {
@@ -232,7 +229,7 @@ public class TestCollectionEvent extends TestAction {
 
         @SuppressWarnings("unchecked")
         List<Specimen> list = session.createCriteria(Specimen.class)
-        .add(Restrictions.eq("collectionEvent.id", cevent.getId())).list();
+            .add(Restrictions.eq("collectionEvent.id", cevent.getId())).list();
 
         Assert.assertEquals(allSpecimens.size(), list.size());
 
@@ -243,276 +240,319 @@ public class TestCollectionEvent extends TestAction {
 
     @Test
     public void checkGetAction() throws Exception {
-        // add specimen type
-        final Integer typeId = exec(new SpecimenTypeSaveAction(getMethodNameR(), getMethodNameR())).getId();
-
-        final Map<String, SaveCEventSpecimenInfo> specs =
-            CollectionEventHelper.createSaveCEventSpecimenInfoRandomList(
-                5, typeId, getExecutor().getUserId());
-
-        setEventAttrs(provisioning.studyId);
-        StudyInfo studyInfo = exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
-
-        StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
-            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
-                phlebotomistStudyAttr = attr;
-            }
-        }
-        Assert.assertNotNull(phlebotomistStudyAttr);
-
-        List<CEventAttrSaveInfo> attrs =
-            new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
-        attrs.add(new CEventAttrSaveInfo(phlebotomistStudyAttr.getId(),
-            EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr.getGlobalEventAttr().getEventAttrType().getName()),
-            "abcdefghi"));
-
-        Integer visitNber = getR().nextInt(20) + 1;
-        String commentText = Utils.getRandomString(20, 30);
-        // Save a new cevent
-        final Integer ceventId = exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds.get(0), visitNber,
-                ActivityStatus.ACTIVE, commentText,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
-                attrs, provisioning.getClinic())).getId();
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        cevent.getComments().add(factory.createComment());
+        factory.createParentSpecimen();
+        factory.createChildSpecimen();
+        factory.createCeventEventAttr();
+        session.getTransaction().commit();
 
         // Call get infos action
-        PatientInfo patientInfo = exec(new PatientGetInfoAction(provisioning.patientIds.get(0)));
-        CEventInfo info = exec(new CollectionEventGetInfoAction(ceventId));
+        CEventInfo info = exec(new CollectionEventGetInfoAction(cevent.getId()));
 
         // no aliquoted specimens added
-        Assert.assertEquals(0, info.aliquotedSpecimenInfos.size());
         Assert.assertNotNull(info.cevent);
-        Assert.assertEquals(visitNber, info.cevent.getVisitNumber());
+        Assert.assertEquals(cevent.getVisitNumber(), info.cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, info.cevent.getActivityStatus());
 
-        Assert.assertEquals(patientInfo.patient.getPnumber(), info.cevent.getPatient().getPnumber());
+        Assert.assertEquals(cevent.getPatient().getPnumber(), info.cevent.getPatient().getPnumber());
 
-        Assert.assertEquals(patientInfo.patient.getStudy().getName(),
+        Assert.assertEquals(cevent.getPatient().getStudy().getName(),
             info.cevent.getPatient().getStudy().getName());
-
-        // TODO: add test to check if the comments' user is fetched
 
         Assert.assertNotNull(info.cevent.getComments());
         // FIXME sometimes size not correct !!??!!
         Assert.assertEquals(1, info.cevent.getComments().size());
-        Assert.assertEquals(attrs.size(), info.eventAttrs.size());
-        Assert.assertEquals(specs.size(), info.sourceSpecimenInfos.size());
-
-        // FIXME need to add test with aliquoted specimens
+        Assert.assertEquals(1, info.eventAttrs.size());
+        Assert.assertEquals(1, info.sourceSpecimenInfos.size());
+        Assert.assertEquals(1, info.aliquotedSpecimenInfos.size());
     }
 
-    @SuppressWarnings("nls")
     @Test
-    public void saveWithAttrs() throws Exception {
-        setEventAttrs(provisioning.studyId);
-        StudyInfo studyInfo =
-            exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
+    public void getEventAttrInfos() throws Exception {
+        session.beginTransaction();
+        CollectionEvent cevent = factory.createCollectionEvent();
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_SINGLE);
+        EventAttr eventAttr = factory.createCeventEventAttr();
+        session.getTransaction().commit();
 
-        StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
-            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
-                phlebotomistStudyAttr = attr;
-            }
+        // Call get eventAttr infos action
+        Map<Integer, EventAttrInfo> infos = exec(
+            new CollectionEventGetEventAttrInfoAction(cevent.getId())).getMap();
+        Assert.assertEquals(1, infos.size());
+        EventAttrInfo info = infos.values().iterator().next();
+        Assert.assertNotNull(info.attr);
+        Assert.assertEquals(factory.getDefaultEventAttrTypeEnum(), info.type);
+        Assert.assertEquals(cevent.getId(), info.attr.getCollectionEvent().getId());
+        Assert.assertEquals(eventAttr.getValue(), info.attr.getValue());
+        Assert.assertEquals(eventAttr.getStudyEventAttr().getId(),
+            info.attr.getStudyEventAttr().getId());
+
+    }
+
+    public void saveWithEventAttr(EventAttrTypeEnum eventAttrTypeEnum) throws Exception {
+        session.beginTransaction();
+        factory.setDefaultEventAttrTypeEnum(eventAttrTypeEnum);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        Patient patient = factory.createPatient();
+        session.getTransaction().commit();
+
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        String value = getMethodNameR();
+
+        switch (eventAttrTypeEnum) {
+        case SELECT_SINGLE:
+            value = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[0];
+            break;
+        case SELECT_MULTIPLE:
+            String[] options = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";");
+            value = options[1] + ";" + options[2];
+            break;
+        case NUMBER:
+            value = "12.34";
+            break;
+        case DATE_TIME:
+            value = "2000-01-01 12:00";
+            break;
+        case TEXT:
+            value = getMethodNameR();
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeEnum);
         }
-        Assert.assertNotNull(phlebotomistStudyAttr);
 
-        final Integer visitNumber = getR().nextInt(20) + 1;
-        final String commentText = Utils.getRandomString(20, 30);
-
-        List<CEventAttrSaveInfo> attrs =
-            new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
-        String value1 = getMethodNameR() + "abcdefghi";
-
-        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(phlebotomistStudyAttr.getId(),
-            EventAttrTypeEnum.getEventAttrType(
-                phlebotomistStudyAttr.getGlobalEventAttr().getEventAttrType().getName()),
-                value1);
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
         attrs.add(attrInfo);
 
         // Save a new cevent
-        final Integer ceventId = exec(
-            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
-                visitNumber, ActivityStatus.ACTIVE, commentText, null,
-                attrs, provisioning.getClinic())).getId();
+        Integer visitNumber = 1;
+        final Integer ceventId = exec(new CollectionEventSaveAction(
+            null, patient.getId(), visitNumber, ActivityStatus.ACTIVE, getMethodNameR(), null,
+            attrs, factory.getDefaultCenter())).getId();
 
         // Check CollectionEvent is in database with correct values
-        CollectionEvent cevent =
-            (CollectionEvent) session.get(CollectionEvent.class, ceventId);
+        CollectionEvent cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertEquals(visitNumber, cevent.getVisitNumber());
         Assert.assertEquals(ActivityStatus.ACTIVE, cevent.getActivityStatus());
-        Assert.assertEquals(1, cevent.getComments()
-            .size());
+        Assert.assertEquals(1, cevent.getComments().size());
         Assert.assertEquals(1, cevent.getEventAttrs().size());
         EventAttr eventAttr = cevent.getEventAttrs().iterator().next();
-        Assert.assertEquals(value1, eventAttr.getValue());
-        Assert.assertEquals(phlebotomistStudyAttr.getId(), eventAttr
-            .getStudyEventAttr().getId());
+        Assert.assertEquals(value, eventAttr.getValue());
+        Assert.assertEquals(studyEventAttr.getId(), eventAttr.getStudyEventAttr().getId());
 
         attrs.remove(attrInfo);
         Integer eventAttrId = eventAttr.getId();
-        String value2 = getMethodNameR() + "jklmnopqr";
-        attrInfo = new CEventAttrSaveInfo(attrInfo.studyEventAttrId, attrInfo.type, value2);
+
+        switch (eventAttrTypeEnum) {
+        case SELECT_SINGLE:
+            value = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[1];
+            break;
+        case SELECT_MULTIPLE:
+            value = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[0] + ";"
+                + Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";")[2];
+            break;
+        case NUMBER:
+            value = "56.78";
+            break;
+        case DATE_TIME:
+            value = "2010-12-31 23:59";
+            break;
+        case TEXT:
+            value = getMethodNameR();
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeEnum);
+        }
+
+        attrInfo = new CEventAttrSaveInfo(attrInfo.studyEventAttrId, attrInfo.type, value);
         attrs.add(attrInfo);
 
         // Save with a different value for attrinfo
-        exec(new CollectionEventSaveAction(ceventId,
-            provisioning.patientIds.get(0), visitNumber, ActivityStatus.ACTIVE,
-            commentText, null, attrs, provisioning.getClinic()));
+        exec(new CollectionEventSaveAction(ceventId, patient.getId(), visitNumber,
+            ActivityStatus.ACTIVE, null, null, attrs, factory.getDefaultCenter()));
 
         session.clear();
         cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         session.refresh(cevent);
         Assert.assertEquals(1, cevent.getEventAttrs().size());
         eventAttr = cevent.getEventAttrs().iterator().next();
-        Assert.assertEquals(value2, eventAttr.getValue());
+        Assert.assertEquals(value, eventAttr.getValue());
         Assert.assertEquals(eventAttrId, eventAttr.getId());
 
-        // make sure only one value in database
-        Query q = session.createQuery(
-            "SELECT eattr FROM " + CollectionEvent.class.getName() + " ce "
-                + "JOIN ce.eventAttrs eattr "
-                + "JOIN eattr.studyEventAttr seattr "
-                + "JOIN seattr.globalEventAttr geattr "
-                + "WHERE ce.id = ? AND geattr.label= ?");
-        q.setParameter(0, cevent.getId());
-        q.setParameter(1, "Phlebotomist");
+        // make sure only one value is present in database
         @SuppressWarnings("unchecked")
-        List<EventAttr> results = q.list();
+        List<EventAttr> results = session.createCriteria(EventAttr.class, "ea")
+            .createAlias("ea.studyEventAttr", "seattr")
+            .createAlias("seattr.globalEventAttr", "geattr")
+            .add(Restrictions.eq("ea.collectionEvent.id", ceventId))
+            .add(Restrictions.eq("geattr.label", studyEventAttr.getGlobalEventAttr().getLabel()))
+            .list();
+
         Assert.assertEquals(1, results.size());
     }
 
+    @Test
+    public void saveWithEventAttr() throws Exception {
+        saveWithEventAttr(EventAttrTypeEnum.TEXT);
+        saveWithEventAttr(EventAttrTypeEnum.SELECT_SINGLE);
+        saveWithEventAttr(EventAttrTypeEnum.SELECT_MULTIPLE);
+        saveWithEventAttr(EventAttrTypeEnum.NUMBER);
+
+        // no global event attribute types of type DATE_TIME defined yet
+        // badEventAttrValue(EventAttrTypeEnum.DATE_TIME);
+    }
+
     /*
-     * add Event Attr to study
+     * EventAttrTypeEnum.TEXT does not have invalid input, therefore not tested.
      */
-    @SuppressWarnings("nls")
-    private void setEventAttrs(Integer studyId)
-        throws Exception {
+    public void badEventAttrValue(EventAttrTypeEnum eventAttrTypeEnum) throws Exception {
+        session.beginTransaction();
+        factory.setDefaultEventAttrTypeEnum(eventAttrTypeEnum);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        Patient patient = factory.createPatient();
+        session.getTransaction().commit();
 
-        Map<Integer, GlobalEventAttrInfo> globalEattrs =
-            exec(new GlobalEventAttrInfoGetAction()).getMap();
-        Assert.assertFalse("EventAttrTypes not initialized",
-            globalEattrs.isEmpty());
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        String value = null;
 
-        HashMap<String, GlobalEventAttrInfo> globalEattrsByLabel =
-            new HashMap<String, GlobalEventAttrInfo>();
-        for (GlobalEventAttrInfo gEattr : globalEattrs.values()) {
-            globalEattrsByLabel.put(gEattr.attr.getLabel(), gEattr);
+        switch (eventAttrTypeEnum) {
+        case SELECT_MULTIPLE:
+            value = getMethodNameR() + ";" + getMethodNameR();
+            break;
+        case SELECT_SINGLE:
+        case NUMBER:
+        case DATE_TIME:
+            value = getMethodNameR();
+            break;
+        default:
+            throw new IllegalStateException("invalid event attribute type: " + eventAttrTypeEnum);
         }
 
-        // make sure the global event attributes are present
-        Assert.assertTrue(
-            "Missing global event attribute",
-            globalEattrsByLabel.keySet().containsAll(
-                Arrays.asList("PBMC Count (x10^6)", "Consent", "Patient Type",
-                    "Visit Type")));
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
 
-        StudyEventAttrSaveAction seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("PBMC Count (x10^6)").attr
-            .getId());
-        seAttrSave.setRequired(true);
-        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
-        seAttrSave.setStudyId(studyId);
-        exec(seAttrSave);
+        exec(new CollectionEventSaveAction(
+            null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+            attrs, factory.getDefaultCenter())).getId();
+    }
 
-        seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Consent").attr.getId());
-        seAttrSave.setRequired(false);
-        seAttrSave.setPermissible("c1;c2;c3");
-        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
-        seAttrSave.setStudyId(studyId);
-        exec(seAttrSave);
+    /*
+     * EventAttrTypeEnum.TEXT does not have invalid input, therefore not tested.
+     */
+    @Test
+    public void badEventAttrValue() throws Exception {
+        try {
+            badEventAttrValue(EventAttrTypeEnum.SELECT_SINGLE);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
 
-        seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Patient Type").attr.getId());
-        seAttrSave.required = true;
-        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
-        seAttrSave.setStudyId(studyId);
-        exec(seAttrSave);
+        try {
+            badEventAttrValue(EventAttrTypeEnum.SELECT_MULTIPLE);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
 
-        seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Visit Type").attr.getId());
-        seAttrSave.required = false;
-        seAttrSave.setPermissible("v1;v2;v3;v4");
-        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
-        seAttrSave.setStudyId(studyId);
-        exec(seAttrSave);
+        try {
+            badEventAttrValue(EventAttrTypeEnum.NUMBER);
+            Assert.fail("should not be allowed to save event attributes with invalid values");
+        } catch (NumberFormatException e) {
+            log.debug(e.getMessage());
+        }
 
-        seAttrSave = new StudyEventAttrSaveAction();
-        seAttrSave.setGlobalEventAttrId(globalEattrsByLabel
-            .get("Phlebotomist").attr.getId());
-        seAttrSave.required = false;
-        seAttrSave.setActivityStatus(ActivityStatus.ACTIVE);
-        seAttrSave.setStudyId(studyId);
-        exec(seAttrSave);
+        // no global event attribute types of type DATE_TIME defined yet
+        // badEventAttrValue(EventAttrTypeEnum.DATE_TIME);
+    }
+
+    @Test
+    public void noStudyEventAttr() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        session.getTransaction().commit();
+
+        // assign a bad study event attribute ID
+        String value = getMethodNameR();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId() + 1,
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to save with an invalid study event attribute");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void lockedStudyEventAttr() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        studyEventAttr.setActivityStatus(ActivityStatus.CLOSED);
+        session.getTransaction().commit();
+
+        String value = getMethodNameR();
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to save with an locked study event attribute");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void multipleOnSelectSingle() throws Exception {
+        session.beginTransaction();
+        Patient patient = factory.createPatient();
+        factory.setDefaultEventAttrTypeEnum(EventAttrTypeEnum.SELECT_SINGLE);
+        StudyEventAttr studyEventAttr = factory.createStudyEventAttr();
+        session.getTransaction().commit();
+
+        String[] options = Factory.STUDY_EVENT_ATTR_SELECT_PERMISSIBLE.split(";");
+        String value = options[1] + ";" + options[2];
+        List<CEventAttrSaveInfo> attrs = new ArrayList<CEventAttrSaveInfo>();
+        CEventAttrSaveInfo attrInfo = new CEventAttrSaveInfo(studyEventAttr.getId(),
+            factory.getDefaultEventAttrTypeEnum(), value);
+        attrs.add(attrInfo);
+
+        try {
+            exec(new CollectionEventSaveAction(
+                null, patient.getId(), 1, ActivityStatus.ACTIVE, getMethodNameR(), null,
+                attrs, factory.getDefaultCenter())).getId();
+            Assert.fail("should not be allowed to select multiple values");
+        } catch (LocalizedException e) {
+            log.debug(e.getLocalizedMessage());
+        }
     }
 
     @Test
     public void deleteWithoutSpecimens() throws Exception {
-        final Integer ceventId =
-            exec(
-                new CollectionEventSaveAction(null, provisioning.patientIds
-                    .get(0), getR().nextInt(20) + 1, ActivityStatus.ACTIVE,
-                    Utils.getRandomString(20, 30), null, null, provisioning.getClinic())).getId();
+        final Integer ceventId = exec(
+            new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
+                getR().nextInt(20) + 1, ActivityStatus.ACTIVE,
+                Utils.getRandomString(20, 30), null, null, provisioning.getClinic())).getId();
 
         // test delete
-        CEventInfo info =
-            exec(new CollectionEventGetInfoAction(ceventId));
+        CEventInfo info = exec(new CollectionEventGetInfoAction(ceventId));
         exec(new CollectionEventDeleteAction(info.cevent));
-        CollectionEvent cevent =
-            (CollectionEvent) session.get(CollectionEvent.class, ceventId);
+        CollectionEvent cevent = (CollectionEvent) session.get(CollectionEvent.class, ceventId);
         Assert.assertNull(cevent);
-    }
-
-    @SuppressWarnings("nls")
-    @Test
-    public void gsetEventAttrInfos() throws Exception {
-        // add specimen type
-        setEventAttrs(provisioning.studyId);
-        StudyInfo studyInfo =
-            exec(new StudyGetInfoAction(provisioning.studyId));
-        Assert.assertEquals(5, studyInfo.getStudyEventAttrs().size());
-
-        StudyEventAttr phlebotomistStudyAttr = null;
-        for (StudyEventAttr attr : studyInfo.getStudyEventAttrs()) {
-            if ("Phlebotomist".equals(attr.getGlobalEventAttr().getLabel())) {
-                phlebotomistStudyAttr = attr;
-            }
-        }
-        Assert.assertNotNull(phlebotomistStudyAttr);
-
-        EventAttrTypeEnum eventAttrType =
-            EventAttrTypeEnum.getEventAttrType(phlebotomistStudyAttr
-                .getGlobalEventAttr().getEventAttrType().getName());
-        List<CEventAttrSaveInfo> attrs =
-            new ArrayList<CollectionEventSaveAction.CEventAttrSaveInfo>();
-        String value = "abcdefghi";
-        attrs.add(new CEventAttrSaveInfo(phlebotomistStudyAttr.getId(), eventAttrType, value));
-
-        Integer visitNber = getR().nextInt(20) + 1;
-        // Save a new cevent
-        final Integer ceventId = exec(new CollectionEventSaveAction(
-            null, provisioning.patientIds.get(0), visitNber, ActivityStatus.ACTIVE,
-            null, null, attrs, provisioning.getClinic())).getId();
-
-        // Call get eventAttr infos action
-        Map<Integer, EventAttrInfo> infos =
-            exec(new CollectionEventGetEventAttrInfoAction(
-                ceventId)).getMap();
-        Assert.assertEquals(1, infos.size());
-        EventAttrInfo info = infos.values().iterator().next();
-        Assert.assertNotNull(info.attr);
-        Assert.assertEquals(eventAttrType, info.type);
-        Assert.assertEquals(ceventId, info.attr.getCollectionEvent().getId());
-        Assert.assertEquals(value, info.attr.getValue());
-        Assert.assertEquals(phlebotomistStudyAttr.getId(), info.attr
-            .getStudyEventAttr().getId());
-
     }
 }

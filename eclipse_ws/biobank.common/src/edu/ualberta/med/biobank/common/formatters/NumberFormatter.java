@@ -1,11 +1,15 @@
 package edu.ualberta.med.biobank.common.formatters;
 
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 public class NumberFormatter {
     public static final NumberFormat defaultNberFormatter = NumberFormat
         .getNumberInstance(Locale.getDefault());
+    {
+        defaultNberFormatter.setRoundingMode(RoundingMode.UNNECESSARY);
+    }
 
     public static final NumberFormat currencyFormatter = NumberFormat
         .getCurrencyInstance(Locale.getDefault());

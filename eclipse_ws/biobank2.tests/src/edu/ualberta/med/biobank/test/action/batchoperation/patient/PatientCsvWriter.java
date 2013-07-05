@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 class PatientCsvWriter {
 
     /**
-     * Generates a Patient CSV file with random patient numbers.
+     * Generates a Patient CSV file with patient numbers.
      * 
      * @param filename The name of the CSV file to be saved.
      * @param patientInfos set of beans containing the information for each row.

@@ -74,13 +74,6 @@ public abstract class DefaultAbstractInfoTableWidget<T>
         if (autoSizeColumns) {
             autoSizeColumns();
         }
-
-        // Table table = tableViewer.getTable();
-        // for (int i = 0, n = table.getColumnCount(); i < n; i++) {
-        // table.getColumn(i).pack();
-        // }
-
-        // System.out.println("2");
     }
 
     @Override

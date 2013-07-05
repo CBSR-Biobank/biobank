@@ -302,7 +302,9 @@ public class ContainerType extends AbstractBiobankModel
 
     @Transient
     public boolean hasMultipleLabelingLayout() {
-        if (childLabelingScheme == null) {
+        Integer rows = getRowCapacity();
+        Integer cols = getColCapacity();
+        if ((rows == null) || (cols == null) || (childLabelingScheme == null)) {
             return false;
         }
         return this.childLabelingScheme.getHasMultipleLayout()

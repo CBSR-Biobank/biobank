@@ -23,6 +23,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -165,6 +166,11 @@ public class SearchView extends ViewPart {
                             // dialog message.
                             i18n.tr("no result"));
                     }
+                } catch (AccessDeniedException e) {
+                    BgcPlugin.openAsyncError(
+                        // dialog title.
+                        i18n.tr("You don't have permission to do this."),
+                        e.getLocalizedMessage());
                 } catch (Exception ex) {
                     BgcPlugin.openAsyncError(
                         // dialog title.

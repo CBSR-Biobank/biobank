@@ -9,10 +9,14 @@ public class V1_3__Biobank_v370 implements SpringJdbcMigration {
 
     @Override
     public void migrate(JdbcTemplate jdbcTemplate) throws Exception {
-        jdbcTemplate.execute("ALTER TABLE container_type ADD COLUMN IS_MICROPLATE "
-            + "TINYINT(1) NULL DEFAULT NULL COMMENT ''");
 
-        jdbcTemplate.execute("UPDATE container_type SET IS_MICROPLATE=0");
+        // for collection event attributes batchOp
+        jdbcTemplate.execute("CREATE TABLE `batch_operation_event_attr` ("
+            + " `EVENT_ATTR_ID` int(11) NOT NULL,"
+            + " `BATCH_OPERATION_ID` int(11) NOT NULL,"
+            + " PRIMARY KEY (PROCESSING_EVENT_ID, BATCH_OPERATION_ID)"
+            + "  KEY `FKF1184A93D3BA0590` (`BATCH_OPERATION_ID`),"
+            + "  CONSTRAINT `FKF1184A93D3BA0590` FOREIGN KEY (`BATCH_OPERATION_ID`) REFERENCES `batch_operation` (`ID`)"
+            + ") ENGINE=InnoDB");
     }
-
 }

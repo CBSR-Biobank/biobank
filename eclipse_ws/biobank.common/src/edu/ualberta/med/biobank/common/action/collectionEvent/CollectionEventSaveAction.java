@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -17,18 +15,18 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrTypeEnum;
+import edu.ualberta.med.biobank.common.action.eventattr.EventAttrUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventCreatePermission;
 import edu.ualberta.med.biobank.common.permission.collectionEvent.CollectionEventUpdatePermission;
 import edu.ualberta.med.biobank.common.util.SetDifference;
 import edu.ualberta.med.biobank.common.util.StringUtil;
-import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.i18n.Tr;
@@ -292,33 +290,27 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
         if ((ceAttrList == null) || ceAttrList.isEmpty()) return;
 
-        Map<Integer, EventAttrInfo> ceventAttrList =
-            new CollectionEventGetEventAttrInfoAction(
-                ceventId).run(context).getMap();
+        Map<Integer, EventAttrInfo> ceventAttrList = new CollectionEventGetEventAttrInfoAction(
+            ceventId).run(context).getMap();
 
-        Map<Integer, StudyEventAttrInfo> studyEventList =
-            new StudyGetEventAttrInfoAction(
-                study.getId()).run(context).getMap();
+        Map<Integer, StudyEventAttrInfo> studyEventList = new StudyGetEventAttrInfoAction(
+            study.getId()).run(context).getMap();
 
         Set<EventAttr> eventAttrs = new HashSet<EventAttr>(ceAttrList.size());
 
         for (CEventAttrSaveInfo attrInfo : ceAttrList) {
-            EventAttrInfo ceventAttrInfo = ceventAttrList
-                .get(attrInfo.studyEventAttrId);
-            StudyEventAttrInfo studyEventAttrInfo = studyEventList
-                .get(attrInfo.studyEventAttrId);
+            EventAttrInfo ceventAttrInfo = ceventAttrList.get(attrInfo.studyEventAttrId);
+            StudyEventAttrInfo studyEventAttrInfo = studyEventList.get(attrInfo.studyEventAttrId);
 
             StudyEventAttr sAttr;
 
             if (ceventAttrInfo != null) {
                 sAttr = ceventAttrInfo.attr.getStudyEventAttr();
             } else {
-                sAttr = studyEventAttrInfo == null ? null
-                    : studyEventAttrInfo.attr;
+                sAttr = studyEventAttrInfo == null ? null : studyEventAttrInfo.attr;
                 if (sAttr == null) {
                     throw new LocalizedException(
-                        STUDY_EVENT_ATTR_MISSING_ERRMSG
-                            .format(attrInfo.studyEventAttrId));
+                        STUDY_EVENT_ATTR_MISSING_ERRMSG.format(attrInfo.studyEventAttrId));
                 }
             }
 
@@ -327,61 +319,10 @@ public class CollectionEventSaveAction implements Action<IdResult> {
                 throw new LocalizedException(LOCKED_LABEL_ERRMSG.format(label));
             }
 
-            if (attrInfo.value != null) {
-                // validate the value
-                attrInfo = new CEventAttrSaveInfo(attrInfo.studyEventAttrId, attrInfo.type,
-                    attrInfo.value.trim());
-                if (attrInfo.value.length() > 0) {
-                    EventAttrTypeEnum type = attrInfo.type;
-                    List<String> permissibleSplit = null;
-
-                    if (type == EventAttrTypeEnum.SELECT_SINGLE
-                        || type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                        String permissible = sAttr.getPermissible();
-                        if (permissible != null) {
-                            permissibleSplit = Arrays.asList(permissible
-                                .split(";")); //$NON-NLS-1$
-                        }
-                    }
-
-                    if (type == EventAttrTypeEnum.SELECT_SINGLE) {
-                        if (!permissibleSplit.contains(attrInfo.value)) {
-                            String label =
-                                sAttr.getGlobalEventAttr().getLabel();
-                            throw new LocalizedException(
-                                INVALID_STUDY_EVENT_ATTR_SINGLE_VALUE_ERRMSG
-                                    .format(attrInfo.value, label));
-                        }
-                    } else if (type == EventAttrTypeEnum.SELECT_MULTIPLE) {
-                        for (String singleVal : attrInfo.value.split(";")) { //$NON-NLS-1$
-                            if (!permissibleSplit.contains(singleVal)) {
-                                String label =
-                                    sAttr.getGlobalEventAttr().getLabel();
-                                throw new LocalizedException(
-                                    INVALID_STUDY_EVENT_ATTR_MULTIPLE_VALUE_ERRMSG
-                                        .format(singleVal, attrInfo.value,
-                                            label));
-                            }
-                        }
-                    } else if (type == EventAttrTypeEnum.NUMBER) {
-                        Double.parseDouble(attrInfo.value);
-                    } else if (type == EventAttrTypeEnum.DATE_TIME) {
-                        try {
-                            DateFormatter.dateFormatter
-                                .parse(attrInfo.value);
-                        } catch (ParseException e) {
-                            throw new LocalizedException(
-                                CANNOT_PARSE_DATE_ERRMSG
-                                    .format(attrInfo.value));
-                        }
-                    } else if (type == EventAttrTypeEnum.TEXT) {
-                        // do nothing
-                    } else {
-                        throw new LocalizedException(
-                            UNKNOWN_EVENT_ATTR_TYPE_ERRMSG
-                                .format(type.getName()));
-                    }
-                }
+            if ((attrInfo.value != null) && !attrInfo.value.trim().isEmpty()) {
+                // the following method throws an exeption if value is invalid
+                EventAttrUtil.validateValue(attrInfo.type, sAttr.getGlobalEventAttr().getLabel(),
+                    sAttr.getPermissible(), attrInfo.value);
             }
 
             EventAttr eventAttr;

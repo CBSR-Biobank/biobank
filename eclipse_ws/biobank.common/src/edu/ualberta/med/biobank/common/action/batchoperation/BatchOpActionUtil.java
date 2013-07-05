@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.action.batchoperation;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -14,16 +15,19 @@ import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.FileData;
 import edu.ualberta.med.biobank.model.FileMetaData;
 import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.PermissionEnum;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import edu.ualberta.med.biobank.model.User;
 
 /**
@@ -66,8 +70,7 @@ public class BatchOpActionUtil {
         return (Specimen) c.uniqueResult();
     }
 
-    public static SpecimenType getSpecimenType(Session session,
-        String name) {
+    public static SpecimenType getSpecimenType(Session session, String name) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }
@@ -123,8 +126,7 @@ public class BatchOpActionUtil {
         return (Container) c.uniqueResult();
     }
 
-    public static OriginInfo getOriginInfo(Session session,
-        String waybill) {
+    public static OriginInfo getOriginInfo(Session session, String waybill) {
         if (session == null) {
             throw new NullPointerException("session is null");
         }
@@ -175,6 +177,34 @@ public class BatchOpActionUtil {
             .uniqueResult();
     }
 
+    public static StudyEventAttr getStudyEventAttr(Session session, Study study,
+        String eventAttrName) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        return (StudyEventAttr) session
+            .createCriteria(StudyEventAttr.class, "sea")
+            .createAlias("sea.globalEventAttr", "gea")
+            .createAlias("sea.study", "study")
+            .add(Restrictions.eq("study.id", study.getId()))
+            .add(Restrictions.eq("gea.label", eventAttrName))
+            .uniqueResult();
+    }
+
+    public static EventAttr getEventAttr(Session session, CollectionEvent cevent,
+        StudyEventAttr studyEventAttr) {
+        if (session == null) {
+            throw new NullPointerException("session is null");
+        }
+
+        return (EventAttr) session
+            .createCriteria(EventAttr.class)
+            .add(Restrictions.eq("collectionEvent.id", cevent.getId()))
+            .add(Restrictions.eq("studyEventAttr.id", studyEventAttr.getId()))
+            .uniqueResult();
+    }
+
     public static BatchOperation createBatchOperation(Session session, User user,
         final FileData fileData) {
         if (session == null) {
@@ -213,5 +243,14 @@ public class BatchOpActionUtil {
             .add(Restrictions.eq("id", batchOpId))
             .uniqueResult();
         return metaData;
+    }
+
+    public static boolean hasPermissionOnStudies(User user, Set<Study> studies) {
+        for (Study study : studies) {
+            if (!PermissionEnum.BATCH_OPERATIONS.isAllowed(user, study)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
