@@ -160,7 +160,6 @@ public class Container extends AbstractBiobankModel
         this.childPositions = childPositions;
     }
 
-    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.topContainer.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TOP_CONTAINER_ID")
     public Container getTopContainer() {
