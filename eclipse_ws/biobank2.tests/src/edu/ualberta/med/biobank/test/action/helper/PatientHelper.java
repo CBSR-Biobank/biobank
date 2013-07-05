@@ -2,9 +2,9 @@ package edu.ualberta.med.biobank.test.action.helper;
 
 import java.util.Date;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.patient.PatientSaveAction;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class PatientHelper extends Helper {
 

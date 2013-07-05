@@ -15,6 +15,8 @@ import org.hibernate.Query;
 import org.junit.Assert;
 import org.junit.Before;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
+import edu.ualberta.med.biobank.action.LocalActionExecutor;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;

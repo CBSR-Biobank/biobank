@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test.action;
+package edu.ualberta.med.biobank.action;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;

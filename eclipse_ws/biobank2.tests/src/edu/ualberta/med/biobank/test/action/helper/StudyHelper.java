@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action.helper;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.study.StudyGetClinicInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyInfo;
 import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
@@ -14,7 +15,6 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class StudyHelper extends Helper {
     public static StudySaveAction getSaveAction(String name, String nameShort,

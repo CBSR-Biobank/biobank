@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.action.helper;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.dispatch.DispatchSaveAction;
@@ -13,7 +14,6 @@ import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class DispatchHelper extends Helper {
 

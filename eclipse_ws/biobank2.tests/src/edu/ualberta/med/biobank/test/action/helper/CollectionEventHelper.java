@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
@@ -22,7 +23,6 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class CollectionEventHelper extends Helper {
 

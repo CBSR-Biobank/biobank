@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.info.AddressSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupSaveInfo;
 import edu.ualberta.med.biobank.common.action.researchGroup.ResearchGroupSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class ResearchGroupHelper extends Helper {
 

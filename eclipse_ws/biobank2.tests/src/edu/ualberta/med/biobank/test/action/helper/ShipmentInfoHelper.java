@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.common.action.shipment.ShippingMethodSaveAction;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class ShipmentInfoHelper extends Helper {
 

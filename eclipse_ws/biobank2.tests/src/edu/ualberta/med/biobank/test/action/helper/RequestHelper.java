@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.info.ResearchGroupReadInfo;
@@ -18,7 +19,6 @@ import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class RequestHelper extends Helper {
 

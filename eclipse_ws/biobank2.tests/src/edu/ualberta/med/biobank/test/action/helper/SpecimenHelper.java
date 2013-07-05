@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.test.action.helper;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.model.Specimen;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class SpecimenHelper extends Helper {
 

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.action.IActionExecutor;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction;
 import edu.ualberta.med.biobank.common.action.clinic.ClinicGetInfoAction.ClinicInfo;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
@@ -17,7 +18,6 @@ import edu.ualberta.med.biobank.common.action.study.StudySaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.action.IActionExecutor;
 
 public class SiteHelper extends Helper {
 
