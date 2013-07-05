@@ -34,8 +34,8 @@ import edu.ualberta.med.biobank.validator.group.PreDelete;
 import edu.ualberta.med.biobank.validator.group.PrePersist;
 
 /**
- * A specifically built physical unit that can hold child containers, or can be
- * contained in a parent container.
+ * A specifically built physical unit that can hold child containers, or can be contained in a
+ * parent container.
  * 
  */
 @Entity
@@ -86,11 +86,9 @@ public class Container extends AbstractBiobankModel
     private Double temperature;
     private String path;
     private Set<Comment> comments = new HashSet<Comment>(0);
-    private Set<ContainerPosition> childPositions =
-        new HashSet<ContainerPosition>(0);
+    private Set<ContainerPosition> childPositions = new HashSet<ContainerPosition>(0);
     private Container topContainer;
-    private Set<SpecimenPosition> specimenPositions =
-        new HashSet<SpecimenPosition>(0);
+    private Set<SpecimenPosition> specimenPositions = new HashSet<SpecimenPosition>(0);
     private ContainerPosition position;
     private Site site;
     private ActivityStatus activityStatus = ActivityStatus.ACTIVE;
@@ -162,6 +160,7 @@ public class Container extends AbstractBiobankModel
         this.childPositions = childPositions;
     }
 
+    @NotNull(message = "{edu.ualberta.med.biobank.model.Container.topContainer.NotNull}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TOP_CONTAINER_ID")
     public Container getTopContainer() {
@@ -298,9 +297,8 @@ public class Container extends AbstractBiobankModel
     }
 
     /**
-     * position is 2 letters, or 2 number or 1 letter and 1 number... this
-     * position string is used to get the correct row and column index the given
-     * position String.
+     * position is 2 letters, or 2 number or 1 letter and 1 number... this position string is used
+     * to get the correct row and column index the given position String.
      * 
      * @throws Exception
      */
