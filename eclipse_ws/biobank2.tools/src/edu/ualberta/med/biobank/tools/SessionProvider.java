@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.test;
+package edu.ualberta.med.biobank.tools;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

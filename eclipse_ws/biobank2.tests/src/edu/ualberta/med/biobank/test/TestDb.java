@@ -11,7 +11,8 @@ import org.junit.Before;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Membership;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.test.SessionProvider.Mode;
+import edu.ualberta.med.biobank.tools.SessionProvider;
+import edu.ualberta.med.biobank.tools.SessionProvider.Mode;
 
 public class TestDb extends TestBase {
     private static final String GLOBAL_ADMIN_LOGIN = "globaladmin";
