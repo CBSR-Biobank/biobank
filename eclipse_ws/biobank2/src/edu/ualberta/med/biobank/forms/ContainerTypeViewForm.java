@@ -50,6 +50,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private Button isTopLevelButton;
 
+    private Button isMicroplateButton;
+
     private BgcBaseText rowCapacityLabel;
 
     private BgcBaseText colCapacityLabel;
@@ -134,6 +136,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
             HasNameShort.PropertyName.NAME_SHORT.toString());
         isTopLevelButton = (Button) createLabelledWidget(client, Button.class, SWT.NONE,
             ContainerType.Property.TOP_LEVEL.toString());
+        isMicroplateButton = (Button) createLabelledWidget(client, Button.class, SWT.NONE,
+                ContainerType.Property.IS_MICROPLATE.toString());
         rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
             // label
             i18n.tr("Rows"));
@@ -171,6 +175,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setTextValue(nameLabel, containerType.getName());
         setTextValue(nameShortLabel, containerType.getNameShort());
         setCheckBoxValue(isTopLevelButton, containerType.getTopLevel());
+        setCheckBoxValue(isMicroplateButton, containerType.getIsMicroplate());
         setTextValue(rowCapacityLabel, containerType.getRowCapacity());
         setTextValue(colCapacityLabel, containerType.getColCapacity());
         setTextValue(defaultTempLabel, containerType.getDefaultTemperature());

@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.action.dispatch;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.Action;
@@ -11,6 +13,8 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchUpdatePermission;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -46,6 +50,17 @@ public class DispatchSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
+        List<SpecimenMicroplateInfo> specimenMicroplateInfos = new ArrayList<SpecimenMicroplateInfo>();
+        for (DispatchSpecimenInfo dsi : dsInfos) {
+            SpecimenMicroplateInfo smi = new SpecimenMicroplateInfo();
+            smi.inventoryId = context.load(Specimen.class, dsi.specimenId).getInventoryId();
+            smi.containerId = null;
+            smi.position = null;
+            specimenMicroplateInfos.add(smi);
+        }
+        new SpecimenMicroplateConsistentAction(
+                dInfo.receiverId, false, specimenMicroplateInfos).run(context);
+
         Dispatch disp = context.get(Dispatch.class, dInfo.dispatchId, new Dispatch());
 
         disp.setReceiverCenter(context.get(Center.class, dInfo.receiverId));

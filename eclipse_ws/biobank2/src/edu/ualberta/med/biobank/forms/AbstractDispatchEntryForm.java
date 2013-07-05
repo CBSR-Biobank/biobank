@@ -149,6 +149,36 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 openScanDialog();
             }
         });
+
+        toolkit.createLabel(addComposite,
+            // label
+            i18n.tr("or enter microplate ID to add:"));
+        final BgcBaseText newMicroplateText = new BgcBaseText(addComposite,
+            SWT.NONE, toolkit);
+        GridData gdMicroplate = new GridData();
+        gdMicroplate.widthHint = 100;
+        newMicroplateText.setLayoutData(gdMicroplate);
+        newMicroplateText.addListener(SWT.DefaultSelection, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+                doMicroplateTextAction(newMicroplateText.getText());
+                newMicroplateText.setFocus();
+                newMicroplateText.setText(StringUtil.EMPTY_STRING);
+            }
+        });
+        Button addButtonMicroplate =
+            toolkit.createButton(addComposite, StringUtil.EMPTY_STRING,
+                SWT.PUSH);
+        addButtonMicroplate.setImage(BgcPlugin.getDefault().getImageRegistry()
+            .get(BgcPlugin.IMG_ADD));
+        addButtonMicroplate.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                doMicroplateTextAction(newMicroplateText.getText());
+                newMicroplateText.setFocus();
+                newMicroplateText.setText(StringUtil.EMPTY_STRING);
+            }
+        });
     }
 
     /**
@@ -160,6 +190,10 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
      * add specimen represented by the inventoryid entered in the text field
      */
     protected abstract void doSpecimenTextAction(String text);
+    /**
+     * add specimens in microplate represented by the microplateid entered in the text field
+     */
+    protected abstract void doMicroplateTextAction(String text);
 
     protected boolean needToTryAgainIfConcurrency() {
         return false;

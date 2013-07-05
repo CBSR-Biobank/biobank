@@ -22,9 +22,11 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
@@ -147,6 +149,35 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 i18n.tr("Problem with specimen"), e);
+        }
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void doMicroplateTextAction(String microplateId) {
+        if (InventoryIdUtil.isFormatMicroplate(microplateId)) {
+            try {
+                ArrayList<String> ids = SessionManager
+                        .getAppService().doAction(
+                            new SpecimenByMicroplateSearchAction(microplateId)).getList();
+                if (ids.isEmpty()) {
+                    BgcPlugin.openAsyncError(
+                            i18n.tr("Microplate does not exist or has no specimens"));
+                }
+                else {
+                    for (String id : ids) {
+                        doSpecimenTextAction(id, true);
+                    }
+                }
+            }
+            catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Problem adding microplate specimens"), e);
+            }
+        }
+        else {
+            BgcPlugin.openAsyncError(
+                    i18n.tr("Microplate ID format not valid"));
         }
     }
 

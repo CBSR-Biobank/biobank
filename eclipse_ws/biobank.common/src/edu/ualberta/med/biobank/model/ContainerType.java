@@ -84,6 +84,9 @@ public class ContainerType extends AbstractBiobankModel
         public static final LString TOP_LEVEL = bundle.trc(
             "model",
             "Top Level").format();
+        public static final LString IS_MICROPLATE = bundle.trc(
+                "model",
+                "Is Microplate").format();
         public static final LString LABELING_LAYOUT = bundle.trc(
             "model",
             "Labeling Layout").format();
@@ -92,6 +95,7 @@ public class ContainerType extends AbstractBiobankModel
     private String name;
     private String nameShort;
     private boolean topLevel = false;
+    private boolean isMicroplate = false;
     private Double defaultTemperature;
     private Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>(0);
     private Set<ContainerType> childContainerTypes =
@@ -137,6 +141,15 @@ public class ContainerType extends AbstractBiobankModel
 
     public void setTopLevel(boolean topLevel) {
         this.topLevel = topLevel;
+    }
+
+    @Column(name = "IS_MICROPLATE")
+    public boolean getIsMicroplate() {
+        return this.isMicroplate;
+    }
+
+    public void setIsMicroplate(boolean isMicroplate) {
+        this.isMicroplate = isMicroplate;
     }
 
     // TODO: change to decimal

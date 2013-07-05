@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -23,8 +24,10 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -341,6 +344,35 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         } catch (Exception e) {
             BgcPlugin.openAsyncError(
                 i18n.tr("Error adding the specimen"), e);
+        }
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void doMicroplateTextAction(String microplateId) {
+        if (InventoryIdUtil.isFormatMicroplate(microplateId)) {
+            try {
+                ArrayList<String> ids = SessionManager
+                        .getAppService().doAction(
+                            new SpecimenByMicroplateSearchAction(microplateId)).getList();
+                if (ids.isEmpty()) {
+                    BgcPlugin.openAsyncError(
+                            i18n.tr("Microplate does not exist or has no specimens"));
+                }
+                else {
+                    for (String id : ids) {
+                        doSpecimenTextAction(id);
+                    }
+                }
+            }
+            catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                        i18n.tr("Problem adding microplate specimens"), e);
+            }
+        }
+        else {
+            BgcPlugin.openAsyncError(
+                    i18n.tr("Microplate ID format not valid"));
         }
     }
 

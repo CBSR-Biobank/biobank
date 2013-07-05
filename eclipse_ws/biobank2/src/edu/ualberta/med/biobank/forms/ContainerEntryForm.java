@@ -17,7 +17,9 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CommentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -198,6 +200,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         Control c = createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
             Container.PropertyName.PRODUCT_BARCODE.toString(),
             null, container, ContainerPeer.PRODUCT_BARCODE.getName(), null);
+        if ((!container.isNew()) && (container.getContainerType().getIsMicroplate())) {
+            c.setEnabled(false);
+        }
         if (!labelIsFirstControl) setFirstControl(c);
 
         activityStatusComboViewer = createComboViewer(client,
@@ -321,6 +326,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         if (doSave) {
+            if (container.getContainerType().getIsMicroplate() && !InventoryIdUtil.isFormatMicroplate(container.getProductBarcode())) {
+                throw new BiobankException(
+                        "Product barcode invalid for microplate container");
+            }
             final ContainerSaveAction saveAction = new ContainerSaveAction();
             saveAction.setId(container.getId());
             saveAction.setBarcode(container.getProductBarcode());

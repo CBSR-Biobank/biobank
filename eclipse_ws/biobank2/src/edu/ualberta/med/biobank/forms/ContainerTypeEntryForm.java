@@ -255,6 +255,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
+        if (containerType.getIsMicroplate() == null) {
+            containerType.setIsMicroplate(false);
+        }
+        Button isMicroplateButton = (Button)createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
+            // label
+            i18n.tr("Is Microplate"),
+            null, containerType,
+            ContainerTypePeer.IS_MICROPLATE.getName(), null);
+        isMicroplateButton.setEnabled(containerType.getId() == null);
+        toolkit.paintBordersFor(client);
+
         BgcBaseText rowText = (BgcBaseText) createBoundWidgetWithLabel(
             client, BgcBaseText.class, SWT.NONE,
             // label
@@ -470,6 +481,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         ctSaveAction.setNameShort(containerType.getNameShort());
         ctSaveAction.setSiteId(containerType.getSite().getId());
         ctSaveAction.setTopLevel(containerType.getTopLevel());
+        ctSaveAction.setIsMicroplate(containerType.getIsMicroplate());
         ctSaveAction.setRowCapacity(containerType.getRowCapacity());
         ctSaveAction.setColCapacity(containerType.getColCapacity());
         ctSaveAction.setActivityStatus(ActivityStatus.ACTIVE);

@@ -89,6 +89,24 @@ public class ContainerTypePeer {
             }
         });
 
+    public static final Property<Boolean, ContainerType> IS_MICROPLATE = Property.create("isMicroplate" //$NON-NLS-1$
+    , ContainerType.class
+        , new TypeReference<Boolean>() {
+        }
+        , new Property.Accessor<Boolean, ContainerType>() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Boolean get(ContainerType model) {
+                return model.getIsMicroplate();
+            }
+
+            @Override
+            public void set(ContainerType model, Boolean value) {
+                model.setIsMicroplate(value);
+            }
+        });
+
     public static final Property<String, ContainerType> NAME_SHORT = Property.create("nameShort" //$NON-NLS-1$
     , ContainerType.class
         , new TypeReference<String>() {
@@ -281,6 +299,7 @@ public class ContainerTypePeer {
         aList.add(DEFAULT_TEMPERATURE);
         aList.add(NAME);
         aList.add(TOP_LEVEL);
+        aList.add(IS_MICROPLATE);
         aList.add(NAME_SHORT);
         aList.add(SITE);
         aList.add(CHILD_LABELING_SCHEME);

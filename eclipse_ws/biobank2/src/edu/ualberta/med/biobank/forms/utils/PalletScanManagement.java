@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -23,6 +24,8 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSch
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction.ContainerLabelingSchemeInfo;
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
+import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -457,6 +460,30 @@ public class PalletScanManagement {
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 wells.put(pos, cell);
+            }
+            try {
+                ArrayList<String> ids = new ArrayList<String>();
+                if ((container.getProductBarcode() != null) && (container.getProductBarcode().length() != 0)) {
+                    ids = SessionManager.getAppService().doAction(
+                            new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
+                }
+                if ((container.getContainerType().getIsMicroplate()) || (!ids.isEmpty())) { // microplate with specimens
+                    for (String id : ids) {
+                        SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
+                                SessionManager.getAppService(), id);
+                        RowColPos pos = container.getPositionFromLabelingScheme(InventoryIdUtil.positionPart(id));
+                        PalletWell cell =
+                            new PalletWell(pos.getRow(), pos.getCol(),
+                                new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
+                        cell.setSpecimen(sw);
+                        cell.setStatus(UICellStatus.NEW);
+                        wells.put(pos, cell);
+                    }
+                }
+            }
+            catch (Exception e) {
+                BgcPlugin.openAsyncError(
+                        i18n.tr("Problem with microplate specimens"), e);
             }
         }
     }

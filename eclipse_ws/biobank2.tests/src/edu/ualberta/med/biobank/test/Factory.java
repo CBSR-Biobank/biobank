@@ -819,6 +819,23 @@ public class Factory {
         return specimen;
     }
 
+    public Specimen createMicroplateSpecimen(String position) {
+        Specimen parentSpecimen = createSpecimen();
+        parentSpecimen.setInventoryId("##" + getDefaultContainer().getLabel() + "##" + position);
+        parentSpecimen.setSpecimenType(getDefaultSourceSpecimenType());
+
+        CollectionEvent cevent = getDefaultCollectionEvent();
+        parentSpecimen.setOriginalCollectionEvent(cevent);
+        cevent.getOriginalSpecimens().add(parentSpecimen);
+        cevent.getAllSpecimens().add(parentSpecimen);
+
+        session.save(parentSpecimen);
+        session.flush();
+
+        //setDefaultParentSpecimen(parentSpecimen);
+        return parentSpecimen;
+    }
+
     public Specimen createParentSpecimen() {
         Specimen parentSpecimen = createSpecimen();
         parentSpecimen.setSpecimenType(getDefaultSourceSpecimenType());

@@ -27,6 +27,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
     private String nameShort;
     private Integer siteId;
     private boolean topLevel = false;
+    private boolean isMicroplate = false;
     private Integer rowCapacity;
     private Integer colCapacity;
     private Double defaultTemperature;
@@ -57,6 +58,10 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
 
     public void setTopLevel(boolean topLevel) {
         this.topLevel = topLevel;
+    }
+
+    public void setIsMicroplate(boolean isMicroplate) {
+        this.isMicroplate = isMicroplate;
     }
 
     public void setRowCapacity(Integer rowCapacity) {
@@ -118,6 +123,7 @@ public class ContainerTypeSaveAction implements Action<IdResult> {
         containerType.setNameShort(nameShort);
         containerType.setSite(context.load(Site.class, siteId));
         containerType.setTopLevel(topLevel);
+        containerType.setIsMicroplate(isMicroplate);
         containerType.getCapacity().setRowCapacity(rowCapacity);
         containerType.getCapacity().setColCapacity(colCapacity);
         containerType.setDefaultTemperature(defaultTemperature);

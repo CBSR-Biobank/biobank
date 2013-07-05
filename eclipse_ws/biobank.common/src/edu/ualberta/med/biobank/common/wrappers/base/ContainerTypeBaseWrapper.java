@@ -42,6 +42,7 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
     protected ContainerType getNewObject() throws Exception {
         ContainerType newObject = super.getNewObject();
         newObject.setTopLevel(false);
+        newObject.setIsMicroplate(false);
         return newObject;
     }
 
@@ -78,6 +79,14 @@ public class ContainerTypeBaseWrapper extends ModelWrapper<ContainerType> {
 
     public void setTopLevel(Boolean topLevel) {
         setProperty(ContainerTypePeer.TOP_LEVEL, topLevel);
+    }
+
+    public Boolean getIsMicroplate() {
+        return getProperty(ContainerTypePeer.IS_MICROPLATE);
+    }
+
+    public void setIsMicroplate(Boolean isMicroplate) {
+        setProperty(ContainerTypePeer.IS_MICROPLATE, isMicroplate);
     }
 
     public String getNameShort() {

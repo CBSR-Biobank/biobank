@@ -141,6 +141,7 @@ public class ValidContainerTypeValidator
 
         isValid &= NullUtil.eq(ct.getCapacity(), oldCt.getCapacity());
         isValid &= NullUtil.eq(ct.getTopLevel(), oldCt.getTopLevel());
+        isValid &= NullUtil.eq(ct.getIsMicroplate(), oldCt.getIsMicroplate());
         isValid &= NullUtil.eq(ct.getChildLabelingScheme(), oldCt.getChildLabelingScheme());
         isValid &= NullUtil.eq(ct.getLabelingLayout(), oldCt.getLabelingLayout());
 
@@ -148,6 +149,7 @@ public class ValidContainerTypeValidator
             context.buildConstraintViolationWithTemplate(ILLEGAL_CHANGE)
                 .addNode("capacity")
                 .addNode("topLevel")
+                .addNode("isMicroplate")
                 .addNode("childLabelingScheme")
                 .addNode("labelingLayout")
                 .addConstraintViolation();

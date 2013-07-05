@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenAssignSaveAction.SpecimenAssignResInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenAssignPermission;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
@@ -77,6 +78,18 @@ public class SpecimenAssignSaveAction implements Action<SpecimenAssignResInfo> {
         res.parentContainerId = containerId;
 
         Container container = context.load(Container.class, containerId);
+
+        List<SpecimenMicroplateInfo> specimenMicroplateInfos = new ArrayList<SpecimenMicroplateInfo>();
+        for (SpecimenInfo si : specInfos) {
+            SpecimenMicroplateInfo smi = new SpecimenMicroplateInfo();
+            smi.inventoryId = context.load(Specimen.class, si.specimenId).getInventoryId();
+            smi.containerId = containerId;
+            smi.position = si.position;
+            specimenMicroplateInfos.add(smi);
+        }
+        new SpecimenMicroplateConsistentAction(
+                container.getSite().getId(), false, specimenMicroplateInfos).run(context);
+
         res.parentBarcode = container.getProductBarcode();
         res.parentTypeName = container.getContainerType().getName();
         res.parentLabel = container.getLabel();

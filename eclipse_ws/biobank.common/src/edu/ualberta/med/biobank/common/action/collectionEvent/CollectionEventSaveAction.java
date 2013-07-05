@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.comment.CommentUtil;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyEventAttrInfo;
 import edu.ualberta.med.biobank.common.action.study.StudyGetEventAttrInfoAction;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -176,6 +178,17 @@ public class CollectionEventSaveAction implements Action<IdResult> {
 
     @Override
     public IdResult run(ActionContext context) throws ActionException {
+        List<SpecimenMicroplateInfo> specimenMicroplateInfos = new ArrayList<SpecimenMicroplateInfo>();
+        for (SaveCEventSpecimenInfo si : sourceSpecimenInfos) {
+            SpecimenMicroplateInfo smi = new SpecimenMicroplateInfo();
+            smi.inventoryId = si.inventoryId;
+            smi.containerId = null;
+            smi.position = null;
+            specimenMicroplateInfos.add(smi);
+        }
+        new SpecimenMicroplateConsistentAction(
+                centerId, true, specimenMicroplateInfos).run(context);
+
         CollectionEvent ceventToSave;
         if (ceventId == null) {
             ceventToSave = new CollectionEvent();

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.action.specimen;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
@@ -10,6 +11,7 @@ import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenLinkSaveAction.AliquotedSpecimenResInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
 import edu.ualberta.med.biobank.common.permission.specimen.SpecimenLinkPermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -74,6 +76,17 @@ public class SpecimenLinkSaveAction implements
     @Override
     public ListResult<AliquotedSpecimenResInfo> run(ActionContext context)
         throws ActionException {
+        List<SpecimenMicroplateInfo> specimenMicroplateInfos = new ArrayList<SpecimenMicroplateInfo>();
+        for (AliquotedSpecimenInfo asi : aliquotedSpecInfoList) {
+            SpecimenMicroplateInfo smi = new SpecimenMicroplateInfo();
+            smi.inventoryId = asi.inventoryId;
+            smi.containerId = asi.containerId;
+            smi.position = asi.position;
+            specimenMicroplateInfos.add(smi);
+        }
+        new SpecimenMicroplateConsistentAction(
+                centerId, true, specimenMicroplateInfos).run(context);
+
         Center currentCenter = context.load(Center.class, centerId);
         Date currentDate = new Date();
 

@@ -135,6 +135,7 @@ public class ContainerAdapter extends AdapterBase {
         addViewMenu(menu, Container.NAME.singular().toString());
 
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
+        Boolean isMicroplate = getContainer().getContainerType().getIsMicroplate();
 
         if (isEditable() && (topLevel == null || !topLevel)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -149,7 +150,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        if (isEditable() && getContainer().hasSpecimens()) {
+        if (isEditable() && getContainer().hasSpecimens() && !isMicroplate) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText(
                 // menu item label.

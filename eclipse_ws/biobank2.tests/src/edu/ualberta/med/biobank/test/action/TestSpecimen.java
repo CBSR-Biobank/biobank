@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.test.action;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,12 +15,19 @@ import junit.framework.Assert;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.action.BooleanResult;
+import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
+import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
+import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
@@ -156,6 +165,59 @@ public class TestSpecimen extends TestAction {
             spc.getInventoryId(), site.getId())).getList();
         Assert.assertEquals(1, actionResult.size());
         Assert.assertEquals(spc.getId(), actionResult.get(0));
+    }
+
+    @Test
+    public void searchByMicroplateIdAction() {
+        session.beginTransaction();
+        factory.createClinic();
+        factory.createStudy();
+        factory.createContainer();
+        Specimen spc = factory.createMicroplateSpecimen("A1");
+        session.getTransaction().commit();
+
+        final List<String> actionResult = exec(new SpecimenByMicroplateSearchAction(
+            InventoryIdUtil.microplatePart(spc.getInventoryId()))).getList();
+        Assert.assertEquals(1, actionResult.size());
+        Assert.assertEquals(spc.getInventoryId(), actionResult.get(0));
+    }
+
+    @Test
+    public void checkMicroplateConsistencyAction() {
+        session.beginTransaction();
+        factory.createClinic();
+        factory.createStudy();
+        factory.createContainer();
+        Specimen spc1 = factory.createMicroplateSpecimen("A1");
+        Specimen spc2 = factory.createMicroplateSpecimen("A2");
+        Site site = factory.createSite();
+        session.getTransaction().commit();
+
+        List<SpecimenMicroplateInfo> smInfos = new ArrayList<SpecimenMicroplateInfo>();
+        SpecimenMicroplateInfo smi1 = new SpecimenMicroplateInfo();
+        smi1.inventoryId = spc1.getInventoryId();
+        smi1.containerId = null;
+        smi1.position = null;
+        smInfos.add(smi1);
+        try {
+            exec(new SpecimenMicroplateConsistentAction(
+                    site.getId(), false, smInfos));
+            Assert.fail();
+        }
+        catch (ActionException ae) {
+        }
+        SpecimenMicroplateInfo smi2 = new SpecimenMicroplateInfo();
+        smi2.inventoryId = spc2.getInventoryId();
+        smi2.containerId = null;
+        smi2.position = null;
+        smInfos.add(smi2);
+        try {
+            exec(new SpecimenMicroplateConsistentAction(
+                    site.getId(), false, smInfos));
+        }
+        catch (ActionException ae) {
+            Assert.fail();
+        }
     }
 
     @Test
