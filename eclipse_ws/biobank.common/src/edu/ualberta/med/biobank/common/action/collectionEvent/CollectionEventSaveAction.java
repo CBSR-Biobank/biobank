@@ -144,9 +144,12 @@ public class CollectionEventSaveAction implements Action<IdResult> {
         this.visitNumber = visitNumber;
         this.activityStatus = activityStatus;
         this.commentText = commentText;
-        this.sourceSpecimenInfos = sourceSpecs;
         this.ceAttrList = ceAttrList;
         this.centerId = currentWorkingCenter.getId();
+
+        if (sourceSpecs != null) {
+            this.sourceSpecimenInfos = sourceSpecs;
+        }
     }
 
     public void setCommentText(String commentText) {
