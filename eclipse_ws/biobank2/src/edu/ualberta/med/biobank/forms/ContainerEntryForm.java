@@ -313,22 +313,22 @@ public class ContainerEntryForm extends BiobankEntryForm {
             container.hasChildren() && oldContainerLabel != null
                 && !oldContainerLabel.equals(container.getLabel());
         if (renamingChildren) {
-            doSave =
-                BgcPlugin
-                    .openConfirm(
-                        // dialog title
-                        i18n.tr("Renaming container"),
-                        // dialog message
-                        i18n.tr("This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?"));
+            doSave = BgcPlugin.openConfirm(
+                // dialog title
+                i18n.tr("Renaming container"),
+                // dialog message
+                i18n.tr("This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?"));
         }
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void saveForm() throws Exception {
         if (doSave) {
-            if (container.getContainerType().getIsMicroplate() && !InventoryIdUtil.isFormatMicroplate(container.getProductBarcode())) {
+            if (container.getContainerType().getIsMicroplate()
+                && !InventoryIdUtil.isFormatMicroplate(container.getProductBarcode())) {
                 throw new BiobankException(
-                        "Product barcode invalid for microplate container");
+                    i18n.tr("Product barcode invalid for microplate container"));
             }
             final ContainerSaveAction saveAction = new ContainerSaveAction();
             saveAction.setId(container.getId());

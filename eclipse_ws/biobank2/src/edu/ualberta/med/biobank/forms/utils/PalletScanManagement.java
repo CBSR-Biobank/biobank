@@ -447,6 +447,7 @@ public class PalletScanManagement {
         return scansCount;
     }
 
+    @SuppressWarnings("nls")
     public void initCellsWithContainer(ContainerWrapper container) {
         if (!useScanner) {
             wells.clear();
@@ -463,14 +464,17 @@ public class PalletScanManagement {
             }
             try {
                 ArrayList<String> ids = new ArrayList<String>();
-                if ((container.getProductBarcode() != null) && (container.getProductBarcode().length() != 0)) {
+                if ((container.getProductBarcode() != null)
+                    && (container.getProductBarcode().length() != 0)) {
                     ids = SessionManager.getAppService().doAction(
-                            new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
+                        new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
                 }
-                if ((container.getContainerType().getIsMicroplate()) || (!ids.isEmpty())) { // microplate with specimens
+                if ((container.getContainerType().getIsMicroplate()) || (!ids.isEmpty())) { // microplate
+                                                                                            // with
+                                                                                            // specimens
                     for (String id : ids) {
                         SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
-                                SessionManager.getAppService(), id);
+                            SessionManager.getAppService(), id);
                         RowColPos pos = container.getPositionFromLabelingScheme(InventoryIdUtil.positionPart(id));
                         PalletWell cell =
                             new PalletWell(pos.getRow(), pos.getCol(),
@@ -480,10 +484,9 @@ public class PalletScanManagement {
                         wells.put(pos, cell);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                        i18n.tr("Problem with microplate specimens"), e);
+                    i18n.tr("Problem with microplate specimens"), e);
             }
         }
     }

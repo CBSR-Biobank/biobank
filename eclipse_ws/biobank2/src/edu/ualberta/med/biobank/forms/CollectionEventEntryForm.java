@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -487,10 +488,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        List<SaveCEventSpecimenInfo> cevents = new ArrayList<SaveCEventSpecimenInfo>();
+        Set<SaveCEventSpecimenInfo> spcInfo = new HashSet<SaveCEventSpecimenInfo>();
         for (SpecimenInfo o : specimensTable.getList()) {
             CommentedSpecimenInfo specInfo = (CommentedSpecimenInfo) o;
-            cevents.add(new SaveCEventSpecimenInfo(
+            spcInfo.add(new SaveCEventSpecimenInfo(
                 specInfo.specimen.getId(), specInfo.specimen.getInventoryId(),
                 specInfo.specimen.getCreatedAt(), specInfo.specimen.getActivityStatus(),
                 specInfo.specimen.getSpecimenType().getId(),
@@ -508,7 +509,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Integer savedCeventId = SessionManager.getAppService().doAction(
             new CollectionEventSaveAction(ceventCopy.getId(),
                 ceventCopy.getPatient().getId(), ceventCopy.getVisitNumber(),
-                ceventCopy.getActivityStatus(), comment.getMessage(), cevents, ceventAttrList,
+                ceventCopy.getActivityStatus(), comment.getMessage(), spcInfo, ceventAttrList,
                 SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject())
             ).getId();
         PatientGetSimpleCollectionEventInfosAction action =

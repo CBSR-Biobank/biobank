@@ -283,7 +283,7 @@ public class TestPatient extends TestAction {
         try {
             exec(new PatientMergeAction(patientId1, patientId2, "testcomment"));
             Assert
-            .fail("Should not be able to merge when patients are from different studies");
+                .fail("Should not be able to merge when patients are from different studies");
         } catch (PatientMergeException pme) {
             Assert.assertTrue(true);
         }
@@ -294,12 +294,12 @@ public class TestPatient extends TestAction {
         Integer patientId, Integer visitNber, Integer specType, int specNber) {
         final Map<String, SaveCEventSpecimenInfo> specs =
             CollectionEventHelper
-            .createSaveCEventSpecimenInfoRandomList(specNber, specType,
-                getExecutor().getUserId());
+                .createSaveCEventSpecimenInfoRandomList(specNber, specType,
+                    getExecutor().getUserId());
         // Save a new cevent
         exec(new CollectionEventSaveAction(null, patientId,
             visitNber, ActivityStatus.ACTIVE, null,
-            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
+            new HashSet<SaveCEventSpecimenInfo>(specs.values()), null,
             provisioning.getClinic()));
     }
 
@@ -323,13 +323,13 @@ public class TestPatient extends TestAction {
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, patientId,
                 getR().nextInt(20) + 1, ActivityStatus.ACTIVE, null,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
+                new HashSet<SaveCEventSpecimenInfo>(specs.values()),
                 null, provisioning.getClinic())).getId();
 
         Map<Integer, SimpleCEventInfo> ceventInfos =
             getExecutor()
-            .exec(new PatientGetSimpleCollectionEventInfosAction(
-                patientId)).getMap();
+                .exec(new PatientGetSimpleCollectionEventInfosAction(
+                    patientId)).getMap();
         Assert.assertEquals(1, ceventInfos.size());
         SimpleCEventInfo info = ceventInfos.get(ceventId);
         Assert.assertNotNull(info);
@@ -363,13 +363,13 @@ public class TestPatient extends TestAction {
 
         // Save a new cevent with specimens
         exec(new CollectionEventSaveAction(null, patientId, getR().nextInt(20) + 1,
-            ActivityStatus.ACTIVE, null, new ArrayList<SaveCEventSpecimenInfo>(specs.values()),
+            ActivityStatus.ACTIVE, null, new HashSet<SaveCEventSpecimenInfo>(specs.values()),
             null, provisioning.getClinic()));
 
         List<PatientCEventInfo> infos =
             getExecutor()
-            .exec(new PatientGetCollectionEventInfosAction(patientId))
-            .getList();
+                .exec(new PatientGetCollectionEventInfosAction(patientId))
+                .getList();
         Assert.assertEquals(1, infos.size());
         PatientCEventInfo info = infos.get(0);
         // no aliquoted specimens added:

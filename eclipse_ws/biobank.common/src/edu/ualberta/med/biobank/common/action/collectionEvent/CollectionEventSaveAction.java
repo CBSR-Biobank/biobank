@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.action.collectionEvent;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -132,13 +131,13 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     private final Integer centerId;
 
     private String commentText;
-    private Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos;
-    private List<CEventAttrSaveInfo> ceAttrList =
-        new ArrayList<CEventAttrSaveInfo>(0);
+    private Set<SaveCEventSpecimenInfo> sourceSpecimenInfos =
+        new HashSet<SaveCEventSpecimenInfo>(0);
+    private List<CEventAttrSaveInfo> ceAttrList = new ArrayList<CEventAttrSaveInfo>(0);
 
     public CollectionEventSaveAction(Integer ceventId, Integer patientId, Integer visitNumber,
         ActivityStatus activityStatus, String commentText,
-        Collection<SaveCEventSpecimenInfo> sourceSpecs, List<CEventAttrSaveInfo> ceAttrList,
+        Set<SaveCEventSpecimenInfo> sourceSpecs, List<CEventAttrSaveInfo> ceAttrList,
         Center currentWorkingCenter) {
         this.ceventId = ceventId;
         this.patientId = patientId;
@@ -155,7 +154,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
     }
 
     public void setSourceSpecimenInfos(
-        Collection<SaveCEventSpecimenInfo> sourceSpecimenInfos) {
+        Set<SaveCEventSpecimenInfo> sourceSpecimenInfos) {
         this.sourceSpecimenInfos = sourceSpecimenInfos;
     }
 
@@ -185,7 +184,7 @@ public class CollectionEventSaveAction implements Action<IdResult> {
             specimenMicroplateInfos.add(smi);
         }
         new SpecimenMicroplateConsistentAction(
-                centerId, true, specimenMicroplateInfos).run(context);
+            centerId, true, specimenMicroplateInfos).run(context);
 
         CollectionEvent ceventToSave;
         if (ceventId == null) {

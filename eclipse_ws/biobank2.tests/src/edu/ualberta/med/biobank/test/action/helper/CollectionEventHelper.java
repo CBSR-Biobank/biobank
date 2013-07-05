@@ -11,9 +11,9 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventGetInfoAction.CEventInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction;
-import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.CEventAttrSaveInfo;
 import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
+import edu.ualberta.med.biobank.common.action.collectionEvent.EventAttrInfo;
 import edu.ualberta.med.biobank.common.action.info.CommentInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.action.specimenType.SpecimenTypeSaveAction;
@@ -42,8 +42,8 @@ public class CollectionEventHelper extends Helper {
     /**
      * @param nber number of specimen info to create
      * @param typeId type of the specimens
-     * @param userId user id is used for the comments fields, if none is
-     *            provided, then no comments are added
+     * @param userId user id is used for the comments fields, if none is provided, then no comments
+     *            are added
      */
     public static Map<String, SaveCEventSpecimenInfo> createSaveCEventSpecimenInfoRandomList(
         int nber, Integer typeId, Integer userId) {
@@ -59,7 +59,7 @@ public class CollectionEventHelper extends Helper {
 
     public static Integer createCEventWithSourceSpecimens(
         IActionExecutor actionExecutor, Integer patientId, Center center)
-            throws Exception {
+        throws Exception {
         // add specimen type
         String name = "createCEventWithSourceSpecimens" + r.nextInt();
         final Integer typeId =
@@ -68,11 +68,12 @@ public class CollectionEventHelper extends Helper {
         final Map<String, SaveCEventSpecimenInfo> specs = CollectionEventHelper
             .createSaveCEventSpecimenInfoRandomList(5, typeId, null);
 
+        specs.values();
+
         // Save a new cevent with specimens
         return actionExecutor.exec(new CollectionEventSaveAction(
             null, patientId, r.nextInt(20) + 1, ActivityStatus.ACTIVE, null,
-            new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null, center))
-            .getId();
+            new HashSet<SaveCEventSpecimenInfo>(specs.values()), null, center)).getId();
 
     }
 
@@ -89,10 +90,8 @@ public class CollectionEventHelper extends Helper {
 
     public static CollectionEventSaveAction getSaveAction(CEventInfo ceventInfo,
         Center center) {
-        HashSet<SaveCEventSpecimenInfo> sourceSpecimens =
-            new HashSet<SaveCEventSpecimenInfo>();
-        List<CEventAttrSaveInfo> ceAttrList =
-            new ArrayList<CEventAttrSaveInfo>();
+        Set<SaveCEventSpecimenInfo> sourceSpecimens = new HashSet<SaveCEventSpecimenInfo>();
+        List<CEventAttrSaveInfo> ceAttrList = new ArrayList<CEventAttrSaveInfo>();
 
         for (SpecimenInfo specimenInfo : ceventInfo.sourceSpecimenInfos) {
             sourceSpecimens.add(new SaveCEventSpecimenInfo(specimenInfo.specimen.getId(),

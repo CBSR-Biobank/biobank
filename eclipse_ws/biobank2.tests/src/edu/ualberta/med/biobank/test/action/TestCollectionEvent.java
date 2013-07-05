@@ -89,7 +89,7 @@ public class TestCollectionEvent extends TestAction {
         final Integer ceventId = exec(
             new CollectionEventSaveAction(null, provisioning.patientIds.get(0),
                 visitNumber, ActivityStatus.ACTIVE, commentText,
-                new ArrayList<SaveCEventSpecimenInfo>(specs.values()), null,
+                new HashSet<SaveCEventSpecimenInfo>(specs.values()), null,
                 provisioning.getClinic()))
             .getId();
 
@@ -122,7 +122,7 @@ public class TestCollectionEvent extends TestAction {
 
         // Save the same cevent with only one kept from previous list (and modified) and with a new
         // one
-        List<SaveCEventSpecimenInfo> newSpecList = new ArrayList<SaveCEventSpecimenInfo>();
+        Set<SaveCEventSpecimenInfo> newSpecList = new HashSet<SaveCEventSpecimenInfo>();
 
         SaveCEventSpecimenInfo spcInfoToCopy = specs.values().iterator().next();
         SaveCEventSpecimenInfo modifiedSpec = new SaveCEventSpecimenInfo(spcInfoToCopy.id,

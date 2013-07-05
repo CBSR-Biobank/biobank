@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.action;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,8 +14,6 @@ import junit.framework.Assert;
 import org.hibernate.criterion.Restrictions;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.action.BooleanResult;
-import edu.ualberta.med.biobank.common.action.collectionEvent.CollectionEventSaveAction.SaveCEventSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
@@ -201,10 +198,9 @@ public class TestSpecimen extends TestAction {
         smInfos.add(smi1);
         try {
             exec(new SpecimenMicroplateConsistentAction(
-                    site.getId(), false, smInfos));
+                site.getId(), false, smInfos));
             Assert.fail();
-        }
-        catch (ActionException ae) {
+        } catch (ActionException ae) {
         }
         SpecimenMicroplateInfo smi2 = new SpecimenMicroplateInfo();
         smi2.inventoryId = spc2.getInventoryId();
@@ -213,9 +209,8 @@ public class TestSpecimen extends TestAction {
         smInfos.add(smi2);
         try {
             exec(new SpecimenMicroplateConsistentAction(
-                    site.getId(), false, smInfos));
-        }
-        catch (ActionException ae) {
+                site.getId(), false, smInfos));
+        } catch (ActionException ae) {
             Assert.fail();
         }
     }
