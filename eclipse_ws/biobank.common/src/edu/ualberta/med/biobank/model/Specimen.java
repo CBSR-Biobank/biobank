@@ -111,6 +111,7 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
     private Specimen parentSpecimen;
     private String plateErrors;
     private String sampleErrors;
+    private Dna dna;
 
     @NotEmpty(message = "{edu.ualberta.med.biobank.model.Specimen.inventoryId.NotEmpty}")
     @Column(name = "INVENTORY_ID", unique = true, nullable = false, length = 100)
@@ -310,5 +311,14 @@ implements HasActivityStatus, HasComments, HasCreatedAt {
 
     public void setSampleErrors(String sampleErrors) {
         this.sampleErrors = sampleErrors;
+    }
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "specimen")
+    public Dna getDna() {
+        return this.dna;
+    }
+
+    public void setDna(Dna dna) {
+        this.dna = dna;
     }
 }

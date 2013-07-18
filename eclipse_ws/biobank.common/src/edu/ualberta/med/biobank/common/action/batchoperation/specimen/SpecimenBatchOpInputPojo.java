@@ -38,6 +38,11 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
     private String comment;
     private String plateErrors;
     private String samplEerrors;
+    private BigDecimal concentrationAbs;
+    private BigDecimal concentrationFluor;
+    private BigDecimal od260Over280;
+    private BigDecimal od260Over230;
+    private BigDecimal aliquotYield;
 
     @Override
     public int getLineNumber() {
@@ -183,6 +188,46 @@ public class SpecimenBatchOpInputPojo implements IBatchOpInputPojo {
 
     public void setSamplEerrors(String samplEerrors) {
         this.samplEerrors = samplEerrors;
+    }
+
+    public BigDecimal getConcentrationAbs() {
+        return concentrationAbs;
+    }
+
+    public void setConcentrationAbs(BigDecimal concentrationAbs) {
+        this.concentrationAbs = concentrationAbs;
+    }
+
+    public BigDecimal getConcentrationFluor() {
+        return concentrationFluor;
+    }
+
+    public void setConcentrationFluor(BigDecimal concentrationFluor) {
+        this.concentrationFluor = concentrationFluor;
+    }
+
+    public BigDecimal getOd260Over280() {
+        return od260Over280;
+    }
+
+    public void setOd260Over280(BigDecimal od260Over280) {
+        this.od260Over280 = od260Over280;
+    }
+
+    public BigDecimal getOd260Over230() {
+        return od260Over230;
+    }
+
+    public void setOd260Over230(BigDecimal od260Over230) {
+        this.od260Over230 = od260Over230;
+    }
+
+    public BigDecimal getAliquotYield() {
+        return aliquotYield;
+    }
+
+    public void setAliquotYield(BigDecimal aliquotYield) {
+        this.aliquotYield = aliquotYield;
     }
 
     public boolean hasPatientAndCollectionEvent() {

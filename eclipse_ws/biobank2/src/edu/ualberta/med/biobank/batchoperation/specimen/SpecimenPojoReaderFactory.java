@@ -27,6 +27,8 @@ public class SpecimenPojoReaderFactory {
             pojoReader = new CbsrTecanSpecimenPojoReader(workingCenter, filename);
         } else if (OhsTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
             pojoReader = new OhsTecanSpecimenPojoReader(workingCenter, filename);
+        } else if (OhsDnaQuantTecanSpecimenPojoReader.isHeaderValid(csvHeaders)) {
+            pojoReader = new OhsDnaQuantTecanSpecimenPojoReader(workingCenter, filename);
         } else {
             throw new ClientBatchOpErrorsException("invalid headers or number of columns in file");
         }

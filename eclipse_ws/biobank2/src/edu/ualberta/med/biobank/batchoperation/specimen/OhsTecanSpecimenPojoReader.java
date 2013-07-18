@@ -617,7 +617,8 @@ public class OhsTecanSpecimenPojoReader implements
             new File(filename), sourceSpecimens,
             new File(filename).getName(),
             timestamp,
-            technicianId);
+            technicianId,
+            false);
     }
 
 }

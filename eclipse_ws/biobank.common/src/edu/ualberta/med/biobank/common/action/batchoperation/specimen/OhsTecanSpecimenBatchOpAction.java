@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.action.exception.BatchOpErrorsException;
 import edu.ualberta.med.biobank.common.action.processingEvent.ProcessingEventSaveAction;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Dna;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.util.CompressedReference;
@@ -60,9 +61,13 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
 
     private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> sourceCompressedList;
 
+    private final CompressedReference<ArrayList<SpecimenBatchOpInputPojo>> aliquotCompressedList;
+
     private final SpecimenBatchOpAction coreAction;
 
     private final BatchOpInputErrorSet errorSet = new BatchOpInputErrorSet();
+
+    private final boolean dnaQuant;
 
     public OhsTecanSpecimenBatchOpAction(Center workingCenter,
         Set<SpecimenBatchOpInputPojo> aliquotBatchOpSpecimens,
@@ -70,7 +75,8 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         Set<SpecimenBatchOpInputPojo> sourceBatchOpSpecimens,
         String worksheet,
         Date timestamp,
-        String technician) throws NoSuchAlgorithmException, IOException {
+        String technician,
+        boolean dnaQuant) throws NoSuchAlgorithmException, IOException {
         this.worksheet = worksheet;
         this.timestamp = timestamp;
         this.technician = technician;
@@ -81,8 +87,14 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
             new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
                 new ArrayList<SpecimenBatchOpInputPojo>(sourceBatchOpSpecimens));
 
+        aliquotCompressedList =
+            new CompressedReference<ArrayList<SpecimenBatchOpInputPojo>>(
+                new ArrayList<SpecimenBatchOpInputPojo>(aliquotBatchOpSpecimens));
+
         this.coreAction = new SpecimenBatchOpAction(workingCenter,
             aliquotBatchOpSpecimens, importFile);
+
+        this.dnaQuant = dnaQuant;
 
         log.debug("SpecimenBatchOpAction: constructor"); //$NON-NLS-1$
     }
@@ -130,12 +142,36 @@ public class OhsTecanSpecimenBatchOpAction implements Action<IdResult> {
         IdResult coreIdResult = coreAction.run(context);
 
         // was postExecution
+        ArrayList<SpecimenBatchOpInputPojo> pojos = null;
+        try {
+            pojos = aliquotCompressedList.get();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+        if (dnaQuant) {
+            for (SpecimenBatchOpInputPojo pojo : pojos) {
+                Specimen specimen = BatchOpActionUtil.getSpecimen(
+                        context.getSession(), pojo.getInventoryId());
+                Dna dna = new Dna();
+                dna.setSpecimen(specimen);
+                dna.setConcentrationAbs(pojo.getConcentrationAbs());
+                dna.setConcentrationFluor(pojo.getConcentrationFluor());
+                dna.setOd260Over230(pojo.getOd260Over230());
+                dna.setOd260Over280(pojo.getOd260Over280());
+                dna.setAliquotYield(pojo.getAliquotYield());
+                specimen.setDna(dna);
+                context.getSession().saveOrUpdate(specimen);
+            }
+        }
+
         Set<Integer> addedSpecimenIds = new HashSet<Integer>();
         Set<Integer> removedSpecimenIds = new HashSet<Integer>();
         for (SpecimenBatchOpInputPojo sourcePojo : sourcePojos) {
             Specimen specimen = BatchOpActionUtil.getSpecimen(
                 context.getSession(), sourcePojo.getInventoryId());
-            specimen.setQuantity(sourcePojo.getVolume());
+            if (!dnaQuant) specimen.setQuantity(sourcePojo.getVolume());
             specimen.setActivityStatus(ActivityStatus.CLOSED);
             context.getSession().saveOrUpdate(specimen);
             addedSpecimenIds.add(specimen.getId());

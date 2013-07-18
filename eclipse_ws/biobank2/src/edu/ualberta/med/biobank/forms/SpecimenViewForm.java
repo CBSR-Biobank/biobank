@@ -100,6 +100,16 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BgcBaseText sampleErrorsLabel;
 
+    private BgcBaseText absorptionConcentrationLabel;
+
+    private BgcBaseText fluorescenceConcentrationLabel;
+
+    private BgcBaseText opticalDensity260Over280Label;
+
+    private BgcBaseText opticalDensity260Over230Label;
+
+    private BgcBaseText aliquotYieldLabel;
+
     private BgcBaseText batchOpLabel;
 
     private Button openBatchOpButton;
@@ -237,6 +247,19 @@ public class SpecimenViewForm extends BiobankViewForm {
         sampleErrorsLabel = createReadOnlyLabelledField(client, SWT.NONE,
             i18n.tr("Sample Errors"));
 
+        if (specimenWrapper.getWrappedObject().getDna() != null) {
+            absorptionConcentrationLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                    i18n.tr("Absorption Concentration"));
+            fluorescenceConcentrationLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                    i18n.tr("Fluorescence Concentration"));
+            opticalDensity260Over230Label = createReadOnlyLabelledField(client, SWT.NONE,
+                    i18n.tr("Optical Density 260/230"));
+            opticalDensity260Over280Label = createReadOnlyLabelledField(client, SWT.NONE,
+                    i18n.tr("Optical Density 260/280"));
+            aliquotYieldLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                    i18n.tr("Aliquot Yield"));
+        }
+
         createSpecimenImportField(client);
     }
 
@@ -365,6 +388,19 @@ public class SpecimenViewForm extends BiobankViewForm {
             .getPlateErrors());
         setTextValue(sampleErrorsLabel, specimenWrapper.getWrappedObject()
             .getSampleErrors());
+
+        if (specimenWrapper.getWrappedObject().getDna() != null) {
+            setTextValue(absorptionConcentrationLabel, specimenWrapper.getWrappedObject()
+                    .getDna().getConcentrationAbs());
+            setTextValue(fluorescenceConcentrationLabel, specimenWrapper.getWrappedObject()
+                    .getDna().getConcentrationFluor());
+            setTextValue(opticalDensity260Over230Label, specimenWrapper.getWrappedObject()
+                    .getDna().getOd260Over230());
+            setTextValue(opticalDensity260Over280Label, specimenWrapper.getWrappedObject()
+                    .getDna().getOd260Over280());
+            setTextValue(aliquotYieldLabel, specimenWrapper.getWrappedObject()
+                    .getDna().getAliquotYield());
+        }
 
         setTextValue(batchOpLabel, specimenBriefInfo.getBatch() != null
             ? i18n.tr("Yes")
