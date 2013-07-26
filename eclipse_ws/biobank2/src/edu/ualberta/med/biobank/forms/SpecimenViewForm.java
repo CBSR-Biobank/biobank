@@ -249,15 +249,15 @@ public class SpecimenViewForm extends BiobankViewForm {
 
         if (specimenWrapper.getWrappedObject().getDna() != null) {
             absorptionConcentrationLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                    i18n.tr("Absorption Concentration"));
+                    i18n.tr("Absorption Concentration (\u00B5g/ml)"));
             fluorescenceConcentrationLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                    i18n.tr("Fluorescence Concentration"));
+                    i18n.tr("Fluorescence Concentration (\u00B5g/ml)"));
             opticalDensity260Over230Label = createReadOnlyLabelledField(client, SWT.NONE,
-                    i18n.tr("Optical Density 260/230"));
+                    i18n.tr("OD 260/230"));
             opticalDensity260Over280Label = createReadOnlyLabelledField(client, SWT.NONE,
-                    i18n.tr("Optical Density 260/280"));
+                    i18n.tr("OD 260/280"));
             aliquotYieldLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                    i18n.tr("Aliquot Yield"));
+                    i18n.tr("Aliquot Yield (\u00B5g)"));
         }
 
         createSpecimenImportField(client);
