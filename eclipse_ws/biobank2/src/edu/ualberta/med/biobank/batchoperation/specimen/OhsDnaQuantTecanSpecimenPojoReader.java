@@ -126,7 +126,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
 
     @SuppressWarnings("nls")
     public static final String CSV_BLANK_RATIO_260_OVER_230_ERROR =
-        i18n.tr("optical density 260/230 has too many decimal places");
+        i18n.tr("OD 260/230 has too many decimal places");
 
     @SuppressWarnings("nls")
     public static final String CSV_BLANK_RATIO_260_OVER_230_NEGATIVE_ERROR =
@@ -134,7 +134,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
 
     @SuppressWarnings("nls")
     public static final String CSV_BLANK_RATIO_260_OVER_280_ERROR =
-        i18n.tr("optical density 260/280 has too many decimal places");
+        i18n.tr("OD 260/280 has too many decimal places");
 
     @SuppressWarnings("nls")
     public static final String CSV_BLANK_RATIO_260_OVER_280_NEGATIVE_ERROR =
@@ -144,7 +144,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
     private static final String CSV_FIRST_HEADER = "containerbarcode";
 
     @SuppressWarnings("nls")
-    private static final String TYPE_DNA_QUANT = "DNA Quant";
+    private static final String TYPE_DNA_QUANT = "DNA Quantified";
 
     @SuppressWarnings("nls")
     private static final SimpleDateFormat TIME_STAMP_FORMAT =
@@ -614,7 +614,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
             return null;
         }
 
-        // deal with optical density 260/230
+        // deal with optical density OD 260/230
         if (csvPojo.blankRatio260Over230.lastIndexOf('.') != -1
             &&
             csvPojo.blankRatio260Over230.length()
@@ -629,7 +629,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
             return null;
         }
 
-        // deal with optical density 260/280
+        // deal with optical density OD 260/280
         if (csvPojo.blankRatio260Over280.lastIndexOf('.') != -1
             &&
             csvPojo.blankRatio260Over280.length()
