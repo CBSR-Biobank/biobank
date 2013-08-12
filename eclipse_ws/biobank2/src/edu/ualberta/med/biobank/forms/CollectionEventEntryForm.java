@@ -500,9 +500,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
         List<CEventAttrSaveInfo> ceventAttrList = new ArrayList<CEventAttrSaveInfo>();
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
-            ceventAttrList.add(new CEventAttrSaveInfo(
-                combinedPvInfo.getStudyEventAttrId(), combinedPvInfo.getType(),
-                combinedPvInfo.getValue()));
+            String value = combinedPvInfo.getValue().trim();
+            if (!value.isEmpty()) {
+                ceventAttrList.add(new CEventAttrSaveInfo(
+                    combinedPvInfo.getStudyEventAttrId(), combinedPvInfo.getType(), value));
+            }
         }
 
         // save the collection event
