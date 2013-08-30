@@ -66,6 +66,10 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @SuppressWarnings("nls")
     protected static final String PLATE_VALIDATOR = "plate-validator";
+
+    @SuppressWarnings("nls")
+    private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
+
     protected BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
@@ -246,7 +250,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         scanButtonTitle = i18n.tr("Launch scan");
         if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
-            scanButtonTitle = "Fake scan";
+            scanButtonTitle = SCAN_BUTTON_FAKE;
         }
         scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
         GridData gd = new GridData();

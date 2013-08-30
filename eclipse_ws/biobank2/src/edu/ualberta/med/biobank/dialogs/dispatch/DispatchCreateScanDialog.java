@@ -259,7 +259,7 @@ public class DispatchCreateScanDialog extends
             //
             // int count = 0;
             // for (PalletWell well : wells.values()) {
-            // if (count == 3) {
+            // if (count == 0) {
             // String message = well.getValue();
             // well.setValue(message.substring(1, message.length() - 1));
             // }

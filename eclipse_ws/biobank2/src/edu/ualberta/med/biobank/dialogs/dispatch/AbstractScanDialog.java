@@ -136,7 +136,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             protected void postprocessScanTubesManually(Set<PalletWell> cells)
                 throws Exception {
-                AbstractScanDialog.this.postprocessScanTubeAlone(cells);
+                AbstractScanDialog.this.postprocessScanTubesManually(cells);
                 setHasValues();
             }
 
@@ -466,7 +466,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             || (cell.getStatus() == UICellStatus.MISSING));
     }
 
-    protected void postprocessScanTubeAlone(Set<PalletWell> cells) throws Exception {
+    protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+        boolean errorFound = false;
         for (PalletWell cell : cells) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             CellProcessResult res = (CellProcessResult) SessionManager
@@ -479,10 +480,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             if (res.getProcessStatus() == CellInfoStatus.ERROR) {
                 Button okButton = getButton(IDialogConstants.PROCEED_ID);
                 okButton.setEnabled(false);
+                errorFound = true;
             }
             specificScanPosProcess(cell);
         }
         spw.redraw();
+        setScanOkValue(!errorFound);
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
