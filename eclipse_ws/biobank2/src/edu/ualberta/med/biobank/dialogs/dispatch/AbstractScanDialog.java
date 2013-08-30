@@ -489,7 +489,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             specificScanPosProcess(cell);
         }
         spw.redraw();
-        setScanOkValue(scanStatus && !errorFound);
+        setScanOkValue(scanStatus && !errorFound);  
         log.debug("postprocessScanTubesManually: end");
     }
 
