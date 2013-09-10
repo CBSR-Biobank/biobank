@@ -466,8 +466,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             || (cell.getStatus() == UICellStatus.MISSING));
     }
 
+    //
+    // For v3.8.0 OHS asked to revert the fix for issue #1822.
+    //
+    // Commenting out the lines below. It can be uncommented when issue #1822 is fixed.
+    //
     protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
-        boolean errorFound = false;
+        // boolean errorFound = false; // comment to revert issue #1822
         for (PalletWell cell : cells) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             CellProcessResult res = (CellProcessResult) SessionManager
@@ -480,12 +485,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             if (res.getProcessStatus() == CellInfoStatus.ERROR) {
                 Button okButton = getButton(IDialogConstants.PROCEED_ID);
                 okButton.setEnabled(false);
-                errorFound = true;
+                // errorFound = true; // comment to revert issue #1822
             }
             specificScanPosProcess(cell);
         }
         spw.redraw();
-        setScanOkValue(!errorFound);
+        // setScanOkValue(!errorFound); // comment to revert issue #1822
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
