@@ -24,11 +24,9 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
     private static final Bundle bundle = new CommonBundle();
 
     @SuppressWarnings("nls")
-    public static final Tr SPECIMEN_MISSING =
-        bundle.tr("Specimen {0} missing");
+    public static final Tr SPECIMEN_MISSING = bundle.tr("Specimen {0} missing");
     @SuppressWarnings("nls")
-    public static final LString SPECIMEN_NOT_FOUND =
-        bundle.tr("Specimen does not exist.").format();
+    public static final LString SPECIMEN_NOT_FOUND = bundle.tr("Specimen does not exist.").format();
     @SuppressWarnings("nls")
     public static final LString NO_INFORMATION = bundle.tr("").format();
     @SuppressWarnings("nls")
@@ -40,7 +38,8 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
     public DispatchCreateProcessAction(ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
         Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode, Locale locale) {
+        boolean isRescanMode,
+        Locale locale) {
         super(currentWorkingCenterId, cells, isRescanMode, locale);
         this.data = data;
     }
@@ -134,10 +133,9 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
     }
 
     /**
-     * Process one cell for create mode param checkAlreadyAdded if set to true,
-     * will set the Cell as error if is already added, otherwise the status will
-     * only be 'already added' (this status is used while scanning: the color
-     * will be different)
+     * Process one cell for create mode param checkAlreadyAdded if set to true, will set the Cell as
+     * error if is already added, otherwise the status will only be 'already added' (this status is
+     * used while scanning: the color will be different)
      */
     @SuppressWarnings("nls")
     private CellInfoStatus processCellDipatchCreateStatus(CellInfo scanCell,

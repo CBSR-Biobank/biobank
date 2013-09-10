@@ -238,10 +238,12 @@ public class PalletScanManagement {
                     wells.put(rcp, oldScannedCell);
                 }
             }
-            if (rescanDifferent)
+            if (rescanDifferent) {
                 throw new Exception(
                     // exception message
-                    i18n.tr("Scan error: Previously scanned specimens has been replaced. Please cancel and start again."));
+                    i18n.tr("Scan error: Previously scanned specimens has been replaced. "
+                        + "Please cancel and start again."));
+            }
         }
         afterSuccessfulScan();
     }

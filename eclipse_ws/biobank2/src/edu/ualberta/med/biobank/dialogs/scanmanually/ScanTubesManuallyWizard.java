@@ -98,8 +98,8 @@ public class ScanTubesManuallyWizard extends Wizard {
     public boolean canFinish() {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
-            log.trace("canFinish: label: " + tubePage.labelToScan + ", canFlipToNextPage: "
-                + page.canFlipToNextPage());
+            log.trace("canFinish: label: {}, canFlipToNextPage: {}",
+                tubePage.labelToScan, page.canFlipToNextPage());
 
             // the last page may be blank, skip it if it is
             if (tubePage.inventoryId == null) continue;
@@ -115,8 +115,8 @@ public class ScanTubesManuallyWizard extends Wizard {
         for (IWizardPage page : this.getPages()) {
             ScanSingleTubePage tubePage = (ScanSingleTubePage) page;
             resultIventoryIdsByLabel.put(tubePage.labelToScan, tubePage.inventoryId);
-            log.trace("performFinish: label: " + tubePage.labelToScan + ", inventoryId: "
-                + tubePage.inventoryId);
+            log.trace("performFinish: label: {}, inventoryId: {}",
+                tubePage.labelToScan, tubePage.inventoryId);
         }
         return true;
     }
@@ -177,8 +177,8 @@ public class ScanTubesManuallyWizard extends Wizard {
 
             // check if this value already exists
             String label = (String) existingInventoryIds.getKey(inventoryId);
-            log.trace("handleEvent: existing inventory id found: label: " + label
-                + ", inventoryId: " + inventoryId);
+            log.trace("handleEvent: existing inventory id found: label: {}, inventoryId: {}",
+                label, inventoryId);
 
             if ((label != null) && !label.equals(labelToScan)) {
                 // TR: wizard page error message

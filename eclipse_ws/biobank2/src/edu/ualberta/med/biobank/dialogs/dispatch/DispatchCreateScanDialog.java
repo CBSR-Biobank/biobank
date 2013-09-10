@@ -16,6 +16,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -43,8 +45,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchCreateScanDialog extends
     AbstractScanDialog<DispatchWrapper> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(DispatchCreateScanDialog.class);
+    private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
+
+    private static Logger log = LoggerFactory.getLogger(DispatchCreateScanDialog.class.getName());
 
     @SuppressWarnings("nls")
     private static final String TITLE_AREA_MESSAGE =
@@ -146,6 +149,7 @@ public class DispatchCreateScanDialog extends
     @Override
     protected boolean checkBeforeProcessing(CenterWrapper<?> center)
         throws Exception {
+        log.debug("checkBeforeProcessing");
         specimensAdded = false;
         currentPallet = null;
         if (isPalletWithPosition) {
@@ -166,21 +170,23 @@ public class DispatchCreateScanDialog extends
         return true;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId,
         CellInfo cell, Locale locale) {
+        log.debug("getCellProcessAction");
         return new DispatchCreateProcessAction(getProcessData(), centerId,
-            cell,
-            locale);
+            cell, locale);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
         Locale locale) {
+        log.debug("getPalletProcessAction");
         return new DispatchCreateProcessAction(getProcessData(), centerId,
-            cells,
-            isRescanMode, locale);
+            cells, isRescanMode, locale);
     }
 
     protected ShipmentProcessInfo getProcessData() {
@@ -237,20 +243,20 @@ public class DispatchCreateScanDialog extends
         return UICellStatus.DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
+        log.debug("getFakeDecodedWells");
         ContainerWrapper currentPallet = null;
         if (isPalletWithPosition)
-            currentPallet = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(
+            currentPallet = ContainerWrapper.getContainerWithProductBarcodeInSite(
                     SessionManager.getAppService(), (SiteWrapper) currentSite,
                     currentProductBarcode);
         Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
         if (currentPallet == null) {
-            Map<RowColPos, PalletWell> wells = PalletWell
-                .getRandomNonDispatchedSpecimens(
-                    SessionManager.getAppService(), (currentShipment)
-                        .getSenderCenter().getId());
+            Map<RowColPos, PalletWell> wells = PalletWell.getRandomNonDispatchedSpecimens(
+                SessionManager.getAppService(),
+                currentShipment.getSenderCenter().getId());
 
             // HACK!
             // mangle some barcodes to pretend there is an error
@@ -259,7 +265,7 @@ public class DispatchCreateScanDialog extends
             //
             // int count = 0;
             // for (PalletWell well : wells.values()) {
-            // if (count == 3) {
+            // if (count == 0) {
             // String message = well.getValue();
             // well.setValue(message.substring(1, message.length() - 1));
             // }

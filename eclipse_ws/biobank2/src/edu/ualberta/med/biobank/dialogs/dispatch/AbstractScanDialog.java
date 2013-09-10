@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -57,8 +59,9 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BgcBaseDialog {
-    private static final I18n i18n = I18nFactory
-        .getI18n(AbstractScanDialog.class);
+    private static final I18n i18n = I18nFactory.getI18n(AbstractScanDialog.class);
+
+    private static Logger log = LoggerFactory.getLogger(AbstractScanDialog.class.getName());
 
     @SuppressWarnings("nls")
     private static final String TITLE = i18n.tr("Scanning specimens");
@@ -69,8 +72,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @SuppressWarnings("nls")
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
     @SuppressWarnings("nls")
-    private static final String MONITOR_PROCESSING = i18n
-        .tr("Processing position {0}");
+    private static final String MONITOR_PROCESSING = i18n.tr("Processing position {0}");
 
     private BgcBaseText plateToScanText;
 
@@ -80,13 +82,14 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected ScanPalletWidget spw;
     protected T currentShipment;
     private final IObservableValue scanHasBeenLaunchedValue =
-        new WritableValue(
-            Boolean.FALSE, Boolean.class);
-    private final IObservableValue scanOkValue = new WritableValue(
-        Boolean.TRUE,
-        Boolean.class);
-    private final IObservableValue hasValues = new WritableValue(Boolean.FALSE,
-        Boolean.class);
+        new WritableValue(Boolean.FALSE, Boolean.class);
+    private final IObservableValue hasValues = new WritableValue(Boolean.FALSE, Boolean.class);
+
+    /** should only be assigned by using {@link setScanOkValue} */
+    private boolean scanStatus = false;
+
+    /** Holds the value stored in {@link scanStatus} */
+    private final IObservableValue scanStatusObservable = new WritableValue(Boolean.TRUE, Boolean.class);
 
     private Button scanButton;
     private boolean rescanMode = false;
@@ -102,11 +105,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
         palletScanManagement = new PalletScanManagement() {
-
-            @Override
-            protected void beforeThreadStart() {
-                AbstractScanDialog.this.beforeScanThreadStart();
-            }
 
             @Override
             protected void processScanResult(IProgressMonitor monitor)
@@ -136,7 +134,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             @Override
             protected void postprocessScanTubesManually(Set<PalletWell> cells)
                 throws Exception {
-                AbstractScanDialog.this.postprocessScanTubeAlone(cells);
+                AbstractScanDialog.this.postprocessScanTubesManually(cells);
                 setHasValues();
             }
 
@@ -157,7 +155,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         return TITLE;
     }
 
+    @SuppressWarnings("nls")
     protected void setRescanMode(boolean isOn) {
+        log.debug("setRescanMode: isOn: {}", isOn);
         if (isOn) {
             scanButton.setText(SCAN_BUTTON_RETRY);
         } else {
@@ -170,10 +170,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         rescanMode = isOn;
     }
 
-    protected void beforeScanThreadStart() {
-        // default does nothing
-    }
-
     protected boolean isRescanMode() {
         return rescanMode;
     }
@@ -181,55 +177,52 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
         throws Exception;
 
-    protected void processScanResult(IProgressMonitor monitor,
-        CenterWrapper<?> currentCenter) throws Exception {
+    @SuppressWarnings("nls")
+    protected void processScanResult(IProgressMonitor monitor, CenterWrapper<?> currentCenter)
+        throws Exception {
+        log.debug("processScanResult: start");
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletWell> cells = getCells();
             // conversion for server side call
-            Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
-                null;
+            Map<RowColPos, CellInfo> serverCells = null;
             if (cells != null) {
-                serverCells =
-                    new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
+                serverCells = new HashMap<RowColPos, CellInfo>();
                 for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
-                    serverCells.put(entry.getKey(), entry.getValue()
-                        .transformIntoServerCell());
+                    serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
                 }
             }
             // server side call
-            ScanProcessResult res = (ScanProcessResult) SessionManager
-                .getAppService().doAction(
-                    getPalletProcessAction(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId(),
-                        serverCells, isRescanMode(),
+            ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+                getPalletProcessAction(
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    serverCells,
+                    isRescanMode(),
                         Locale.getDefault()));
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
-                for (Entry<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> entry : res
-                    .getCells().entrySet()) {
+                for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
                     RowColPos pos = entry.getKey();
                     monitor.subTask(MessageFormat.format(MONITOR_PROCESSING,
                         SbsLabeling.fromRowCol(pos)));
-                    PalletWell palletCell = cells.get(entry.getKey());
+                    PalletWell palletWell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
-                    if (palletCell == null) { // can happened if missing
-                        palletCell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
-                            servercell.getRow(), servercell.getCol(),
-                            servercell.getValue()));
-                        cells.put(pos, palletCell);
+                    if (palletWell == null) { // can happened if missing
+                        palletWell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
+                            servercell.getRow(), servercell.getCol(), servercell.getValue()));
+                        cells.put(pos, palletWell);
                     }
-                    palletCell
-                        .merge(SessionManager.getAppService(), servercell);
-                    specificScanPosProcess(palletCell);
+                    palletWell.merge(SessionManager.getAppService(), servercell);
+                    specificScanPosProcess(palletWell);
                 }
             }
             setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
         } else {
             setScanOkValue(false);
         }
+        log.debug("processScanResult: end");
     }
 
     @SuppressWarnings("unused")
@@ -252,12 +245,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createCustomDialogPreContents(contents);
 
-        plateToScanText =
-            (BgcBaseText) createBoundWidgetWithLabel(contents,
-                BgcBaseText.class, SWT.NONE,
-                i18n.tr("Plate to scan"), new String[0],
+        plateToScanText = (BgcBaseText) createBoundWidgetWithLabel(contents,
+            BgcBaseText.class, SWT.NONE, i18n.tr("Plate to scan"), new String[0],
                 this, "plateToScan", new ScannerBarcodeValidator(
                     i18n.tr("Enter a valid plate barcode")));
+
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -295,10 +287,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
-        widgetCreator
-            .addBooleanBinding(
+        scanStatus = false;
+        widgetCreator.addBooleanBinding(
                 new WritableValue(Boolean.FALSE, Boolean.class),
-                scanOkValue,
+            scanStatusObservable,
                 i18n.tr("Error in scan result. Please keep only specimens with no errors."),
                 IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
@@ -317,22 +309,29 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected abstract List<UICellStatus> getPalletCellStatus();
 
+    @SuppressWarnings("nls")
     private void launchScan() {
+        log.debug("launchScan");
         setScanOkValue(false);
         palletScanManagement.launchScanAndProcessResult(plateToScan, isRescanMode());
     }
 
+    @SuppressWarnings("nls")
     protected void startNewPallet() {
+        log.debug("startNewPallet");
         spw.setCells(null);
         scanHasBeenLaunchedValue.setValue(false);
         setRescanMode(false);
     }
 
-    protected void setScanOkValue(final boolean resOk) {
+    @SuppressWarnings("nls")
+    protected void setScanOkValue(final boolean value) {
+        log.debug("setScanOkValue: value: {}", value);
+        scanStatus = value;
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                scanOkValue.setValue(resOk);
+                scanStatusObservable.setValue(scanStatus);
             }
         });
     }
@@ -346,15 +345,20 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         });
     }
 
+    @SuppressWarnings("nls")
     private void setScanHasBeenLaunched(final boolean launched) {
+        log.debug("setScanHasBeenLaunched: start: launched: {}", launched);
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
+                log.debug("setScanHasBeenLaunched: run: start");
                 scanHasBeenLaunchedValue.setValue(launched);
                 setRescanMode(launched);
                 plateToScanText.setEnabled(!launched);
+                log.debug("setScanHasBeenLaunched: run: end");
             }
         });
+        log.debug("setScanHasBeenLaunched: end");
     }
 
     private boolean isScanHasBeenLaunched() {
@@ -372,24 +376,21 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @SuppressWarnings("nls")
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.CANCEL_ID,
-            i18n.tr("Cancel"), false);
-        createButton(parent, IDialogConstants.PROCEED_ID,
-            getProceedButtonlabel(), false);
-        createButton(parent, IDialogConstants.NEXT_ID,
-            i18n.tr("Start next Pallet"), false);
-        createButton(parent, IDialogConstants.FINISH_ID,
-            IDialogConstants.FINISH_LABEL, false);
+        createButton(parent, IDialogConstants.CANCEL_ID, i18n.tr("Cancel"), false);
+        createButton(parent, IDialogConstants.PROCEED_ID, getProceedButtonlabel(), false);
+        createButton(parent, IDialogConstants.NEXT_ID, i18n.tr("Start next Pallet"), false);
+        createButton(parent, IDialogConstants.FINISH_ID, IDialogConstants.FINISH_LABEL, false);
     }
 
     protected abstract String getProceedButtonlabel();
 
+    @SuppressWarnings("nls")
     @Override
     protected void setOkButtonEnabled(boolean enabled) {
         Button proceedButton = getButton(IDialogConstants.PROCEED_ID);
         Button finishButton = getButton(IDialogConstants.FINISH_ID);
         Button nextButton = getButton(IDialogConstants.NEXT_ID);
-        if (finishButton != null && !finishButton.isDisposed()) {
+        if ((finishButton != null) && !finishButton.isDisposed()) {
             if (canActivateProceedButton())
                 proceedButton.setEnabled(enabled);
             else
@@ -405,6 +406,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         } else {
             okButtonEnabled = enabled;
         }
+        log.debug("setOkButtonEnabled");
     }
 
     protected boolean canActivateNextAndFinishButton() {
@@ -439,8 +441,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             try {
                 doProceed();
             } catch (Exception e) {
-                BgcPlugin.openAsyncError(
-                    i18n.tr("Error"), e);
+                BgcPlugin.openAsyncError(i18n.tr("Error"), e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);
@@ -460,29 +461,36 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     protected abstract void doProceed() throws Exception;
 
+    @SuppressWarnings("nls")
     protected boolean canScanTubeAlone(PalletWell cell) {
-        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
+        boolean result = ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
             || (cell.getStatus() == UICellStatus.ERROR)
             || (cell.getStatus() == UICellStatus.MISSING));
+        log.debug("canScanTubeAlone: result: {}", result);
+        return result;
     }
 
-    protected void postprocessScanTubeAlone(Set<PalletWell> cells) throws Exception {
+    @SuppressWarnings("nls")
+    protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+        log.debug("postprocessScanTubesManually: start");
+        boolean errorFound = false;
         for (PalletWell cell : cells) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-            CellProcessResult res = (CellProcessResult) SessionManager
-                .getAppService().doAction(
-                    getCellProcessAction(SessionManager.getUser()
-                        .getCurrentWorkingCenter().getId(),
+            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+                getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
                         cell.transformIntoServerCell(),
                         Locale.getDefault()));
             cell.merge(SessionManager.getAppService(), res.getCell());
             if (res.getProcessStatus() == CellInfoStatus.ERROR) {
                 Button okButton = getButton(IDialogConstants.PROCEED_ID);
                 okButton.setEnabled(false);
+                errorFound = true;
             }
             specificScanPosProcess(cell);
         }
         spw.redraw();
+        setScanOkValue(scanStatus && !errorFound);
+        log.debug("postprocessScanTubesManually: end");
     }
 
     protected abstract Action<ProcessResult> getCellProcessAction(
