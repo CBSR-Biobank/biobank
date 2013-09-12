@@ -1,3 +1,5 @@
+# BioBank Feature Overview
+
 This document describes the features provided by BioBank. BioBank is a client server application
 using an N-tier server architecture. A Thick Client, used by clinic personnel and repository site
 technicians, provides the functionality for specimen collection and processing.
@@ -158,4 +160,5 @@ FURTHER INFORMATION
 For further information you may email The Canadian BioSample Repository (CBSR) at
 hel@biosample.ca. You may also like to visit the web site at:
 
-    http://biosample.ca/
+* [http://biosample.ca/](http://biosample.ca/)
+
