@@ -24,4 +24,4 @@ Currently, CBSR uses Biobank to manage upwards of 480,000 biospecimens and
 around the world (Canada, the United States, and Europe).
 
 For an overview of the features provided by BioBank please see
-[BioBank Feature Overview](feature_overview.md).
+[BioBank Feature Overview](docs/feature_overview.md).
