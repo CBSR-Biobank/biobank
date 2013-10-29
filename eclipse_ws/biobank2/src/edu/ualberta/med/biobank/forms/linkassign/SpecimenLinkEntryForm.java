@@ -65,8 +65,8 @@ import edu.ualberta.med.biobank.widgets.specimentypeselection.AliquotedSpecimenS
 import edu.ualberta.med.biobank.widgets.specimentypeselection.ISpecimenTypeSelectionChangedListener;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionEvent;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionWidget;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version.
@@ -472,10 +472,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
 
         Set<Capacity> capacities = new HashSet<Capacity>();
-        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
+        for (PlateDimensions gridDimensions : PlateDimensions.values()) {
             Capacity capacity = new Capacity();
-            capacity.setRowCapacity(PreferenceConstants.gridRows(gridDimensions));
-            capacity.setColCapacity(PreferenceConstants.gridCols(gridDimensions));
+            capacity.setRowCapacity(gridDimensions.getRows());
+            capacity.setColCapacity(gridDimensions.getCols());
             capacities.add(capacity);
         }
         result = SessionManager.getAppService().doAction(

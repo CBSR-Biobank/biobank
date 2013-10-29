@@ -79,8 +79,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
@@ -880,9 +880,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private boolean isPalletScannable(ContainerTypeWrapper ctype) {
-        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
-            int rows = PreferenceConstants.gridRows(gridDimensions);
-            int cols = PreferenceConstants.gridCols(gridDimensions);
+        for (PlateDimensions gridDimensions : PlateDimensions.values()) {
+            int rows = gridDimensions.getRows();
+            int cols = gridDimensions.getCols();
             if (ctype.isPalletRowsCols(rows, cols))
                 return true;
         }
@@ -1046,9 +1046,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     private void initPalletContainerTypes() throws ApplicationException {
         palletContainerTypes = new ArrayList<ContainerTypeWrapper>();
-        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
-            int rows = PreferenceConstants.gridRows(gridDimensions);
-            int cols = PreferenceConstants.gridCols(gridDimensions);
+        for (PlateDimensions gridDimensions : PlateDimensions.values()) {
+            int rows = gridDimensions.getRows();
+            int cols = gridDimensions.getCols();
             palletContainerTypes.addAll(ContainerTypeWrapper.getContainerTypesByCapacity(
                 SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingSite(),
                 rows, cols));

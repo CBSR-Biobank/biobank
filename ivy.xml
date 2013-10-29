@@ -182,6 +182,8 @@
     </dependency>
     <dependency org="commons-io" name="commons-io" rev="1.4" conf="biobank.gui.common->default,sources" />
     <dependency org="commons-collections" name="commons-collections" rev="3.2.1" conf="biobank.gui.common->default,sources" />
+    <dependency org="org.apache.commons" name="commons-lang3" rev="3.0" conf="biobank.gui.common->default,sources" />
+
 
     <!-- for biobank.mvp -->
     <dependency org="aopalliance" name="aopalliance" rev="1.0" conf="biobank.mvp->default,sources" />

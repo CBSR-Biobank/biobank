@@ -24,9 +24,9 @@ import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 
 public class DecodePlateForm extends PlateForm {
     private static final I18n i18n = I18nFactory
@@ -73,9 +73,9 @@ public class DecodePlateForm extends PlateForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 int plateNumber = plateSelectionWidget.getSelectedPlate();
-                String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-                int rows = PreferenceConstants.gridRows(gridDimensions);
-                int cols = PreferenceConstants.gridCols(gridDimensions);
+                PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
+                int rows = gridDimensions.getRows();
+                int cols = gridDimensions.getCols();
                 spw.dispose();
                 spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
                     UICellStatus.FILLED), rows, cols);
@@ -89,7 +89,7 @@ public class DecodePlateForm extends PlateForm {
             public void widgetDefaultSelected(SelectionEvent e) {
                 widgetSelected(e);
             }
-          });
+        });
 
         scanButton = toolkit.createButton(page,
             i18n.tr("Scan and Decode Plate"), SWT.PUSH);
@@ -110,9 +110,9 @@ public class DecodePlateForm extends PlateForm {
             cols = RowColPos.COLS_DEFAULT;
         }
         else {
-            String gridDimensions = ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-            rows = PreferenceConstants.gridRows(gridDimensions);
-            cols = PreferenceConstants.gridCols(gridDimensions);
+            PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
+            rows = gridDimensions.getRows();
+            cols = gridDimensions.getCols();
         }
 
         spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,

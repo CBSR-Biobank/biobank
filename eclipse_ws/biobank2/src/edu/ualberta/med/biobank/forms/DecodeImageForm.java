@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -79,24 +79,16 @@ public class DecodeImageForm extends PlateForm implements
         buttonsComposite.setLayoutData(gd);
         toolkit.paintBordersFor(buttonsComposite);
         // radio button to choose grid dimensions
-        gridDimensionsButtons = new Button[PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS.length];
+        gridDimensionsButtons = new Button[PlateDimensions.values().length];
         int iGridDimensions = 0;
-        for (String gridDimensions : PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS_ROWSCOLS) {
-            gridDimensionsButtons[iGridDimensions] = toolkit
-                .createButton(buttonsComposite, gridDimensions,
-                    SWT.RADIO);
+        for (final PlateDimensions gridDimensions : PlateDimensions.values()) {
+            gridDimensionsButtons[iGridDimensions] = toolkit.createButton(
+                buttonsComposite, gridDimensions.getDisplayString(), SWT.RADIO);
             gridDimensionsButtons[iGridDimensions].addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    int rows = RowColPos.ROWS_DEFAULT;
-                    int cols = RowColPos.COLS_DEFAULT;
-                    for (Button b : gridDimensionsButtons) {
-                        if (b.getSelection()) {
-                            rows = PreferenceConstants.gridRows(b.getText());
-                            cols = PreferenceConstants.gridCols(b.getText());
-                            break;
-                        }
-                    }
+                    int rows = gridDimensions.getRows();
+                    int cols = gridDimensions.getCols();
                     spw.dispose();
                     spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
                         UICellStatus.FILLED), rows, cols);
@@ -128,8 +120,9 @@ public class DecodeImageForm extends PlateForm implements
         int c = RowColPos.COLS_DEFAULT;
         for (Button b : gridDimensionsButtons) {
             if (b.getSelection()) {
-                r = PreferenceConstants.gridRows(b.getText());
-                c = PreferenceConstants.gridCols(b.getText());
+                PlateDimensions dimensions = PlateDimensions.getFromString(b.getText());
+                r = dimensions.getRows();
+                c = dimensions.getCols();
                 break;
             }
         }

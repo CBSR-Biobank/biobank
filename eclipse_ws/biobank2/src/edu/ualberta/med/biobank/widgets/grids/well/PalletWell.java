@@ -20,9 +20,9 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -59,14 +59,9 @@ public class PalletWell extends AbstractUIWell {
 
         if (plateNumber < 0) return result;
 
-        String gridDimensions =
-            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-
-        if (gridDimensions.isEmpty()) return null;
-
-        int maxRows = PreferenceConstants.gridRows(gridDimensions);
-        int maxCols = PreferenceConstants.gridCols(gridDimensions);
-
+        PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
+        int maxRows = gridDimensions.getRows();
+        int maxCols = gridDimensions.getCols();
         int maxMissed = 4;
         int totMissed = 0;
 

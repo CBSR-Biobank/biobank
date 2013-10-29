@@ -75,6 +75,7 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -374,15 +375,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         int plateNumber = getPlateNumber(plateString);
 
         if (plateNumber < 0) return null;
-
-        String gridDimensions =
-            ScannerConfigPlugin.getDefault().getPlateGridDimensions(plateNumber);
-
-        if (gridDimensions.isEmpty()) return null;
-
-        return new RowColPos(
-            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.gridRows(gridDimensions),
-            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.gridCols(gridDimensions));
+        PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
+        return new RowColPos(gridDimensions.getRows(), gridDimensions.getCols());
     }
 
 }

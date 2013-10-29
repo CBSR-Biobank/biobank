@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
@@ -94,8 +95,7 @@ public class PalletScanManagement {
         launchScanAndProcessResult(plateToScan, false);
     }
 
-    public void launchScanAndProcessResult(final String plateToScan,
-        final boolean isRescanMode) {
+    public void launchScanAndProcessResult(final String plateToScan, final boolean isRescanMode) {
         IRunnableWithProgress op = new IRunnableWithProgress() {
             @SuppressWarnings("nls")
             @Override
@@ -114,10 +114,9 @@ public class PalletScanManagement {
                     for (plateId = 0; plateId < PreferenceConstants.SCANNER_PLATE_BARCODES.length; plateId++) {
                         if (plateToScan.equals(prefs.getString(
                             PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
-                            rows = PreferenceConstants.gridRows(prefs.getString(
-                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]));
-                            cols = PreferenceConstants.gridCols(prefs.getString(
-                                PreferenceConstants.SCANNER_PALLET_GRID_DIMENSIONS[plateId]));
+                            PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateId);
+                            rows = gridDimensions.getRows();
+                            cols = gridDimensions.getCols();
                             break;
                         }
                     }
