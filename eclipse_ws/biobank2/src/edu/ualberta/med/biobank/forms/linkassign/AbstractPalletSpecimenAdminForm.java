@@ -272,7 +272,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
             // TR: validation error message
-            i18n.tr("Flatbed scan required"));
+            i18n.tr("Launch a flatbed scan or enter inventory IDs manually by double clicking cells on the grid"));
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message
