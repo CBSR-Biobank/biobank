@@ -20,11 +20,17 @@ Currently, CBSR uses Biobank to manage upwards of 480,000 biospecimens and 14,00
 studies in dozens of clinics and processing centres around the world (Canada, the United States, and
 Europe).
 
-For an overview of the features provided by BioBank click on the following link:
-[BioBank Feature Overview](docs/feature_overview.md).
 
 For further information or to request a demonstration of the software you may email CBSR at
 <help@biosample.ca>. You may also like to visit the web site at:
 
 * [http://biosample.ca/](http://biosample.ca/)
+
+## Contents
+
+1. [BioBank Feature Overview](docs/feature_overview.md): An overview of the features provided by
+   BioBank.
+
+3. [Thick Client Installation](docs/client_installation.md): Information for installing the Biobank thick
+   client.
 
