@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.io.File;
 import java.util.Arrays;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -22,11 +22,10 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
-import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanLibResult;
 
 public class DecodePlateForm extends PlateForm {
     private static final I18n i18n = I18nFactory
@@ -36,11 +35,29 @@ public class DecodePlateForm extends PlateForm {
     public static final String ID =
         "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
+    private static final String FAKE_PLATE_IMAGE_FILE_NAME = "fakePlateImage.bmp";
+
     private ScanPalletWidget spw;
 
     private PlateSelectionWidget plateSelectionWidget;
 
     Integer plateToScan;
+
+    // used for debugging in Linux
+    private final boolean haveFakePlateImage;
+
+    @SuppressWarnings("nls")
+    public DecodePlateForm() {
+        super();
+        // For Linux set debugMode to true if a fake flatbed image exits
+        if (!System.getProperty("os.name").startsWith("Windows")) {
+            File platesFile = new File(FAKE_PLATE_IMAGE_FILE_NAME);
+            haveFakePlateImage = platesFile.exists();
+        } else {
+            haveFakePlateImage = false;
+        }
+
+    }
 
     @SuppressWarnings("nls")
     @Override
@@ -77,8 +94,8 @@ public class DecodePlateForm extends PlateForm {
                 int rows = gridDimensions.getRows();
                 int cols = gridDimensions.getCols();
                 spw.dispose();
-                spw = new ScanPalletWidget(page, Arrays.asList(UICellStatus.EMPTY,
-                    UICellStatus.FILLED), rows, cols);
+                spw = new ScanPalletWidget(
+                    page, Arrays.asList(UICellStatus.EMPTY, UICellStatus.FILLED), rows, cols);
                 spw.setVisible(true);
                 toolkit.adapt(spw);
                 page.layout(true, true);
@@ -91,10 +108,8 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        scanButton = toolkit.createButton(page,
-            i18n.tr("Scan and Decode Plate"), SWT.PUSH);
-        scanButton
-            .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
+        scanButton = toolkit.createButton(page, i18n.tr("Scan"), SWT.PUSH);
+        scanButton.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -150,7 +165,7 @@ public class DecodePlateForm extends PlateForm {
                     i18n.tr("Scanning and decoding..."),
                     IProgressMonitor.UNKNOWN);
                 try {
-                    scanAndProcessResult(monitor);
+                    launchScan(monitor);
                 } catch (RemoteConnectFailureException exp) {
                     BgcPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
@@ -170,9 +185,25 @@ public class DecodePlateForm extends PlateForm {
     }
 
     @SuppressWarnings("nls")
-    protected void scanAndProcessResult(IProgressMonitor monitor)
-        throws Exception {
-        launchScan(monitor);
+    protected void launchScan(IProgressMonitor monitor) throws Exception {
+        monitor.subTask(
+            // progress monitor message.
+            i18n.tr("Launching scan"));
+
+        String filename = String.format("plate_scan_%d.bmp", plateToScan);
+        ScanLibResult.Result result = ScannerConfigPlugin.scanPlate(plateToScan, filename);
+
+        if ((result == ScanLibResult.Result.SUCCESS)
+            || ((result == ScanLibResult.Result.FAIL) && (haveFakePlateImage))) {
+        }
+
+        // Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodePlate(plateToScan);
+        // wells = PalletWell.convertArray(decodedCells);
+        processResult(monitor);
+    }
+
+    @SuppressWarnings("nls")
+    protected void processResult(IProgressMonitor monitor) throws Exception {
         monitor.subTask(
             // progress monitor message.
             i18n.tr("Decoding..."));
@@ -184,16 +215,6 @@ public class DecodePlateForm extends PlateForm {
                 spw.setCells(wells);
             }
         });
-    }
-
-    @SuppressWarnings("nls")
-    protected void launchScan(IProgressMonitor monitor) throws Exception {
-        monitor.subTask(
-            // progress monitor message.
-            i18n.tr("Launching scan"));
-
-        Set<DecodedWell> decodedCells = ScannerConfigPlugin.decodePlate(plateToScan);
-        wells = PalletWell.convertArray(decodedCells);
     }
 
     @Override
