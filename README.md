@@ -31,6 +31,6 @@ For further information or to request a demonstration of the software you may em
 1. [BioBank Feature Overview](docs/feature_overview.md): An overview of the features provided by
    BioBank.
 
-3. [Thick Client Installation](docs/client_installation.md): Information for installing the Biobank thick
-   client.
+3. [Thick Client Installation](docs/client_installation.md): Information for installing the Biobank
+client desktop application.
 

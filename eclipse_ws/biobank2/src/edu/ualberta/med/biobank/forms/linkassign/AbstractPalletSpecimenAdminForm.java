@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +13,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -24,14 +22,11 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -46,10 +41,8 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
@@ -70,14 +63,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     @SuppressWarnings("nls")
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
 
-    protected BgcBaseText plateToScanText;
     protected Button scanButton;
     private String scanButtonTitle;
-
-    @SuppressWarnings("nls")
-    protected final ScannerBarcodeValidator scannerBarcodeValidator = new ScannerBarcodeValidator(
-        // TR: validation error message
-        i18n.tr("Enter a valid plate barcode"));
 
     protected CancelConfirmWidget cancelConfirmWidget;
 
@@ -116,8 +103,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         super.init();
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         currentPlateToScan = plateToScanSessionString;
-        addScannerPreferencesPropertyListener();
         palletScanManagement = new PalletScanManagement() {
+            // FIXME: scanning and decoding
 
             @Override
             protected void beforeThreadStart() {
@@ -188,21 +175,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
                 return AbstractPalletSpecimenAdminForm.this.canScanTubesManually(cell);
             }
         };
-    }
-
-    private void addScannerPreferencesPropertyListener() {
-        propertyListener = new IPropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                // force a check on available plates
-                String plateText = plateToScanText.getText();
-                plateToScanText.setText(StringUtil.EMPTY_STRING);
-                plateToScanText.setText(plateText);
-            }
-        };
-        ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
-
     }
 
     protected void beforeScanThreadStart() {
@@ -280,62 +252,21 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     protected void launchScanAndProcessResult() {
-        palletScanManagement.launchScanAndProcessResult(plateToScanValue.getValue().toString(),
-            isRescanMode());
+        palletScanManagement.launchScanAndProcessResult();
         refreshPalletDisplay();
     }
 
     protected abstract void refreshPalletDisplay();
 
-    @SuppressWarnings("nls")
-    protected void createPlateToScanField(Composite fieldsComposite) {
-        plateToScanLabel = widgetCreator.createLabel(fieldsComposite,
-            // TR: label;
-            i18n.tr("Plate to scan"));
-        plateToScanText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE, plateToScanLabel, new String[0],
-            plateToScanValue, scannerBarcodeValidator, PLATE_VALIDATOR);
-        plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (scanButton.isEnabled()) {
-                    launchScanAndProcessResult();
-                }
-            }
-        });
-        plateToScanText.addModifyListener(this);
-
-        // TR: tooltip
-        String tooltip =
-            i18n.tr("No barcodes availables. See the preferences to complete the configuration.");
-        List<String> barcodes = BiobankPlugin.getDefault().getPossibleBarcodes();
-        if (barcodes.size() > 0) {
-            // TR: tooltip
-            tooltip = i18n.tr("Available barcodes are: {0}", StringUtil.join(barcodes, ", "));
-        }
-        plateToScanText.setToolTipText(tooltip);
-        GridData gd = (GridData) plateToScanText.getLayoutData();
-        gd.horizontalAlignment = SWT.FILL;
-        int parentNumColumns = ((GridLayout) fieldsComposite.getLayout()).numColumns;
-        if (parentNumColumns > 2) {
-            gd.horizontalSpan = parentNumColumns - 1;
-        }
-        plateToScanText.setLayoutData(gd);
-    }
-
     @Override
     public void modifyText(ModifyEvent e) {
-        if (e.getSource() == plateToScanText.getTextWidget()) {
-            if (scanButton != null) {
-                scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid()
-                    && isPlateValid());
-            }
+        if (scanButton != null) {
+            scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && fieldsValid());
         }
     }
 
     protected void showPlateToScanField(boolean show) {
         widgetCreator.showWidget(plateToScanLabel, show);
-        widgetCreator.showWidget(plateToScanText, show);
         widgetCreator.setBinding(PLATE_VALIDATOR, show && needPlate());
     }
 
@@ -365,7 +296,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             cancelConfirmWidget.setConfirmEnabled(false);
             setConfirmEnabled(false);
         }
-        scanButton.setEnabled((Boolean) canLaunchScanValue.getValue() && isPlateValid());
+        scanButton.setEnabled((Boolean) canLaunchScanValue.getValue());
     }
 
     protected abstract boolean fieldsValid();
@@ -413,12 +344,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         rescanMode = false;
     }
 
-    protected boolean isPlateValid() {
-        return BiobankPlugin.getDefault().isValidPlateBarcode(plateToScanText.getText());
-    }
-
     protected void resetPlateToScan() {
-        plateToScanText.setText(plateToScanSessionString);
         plateToScanValue.setValue(plateToScanSessionString);
     }
 
@@ -566,10 +492,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         });
     }
 
-    protected void focusPlateToScan() {
-        focusControl(plateToScanText);
-    }
-
     protected void initCellsWithContainer(ContainerWrapper currentMultipleContainer) {
         if (currentMultipleContainer != null) {
             palletScanManagement.initCellsWithContainer(currentMultipleContainer);
@@ -578,9 +500,5 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     protected void setContainerType(ContainerType type) {
         palletScanManagement.setContainerType(type);
-    }
-
-    protected void hideScannerBarcodeDecoration() {
-        scannerBarcodeValidator.hideDecoration();
     }
 }

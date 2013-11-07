@@ -26,14 +26,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -55,10 +49,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.forms.FieldInfo;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
-import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.DateTimeWidget;
@@ -392,18 +384,42 @@ public class BgcWidgetCreator {
     /**
      * Create a combo viewer with a validator when selection is null using errorMessage and using
      * the default comparator.
+     * 
+     * @param parent the parent composite.
+     * @param fieldLabel the label to be displayed to the left of the combo box.
+     * @param input the items to select from.
+     * @param selection the default selection.
+     * @param errorMessage the error message to display if nothing is selected.
+     * @param csu when not null, the callback interface to invoke when an item is selected.
+     * @param labelProvider the label provider for the combo input.
+     * 
+     * @return The combo viewer.
      */
-    public <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<? extends T> input, T selection,
-        String errorMessage, final ComboSelectionUpdate csu,
+    public <T> ComboViewer createComboViewer(
+        Composite parent,
+        String fieldLabel,
+        Collection<? extends T> input,
+        T selection,
+        String errorMessage,
+        final ComboSelectionUpdate csu,
         IBaseLabelProvider labelProvider) {
-        return createComboViewer(parent, fieldLabel, input, selection,
-            errorMessage, true, csu, labelProvider);
+        return createComboViewer(parent, fieldLabel, input, selection, errorMessage, true, csu,
+            labelProvider);
     }
 
     /**
      * Create a combo viewer with a validator when selection is null using errorMessage and using
      * the default comparator if useDefaultComparator is set to true.
+     * 
+     * @param parent the parent composite.
+     * @param fieldLabel the label to be displayed to the left of the combo box.
+     * @param input the items to select from.
+     * @param selection the default selection.
+     * @param errorMessage the error message to display if nothing is selected.
+     * @param useDefaultComparator set to true to sort the selection list.
+     * @param csu when not null, the callback interface to invoke when an item is selected.
+     * @param labelProvider the label provider for the combo input.
+     * @return
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         String fieldLabel, Collection<? extends T> input, T selection,
@@ -442,67 +458,20 @@ public class BgcWidgetCreator {
 
     /**
      * Create a combo using ArrayContentProvider as content provider and BiobankLabelProvider as
-     * Label provider. You should use comboViewer.getSelection() to update datas.
+     * Label provider.
      */
     public <T> ComboViewer createComboViewer(Composite parent,
         Label fieldLabel, Collection<? extends T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu, IBaseLabelProvider labelProvider) {
-        Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-        final ComboViewer comboViewer = new ComboViewer(combo);
-        comboViewer.setContentProvider(new ArrayContentProvider());
-        comboViewer.setLabelProvider(labelProvider);
-        if (useDefaultComparator) {
-            comboViewer.setComparator(new ViewerComparator());
-        }
-        if (input != null) {
-            comboViewer.setInput(input);
-        }
 
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        if ((dbc != null) && (fieldLabel != null)) {
-            NonEmptyStringValidator validator = new NonEmptyStringValidator(
-                errorMessage);
-            validator.setControlDecoration(BgcBaseWidget.createDecorator(
-                fieldLabel, errorMessage));
-            UpdateValueStrategy uvs = new UpdateValueStrategy();
-            uvs.setAfterGetValidator(validator);
-            IObservableValue selectedValue =
-                new WritableValue(StringUtil.EMPTY_STRING, String.class);
-            Binding binding = dbc.bindValue(
-                SWTObservables.observeSelection(combo), selectedValue, uvs,
-                null);
-            if (bindingKey != null) {
-                bindings.put(bindingKey, binding);
-            }
-        }
-        if (selection != null) {
-            comboViewer.setSelection(new StructuredSelection(selection));
+        ReadOnlyComboViewer<T> comboViewer = new ReadOnlyComboViewer<T>(
+            parent, dbc, fieldLabel, input, selection, errorMessage, useDefaultComparator,
+            csu, labelProvider, modifyListener);
 
+        if (bindingKey != null) {
+            bindings.put(bindingKey, comboViewer.getBinding());
         }
-        if (csu != null) {
-            comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection selection = (IStructuredSelection)
-                        comboViewer.getSelection();
-                    if ((selection != null) && (selection.size() > 0)) {
-                        csu.doSelection(selection.getFirstElement());
-                    } else {
-                        csu.doSelection(null);
-                    }
-                }
-            });
-        }
-        if (modifyListener != null) {
-            combo.addModifyListener(modifyListener);
-        }
-        combo.addListener(SWT.MouseWheel, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                event.doit = false;
-            }
-        });
         return comboViewer;
     }
 

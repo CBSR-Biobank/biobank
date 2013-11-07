@@ -66,7 +66,6 @@ import edu.ualberta.med.biobank.widgets.specimentypeselection.ISpecimenTypeSelec
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionEvent;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionWidget;
 import edu.ualberta.med.scannerconfig.PlateDimensions;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 // FIXME the custom selection is not done in this version.
@@ -216,21 +215,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         multipleOptionsFields.setLayoutData(gd);
-        // plate selection
-        createPlateToScanField(multipleOptionsFields);
-        plateToScanText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                if (checkGridDimensionsChanged()) {
-                    recreateScanPalletWidget(currentGridDimensions.getRow(),
-                        currentGridDimensions.getCol());
-                    // typesSelectionPerRowComposite.dispose();
-                    updateHierarchyWidgets(currentGridDimensions.getRow());
-                    page.layout(true, true);
-                    book.reflow(true);
-                }
-            }
-        });
         createScanButton(parent);
         createHierarchyWidgets(parent);
     }
@@ -488,7 +472,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean fieldsValid() {
         if (mode.isSingleMode()) return true;
         if ((mode == Mode.MULTIPLE) && scanMultipleWithHandheldInput) return true;
-        return isPlateValid() && linkFormPatientManagement.fieldsValid();
+        return linkFormPatientManagement.fieldsValid();
     }
 
     /**
@@ -686,25 +670,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     @Override
-    /**
-     * Multiple linking: return fake cells for testing
-     */
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
-        if (isFakeScanRandom) {
-            return PalletWell.getRandomScanLink(plateToScan);
-        }
-        try {
-            return PalletWell.getRandomScanLinkWithSpecimensAlreadyLinked(
-                SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingCenter()
-                    .getId(), plateToScan);
-        } catch (Exception ex) {
-            BgcPlugin.openAsyncError("Fake Scan problem", ex);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("nls")
-    @Override
     protected Action<ProcessResult> getCellProcessAction(Integer centerId, CellInfo cell,
         Locale locale) {
         log.debug("getCellProcessAction");
@@ -819,12 +784,11 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.postprocessScanTubeAlone(palletCells);
         widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
-        hideScannerBarcodeDecoration();
     }
 
     private void createHierarchyWidgets(Composite parent) {
         specimenTypesWidget = new SpecimenTypeSelectionWidget(parent, widgetCreator,
-            ScannerConfigPlugin.getDefault().getPlateMaxRows(), currentGridDimensions.getRow());
+            currentGridDimensions.getRow());
         specimenTypesWidget.addSelectionChangedListener(new ISpecimenTypeSelectionChangedListener() {
 
             @Override
@@ -855,9 +819,4 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         });
         toolkit.adapt(specimenTypesWidget);
     }
-
-    private void updateHierarchyWidgets(int rows) {
-        specimenTypesWidget.updateHierarchyWidgets(rows);
-    }
-
 }

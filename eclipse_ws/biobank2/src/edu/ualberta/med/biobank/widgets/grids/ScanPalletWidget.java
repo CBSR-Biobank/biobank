@@ -26,7 +26,7 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
     }
 
     public boolean isEverythingTyped() {
-        if (cells == null)  return false;
+        if (cells == null) return false;
 
         for (AbstractUIWell cell : cells.values()) {
             PalletWell pCell = (PalletWell) cell;

@@ -28,12 +28,11 @@ import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
-import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
- * Reads an OHS DNA Quantitation TECAN CSV file containing specimen information and returns the file as a list of
- * SpecimenBatchOpInputPojo.
+ * Reads an OHS DNA Quantitation TECAN CSV file containing specimen information and returns the file
+ * as a list of SpecimenBatchOpInputPojo.
  * 
  * @author Brian Allen
  * 
@@ -41,8 +40,7 @@ import edu.ualberta.med.biobank.model.Center;
 public class OhsDnaQuantTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(DecodeImageForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(OhsDnaQuantTecanSpecimenPojoReader.class);
 
     @SuppressWarnings("nls")
     public static final String CSV_CONTAINER_BARCODE_MISSING_ERROR =
@@ -431,7 +429,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
 
                 // container barcode
                 if (containerBarcode == null) {
-                	containerBarcode = csvPojo.containerBarcode;
+                    containerBarcode = csvPojo.containerBarcode;
                 }
                 else if (!containerBarcode.equals(csvPojo.containerBarcode)) {
                     getErrorList().addError(reader.getLineNumber(),
@@ -546,8 +544,9 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
 
         // deal with inventory ID
         String position = csvPojo.containerPosition;
-        if (csvPojo.containerPosition.matches("\\D0\\d")) position =
-        		csvPojo.containerPosition.substring(0, 1).concat(csvPojo.containerPosition.substring(2, 3));
+        if (csvPojo.containerPosition.matches("\\D0\\d"))
+            position =
+                csvPojo.containerPosition.substring(0, 1).concat(csvPojo.containerPosition.substring(2, 3));
         batchOpPojo.setInventoryId(InventoryIdUtil.formatMicroplatePosition(csvPojo.containerBarcode, position));
         if (batchOpPojo.getInventoryId() == null) {
             getErrorList()
@@ -643,7 +642,7 @@ public class OhsDnaQuantTecanSpecimenPojoReader implements
                 .addError(linenumber, CSV_BLANK_RATIO_260_OVER_280_NEGATIVE_ERROR);
             return null;
         }
-        
+
         // deal with aliquot yield
         batchOpPojo.setAliquotYield(batchOpPojo.getConcentrationFluor().multiply(batchOpPojo.getVolume()));
 

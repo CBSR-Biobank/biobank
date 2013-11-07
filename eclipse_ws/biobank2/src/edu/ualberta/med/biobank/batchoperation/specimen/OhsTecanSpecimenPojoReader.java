@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.batchoperation.IBatchOpInputPojo;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.OhsTecanSpecimenBatchOpAction;
 import edu.ualberta.med.biobank.common.action.batchoperation.specimen.SpecimenBatchOpInputPojo;
-import edu.ualberta.med.biobank.forms.DecodeImageForm;
 import edu.ualberta.med.biobank.model.Center;
 
 /**
@@ -40,8 +39,7 @@ import edu.ualberta.med.biobank.model.Center;
 public class OhsTecanSpecimenPojoReader implements
     IBatchOpPojoReader<SpecimenBatchOpInputPojo> {
 
-    private static final I18n i18n = I18nFactory
-        .getI18n(DecodeImageForm.class);
+    private static final I18n i18n = I18nFactory.getI18n(OhsTecanSpecimenPojoReader.class);
 
     @SuppressWarnings("nls")
     public static final String CSV_TECAN_RACK_ID_MISSING_ERROR =

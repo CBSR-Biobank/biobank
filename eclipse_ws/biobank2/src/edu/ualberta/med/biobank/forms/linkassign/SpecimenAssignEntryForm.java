@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms.linkassign;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +38,6 @@ import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
@@ -80,7 +78,6 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PlateDimensions;
-import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
@@ -141,7 +138,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private List<ContainerTypeWrapper> palletContainerTypes;
     private BgcBaseText palletproductBarcodeText;
     private boolean saveEvenIfMissing;
-    private boolean isFakeScanLinkedOnly;
     private Button fakeScanLinkedOnlyButton;
     private Composite multipleOptionsFields;
     private Composite fakeScanComposite;
@@ -673,8 +669,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         });
 
         createPalletTypesViewer(multipleOptionsFields);
-        createPlateToScanField(multipleOptionsFields);
-
         createScanButton(parent);
     }
 
@@ -939,7 +933,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // can't modify the position if exists already
 
             palletPositionText.setEnabled(false);
-            focusPlateToScan();
         } catch (Exception ex) {
             BgcPlugin.openError(
                 // TR: dialog title
@@ -1067,14 +1060,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void modifyText(ModifyEvent e) {
-        super.modifyText(e);
-        if (e.getSource() == plateToScanText) {
-            plateMismatchErrorReported = false;
-        }
-    }
-
-    @Override
     protected void enableFields(boolean enable) {
         super.enableFields(enable);
         multipleOptionsFields.setEnabled(enable);
@@ -1085,7 +1070,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (mode.isSingleMode()) return true;
 
         IStructuredSelection selection = (IStructuredSelection) palletTypesViewer.getSelection();
-        return (!useScanner || isPlateValid() || scanMultipleWithHandheldInput)
+        return (!useScanner || scanMultipleWithHandheldInput)
             && (!useScanner || productBarcodeValidator.validate(
                 palletproductBarcodeText.getText()).equals(Status.OK_STATUS))
             && palletLabelValidator.validate(palletPositionText.getText()).equals(Status.OK_STATUS)
@@ -1348,8 +1333,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         currentMultipleContainer.setSite(SessionManager.getUser().getCurrentWorkingSite());
         currentMultipleContainer.setContainerType((ContainerTypeWrapper) ((IStructuredSelection)
             palletTypesViewer.getSelection()).getFirstElement());
-        isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
-            && fakeScanLinkedOnlyButton.getSelection();
     }
 
     /**
@@ -1407,31 +1390,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             page.layout(true, true);
             book.reflow(true);
         }
-    }
-
-    /**
-     * Multiple assign
-     */
-    @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
-        throws Exception {
-        if (currentMultipleContainer.hasSpecimens()) {
-            Map<RowColPos, PalletWell> palletScanned = new HashMap<RowColPos, PalletWell>();
-            for (RowColPos pos : currentMultipleContainer.getSpecimens().keySet()) {
-                if (pos.getRow() != 0 && pos.getCol() != 2) {
-                    palletScanned.put(pos, new PalletWell(pos.getRow(), pos.getCol(),
-                        new DecodedWell(pos.getRow(), pos.getCol(),
-                            currentMultipleContainer.getSpecimens().get(pos).getInventoryId())));
-                }
-            }
-            return palletScanned;
-        }
-        if (isFakeScanLinkedOnly) {
-            return PalletWell.getRandomSpecimensNotAssigned(SessionManager.getAppService(),
-                currentMultipleContainer.getSite().getId());
-        }
-        return PalletWell.getRandomSpecimensAlreadyAssigned(SessionManager.getAppService(),
-            currentMultipleContainer.getSite().getId());
     }
 
     @Override
@@ -1518,8 +1476,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         RowColPos plateDimensions = new RowColPos(ctype.getCapacity().getRowCapacity(),
             ctype.getCapacity().getColCapacity());
 
-        scannerBarcodeValidator.setValidPlateDimensions(plateDimensions);
-
         if (!currentGridDimensions.equals(plateDimensions)) {
             currentGridDimensions = plateDimensions;
             recreateScanPalletWidget(ctype.getCapacity().getRowCapacity(),
@@ -1530,24 +1486,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected boolean isPlateValid() {
-        String plateText = plateToScanText.getText();
-        if (plateText.trim().isEmpty()) return false;
-
-        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
-            plateToScanText.getText());
-
-        if (plateDimensions == null) return false;
-
-        return currentGridDimensions.equals(plateDimensions);
-    }
-
-    @Override
     protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
         super.postprocessScanTubeAlone(palletCells);
         widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
-        hideScannerBarcodeDecoration();
     }
 
     @Override

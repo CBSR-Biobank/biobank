@@ -28,7 +28,7 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     implements ISpecimenTypeSelectionChangedListener {
     private static final I18n i18n = I18nFactory.getI18n(AliquotedSpecimenSelectionWidget.class);
 
-    private final int maxRows;
+    private static final int maxRows = 10;
 
     private int currentRows;
 
@@ -40,9 +40,8 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
 
     @SuppressWarnings("nls")
     public SpecimenTypeSelectionWidget(Composite parent, BgcWidgetCreator widgetCreator,
-        int maxRows, int currentRows) {
+        int currentRows) {
         super(parent, SWT.NONE);
-        this.maxRows = maxRows;
         this.currentRows = currentRows;
         GridLayout layout = new GridLayout(4, false);
         layout.horizontalSpacing = 10;

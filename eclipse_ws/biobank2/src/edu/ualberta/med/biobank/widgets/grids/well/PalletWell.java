@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.scannerconfig.PlateDimensions;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -53,13 +52,11 @@ public class PalletWell extends AbstractUIWell {
         return palletScanned;
     }
 
-    static Set<DecodedWell> getRandomDecodedCells(String plateToScan) {
+    static Set<DecodedWell> getRandomDecodedCells(int plateNumber, PlateDimensions gridDimensions) {
         Set<DecodedWell> result = new HashSet<DecodedWell>();
-        int plateNumber = ScannerConfigPlugin.getDefault().getPlateNumber(plateToScan);
 
         if (plateNumber < 0) return result;
 
-        PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
         int maxRows = gridDimensions.getRows();
         int maxCols = gridDimensions.getCols();
         int maxMissed = 4;
@@ -82,35 +79,6 @@ public class PalletWell extends AbstractUIWell {
             }
         }
         return result;
-    }
-
-    public static Map<RowColPos, PalletWell> getRandomScanLink(String plateToScan) {
-        return convertArray(getRandomDecodedCells(plateToScan));
-    }
-
-    public static Map<RowColPos, PalletWell> getRandomScanLinkWithSpecimensAlreadyLinked(
-        WritableApplicationService appService, Integer siteId, String plateToScan) throws Exception {
-        Map<RowColPos, PalletWell> cells =
-            convertArray(getRandomDecodedCells(plateToScan));
-        List<SpecimenWrapper> specimens = DebugUtil
-            .getRandomLinkedAliquotedSpecimens(appService, siteId);
-        if (specimens.size() > 1) {
-            RowColPos pos = new RowColPos(2, 3);
-            DecodedWell decodedWell = new DecodedWell(
-                SbsLabeling.fromRowCol(pos), specimens.get(0).getInventoryId());
-            cells.put(pos, new PalletWell(pos.getRow(), pos.getCol(), decodedWell));
-
-            pos = new RowColPos(3, 1);
-            decodedWell = new DecodedWell(SbsLabeling.fromRowCol(pos),
-                specimens.get(1).getInventoryId());
-            cells.put(pos, new PalletWell(pos.getRow(), pos.getCol(), decodedWell));
-        }
-        return cells;
-    }
-
-    public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(
-        WritableApplicationService appService, Integer siteId) throws Exception {
-        return getRandomSpecimensAlreadyAssigned(appService, siteId, null);
     }
 
     public static Map<RowColPos, PalletWell> getRandomSpecimensAlreadyAssigned(

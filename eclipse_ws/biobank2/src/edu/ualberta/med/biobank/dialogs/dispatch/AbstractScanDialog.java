@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,8 +24,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,35 +44,33 @@ import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
-import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
-import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
-public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
-    BgcBaseDialog {
+public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcBaseDialog {
+
     private static final I18n i18n = I18nFactory.getI18n(AbstractScanDialog.class);
 
-    private static Logger log = LoggerFactory.getLogger(AbstractScanDialog.class.getName());
+    private static Logger log = LoggerFactory.getLogger(AbstractScanDialog.class);
 
     @SuppressWarnings("nls")
     private static final String TITLE = i18n.tr("Scanning specimens");
+
     @SuppressWarnings("nls")
     private static final String SCAN_BUTTON_RETRY = i18n.tr("Retry scan");
+
     @SuppressWarnings("nls")
     private static final String SCAN_BUTTON_LAUNCH = i18n.tr("Launch Scan");
+
     @SuppressWarnings("nls")
     private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
+
     @SuppressWarnings("nls")
     private static final String MONITOR_PROCESSING = i18n.tr("Processing position {0}");
-
-    private BgcBaseText plateToScanText;
-
-    private String plateToScan;
 
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
@@ -199,7 +193,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                     SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     serverCells,
                     isRescanMode(),
-                        Locale.getDefault()));
+                    Locale.getDefault()));
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
@@ -245,32 +239,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         createCustomDialogPreContents(contents);
 
-        plateToScanText = (BgcBaseText) createBoundWidgetWithLabel(contents,
-            BgcBaseText.class, SWT.NONE, i18n.tr("Plate to scan"), new String[0],
-                this, "plateToScan", new ScannerBarcodeValidator(
-                    i18n.tr("Enter a valid plate barcode")));
-
-        plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
-            @Override
-            public void handleEvent(Event e) {
-                if (scanButton.isEnabled()) {
-                    launchScan();
-                }
-            }
-        });
-        plateToScanText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                if (checkGridDimensionsChanged()) {
-                    spw.dispose();
-                    createScanPalletWidget(contents, currentGridDimensions.getRow(),
-                        currentGridDimensions.getCol());
-                    initializeBounds();
-                    contents.layout(true, true);
-                }
-            }
-        });
-
         String scanButtonText = SCAN_BUTTON_LAUNCH;
         if (!BiobankPlugin.isRealScanEnabled()) {
             scanButtonText = SCAN_BUTTON_FAKE;
@@ -289,10 +257,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
         scanStatus = false;
         widgetCreator.addBooleanBinding(
-                new WritableValue(Boolean.FALSE, Boolean.class),
+            new WritableValue(Boolean.FALSE, Boolean.class),
             scanStatusObservable,
-                i18n.tr("Error in scan result. Please keep only specimens with no errors."),
-                IStatus.ERROR);
+            i18n.tr("Error in scan result. Please keep only specimens with no errors."),
+            IStatus.ERROR);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanHasBeenLaunchedValue,
             i18n.tr("Scan should be launched"), IStatus.ERROR);
@@ -313,7 +281,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     private void launchScan() {
         log.debug("launchScan");
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScan, isRescanMode());
+        palletScanManagement.launchScanAndProcessResult();
     }
 
     @SuppressWarnings("nls")
@@ -354,7 +322,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                 log.debug("setScanHasBeenLaunched: run: start");
                 scanHasBeenLaunchedValue.setValue(launched);
                 setRescanMode(launched);
-                plateToScanText.setEnabled(!launched);
                 log.debug("setScanHasBeenLaunched: run: end");
             }
         });
@@ -420,17 +387,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected void handleStatusChanged(IStatus status) {
         super.handleStatusChanged(status);
-        scanButton.setEnabled(fieldsValid());
     }
 
     protected boolean fieldsValid() {
-        return isPlateValid();
+        return true;
     }
-
-    private boolean isPlateValid() {
-        return BiobankPlugin.getDefault().isValidPlateBarcode(
-            plateToScanText.getText());
-    };
 
     @SuppressWarnings("nls")
     @Override
@@ -449,14 +410,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         } else if (IDialogConstants.NEXT_ID == buttonId) {
             startNewPallet();
         }
-    }
-
-    public String getPlateToScan() {
-        return plateToScan;
-    }
-
-    public void setPlateToScan(String plateToScan) {
-        this.plateToScan = plateToScan;
     }
 
     protected abstract void doProceed() throws Exception;
@@ -478,8 +431,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
                 getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                        cell.transformIntoServerCell(),
-                        Locale.getDefault()));
+                    cell.transformIntoServerCell(),
+                    Locale.getDefault()));
             cell.merge(SessionManager.getAppService(), res.getCell());
             if (res.getProcessStatus() == CellInfoStatus.ERROR) {
                 Button okButton = getButton(IDialogConstants.PROCEED_ID);
@@ -489,7 +442,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             specificScanPosProcess(cell);
         }
         spw.redraw();
-        setScanOkValue(scanStatus && !errorFound);  
+        setScanOkValue(scanStatus && !errorFound);
         log.debug("postprocessScanTubesManually: end");
     }
 
@@ -525,17 +478,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     /**
      * Returns true if the grid dimensions have changed.
      */
+    @SuppressWarnings("nls")
     protected boolean checkGridDimensionsChanged() {
-        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
-            plateToScanText.getText());
-
-        if (plateDimensions == null) return false;
-
-        if (!currentGridDimensions.equals(plateDimensions)) {
-            currentGridDimensions = plateDimensions;
-            return true;
-        }
-
-        return false;
+        // FIXME: scanning and decoding
+        throw new RuntimeException("not implemented yet");
     }
 }

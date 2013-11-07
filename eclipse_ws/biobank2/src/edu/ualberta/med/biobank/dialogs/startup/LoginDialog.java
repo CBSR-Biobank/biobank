@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.dialogs.startup;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -19,8 +21,8 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -43,7 +45,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
-import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -54,9 +55,9 @@ import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction;
 import edu.ualberta.med.biobank.common.action.security.UserPermissionsGetAction.UserCreatePermissions;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.LoginPermissionSessionState;
+import edu.ualberta.med.biobank.gui.common.dialogs.PersistedDialog;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
@@ -64,30 +65,25 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 
-public class LoginDialog extends TitleAreaDialog {
-    private static final I18n i18n = I18nFactory
-        .getI18n(LoginDialog.class);
+public class LoginDialog extends PersistedDialog {
+    private static final I18n i18n = I18nFactory.getI18n(LoginDialog.class);
 
-    private final DataBindingContext dbc;
+    // private static Logger log = LoggerFactory.getLogger(DecodePlateDialog.class);
 
-    private final ArrayList<String> servers;
+    @SuppressWarnings("nls")
+    private static final String LOGIN_DIALOG_SETTINGS = "LOGIN_DIALOG_SETTINGS";
 
-    private final ArrayList<String> userNames;
+    @SuppressWarnings("nls")
+    private static final String TITLE_AREA_TITLE = i18n.tr("Login to a BioBank server");
 
-    private Combo serverWidget;
-
-    private Combo userNameWidget;
-
-    private Text passwordWidget;
+    @SuppressWarnings("nls")
+    private static final String TITLE_AREA_MESSAGE = i18n.tr("Enter server name and login details.");
 
     @SuppressWarnings("nls")
     private static final String LAST_SERVER = "lastServer";
 
     @SuppressWarnings("nls")
     private static final String SAVED_USER_NAMES = "savedUserNames";
-
-    @SuppressWarnings("nls")
-    private static final String USER_NAME = "userName";
 
     @SuppressWarnings("nls")
     private static final String LAST_USER_NAME = "lastUserName";
@@ -98,8 +94,19 @@ public class LoginDialog extends TitleAreaDialog {
     @SuppressWarnings("nls")
     private static final String DEFAULT_UNSECURE_PREFIX = "http://";
 
-    private static final BgcLogger logger = BgcLogger
-        .getLogger(LoginDialog.class.getName());
+    private static final int USER_NAMES_HISTORY_SIZE = 5;
+
+    private final DataBindingContext dbc;
+
+    private final ArrayList<String> servers = new ArrayList<String>();
+
+    private final String[] usernames;
+
+    private Combo serverWidget;
+
+    private Combo userNameWidget;
+
+    private Text passwordWidget;
 
     public Preferences pluginPrefs = null;
 
@@ -107,88 +114,73 @@ public class LoginDialog extends TitleAreaDialog {
 
     private final Authentication authentication;
 
-    private Boolean okButtonEnabled;
-
     private boolean setupFinished = false;
 
-    @SuppressWarnings("nls")
     public LoginDialog(Shell parentShell) {
         super(parentShell);
-
         authentication = new Authentication();
-
         dbc = new DataBindingContext();
-
-        servers = new ArrayList<String>();
-        userNames = new ArrayList<String>();
-
         pluginPrefs = InstanceScope.INSTANCE.getNode(Application.PLUGIN_ID);
-        Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
+        restoreServerList(BiobankPlugin.getDefault().getPreferenceStore());
+        usernames = restoreUserNames(getDialogSettings());
+    }
 
-        IPreferenceStore prefsStore = BiobankPlugin.getDefault()
-            .getPreferenceStore();
+    @Override
+    protected String getTitleAreaMessage() {
+        return TITLE_AREA_MESSAGE;
+    }
 
-        String serverList = prefsStore
-            .getString(PreferenceConstants.SERVER_LIST);
+    @Override
+    protected String getTitleAreaTitle() {
+        return TITLE_AREA_TITLE;
+    }
+
+    @Override
+    protected String getDialogShellTitle() {
+        return TITLE_AREA_TITLE;
+    }
+
+    @Override
+    protected IDialogSettings getDialogSettings() {
+        IDialogSettings settings = super.getDialogSettings();
+        IDialogSettings section = settings.getSection(LOGIN_DIALOG_SETTINGS);
+        if (section == null) {
+            section = settings.addNewSection(LOGIN_DIALOG_SETTINGS);
+        }
+        return section;
+    }
+
+    @Override
+    protected IDialogSettings getDialogBoundsSettings() {
+        return getDialogSettings();
+    }
+
+    private void restoreServerList(IPreferenceStore prefsStore) {
+        String serverList = prefsStore.getString(PreferenceConstants.SERVER_LIST);
+        @SuppressWarnings("nls")
         StringTokenizer st = new StringTokenizer(serverList, "\n");
         while (st.hasMoreTokens()) {
             servers.add(st.nextToken());
         }
+    }
 
-        try {
-            String[] userNodeNames = prefsUserNames.childrenNames();
-            for (String userNodeName : userNodeNames) {
-                Preferences node = prefsUserNames.node(userNodeName);
-                userNames.add(node.get(USER_NAME, StringUtil.EMPTY_STRING));
-            }
-        } catch (BackingStoreException e) {
-            logger.error("Could not get " + USER_NAME + " preference", e);
+    private String[] restoreUserNames(IDialogSettings settings) {
+        String[] usernames = settings.getArray(SAVED_USER_NAMES);
+        if (usernames == null) {
+            usernames = new String[0];
         }
+        return usernames;
     }
 
     @SuppressWarnings("nls")
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        // login dialog title
-        shell.setText(i18n.tr("BioBank Login"));
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        // login dialog title
-        setTitle(i18n.tr("Login to a BioBank server"));
-        setTitleImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_LOGINWIZ));
-        // login dialog title area message
-        setMessage(i18n.tr("Enter server name and login details."));
-        return contents;
-    }
-
-    @Override
-    protected Control createButtonBar(Composite parent) {
-        Control contents = super.createButtonBar(parent);
-        if (okButtonEnabled != null) {
-            // in case the binding wanted to modify it before its creation
-            setOkButtonEnabled(okButtonEnabled);
-        }
-        return contents;
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    protected Control createDialogArea(Composite parent) {
-        Composite parentComposite = (Composite) super.createDialogArea(parent);
-
-        Composite contents = new Composite(parentComposite, SWT.NONE);
+    protected void createDialogAreaInternal(Composite parent) {
+        Composite contents = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        String lastServer =
-            pluginPrefs.get(LAST_SERVER, StringUtil.EMPTY_STRING);
+        String lastServer = pluginPrefs.get(LAST_SERVER, StringUtil.EMPTY_STRING);
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             // validation error when server text box is empty
             i18n.tr("Server field cannot be empty"));
@@ -225,14 +217,18 @@ public class LoginDialog extends TitleAreaDialog {
 
         }
 
-        userNameWidget =
-            createWritableCombo(contents,
-                // TR: login dialog user name text box label
-                i18n.tr("&User Name"),
-                userNames.toArray(new String[0]),
-                Authentication.USERNAME_PROPERTY_NAME,
-                pluginPrefs.get(LAST_USER_NAME, StringUtil.EMPTY_STRING),
-                userNameValidator);
+        String defaultUsername = null;
+        if (usernames.length > 0) {
+            defaultUsername = usernames[0];
+        }
+
+        userNameWidget = createWritableCombo(contents,
+            // TR: login dialog user name text box label
+            i18n.tr("&User Name"),
+            usernames,
+            Authentication.USERNAME_PROPERTY_NAME,
+            defaultUsername,
+            userNameValidator);
 
         passwordWidget = createPassWordText(contents,
             // TR: login dialog password text box label
@@ -242,8 +238,6 @@ public class LoginDialog extends TitleAreaDialog {
         bindChangeListener();
 
         setupFinished = true;
-
-        return contents;
     }
 
     private Text createPassWordText(Composite parent, String labelText,
@@ -258,8 +252,7 @@ public class LoginDialog extends TitleAreaDialog {
     private void arrangeAndBindControl(Control control,
         AbstractValidator validator, ISWTObservableValue observable,
         String propertyObserved) {
-        control.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true,
-            false));
+        control.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
         UpdateValueStrategy uvs = null;
         if (validator != null) {
             uvs = new UpdateValueStrategy();
@@ -302,6 +295,7 @@ public class LoginDialog extends TitleAreaDialog {
         return combo;
     }
 
+    @Override
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
@@ -326,6 +320,7 @@ public class LoginDialog extends TitleAreaDialog {
                 AggregateValidationStatus.MAX_SEVERITY));
     }
 
+    @Override
     protected void setOkButtonEnabled(boolean enabled) {
         Button okButton = getButton(IDialogConstants.OK_ID);
         if (okButton != null && !okButton.isDisposed()) {
@@ -350,14 +345,6 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         if (!BiobankPlugin.getDefault().isDebugging()) {
-            // until further notice, we still want to be able to specify the
-            // port, even in non debug mode
-            // if (url.getPort() != -1) {
-            // MessageDialog
-            // .openError(getShell(), "Invalid Server URL",
-            // "You are not allowed to specify a port, only a hostname and path.");
-            // return;
-            // }
             if (userNameWidget.getText().isEmpty()) {
                 MessageDialog.openError(getShell(),
                     // TR: error dialog title
@@ -369,8 +356,7 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         boolean secureConnection =
-            ((secureConnectionButton == null) || secureConnectionButton
-                .getSelection());
+            ((secureConnectionButton == null) || secureConnectionButton.getSelection());
 
         SessionHelper sessionHelper = new SessionHelper(serverWidget.getText(),
             secureConnection, userNameWidget.getText(),
@@ -399,8 +385,7 @@ public class LoginDialog extends TitleAreaDialog {
                     if (!page.getPerspective().getId()
                         .equals(MainPerspective.ID)) {
                         try {
-                            workbench.showPerspective(MainPerspective.ID,
-                                activeWindow);
+                            workbench.showPerspective(MainPerspective.ID, activeWindow);
                         } catch (WorkbenchException e) {
                             BgcPlugin.openAsyncError(
                                 // error dialog title
@@ -412,7 +397,8 @@ public class LoginDialog extends TitleAreaDialog {
                 if (sessionHelper.getUser().isSuperAdmin()
                     || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
                     // login successful
-                    savePreferences();
+                    saveServerListPreferences();
+                    saveUsernamesSettings(getDialogSettings());
                     SessionManager.getInstance().addSession(
                         sessionHelper.getAppService(), serverWidget.getText(),
                         sessionHelper.getUser());
@@ -422,7 +408,7 @@ public class LoginDialog extends TitleAreaDialog {
     }
 
     @SuppressWarnings("nls")
-    private void savePreferences() {
+    private void saveServerListPreferences() {
         pluginPrefs.put(LAST_SERVER, serverWidget.getText());
         pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
 
@@ -439,21 +425,20 @@ public class LoginDialog extends TitleAreaDialog {
             prefsStore.putValue(PreferenceConstants.SERVER_LIST, serverList
                 .append(serverWidget.getText().trim()).toString());
         }
+    }
 
-        if ((userNameWidget.getText().length() > 0)
-            && (userNameWidget.getSelectionIndex() == -1)
-            && !userNames.contains(userNameWidget.getText())) {
-            Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
-            Preferences prefsUserName = prefsUserNames.node(Integer
-                .toString(userNames.size()));
-            prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
-        }
+    private void saveUsernamesSettings(IDialogSettings settings) {
+        LinkedHashSet<String> newUsernames = new LinkedHashSet<String>();
+        newUsernames.add(userNameWidget.getText());
+        newUsernames.addAll(Arrays.asList(usernames));
 
-        try {
-            pluginPrefs.flush();
-        } catch (BackingStoreException e) {
-            logger.error("Could not save loggin preferences", e);
-        }
+        // now convert it to the array of required size
+        int size = Math.min(USER_NAMES_HISTORY_SIZE, newUsernames.size());
+        String[] newUsernamesArray = new String[size];
+        newUsernames.toArray(newUsernamesArray);
+
+        // store
+        settings.put(SAVED_USER_NAMES, newUsernamesArray);
     }
 
     @SuppressWarnings("nls")
@@ -472,12 +457,11 @@ public class LoginDialog extends TitleAreaDialog {
             if (workingCenters.size() == 0) {
                 if (!sessionHelper.getUser().isSuperAdmin())
                     // cannot access the application.
-                    BgcPlugin
-                        .openError(
-                            // TR: error dialog title
-                            i18n.tr("Problem getting user working centers"),
-                            // TR: error dialog message
-                            i18n.tr("No working center has been found for this user. Check with your manager or application administrator for user rights."));
+                    BgcPlugin.openError(
+                        // TR: error dialog title
+                        i18n.tr("Problem getting user working centers"),
+                        // TR: error dialog message
+                        i18n.tr("No working center has been found for this user. Check with your manager or application administrator for user rights."));
             } else if (workingCenters.size() == 1)
                 sessionHelper.getUser().setCurrentWorkingCenter(
                     workingCenters.get(0));
@@ -585,7 +569,11 @@ public class LoginDialog extends TitleAreaDialog {
 
         @Override
         public String toString() {
-            return server + "/" + username + "/" + password;
+            StringBuffer b = new StringBuffer();
+            b.append(server).append("/");
+            b.append(username).append("/");
+            b.append(password);
+            return b.toString();
         }
     }
 

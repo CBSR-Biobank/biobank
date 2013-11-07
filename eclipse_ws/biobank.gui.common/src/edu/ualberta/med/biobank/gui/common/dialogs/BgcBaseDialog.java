@@ -21,6 +21,8 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -31,6 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
@@ -296,4 +299,10 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
         return section;
     }
 
+    public static Point getCenterPoint() {
+        Shell parentShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        Rectangle shellBounds = parentShell.getBounds();
+        return new Point(shellBounds.x + shellBounds.width / 2,
+            shellBounds.y + shellBounds.height / 2);
+    }
 }

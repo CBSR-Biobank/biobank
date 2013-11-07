@@ -9,24 +9,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction.ContainerLabelingSchemeInfo;
-import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
-import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
@@ -37,10 +29,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import edu.ualberta.med.scannerconfig.preferences.PreferenceConstants;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PalletScanManagement {
@@ -91,160 +80,10 @@ public class PalletScanManagement {
         this.type = containerType;
     }
 
-    public void launchScanAndProcessResult(final String plateToScan) {
-        launchScanAndProcessResult(plateToScan, false);
-    }
-
-    public void launchScanAndProcessResult(final String plateToScan, final boolean isRescanMode) {
-        IRunnableWithProgress op = new IRunnableWithProgress() {
-            @SuppressWarnings("nls")
-            @Override
-            public void run(IProgressMonitor monitor) {
-                monitor.beginTask(
-                    // progress monitor message
-                    i18n.tr("Scan and process..."),
-                    IProgressMonitor.UNKNOWN);
-                try {
-                    launchScan(monitor, plateToScan, isRescanMode);
-
-                    int rows = RowColPos.ROWS_DEFAULT;
-                    int cols = RowColPos.COLS_DEFAULT;
-                    int plateId = -1;
-                    IPreferenceStore prefs = ScannerConfigPlugin.getDefault().getPreferenceStore();
-                    for (plateId = 0; plateId < PreferenceConstants.SCANNER_PLATE_BARCODES.length; plateId++) {
-                        if (plateToScan.equals(prefs.getString(
-                            PreferenceConstants.SCANNER_PLATE_BARCODES[plateId]))) {
-                            PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateId);
-                            rows = gridDimensions.getRows();
-                            cols = gridDimensions.getCols();
-                            break;
-                        }
-                    }
-                    type.setCapacity(new Capacity(rows, cols));
-
-                    processScanResult(monitor);
-                    afterScanAndProcess();
-                } catch (RemoteConnectFailureException exp) {
-                    BgcPlugin.openRemoteConnectErrorMessage(exp);
-                    scanAndProcessError(null);
-                } catch (AccessDeniedException e) {
-                    BgcPlugin.openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan result error"),
-                        e.getLocalizedMessage());
-                    scanAndProcessError(e.getLocalizedMessage());
-                } catch (Exception e) {
-                    BgcPlugin.openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan result error"),
-                        e);
-                    String msg = e.getMessage();
-                    if (((msg == null) || msg.isEmpty()) && (e.getCause() != null)) {
-                        msg = e.getCause().getMessage();
-                    }
-                    scanAndProcessError("ERROR: " + msg);
-                }
-                monitor.done();
-            }
-        };
-        try {
-            beforeThreadStart();
-            new ProgressMonitorDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell()).run(true, false, op);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @SuppressWarnings("nls")
-    private void launchScan(IProgressMonitor monitor, String plateToScan, boolean rescanMode)
-        throws Exception {
-        monitor.subTask(
-            // progress monitor text
-            i18n.tr("Launching scan"));
-        beforeScan();
-        Map<RowColPos, PalletWell> oldCells = wells;
-        if (BiobankPlugin.isRealScanEnabled()) {
-            int plateNum = BiobankPlugin.getDefault().getPlateNumber(plateToScan);
-            if (plateNum == -1) {
-                plateError();
-                BgcPlugin.openAsyncError(
-                    // dialog title
-                    i18n.tr("Scan error"),
-                    // dialog message
-                    i18n.tr("Plate with barcode {0} is not enabled", plateToScan));
-                return;
-            }
-            Set<DecodedWell> scanCells = null;
-            try {
-                scanCells = ScannerConfigPlugin.decodePlate(plateNum);
-                wells = PalletWell.convertArray(scanCells);
-            } catch (Exception ex) {
-                BgcPlugin
-                    .openAsyncError(
-                        // dialog title
-                        i18n.tr("Scan error"),
-                        ex,
-                        // dialog message
-                        i18n.tr("Barcodes can still be scanned with the handheld 2D scanner."));
-                return;
-            } finally {
-                scansCount++;
-                afterScanBeforeMerge();
-            }
-        } else {
-            wells = getFakeDecodedWells(plateToScan);
-            scansCount++;
-            afterScanBeforeMerge();
-        }
-        Map<String, PalletWell> cellValues = getValuesMap(wells);
-        if (rescanMode && oldCells != null) {
-            // rescan: merge previous scan with new in case the scanner
-            // wasn't able to scan well
-            boolean rescanDifferent = false;
-            for (Entry<RowColPos, PalletWell> entry : oldCells.entrySet()) {
-                RowColPos rcp = entry.getKey();
-                PalletWell oldScannedCell = entry.getValue();
-                PalletWell newScannedCell = wells.get(rcp);
-                boolean copyOldValue = false;
-                if (PalletWell.hasValue(oldScannedCell)) {
-                    copyOldValue = true;
-                    if (PalletWell.hasValue(newScannedCell)
-                        && !oldScannedCell.getValue().equals(
-                            newScannedCell.getValue())) {
-                        // Different values at same position
-                        oldScannedCell
-                            .setInformation((oldScannedCell.getInformation() != null ? oldScannedCell
-                                .getInformation()
-                                : StringUtil.EMPTY_STRING)
-                                + " "
-                                + i18n.tr("Rescanned value is different"));
-                        oldScannedCell.setStatus(CellInfoStatus.ERROR);
-                        rescanDifferent = true;
-
-                    } else if (!PalletWell.hasValue(newScannedCell)) {
-                        // previous position has value - new has none
-                        PalletWell newPosition = cellValues.get(oldScannedCell
-                            .getValue());
-                        if (newPosition != null) {
-                            // still there but moved to another position, so
-                            // don't copy previous scanned position
-                            copyOldValue = false;
-                        }
-                    }
-                }
-                if (copyOldValue) {
-                    wells.put(rcp, oldScannedCell);
-                }
-            }
-            if (rescanDifferent) {
-                throw new Exception(
-                    // exception message
-                    i18n.tr("Scan error: Previously scanned specimens has been replaced. "
-                        + "Please cancel and start again."));
-            }
-        }
-        afterSuccessfulScan();
+    public void launchScanAndProcessResult() {
+        // FIXME: scanning and decoding
+        throw new RuntimeException("not implemented yet");
     }
 
     @SuppressWarnings("nls")
@@ -371,16 +210,6 @@ public class PalletScanManagement {
         labelsMissingInventoryId.addAll(labelsMissingInventoryIdBeforeSelection);
 
         return labelsMissingInventoryId;
-    }
-
-    private Map<String, PalletWell> getValuesMap(
-        Map<RowColPos, PalletWell> cells) {
-        Map<String, PalletWell> valuesMap = new HashMap<String, PalletWell>();
-        for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
-            PalletWell cell = entry.getValue();
-            valuesMap.put(cell.getValue(), cell);
-        }
-        return valuesMap;
     }
 
     protected void beforeThreadStart() {

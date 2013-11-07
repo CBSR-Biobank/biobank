@@ -43,8 +43,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
-public class DispatchCreateScanDialog extends
-    AbstractScanDialog<DispatchWrapper> {
+public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
 
     private static Logger log = LoggerFactory.getLogger(DispatchCreateScanDialog.class.getName());
@@ -136,10 +135,9 @@ public class DispatchCreateScanDialog extends
      */
     @Override
     protected boolean fieldsValid() {
-        return super.fieldsValid()
-            && (productBarcodeValidator == null || productBarcodeValidator
-                .validate(palletproductBarcodeText.getText()).equals(
-                    Status.OK_STATUS));
+        return (productBarcodeValidator == null)
+            || productBarcodeValidator.validate(palletproductBarcodeText.getText()).equals(
+                Status.OK_STATUS);
     }
 
     /**
@@ -250,8 +248,8 @@ public class DispatchCreateScanDialog extends
         ContainerWrapper currentPallet = null;
         if (isPalletWithPosition)
             currentPallet = ContainerWrapper.getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(), (SiteWrapper) currentSite,
-                    currentProductBarcode);
+                SessionManager.getAppService(), (SiteWrapper) currentSite,
+                currentProductBarcode);
         Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletWell> wells = PalletWell.getRandomNonDispatchedSpecimens(

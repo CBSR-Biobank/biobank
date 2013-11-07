@@ -29,7 +29,6 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
@@ -870,18 +869,10 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     /**
      * Returns true if the grid dimensions have changed.
      */
+    @SuppressWarnings("nls")
     protected boolean checkGridDimensionsChanged() {
-        RowColPos plateDimensions = BiobankPlugin.getDefault().getGridDimensions(
-            plateToScanText.getText());
-
-        if (plateDimensions == null) return false;
-
-        if (!currentGridDimensions.equals(plateDimensions)) {
-            currentGridDimensions = plateDimensions;
-            return true;
-        }
-
-        return false;
+        // FIXME: scanning and decoding
+        throw new RuntimeException("not implemented yet");
     }
 
 }

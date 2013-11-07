@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -32,7 +31,6 @@ import com.google.web.bindery.event.shared.EventBus;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
 import edu.ualberta.med.biobank.mvp.event.ExceptionHandler;
 import edu.ualberta.med.biobank.mvp.presenter.impl.FormManagerPresenter;
@@ -75,7 +73,6 @@ import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ReceivingRequestGroup;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -252,20 +249,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
         return getPreferenceStore().getString(PreferenceConstants.GENERAL_CONFIRM).equals(code);
     }
 
-    public int getPlateNumber(String barcode) {
-        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode);
-    }
-
-    public List<String> getPossibleBarcodes() {
-        return ScannerConfigPlugin.getDefault().getPossibleBarcodes();
-    }
-
     public static int getPlatesEnabledCount() {
-        return ScannerConfigPlugin.getPlatesEnabledCount(isRealScanEnabled());
-    }
-
-    public boolean isValidPlateBarcode(String value) {
-        return (!value.isEmpty() && (getPlateNumber(value) != -1));
+        return ScannerConfigPlugin.getPlatesEnabledCount();
     }
 
     public static String getActivityLogPath() {
@@ -365,18 +350,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
         ISourceProviderService service =
             (ISourceProviderService) window.getService(ISourceProviderService.class);
         return (UserState) service.getSourceProvider(UserState.HAS_WORKING_CENTER_SOURCE_NAME);
-    }
-
-    /**
-     * Returns a position object if {@link plateString} corresponds to a plate number defined in the
-     * preferences. Returns null if plateString is not found in the preferences.
-     */
-    public RowColPos getGridDimensions(String plateString) {
-        int plateNumber = getPlateNumber(plateString);
-
-        if (plateNumber < 0) return null;
-        PlateDimensions gridDimensions = ScannerConfigPlugin.getPlateGridDimensions(plateNumber);
-        return new RowColPos(gridDimensions.getRows(), gridDimensions.getCols());
     }
 
 }
