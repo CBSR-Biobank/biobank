@@ -390,8 +390,7 @@ class FilterRow extends Composite {
             .setToolTipText(
             // tooltip.
             i18n.tr("Suggest possible values (considers other filters)"));
-        autoButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_WAND));
+        autoButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.WAND));
         autoButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {

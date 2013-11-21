@@ -47,12 +47,12 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Base class for data all BioBank view and entry forms. This class is the
- * superclass for {@link BiobankEntryForm} and {@link BiobankViewForm}. Please
- * extend from these two classes instead of <code>BiobankFormBase</code>.
+ * Base class for data all BioBank view and entry forms. This class is the superclass for
+ * {@link BiobankEntryForm} and {@link BiobankViewForm}. Please extend from these two classes
+ * instead of <code>BiobankFormBase</code>.
  * <p>
- * Form creation is called in a non-UI thread so making calls to the ORM layer
- * possible. See {@link #createFormContent()}
+ * Form creation is called in a non-UI thread so making calls to the ORM layer possible. See
+ * {@link #createFormContent()}
  */
 public abstract class BiobankFormBase extends BgcFormBase {
     private static final I18n i18n = I18nFactory
@@ -159,9 +159,8 @@ public abstract class BiobankFormBase extends BgcFormBase {
 
     @SuppressWarnings("unused")
     protected void addSectionToolbar(Section section, String tooltip,
-        SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
-        ((WidgetCreator) widgetCreator).addSectionToolbar(section, tooltip,
-            listener, imageKey);
+        SelectionListener listener, Class<?> wrapperTypeToAdd, BgcPlugin.Image image) {
+        ((WidgetCreator) widgetCreator).addSectionToolbar(section, tooltip, listener, image);
     }
 
     public AbstractAdapterBase getAdapter() {

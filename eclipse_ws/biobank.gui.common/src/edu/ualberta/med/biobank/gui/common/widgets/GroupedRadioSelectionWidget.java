@@ -84,6 +84,10 @@ public class GroupedRadioSelectionWidget<T> extends Composite {
         throw new IllegalStateException("nothing was selected");
     }
 
+    public void setSelection(T selection) {
+        radioGroup.setSelection(selection);
+    }
+
     public void addSelectionListener(SelectionListener listener) {
         radioGroup.addSelectionListener(listener);
     }

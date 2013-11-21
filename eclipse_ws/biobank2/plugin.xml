@@ -617,7 +617,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DecodePlateHandler"
+            class="edu.ualberta.med.biobank.handlers.DecodeImageHandler"
             commandId="edu.ualberta.med.biobank.commands.scanner.decodePlate">
       </handler>
       <handler

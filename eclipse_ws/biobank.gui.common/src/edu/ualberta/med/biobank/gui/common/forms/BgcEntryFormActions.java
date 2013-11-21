@@ -31,20 +31,16 @@ public class BgcEntryFormActions {
     private static final String PRINT_ACTION_TEXT = i18n.tr("Print");
 
     private static ImageDescriptor printActionImage = ImageDescriptor
-        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_PRINTER));
+        .createFromImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.PRINTER));
 
     private static ImageDescriptor reloadActionImage = ImageDescriptor
-        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RELOAD_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RELOAD_FORM));
 
     private static ImageDescriptor cancelActionImage = ImageDescriptor
-        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_CANCEL_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.CANCEL_FORM));
 
     private static ImageDescriptor confirmActionImage = ImageDescriptor
-        .createFromImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_CONFIRM_FORM));
+        .createFromImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.CONFIRM_FORM));
 
     private final IBgcEntryForm entryForm;
 

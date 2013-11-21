@@ -229,8 +229,8 @@ public class ColumnSelectWidget extends Composite {
 
         createLabel(subContainer, StringUtil.EMPTY_STRING);
 
-        rightButton = createButton(subContainer, BgcPlugin.IMG_ARROW_RIGHT);
-        leftButton = createButton(subContainer, BgcPlugin.IMG_ARROW_LEFT);
+        rightButton = createButton(subContainer, BgcPlugin.Image.ARROW_RIGHT);
+        leftButton = createButton(subContainer, BgcPlugin.Image.ARROW_LEFT);
 
         rightButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -255,8 +255,8 @@ public class ColumnSelectWidget extends Composite {
 
         createLabel(subContainer, StringUtil.EMPTY_STRING);
 
-        upButton = createButton(subContainer, BgcPlugin.IMG_UP);
-        downButton = createButton(subContainer, BgcPlugin.IMG_DOWN);
+        upButton = createButton(subContainer, BgcPlugin.Image.UP);
+        downButton = createButton(subContainer, BgcPlugin.Image.DOWN);
 
         upButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -358,10 +358,9 @@ public class ColumnSelectWidget extends Composite {
         displayed.refresh(true, true);
     }
 
-    private static Button createButton(Composite parent, String imageName) {
+    private static Button createButton(Composite parent, BgcPlugin.Image image) {
         Button button = new Button(parent, SWT.PUSH);
-        button.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(imageName));
+        button.setImage(BgcPlugin.getDefault().getImage(image));
 
         return button;
     }

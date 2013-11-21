@@ -66,8 +66,7 @@ public class LoggingForm extends BiobankViewForm {
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_LOGGING));
+        form.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.LOGGING));
 
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));

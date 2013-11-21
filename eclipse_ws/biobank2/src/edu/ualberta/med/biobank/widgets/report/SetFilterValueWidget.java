@@ -299,8 +299,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         @SuppressWarnings("nls")
         private void createEditModeButton() {
             editModeButton = new Button(this, SWT.NONE);
-            editModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_DOWN));
+            editModeButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.DOWN));
             editModeButton.setToolTipText(
                 // button tooltip.
                 i18n.tr("Expand to add values"));
@@ -346,8 +345,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         @SuppressWarnings("nls")
         private void createAddButton() {
             addButton = new Button(this, SWT.NONE);
-            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
             addButton.setToolTipText(
                 // button tooltip.
                 i18n.tr("Add value to list"));
@@ -417,8 +415,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         @SuppressWarnings("nls")
         private void createRemoveButton() {
             removeButton = new Button(this, SWT.NONE);
-            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_REMOVE));
+            removeButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.REMOVE));
             removeButton.setToolTipText(
                 // button tooltip.
                 i18n.tr("Remove selected value(s) from list"));
@@ -438,8 +435,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         @SuppressWarnings("nls")
         private void createViewModeButton() {
             viewModeButton = new Button(this, SWT.NONE);
-            viewModeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_UP));
+            viewModeButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.UP));
             viewModeButton.setToolTipText(
                 // button tooltip.
                 i18n.tr("Collapse"));

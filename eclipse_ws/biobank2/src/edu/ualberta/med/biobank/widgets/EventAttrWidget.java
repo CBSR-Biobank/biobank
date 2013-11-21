@@ -109,8 +109,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             bcomp.setLayoutData(new GridData());
 
             addButton = new Button(bcomp, SWT.PUSH);
-            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
             addButton.setToolTipText(i18n.tr("Add"));
             addButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -155,8 +154,7 @@ public class EventAttrWidget extends BgcBaseWidget {
             });
 
             removeButton = new Button(bcomp, SWT.PUSH);
-            removeButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_DELETE));
+            removeButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.DELETE));
             removeButton.setToolTipText(i18n.tr("Remove"));
             removeButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 

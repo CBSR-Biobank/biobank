@@ -144,8 +144,7 @@ public abstract class ReportsEditor extends BiobankEntryForm {
         printButton = toolkit.createButton(buttonSection,
             // button text
             i18n.tr("Print"), SWT.NONE);
-        printButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_PRINTER));
+        printButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.PRINTER));
         printButton.setEnabled(false);
         printButton.addSelectionListener(new SelectionAdapter() {
             @Override

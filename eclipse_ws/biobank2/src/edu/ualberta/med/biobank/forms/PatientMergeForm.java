@@ -49,11 +49,11 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     @SuppressWarnings("nls")
     public static final String ID =
-    "edu.ualberta.med.biobank.forms.PatientMergeForm";
+        "edu.ualberta.med.biobank.forms.PatientMergeForm";
 
     @SuppressWarnings("nls")
     public static final String MSG_PATIENT_NOT_VALID =
-    "Select a second patient";
+        "Select a second patient";
 
     private PatientWrapper patient1 = new PatientWrapper(
         SessionManager.getAppService());
@@ -114,13 +114,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         form.setText(i18n.tr("Merging into Patient {0}",
             patient1.getPnumber()));
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_PATIENT));
+        form.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.PATIENT));
 
         toolkit.createLabel(page, i18n.tr(
             "Enter the patient number to merge into patient {0} "
                 + "and press the Enter key",
-                patient1.getPnumber()), SWT.LEFT);
+            patient1.getPnumber()), SWT.LEFT);
 
         createPatientSection();
         createCommentSection();
@@ -162,8 +161,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         Label arrow = toolkit.createLabel(client,
             // label.
             i18n.tr("Arrow"), SWT.IMAGE_BMP);
-        arrow.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ARROW_LEFT2));
+        arrow.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ARROW_LEFT2));
 
         Composite patientArea2 = toolkit.createComposite(client);
         GridLayout patient2Layout = new GridLayout(2, false);
@@ -334,7 +332,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                         searcher.removePatient(patient2.getId());
                         searcher.rebuild();
                         CollectionView.getCurrent().getTreeViewer()
-                        .setExpandedTreePaths(expandedTreePaths);
+                            .setExpandedTreePaths(expandedTreePaths);
                     }
                     closeEntryOpenView(false, true);
                 }
@@ -342,7 +340,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             SessionManager.log("merge",
                 patient2.getPnumber() + " " + "-->"
                     + " " + patient1.getPnumber(),
-                    Patient.NAME.singular().toString());
+                Patient.NAME.singular().toString());
         }
     }
 
@@ -354,7 +352,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         pnumber2Text.setText(StringUtil.EMPTY_STRING);
         study2Text.setText(StringUtil.EMPTY_STRING);
         patient2VisitsTable
-        .setList(new ArrayList<PatientCEventInfo>());
+            .setList(new ArrayList<PatientCEventInfo>());
         patient2 = null;
         comment.setWrappedObject(new Comment());
     }

@@ -45,9 +45,8 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 /**
- * Took same structure than PreferenceDialog. Difference is that the left panel
- * is a list and not a tree. The list is composed of BgcDialogPage objects (see
- * createPages method).
+ * Took same structure than PreferenceDialog. Difference is that the left panel is a list and not a
+ * tree. The list is composed of BgcDialogPage objects (see createPages method).
  * 
  * @see org.eclipse.jface.preference.PreferenceDialog
  * @author delphine
@@ -163,8 +162,7 @@ public abstract class BgcDialogWithPages extends BgcBaseDialog {
 
         ToolBar tbar = new ToolBar(titleComposite, SWT.FLAT | SWT.HORIZONTAL);
         ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        titem.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         titem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

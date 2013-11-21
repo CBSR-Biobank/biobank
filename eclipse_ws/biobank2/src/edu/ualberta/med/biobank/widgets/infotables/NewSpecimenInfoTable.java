@@ -89,8 +89,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 if (columnIndex == 5
                     && ActivityStatus.FLAGGED == row.specimen
                         .getActivityStatus())
-                    return BgcPlugin.getDefault().getImageRegistry()
-                        .get(BgcPlugin.IMG_ERROR);
+                    return BgcPlugin.getDefault().getImage(BgcPlugin.Image.ERROR);
                 return null;
             }
         },
@@ -144,8 +143,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 if (columnIndex == 5
                     && ActivityStatus.FLAGGED == row.specimen
                         .getActivityStatus())
-                    return BgcPlugin.getDefault().getImageRegistry()
-                        .get(BgcPlugin.IMG_ERROR);
+                    return BgcPlugin.getDefault().getImage(BgcPlugin.Image.ERROR);
                 return null;
             }
         },
@@ -206,8 +204,7 @@ public class NewSpecimenInfoTable extends InfoTableWidget<SpecimenInfo> {
                 if (columnIndex == 5
                     && ActivityStatus.FLAGGED == row.specimen
                         .getActivityStatus())
-                    return BgcPlugin.getDefault().getImageRegistry()
-                        .get(BgcPlugin.IMG_ERROR);
+                    return BgcPlugin.getDefault().getImage(BgcPlugin.Image.ERROR);
                 return null;
             }
         };

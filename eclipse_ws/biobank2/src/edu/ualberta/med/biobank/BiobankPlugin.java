@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -90,53 +89,57 @@ public class BiobankPlugin extends AbstractUIPlugin {
     //
     // ContainerTypeAdapter and Container missing on purpose.
     //
-    private static Map<String, String> classToImageKey;
+    private static Map<String, BgcPlugin.Image> classToImageKey;
     static {
-        classToImageKey = new HashMap<String, String>();
-        classToImageKey.put(SessionAdapter.class.getName(), BgcPlugin.IMG_SESSIONS);
-        classToImageKey.put(SiteAdapter.class.getName(), BgcPlugin.IMG_SITE);
-        classToImageKey.put(SiteGroup.class.getName(), BgcPlugin.IMG_SITES);
-        classToImageKey.put(AbstractClinicGroup.class.getName(), BgcPlugin.IMG_CLINICS);
-        classToImageKey.put(AbstractStudyGroup.class.getName(), BgcPlugin.IMG_STUDIES);
-        classToImageKey.put(ContainerTypeGroup.class.getName(), BgcPlugin.IMG_CONTAINER_TYPES);
-        classToImageKey.put(ContainerGroup.class.getName(), BgcPlugin.IMG_CONTAINERS);
-        classToImageKey.put(ClinicAdapter.class.getName(), BgcPlugin.IMG_CLINIC);
-        classToImageKey.put(StudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
-        classToImageKey.put(NewStudyAdapter.class.getName(), BgcPlugin.IMG_STUDY);
-        classToImageKey.put(PatientAdapter.class.getName(), BgcPlugin.IMG_PATIENT);
-        classToImageKey.put(CollectionEventAdapter.class.getName(), BgcPlugin.IMG_COLLECTION_EVENT);
-        classToImageKey.put(ShipmentAdapter.class.getName(), BgcPlugin.IMG_CLINIC_SHIPMENT);
-        classToImageKey.put(AbstractSearchedNode.class.getName(), BgcPlugin.IMG_SEARCH);
-        classToImageKey.put(NewAbstractSearchedNode.class.getName(), BgcPlugin.IMG_SEARCH);
-        classToImageKey.put(AbstractTodayNode.class.getName(), BgcPlugin.IMG_TODAY);
-        classToImageKey.put(DateNode.class.getName(), BgcPlugin.IMG_CALENDAR);
-        classToImageKey.put(OutgoingNode.class.getName(), BgcPlugin.IMG_SENT);
-        classToImageKey.put(IncomingNode.class.getName(), BgcPlugin.IMG_RECEIVED);
+        classToImageKey = new HashMap<String, BgcPlugin.Image>();
+        classToImageKey.put(SessionAdapter.class.getName(), BgcPlugin.Image.SESSIONS);
+        classToImageKey.put(SiteAdapter.class.getName(), BgcPlugin.Image.SITE);
+        classToImageKey.put(SiteGroup.class.getName(), BgcPlugin.Image.SITES);
+        classToImageKey.put(AbstractClinicGroup.class.getName(), BgcPlugin.Image.CLINICS);
+        classToImageKey.put(AbstractStudyGroup.class.getName(), BgcPlugin.Image.STUDIES);
+        classToImageKey.put(ContainerTypeGroup.class.getName(), BgcPlugin.Image.CONTAINER_TYPES);
+        classToImageKey.put(ContainerGroup.class.getName(), BgcPlugin.Image.CONTAINERS);
+        classToImageKey.put(ClinicAdapter.class.getName(), BgcPlugin.Image.CLINIC);
+        classToImageKey.put(StudyAdapter.class.getName(), BgcPlugin.Image.STUDY);
+        classToImageKey.put(NewStudyAdapter.class.getName(), BgcPlugin.Image.STUDY);
+        classToImageKey.put(PatientAdapter.class.getName(), BgcPlugin.Image.PATIENT);
+        classToImageKey.put(CollectionEventAdapter.class.getName(), BgcPlugin.Image.COLLECTION_EVENT);
+        classToImageKey.put(ShipmentAdapter.class.getName(), BgcPlugin.Image.CLINIC_SHIPMENT);
+        classToImageKey.put(AbstractSearchedNode.class.getName(), BgcPlugin.Image.SEARCH);
+        classToImageKey.put(NewAbstractSearchedNode.class.getName(), BgcPlugin.Image.SEARCH);
+        classToImageKey.put(AbstractTodayNode.class.getName(), BgcPlugin.Image.TODAY);
+        classToImageKey.put(DateNode.class.getName(), BgcPlugin.Image.CALENDAR);
+        classToImageKey.put(OutgoingNode.class.getName(), BgcPlugin.Image.SENT);
+        classToImageKey.put(IncomingNode.class.getName(), BgcPlugin.Image.RECEIVED);
         classToImageKey.put(InCreationDispatchGroup.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
+            BgcPlugin.Image.DISPATCH_SHIPMENT_CREATION);
         classToImageKey.put(ReceivingInTransitDispatchGroup.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+            BgcPlugin.Image.DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(SentInTransitDispatchGroup.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+            BgcPlugin.Image.DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(ReceivingNoErrorsDispatchGroup.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
+            BgcPlugin.Image.DISPATCH_SHIPMENT_RECEIVING);
         classToImageKey.put(ReceivingWithErrorsDispatchGroup.class.getName(),
-            BgcPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
-        classToImageKey.put(DispatchAdapter.class.getName(), BgcPlugin.IMG_DISPATCH_SHIPMENT);
-        classToImageKey.put(DispatchCenterAdapter.class.getName(), BgcPlugin.IMG_SITE);
-        classToImageKey.put(ReceivingRequestGroup.class.getName(), BgcPlugin.IMG_REQUEST_SHIPPED);
-        classToImageKey.put(RequestAdapter.class.getName(), BgcPlugin.IMG_REQUEST);
-        classToImageKey.put(SpecimenAdapter.class.getName(), BgcPlugin.IMG_SPECIMEN);
-        classToImageKey.put(ProcessingEventAdapter.class.getName(), BgcPlugin.IMG_PROCESSING_EVENT);
-        classToImageKey.put(ProcessingEventGroup.class.getName(), BgcPlugin.IMG_PROCESSING);
-        classToImageKey.put(ResearchGroupAdapter.class.getName(), BgcPlugin.IMG_RESEARCH_GROUP);
+            BgcPlugin.Image.DISPATCH_SHIPMENT_ERROR);
+        classToImageKey.put(DispatchAdapter.class.getName(), BgcPlugin.Image.DISPATCH_SHIPMENT);
+        classToImageKey.put(DispatchCenterAdapter.class.getName(), BgcPlugin.Image.SITE);
+        classToImageKey.put(ReceivingRequestGroup.class.getName(), BgcPlugin.Image.REQUEST_SHIPPED);
+        classToImageKey.put(RequestAdapter.class.getName(), BgcPlugin.Image.REQUEST);
+        classToImageKey.put(SpecimenAdapter.class.getName(), BgcPlugin.Image.SPECIMEN);
+        classToImageKey.put(ProcessingEventAdapter.class.getName(), BgcPlugin.Image.PROCESSING_EVENT);
+        classToImageKey.put(ProcessingEventGroup.class.getName(), BgcPlugin.Image.PROCESSING);
+        classToImageKey.put(ResearchGroupAdapter.class.getName(), BgcPlugin.Image.RESEARCH_GROUP);
         classToImageKey
-            .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.IMG_RESEARCH_GROUPS);
+            .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.Image.RESEARCH_GROUPS);
     };
 
-    private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] { BgcPlugin.IMG_BIN,
-        BgcPlugin.IMG_BOX, BgcPlugin.IMG_CABINET, BgcPlugin.IMG_DRAWER, BgcPlugin.IMG_FREEZER,
-        BgcPlugin.IMG_HOTEL, BgcPlugin.IMG_PALLET, };
+    private static final BgcPlugin.Image[] CONTAINER_TYPE_IMAGES = new BgcPlugin.Image[] {
+        BgcPlugin.Image.BIN,
+        BgcPlugin.Image.CABINET,
+        BgcPlugin.Image.DRAWER,
+        BgcPlugin.Image.FREEZER,
+        BgcPlugin.Image.HOTEL,
+        BgcPlugin.Image.PALLET, };
 
     public static final String BARCODES_FILE = BiobankPlugin.class.getPackage().getName()
         + ".barcode"; //$NON-NLS-1$
@@ -277,7 +280,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     }
 
     public Image getImage(Object object) {
-        String imageKey = null;
+        BgcPlugin.Image imageKey = null;
         if (object == null) return null;
         if (object instanceof AbstractAdapterBase) {
             Class<?> objectClass = object.getClass();
@@ -299,15 +302,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
                 return getIconForTypeName(ctName);
             }
         } else {
-            if (object instanceof String) {
-                imageKey = (String) object;
+            if (object instanceof BgcPlugin.Image) {
+                imageKey = (BgcPlugin.Image) object;
             }
         }
-        return BgcPlugin.getDefault().getImageRegistry().get(imageKey);
-    }
-
-    public static ImageDescriptor getImageDescriptor(String key) {
-        return BgcPlugin.getDefault().getImageRegistry().getDescriptor(key);
+        return BgcPlugin.getDefault().getImage(imageKey);
     }
 
     private Image getIconForTypeName(String typeName) {
@@ -315,21 +314,21 @@ public class BiobankPlugin extends AbstractUIPlugin {
             return null;
         }
         if (classToImageKey.containsKey(typeName)) {
-            return BgcPlugin.getDefault().getImageRegistry().get(classToImageKey.get(typeName));
+            return BgcPlugin.getDefault().getImage(classToImageKey.get(typeName));
         }
 
-        String imageKey = null;
-        for (String name : CONTAINER_TYPE_IMAGE_KEYS) {
-            if (typeName.toLowerCase().contains(name)) {
-                imageKey = name;
+        BgcPlugin.Image result = null;
+        for (BgcPlugin.Image image : CONTAINER_TYPE_IMAGES) {
+            if (image.getFilename().contains(typeName.toLowerCase())) {
+                result = image;
                 break;
             }
         }
 
-        if (imageKey == null) imageKey = BgcPlugin.IMG_FREEZER;
+        if (result == null) result = BgcPlugin.Image.FREEZER;
 
-        classToImageKey.put(typeName, imageKey);
-        return BgcPlugin.getDefault().getImageRegistry().get(imageKey);
+        classToImageKey.put(typeName, result);
+        return BgcPlugin.getDefault().getImage(result);
     }
 
     /**

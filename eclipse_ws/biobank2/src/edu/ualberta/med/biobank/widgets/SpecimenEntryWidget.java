@@ -117,8 +117,7 @@ public class SpecimenEntryWidget extends BgcBaseWidget {
                 });
             addButton =
                 toolkit.createButton(this, StringUtil.EMPTY_STRING, SWT.PUSH);
-            addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_ADD));
+            addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

@@ -255,8 +255,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
     /**
      * This method is used to load object model data in the background thread.
      * 
-     * @param item the model object representing the base object to get
-     *            information from.
+     * @param item the model object representing the base object to get information from.
      * @return an non-object model object with the tree data.
      * 
      * @throws Exception
@@ -404,8 +403,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_FIRST));
         firstButton.setToolTipText(FIRST_PAGE);
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -415,8 +413,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_PREV));
         prevButton
             .setToolTipText(PREV_PAGE);
         prevButton.addSelectionListener(new SelectionAdapter() {
@@ -429,8 +426,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_NEXT));
         nextButton.setToolTipText(NEXT_PAGE);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -440,8 +436,7 @@ public abstract class AbstractInfoTreeWidget<T> extends BgcBaseWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_LAST));
         lastButton.setToolTipText(LAST_PAGE);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

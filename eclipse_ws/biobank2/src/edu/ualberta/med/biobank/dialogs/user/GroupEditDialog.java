@@ -132,8 +132,7 @@ public class GroupEditDialog extends AbstractSecurityEditDialog {
                 addMembership();
             }
         });
-        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.RIGHT;
         addButton.setLayoutData(gd);

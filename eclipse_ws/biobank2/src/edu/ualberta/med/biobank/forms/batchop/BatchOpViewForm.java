@@ -62,7 +62,7 @@ public abstract class BatchOpViewForm extends BiobankViewForm {
 
     @Override
     protected Image getFormImage() {
-        return BgcPlugin.getDefault().getImageRegistry().get(BgcPlugin.IMG_DATABASE_GO);
+        return BgcPlugin.getDefault().getImage(BgcPlugin.Image.DATABASE_GO);
     }
 
     @SuppressWarnings("nls")

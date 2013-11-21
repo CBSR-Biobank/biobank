@@ -187,7 +187,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         final MsgStatusItem superAdminMsgStatusItem = new MsgStatusItem(
             SUPER_ADMIN_MSG_ID);
         superAdminMsgStatusItem.setIcon(BiobankPlugin.getDefault().getImage(
-            BgcPlugin.IMG_ADMIN));
+            BgcPlugin.Image.ADMIN));
         superAdminMsgStatusItem.setText(
             // menu item text.
             i18n.tr("Super Administrator Mode"));

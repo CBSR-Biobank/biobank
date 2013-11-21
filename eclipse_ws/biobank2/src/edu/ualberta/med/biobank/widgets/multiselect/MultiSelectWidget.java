@@ -60,8 +60,8 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
     private Transfer dndTransfer;
 
     /**
-     * Default will drag and drop for ModelWrapper. Should use the other
-     * constructor if want to use another one
+     * Default will drag and drop for ModelWrapper. Should use the other constructor if want to use
+     * another one
      */
     public MultiSelectWidget(Composite parent, int style, String leftLabel,
         String rightLabel, int minHeight) {
@@ -89,12 +89,10 @@ public abstract class MultiSelectWidget<T> extends BgcBaseWidget {
         moveComposite.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
             false, true));
         moveRightButton = new Button(moveComposite, SWT.PUSH);
-        moveRightButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ARROW_RIGHT));
+        moveRightButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ARROW_RIGHT));
         moveRightButton.setToolTipText(i18n.tr("Move to selected"));
         moveLeftButton = new Button(moveComposite, SWT.PUSH);
-        moveLeftButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ARROW_LEFT));
+        moveLeftButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ARROW_LEFT));
         moveLeftButton
             .setToolTipText(i18n.tr("Remove from selected"));
 

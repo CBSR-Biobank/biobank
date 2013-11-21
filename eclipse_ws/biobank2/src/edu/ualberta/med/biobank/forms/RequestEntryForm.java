@@ -177,8 +177,7 @@ public class RequestEntryForm extends BiobankViewForm {
         addButton =
             toolkit.createButton(dispatchCreation, StringUtil.EMPTY_STRING,
                 SWT.PUSH);
-        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        addButton.setImage(BiobankPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -209,8 +208,7 @@ public class RequestEntryForm extends BiobankViewForm {
         openScanButton =
             toolkit.createButton(dispatchCreation, StringUtil.EMPTY_STRING,
                 SWT.PUSH);
-        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+        openScanButton.setImage(BiobankPlugin.getDefault().getImage(BgcPlugin.Image.DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -295,8 +293,7 @@ public class RequestEntryForm extends BiobankViewForm {
         Button addButton =
             toolkit.createButton(addComposite, StringUtil.EMPTY_STRING,
                 SWT.PUSH);
-        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

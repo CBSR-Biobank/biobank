@@ -19,7 +19,7 @@ public class WidgetCreator extends BgcWidgetCreator {
     }
 
     public void addSectionToolbar(Section section, String tooltip,
-        SelectionListener listener, String imageKey) {
+        SelectionListener listener, BgcPlugin.Image image) {
         ToolBar tbar = (ToolBar) section.getTextClient();
         if (tbar == null) {
             tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
@@ -27,11 +27,10 @@ public class WidgetCreator extends BgcWidgetCreator {
         }
 
         ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        if (imageKey == null) {
-            imageKey = BgcPlugin.IMG_ADD;
+        if (image == null) {
+            image = BgcPlugin.Image.ADD;
         }
-        titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(imageKey));
+        titem.setImage(BgcPlugin.getDefault().getImage(image));
         titem.setToolTipText(tooltip);
         titem.addSelectionListener(listener);
     }

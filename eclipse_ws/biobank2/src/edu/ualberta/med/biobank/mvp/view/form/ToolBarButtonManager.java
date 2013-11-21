@@ -8,7 +8,6 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,23 +26,23 @@ public class ToolBarButtonManager {
     @SuppressWarnings("nls")
     public enum ButtonType {
         // TODO: internationalize text
-        EDIT("Edit", BgcPlugin.IMG_EDIT_FORM),
-        PRINT("Print", BgcPlugin.IMG_PRINTER),
-        RELOAD("Reload", BgcPlugin.IMG_RESET_FORM),
-        CLOSE("Close", BgcPlugin.IMG_CANCEL_FORM),
-        SAVE("Save", BgcPlugin.IMG_CONFIRM_FORM);
+        EDIT("Edit", BgcPlugin.Image.EDIT_FORM),
+        PRINT("Print", BgcPlugin.Image.PRINTER),
+        RELOAD("Reload", BgcPlugin.Image.RESET_FORM),
+        CLOSE("Close", BgcPlugin.Image.CANCEL_FORM),
+        SAVE("Save", BgcPlugin.Image.CONFIRM_FORM);
 
         private final String label;
         private final ImageDescriptor image;
 
-        private ButtonType(String label, String imageKey) {
+        private ButtonType(String label, BgcPlugin.Image image) {
             this.label = label;
-            this.image = getImageDescriptor(imageKey);
+            this.image = getImage(image);
         }
 
-        private ImageDescriptor getImageDescriptor(String imageKey) {
-            ImageRegistry reg = BgcPlugin.getDefault().getImageRegistry();
-            return ImageDescriptor.createFromImage(reg.get(imageKey));
+        private ImageDescriptor getImage(BgcPlugin.Image image) {
+            org.eclipse.swt.graphics.Image img = BgcPlugin.getDefault().getImage(image);
+            return ImageDescriptor.createFromImage(img);
         }
     }
 
@@ -54,8 +53,7 @@ public class ToolBarButtonManager {
     }
 
     /**
-     * Returns an {@link HasButton} based on the given {@link ButtonType},
-     * creating it if necessary.
+     * Returns an {@link HasButton} based on the given {@link ButtonType}, creating it if necessary.
      * 
      * @param buttonType
      * @return

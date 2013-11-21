@@ -72,8 +72,7 @@ public class PaginationWidget extends BgcBaseWidget {
         setLayout(new GridLayout(5, false));
 
         firstButton = new Button(this, SWT.NONE);
-        firstButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_FIRST));
         firstButton
             .setToolTipText(FIRST_PAGE_BUTTON_TOOLTIP);
         firstButton.addSelectionListener(new SelectionAdapter() {
@@ -84,8 +83,7 @@ public class PaginationWidget extends BgcBaseWidget {
         });
 
         prevButton = new Button(this, SWT.NONE);
-        prevButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_PREV));
         prevButton
             .setToolTipText(PREVIOUS_PAGE_BUTTON_TOOLTIP);
         prevButton.addSelectionListener(new SelectionAdapter() {
@@ -98,8 +96,7 @@ public class PaginationWidget extends BgcBaseWidget {
         pageLabel = new Label(this, SWT.NONE);
 
         nextButton = new Button(this, SWT.NONE);
-        nextButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_NEXT));
         nextButton.setToolTipText(NEXT_PAGE_BUTTON_TOOLTIP);
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -109,8 +106,7 @@ public class PaginationWidget extends BgcBaseWidget {
         });
 
         lastButton = new Button(this, SWT.NONE);
-        lastButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.RESULTSET_LAST));
         lastButton.setToolTipText(LAST_PAGE_BUTTON_TOOLTIP);
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

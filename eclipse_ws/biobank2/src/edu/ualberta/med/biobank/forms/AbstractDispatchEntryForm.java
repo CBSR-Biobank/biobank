@@ -45,18 +45,18 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
 
     @SuppressWarnings("unused")
     private static BgcLogger logger = BgcLogger
-    .getLogger(AbstractDispatchEntryForm.class.getName());
+        .getLogger(AbstractDispatchEntryForm.class.getName());
 
     protected DispatchWrapper dispatch = new DispatchWrapper(SessionManager.getAppService());
 
     protected BgcEntryFormWidgetListener biobankListener =
         new BgcEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            reloadSpecimens();
-            setDirty(true);
-        }
-    };
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                reloadSpecimens();
+                setDirty(true);
+            }
+        };
 
     protected boolean tryAgain;
 
@@ -86,7 +86,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
                 SessionManager.getAppService().doAction(
                     new DispatchGetInfoAction(adapter.getId()));
             read.dispatch
-            .setDispatchSpecimens(read.dispatchSpecimens);
+                .setDispatchSpecimens(read.dispatchSpecimens);
             dispatch.setWrappedObject(read.dispatch);
             SessionManager.logLookup(read.dispatch);
         }
@@ -96,8 +96,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
     protected abstract String getTextForPartName();
 
     /**
-     * Create a field to enter inventory id one by one + a button to open a scan
-     * dialog
+     * Create a field to enter inventory id one by one + a button to open a scan dialog
      */
     @SuppressWarnings("nls")
     protected void createSpecimensSelectionActions(Composite composite,
@@ -126,8 +125,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Button addButton =
             toolkit.createButton(addComposite, StringUtil.EMPTY_STRING,
                 SWT.PUSH);
-        addButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        addButton.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -141,8 +139,8 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             i18n.tr("or open scan dialog:"));
         Button openScanButton = toolkit
             .createButton(addComposite, StringUtil.EMPTY_STRING, SWT.PUSH);
-        openScanButton.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_DISPATCH_SHIPMENT_ADD_SPECIMEN));
+        openScanButton.setImage(BgcPlugin.getDefault().getImage(
+            BgcPlugin.Image.DISPATCH_SHIPMENT_ADD_SPECIMEN));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -169,8 +167,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
         Button addButtonMicroplate =
             toolkit.createButton(addComposite, StringUtil.EMPTY_STRING,
                 SWT.PUSH);
-        addButtonMicroplate.setImage(BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_ADD));
+        addButtonMicroplate.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
         addButtonMicroplate.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -190,6 +187,7 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
      * add specimen represented by the inventoryid entered in the text field
      */
     protected abstract void doSpecimenTextAction(String text);
+
     /**
      * add specimens in microplate represented by the microplateid entered in the text field
      */
@@ -232,12 +230,12 @@ public abstract class AbstractDispatchEntryForm extends BiobankEntryForm {
             dispatch.getId(), dispatch.getReceiverCenter().getWrappedObject(),
             dispatch.getSenderCenter().getWrappedObject(), dispatch.getState(),
             (comment.getMessage() == null)
-            ? StringUtil.EMPTY_STRING : comment.getMessage());
+                ? StringUtil.EMPTY_STRING : comment.getMessage());
 
         ShipmentInfoSaveInfo ship = null;
         if (!dispatch.isNew() && dispatch.getShipmentInfo() != null)
             ship =
-            DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
+                DispatchSaveAction.prepareShipInfo(dispatch.getShipmentInfo());
         DispatchSaveAction save = new DispatchSaveAction(dInfo, dsInfos, ship);
         dispatch.setId(SessionManager.getAppService().doAction(save).getId());
         ((AdapterBase) adapter).setModelObject(dispatch);

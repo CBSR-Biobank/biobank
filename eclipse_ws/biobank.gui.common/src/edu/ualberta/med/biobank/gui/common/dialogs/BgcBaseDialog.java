@@ -76,8 +76,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
     }
 
     protected Image getTitleAreaImage() {
-        return BgcPlugin.getDefault().getImageRegistry()
-            .get(BgcPlugin.IMG_DIALOGS);
+        return BgcPlugin.getDefault().getImage(BgcPlugin.Image.DIALOGS);
     }
 
     protected int getTitleAreaMessageType() {
@@ -291,8 +290,7 @@ public abstract class BgcBaseDialog extends TitleAreaDialog {
 
         if (addListener != null) {
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
-            titem.setImage(BgcPlugin.getDefault().getImageRegistry()
-                .get(BgcPlugin.IMG_ADD));
+            titem.setImage(BgcPlugin.getDefault().getImage(BgcPlugin.Image.ADD));
             titem.setToolTipText(addTooltip);
             titem.addSelectionListener(addListener);
         }
