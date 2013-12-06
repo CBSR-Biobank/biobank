@@ -26,11 +26,12 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
 
     private final ShipmentProcessInfo data;
 
-    public ShipmentReceiveProcessAction(ShipmentProcessInfo data,
+    public ShipmentReceiveProcessAction(
+        ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
         Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode, Locale locale) {
-        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        Locale locale) {
+        super(currentWorkingCenterId, cells, locale);
         this.data = data;
     }
 
@@ -46,8 +47,7 @@ public class ShipmentReceiveProcessAction extends ServerProcessAction {
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
+    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells, receiveProcess(session, cells));

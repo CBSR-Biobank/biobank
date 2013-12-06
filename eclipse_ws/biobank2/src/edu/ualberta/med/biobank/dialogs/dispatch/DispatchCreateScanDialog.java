@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,7 +40,6 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
@@ -49,10 +47,10 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     private static Logger log = LoggerFactory.getLogger(DispatchCreateScanDialog.class.getName());
 
     @SuppressWarnings("nls")
-    private static final String TITLE_AREA_MESSAGE =
-        i18n.tr("Scan specimens to dispatch. If a pallet with previous" +
-            " position is scan, the specimens scanned\nwill be compared" +
-            " to those that are supposed to be in the pallet.");
+    private static final String TITLE_AREA_MESSAGE = i18n.tr(
+        "Scan specimens to dispatch. If a pallet with a "
+            + " position is scanned, the specimens scanned\n"
+            + "will be compared to those that are supposed to be in the pallet.");
 
     private BgcBaseText palletproductBarcodeText;
     private NonEmptyStringValidator productBarcodeValidator;
@@ -60,11 +58,12 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     private boolean isPalletWithPosition;
     private boolean specimensAdded = false;
     private ContainerWrapper currentPallet;
-    private final List<ContainerWrapper> removedPallets =
-        new ArrayList<ContainerWrapper>();
+    private final List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
-    public DispatchCreateScanDialog(Shell parentShell,
-        DispatchWrapper currentShipment, CenterWrapper<?> site) {
+    public DispatchCreateScanDialog(
+        Shell parentShell,
+        DispatchWrapper currentShipment,
+        CenterWrapper<?> site) {
         super(parentShell, currentShipment, site);
     }
 
@@ -84,35 +83,31 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         // only sites have containers
         if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
-            palletWithoutPositionRadio
-                .setText(i18n.tr("Pallet without previous position"));
-            final Button palletWithPositionRadio =
-                new Button(parent, SWT.RADIO);
-            palletWithPositionRadio
-                .setText(i18n.tr("Pallet with previous position"));
+            palletWithoutPositionRadio.setText(i18n.tr("Pallet without previous position"));
+            final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);
+            palletWithPositionRadio.setText(i18n.tr("Pallet with previous position"));
 
-            palletWithPositionRadio
-                .addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        isPalletWithPosition = palletWithPositionRadio
-                            .getSelection();
-                        showProductBarcodeField(palletWithPositionRadio
-                            .getSelection());
-                    }
-                });
+            palletWithPositionRadio.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    isPalletWithPosition = palletWithPositionRadio.getSelection();
+                    showProductBarcodeField(palletWithPositionRadio.getSelection());
+                }
+            });
 
-            productBarcodeValidator = new NonEmptyStringValidator(
-                i18n.tr("Enter product barcode"));
-            Label palletproductBarcodeLabel = widgetCreator.createLabel(parent,
-                i18n.tr("Pallet product barcode"));
-            palletproductBarcodeText =
-                (BgcBaseText) createBoundWidget(parent,
-                    BgcBaseText.class, SWT.NONE, palletproductBarcodeLabel,
-                    new String[0], this,
-                    "currentProductBarcode", productBarcodeValidator);
-            palletproductBarcodeText
-                .addKeyListener(new EnterKeyToNextFieldListener());
+            productBarcodeValidator = new NonEmptyStringValidator(i18n.tr("Enter product barcode"));
+            Label palletproductBarcodeLabel = widgetCreator.createLabel(
+                parent, i18n.tr("Pallet product barcode"));
+            palletproductBarcodeText = (BgcBaseText) createBoundWidget(
+                parent,
+                BgcBaseText.class,
+                SWT.NONE,
+                palletproductBarcodeLabel,
+                new String[0],
+                this,
+                "currentProductBarcode",
+                productBarcodeValidator);
+            palletproductBarcodeText.addKeyListener(new EnterKeyToNextFieldListener());
             showProductBarcodeField(false);
             palletWithoutPositionRadio.setSelection(true);
         }
@@ -125,8 +120,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         if (show) {
             palletproductBarcodeText.setText(StringUtil.EMPTY_STRING);
         } else {
-            palletproductBarcodeText
-                .setText(i18n.tr("No previous position"));
+            palletproductBarcodeText.setText(i18n.tr("No previous position"));
         }
     }
 
@@ -135,9 +129,9 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
      */
     @Override
     protected boolean fieldsValid() {
-        return (productBarcodeValidator == null)
-            || productBarcodeValidator.validate(palletproductBarcodeText.getText()).equals(
-                Status.OK_STATUS);
+        return ((productBarcodeValidator == null)
+        || productBarcodeValidator.validate(
+            palletproductBarcodeText.getText()).equals(Status.OK_STATUS));
     }
 
     /**
@@ -152,16 +146,13 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         currentPallet = null;
         if (isPalletWithPosition) {
             if (center instanceof SiteWrapper)
-                currentPallet = ContainerWrapper
-                    .getContainerWithProductBarcodeInSite(
-                        SessionManager.getAppService(), (SiteWrapper) center,
-                        currentProductBarcode);
+                currentPallet = ContainerWrapper.getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(), (SiteWrapper) center, currentProductBarcode);
             if (currentPallet == null) {
-                BgcPlugin
-                    .openAsyncError(
-                        i18n.tr("Pallet error"),
-                        i18n.tr("Can''t find pallet with barcode \"{0}\".",
-                            currentProductBarcode));
+                BgcPlugin.openAsyncError(
+                    i18n.tr("Pallet error"),
+                    i18n.tr("Can''t find pallet with barcode \"{0}\".",
+                        currentProductBarcode));
                 return false;
             }
         }
@@ -170,26 +161,27 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
 
     @SuppressWarnings("nls")
     @Override
-    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        CellInfo cell, Locale locale) {
+    protected Action<ProcessResult> getCellProcessAction(
+        Integer centerId,
+        CellInfo cell,
+        Locale locale) {
         log.debug("getCellProcessAction");
-        return new DispatchCreateProcessAction(getProcessData(), centerId,
-            cell, locale);
+        return new DispatchCreateProcessAction(getProcessData(), centerId, cell, locale);
     }
 
     @SuppressWarnings("nls")
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
         Locale locale) {
         log.debug("getPalletProcessAction");
-        return new DispatchCreateProcessAction(getProcessData(), centerId,
-            cells, isRescanMode, locale);
+        return new DispatchCreateProcessAction(getProcessData(), centerId, cells, locale);
     }
 
     protected ShipmentProcessInfo getProcessData() {
-        return new ShipmentProcessInfo(currentPallet == null ? null
-            : currentPallet.getWrappedObject(),
+        return new ShipmentProcessInfo(
+            (currentPallet == null) ? null : currentPallet.getWrappedObject(),
             currentShipment, false);
     }
 
@@ -239,48 +231,6 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     @Override
     protected List<UICellStatus> getPalletCellStatus() {
         return UICellStatus.DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST;
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
-        log.debug("getFakeDecodedWells");
-        ContainerWrapper currentPallet = null;
-        if (isPalletWithPosition)
-            currentPallet = ContainerWrapper.getContainerWithProductBarcodeInSite(
-                SessionManager.getAppService(), (SiteWrapper) currentSite,
-                currentProductBarcode);
-        Map<RowColPos, PalletWell> map = new HashMap<RowColPos, PalletWell>();
-        if (currentPallet == null) {
-            Map<RowColPos, PalletWell> wells = PalletWell.getRandomNonDispatchedSpecimens(
-                SessionManager.getAppService(),
-                currentShipment.getSenderCenter().getId());
-
-            // HACK!
-            // mangle some barcodes to pretend there is an error
-            //
-            // used for testing - comment out for now
-            //
-            // int count = 0;
-            // for (PalletWell well : wells.values()) {
-            // if (count == 0) {
-            // String message = well.getValue();
-            // well.setValue(message.substring(1, message.length() - 1));
-            // }
-            // ++count;
-            // }
-
-            return wells;
-        }
-        for (SpecimenWrapper specimen : currentPallet.getSpecimens().values()) {
-            RowColPos pos = specimen.getPosition();
-            PalletWell cell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
-                specimen.getPosition().getRow(), specimen.getPosition()
-                    .getCol(),
-                specimen.getInventoryId()));
-            map.put(specimen.getPosition(), cell);
-        }
-        return map;
     }
 
     public List<ContainerWrapper> getRemovedPallets() {

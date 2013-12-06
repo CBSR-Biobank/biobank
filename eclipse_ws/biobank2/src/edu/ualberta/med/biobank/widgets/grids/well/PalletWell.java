@@ -243,15 +243,17 @@ public class PalletWell extends AbstractUIWell {
     public void merge(WritableApplicationService appService, CellInfo cell)
         throws Exception {
         setStatus(cell.getStatus());
-        if (cell.getInformation() != null)
+        if (cell.getInformation() != null) {
             setInformation(cell.getInformation().toString());
+        } else {
+            setInformation(StringUtil.EMPTY_STRING);
+        }
         decodedWell = new DecodedWell(decodedWell.getLabel(), cell.getValue());
         setTitle(cell.getTitle().toString());
         SpecimenWrapper expectedSpecimen = null;
         if (cell.getExpectedSpecimenId() != null) {
             expectedSpecimen = new SpecimenWrapper(appService);
-            expectedSpecimen.getWrappedObject().setId(
-                cell.getExpectedSpecimenId());
+            expectedSpecimen.getWrappedObject().setId(cell.getExpectedSpecimenId());
             expectedSpecimen.reload();
         }
         setExpectedSpecimen(expectedSpecimen);
@@ -260,9 +262,8 @@ public class PalletWell extends AbstractUIWell {
             specimen = new SpecimenWrapper(appService);
 
             try {
-                specimen.setWrappedObject(SessionManager.getAppService()
-                    .doAction(new SpecimenGetInfoAction(cell.getSpecimenId()))
-                    .getSpecimen());
+                specimen.setWrappedObject(SessionManager.getAppService().doAction(
+                    new SpecimenGetInfoAction(cell.getSpecimenId())).getSpecimen());
             } catch (AccessDeniedException e) {
                 throw new Exception(e.getLocalizedMessage() + " for specimen with Id "
                     + cell.getValue());

@@ -14,14 +14,16 @@ import edu.ualberta.med.biobank.model.type.DispatchState;
 public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
     private static final long serialVersionUID = 1L;
 
-    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(
-        "yyyy-MM-dd HH:mm"); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
+    @SuppressWarnings("nls")
     @Override
     public Log getLog(Dispatch dispatch) {
         Log log = new Log();
 
         DispatchState dispatchState = dispatch.getState();
+        StringBuilder sb;
 
         if (dispatchState != null) {
             if (dispatchState.equals(DispatchState.CREATION)
@@ -35,8 +37,10 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
         List<String> detailsList = new ArrayList<String>();
 
         if (dispatchState != null) {
-            detailsList.add(new StringBuilder("state: ").append( //$NON-NLS-1$
-                dispatchState.getLabel()).toString());
+            sb = new StringBuilder();
+            sb.append("state: ");
+            sb.append(dispatchState.getLabel());
+            detailsList.add(sb.toString());
 
             if (dispatchState.equals(DispatchState.CREATION)
                 || dispatchState.equals(DispatchState.IN_TRANSIT)
@@ -44,10 +48,10 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
 
                 ShipmentInfo shipmentInfo = dispatch.getShipmentInfo();
                 if (shipmentInfo != null && shipmentInfo.getPackedAt() != null) {
-                    String packedAt = DATE_FORMATTER.format(shipmentInfo
-                        .getPackedAt());
-                    detailsList.add(new StringBuilder("packed at: ").append( //$NON-NLS-1$
-                        packedAt).toString());
+                    sb = new StringBuilder();
+                    sb.append("packed at: ");
+                    sb.append(DATE_FORMATTER.format(shipmentInfo.getPackedAt()));
+                    detailsList.add(sb.toString());
                 }
             }
         }
@@ -56,18 +60,21 @@ public class DispatchLogProvider implements WrapperLogProvider<Dispatch> {
         if (shipmentInfo != null) {
             Date receivedAt = shipmentInfo.getReceivedAt();
             if (receivedAt != null) {
-                String receivedAtString = DATE_FORMATTER.format(receivedAt);
-                detailsList.add(new StringBuilder("received at: ").append( //$NON-NLS-1$
-                    receivedAtString).toString());
+                sb = new StringBuilder();
+                sb.append("received at: ");
+                sb.append(DATE_FORMATTER.format(receivedAt));
+                detailsList.add(sb.toString());
             }
 
             String waybill = shipmentInfo.getWaybill();
             if (waybill != null) {
-                detailsList.add(new StringBuilder(", waybill: ") //$NON-NLS-1$
-                    .append(waybill).toString());
+                sb = new StringBuilder();
+                sb.append("waybill: ");
+                sb.append(waybill);
+                detailsList.add(sb.toString());
             }
         }
-        log.setDetails(StringUtil.join(detailsList, ", ")); //$NON-NLS-1$
+        log.setDetails(StringUtil.join(detailsList, ", "));
 
         return log;
     }

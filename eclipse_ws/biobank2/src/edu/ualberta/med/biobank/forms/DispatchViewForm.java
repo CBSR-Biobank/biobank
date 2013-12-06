@@ -374,10 +374,10 @@ public class DispatchViewForm extends BiobankViewForm {
 
     @SuppressWarnings("nls")
     public void dispatchSend() {
-        if (new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open()
-            == Dialog.OK) {
-            IRunnableContext context = new ProgressMonitorDialog(Display.getDefault()
-                .getActiveShell());
+        int result = new SendDispatchDialog(Display.getDefault().getActiveShell(), dispatch).open();
+        if (result == Dialog.OK) {
+            IRunnableContext context =
+                new ProgressMonitorDialog(Display.getDefault().getActiveShell());
             try {
                 context.run(true, true, new IRunnableWithProgress() {
                     @Override

@@ -80,6 +80,8 @@ public enum UICellStatus {
     public UICellStatus mergeWith(UICellStatus newStatus) {
         if (this == EMPTY || this == MISSING)
             return newStatus;
+        if (this == ERROR || newStatus == NEW)
+            return NEW;
         if (this == ERROR || newStatus == ERROR)
             return ERROR;
         if (this == FILLED || this == MOVED) {

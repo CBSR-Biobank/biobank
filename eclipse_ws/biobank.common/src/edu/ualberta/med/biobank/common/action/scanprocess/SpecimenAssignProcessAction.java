@@ -28,9 +28,12 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     private final AssignProcessInfo data;
 
     // multiple cells assign process
-    public SpecimenAssignProcessAction(AssignProcessInfo data, Integer currentWorkingCenterId,
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
-        super(currentWorkingCenterId, cells, isRescanMode, locale);
+    public SpecimenAssignProcessAction(
+        AssignProcessInfo data,
+        Integer currentWorkingCenterId,
+        Map<RowColPos, CellInfo> cells,
+        Locale locale) {
+        super(currentWorkingCenterId, cells, locale);
         this.data = data;
     }
 
@@ -42,15 +45,17 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode) throws ActionException {
+    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells)
+        throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
-        res.setResult(cells, internalProcessScanResult(session, cells, isRescanMode));
+        res.setResult(cells, internalProcessScanResult(session, cells));
         return res;
     }
 
-    protected CellInfoStatus internalProcessScanResult(Session session,
-        Map<RowColPos, CellInfo> cells, boolean rescanMode) throws ActionException {
+    protected CellInfoStatus internalProcessScanResult(
+        Session session,
+        Map<RowColPos, CellInfo> cells)
+        throws ActionException {
         AssignProcessInfo assignData = data;
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         Map<RowColPos, Boolean> movedAndMissingSpecimensFromPallet =
@@ -59,7 +64,7 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
             for (int col = 0; col < assignData.getPalletColCapacity(actionContext); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 CellInfo cell = cells.get(rcp);
-                if (!rescanMode || cell == null || cell.getStatus() == null
+                if (cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellInfoStatus.EMPTY
                     || cell.getStatus() == CellInfoStatus.ERROR
                     || cell.getStatus() == CellInfoStatus.MISSING) {

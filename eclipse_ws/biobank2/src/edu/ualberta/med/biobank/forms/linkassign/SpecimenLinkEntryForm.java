@@ -124,7 +124,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         super.init();
         // TR: title
         setPartName(i18n.tr("Linking specimens"));
-        setCanLaunchScan(true);
+        setCanLaunchScan(false);
     }
 
     @SuppressWarnings("nls")
@@ -198,6 +198,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         linkFormPatientManagement.setCEventComboCallback(new CEventComboCallback() {
             @Override
             public void selectionChanged() {
+                setCanLaunchScan(true);
                 setTypeCombos();
             }
         });
@@ -679,11 +680,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     @Override
-    protected Action<ProcessResult> getPalletProcessAction(Integer centerId,
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
+        Locale locale) {
         log.debug("getPalletProcessAction");
         return new SpecimenLinkProcessAction(centerId, linkFormPatientManagement
-            .getCurrentPatient().getStudy().getId(), cells, isRescanMode, locale);
+            .getCurrentPatient().getStudy().getId(), cells, locale);
     }
 
     @Override
@@ -718,7 +721,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 specimenTypesWidget.setFocus();
                 // Show result in grid
                 palletWidget.setCells(getCells());
-                setRescanMode();
             }
         });
     }
@@ -733,8 +735,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
             typesRowsCount = 0;
-            specimenTypesWidget.resetValues(rcp.getRow(), !isRescanMode(), true, true);
+            specimenTypesWidget.resetValues(rcp.getRow(), true, true, true);
         }
+
         SpecimenHierarchyInfo selection = preSelections.get(cell.getRow());
         if (selection != null) setHierarchyToCell(cell, selection);
         if (PalletWell.hasValue(cell)) {
@@ -782,7 +785,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
         super.postprocessScanTubeAlone(palletCells);
-        widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
     }
 

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -11,7 +10,6 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
@@ -61,22 +58,18 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     private static final String TITLE = i18n.tr("Scanning specimens");
 
     @SuppressWarnings("nls")
-    private static final String SCAN_BUTTON_RETRY = i18n.tr("Retry scan");
-
-    @SuppressWarnings("nls")
-    private static final String SCAN_BUTTON_LAUNCH = i18n.tr("Launch Scan");
-
-    @SuppressWarnings("nls")
-    private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
-
-    @SuppressWarnings("nls")
-    private static final String MONITOR_PROCESSING = i18n.tr("Processing position {0}");
+    // TR: button label
+    private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
     private PalletScanManagement palletScanManagement;
+
     protected ScanPalletWidget spw;
+
     protected T currentShipment;
+
     private final IObservableValue scanHasBeenLaunchedValue =
         new WritableValue(Boolean.FALSE, Boolean.class);
+
     private final IObservableValue hasValues = new WritableValue(Boolean.FALSE, Boolean.class);
 
     /** should only be assigned by using {@link setScanOkValue} */
@@ -86,7 +79,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     private final IObservableValue scanStatusObservable = new WritableValue(Boolean.TRUE, Boolean.class);
 
     private Button scanButton;
-    private boolean rescanMode = false;
 
     protected CenterWrapper<?> currentSite;
 
@@ -101,17 +93,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
         palletScanManagement = new PalletScanManagement() {
 
             @Override
-            protected void processScanResult(IProgressMonitor monitor)
-                throws Exception {
-                AbstractScanDialog.this.processScanResult(monitor,
-                    AbstractScanDialog.this.currentSite);
+            protected void processScanResult() throws Exception {
+                AbstractScanDialog.this.processScanResult(AbstractScanDialog.this.currentSite);
                 setHasValues();
-            }
-
-            @Override
-            protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
-                throws Exception {
-                return AbstractScanDialog.this.getFakeDecodedWells(plateToScan);
             }
 
             @Override
@@ -150,29 +134,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     }
 
     @SuppressWarnings("nls")
-    protected void setRescanMode(boolean isOn) {
-        log.debug("setRescanMode: isOn: {}", isOn);
-        if (isOn) {
-            scanButton.setText(SCAN_BUTTON_RETRY);
-        } else {
-            String scanButtonText = SCAN_BUTTON_LAUNCH;
-            if (!BiobankPlugin.isRealScanEnabled()) {
-                scanButtonText = SCAN_BUTTON_FAKE;
-            }
-            scanButton.setText(scanButtonText);
-        }
-        rescanMode = isOn;
-    }
-
-    protected boolean isRescanMode() {
-        return rescanMode;
-    }
-
-    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
-        throws Exception;
-
-    @SuppressWarnings("nls")
-    protected void processScanResult(IProgressMonitor monitor, CenterWrapper<?> currentCenter)
+    protected void processScanResult(CenterWrapper<?> currentCenter)
         throws Exception {
         log.debug("processScanResult: start");
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
@@ -192,18 +154,16 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
                 getPalletProcessAction(
                     SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     serverCells,
-                    isRescanMode(),
                     Locale.getDefault()));
 
             if (cells != null) {
                 // for each cell, convert into a client side cell
                 for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
                     RowColPos pos = entry.getKey();
-                    monitor.subTask(MessageFormat.format(MONITOR_PROCESSING,
-                        SbsLabeling.fromRowCol(pos)));
                     PalletWell palletWell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
-                    if (palletWell == null) { // can happened if missing
+                    if (palletWell == null) {
+                        // can happen if missing
                         palletWell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
                             servercell.getRow(), servercell.getCol(), servercell.getValue()));
                         cells.put(pos, palletWell);
@@ -239,12 +199,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
 
         createCustomDialogPreContents(contents);
 
-        String scanButtonText = SCAN_BUTTON_LAUNCH;
-        if (!BiobankPlugin.isRealScanEnabled()) {
-            scanButtonText = SCAN_BUTTON_FAKE;
-        }
         scanButton = new Button(contents, SWT.PUSH);
-        scanButton.setText(scanButtonText);
+        scanButton.setText(FLATBED_SCAN_BUTTON_LABEL);
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -261,11 +217,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
             scanStatusObservable,
             i18n.tr("Error in scan result. Please keep only specimens with no errors."),
             IStatus.ERROR);
-        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), scanHasBeenLaunchedValue,
-            i18n.tr("Scan should be launched"), IStatus.ERROR);
-        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), hasValues, i18n.tr("No values scanned"),
+        widgetCreator.addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
+            scanHasBeenLaunchedValue,
+            i18n.tr("Scan should be launched"),
+            IStatus.ERROR);
+        widgetCreator.addBooleanBinding(
+            new WritableValue(Boolean.FALSE, Boolean.class),
+            hasValues,
+            i18n.tr("No values scanned"),
             IStatus.ERROR);
 
     }
@@ -289,7 +249,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
         log.debug("startNewPallet");
         spw.setCells(null);
         scanHasBeenLaunchedValue.setValue(false);
-        setRescanMode(false);
     }
 
     @SuppressWarnings("nls")
@@ -321,7 +280,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
             public void run() {
                 log.debug("setScanHasBeenLaunched: run: start");
                 scanHasBeenLaunchedValue.setValue(launched);
-                setRescanMode(launched);
                 log.debug("setScanHasBeenLaunched: run: end");
             }
         });
@@ -387,6 +345,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     @Override
     protected void handleStatusChanged(IStatus status) {
         super.handleStatusChanged(status);
+        scanButton.setEnabled(fieldsValid());
     }
 
     protected boolean fieldsValid() {
@@ -450,8 +409,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
         Integer centerId, CellInfo cell, Locale locale);
 
     protected abstract Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
-        Locale locale);
+        Integer centerId, Map<RowColPos, CellInfo> cells, Locale locale);
 
     protected void resetScan() {
         if (spw != null)

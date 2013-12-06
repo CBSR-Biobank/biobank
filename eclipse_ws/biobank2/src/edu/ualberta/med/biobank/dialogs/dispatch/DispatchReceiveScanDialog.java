@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Shell;
 import org.xnap.commons.i18n.I18n;
@@ -15,15 +14,12 @@ import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class DispatchReceiveScanDialog extends
     ReceiveScanDialog<DispatchWrapper> {
@@ -45,11 +41,10 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
         Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
-            cells,
-            isRescanMode, locale);
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells, locale);
     }
 
     protected ShipmentProcessInfo getProcessData() {
@@ -85,31 +80,5 @@ public class DispatchReceiveScanDialog extends
     @Override
     protected List<UICellStatus> getPalletCellStatus() {
         return UICellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) {
-        Map<RowColPos, PalletWell> palletScanned = new TreeMap<RowColPos, PalletWell>();
-        if (currentShipment.getDispatchSpecimenCollection(false).size() > 0) {
-            int i = 0;
-            do {
-                DispatchSpecimenWrapper dsa = currentShipment
-                    .getDispatchSpecimenCollection(false).get(i);
-                int row = i / 12;
-                int col = i % 12;
-                if (DispatchSpecimenState.MISSING != dsa.getState())
-                    palletScanned.put(new RowColPos(row, col), new PalletWell(row, col,
-                        new DecodedWell(row, col, dsa.getSpecimen()
-                            .getInventoryId())));
-                i++;
-            } while (i < (8 * 12 - 1)
-                && i < currentShipment.getDispatchSpecimenCollection(false)
-                    .size());
-
-            palletScanned.put(new RowColPos(6, 6),
-                new PalletWell(6, 6, new DecodedWell(6, 6, "aaah")));
-        }
-        return palletScanned;
     }
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -9,14 +10,19 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteConnectFailureException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSchemeGetInfoAction.ContainerLabelingSchemeInfo;
+import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -26,9 +32,12 @@ import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.mvp.view.DialogView.Dialog;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.dialogs.DecodeImageDialog;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -82,8 +91,61 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        // FIXME: scanning and decoding
-        throw new RuntimeException("not implemented yet");
+        beforeScanStart();
+        beforeScan();
+
+        DecodeImageDialog dialog = new DecodeImageDialog(
+            Display.getDefault().getActiveShell(),
+            Arrays.asList(PlateDimensions.values()));
+        if (dialog.open() == Dialog.OK) {
+            scansCount++;
+            initCells();
+            Set<DecodedWell> decodeResult = dialog.getDecodeResult();
+            wells = PalletWell.convertArray(decodeResult);
+
+            IRunnableWithProgress op = new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor) {
+                    monitor.beginTask(
+                        // progress monitor message
+                        i18n.tr("Processing specimens..."),
+                        IProgressMonitor.UNKNOWN);
+
+                    try {
+                        processScanResult();
+                        afterScanAndProcess();
+                        afterScanBeforeMerge();
+                        afterSuccessfulScan();
+                        afterScanAndProcess();
+                    } catch (RemoteConnectFailureException exp) {
+                        BgcPlugin.openRemoteConnectErrorMessage(exp);
+                        scanAndProcessError(null);
+                    } catch (AccessDeniedException e) {
+                        BgcPlugin.openAsyncError(
+                            // dialog title
+                            i18n.tr("Scan result error"),
+                            e.getLocalizedMessage());
+                        scanAndProcessError(e.getLocalizedMessage());
+                    } catch (Exception ex) {
+                        BgcPlugin.openAsyncError(
+                            // dialog title
+                            i18n.tr("Processing error"),
+                            ex,
+                            // dialog message
+                            i18n.tr("Barcodes can still be entered with the handheld 2D scanner."));
+                    }
+                    monitor.done();
+                }
+            };
+
+            try {
+                new ProgressMonitorDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell()).run(
+                    true, false, op);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @SuppressWarnings("nls")
@@ -106,13 +168,8 @@ public class PalletScanManagement {
 
             if ((inventoryId == null) || inventoryId.isEmpty()) continue;
 
-            PalletWell cell = wells.get(pos);
-            if (cell == null) {
-                cell = new PalletWell(row, col, new DecodedWell(row, col, inventoryId));
-                wells.put(pos, cell);
-            } else {
-                cell.setValue(inventoryId);
-            }
+            PalletWell cell = new PalletWell(row, col, new DecodedWell(row, col, inventoryId));
+            wells.put(pos, cell);
 
             manuallyEnteredCells.add(cell);
         }
@@ -212,7 +269,7 @@ public class PalletScanManagement {
         return labelsMissingInventoryId;
     }
 
-    protected void beforeThreadStart() {
+    protected void beforeScanStart() {
         // default does nothing
     }
 
@@ -220,13 +277,7 @@ public class PalletScanManagement {
         // default does nothing
     }
 
-    @SuppressWarnings("unused")
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected void processScanResult() throws Exception {
         // default does nothing
     }
 

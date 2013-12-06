@@ -158,32 +158,30 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
         if (InventoryIdUtil.isFormatMicroplate(microplateId)) {
             try {
                 ArrayList<String> ids = SessionManager
-                        .getAppService().doAction(
-                            new SpecimenByMicroplateSearchAction(microplateId)).getList();
+                    .getAppService().doAction(
+                        new SpecimenByMicroplateSearchAction(microplateId)).getList();
                 if (ids.isEmpty()) {
                     BgcPlugin.openAsyncError(
-                            i18n.tr("Microplate does not exist or has no specimens"));
+                        i18n.tr("Microplate does not exist or has no specimens"));
                 }
                 else {
                     for (String id : ids) {
                         doSpecimenTextAction(id, true);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 BgcPlugin.openAsyncError(
                     i18n.tr("Problem adding microplate specimens"), e);
             }
         }
         else {
             BgcPlugin.openAsyncError(
-                    i18n.tr("Microplate ID format not valid"));
+                i18n.tr("Microplate ID format not valid"));
         }
     }
 
     /**
-     * when called from gui, errors will show a dialog. Otherwise, will throw an
-     * exception
+     * when called from gui, errors will show a dialog. Otherwise, will throw an exception
      */
     @SuppressWarnings("nls")
     protected void doSpecimenTextAction(String inventoryId, boolean showMessages)
@@ -224,21 +222,18 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
                 break;
             case EXTRA:
                 if (showMessages)
-                    BgcPlugin
-                        .openInformation(
-                            i18n.tr("Specimen not found"),
-                            i18n.tr(
-                                "Specimen with inventory id {0} has not been found in this dispatch. It will be moved into the extra-pending list.",
-                                inventoryId));
+                    BgcPlugin.openInformation(
+                        i18n.tr("Specimen not found"),
+                        i18n.tr(
+                            "Specimen with inventory id {0} has not been found in this dispatch. It will be moved into the extra-pending list.",
+                            inventoryId));
                 if (specimen == null) {
                     if (showMessages)
-                        BgcPlugin
-                            .openAsyncError(
-                                i18n.tr("Problem with specimen"),
-                                i18n.tr("Specimen is extra but object is null"));
-                    else
-                        throw new Exception(
+                        BgcPlugin.openAsyncError(
+                            i18n.tr("Problem with specimen"),
                             i18n.tr("Specimen is extra but object is null"));
+                    else
+                        throw new Exception(i18n.tr("Specimen is extra but object is null"));
                     break;
                 }
                 dispatch.addSpecimens(Arrays.asList(specimen),
@@ -250,11 +245,10 @@ public class DispatchReceivingEntryForm extends AbstractDispatchEntryForm {
             default:
                 if (showMessages)
                     BgcPlugin.openInformation(
-                        i18n.tr("Problem with specimen"), res
-                            .getCell().getInformation().toString());
+                        i18n.tr("Problem with specimen"),
+                        res.getCell().getInformation().toString());
                 else
-                    throw new Exception(
-                        i18n.tr("Problem with specimen"));
+                    throw new Exception(i18n.tr("Problem with specimen"));
             }
         } catch (Exception e) {
             if (showMessages)

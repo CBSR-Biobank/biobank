@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -17,15 +16,11 @@ import edu.ualberta.med.biobank.common.action.scanprocess.ShipmentReceiveProcess
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.model.type.RequestSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
     private static final I18n i18n = I18nFactory
@@ -73,28 +68,6 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         return UICellStatus.REQUEST_PALLET_STATUS_LIST;
     }
 
-    @Override
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) {
-        Map<RowColPos, PalletWell> palletScanned =
-            new TreeMap<RowColPos, PalletWell>();
-        if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
-            int i = 0;
-            for (RequestSpecimenWrapper dsa : (currentShipment)
-                .getRequestSpecimenCollection(false)) {
-                int row = i / 12;
-                int col = i % 12;
-                if (row > 7)
-                    break;
-                if (RequestSpecimenState.UNAVAILABLE_STATE != dsa.getState()) {
-                    palletScanned.put(new RowColPos(row, col), new PalletWell(row, col,
-                        new DecodedWell(row, col, dsa.getSpecimen().getInventoryId())));
-                }
-                i++;
-            }
-        }
-        return palletScanned;
-    }
-
     public List<SpecimenWrapper> getSpecimens() {
         return dispatchSpecimens;
     }
@@ -109,11 +82,10 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
         Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
-            cells,
-            isRescanMode, locale);
+        return new ShipmentReceiveProcessAction(getProcessData(), centerId, cells, locale);
     }
 
     private ShipmentProcessInfo getProcessData() {

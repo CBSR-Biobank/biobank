@@ -382,8 +382,7 @@ public class BgcPlugin extends AbstractUIPlugin {
      * Display remote connect error message
      */
     public static void openRemoteConnectErrorMessage(Throwable ex) {
-        openAsyncError(CONNECTION_FAILED_TITLE,
-            CANNOT_CONNECT_TO_SERVER);
+        openAsyncError(CONNECTION_FAILED_TITLE, CANNOT_CONNECT_TO_SERVER);
         if (ex != null) {
             logger.error("Connection Attempt Failed", ex);
         }

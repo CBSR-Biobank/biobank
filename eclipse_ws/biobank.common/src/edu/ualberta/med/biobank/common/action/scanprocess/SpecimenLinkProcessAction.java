@@ -26,10 +26,12 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     private final Integer studyId;
 
     // multiple cells link process
-    public SpecimenLinkProcessAction(Integer currentWorkingCenterId,
+    public SpecimenLinkProcessAction(
+        Integer currentWorkingCenterId,
         Integer studyId,
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
-        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        Map<RowColPos, CellInfo> cells,
+        Locale locale) {
+        super(currentWorkingCenterId, cells, locale);
         this.studyId = studyId;
     }
 
@@ -42,20 +44,20 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
     }
 
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
+    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells,
-            internalProcessScanResult(session, cells, isRescanMode));
+            internalProcessScanResult(session, cells));
         return res;
     }
 
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    protected CellInfoStatus internalProcessScanResult(Session session,
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
+    protected CellInfoStatus internalProcessScanResult(
+        Session session,
+        Map<RowColPos, CellInfo> cells)
         throws ActionException {
         CellInfoStatus currentScanState = CellInfoStatus.EMPTY;
         if (cells != null) {
@@ -83,9 +85,8 @@ public class SpecimenLinkProcessAction extends ServerProcessAction {
                         allValues.put(cell.getValue(), cell);
                     }
                 }
-                if (!isRescanMode
-                    || (cell != null && cell.getStatus() != CellInfoStatus.TYPE && cell
-                        .getStatus() != CellInfoStatus.NO_TYPE)) {
+                if ((cell != null) && (cell.getStatus() != CellInfoStatus.TYPE)
+                    && (cell.getStatus() != CellInfoStatus.NO_TYPE)) {
                     processCellLinkStatus(session, cell);
                 }
                 CellInfoStatus newStatus = CellInfoStatus.EMPTY;

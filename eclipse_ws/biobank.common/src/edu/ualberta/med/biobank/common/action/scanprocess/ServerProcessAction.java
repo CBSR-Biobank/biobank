@@ -26,7 +26,6 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
     private final List<String> logs;
     protected Locale locale;
     private Map<RowColPos, CellInfo> cells;
-    private boolean isRescanMode = false;
     private final boolean processOneCell;
     private CellInfo cell;
 
@@ -36,10 +35,9 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
     public ServerProcessAction(
         Integer currentWorkingCenterId,
         Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode, Locale locale) {
+        Locale locale) {
         this.currentWorkingCenterId = currentWorkingCenterId;
         this.cells = cells;
-        this.isRescanMode = isRescanMode;
         this.locale = locale;
         this.processOneCell = false;
         logs = new ArrayList<String>();
@@ -67,14 +65,13 @@ public abstract class ServerProcessAction implements Action<ProcessResult> {
         if (processOneCell) {
             res = getCellProcessResult(cell);
         } else {
-            res = getScanProcessResult(cells, isRescanMode);
+            res = getScanProcessResult(cells);
         }
         res.setLogs(logs);
         return res;
     }
 
-    protected abstract ScanProcessResult getScanProcessResult(
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
+    protected abstract ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells)
         throws ActionException;
 
     protected abstract CellProcessResult getCellProcessResult(CellInfo cell)

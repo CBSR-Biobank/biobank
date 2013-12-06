@@ -35,12 +35,12 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
 
     private final ShipmentProcessInfo data;
 
-    public DispatchCreateProcessAction(ShipmentProcessInfo data,
+    public DispatchCreateProcessAction(
+        ShipmentProcessInfo data,
         Integer currentWorkingCenterId,
         Map<RowColPos, CellInfo> cells,
-        boolean isRescanMode,
         Locale locale) {
-        super(currentWorkingCenterId, cells, isRescanMode, locale);
+        super(currentWorkingCenterId, cells, locale);
         this.data = data;
     }
 
@@ -56,8 +56,7 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
      * Process of a map of cells
      */
     @Override
-    protected ScanProcessResult getScanProcessResult(
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode)
+    protected ScanProcessResult getScanProcessResult(Map<RowColPos, CellInfo> cells)
         throws ActionException {
         ScanProcessResult res = new ScanProcessResult();
         res.setResult(cells, createProcess(cells));

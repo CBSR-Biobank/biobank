@@ -9,10 +9,8 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -26,7 +24,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -46,7 +45,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
@@ -54,19 +52,15 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractPalletSpecimenAdminForm.class);
 
-    // private static BgcLogger log =
-    // BgcLogger.getLogger(AbstractPalletSpecimenAdminForm.class.getName());
-
-    @SuppressWarnings("nls")
-    protected static final String PLATE_VALIDATOR = "plate-validator";
-
-    @SuppressWarnings("nls")
-    private static final String SCAN_BUTTON_FAKE = i18n.tr("Fake scan");
+    private static Logger log = LoggerFactory.getLogger(AbstractPalletSpecimenAdminForm.class);
 
     protected Button scanButton;
-    private String scanButtonTitle;
 
     protected CancelConfirmWidget cancelConfirmWidget;
+
+    @SuppressWarnings("nls")
+    // TR: button label
+    private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
     private static String plateToScanSessionString = StringUtil.EMPTY_STRING;
 
@@ -82,13 +76,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     private final IObservableValue scanValidValue = new WritableValue(
         Boolean.TRUE, Boolean.class);
 
-    private boolean rescanMode = false;
-
     protected PalletScanManagement palletScanManagement;
 
     protected ComboViewer profilesCombo;
-
-    private IPropertyChangeListener propertyListener;
 
     protected String currentPlateToScan;
 
@@ -96,7 +86,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     // global state of the pallet process
     protected UICellStatus currentScanState = UICellStatus.NOT_INITIALIZED;
-    private Label plateToScanLabel;
 
     @Override
     protected void init() throws Exception {
@@ -107,7 +96,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             // FIXME: scanning and decoding
 
             @Override
-            protected void beforeThreadStart() {
+            protected void beforeScanStart() {
                 currentPlateToScan = plateToScanValue.getValue().toString();
                 AbstractPalletSpecimenAdminForm.this.beforeScanThreadStart();
             }
@@ -117,23 +106,13 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             protected void beforeScan() {
                 setScanHasBeenLaunched(false, true);
                 String msg = "----SCAN on plate {0}----";
-                if (isRescanMode()) {
-                    msg = "----RESCAN on plate {0}----";
-                }
                 appendLog(NLS.bind(msg, currentPlateToScan));
 
             }
 
             @Override
-            protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan)
-                throws Exception {
-                return AbstractPalletSpecimenAdminForm.this.getFakeDecodedWells(plateToScan);
-            }
-
-            @Override
-            protected void processScanResult(IProgressMonitor monitor)
-                throws Exception {
-                AbstractPalletSpecimenAdminForm.this.processScanResult(monitor);
+            protected void processScanResult() throws Exception {
+                AbstractPalletSpecimenAdminForm.this.processScanResult();
             }
 
             @Override
@@ -187,13 +166,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     @Override
-    public void dispose() {
-        ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .removePropertyChangeListener(propertyListener);
-        super.dispose();
-    }
-
-    @Override
     public boolean onClose() {
         synchronized (plateToScanSessionString) {
             plateToScanSessionString = (String) plateToScanValue.getValue();
@@ -204,27 +176,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         return super.onClose();
     }
 
-    @SuppressWarnings("nls")
-    protected void setRescanMode() {
-        if (palletScanManagement.getScansCount() > 0) {
-            // TR: button text
-            scanButton.setText(i18n.tr("Retry scan"));
-            rescanMode = true;
-            enableFields(false);
-        }
-    }
-
     protected abstract void enableFields(boolean enable);
 
     @SuppressWarnings("nls")
     protected void createScanButton(Composite parent) {
         // TR: button text
-        scanButtonTitle = i18n.tr("Launch scan");
-        if (!BiobankPlugin.isRealScanEnabled()) {
-            createFakeOptions(parent);
-            scanButtonTitle = SCAN_BUTTON_FAKE;
-        }
-        scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
+        scanButton = toolkit.createButton(parent, FLATBED_SCAN_BUTTON_LABEL, SWT.PUSH);
         GridData gd = new GridData();
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
@@ -239,7 +196,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             canLaunchScanValue,
             // TR: validation error message
-            i18n.tr("Errors were detected. Cannot launch scan."));
+            i18n.tr("Errors were detected. Cannot perform a flatbed scan yet."));
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
@@ -248,7 +205,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message
-            i18n.tr("Errors with flatbed scan result"));
+            i18n.tr("Errors with tube inventory IDs"));
     }
 
     protected void launchScanAndProcessResult() {
@@ -265,23 +222,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         }
     }
 
-    protected void showPlateToScanField(boolean show) {
-        widgetCreator.showWidget(plateToScanLabel, show);
-        widgetCreator.setBinding(PLATE_VALIDATOR, show && needPlate());
-    }
-
-    @SuppressWarnings("unused")
-    protected void createFakeOptions(Composite fieldsComposite) {
-        // default does nothing
-    }
-
     protected void createCancelConfirmWidget(Composite parent) {
         cancelConfirmWidget = new CancelConfirmWidget(parent, this, true);
-    }
-
-    @SuppressWarnings("unused")
-    protected Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan) throws Exception {
-        return null;
     }
 
     @Override
@@ -335,22 +277,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         }
     }
 
-    protected boolean isRescanMode() {
-        return rescanMode;
-    }
-
-    protected void removeRescanMode() {
-        scanButton.setText(scanButtonTitle);
-        rescanMode = false;
-    }
-
     protected void resetPlateToScan() {
         plateToScanValue.setValue(plateToScanSessionString);
     }
 
     protected void setBindings(boolean isSingleMode) {
         setScanHasBeenLaunched(isSingleMode);
-        widgetCreator.setBinding(PLATE_VALIDATOR, !isSingleMode && needPlate());
     }
 
     protected boolean needPlate() {
@@ -373,14 +305,17 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
                 palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
             beforeScanTubeAlone();
             CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-                getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    palletCell.transformIntoServerCell(), Locale.getDefault()));
+                getCellProcessAction(
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    palletCell.transformIntoServerCell(),
+                    Locale.getDefault()));
             palletCell.merge(SessionManager.getAppService(), res.getCell());
             appendLogs(res.getLogs());
             processCellResult(palletCell.getRowColPos(), palletCell);
             currentScanState = currentScanState.mergeWith(palletCell.getStatus());
-            setScanValid(getCells() != null && !getCells().isEmpty()
-                && currentScanState != UICellStatus.ERROR);
+            setScanValid((getCells() != null)
+                && !getCells().isEmpty()
+                && (currentScanState != UICellStatus.ERROR));
             afterScanAndProcess(palletCell.getRow());
             setScanHasBeenLaunched(true);
         }
@@ -390,7 +325,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         Integer centerId, CellInfo cell, Locale locale);
 
     protected abstract Action<ProcessResult> getPalletProcessAction(
-        Integer centerId, Map<RowColPos, CellInfo> cells, boolean isRescanMode,
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
         Locale locale);
 
     protected void beforeScanTubeAlone() {
@@ -421,16 +357,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     /**
      * go through cells retrieved from scan, set status and update the types combos components
+     * 
+     * @throws Exception
      */
     @SuppressWarnings("nls")
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected void processScanResult() throws Exception {
         Map<RowColPos, PalletWell> cells = getCells();
         // conversion for server side call
-        Map<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo> serverCells =
-            null;
+        Map<RowColPos, CellInfo> serverCells = null;
         if (cells != null) {
-            serverCells =
-                new HashMap<RowColPos, edu.ualberta.med.biobank.common.action.scanprocess.CellInfo>();
+            serverCells = new HashMap<RowColPos, CellInfo>();
             for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
@@ -439,7 +375,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         // server side call
         ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
             getPalletProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                serverCells, isRescanMode(), Locale.getDefault()));
+                serverCells, Locale.getDefault()));
         // print result logs
         appendLogs(res.getLogs());
 
@@ -447,18 +383,20 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             // for each cell, convert into a client side cell
             for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
                 RowColPos pos = entry.getKey();
-                monitor.subTask(
-                    // TR: progress monitor message
-                    i18n.tr("Processing position {0}",
-                        palletScanManagement.getContainerType()
-                            .getPositionString(pos)));
                 PalletWell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
-                if (palletCell == null) { // can happened if missing
-                    palletCell = new PalletWell(pos.getRow(), pos.getCol(),
-                        new DecodedWell(servercell.getRow(), servercell.getCol(),
+                if (palletCell == null) {
+                    // can happen if missing no tube in this cell
+                    palletCell = new PalletWell(
+                        pos.getRow(),
+                        pos.getCol(),
+                        new DecodedWell(
+                            servercell.getRow(),
+                            servercell.getCol(),
                             servercell.getValue()));
                     cells.put(pos, palletCell);
+                    log.debug("processScanResult: palletCell is null: pos ({}, {})",
+                        pos.getRow(), pos.getCol());
                 }
                 palletCell.merge(SessionManager.getAppService(), servercell);
                 // additional cell specific client conversion if needed
@@ -480,7 +418,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     protected boolean canScanTubesManually(PalletWell cell) {
-        return cell == null || cell.getStatus() == UICellStatus.EMPTY;
+        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY));
     }
 
     protected void focusControl(final Control control) {

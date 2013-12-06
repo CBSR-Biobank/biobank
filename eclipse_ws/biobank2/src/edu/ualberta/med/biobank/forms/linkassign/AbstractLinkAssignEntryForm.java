@@ -97,8 +97,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     private Composite multipleFieldsComposite;
     private ScrolledComposite visualisationScroll;
     private Composite visualisationComposite;
-    private Button fakeScanRandom;
-    protected boolean isFakeScanRandom;
     private Composite multipleVisualisation;
     protected Label freezerLabel;
     protected Label hotelLabel;
@@ -440,8 +438,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        PalletWell cell = (PalletWell) ((ScanPalletWidget) e.widget)
-            .getObjectAtCoordinates(e.x, e.y);
+        ScanPalletWidget widget = (ScanPalletWidget) e.widget;
+        PalletWell cell = (PalletWell) widget.getObjectAtCoordinates(e.x, e.y);
         if (canScanTubesManually(cell)) {
             scanTubesManually(e);
         } else if (cell != null) {
@@ -485,25 +483,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         toolkit.adapt(secondSingleParentWidget);
 
         displaySinglePositions(false);
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    /**
-     * when creating the scan button in debug mode, add options to create random values
-     */
-    protected void createFakeOptions(Composite fieldsComposite) {
-        GridData gd;
-        Composite comp = toolkit.createComposite(fieldsComposite);
-        comp.setLayout(new GridLayout());
-        gd = new GridData();
-        gd.horizontalSpan = 3;
-        comp.setLayoutData(gd);
-        fakeScanRandom = toolkit.createButton(comp, "Get random scan values",
-            SWT.RADIO);
-        fakeScanRandom.setSelection(true);
-        toolkit.createButton(comp,
-            "Get random and already linked specimens", SWT.RADIO);
     }
 
     /**
@@ -564,30 +543,12 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected void reset(boolean resetAll) {
         container = null;
         cancelConfirmWidget.reset();
-        removeRescanMode();
         setScanHasBeenLaunched(isSingleMode());
         if (resetAll) {
             resetPlateToScan();
         }
+        setCanLaunchScan(false);
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
-    }
-
-    @Override
-    /**
-     * Multiple linking: do this before multiple scan is made
-     */
-    protected void beforeScanThreadStart() {
-        isFakeScanRandom = fakeScanRandom != null
-            && fakeScanRandom.getSelection();
-    }
-
-    @Override
-    /**
-     * Multiple linking: do this before scan of one tube is really made
-     */
-    protected void beforeScanTubeAlone() {
-        isFakeScanRandom = fakeScanRandom != null
-            && fakeScanRandom.getSelection();
     }
 
     /**

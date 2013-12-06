@@ -138,9 +138,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private List<ContainerTypeWrapper> palletContainerTypes;
     private BgcBaseText palletproductBarcodeText;
     private boolean saveEvenIfMissing;
-    private Button fakeScanLinkedOnlyButton;
     private Composite multipleOptionsFields;
-    private Composite fakeScanComposite;
     private Button useScannerButton;
     private Label palletproductBarcodeLabel;
     private boolean isNewMultipleContainer;
@@ -160,6 +158,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         super.init();
         setCanLaunchScan(false);
         initPalletValues();
+        scanMultipleWithHandheldInput = true;
     }
 
     /**
@@ -597,8 +596,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             @Override
             public void focusLost(FocusEvent e) {
                 if (palletproductBarcodeTextModified
-                    && productBarcodeValidator.validate(currentMultipleContainer.getProductBarcode())
-                        .equals(Status.OK_STATUS)) {
+                    && productBarcodeValidator.validate(
+                        currentMultipleContainer.getProductBarcode()).equals(Status.OK_STATUS)) {
                     boolean ok = checkMultipleScanBarcode();
                     setCanLaunchScan(ok);
                     if (!ok) {
@@ -982,13 +981,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void setUseScanner(boolean use) {
         useScanner = use;
-        showPlateToScanField(use && !mode.isSingleMode());
         widgetCreator.showWidget(scanButton, use);
         widgetCreator.showWidget(palletproductBarcodeLabel, use);
         widgetCreator.showWidget(palletproductBarcodeText, use);
         widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, use);
-        if (fakeScanComposite != null)
-            widgetCreator.showWidget(fakeScanComposite, use);
         if (palletTypesViewer != null) {
             palletTypesViewer.setInput(null);
             palletTypesViewer.getCombo().deselectAll();
@@ -1246,7 +1242,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 palletTypesViewer.setInput(null);
                 palletTypesViewer.getCombo().deselectAll();
             }
-            removeRescanMode();
             freezerWidget.setSelection(null);
             hotelWidget.setSelection(null);
             palletLabel.setText(i18n.tr("Pallet"));
@@ -1277,12 +1272,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         oldSinglePositionCheckText.setText("?");
         widgetCreator.setBinding(NEW_SINGLE_POSITION_BINDING, isSingleMode);
         widgetCreator.setBinding(PRODUCT_BARCODE_BINDING, !isSingleMode && useScanner);
-        widgetCreator.setBinding(PLATE_VALIDATOR, !isSingleMode && useScanner);
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
         setScanHasBeenLaunched(isSingleMode || !useScanner);
         checkPalletContainerTypes();
-        setCanLaunchScan(true);
+        setCanLaunchScan(false);
     }
 
     @Override
@@ -1309,8 +1303,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     @Override
     protected boolean canScanTubesManually(PalletWell cell) {
-        return fieldsValid() && (super.canScanTubesManually(cell)
-            || cell.getStatus() == UICellStatus.MISSING);
+        return fieldsValid();
     }
 
     /**
@@ -1347,7 +1340,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 displayPalletPositions();
                 palletWidget.setCells(getCells());
                 setDirty(true);
-                setRescanMode();
                 page.layout(true, true);
                 form.reflow(true);
             }
@@ -1412,26 +1404,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
     }
 
-    /**
-     * Multiple assign
-     */
-    @SuppressWarnings("nls")
-    @Override
-    protected void createFakeOptions(Composite fieldsComposite) {
-        fakeScanComposite = toolkit.createComposite(fieldsComposite);
-        fakeScanComposite.setLayout(new GridLayout());
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        fakeScanComposite.setLayoutData(gd);
-        fakeScanLinkedOnlyButton = toolkit.createButton(fakeScanComposite,
-            // TR: radio button text
-            i18n.tr("Select linked only specimens"), SWT.RADIO);
-        fakeScanLinkedOnlyButton.setSelection(true);
-        toolkit.createButton(fakeScanComposite,
-            // TR: radio button text
-            i18n.tr("Select linked and assigned specimens"), SWT.RADIO);
-    }
-
     @Override
     protected Mode initialisationMode() {
         return mode;
@@ -1457,10 +1429,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected Action<ProcessResult> getPalletProcessAction(Integer centerId,
-        Map<RowColPos, CellInfo> cells, boolean isRescanMode, Locale locale) {
-        return new SpecimenAssignProcessAction(getProcessData(), centerId,
-            cells, isRescanMode, locale);
+    protected Action<ProcessResult> getPalletProcessAction(
+        Integer centerId,
+        Map<RowColPos, CellInfo> cells,
+        Locale locale) {
+        return new SpecimenAssignProcessAction(getProcessData(), centerId, cells, locale);
     }
 
     protected AssignProcessInfo getProcessData() {
@@ -1488,12 +1461,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
         super.postprocessScanTubeAlone(palletCells);
-        widgetCreator.setBinding(PLATE_VALIDATOR, false);
         scanMultipleWithHandheldInput = true;
     }
 
     @Override
     protected void scanTubesManually(MouseEvent e) {
-        palletScanManagement.scanTubesManually(e, ScanManualOption.ALLOW_DUPLICATES);
+        palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
     }
 }

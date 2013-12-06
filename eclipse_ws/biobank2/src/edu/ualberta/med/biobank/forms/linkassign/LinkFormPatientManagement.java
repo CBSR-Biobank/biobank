@@ -229,9 +229,8 @@ public class LinkFormPatientManagement {
             null, new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    currentCEventSelected =
-                        (CollectionEventWrapper) selectedObject;
-                    if (cEventComboCallback != null && !settingCollectionEvent)
+                    currentCEventSelected = (CollectionEventWrapper) selectedObject;
+                    if ((cEventComboCallback != null) && !settingCollectionEvent)
                         cEventComboCallback.selectionChanged();
                 }
             }, new BiobankLabelProvider());
@@ -394,24 +393,20 @@ public class LinkFormPatientManagement {
         if (viewerProcessingEvents != null) {
             if (currentPatient != null) {
                 List<ProcessingEventWrapper> collection = null;
-                if (pEventListCheck.getSelection())
+                if (pEventListCheck.getSelection()) {
                     try {
-                        collection = currentPatient
-                            .getLast7DaysProcessingEvents(SessionManager
-                                .getUser().getCurrentWorkingCenter());
+                        collection = currentPatient.getLast7DaysProcessingEvents(
+                            SessionManager.getUser().getCurrentWorkingCenter());
                     } catch (ApplicationException e) {
-                        BgcPlugin
-                            .openAsyncError(
-                                // TR: dialog title
-                                i18n.tr("Problem retrieving processing events"),
-                                e);
+                        BgcPlugin.openAsyncError(
+                            // TR: dialog title
+                            i18n.tr("Problem retrieving processing events"),
+                            e);
                     }
-                else
-                    collection =
-                        currentPatient
-                            .getProcessingEventCollection(SessionManager
-                                .getUser().getCurrentWorkingCenter()
-                                , false);
+                } else {
+                    collection = currentPatient.getProcessingEventCollection(
+                        SessionManager.getUser().getCurrentWorkingCenter(), false);
+                }
                 viewerProcessingEvents.setInput(collection);
                 viewerProcessingEvents.getCombo().setFocus();
                 if (collection != null && collection.size() == 1) {
@@ -439,15 +434,13 @@ public class LinkFormPatientManagement {
             if (currentPEventSelected != null) {
                 List<CollectionEventWrapper> collection = null;
                 try {
-                    collection =
-                        currentPEventSelected
-                            .getCollectionEventFromSpecimensAndPatient(currentPatient);
+                    collection = currentPEventSelected.getCollectionEventFromSpecimensAndPatient(
+                        currentPatient);
                 } catch (ApplicationException e) {
-                    BgcPlugin
-                        .openAsyncError(
-                            // TR: dialog title
-                            i18n.tr("Problem retrieving collection events"),
-                            e);
+                    BgcPlugin.openAsyncError(
+                        // TR: dialog title
+                        i18n.tr("Problem retrieving collection events"),
+                        e);
                 }
                 viewerCollectionEvents.setInput(collection);
                 if (collection != null && collection.size() == 1) {

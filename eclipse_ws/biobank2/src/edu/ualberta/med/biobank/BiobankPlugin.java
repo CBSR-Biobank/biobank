@@ -17,6 +17,8 @@ import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.services.ISourceProviderService;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -82,6 +84,8 @@ public class BiobankPlugin extends AbstractUIPlugin {
 
     private static final I18n i18n = I18nFactory.getI18n(BiobankPlugin.class);
 
+    private static Logger log = LoggerFactory.getLogger(BiobankPlugin.class);
+
     public static final String PLUGIN_ID = "biobank"; //$NON-NLS-1$
 
     public static BundleContext bundleContext;
@@ -129,8 +133,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(ProcessingEventAdapter.class.getName(), BgcPlugin.Image.PROCESSING_EVENT);
         classToImageKey.put(ProcessingEventGroup.class.getName(), BgcPlugin.Image.PROCESSING);
         classToImageKey.put(ResearchGroupAdapter.class.getName(), BgcPlugin.Image.RESEARCH_GROUP);
-        classToImageKey
-            .put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.Image.RESEARCH_GROUPS);
+        classToImageKey.put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.Image.RESEARCH_GROUPS);
     };
 
     private static final BgcPlugin.Image[] CONTAINER_TYPE_IMAGES = new BgcPlugin.Image[] {
@@ -279,6 +282,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         return true;
     }
 
+    @SuppressWarnings("nls")
     public Image getImage(Object object) {
         BgcPlugin.Image imageKey = null;
         if (object == null) return null;
@@ -305,6 +309,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
             if (object instanceof BgcPlugin.Image) {
                 imageKey = (BgcPlugin.Image) object;
             }
+        }
+        if (imageKey == null) {
+            log.error("image not found for class: " + object);
+            // return null for now until its fixed
+            return null;
         }
         return BgcPlugin.getDefault().getImage(imageKey);
     }

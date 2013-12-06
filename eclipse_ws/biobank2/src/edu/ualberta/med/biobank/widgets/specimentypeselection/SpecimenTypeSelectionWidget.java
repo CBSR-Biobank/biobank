@@ -177,7 +177,10 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     }
 
     @SuppressWarnings("nls")
-    public void resetValues(int row, final boolean resetSelection, final boolean resetNumber,
+    public void resetValues(
+        int row,
+        final boolean resetSelection,
+        final boolean resetNumber,
         boolean async) {
         if (row > specimenTypesWidgets.size()) {
             throw new IllegalArgumentException("row exeeds maximum: " + row);

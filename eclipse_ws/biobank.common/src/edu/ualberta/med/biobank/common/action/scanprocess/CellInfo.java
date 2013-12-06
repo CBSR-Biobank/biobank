@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.action.scanprocess;
 
 import java.io.Serializable;
 
+import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.i18n.LString;
 
 public class CellInfo implements Serializable {
@@ -18,8 +19,7 @@ public class CellInfo implements Serializable {
 
     private LString information;
 
-    @SuppressWarnings("nls")
-    private String title = "";
+    private String title = StringUtil.EMPTY_STRING;
 
     private Integer expectedSpecimenId;
 

@@ -185,9 +185,6 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
     @Override
     protected abstract List<UICellStatus> getPalletCellStatus();
 
-    @Override
-    protected abstract Map<RowColPos, PalletWell> getFakeDecodedWells(String plateToScan);
-
     public boolean hasReceivedSpecimens() {
         return specimensReceived;
     }
