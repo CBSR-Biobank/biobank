@@ -636,12 +636,12 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         return super.onClose();
     }
 
-    @SuppressWarnings("nls")
-    @Override
     /**
      * Multiple linking: do this before multiple scan is made
      */
-    protected void beforeScanThreadStart() {
+    @SuppressWarnings("nls")
+    @Override
+    public void beforeScanThreadStart() {
         log.debug("beforeScanThreadStart");
         super.beforeScanThreadStart();
         setTypeCombos();
@@ -775,7 +775,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected boolean canScanTubesManually(PalletWell cell) {
+    public boolean canScanTubesManually(PalletWell cell) {
         if (linkFormPatientManagement.getSelectedCollectionEvent() == null) {
             return false;
         }
@@ -783,8 +783,8 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
-        super.postprocessScanTubeAlone(palletCells);
+    public void postprocessScanTubesManually(Set<PalletWell> palletCells) throws Exception {
+        super.postprocessScanTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
     }
 
@@ -820,5 +820,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         });
         toolkit.adapt(specimenTypesWidget);
+    }
+
+    @Override
+    public Set<PlateDimensions> getValidPlateDimensions() {
+        return new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
     }
 }

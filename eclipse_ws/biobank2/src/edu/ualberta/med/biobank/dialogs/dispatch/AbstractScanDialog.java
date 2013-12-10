@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.linkassign.IPalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -46,9 +47,12 @@ import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
-public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcBaseDialog {
+public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
+    extends BgcBaseDialog
+    implements IPalletScanManagement {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractScanDialog.class);
 
@@ -61,7 +65,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     // TR: button label
     private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
-    private PalletScanManagement palletScanManagement;
+    private final PalletScanManagement palletScanManagement;
 
     protected ScanPalletWidget spw;
 
@@ -76,51 +80,22 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     private boolean scanStatus = false;
 
     /** Holds the value stored in {@link scanStatus} */
-    private final IObservableValue scanStatusObservable = new WritableValue(Boolean.TRUE, Boolean.class);
+    private final IObservableValue scanStatusObservable =
+        new WritableValue(Boolean.TRUE, Boolean.class);
 
     private Button scanButton;
 
     protected CenterWrapper<?> currentSite;
 
-    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
-        RowColPos.COLS_DEFAULT);
+    protected RowColPos currentGridDimensions =
+        new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
 
     public AbstractScanDialog(Shell parentShell, final T currentShipment,
         CenterWrapper<?> currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
-        palletScanManagement = new PalletScanManagement() {
-
-            @Override
-            protected void processScanResult() throws Exception {
-                AbstractScanDialog.this.processScanResult(AbstractScanDialog.this.currentSite);
-                setHasValues();
-            }
-
-            @Override
-            protected void afterScanAndProcess() {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        spw.setCells(getCells());
-                        setScanHasBeenLaunched(true);
-                    }
-                });
-            }
-
-            @Override
-            protected void postprocessScanTubesManually(Set<PalletWell> cells)
-                throws Exception {
-                AbstractScanDialog.this.postprocessScanTubesManually(cells);
-                setHasValues();
-            }
-
-            @Override
-            protected boolean canScanTubeAlone(PalletWell cell) {
-                return AbstractScanDialog.this.canScanTubeAlone(cell);
-            }
-        };
+        palletScanManagement = new PalletScanManagement(this);
     }
 
     @Override
@@ -131,52 +106,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
     @Override
     protected String getDialogShellTitle() {
         return TITLE;
-    }
-
-    @SuppressWarnings("nls")
-    protected void processScanResult(CenterWrapper<?> currentCenter)
-        throws Exception {
-        log.debug("processScanResult: start");
-        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-
-        if (checkBeforeProcessing(currentCenter)) {
-            Map<RowColPos, PalletWell> cells = getCells();
-            // conversion for server side call
-            Map<RowColPos, CellInfo> serverCells = null;
-            if (cells != null) {
-                serverCells = new HashMap<RowColPos, CellInfo>();
-                for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
-                    serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
-                }
-            }
-            // server side call
-            ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
-                getPalletProcessAction(
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    serverCells,
-                    Locale.getDefault()));
-
-            if (cells != null) {
-                // for each cell, convert into a client side cell
-                for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
-                    RowColPos pos = entry.getKey();
-                    PalletWell palletWell = cells.get(entry.getKey());
-                    CellInfo servercell = entry.getValue();
-                    if (palletWell == null) {
-                        // can happen if missing
-                        palletWell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
-                            servercell.getRow(), servercell.getCol(), servercell.getValue()));
-                        cells.put(pos, palletWell);
-                    }
-                    palletWell.merge(SessionManager.getAppService(), servercell);
-                    specificScanPosProcess(palletWell);
-                }
-            }
-            setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
-        } else {
-            setScanOkValue(false);
-        }
-        log.debug("processScanResult: end");
     }
 
     @SuppressWarnings("unused")
@@ -373,38 +302,6 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
 
     protected abstract void doProceed() throws Exception;
 
-    @SuppressWarnings("nls")
-    protected boolean canScanTubeAlone(PalletWell cell) {
-        boolean result = ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
-            || (cell.getStatus() == UICellStatus.ERROR)
-            || (cell.getStatus() == UICellStatus.MISSING));
-        log.debug("canScanTubeAlone: result: {}", result);
-        return result;
-    }
-
-    @SuppressWarnings("nls")
-    protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
-        log.debug("postprocessScanTubesManually: start");
-        boolean errorFound = false;
-        for (PalletWell cell : cells) {
-            Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-                getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    cell.transformIntoServerCell(),
-                    Locale.getDefault()));
-            cell.merge(SessionManager.getAppService(), res.getCell());
-            if (res.getProcessStatus() == CellInfoStatus.ERROR) {
-                Button okButton = getButton(IDialogConstants.PROCEED_ID);
-                okButton.setEnabled(false);
-                errorFound = true;
-            }
-            specificScanPosProcess(cell);
-        }
-        spw.redraw();
-        setScanOkValue(scanStatus && !errorFound);
-        log.debug("postprocessScanTubesManually: end");
-    }
-
     protected abstract Action<ProcessResult> getCellProcessAction(
         Integer centerId, CellInfo cell, Locale locale);
 
@@ -433,12 +330,126 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends BgcB
         });
     }
 
-    /**
-     * Returns true if the grid dimensions have changed.
-     */
+    @Override
+    public void beforeScanThreadStart() {
+        // do nothing
+    }
+
+    @Override
+    public void beforeScan() {
+        // do nothing
+    }
+
+    @Override
     @SuppressWarnings("nls")
-    protected boolean checkGridDimensionsChanged() {
-        // FIXME: scanning and decoding
-        throw new RuntimeException("not implemented yet");
+    public void processScanResult() throws Exception {
+        log.debug("processScanResult: start");
+        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
+        if (checkBeforeProcessing(currentSite)) {
+            Map<RowColPos, PalletWell> cells = getCells();
+            // conversion for server side call
+            Map<RowColPos, CellInfo> serverCells = null;
+            if (cells != null) {
+                serverCells = new HashMap<RowColPos, CellInfo>();
+                for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+                    serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
+                }
+            }
+            // server side call
+            ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+                getPalletProcessAction(
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    serverCells,
+                    Locale.getDefault()));
+
+            if (cells != null) {
+                // for each cell, convert into a client side cell
+                for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
+                    RowColPos pos = entry.getKey();
+                    PalletWell palletWell = cells.get(entry.getKey());
+                    CellInfo servercell = entry.getValue();
+                    if (palletWell == null) {
+                        // can happen if missing
+                        palletWell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
+                            servercell.getRow(), servercell.getCol(), servercell.getValue()));
+                        cells.put(pos, palletWell);
+                    }
+                    palletWell.merge(SessionManager.getAppService(), servercell);
+                    specificScanPosProcess(palletWell);
+                }
+            }
+            setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
+        } else {
+            setScanOkValue(false);
+        }
+        setHasValues();
+        log.debug("processScanResult: end");
+    }
+
+    @Override
+    public void afterScanBeforeMerge() {
+        // do nothing
+    }
+
+    @Override
+    public void afterSuccessfulScan(Map<RowColPos, PalletWell> wells) {
+        // do nothing
+    }
+
+    @Override
+    public void afterScanAndProcess() {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                spw.setCells(getCells());
+                setScanHasBeenLaunched(true);
+            }
+        });
+    }
+
+    @Override
+    public void scanAndProcessError(String errorMsg) {
+        // do nothing
+    }
+
+    @Override
+    @SuppressWarnings("nls")
+    public void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+        log.debug("postprocessScanTubesManually: start");
+        boolean errorFound = false;
+        for (PalletWell cell : cells) {
+            Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+                getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    cell.transformIntoServerCell(),
+                    Locale.getDefault()));
+            cell.merge(SessionManager.getAppService(), res.getCell());
+            if (res.getProcessStatus() == CellInfoStatus.ERROR) {
+                Button okButton = getButton(IDialogConstants.PROCEED_ID);
+                okButton.setEnabled(false);
+                errorFound = true;
+            }
+            specificScanPosProcess(cell);
+        }
+        spw.redraw();
+        setScanOkValue(scanStatus && !errorFound);
+        setHasValues();
+        log.debug("postprocessScanTubesManually: end");
+    }
+
+    @Override
+    @SuppressWarnings("nls")
+    public boolean canScanTubesManually(PalletWell cell) {
+        boolean result = ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
+            || (cell.getStatus() == UICellStatus.ERROR)
+            || (cell.getStatus() == UICellStatus.MISSING));
+        log.debug("canScanTubeAlone: result: {}", result);
+        return result;
+    }
+
+    @Override
+    public Set<PlateDimensions> getValidPlateDimensions() {
+        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
     }
 }

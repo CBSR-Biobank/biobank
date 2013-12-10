@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(RequestReceiveScanDialog.class);
+
+    private static final I18n i18n = I18nFactory.getI18n(RequestReceiveScanDialog.class);
 
     private final List<SpecimenWrapper> dispatchSpecimens;
 
