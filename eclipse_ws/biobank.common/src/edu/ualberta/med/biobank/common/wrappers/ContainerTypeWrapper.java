@@ -220,18 +220,17 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
      * Get containers types with the given capacity in the given site. The container types returned
      * are ones that can only hold specimens.
      */
-    public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
+    public static List<ContainerType> getContainerTypesByCapacity(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         int maxRows, int maxCols) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(CONTAINER_TYPES_BY_CAPACITY_QRY,
-            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
-                maxRows, maxCols }));
+        HQLCriteria criteria = new HQLCriteria(
+            CONTAINER_TYPES_BY_CAPACITY_QRY,
+            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(), maxRows, maxCols }));
         List<ContainerType> containerTypes = appService.query(criteria);
-        return wrapModelCollection(appService, containerTypes,
-            ContainerTypeWrapper.class);
+        return containerTypes;
     }
 
-    public static List<ContainerTypeWrapper> getContainerTypesPallet96(
+    public static List<ContainerType> getContainerTypesPallet96(
         WritableApplicationService appService, SiteWrapper siteWrapper)
         throws ApplicationException {
         return getContainerTypesByCapacity(appService, siteWrapper,

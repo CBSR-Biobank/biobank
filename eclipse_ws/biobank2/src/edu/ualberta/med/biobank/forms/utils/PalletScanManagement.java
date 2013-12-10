@@ -53,12 +53,16 @@ public class PalletScanManagement {
     private int scansCount = 0;
     private boolean useScanner = true;
 
-    private ContainerType type;
+    private ContainerType selectedContainerType;
+
+    private final Set<ContainerType> validContainerTypes;
 
     @SuppressWarnings("nls")
     public PalletScanManagement() {
+        this.validContainerTypes = new HashSet<ContainerType>();
+
         try {
-            this.type = getFakePalletRowsCols(8, 12);
+            this.selectedContainerType = getFakePalletRowsCols(8, 12);
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 // TR: dialog title
@@ -86,7 +90,8 @@ public class PalletScanManagement {
     }
 
     public PalletScanManagement(ContainerType containerType) {
-        this.type = containerType;
+        this.validContainerTypes = new HashSet<ContainerType>();
+        this.selectedContainerType = containerType;
     }
 
     @SuppressWarnings("nls")
@@ -94,9 +99,17 @@ public class PalletScanManagement {
         beforeScanStart();
         beforeScan();
 
+        Set<PlateDimensions> validPlateDimensions;
+        if (validContainerTypes.isEmpty()) {
+            validPlateDimensions = new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
+        } else {
+            validPlateDimensions = getValidPlateDimensions();
+        }
+
         DecodeImageDialog dialog = new DecodeImageDialog(
             Display.getDefault().getActiveShell(),
-            Arrays.asList(PlateDimensions.values()));
+            validPlateDimensions);
+
         if (dialog.open() == Dialog.OK) {
             scansCount++;
             initCells();
@@ -211,7 +224,7 @@ public class PalletScanManagement {
 
         for (Entry<String, String> entry : inventoryIds.entrySet()) {
             try {
-                RowColPos pos = type.getRowColFromPositionString(entry.getKey());
+                RowColPos pos = selectedContainerType.getRowColFromPositionString(entry.getKey());
                 if (pos == null) {
                     throw new RuntimeException("label converstion to position failed: "
                         + entry.getKey());
@@ -236,10 +249,10 @@ public class PalletScanManagement {
     private Set<String> getLabelsForMissingInventoryIds(RowColPos startPos) {
 
         // find the tubes that were not successfully scanned
-        Capacity capacity = type.getCapacity();
+        Capacity capacity = selectedContainerType.getCapacity();
 
         Set<String> labelsMissingInventoryId = new LinkedHashSet<String>();
-        labelsMissingInventoryId.add(type.getPositionString(startPos));
+        labelsMissingInventoryId.add(selectedContainerType.getPositionString(startPos));
 
         Set<String> labelsMissingInventoryIdBeforeSelection = new LinkedHashSet<String>();
 
@@ -256,9 +269,9 @@ public class PalletScanManagement {
 
                 if ((well == null) || (well.getValue() == null) || well.getValue().isEmpty()) {
                     if (selectionFound) {
-                        labelsMissingInventoryId.add(type.getPositionString(pos));
+                        labelsMissingInventoryId.add(selectedContainerType.getPositionString(pos));
                     } else {
-                        labelsMissingInventoryIdBeforeSelection.add(type.getPositionString(pos));
+                        labelsMissingInventoryIdBeforeSelection.add(selectedContainerType.getPositionString(pos));
                     }
                 }
             }
@@ -372,11 +385,42 @@ public class PalletScanManagement {
         }
     }
 
+    @SuppressWarnings("nls")
+    private PlateDimensions capacityToPlateDimensions(Capacity capacity) {
+        int rows = capacity.getRowCapacity();
+        int cols = capacity.getColCapacity();
+
+        for (PlateDimensions dim : PlateDimensions.values()) {
+            if ((dim.getRows() == rows) && (dim.getCols() == cols)) {
+                return dim;
+            }
+        }
+
+        throw new IllegalStateException("capacity does not match a valid plate dimension");
+    }
+
+    private Set<PlateDimensions> getValidPlateDimensions() {
+        Set<PlateDimensions> dimensions = new HashSet<PlateDimensions>(validContainerTypes.size());
+        for (ContainerType ctype : validContainerTypes) {
+            Capacity capacity = ctype.getCapacity();
+            dimensions.add(capacityToPlateDimensions(capacity));
+        }
+        return dimensions;
+    }
+
     public void setContainerType(ContainerType containerType) {
-        this.type = containerType;
+        this.selectedContainerType = containerType;
     }
 
     public ContainerType getContainerType() {
-        return type;
+        return selectedContainerType;
+    }
+
+    public Set<ContainerType> getValidContainerTypes() {
+        return validContainerTypes;
+    }
+
+    public void setValidContainerTypes(Set<ContainerType> validContainerTypes) {
+        this.validContainerTypes.addAll(validContainerTypes);
     }
 }

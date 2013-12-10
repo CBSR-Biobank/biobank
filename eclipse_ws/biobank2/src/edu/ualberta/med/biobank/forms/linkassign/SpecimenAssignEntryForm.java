@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean useNewProductBarcode;
     private ComboViewer palletTypesViewer;
     protected boolean palletPositionTextModified;
-    private List<ContainerTypeWrapper> palletContainerTypes;
+    private final Set<ContainerType> palletContainerTypes;
     private BgcBaseText palletproductBarcodeText;
     private boolean saveEvenIfMissing;
     private Composite multipleOptionsFields;
@@ -149,8 +150,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected SpecimenAssignResInfo res;
 
     public SpecimenAssignEntryForm() {
-        currentMultipleContainer = new ContainerWrapper(
-            SessionManager.getAppService());
+        currentMultipleContainer = new ContainerWrapper(SessionManager.getAppService());
+        palletContainerTypes = new HashSet<ContainerType>();
     }
 
     @Override
@@ -167,12 +168,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @SuppressWarnings("nls")
     private void initPalletValues() {
         try {
-            currentMultipleContainer.initObjectWith(new ContainerWrapper(
-                SessionManager.getAppService()));
+            currentMultipleContainer.initObjectWith(
+                new ContainerWrapper(SessionManager.getAppService()));
             currentMultipleContainer.reset();
             currentMultipleContainer.setActivityStatus(ActivityStatus.ACTIVE);
-            currentMultipleContainer.setSite(SessionManager.getUser()
-                .getCurrentWorkingSite());
+            currentMultipleContainer.setSite(SessionManager.getUser().getCurrentWorkingSite());
         } catch (Exception e) {
             log.error("Error while reseting pallet values", e);
         }
@@ -338,7 +338,9 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             new WritableValue(Boolean.TRUE, Boolean.class), uvs, null);
         widgetCreator.addBindingToMap(INVENTORY_ID_BINDING, inventoryIdBinding);
 
-        singleTypeText = (BgcBaseText) createLabelledWidget(fieldsComposite, BgcBaseText.class,
+        singleTypeText = (BgcBaseText) createLabelledWidget(
+            fieldsComposite,
+            BgcBaseText.class,
             SWT.NONE,
             // TR: form label
             i18n.tr("Type"));
@@ -377,9 +379,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         appendLog(NLS.bind("Getting informations for inventoryID {0}",
             singleSpecimen.getInventoryId()));
-        SpecimenWrapper foundSpecimen = SpecimenWrapper
-            .getSpecimen(SessionManager.getAppService(),
-                singleSpecimen.getInventoryId());
+        SpecimenWrapper foundSpecimen = SpecimenWrapper.getSpecimen(
+            SessionManager.getAppService(), singleSpecimen.getInventoryId());
         foundSpecNull.setValue(false);
         if (foundSpecimen == null) {
             foundSpecNull.setValue(true);
@@ -405,8 +406,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 singleSpecimen.getCurrentCenter().getNameShort()));
         }
         singleTypeText.setText(singleSpecimen.getSpecimenType().getNameShort());
-        singleCollectionDateText.setText(singleSpecimen.getTopSpecimen()
-            .getFormattedCreatedAt());
+        singleCollectionDateText.setText(singleSpecimen.getTopSpecimen().getFormattedCreatedAt());
         String positionString = singleSpecimen.getPositionString(true, false);
         if (positionString == null) {
             displayOldSingleFields(false);
@@ -415,8 +415,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             focusControl(newSinglePositionText);
         } else {
             displayOldSingleFields(true);
-            oldSinglePositionCheckText.setText(oldSinglePositionCheckText
-                .getText());
+            oldSinglePositionCheckText.setText(oldSinglePositionCheckText.getText());
             focusControl(oldSinglePositionCheckText);
         }
         oldSinglePositionText.setText(positionString);
@@ -435,11 +434,15 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             // TR: label
             i18n.tr("Old position"));
         oldSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE,
-            oldSinglePositionLabel, new String[0], null, null);
+            fieldsComposite,
+            BgcBaseText.class,
+            SWT.NONE,
+            oldSinglePositionLabel,
+            new String[0],
+            null,
+            null);
         oldSinglePositionText.setEnabled(false);
-        oldSinglePositionText
-            .addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
+        oldSinglePositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
 
         // for move mode: field to enter old position. Check needed to be sure
         // nothing is wrong with the specimen
@@ -487,25 +490,27 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             i18n.tr("Enter a position"));
         displayOldSingleFields(false);
         newSinglePositionText = (BgcBaseText) widgetCreator.createBoundWidget(
-            fieldsComposite, BgcBaseText.class, SWT.NONE,
-            newSinglePositionLabel, new String[0], new WritableValue(
-                StringUtil.EMPTY_STRING, String.class),
-            newSinglePositionValidator, NEW_SINGLE_POSITION_BINDING);
+            fieldsComposite,
+            BgcBaseText.class,
+            SWT.NONE,
+            newSinglePositionLabel,
+            new String[0],
+            new WritableValue(StringUtil.EMPTY_STRING, String.class),
+            newSinglePositionValidator,
+            NEW_SINGLE_POSITION_BINDING);
         newSinglePositionText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 if (positionTextModified
-                    && newSinglePositionValidator
-                        .validate(newSinglePositionText.getText()) == Status.OK_STATUS) {
-                    BusyIndicator.showWhile(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell().getDisplay(),
+                    && (newSinglePositionValidator.validate(newSinglePositionText.getText())
+                        == Status.OK_STATUS)) {
+                    BusyIndicator.showWhile(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(),
                         new Runnable() {
                             @Override
                             public void run() {
-                                initContainersFromPosition(
-                                    newSinglePositionText, null);
-                                checkPositionAndSpecimen(inventoryIdText,
-                                    newSinglePositionText);
+                                initContainersFromPosition(newSinglePositionText, null);
+                                checkPositionAndSpecimen(inventoryIdText, newSinglePositionText);
                             }
                         });
                 }
@@ -747,6 +752,12 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                 palletproductBarcodeText.setText(newBarcode);
             }
 
+            Set<ContainerType> unwrappedCtypes = new HashSet<ContainerType>(possibleTypes.size());
+            for (ContainerTypeWrapper wrapper : possibleTypes) {
+                unwrappedCtypes.add(wrapper.getWrappedObject());
+            }
+
+            palletScanManagement.setValidContainerTypes(unwrappedCtypes);
             palletTypesViewer.getCombo().setEnabled(enableTypesCombo);
             palletTypesViewer.setInput(possibleTypes);
             if (possibleTypes.isEmpty()) {
@@ -978,6 +989,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         setUseScanner(use);
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void setUseScanner(boolean use) {
         useScanner = use;
@@ -1002,6 +1014,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         }
         super.setUseScanner(use);
         page.layout(true, true);
+        log.debug("setUseScanner: use: " + use);
         checkPalletContainerTypes();
     }
 
@@ -1012,8 +1025,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     private void createPalletTypesViewer(Composite parent)
         throws ApplicationException {
         initPalletContainerTypes();
-        palletTypesViewer = widgetCreator.createComboViewer(parent,
-            ContainerType.NAME.format(1).toString(), null, null,
+        palletTypesViewer = widgetCreator.createComboViewer(
+            parent,
+            ContainerType.NAME.format(1).toString(),
+            null,
+            null,
             // TR: validation error message
             i18n.tr("A pallet type should be selected"), true,
             PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
@@ -1023,6 +1039,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                     updateGridDimensions(ctype);
                     currentMultipleContainer.setContainerType(ctype);
                     palletTypesViewer.getCombo().setFocus();
+
+                    Set<ContainerType> ctypes = new HashSet<ContainerType>(1);
+                    ctypes.add(ctype.getWrappedObject());
+                    palletScanManagement.setValidContainerTypes(ctypes);
                     if (!useScanner) {
                         displayPalletPositions();
                     }
@@ -1033,25 +1053,30 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     /**
      * Multiple assign. Initialise list of possible pallets (8*12 or 10*10)
      */
-    private void initPalletContainerTypes() throws ApplicationException {
-        palletContainerTypes = new ArrayList<ContainerTypeWrapper>();
+    public static Set<ContainerType> getPalletContainerTypes() throws ApplicationException {
+        Set<ContainerType> ctypes = new HashSet<ContainerType>();
         for (PlateDimensions gridDimensions : PlateDimensions.values()) {
             int rows = gridDimensions.getRows();
             int cols = gridDimensions.getCols();
-            palletContainerTypes.addAll(ContainerTypeWrapper.getContainerTypesByCapacity(
-                SessionManager.getAppService(), SessionManager.getUser().getCurrentWorkingSite(),
-                rows, cols));
+            List<ContainerType> containerTypesByCapacity =
+                ContainerTypeWrapper.getContainerTypesByCapacity(
+                    SessionManager.getAppService(),
+                    SessionManager.getUser().getCurrentWorkingSite(),
+                    rows,
+                    cols);
+            ctypes.addAll(containerTypesByCapacity);
         }
+        return ctypes;
+    }
+
+    private void initPalletContainerTypes() throws ApplicationException {
+        palletContainerTypes.addAll(getPalletContainerTypes());
     }
 
     @SuppressWarnings("nls")
     private void checkPalletContainerTypes() {
         if (!isSingleMode() && useScanner && palletContainerTypes.isEmpty()) {
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("No Pallet defined?"),
-                // TR: dialog message
-                i18n.tr("No child container types found with 8 rows and 12 columns or 10 rows and 10 columns"));
+            throw new IllegalStateException("no pallets defined at this site");
         }
     }
 
@@ -1275,6 +1300,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         super.setBindings(isSingleMode);
         setScanHasBeenLaunched(isSingleMode || !useScanner);
+        log.debug("setBindings: isSingleMode" + isSingleMode);
         checkPalletContainerTypes();
         setCanLaunchScan(false);
     }

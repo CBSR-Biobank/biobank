@@ -36,8 +36,8 @@ public class UserManagementHandler extends AbstractHandler
         } catch (ApplicationException e) {
             BgcPlugin.openAsyncError(
                 // dialog title
-                i18n.tr("Unable to Load User Management Data")
-                , e.getMessage());
+                i18n.tr("Unable to Load User Management Data"),
+                e.getMessage());
         }
 
         return null;

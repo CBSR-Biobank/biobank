@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -55,11 +56,15 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
      */
     public static List<SpecimenTypeWrapper> getSpecimenTypeForPalletRowsCols(
         WritableApplicationService appService, SiteWrapper siteWrapper, int rows, int cols)
-            throws ApplicationException {
-        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
+        throws ApplicationException {
+        List<ContainerType> containerTypes = ContainerTypeWrapper
             .getContainerTypesByCapacity(appService, siteWrapper, rows, cols);
+
+        List<ContainerTypeWrapper> wrappers = wrapModelCollection(appService, containerTypes,
+            ContainerTypeWrapper.class);
+
         Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
-        for (ContainerTypeWrapper containerType : containerTypes) {
+        for (ContainerTypeWrapper containerType : wrappers) {
             SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
@@ -71,7 +76,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
         WritableApplicationService appService, boolean sort)
-            throws ApplicationException {
+        throws ApplicationException {
         HQLCriteria c = new HQLCriteria(ALL_SAMPLE_TYPES_QRY);
 
         List<SpecimenType> SpecimenTypes = appService.query(c);
@@ -92,7 +97,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
     public static List<SpecimenTypeWrapper> getAllSourceOnlySpecimenTypes(
         WritableApplicationService appService, boolean sort)
-            throws ApplicationException {
+        throws ApplicationException {
         HQLCriteria c = new HQLCriteria(ALL_SOURCE_ONLY_SPECIMEN_TYPES_QRY);
 
         List<SpecimenType> SpecimenTypes = appService.query(c);
@@ -126,12 +131,12 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     private static final String IS_USED_QRY_START = "select count(x) from ";
     @SuppressWarnings("nls")
     private static final String IS_USED_QRY_END =
-    " as x where x.specimenType.id=?";
+        " as x where x.specimenType.id=?";
     private static final Class<?>[] isUsedCheckClasses = new Class[] {
         Specimen.class, SourceSpecimen.class, AliquotedSpecimen.class };
 
     public boolean isUsed() throws ApplicationException,
-    BiobankQueryResultSizeException {
+        BiobankQueryResultSizeException {
         long usedCount = 0;
         for (Class<?> clazz : isUsedCheckClasses) {
             StringBuilder sb = new StringBuilder(IS_USED_QRY_START).append(

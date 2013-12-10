@@ -362,17 +362,18 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         gd.grabExcessHorizontalSpace = true;
         multipleVisualisation.setLayoutData(gd);
 
-        Composite freezerComposite = toolkit
-            .createComposite(multipleVisualisation);
+        Composite freezerComposite = toolkit.createComposite(multipleVisualisation);
         layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         freezerComposite.setLayout(layout);
+
         GridData gdFreezer = new GridData();
         gdFreezer.horizontalSpan = 3;
         gdFreezer.horizontalAlignment = SWT.RIGHT;
         freezerComposite.setLayoutData(gdFreezer);
+
         freezerLabel = toolkit.createLabel(freezerComposite,
             // TR: label
             i18n.tr("Freezer"));
@@ -382,13 +383,13 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         toolkit.adapt(freezerWidget);
         freezerWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH, 100);
 
-        Composite hotelComposite = toolkit
-            .createComposite(multipleVisualisation);
+        Composite hotelComposite = toolkit.createComposite(multipleVisualisation);
         layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         hotelComposite.setLayout(layout);
+
         hotelComposite.setLayoutData(new GridData());
         hotelLabel = toolkit.createLabel(hotelComposite,
             // TR: label
@@ -396,8 +397,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         hotelWidget = new ContainerDisplayWidget(hotelComposite);
         hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
-        hotelWidget.setDisplaySize(100,
-            ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
+        hotelWidget.setDisplaySize(100, ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
         Composite palletComposite = toolkit
             .createComposite(multipleVisualisation);

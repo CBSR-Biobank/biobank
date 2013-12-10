@@ -1096,7 +1096,7 @@ public class TestContainerType extends TestDatabase {
         topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
 
-        List<ContainerTypeWrapper> types = ContainerTypeWrapper
+        List<ContainerType> types = ContainerTypeWrapper
             .getContainerTypesByCapacity(appService, topType.getSite(),
                 childType.getRowCapacity(), childType.getColCapacity());
 
@@ -1123,8 +1123,8 @@ public class TestContainerType extends TestDatabase {
 
         Assert.assertTrue(childType.isPallet96());
 
-        List<ContainerTypeWrapper> pallet96s = ContainerTypeWrapper
-            .getContainerTypesPallet96(appService, site);
+        List<ContainerType> pallet96s = ContainerTypeWrapper.getContainerTypesPallet96(
+            appService, site);
         Assert.assertTrue(pallet96s.contains(childType));
         Assert.assertTrue(!pallet96s.contains(topType));
     }
