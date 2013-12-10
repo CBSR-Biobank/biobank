@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -28,6 +27,7 @@ import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
+import edu.ualberta.med.biobank.forms.linkassign.IPalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -55,11 +55,16 @@ public class PalletScanManagement {
 
     private ContainerType selectedContainerType;
 
-    private final Set<ContainerType> validContainerTypes;
+    private final IPalletScanManagement parent;
+
+    public PalletScanManagement(IPalletScanManagement parent, ContainerType containerType) {
+        this.parent = parent;
+        this.selectedContainerType = containerType;
+    }
 
     @SuppressWarnings("nls")
-    public PalletScanManagement() {
-        this.validContainerTypes = new HashSet<ContainerType>();
+    public PalletScanManagement(IPalletScanManagement parent) {
+        this.parent = parent;
 
         try {
             this.selectedContainerType = getFakePalletRowsCols(8, 12);
@@ -89,26 +94,15 @@ public class PalletScanManagement {
         return ct;
     }
 
-    public PalletScanManagement(ContainerType containerType) {
-        this.validContainerTypes = new HashSet<ContainerType>();
-        this.selectedContainerType = containerType;
-    }
-
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        beforeScanStart();
-        beforeScan();
+        parent.beforeScanThreadStart();
+        parent.beforeScan();
 
-        Set<PlateDimensions> validPlateDimensions;
-        if (validContainerTypes.isEmpty()) {
-            validPlateDimensions = new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
-        } else {
-            validPlateDimensions = getValidPlateDimensions();
-        }
+        Set<PlateDimensions> validPlateDimensions = parent.getValidPlateDimensions();
 
         DecodeImageDialog dialog = new DecodeImageDialog(
-            Display.getDefault().getActiveShell(),
-            validPlateDimensions);
+            Display.getDefault().getActiveShell(), validPlateDimensions);
 
         if (dialog.open() == Dialog.OK) {
             scansCount++;
@@ -125,20 +119,20 @@ public class PalletScanManagement {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        processScanResult();
-                        afterScanAndProcess();
-                        afterScanBeforeMerge();
-                        afterSuccessfulScan();
-                        afterScanAndProcess();
+                        parent.processScanResult();
+                        parent.afterScanAndProcess();
+                        parent.afterScanBeforeMerge();
+                        parent.afterSuccessfulScan(wells);
+                        parent.afterScanAndProcess();
                     } catch (RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
-                        scanAndProcessError(null);
+                        parent.scanAndProcessError(null);
                     } catch (AccessDeniedException e) {
                         BgcPlugin.openAsyncError(
                             // dialog title
                             i18n.tr("Scan result error"),
                             e.getLocalizedMessage());
-                        scanAndProcessError(e.getLocalizedMessage());
+                        parent.scanAndProcessError(e.getLocalizedMessage());
                     } catch (Exception ex) {
                         BgcPlugin.openAsyncError(
                             // dialog title
@@ -188,7 +182,7 @@ public class PalletScanManagement {
         }
 
         try {
-            postprocessScanTubesManually(manuallyEnteredCells);
+            parent.postprocessScanTubesManually(manuallyEnteredCells);
         } catch (Exception ex) {
             BgcPlugin.openAsyncError(
                 // dialog title
@@ -282,44 +276,6 @@ public class PalletScanManagement {
         return labelsMissingInventoryId;
     }
 
-    protected void beforeScanStart() {
-        // default does nothing
-    }
-
-    protected void beforeScan() {
-        // default does nothing
-    }
-
-    protected void processScanResult() throws Exception {
-        // default does nothing
-    }
-
-    @SuppressWarnings("unused")
-    protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
-        // default does nothing
-    }
-
-    protected void afterScanBeforeMerge() {
-        // default does nothing
-    }
-
-    protected void afterSuccessfulScan() {
-        // default does nothing
-    }
-
-    protected void afterScanAndProcess() {
-        // default does nothing
-    }
-
-    protected void plateError() {
-        // default does nothing
-    }
-
-    protected void scanAndProcessError(
-        @SuppressWarnings("unused") String errorMsg) {
-        // default does nothing
-    }
-
     public Map<RowColPos, PalletWell> getCells() {
         return wells;
     }
@@ -385,8 +341,16 @@ public class PalletScanManagement {
         }
     }
 
+    public void setContainerType(ContainerType containerType) {
+        this.selectedContainerType = containerType;
+    }
+
+    public ContainerType getContainerType() {
+        return selectedContainerType;
+    }
+
     @SuppressWarnings("nls")
-    private PlateDimensions capacityToPlateDimensions(Capacity capacity) {
+    public static PlateDimensions capacityToPlateDimensions(Capacity capacity) {
         int rows = capacity.getRowCapacity();
         int cols = capacity.getColCapacity();
 
@@ -399,28 +363,13 @@ public class PalletScanManagement {
         throw new IllegalStateException("capacity does not match a valid plate dimension");
     }
 
-    private Set<PlateDimensions> getValidPlateDimensions() {
-        Set<PlateDimensions> dimensions = new HashSet<PlateDimensions>(validContainerTypes.size());
-        for (ContainerType ctype : validContainerTypes) {
-            Capacity capacity = ctype.getCapacity();
-            dimensions.add(capacityToPlateDimensions(capacity));
-        }
+    /*
+     * This is the default implementation for scan assign and dispatch. For scan link this method is
+     * overriden.
+     */
+    public static Set<PlateDimensions> getValidPlateDimensions(ContainerType containerType) {
+        Set<PlateDimensions> dimensions = new HashSet<PlateDimensions>(1);
+        dimensions.add(capacityToPlateDimensions(containerType.getCapacity()));
         return dimensions;
-    }
-
-    public void setContainerType(ContainerType containerType) {
-        this.selectedContainerType = containerType;
-    }
-
-    public ContainerType getContainerType() {
-        return selectedContainerType;
-    }
-
-    public Set<ContainerType> getValidContainerTypes() {
-        return validContainerTypes;
-    }
-
-    public void setValidContainerTypes(Set<ContainerType> validContainerTypes) {
-        this.validContainerTypes.addAll(validContainerTypes);
     }
 }

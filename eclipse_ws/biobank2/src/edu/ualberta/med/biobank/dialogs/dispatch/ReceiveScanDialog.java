@@ -2,8 +2,10 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -28,11 +30,12 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PlateDimensions;
 
-public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
-    AbstractScanDialog<T> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ReceiveScanDialog.class);
+public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
+    extends AbstractScanDialog<T> {
+
+    private static final I18n i18n = I18nFactory.getI18n(ReceiveScanDialog.class);
 
     private boolean specimensReceived = false;
 
@@ -113,27 +116,26 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
 
-        if (BgcPlugin
-            .openConfirm(
-                // confirmation dialog title
-                i18n.tr("Print"),
-                // confirmation dialog message
-                i18n.tr("Do you wish to print a location sheet for the recipient?")))
+        boolean userSelection = BgcPlugin.openConfirm(
+            // confirmation dialog title
+            i18n.tr("Print"),
+            // confirmation dialog message
+            i18n.tr("Do you wish to print a location sheet for the recipient?"));
+        if (userSelection) {
             print();
+        }
     }
 
     @SuppressWarnings("nls")
     protected void print() {
         try {
-            PalletBarcodeDialog barcodeDialog = new PalletBarcodeDialog(
-                getShell());
+            PalletBarcodeDialog barcodeDialog = new PalletBarcodeDialog(getShell());
             if (barcodeDialog.open() == Dialog.OK) {
                 String productBarcode = barcodeDialog.getBarcode();
                 List<Object> output = new ArrayList<Object>();
                 Map<RowColPos, ? extends AbstractUIWell> cells = spw.getCells();
                 for (RowColPos pos : cells.keySet()) {
-                    String inventoryId = ((PalletWell) cells.get(pos))
-                        .getValue();
+                    String inventoryId = ((PalletWell) cells.get(pos)).getValue();
                     SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                         SessionManager.getAppService(), inventoryId);
                     String cell[] =
@@ -187,6 +189,11 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>> extends
 
     public boolean hasReceivedSpecimens() {
         return specimensReceived;
+    }
+
+    @Override
+    public Set<PlateDimensions> getValidPlateDimensions() {
+        return new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
     }
 
 }

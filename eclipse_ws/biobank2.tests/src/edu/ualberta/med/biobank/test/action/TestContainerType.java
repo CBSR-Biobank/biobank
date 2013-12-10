@@ -16,8 +16,10 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeDeleteA
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeGetInfoAction.ContainerTypeInfo;
 import edu.ualberta.med.biobank.common.action.containerType.ContainerTypeSaveAction;
+import edu.ualberta.med.biobank.common.action.containerType.SpecimenContainerTypesByCapacityAction;
 import edu.ualberta.med.biobank.common.util.HibernateUtil;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.test.Utils;
@@ -184,15 +186,12 @@ public class TestContainerType extends TestAction {
             ctContainerTypeIds.add(allContainerTypes.get(i).getId());
             set1.add(allContainerTypes.get(i).getId());
 
-            containerTypeSaveAction
-                .setChildContainerTypeIds(ctContainerTypeIds);
+            containerTypeSaveAction.setChildContainerTypeIds(ctContainerTypeIds);
             containerTypeId = exec(containerTypeSaveAction).getId();
-            containerTypeInfo =
-                exec(new ContainerTypeGetInfoAction(containerTypeId));
+            containerTypeInfo = exec(new ContainerTypeGetInfoAction(containerTypeId));
             Assert.assertEquals(ctContainerTypeIds,
                 getChildContainerTypeIds(containerTypeInfo));
-            containerTypeSaveAction =
-                ContainerTypeHelper.getSaveAction(containerTypeInfo);
+            containerTypeSaveAction = ContainerTypeHelper.getSaveAction(containerTypeInfo);
         }
 
         // add another 2 container types all at once
@@ -290,20 +289,15 @@ public class TestContainerType extends TestAction {
     @Test
     public void comments() {
         // save with no comments
-        Integer containerTypeId =
-            exec(containerTypeSaveAction).getId();
-        ContainerTypeInfo containerTypeInfo =
-            exec(new ContainerTypeGetInfoAction(containerTypeId));
-        Assert.assertEquals(0, containerTypeInfo.getContainerType()
-            .getComments().size());
+        Integer containerTypeId = exec(containerTypeSaveAction).getId();
+        ContainerTypeInfo containerTypeInfo = exec(new ContainerTypeGetInfoAction(containerTypeId));
+        Assert.assertEquals(0, containerTypeInfo.getContainerType().getComments().size());
 
         containerTypeInfo = addComment(containerTypeId);
-        Assert.assertEquals(1, containerTypeInfo.getContainerType()
-            .getComments().size());
+        Assert.assertEquals(1, containerTypeInfo.getContainerType().getComments().size());
 
         containerTypeInfo = addComment(containerTypeId);
-        Assert.assertEquals(2, containerTypeInfo.getContainerType()
-            .getComments().size());
+        Assert.assertEquals(2, containerTypeInfo.getContainerType().getComments().size());
 
         // TODO: check full name on each comment's user
         // for (Comment comment :
@@ -317,8 +311,7 @@ public class TestContainerType extends TestAction {
         ContainerTypeSaveAction containerTypeSaveAction =
             ContainerTypeHelper.getSaveAction(
                 exec(new ContainerTypeGetInfoAction(containerTypeId)));
-        containerTypeSaveAction
-            .setCommentMessage(Utils.getRandomString(20, 30));
+        containerTypeSaveAction.setCommentMessage(Utils.getRandomString(20, 30));
         exec(containerTypeSaveAction).getId();
         return exec(new ContainerTypeGetInfoAction(containerTypeId));
     }
@@ -333,12 +326,91 @@ public class TestContainerType extends TestAction {
             .getContainerType()));
 
         // hql query for container type should return empty
-        Query q =
-            session.createQuery("SELECT COUNT(*) FROM "
-                + ContainerType.class.getName() + " WHERE id=?");
+        Query q = session.createQuery("SELECT COUNT(*) FROM "
+            + ContainerType.class.getName() + " WHERE id=?");
         q.setParameter(0, containerTypeId);
         Long result = HibernateUtil.getCountFromQuery(q);
 
         Assert.assertTrue(result.equals(0L));
+    }
+
+    private ContainerType addContainerType(int rows, int cols, Set<SpecimenType> specimenTypes) {
+        Capacity capacity = factory.createCapacity();
+        capacity.setRowCapacity(rows);
+        capacity.setColCapacity(cols);
+
+        ContainerType ctype = factory.createContainerType();
+        ctype.setSpecimenTypes(specimenTypes);
+        ctype.setCapacity(capacity);
+        return ctype;
+    }
+
+    @Test
+    public void containerTypesByCapacitySingle() {
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        Set<Capacity> capacities = new HashSet<Capacity>();
+
+        session.beginTransaction();
+
+        SpecimenType specimenType = factory.createSpecimenType();
+        specimenTypes.add(specimenType);
+
+        ContainerType ctype = addContainerType(5, 6, specimenTypes);
+
+        Capacity capacity = ctype.getCapacity();
+        capacities.add(capacity);
+
+        session.getTransaction().commit();
+
+        SpecimenContainerTypesByCapacityAction action = new SpecimenContainerTypesByCapacityAction(
+            factory.getDefaultSite(), capacities);
+
+        ArrayList<ContainerType> result = exec(action).getList();
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals(ctype, result.get(0));
+        Assert.assertEquals(capacity, result.get(0).getCapacity());
+    }
+
+    @Test
+    public void containerTypesByCapacityMultiple() {
+        Set<SpecimenType> specimenTypes = new HashSet<SpecimenType>();
+        Set<Capacity> capacities = new HashSet<Capacity>();
+
+        session.beginTransaction();
+
+        SpecimenType specimenType = factory.createSpecimenType();
+        specimenTypes.add(specimenType);
+
+        List<ContainerType> ctypes = new ArrayList<ContainerType>();
+        ctypes.add(addContainerType(5, 6, specimenTypes));
+        ctypes.add(addContainerType(8, 12, specimenTypes));
+
+        for (ContainerType ctype : ctypes) {
+            capacities.add(ctype.getCapacity());
+        }
+
+        session.getTransaction().commit();
+
+        SpecimenContainerTypesByCapacityAction action = new SpecimenContainerTypesByCapacityAction(
+            factory.getDefaultSite(), capacities);
+
+        ArrayList<ContainerType> result = exec(action).getList();
+        Assert.assertEquals(2, result.size());
+        Assert.assertTrue(result.containsAll(ctypes));
+    }
+
+    @Test
+    public void containerTypesByCapacityNone() {
+        Set<Capacity> emptyCapacities = new HashSet<Capacity>();
+
+        session.beginTransaction();
+        factory.createSite();
+        session.getTransaction().commit();
+
+        SpecimenContainerTypesByCapacityAction action = new SpecimenContainerTypesByCapacityAction(
+            factory.getDefaultSite(), emptyCapacities);
+
+        ArrayList<ContainerType> result = exec(action).getList();
+        Assert.assertEquals(0, result.size());
     }
 }

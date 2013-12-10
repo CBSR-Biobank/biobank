@@ -21,10 +21,9 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
-public class DispatchReceiveScanDialog extends
-    ReceiveScanDialog<DispatchWrapper> {
-    private static final I18n i18n = I18nFactory
-        .getI18n(DispatchReceiveScanDialog.class);
+public class DispatchReceiveScanDialog extends ReceiveScanDialog<DispatchWrapper> {
+
+    private static final I18n i18n = I18nFactory.getI18n(DispatchReceiveScanDialog.class);
 
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {

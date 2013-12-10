@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.tools.testconfig;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -71,6 +71,8 @@ public class TestConfigCreate {
     private final String globalAdminUserLogin = "testuser";
 
     private final User globalAdminUser;
+
+    private Map<String, ContainerType> containerTypes;
 
     public static void main(String[] argv) {
         try {
@@ -285,71 +287,58 @@ public class TestConfigCreate {
         return site;
     }
 
-    private void createFreezer(Site site) {
-        if (session == null) {
-            throw new IllegalStateException("session not initialized");
-        }
-        if (site == null) {
-            throw new IllegalStateException("studies is null");
-        }
-
-        session.beginTransaction();
-        List<ContainerType> containerTypes = createContainerTypes(site);
-        createContainers(containerTypes, "01");
-        session.getTransaction().commit();
-    }
-
-    private List<ContainerType> createContainerTypes(Site site) {
+    private Map<String, ContainerType> createContainerTypes(Site site) {
         ContainerType pallet96 = createContainerType(site, "Pallet96", "P96", 8, 12,
             getContainerLabelingScheme("SBS Standard"));
         pallet96.getSpecimenTypes().add(getSpecimenType(ALQ_SPC_TYPE_NAME));
         session.update(pallet96);
 
+        ContainerType pallet9x9 = createContainerType(site, "Pallet9x9", "P9x9", 9, 9,
+            getContainerLabelingScheme("SBS Standard"));
+        pallet9x9.getSpecimenTypes().add(getSpecimenType(ALQ_SPC_TYPE_NAME));
+        session.update(pallet9x9);
+
+        ContainerType pallet10x10 = createContainerType(site, "Pallet10x10", "P10x10", 10, 10,
+            getContainerLabelingScheme("SBS Standard"));
+        pallet10x10.getSpecimenTypes().add(getSpecimenType(ALQ_SPC_TYPE_NAME));
+        session.update(pallet10x10);
+
+        ContainerType pallet12x12 = createContainerType(site, "Pallet12x12", "P12x12", 12, 12,
+            getContainerLabelingScheme("SBS Standard"));
+        pallet12x12.getSpecimenTypes().add(getSpecimenType(ALQ_SPC_TYPE_NAME));
+        session.update(pallet12x12);
+
+        // Hotel 19 holds all types of pallets
         ContainerType hotel19 = createContainerType(site, "Hotel19", "H19", 19, 1,
             getContainerLabelingScheme("2 char numeric"));
         hotel19.getChildContainerTypes().add(pallet96);
+        hotel19.getChildContainerTypes().add(pallet9x9);
+        hotel19.getChildContainerTypes().add(pallet10x10);
+        hotel19.getChildContainerTypes().add(pallet12x12);
         session.update(hotel19);
+
+        // Hotel 13 only holds Pallet96
+        ContainerType hotel13 = createContainerType(site, "Hotel13", "H13", 13, 1,
+            getContainerLabelingScheme("2 char numeric"));
+        hotel19.getChildContainerTypes().add(pallet96);
+        session.update(hotel13);
 
         ContainerType freezer = createContainerType(site, "Freezer4x10", "FR4x10", 4, 10,
             getContainerLabelingScheme("2 char alphabetic"));
         freezer.setTopLevel(true);
         freezer.getChildContainerTypes().add(hotel19);
+        freezer.getChildContainerTypes().add(hotel13);
         session.update(freezer);
 
-        return Arrays.asList(freezer, hotel19, pallet96);
-    }
-
-    /**
-     * Creates top level container and the first level child at the first position.
-     * 
-     * containerTypes is a list with 3 items where item 0 is the top level container, 1 the first
-     * level child and 2 the second level child.
-     */
-    private void createContainers(List<ContainerType> containerTypes, String topLevelLabel) {
-        if (containerTypes.size() != 3) {
-            throw new IllegalStateException("invalid number of items in containerTypes list");
-        }
-
-        Container topContainer = createContainer(containerTypes.get(0));
-        topContainer.setLabel(topLevelLabel);
-        session.save(topContainer);
-        session.flush();
-
-        Container childContainer = createContainer(containerTypes.get(1));
-        childContainer.setLabel("01AA");
-        session.save(childContainer);
-
-        ContainerPosition pos = new ContainerPosition();
-        pos.setRow(0);
-        pos.setCol(0);
-        pos.setContainer(childContainer);
-        childContainer.setPosition(pos);
-        childContainer.setTopContainer(topContainer);
-        session.update(childContainer);
-
-        pos.setParentContainer(topContainer);
-        topContainer.getChildPositions().add(pos);
-        session.update(topContainer);
+        Map<String, ContainerType> result = new HashMap<String, ContainerType>();
+        result.put(freezer.getName(), freezer);
+        result.put(hotel19.getName(), hotel19);
+        result.put(hotel13.getName(), hotel13);
+        result.put(pallet96.getName(), pallet96);
+        result.put(pallet9x9.getName(), pallet9x9);
+        result.put(pallet10x10.getName(), pallet10x10);
+        result.put(pallet12x12.getName(), pallet12x12);
+        return result;
     }
 
     private ContainerType createContainerType(Site site, String name, String nameShort,
@@ -370,14 +359,6 @@ public class TestConfigCreate {
         return containerType;
     }
 
-    private Container createContainer(ContainerType containerType) {
-        Container container = new Container();
-        container.setSite(containerType.getSite());
-        container.setContainerType(containerType);
-        container.setTopContainer(container);
-        return container;
-    }
-
     private ContainerLabelingScheme getContainerLabelingScheme(String schemeName) {
         ContainerLabelingScheme scheme =
             (ContainerLabelingScheme) session.createCriteria(ContainerLabelingScheme.class)
@@ -388,5 +369,77 @@ public class TestConfigCreate {
         }
 
         return scheme;
+    }
+
+    private void createFreezer(Site site) {
+        if (session == null) {
+            throw new IllegalStateException("session not initialized");
+        }
+        if (site == null) {
+            throw new IllegalStateException("studies is null");
+        }
+
+        session.beginTransaction();
+        containerTypes = createContainerTypes(site);
+        createFreezer("01");
+        session.getTransaction().commit();
+    }
+
+    /**
+     * Creates top level container and the first level child at the first position.
+     * 
+     * containerTypes is a list with 3 items where item 0 is the top level container, 1 the first
+     * level child and 2 the second level child.
+     */
+    private void createFreezer(String topLevelLabel) {
+        if (containerTypes.isEmpty()) {
+            throw new IllegalStateException("containerTypes list is empty");
+        }
+
+        Container topContainer = createContainer(containerTypes.get("Freezer4x10"));
+        topContainer.setLabel(topLevelLabel);
+        session.save(topContainer);
+        session.flush();
+
+        addChildContainer(topContainer, containerTypes.get("Hotel19"), "01AA", 0, 0);
+        addChildContainer(topContainer, containerTypes.get("Hotel13"), "01AB", 1, 0);
+    }
+
+    private Container createContainer(ContainerType containerType) {
+        if (containerType == null) {
+            throw new IllegalStateException("container type is null");
+        }
+
+        Container container = new Container();
+        container.setSite(containerType.getSite());
+        container.setContainerType(containerType);
+        container.setTopContainer(container);
+        return container;
+    }
+
+    private void addChildContainer(
+        Container parentContainer,
+        ContainerType childContainerType,
+        String label,
+        int row,
+        int col) {
+
+        session.flush();
+        Container childContainer = createContainer(childContainerType);
+        childContainer.setLabel(label);
+        session.save(childContainer);
+
+        ContainerPosition pos = new ContainerPosition();
+        pos.setRow(row);
+        pos.setCol(col);
+        pos.setContainer(childContainer);
+        childContainer.setPosition(pos);
+        childContainer.setTopContainer(parentContainer);
+        session.update(childContainer);
+
+        pos.setParentContainer(parentContainer);
+        parentContainer.getChildPositions().add(pos);
+
+        session.update(parentContainer);
     }
 }

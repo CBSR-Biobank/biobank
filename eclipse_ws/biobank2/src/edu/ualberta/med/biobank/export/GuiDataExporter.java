@@ -48,8 +48,8 @@ public abstract class GuiDataExporter implements DataExporter {
     }
 
     @Override
-    public final void export(final Data data,
-        final ITableLabelProvider labelProvider) throws DataExportException {
+    public final void export(final Data data, final ITableLabelProvider labelProvider)
+        throws DataExportException {
         Shell shell = Display.getDefault().getActiveShell();
         IRunnableContext context = new ProgressMonitorDialog(shell);
         try {

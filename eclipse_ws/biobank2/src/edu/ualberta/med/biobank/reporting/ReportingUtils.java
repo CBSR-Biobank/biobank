@@ -82,9 +82,8 @@ public class ReportingUtils {
     public static PrinterData data;
 
     /**
-     * if userIntegerProperties is set to true, then the map contained inside
-     * 'list' should be contain [{0=value}, {1=value}...] instead of
-     * [{name=value}...] (see issue #1312)
+     * if userIntegerProperties is set to true, then the map contained inside 'list' should be
+     * contain [{0=value}, {1=value}...] instead of [{name=value}...] (see issue #1312)
      */
     @SuppressWarnings("nls")
     public static JasperPrint createDynamicReport(String reportName,
@@ -281,7 +280,7 @@ public class ReportingUtils {
             @SuppressWarnings("nls")
             @Override
             public void run() {
-                Shell shell = display.getActiveShell();
+                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
                 PrintDialog dialog = new PrintDialog(shell, SWT.NONE);
                 PrinterData data = dialog.open();
 

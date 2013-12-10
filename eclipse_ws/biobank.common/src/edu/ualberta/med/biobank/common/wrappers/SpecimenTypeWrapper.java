@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.WrapperTransaction.TaskList;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
@@ -57,14 +56,10 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     public static List<SpecimenTypeWrapper> getSpecimenTypeForPalletRowsCols(
         WritableApplicationService appService, SiteWrapper siteWrapper, int rows, int cols)
         throws ApplicationException {
-        List<ContainerType> containerTypes = ContainerTypeWrapper
+        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesByCapacity(appService, siteWrapper, rows, cols);
-
-        List<ContainerTypeWrapper> wrappers = wrapModelCollection(appService, containerTypes,
-            ContainerTypeWrapper.class);
-
         Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
-        for (ContainerTypeWrapper containerType : wrappers) {
+        for (ContainerTypeWrapper containerType : containerTypes) {
             SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
         return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);

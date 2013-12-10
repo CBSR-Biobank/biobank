@@ -48,7 +48,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
-    implements ModifyListener {
+    implements IPalletScanManagement, ModifyListener {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -64,17 +64,17 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     private static String plateToScanSessionString = StringUtil.EMPTY_STRING;
 
-    private final IObservableValue plateToScanValue = new WritableValue(
-        plateToScanSessionString, String.class);
+    private final IObservableValue plateToScanValue =
+        new WritableValue(plateToScanSessionString, String.class);
 
-    private final IObservableValue canLaunchScanValue = new WritableValue(
-        Boolean.TRUE, Boolean.class);
+    private final IObservableValue canLaunchScanValue =
+        new WritableValue(Boolean.TRUE, Boolean.class);
 
     private final IObservableValue scanHasBeenLaunchedValue =
         new WritableValue(Boolean.FALSE, Boolean.class);
 
-    private final IObservableValue scanValidValue = new WritableValue(
-        Boolean.TRUE, Boolean.class);
+    private final IObservableValue scanValidValue =
+        new WritableValue(Boolean.TRUE, Boolean.class);
 
     protected PalletScanManagement palletScanManagement;
 
@@ -92,72 +92,128 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         super.init();
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         currentPlateToScan = plateToScanSessionString;
-        palletScanManagement = new PalletScanManagement() {
-            // FIXME: scanning and decoding
-
-            @Override
-            protected void beforeScanStart() {
-                currentPlateToScan = plateToScanValue.getValue().toString();
-                AbstractPalletSpecimenAdminForm.this.beforeScanThreadStart();
-            }
-
-            @SuppressWarnings("nls")
-            @Override
-            protected void beforeScan() {
-                setScanHasBeenLaunched(false, true);
-                String msg = "----SCAN on plate {0}----";
-                appendLog(NLS.bind(msg, currentPlateToScan));
-
-            }
-
-            @Override
-            protected void processScanResult() throws Exception {
-                AbstractPalletSpecimenAdminForm.this.processScanResult();
-            }
-
-            @Override
-            protected void afterScanBeforeMerge() {
-                setScanHasBeenLaunched(true, true);
-            }
-
-            @SuppressWarnings("nls")
-            @Override
-            protected void afterSuccessfulScan() {
-                appendLog(NLS.bind("Scan completed - {0} specimens found", wells.keySet().size()));
-            }
-
-            @Override
-            protected void afterScanAndProcess() {
-                AbstractPalletSpecimenAdminForm.this.afterScanAndProcess(null);
-            }
-
-            @Override
-            protected void scanAndProcessError(String errorMsg) {
-                setScanValid(false);
-                if (errorMsg != null && !errorMsg.isEmpty()) {
-                    appendLog(errorMsg);
-                }
-            }
-
-            @Override
-            protected void plateError() {
-                setScanHasBeenLaunched(false, true);
-            }
-
-            @Override
-            protected void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
-                AbstractPalletSpecimenAdminForm.this.postprocessScanTubeAlone(cells);
-            }
-
-            @Override
-            protected boolean canScanTubeAlone(PalletWell cell) {
-                return AbstractPalletSpecimenAdminForm.this.canScanTubesManually(cell);
-            }
-        };
+        palletScanManagement = new PalletScanManagement(this);
     }
 
-    protected void beforeScanThreadStart() {
-        // default does nothing
+    @Override
+    public void beforeScanThreadStart() {
+        currentPlateToScan = plateToScanValue.getValue().toString();
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void beforeScan() {
+        setScanHasBeenLaunched(false, true);
+        String msg = "----SCAN on plate {0}----";
+        appendLog(NLS.bind(msg, currentPlateToScan));
+
+    }
+
+    /**
+     * go through cells retrieved from scan, set status and update the types combos components
+     * 
+     * @throws Exception
+     */
+    @Override
+    @SuppressWarnings("nls")
+    public void processScanResult() throws Exception {
+        Map<RowColPos, PalletWell> cells = getCells();
+        // conversion for server side call
+        Map<RowColPos, CellInfo> serverCells = null;
+        if (cells != null) {
+            serverCells = new HashMap<RowColPos, CellInfo>();
+            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+                serverCells.put(entry.getKey(), entry.getValue()
+                    .transformIntoServerCell());
+            }
+        }
+        // server side call
+        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+            getPalletProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                serverCells, Locale.getDefault()));
+        // print result logs
+        appendLogs(res.getLogs());
+
+        if (cells != null) {
+            // for each cell, convert into a client side cell
+            for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
+                RowColPos pos = entry.getKey();
+                PalletWell palletCell = cells.get(entry.getKey());
+                CellInfo servercell = entry.getValue();
+                if (palletCell == null) {
+                    // can happen if missing no tube in this cell
+                    palletCell = new PalletWell(
+                        pos.getRow(),
+                        pos.getCol(),
+                        new DecodedWell(
+                            servercell.getRow(),
+                            servercell.getCol(),
+                            servercell.getValue()));
+                    cells.put(pos, palletCell);
+                    log.debug("processScanResult: palletCell is null: pos ({}, {})",
+                        pos.getRow(), pos.getCol());
+                }
+                palletCell.merge(SessionManager.getAppService(), servercell);
+                // additional cell specific client conversion if needed
+                processCellResult(pos, palletCell);
+            }
+        }
+        currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
+        setScanValid(getCells() != null && !getCells().isEmpty()
+            && currentScanState != UICellStatus.ERROR);
+    }
+
+    @Override
+    public void afterScanBeforeMerge() {
+        setScanHasBeenLaunched(true, true);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void afterSuccessfulScan(Map<RowColPos, PalletWell> wells) {
+        appendLog(NLS.bind("Scan completed - {0} specimens found", wells.keySet().size()));
+    }
+
+    @Override
+    public void afterScanAndProcess() {
+        AbstractPalletSpecimenAdminForm.this.afterScanAndProcess(null);
+    }
+
+    @Override
+    public void scanAndProcessError(String errorMsg) {
+        setScanValid(false);
+        if (errorMsg != null && !errorMsg.isEmpty()) {
+            appendLog(errorMsg);
+        }
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+        for (PalletWell palletCell : cells) {
+            appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
+                palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
+            beforeScanTubeAlone();
+            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+                getCellProcessAction(
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    palletCell.transformIntoServerCell(),
+                    Locale.getDefault()));
+            palletCell.merge(SessionManager.getAppService(), res.getCell());
+            appendLogs(res.getLogs());
+            processCellResult(palletCell.getRowColPos(), palletCell);
+            currentScanState = currentScanState.mergeWith(palletCell.getStatus());
+            setScanValid((getCells() != null)
+                && !getCells().isEmpty()
+                && (currentScanState != UICellStatus.ERROR));
+            afterScanAndProcess(palletCell.getRow());
+            setScanHasBeenLaunched(true);
+        }
+    }
+
+    @Override
+    public boolean canScanTubesManually(PalletWell cell) {
+        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY));
     }
 
     @SuppressWarnings("unused")
@@ -297,30 +353,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
     }
 
-    @SuppressWarnings("nls")
-    protected void postprocessScanTubeAlone(Set<PalletWell> palletCells) throws Exception {
-
-        for (PalletWell palletCell : palletCells) {
-            appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
-                palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
-            beforeScanTubeAlone();
-            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-                getCellProcessAction(
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    palletCell.transformIntoServerCell(),
-                    Locale.getDefault()));
-            palletCell.merge(SessionManager.getAppService(), res.getCell());
-            appendLogs(res.getLogs());
-            processCellResult(palletCell.getRowColPos(), palletCell);
-            currentScanState = currentScanState.mergeWith(palletCell.getStatus());
-            setScanValid((getCells() != null)
-                && !getCells().isEmpty()
-                && (currentScanState != UICellStatus.ERROR));
-            afterScanAndProcess(palletCell.getRow());
-            setScanHasBeenLaunched(true);
-        }
-    }
-
     protected abstract Action<ProcessResult> getCellProcessAction(
         Integer centerId, CellInfo cell, Locale locale);
 
@@ -355,59 +387,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         }
     }
 
-    /**
-     * go through cells retrieved from scan, set status and update the types combos components
-     * 
-     * @throws Exception
-     */
-    @SuppressWarnings("nls")
-    protected void processScanResult() throws Exception {
-        Map<RowColPos, PalletWell> cells = getCells();
-        // conversion for server side call
-        Map<RowColPos, CellInfo> serverCells = null;
-        if (cells != null) {
-            serverCells = new HashMap<RowColPos, CellInfo>();
-            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
-                serverCells.put(entry.getKey(), entry.getValue()
-                    .transformIntoServerCell());
-            }
-        }
-        // server side call
-        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
-            getPalletProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                serverCells, Locale.getDefault()));
-        // print result logs
-        appendLogs(res.getLogs());
-
-        if (cells != null) {
-            // for each cell, convert into a client side cell
-            for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
-                RowColPos pos = entry.getKey();
-                PalletWell palletCell = cells.get(entry.getKey());
-                CellInfo servercell = entry.getValue();
-                if (palletCell == null) {
-                    // can happen if missing no tube in this cell
-                    palletCell = new PalletWell(
-                        pos.getRow(),
-                        pos.getCol(),
-                        new DecodedWell(
-                            servercell.getRow(),
-                            servercell.getCol(),
-                            servercell.getValue()));
-                    cells.put(pos, palletCell);
-                    log.debug("processScanResult: palletCell is null: pos ({}, {})",
-                        pos.getRow(), pos.getCol());
-                }
-                palletCell.merge(SessionManager.getAppService(), servercell);
-                // additional cell specific client conversion if needed
-                processCellResult(pos, palletCell);
-            }
-        }
-        currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
-        setScanValid(getCells() != null && !getCells().isEmpty()
-            && currentScanState != UICellStatus.ERROR);
-    }
-
     @SuppressWarnings("unused")
     protected void processCellResult(RowColPos rcp, PalletWell palletCell) {
         // nothing done by default
@@ -415,10 +394,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     protected boolean isAtLeastOneScanLaunched() {
         return palletScanManagement.getScansCount() > 0;
-    }
-
-    protected boolean canScanTubesManually(PalletWell cell) {
-        return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY));
     }
 
     protected void focusControl(final Control control) {
