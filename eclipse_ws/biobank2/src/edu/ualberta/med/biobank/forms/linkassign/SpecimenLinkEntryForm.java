@@ -78,6 +78,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
 
     @SuppressWarnings("nls")
+    public static final String FORM_TITLE = i18n.tr("Specimen Link");
+
+    @SuppressWarnings("nls")
     private static final String INVENTORY_ID_BINDING = "inventoryId-binding";
 
     @SuppressWarnings("nls")
@@ -123,7 +126,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         log.debug("init");
         super.init();
         // TR: title
-        setPartName(i18n.tr("Linking specimens"));
+        setPartName(FORM_TITLE);
         setCanLaunchScan(false);
     }
 
@@ -131,7 +134,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected String getFormTitle() {
         // TR: form title
-        return i18n.tr("Linking specimens");
+        return i18n.tr(FORM_TITLE);
     }
 
     @SuppressWarnings("nls")
