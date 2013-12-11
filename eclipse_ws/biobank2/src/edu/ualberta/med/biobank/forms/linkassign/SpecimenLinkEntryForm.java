@@ -78,6 +78,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenLinkEntryForm";
 
     @SuppressWarnings("nls")
+    // TR: form title
     public static final String FORM_TITLE = i18n.tr("Specimen Link");
 
     @SuppressWarnings("nls")
@@ -130,11 +131,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         setCanLaunchScan(false);
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected String getFormTitle() {
-        // TR: form title
-        return i18n.tr(FORM_TITLE);
+        return FORM_TITLE;
     }
 
     @SuppressWarnings("nls")
@@ -692,11 +691,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
             .getCurrentPatient().getStudy().getId(), cells, locale);
     }
 
-    @Override
     /**
-     *  Multiple linking: do this after multiple scan has been launched
-     *  @param rowToProcess is null if scanning everything, is the current row if is scanning a single cell
+     * Multiple linking: do this after multiple scan has been launched
+     * 
+     * @param rowToProcess is null if scanning everything, is the current row if is scanning a
+     *            single cell
      */
+    @Override
     protected void afterScanAndProcess(final Integer rowToProcess) {
         Display.getDefault().asyncExec(new Runnable() {
             @SuppressWarnings("nls")
@@ -792,36 +793,37 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private void createHierarchyWidgets(Composite parent) {
-        specimenTypesWidget = new SpecimenTypeSelectionWidget(parent, widgetCreator,
-            currentGridDimensions.getRow());
-        specimenTypesWidget.addSelectionChangedListener(new ISpecimenTypeSelectionChangedListener() {
+        specimenTypesWidget = new SpecimenTypeSelectionWidget(
+            parent, widgetCreator, currentGridDimensions.getRow());
+        specimenTypesWidget.addSelectionChangedListener(
+            new ISpecimenTypeSelectionChangedListener() {
 
-            @Override
-            public void selectionChanged(SpecimenTypeSelectionEvent event) {
-                // if (selection != null) {
-                @SuppressWarnings("unchecked")
-                Map<RowColPos, PalletWell> cells =
-                    (Map<RowColPos, PalletWell>) palletWidget.getCells();
-                if (cells != null) {
-                    for (RowColPos rcp : cells.keySet()) {
-                        if (rcp.getRow() == event.getRowNumber()) {
-                            PalletWell cell = cells.get(rcp);
-                            if (PalletWell.hasValue(cell)) {
-                                setHierarchyToCell(cell, event);
+                @Override
+                public void selectionChanged(SpecimenTypeSelectionEvent event) {
+                    // if (selection != null) {
+                    @SuppressWarnings("unchecked")
+                    Map<RowColPos, PalletWell> cells =
+                        (Map<RowColPos, PalletWell>) palletWidget.getCells();
+                    if (cells != null) {
+                        for (RowColPos rcp : cells.keySet()) {
+                            if (rcp.getRow() == event.getRowNumber()) {
+                                PalletWell cell = cells.get(rcp);
+                                if (PalletWell.hasValue(cell)) {
+                                    setHierarchyToCell(cell, event);
+                                }
                             }
                         }
+                        palletWidget.redraw();
                     }
-                    palletWidget.redraw();
+                    // }
+
+                    if (palletWidget.isEverythingTyped()) {
+                        setDirty(true);
+                    }
+
                 }
-                // }
 
-                if (palletWidget.isEverythingTyped()) {
-                    setDirty(true);
-                }
-
-            }
-
-        });
+            });
         toolkit.adapt(specimenTypesWidget);
     }
 

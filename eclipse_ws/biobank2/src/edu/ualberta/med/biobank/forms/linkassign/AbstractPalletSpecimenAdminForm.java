@@ -29,14 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
-import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
@@ -62,11 +60,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     // TR: button label
     private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
-    private static String plateToScanSessionString = StringUtil.EMPTY_STRING;
-
-    private final IObservableValue plateToScanValue =
-        new WritableValue(plateToScanSessionString, String.class);
-
     private final IObservableValue canLaunchScanValue =
         new WritableValue(Boolean.TRUE, Boolean.class);
 
@@ -80,8 +73,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     protected ComboViewer profilesCombo;
 
-    protected String currentPlateToScan;
-
     protected boolean plateMismatchErrorReported = false;
 
     // global state of the pallet process
@@ -91,21 +82,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     protected void init() throws Exception {
         super.init();
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        currentPlateToScan = plateToScanSessionString;
         palletScanManagement = new PalletScanManagement(this);
     }
 
     @Override
     public void beforeScanThreadStart() {
-        currentPlateToScan = plateToScanValue.getValue().toString();
     }
 
-    @SuppressWarnings("nls")
     @Override
     public void beforeScan() {
         setScanHasBeenLaunched(false, true);
-        String msg = "----SCAN on plate {0}----";
-        appendLog(NLS.bind(msg, currentPlateToScan));
 
     }
 
@@ -176,7 +162,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @Override
     public void afterScanAndProcess() {
-        AbstractPalletSpecimenAdminForm.this.afterScanAndProcess(null);
+        afterScanAndProcess(null);
     }
 
     @Override
@@ -219,17 +205,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     @SuppressWarnings("unused")
     protected void afterScanAndProcess(Integer rowToProcess) {
         // default does nothing
-    }
-
-    @Override
-    public boolean onClose() {
-        synchronized (plateToScanSessionString) {
-            plateToScanSessionString = (String) plateToScanValue.getValue();
-            if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
-                plateToScanSessionString = StringUtil.EMPTY_STRING;
-            }
-        }
-        return super.onClose();
     }
 
     protected abstract void enableFields(boolean enable);
@@ -333,10 +308,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         }
     }
 
-    protected void resetPlateToScan() {
-        plateToScanValue.setValue(plateToScanSessionString);
-    }
-
     protected void setBindings(boolean isSingleMode) {
         setScanHasBeenLaunched(isSingleMode);
     }
@@ -374,7 +345,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         scanValidValue.setValue(true);
         palletScanManagement.onReset();
         enableFields(true);
-        resetPlateToScan();
     }
 
     protected void setUseScanner(boolean useScanner) {

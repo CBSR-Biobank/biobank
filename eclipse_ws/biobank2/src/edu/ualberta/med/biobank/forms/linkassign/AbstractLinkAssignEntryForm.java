@@ -540,13 +540,13 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         setFocus();
     }
 
+    /**
+     * @param resetAll When true visual widgets are also reset.
+     */
     protected void reset(boolean resetAll) {
         container = null;
         cancelConfirmWidget.reset();
         setScanHasBeenLaunched(isSingleMode());
-        if (resetAll) {
-            resetPlateToScan();
-        }
         setCanLaunchScan(false);
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
     }

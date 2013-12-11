@@ -109,6 +109,9 @@ public class PalletScanManagement {
             initCells();
             Set<DecodedWell> decodeResult = dialog.getDecodeResult();
             wells = PalletWell.convertArray(decodeResult);
+            final PlateDimensions plateDimensions = dialog.getPlateDimensions();
+            selectedContainerType.setCapacity(new Capacity(
+                plateDimensions.getRows(), plateDimensions.getCols()));
 
             IRunnableWithProgress op = new IRunnableWithProgress() {
                 @Override

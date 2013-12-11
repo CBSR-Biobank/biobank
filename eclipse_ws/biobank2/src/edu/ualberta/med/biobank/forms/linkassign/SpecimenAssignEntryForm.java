@@ -1254,7 +1254,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         String label = StringUtil.EMPTY_STRING;
         ContainerTypeWrapper type = null;
 
-        if (!resetAll) { // keep fields values
+        if (!resetAll) {
+            // keep fields values
             productBarcode = palletproductBarcodeText.getText();
             label = palletPositionText.getText();
             type = currentMultipleContainer.getContainerType();
