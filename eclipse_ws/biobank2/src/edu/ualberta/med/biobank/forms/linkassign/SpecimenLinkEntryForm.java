@@ -640,15 +640,28 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     /**
      * Multiple linking: do this before multiple scan is made
+     * 
+     * This code runs in the UI thread.
      */
     @SuppressWarnings("nls")
     @Override
     public void beforeProcessingThreadStart() {
         log.debug("beforeScanThreadStart");
         super.beforeProcessingThreadStart();
-        specimenTypesWidget.updateHierarchyWidgets(currentGridDimensions.getRow());
+        adjustWidgetsForScannedPallet();
         setTypeCombos();
         beforeScans(true);
+    }
+
+    private void adjustWidgetsForScannedPallet() {
+        Capacity capacity = palletScanManagement.getContainerType().getCapacity();
+        int rows = capacity.getRowCapacity();
+        int cols = capacity.getColCapacity();
+        currentGridDimensions = new RowColPos(rows, cols);
+        recreateScanPalletWidget(rows, cols);
+        specimenTypesWidget.updateHierarchyWidgets(rows);
+        page.layout(true, true);
+        book.reflow(true);
     }
 
     @SuppressWarnings("nls")
@@ -801,7 +814,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
                 @Override
                 public void selectionChanged(SpecimenTypeSelectionEvent event) {
-                    // if (selection != null) {
                     @SuppressWarnings("unchecked")
                     Map<RowColPos, PalletWell> cells =
                         (Map<RowColPos, PalletWell>) palletWidget.getCells();
@@ -816,7 +828,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                         }
                         palletWidget.redraw();
                     }
-                    // }
 
                     if (palletWidget.isEverythingTyped()) {
                         setDirty(true);
