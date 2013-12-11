@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
@@ -65,7 +64,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     // TR: button label
     private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
-    private final PalletScanManagement palletScanManagement;
+    protected final PalletScanManagement palletScanManagement;
 
     protected ScanPalletWidget spw;
 
@@ -446,10 +445,5 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             || (cell.getStatus() == UICellStatus.MISSING));
         log.debug("canScanTubeAlone: result: {}", result);
         return result;
-    }
-
-    @Override
-    public Set<PlateDimensions> getValidPlateDimensions() {
-        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
     }
 }
