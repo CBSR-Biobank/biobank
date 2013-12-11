@@ -10,6 +10,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 
@@ -17,16 +18,16 @@ public class LoginHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        LoginDialog loginDialog = new LoginDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell());
-        if (loginDialog.open() == Dialog.OK)
-            if (SessionManager.getInstance().getSession().getUser()
-                .needChangePassword()) {
-                ChangePasswordDialog
-                    .open(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        true);
+        LoginDialog loginDialog = new LoginDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
+        if (loginDialog.open() == Dialog.OK) {
+            SessionAdapter session = SessionManager.getInstance().getSession();
+            if ((session != null) && session.getUser().needChangePassword()) {
+                ChangePasswordDialog.open(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    true);
             }
+        }
         return null;
     }
 }

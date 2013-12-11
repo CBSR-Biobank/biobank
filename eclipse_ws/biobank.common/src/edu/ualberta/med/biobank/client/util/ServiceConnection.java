@@ -13,8 +13,9 @@ public class ServiceConnection {
             appService = (BiobankApplicationService) ApplicationServiceProvider
                 .getApplicationServiceFromUrl(serverUrl);
         } else {
-            appService = (BiobankApplicationService) ApplicationServiceProvider
-                .getApplicationServiceFromUrl(serverUrl, userName, password);
+            appService = (BiobankApplicationService)
+                ApplicationServiceProvider.getApplicationServiceFromUrl(
+                    serverUrl, userName, password);
         }
         Log logMessage = new Log();
         logMessage.setAction("login"); //$NON-NLS-1$

@@ -358,12 +358,15 @@ public class LoginDialog extends PersistedDialog {
         boolean secureConnection =
             ((secureConnectionButton == null) || secureConnectionButton.getSelection());
 
-        SessionHelper sessionHelper = new SessionHelper(serverWidget.getText(),
-            secureConnection, userNameWidget.getText(),
+        SessionHelper sessionHelper = new SessionHelper(
+            serverWidget.getText(),
+            secureConnection,
+            userNameWidget.getText(),
             passwordWidget.getText());
 
-        BusyIndicator.showWhile(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
+        BusyIndicator.showWhile(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(),
+            sessionHelper);
 
         if (sessionHelper.getUser() != null) {
             finalizeConnection(sessionHelper);

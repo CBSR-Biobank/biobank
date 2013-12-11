@@ -159,11 +159,11 @@ public class SessionManager {
             .isDebugging());
     }
 
-    @SuppressWarnings("nls")
     public SessionAdapter getSession() {
-        Assert.isNotNull(sessionAdapter,
-            "No connection available. Please log in to continue.");
-        return sessionAdapter;
+        if (sessionAdapter != null) {
+            return sessionAdapter;
+        }
+        return null;
     }
 
     public static BiobankApplicationService getAppService() {
