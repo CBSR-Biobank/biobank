@@ -9,9 +9,9 @@ import edu.ualberta.med.scannerconfig.PlateDimensions;
 
 public interface IPalletScanManagement {
 
-    void beforeScanThreadStart();
+    void beforeProcessingThreadStart();
 
-    void beforeScan();
+    void beforeProcessing();
 
     void processScanResult() throws Exception;
 

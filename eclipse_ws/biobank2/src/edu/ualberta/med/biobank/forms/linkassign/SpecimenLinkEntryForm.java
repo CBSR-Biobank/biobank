@@ -643,9 +643,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     @SuppressWarnings("nls")
     @Override
-    public void beforeScanThreadStart() {
+    public void beforeProcessingThreadStart() {
         log.debug("beforeScanThreadStart");
-        super.beforeScanThreadStart();
+        super.beforeProcessingThreadStart();
+        specimenTypesWidget.updateHierarchyWidgets(currentGridDimensions.getRow());
         setTypeCombos();
         beforeScans(true);
     }

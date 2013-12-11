@@ -1344,7 +1344,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    public void beforeScanThreadStart() {
+    public void beforeProcessingThreadStart() {
         showOnlyPallet(false, false);
         currentMultipleContainer.setSite(SessionManager.getUser().getCurrentWorkingSite());
         currentMultipleContainer.setContainerType((ContainerTypeWrapper) ((IStructuredSelection)

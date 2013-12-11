@@ -105,8 +105,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected ContainerDisplayWidget hotelWidget;
     protected ScanPalletWidget palletWidget;
 
-    protected RowColPos currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT,
-        RowColPos.COLS_DEFAULT);
+    protected RowColPos currentGridDimensions =
+        new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
 
     // set to true when in scan link multiple and user enters barcodes using the
     // handheld scanner

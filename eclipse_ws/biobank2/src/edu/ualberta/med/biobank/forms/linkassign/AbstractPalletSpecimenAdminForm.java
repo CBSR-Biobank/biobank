@@ -86,11 +86,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     @Override
-    public void beforeScanThreadStart() {
+    public void beforeProcessingThreadStart() {
     }
 
     @Override
-    public void beforeScan() {
+    public void beforeProcessing() {
         setScanHasBeenLaunched(false, true);
 
     }

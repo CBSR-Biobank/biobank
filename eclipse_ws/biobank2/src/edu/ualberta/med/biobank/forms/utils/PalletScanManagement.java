@@ -96,9 +96,6 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        parent.beforeScanThreadStart();
-        parent.beforeScan();
-
         Set<PlateDimensions> validPlateDimensions = parent.getValidPlateDimensions();
 
         DecodeImageDialog dialog = new DecodeImageDialog(
@@ -113,6 +110,8 @@ public class PalletScanManagement {
             selectedContainerType.setCapacity(new Capacity(
                 plateDimensions.getRows(), plateDimensions.getCols()));
 
+            parent.beforeProcessingThreadStart();
+
             IRunnableWithProgress op = new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor) {
@@ -122,6 +121,7 @@ public class PalletScanManagement {
                         IProgressMonitor.UNKNOWN);
 
                     try {
+                        parent.beforeProcessing();
                         parent.processScanResult();
                         parent.afterScanAndProcess();
                         parent.afterScanBeforeMerge();

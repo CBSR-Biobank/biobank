@@ -330,12 +330,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     @Override
-    public void beforeScanThreadStart() {
+    public void beforeProcessingThreadStart() {
         // do nothing
     }
 
     @Override
-    public void beforeScan() {
+    public void beforeProcessing() {
         // do nothing
     }
 
