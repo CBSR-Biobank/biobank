@@ -96,7 +96,7 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        Set<PalletDimensions> validPlateDimensions = parent.getValidPlateDimensions();
+        Set<PalletDimensions> validPlateDimensions = getValidPlateDimensions(selectedContainerType);
 
         DecodeImageDialog dialog = new DecodeImageDialog(
             Display.getDefault().getActiveShell(), validPlateDimensions);
@@ -106,9 +106,6 @@ public class PalletScanManagement {
             initCells();
             Set<DecodedWell> decodeResult = dialog.getDecodeResult();
             wells = PalletWell.convertArray(decodeResult);
-            final PalletDimensions plateDimensions = dialog.getPlateDimensions();
-            selectedContainerType.setCapacity(new Capacity(
-                plateDimensions.getRows(), plateDimensions.getCols()));
 
             parent.beforeProcessingThreadStart();
 
@@ -342,6 +339,10 @@ public class PalletScanManagement {
                     i18n.tr("Problem with microplate specimens"), e);
             }
         }
+    }
+
+    public void setFakeContainerType(int rows, int cols) throws ApplicationException {
+        this.selectedContainerType = getFakePalletRowsCols(rows, cols);
     }
 
     public void setContainerType(ContainerType containerType) {

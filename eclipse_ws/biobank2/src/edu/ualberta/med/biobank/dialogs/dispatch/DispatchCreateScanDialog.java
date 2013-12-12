@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
@@ -34,7 +33,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
@@ -42,7 +40,6 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
@@ -246,10 +243,5 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
 
     public String getCurrentProductBarcode() {
         return currentProductBarcode;
-    }
-
-    @Override
-    public Set<PalletDimensions> getValidPlateDimensions() {
-        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
     }
 }

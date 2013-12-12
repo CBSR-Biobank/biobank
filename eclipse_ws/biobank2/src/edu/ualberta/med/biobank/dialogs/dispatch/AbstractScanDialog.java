@@ -64,7 +64,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     // TR: button label
     private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
 
-    protected final PalletScanManagement palletScanManagement;
+    private final PalletScanManagement palletScanManagement;
 
     protected ScanPalletWidget spw;
 

@@ -859,15 +859,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     }
 
     /**
-     * Returns the valid plate dimensions for the selected container type. This usually returns a
-     * single plate dimension.
-     */
-    @Override
-    public Set<PalletDimensions> getValidPlateDimensions() {
-        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
-    }
-
-    /**
      * Returns the leaf container types, ones that only hold specimens, that match the plate
      * dimensions define in {@link PalletDimensions}.
      * 
@@ -891,7 +882,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     }
 
     public PalletDimensions getCurrentPlateDimensions() {
-        ContainerType containerType = palletScanManagement.getContainerType();
+        ContainerType containerType = getContainerType();
         return PalletScanManagement.capacityToPlateDimensions(containerType.getCapacity());
 
     }

@@ -5,7 +5,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
-import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public interface IPalletScanManagement {
 
@@ -26,6 +25,4 @@ public interface IPalletScanManagement {
     void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception;
 
     boolean canScanTubesManually(PalletWell cell);
-
-    Set<PalletDimensions> getValidPlateDimensions();
 }

@@ -2,10 +2,8 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -30,7 +28,6 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
     extends AbstractScanDialog<T> {
@@ -189,11 +186,6 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
 
     public boolean hasReceivedSpecimens() {
         return specimensReceived;
-    }
-
-    @Override
-    public Set<PalletDimensions> getValidPlateDimensions() {
-        return new HashSet<PalletDimensions>(Arrays.asList(PalletDimensions.values()));
     }
 
 }

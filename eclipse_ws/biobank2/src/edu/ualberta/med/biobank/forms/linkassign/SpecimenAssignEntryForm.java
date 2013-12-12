@@ -26,7 +26,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -58,7 +57,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.AbstractValidator;
@@ -1469,10 +1467,5 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     public void postprocessScanTubesManually(Set<PalletWell> palletCells) throws Exception {
         super.postprocessScanTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
-    }
-
-    @Override
-    protected void scanTubesManually(MouseEvent e) {
-        palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
     }
 }

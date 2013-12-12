@@ -138,7 +138,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void init() throws Exception {
         log.debug("init");
         super.init();
-        // TR: title
         setPartName(FORM_TITLE);
         setCanLaunchScan(false);
     }
@@ -244,9 +243,19 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 @Override
                 public void doSelection(Object selectedObject) {
                     PalletDimensions plateDimensions = (PalletDimensions) selectedObject;
-                    Capacity capacity = new Capacity(
-                        plateDimensions.getRows(), plateDimensions.getCols());
+                    int rows = plateDimensions.getRows();
+                    int cols = plateDimensions.getCols();
+                    Capacity capacity = new Capacity(rows, cols);
                     adjustWidgetsForScannedPallet(capacity);
+
+                    try {
+                        setFakeContainerType(rows, cols);
+                    } catch (ApplicationException e) {
+                        BgcPlugin.openError(
+                            // TR: dialog title
+                            i18n.tr("Server error"),
+                            e);
+                    }
                 }
             },
             new LabelProvider() {
@@ -689,7 +698,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public void beforeProcessingThreadStart() {
         log.debug("beforeScanThreadStart");
         super.beforeProcessingThreadStart();
-        Capacity capacity = palletScanManagement.getContainerType().getCapacity();
+        Capacity capacity = getContainerType().getCapacity();
         adjustWidgetsForScannedPallet(capacity);
         setTypeCombos();
         beforeScans(true);
