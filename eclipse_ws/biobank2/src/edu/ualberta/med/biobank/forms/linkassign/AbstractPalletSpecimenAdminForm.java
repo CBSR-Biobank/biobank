@@ -236,7 +236,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message
-            i18n.tr("Errors with tube inventory IDs"));
+            i18n.tr("Errors found with inventory IDs"));
     }
 
     protected void launchScanAndProcessResult() {

@@ -32,6 +32,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetContainerOrParentsByLabelAction.ContainerData;
+import edu.ualberta.med.biobank.common.action.containerType.SpecimenContainerTypesByCapacityAction;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -39,8 +40,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
+import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -50,7 +53,15 @@ import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
+/**
+ * Allows the user to perform a specimen link, which means that specimens are linked with patients.
+ * 
+ * @author Delphine
+ * 
+ */
 public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractLinkAssignEntryForm.class);
@@ -111,6 +122,12 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     // set to true when in scan link multiple and user enters barcodes using the
     // handheld scanner
     protected boolean scanMultipleWithHandheldInput = false;
+
+    private final Set<ContainerType> palletContainerTypes;
+
+    public AbstractLinkAssignEntryForm() {
+        palletContainerTypes = new HashSet<ContainerType>();
+    }
 
     @SuppressWarnings("nls")
     @Override
@@ -216,9 +233,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         toolkit.paintBordersFor(commonFieldsComposite);
 
         createCommonFields(commonFieldsComposite);
-
         createSingleMultipleSection(leftComposite);
-
         createCancelConfirmWidget(leftComposite);
     }
 
@@ -260,6 +275,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             // TR: radio button label
             i18n.trc("scan link assign", "Single"),
             SWT.RADIO);
+
         // used only for linking (but faster and easier to add it in this class)
         radioSinglePosition = toolkit.createButton(buttonsComposite,
             // TR: radio button label
@@ -827,13 +843,56 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         palletWidget.redraw();
     }
 
-    /**
-     * Returns true if the grid dimensions have changed.
-     */
-    @SuppressWarnings("nls")
-    protected boolean checkGridDimensionsChanged() {
-        // FIXME: scanning and decoding
-        throw new RuntimeException("not implemented yet");
+    protected void initPalletContainerTypes() throws ApplicationException {
+        palletContainerTypes.addAll(getPalletContainerTypes());
     }
 
+    @SuppressWarnings("nls")
+    protected void checkPalletContainerTypes() {
+        if (!isSingleMode() && palletContainerTypes.isEmpty()) {
+            throw new IllegalStateException("no pallets defined at this site");
+        }
+    }
+
+    protected boolean isPalletContainerTypesInvalid() {
+        return palletContainerTypes.isEmpty();
+    }
+
+    /**
+     * Returns the valid plate dimensions for the selected container type. This usually returns a
+     * single plate dimension.
+     */
+    @Override
+    public Set<PalletDimensions> getValidPlateDimensions() {
+        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
+    }
+
+    /**
+     * Returns the leaf container types, ones that only hold specimens, that match the plate
+     * dimensions define in {@link PalletDimensions}.
+     * 
+     * @note A site may not have any container types defined that match any elements of
+     *       PlateDimensions.
+     */
+    public static Set<ContainerType> getPalletContainerTypes() throws ApplicationException {
+        Site site = SessionManager.getUser().getCurrentWorkingSite().getWrappedObject();
+
+        Set<Capacity> capacities = new HashSet<Capacity>();
+        for (PalletDimensions plateDimensions : PalletDimensions.values()) {
+            Capacity capacity = new Capacity();
+            capacity.setRowCapacity(plateDimensions.getRows());
+            capacity.setColCapacity(plateDimensions.getCols());
+            capacities.add(capacity);
+        }
+
+        List<ContainerType> ctypesList = SessionManager.getAppService().doAction(
+            new SpecimenContainerTypesByCapacityAction(site, capacities)).getList();
+        return new HashSet<ContainerType>(ctypesList);
+    }
+
+    public PalletDimensions getCurrentPlateDimensions() {
+        ContainerType containerType = palletScanManagement.getContainerType();
+        return PalletScanManagement.capacityToPlateDimensions(containerType.getCapacity());
+
+    }
 }

@@ -445,10 +445,16 @@ public class BgcWidgetCreator {
      * 
      * @return The combo viewer.
      */
-    public <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<? extends T> input, T selection,
-        String errorMessage, boolean useDefaultComparator, String bindingKey,
-        final ComboSelectionUpdate csu, IBaseLabelProvider labelProvider) {
+    public <T> ComboViewer createComboViewer(
+        Composite parent,
+        String fieldLabel,
+        Collection<? extends T> input,
+        T selection,
+        String errorMessage,
+        boolean useDefaultComparator,
+        String bindingKey,
+        final ComboSelectionUpdate csu,
+        IBaseLabelProvider labelProvider) {
         Label label = null;
         if (fieldLabel != null)
             label = createLabel(parent, fieldLabel);

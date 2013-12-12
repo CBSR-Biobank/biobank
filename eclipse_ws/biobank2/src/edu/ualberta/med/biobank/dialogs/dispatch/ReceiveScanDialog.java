@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
     extends AbstractScanDialog<T> {
@@ -192,8 +192,8 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
     }
 
     @Override
-    public Set<PlateDimensions> getValidPlateDimensions() {
-        return new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
+    public Set<PalletDimensions> getValidPlateDimensions() {
+        return new HashSet<PalletDimensions>(Arrays.asList(PalletDimensions.values()));
     }
 
 }

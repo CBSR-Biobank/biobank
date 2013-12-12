@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -52,7 +52,7 @@ public class PalletWell extends AbstractUIWell {
         return palletScanned;
     }
 
-    static Set<DecodedWell> getRandomDecodedCells(int plateNumber, PlateDimensions gridDimensions) {
+    static Set<DecodedWell> getRandomDecodedCells(int plateNumber, PalletDimensions gridDimensions) {
         Set<DecodedWell> result = new HashSet<DecodedWell>();
 
         if (plateNumber < 0) return result;

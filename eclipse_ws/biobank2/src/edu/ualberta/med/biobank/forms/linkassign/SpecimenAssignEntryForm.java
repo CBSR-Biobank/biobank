@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.container.ContainerSaveAction;
-import edu.ualberta.med.biobank.common.action.containerType.SpecimenContainerTypesByCapacityAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.SpecimenAssignProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.AssignProcessInfo;
@@ -59,7 +58,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
-import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -70,7 +68,6 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -81,10 +78,18 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
+/**
+ * A class that allows the user to perform a specimen assign, which means that specimens are linked
+ * with container positions. This functionality is only available to sites.
+ * 
+ * @author Delphine
+ * 
+ */
 public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
+
     private static final I18n i18n = I18nFactory.getI18n(SpecimenAssignEntryForm.class);
 
     private static BgcLogger log = BgcLogger.getLogger(SpecimenAssignEntryForm.class.getName());
@@ -139,7 +144,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     protected boolean useNewProductBarcode;
     private ComboViewer palletTypesViewer;
     protected boolean palletPositionTextModified;
-    private final Set<ContainerType> palletContainerTypes;
     private BgcBaseText palletproductBarcodeText;
     private boolean saveEvenIfMissing;
     private Composite multipleOptionsFields;
@@ -154,7 +158,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
     public SpecimenAssignEntryForm() {
         currentMultipleContainer = new ContainerWrapper(SessionManager.getAppService());
-        palletContainerTypes = new HashSet<ContainerType>();
     }
 
     @Override
@@ -881,7 +884,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     private boolean isPalletScannable(ContainerTypeWrapper ctype) {
-        for (PlateDimensions gridDimensions : PlateDimensions.values()) {
+        for (PalletDimensions gridDimensions : PalletDimensions.values()) {
             int rows = gridDimensions.getRows();
             int cols = gridDimensions.getCols();
             if (ctype.isPalletRowsCols(rows, cols))
@@ -1028,8 +1031,10 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             null,
             null,
             // TR: validation error message
-            i18n.tr("A pallet type should be selected"), true,
-            PALLET_TYPES_BINDING, new ComboSelectionUpdate() {
+            i18n.tr("A pallet type should be selected"),
+            true,
+            PALLET_TYPES_BINDING,
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     ContainerTypeWrapper ctype = (ContainerTypeWrapper) selectedObject;
@@ -1043,35 +1048,14 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
                         displayPalletPositions();
                     }
                 }
-            }, new BiobankLabelProvider());
+            },
+            new BiobankLabelProvider());
     }
 
-    /**
-     * Multiple assign. Initialise list of possible pallets (8*12, 10*10, etc.)
-     */
-    public static Set<ContainerType> getPalletContainerTypes() throws ApplicationException {
-        Site site = SessionManager.getUser().getCurrentWorkingSite().getWrappedObject();
-
-        Set<Capacity> capacities = new HashSet<Capacity>();
-        for (PlateDimensions plateDimensions : PlateDimensions.values()) {
-            Capacity capacity = new Capacity();
-            capacity.setRowCapacity(plateDimensions.getRows());
-            capacity.setColCapacity(plateDimensions.getCols());
-            capacities.add(capacity);
-        }
-
-        List<ContainerType> ctypesList = SessionManager.getAppService().doAction(
-            new SpecimenContainerTypesByCapacityAction(site, capacities)).getList();
-        return new HashSet<ContainerType>(ctypesList);
-    }
-
-    private void initPalletContainerTypes() throws ApplicationException {
-        palletContainerTypes.addAll(getPalletContainerTypes());
-    }
-
+    @Override
     @SuppressWarnings("nls")
-    private void checkPalletContainerTypes() {
-        if (!isSingleMode() && useScanner && palletContainerTypes.isEmpty()) {
+    protected void checkPalletContainerTypes() {
+        if (!isSingleMode() && useScanner && isPalletContainerTypesInvalid()) {
             throw new IllegalStateException("no pallets defined at this site");
         }
     }
@@ -1490,10 +1474,5 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     @Override
     protected void scanTubesManually(MouseEvent e) {
         palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
-    }
-
-    @Override
-    public Set<PlateDimensions> getValidPlateDimensions() {
-        return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
     }
 }

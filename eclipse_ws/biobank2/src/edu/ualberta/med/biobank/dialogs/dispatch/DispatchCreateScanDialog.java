@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
@@ -249,7 +249,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     }
 
     @Override
-    public Set<PlateDimensions> getValidPlateDimensions() {
+    public Set<PalletDimensions> getValidPlateDimensions() {
         return PalletScanManagement.getValidPlateDimensions(palletScanManagement.getContainerType());
     }
 }

@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.mvp.view.DialogView.Dialog;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 import edu.ualberta.med.scannerconfig.dialogs.DecodeImageDialog;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -96,7 +96,7 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        Set<PlateDimensions> validPlateDimensions = parent.getValidPlateDimensions();
+        Set<PalletDimensions> validPlateDimensions = parent.getValidPlateDimensions();
 
         DecodeImageDialog dialog = new DecodeImageDialog(
             Display.getDefault().getActiveShell(), validPlateDimensions);
@@ -106,7 +106,7 @@ public class PalletScanManagement {
             initCells();
             Set<DecodedWell> decodeResult = dialog.getDecodeResult();
             wells = PalletWell.convertArray(decodeResult);
-            final PlateDimensions plateDimensions = dialog.getPlateDimensions();
+            final PalletDimensions plateDimensions = dialog.getPlateDimensions();
             selectedContainerType.setCapacity(new Capacity(
                 plateDimensions.getRows(), plateDimensions.getCols()));
 
@@ -353,11 +353,11 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    public static PlateDimensions capacityToPlateDimensions(Capacity capacity) {
+    public static PalletDimensions capacityToPlateDimensions(Capacity capacity) {
         int rows = capacity.getRowCapacity();
         int cols = capacity.getColCapacity();
 
-        for (PlateDimensions dim : PlateDimensions.values()) {
+        for (PalletDimensions dim : PalletDimensions.values()) {
             if ((dim.getRows() == rows) && (dim.getCols() == cols)) {
                 return dim;
             }
@@ -370,8 +370,8 @@ public class PalletScanManagement {
      * This is the default implementation for scan assign and dispatch. For scan link this method is
      * overriden.
      */
-    public static Set<PlateDimensions> getValidPlateDimensions(ContainerType containerType) {
-        Set<PlateDimensions> dimensions = new HashSet<PlateDimensions>(1);
+    public static Set<PalletDimensions> getValidPlateDimensions(ContainerType containerType) {
+        Set<PalletDimensions> dimensions = new HashSet<PalletDimensions>(1);
         dimensions.add(capacityToPlateDimensions(containerType.getCapacity()));
         return dimensions;
     }

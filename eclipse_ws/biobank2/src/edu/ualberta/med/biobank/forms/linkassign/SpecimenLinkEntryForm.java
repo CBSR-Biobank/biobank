@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusAdapter;
@@ -51,6 +52,7 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -65,11 +67,18 @@ import edu.ualberta.med.biobank.widgets.specimentypeselection.AliquotedSpecimenS
 import edu.ualberta.med.biobank.widgets.specimentypeselection.ISpecimenTypeSelectionChangedListener;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionEvent;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.SpecimenTypeSelectionWidget;
-import edu.ualberta.med.scannerconfig.PlateDimensions;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-// FIXME the custom selection is not done in this version.
+/**
+ * A class that allows the user to perform a specimen link, which means that specimens are linked
+ * with patients.
+ * 
+ * @author Delphine
+ * 
+ */
 public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
+
     private static final I18n i18n = I18nFactory.getI18n(SpecimenLinkEntryForm.class);
 
     private static Logger log = LoggerFactory.getLogger(SpecimenLinkEntryForm.class.getName());
@@ -86,6 +95,9 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @SuppressWarnings("nls")
     private static final String NEW_SINGLE_POSITION_BINDING = "newSinglePosition-binding";
+
+    @SuppressWarnings("nls")
+    private static final String PALLET_TYPES_BINDING = "palletType-binding";
 
     private static BgcLogger logger = BgcLogger.getLogger(SpecimenLinkEntryForm.class.getName());
 
@@ -183,7 +195,6 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
     @Override
     protected void createCommonFields(Composite commonFieldsComposite) {
-        // Patient number
         linkFormPatientManagement.createPatientNumberText(commonFieldsComposite);
         linkFormPatientManagement.setPatientTextCallback(new PatientTextCallback() {
             @Override
@@ -206,6 +217,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         });
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void createMultipleFields(final Composite parent) {
         multipleOptionsFields = toolkit.createComposite(parent);
@@ -218,6 +230,34 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         multipleOptionsFields.setLayoutData(gd);
+
+        widgetCreator.createComboViewer(
+            multipleOptionsFields,
+            i18n.tr("Pallet Dimensions"),
+            Arrays.asList(PalletDimensions.values()),
+            getCurrentPlateDimensions(),
+            // TR: validation error message
+            i18n.tr("A pallet type should be selected"),
+            true,
+            PALLET_TYPES_BINDING,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    PalletDimensions plateDimensions = (PalletDimensions) selectedObject;
+                    Capacity capacity = new Capacity(
+                        plateDimensions.getRows(), plateDimensions.getCols());
+                    adjustWidgetsForScannedPallet(capacity);
+                }
+            },
+            new LabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    PalletDimensions plateDimensions = (PalletDimensions) element;
+                    return plateDimensions.getDisplayLabel();
+                }
+            }
+            );
+
         createScanButton(parent);
         createHierarchyWidgets(parent);
     }
@@ -370,6 +410,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     protected void setBindings(boolean isSingleMode) {
         super.setBindings(isSingleMode);
         widgetCreator.setBinding(INVENTORY_ID_BINDING, isSingleMode);
+        widgetCreator.setBinding(PALLET_TYPES_BINDING, !isSingleMode);
         singleTypesWidget.removeBindings();
         if (isSingleMode) {
             singleTypesWidget.addBindings();
@@ -459,7 +500,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         }
 
         Set<Capacity> capacities = new HashSet<Capacity>();
-        for (PlateDimensions gridDimensions : PlateDimensions.values()) {
+        for (PalletDimensions gridDimensions : PalletDimensions.values()) {
             Capacity capacity = new Capacity();
             capacity.setRowCapacity(gridDimensions.getRows());
             capacity.setColCapacity(gridDimensions.getCols());
@@ -648,13 +689,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     public void beforeProcessingThreadStart() {
         log.debug("beforeScanThreadStart");
         super.beforeProcessingThreadStart();
-        adjustWidgetsForScannedPallet();
+        Capacity capacity = palletScanManagement.getContainerType().getCapacity();
+        adjustWidgetsForScannedPallet(capacity);
         setTypeCombos();
         beforeScans(true);
     }
 
-    private void adjustWidgetsForScannedPallet() {
-        Capacity capacity = palletScanManagement.getContainerType().getCapacity();
+    private void adjustWidgetsForScannedPallet(Capacity capacity) {
         int rows = capacity.getRowCapacity();
         int cols = capacity.getColCapacity();
         currentGridDimensions = new RowColPos(rows, cols);
@@ -837,10 +878,5 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
             });
         toolkit.adapt(specimenTypesWidget);
-    }
-
-    @Override
-    public Set<PlateDimensions> getValidPlateDimensions() {
-        return new HashSet<PlateDimensions>(Arrays.asList(PlateDimensions.values()));
     }
 }

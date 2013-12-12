@@ -23,12 +23,13 @@ import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.SourceSpecimen;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.util.SbsLabeling;
+import edu.ualberta.med.scannerconfig.PalletDimensions;
 
 public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     implements ISpecimenTypeSelectionChangedListener {
     private static final I18n i18n = I18nFactory.getI18n(AliquotedSpecimenSelectionWidget.class);
 
-    private static final int maxRows = 10;
+    private final int maxRows;
 
     private int currentRows;
 
@@ -39,9 +40,13 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     private final List<AliquotedSpecimenSelectionWidget> specimenTypesWidgets;
 
     @SuppressWarnings("nls")
-    public SpecimenTypeSelectionWidget(Composite parent, BgcWidgetCreator widgetCreator,
+    public SpecimenTypeSelectionWidget(
+        Composite parent,
+        BgcWidgetCreator widgetCreator,
         int currentRows) {
         super(parent, SWT.NONE);
+
+        this.maxRows = PalletDimensions.getDimensionsWithMaxRows().getRows();
         this.currentRows = currentRows;
         GridLayout layout = new GridLayout(4, false);
         layout.horizontalSpacing = 10;
