@@ -88,11 +88,9 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         super.init();
 
         if (dispatch.isNew()) {
-            Assert
-                .isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+            Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             dispatch.getWrappedObject().setSenderCenter(
-                SessionManager.getUser()
-                    .getCurrentWorkingCenter().getWrappedObject());
+                SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject());
         } else {
             shipmentInfo = dispatch.getShipmentInfo();
         }
@@ -128,27 +126,40 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         createReceiverCombo(client);
 
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
-            ShippingMethodWrapper selectedShippingMethod = dispatch
-                .getShipmentInfo().getShippingMethod();
-            shippingMethodViewer = widgetCreator.createComboViewer(client,
+            ShippingMethodWrapper selectedShippingMethod =
+                dispatch.getShipmentInfo().getShippingMethod();
+            shippingMethodViewer = widgetCreator.createComboViewer(
+                client,
                 ShippingMethod.NAME.singular().toString(),
-                ShippingMethodWrapper.getShippingMethods(SessionManager
-                    .getAppService()), selectedShippingMethod, null,
+                ShippingMethodWrapper.getShippingMethods(SessionManager.getAppService()),
+                selectedShippingMethod,
+                null,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        dispatch.getShipmentInfo().setShippingMethod(
-                            (ShippingMethodWrapper) selectedObject);
+                        ShippingMethodWrapper shippingMethod = (ShippingMethodWrapper) selectedObject;
+                        dispatch.getShipmentInfo().setShippingMethod(shippingMethod);
                     }
-                }, new BiobankLabelProvider());
+                },
+                new BiobankLabelProvider());
 
-            createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.NONE,
-                ShipmentInfo.PropertyName.WAYBILL.toString(), null,
-                shipmentInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
-
-            createDateTimeWidget(client, i18n.tr("Departed"), null,
+            createBoundWidgetWithLabel(
+                client,
+                BgcBaseText.class,
+                SWT.NONE,
+                ShipmentInfo.PropertyName.WAYBILL.toString(),
+                null,
                 shipmentInfo,
-                ShipmentInfoPeer.PACKED_AT.getName(), null);
+                ShipmentInfoPeer.WAYBILL.getName(),
+                null);
+
+            createDateTimeWidget(
+                client,
+                i18n.tr("Departed"),
+                null,
+                shipmentInfo,
+                ShipmentInfoPeer.PACKED_AT.getName(),
+                null);
         }
 
         createCommentSection();
@@ -163,48 +174,51 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         GridLayout gl = new GridLayout(2, false);
 
         client.setLayout(gl);
-        commentEntryTable = new CommentsInfoTable(client,
-            dispatch.getCommentCollection(false));
+        commentEntryTable = new CommentsInfoTable(client, dispatch.getCommentCollection(false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
         commentEntryTable.setLayoutData(gd);
-        createBoundWidgetWithLabel(client, BgcBaseText.class, SWT.MULTI,
-            i18n.tr("Add a comment"), null, comment, "message", null);
+        createBoundWidgetWithLabel(
+            client,
+            BgcBaseText.class,
+            SWT.MULTI,
+            i18n.tr("Add a comment"),
+            null,
+            comment,
+            "message",
+            null);
 
     }
 
     @SuppressWarnings("nls")
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
-            BgcBaseText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, Dispatch.PropertyName.RECEIVER_CENTER.toString());
-            setTextValue(receiverLabel, dispatch.getReceiverCenter()
-                .getNameShort());
+            BgcBaseText receiverLabel = createReadOnlyLabelledField(
+                client, SWT.NONE, Dispatch.PropertyName.RECEIVER_CENTER.toString());
+            setTextValue(receiverLabel, dispatch.getReceiverCenter().getNameShort());
         } else {
-            Assert
-                .isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+            Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             try {
-                destSiteComboViewer = createComboViewer(client,
+                destSiteComboViewer = createComboViewer(
+                    client,
                     Dispatch.PropertyName.RECEIVER_CENTER.toString(),
-                    CenterWrapper.getOtherCenters(SessionManager
-                        .getAppService(), SessionManager.getUser()
-                        .getCurrentWorkingCenter()),
+                    CenterWrapper.getOtherCenters(
+                        SessionManager.getAppService(),
+                        SessionManager.getUser().getCurrentWorkingCenter()),
                     dispatch.getReceiverCenter(),
-                    // validation error message.
+                    // TR: validation error message.
                     i18n.tr("Dispatch must have a receiver"),
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {
-                            dispatch
-                                .setReceiverCenter((CenterWrapper<?>) selectedObject);
+                            dispatch.setReceiverCenter((CenterWrapper<?>) selectedObject);
                             setDirty(true);
                         }
                     });
             } catch (ApplicationException e) {
-                BgcPlugin
-                    .openAsyncError(
+                BgcPlugin.openAsyncError(
                     // dialog message.
                     i18n.tr("Unable to retrieve Centers"));
             }
@@ -214,28 +228,29 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     @SuppressWarnings("nls")
     private void createSpecimensSelectionSection() {
         if (dispatch.isInCreationState()) {
-            Section section =
-                createSection(Specimen.NAME.plural().toString());
+            Section section = createSection(Specimen.NAME.plural().toString());
             Composite composite = toolkit.createComposite(section);
             composite.setLayout(new GridLayout(1, false));
             section.setClient(composite);
             if (dispatch.isInCreationState()) {
-                addSectionToolbar(section,
+                addSectionToolbar(
+                    section,
                     i18n.tr("Add specimens to this dispatch"),
                     new SelectionAdapter() {
                         @Override
                         public void widgetSelected(SelectionEvent e) {
                             openScanDialog();
                         }
-                    }, null, BgcPlugin.Image.DISPATCH_SHIPMENT_ADD_SPECIMEN);
+                    },
+                    null,
+                    BgcPlugin.Image.DISPATCH_SHIPMENT_ADD_SPECIMEN);
 
                 createSpecimensSelectionActions(composite, false);
                 createSpecimensNonProcessedSection(true);
             }
         } else {
-            specimensTreeTable =
-                new DispatchSpecimensTreeTable(page, dispatch,
-                    !dispatch.isInClosedState() && !dispatch.isInLostState());
+            specimensTreeTable = new DispatchSpecimensTreeTable(
+                page, dispatch, !dispatch.isInClosedState() && !dispatch.isInLostState());
             specimensTreeTable.addSelectionChangedListener(biobankListener);
             specimensTreeTable.addClickListener();
         }
@@ -248,48 +263,42 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
             title = i18n.tr("Added specimens");
         }
         Composite parent = createSectionWithClient(title);
-        specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent,
-            dispatch, edit) {
+        specimensNonProcessedTable = new DispatchSpecimenListInfoTable(parent, dispatch, edit) {
             @Override
             public List<DispatchSpecimenWrapper> getInternalDispatchSpecimens() {
                 return dispatch.getDispatchSpecimenCollection(false);
             }
         };
         specimensNonProcessedTable.adaptToToolkit(toolkit, true);
-        specimensNonProcessedTable
-            .addClickListener(new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
+        specimensNonProcessedTable.addClickListener(
+            new IInfoTableDoubleClickItemListener<DispatchSpecimenWrapper>() {
                 @Override
                 public void doubleClick(
                     InfoTableEvent<DispatchSpecimenWrapper> event) {
                     Object selection = event.getSelection();
                     if (selection instanceof InfoTableSelection) {
-                        InfoTableSelection tableSelection =
-                            (InfoTableSelection) selection;
-                        DispatchSpecimenWrapper dsa =
-                            (DispatchSpecimenWrapper) tableSelection
-                                .getObject();
+                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                        DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper)
+                            tableSelection.getObject();
                         if (dsa != null) {
                             SessionManager.openViewForm(dsa.getSpecimen());
                         }
                     }
                 }
             });
-        specimensNonProcessedTable
-            .addEditItemListener(new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
+        specimensNonProcessedTable.addEditItemListener(
+            new IInfoTableEditItemListener<DispatchSpecimenWrapper>() {
 
                 @Override
                 public void editItem(
                     InfoTableEvent<DispatchSpecimenWrapper> event) {
                     Object selection = event.getSelection();
                     if (selection instanceof InfoTableSelection) {
-                        InfoTableSelection tableSelection =
-                            (InfoTableSelection) selection;
-                        DispatchSpecimenWrapper dsa =
-                            (DispatchSpecimenWrapper) tableSelection
-                                .getObject();
+                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                        DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper)
+                            tableSelection.getObject();
                         if (dsa != null) {
-                            new SpecimenAdapter(null, dsa.getSpecimen())
-                                .openEntryForm();
+                            new SpecimenAdapter(null, dsa.getSpecimen()).openEntryForm();
                         }
                     }
                 }
@@ -302,7 +311,8 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, SessionManager.getUser().getCurrentWorkingCenter());
+            dispatch,
+            SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         setDirty(true); // FIXME add a boolean in the dialog to know if
                         // specimens were added
@@ -314,23 +324,19 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     protected void doSpecimenTextAction(String inventoryId) {
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
         try {
-            CellProcessResult res =
-                (CellProcessResult) SessionManager
-                    .getAppService().doAction(
-                        new DispatchCreateProcessAction(
-                            new ShipmentProcessInfo(null,
-                                dispatch, true), SessionManager.getUser()
-                                .getCurrentWorkingCenter().getId(),
-                            new CellInfo(-1, -1, inventoryId, null),
-                            Locale.getDefault()));
+            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
+                new DispatchCreateProcessAction(
+                    new ShipmentProcessInfo(null, dispatch, true),
+                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    new CellInfo(-1, -1, inventoryId, null),
+                    Locale.getDefault()));
             switch (res.getProcessStatus()) {
             case FILLED:
                 // ok
-                Specimen spec = SessionManager.getAppService()
-                    .doAction(new SpecimenGetInfoAction(res
-                        .getCell().getSpecimenId())).getSpecimen();
-                dispatch.addSpecimens(Arrays.asList(new SpecimenWrapper(
-                    SessionManager.getAppService(), spec)),
+                Specimen spec = SessionManager.getAppService().doAction(
+                    new SpecimenGetInfoAction(res.getCell().getSpecimenId())).getSpecimen();
+                dispatch.addSpecimens(Arrays.asList(
+                    new SpecimenWrapper(SessionManager.getAppService(), spec)),
                     DispatchSpecimenState.NONE);
                 reloadSpecimens();
                 setDirty(true);
@@ -352,27 +358,25 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
     protected void doMicroplateTextAction(String microplateId) {
         if (InventoryIdUtil.isFormatMicroplate(microplateId)) {
             try {
-                ArrayList<String> ids = SessionManager
-                        .getAppService().doAction(
-                            new SpecimenByMicroplateSearchAction(microplateId)).getList();
+                ArrayList<String> ids = SessionManager.getAppService().doAction(
+                    new SpecimenByMicroplateSearchAction(microplateId)).getList();
                 if (ids.isEmpty()) {
                     BgcPlugin.openAsyncError(
-                            i18n.tr("Microplate does not exist or has no specimens"));
+                        i18n.tr("Microplate does not exist or has no specimens"));
                 }
                 else {
                     for (String id : ids) {
                         doSpecimenTextAction(id);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 BgcPlugin.openAsyncError(
-                        i18n.tr("Problem adding microplate specimens"), e);
+                    i18n.tr("Problem adding microplate specimens"), e);
             }
         }
         else {
             BgcPlugin.openAsyncError(
-                    i18n.tr("Microplate ID format not valid"));
+                i18n.tr("Microplate ID format not valid"));
         }
     }
 
@@ -394,9 +398,7 @@ public class DispatchSendingEntryForm extends AbstractDispatchEntryForm {
 
         if (shipmentInfo != null) {
             dispatch.setShipmentInfo(shipmentInfo);
-
-            GuiUtil.reset(shippingMethodViewer,
-                shipmentInfo.getShippingMethod());
+            GuiUtil.reset(shippingMethodViewer, shipmentInfo.getShippingMethod());
         }
 
         GuiUtil.reset(destSiteComboViewer, dispatch.getReceiverCenter());
