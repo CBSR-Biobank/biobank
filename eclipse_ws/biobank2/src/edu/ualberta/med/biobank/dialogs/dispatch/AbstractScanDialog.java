@@ -42,6 +42,7 @@ import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
@@ -84,7 +85,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     private Button scanButton;
 
-    protected CenterWrapper<?> currentSite;
+    protected CenterWrapper<?> currentCenter;
 
     protected RowColPos currentGridDimensions =
         new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
@@ -93,7 +94,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         CenterWrapper<?> currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
-        this.currentSite = currentSite;
+        this.currentCenter = currentSite;
         palletScanManagement = new PalletScanManagement(this);
     }
 
@@ -113,8 +114,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     @SuppressWarnings("unused")
-    protected boolean checkBeforeProcessing(CenterWrapper<?> currentCenter)
-        throws Exception {
+    protected boolean checkBeforeProcessing(CenterWrapper<?> currentCenter) throws Exception {
         return true;
     }
 
@@ -132,7 +132,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                launchScan();
+                scanButtonSelected();
             }
         });
         scanButton.setEnabled(false);
@@ -155,6 +155,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             hasValues,
             i18n.tr("No values scanned"),
             IStatus.ERROR);
+    }
+
+    protected void scanButtonSelected() {
+        launchScan();
 
     }
 
@@ -345,7 +349,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         log.debug("processScanResult: start");
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
-        if (checkBeforeProcessing(currentSite)) {
+        if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletWell> cells = getCells();
             // conversion for server side call
             Map<RowColPos, CellInfo> serverCells = null;
@@ -445,5 +449,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             || (cell.getStatus() == UICellStatus.MISSING));
         log.debug("canScanTubeAlone: result: {}", result);
         return result;
+    }
+
+    public void setContainerType(ContainerType containerType) {
+        palletScanManagement.setContainerType(containerType);
     }
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -96,7 +97,12 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void launchScanAndProcessResult() {
-        Set<PalletDimensions> validPlateDimensions = getValidPlateDimensions(selectedContainerType);
+        Set<PalletDimensions> validPlateDimensions;
+        if (selectedContainerType != null) {
+            validPlateDimensions = getValidPlateDimensions(selectedContainerType);
+        } else {
+            validPlateDimensions = new HashSet<PalletDimensions>(Arrays.asList(PalletDimensions.values()));
+        }
 
         DecodeImageDialog dialog = new DecodeImageDialog(
             Display.getDefault().getActiveShell(), validPlateDimensions);

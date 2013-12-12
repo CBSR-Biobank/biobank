@@ -9,10 +9,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
+import edu.ualberta.med.biobank.common.action.container.ContainerGetInfoAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.DispatchCreateProcessAction;
 import edu.ualberta.med.biobank.common.action.scanprocess.data.ShipmentProcessInfo;
@@ -36,10 +39,12 @@ import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
+import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper> {
     private static final I18n i18n = I18nFactory.getI18n(DispatchCreateScanDialog.class);
@@ -65,6 +70,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         DispatchWrapper currentShipment,
         CenterWrapper<?> site) {
         super(parentShell, currentShipment, site);
+        setContainerType(null);
     }
 
     @Override
@@ -124,6 +130,52 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         }
     }
 
+    @SuppressWarnings("nls")
+    @Override
+    protected void scanButtonSelected() {
+        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+            @Override
+            public void run() {
+                currentPallet = null;
+                if (isPalletWithPosition) {
+                    if (currentCenter instanceof SiteWrapper) {
+                        try {
+                            SiteWrapper site = (SiteWrapper) currentCenter;
+                            Container container = new Container();
+                            container.setProductBarcode(currentProductBarcode);
+                            List<Container> containers;
+                            containers = SessionManager.getAppService().doAction(
+                                new ContainerGetInfoAction(container, site.getWrappedObject()))
+                                .getList();
+
+                            if (containers.isEmpty()) {
+                                BgcPlugin.openAsyncError(
+                                    i18n.tr("Pallet error"),
+                                    i18n.tr("Can''t find pallet with barcode \"{0}\".",
+                                        currentProductBarcode));
+                            } else if (containers.size() > 1) {
+                                throw new IllegalStateException(
+                                    "ContainerGetInfoAction returned more than one container for product barcode "
+                                        + currentProductBarcode);
+                            }
+
+                            currentPallet = new ContainerWrapper(
+                                SessionManager.getAppService(), containers.get(0));
+                            setContainerType(currentPallet.getContainerType().getWrappedObject());
+                        } catch (ApplicationException e) {
+                            BgcPlugin.openError(
+                                // TR: dialog title
+                                i18n.tr("Values validation"), e);
+                        }
+                    }
+                }
+            }
+        });
+
+        super.scanButtonSelected();
+
+    }
+
     /**
      * Add validation of product barcode
      */
@@ -137,25 +189,9 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     /**
      * check the pallet is actually found (if need one)
      */
-    @SuppressWarnings("nls")
     @Override
-    protected boolean checkBeforeProcessing(CenterWrapper<?> center)
-        throws Exception {
-        log.debug("checkBeforeProcessing");
+    protected boolean checkBeforeProcessing(CenterWrapper<?> center) throws Exception {
         specimensAdded = false;
-        currentPallet = null;
-        if (isPalletWithPosition) {
-            if (center instanceof SiteWrapper)
-                currentPallet = ContainerWrapper.getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(), (SiteWrapper) center, currentProductBarcode);
-            if (currentPallet == null) {
-                BgcPlugin.openAsyncError(
-                    i18n.tr("Pallet error"),
-                    i18n.tr("Can''t find pallet with barcode \"{0}\".",
-                        currentProductBarcode));
-                return false;
-            }
-        }
         return true;
     }
 
