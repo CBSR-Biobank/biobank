@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -8,9 +10,14 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.gui.common.Swt2DUtil;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
@@ -21,6 +28,8 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  * width and height of the cells
  */
 public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
+
+    private static final int IMAGE_BORDER_SIZE = 2;
 
     private int cellWidth = 60;
 
@@ -52,40 +61,55 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     public boolean legendOnSide = false;
 
     @Override
-    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
-        for (int indexRow = 0; indexRow < rows; indexRow++) {
-            for (int indexCol = 0; indexCol < columns; indexCol++) {
-                int xPosition = cellWidth * indexCol;
-                int yPosition = cellHeight * indexRow;
-                Rectangle rectangle = new Rectangle(xPosition, yPosition,
-                    cellWidth, cellHeight);
+    protected Image createGridImage(ContainerDisplayWidget displayWidget) {
+        // make image slightly larger so all cell borders fit on image
+        int width = columns * cellWidth + 2 * IMAGE_BORDER_SIZE;
+        int height = rows * cellHeight + 2 * IMAGE_BORDER_SIZE;
 
-                Color defaultColor = getDefaultBackgroundColor(e, displayWidget, rectangle,
-                    indexRow, indexCol);
-                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol, defaultColor);
-                String topText = getTopTextForBox(displayWidget.getCells(), indexRow, indexCol);
+        Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
+        Image image = new Image(display, width, height);
+
+        // center grid on image
+        Rectangle2D.Double cellRect = new Rectangle2D.Double(
+            IMAGE_BORDER_SIZE, IMAGE_BORDER_SIZE, cellWidth, cellHeight);
+
+        GC newGC = new GC(image);
+        for (int row = 0; row < rows; ++row) {
+            for (int col = 0; col < columns; ++col) {
+                AffineTransform t = AffineTransform.getTranslateInstance(
+                    col * cellWidth, row * cellHeight);
+                Rectangle2D.Double rectangle = Swt2DUtil.transformRect(t, cellRect);
+                Rectangle r = new Rectangle(
+                    (int) rectangle.x,
+                    (int) rectangle.y,
+                    (int) rectangle.width,
+                    (int) rectangle.height);
+
+                drawRectangle(display, newGC, displayWidget, r, row, col, UICellStatus.EMPTY.getColor());
+                String topText = getTopTextForBox(displayWidget.getCells(), row, col);
                 if (topText != null) {
-                    drawText(e, topText, rectangle, SWT.TOP);
+                    drawText(display, newGC, topText, r, SWT.TOP);
                 }
-                String middleText = getMiddleTextForBox(displayWidget.getCells(), indexRow, indexCol);
+                String middleText = getMiddleTextForBox(displayWidget.getCells(), row, col);
                 if (middleText != null) {
-                    drawText(e, middleText, rectangle, SWT.CENTER);
+                    drawText(display, newGC, middleText, r, SWT.CENTER);
                 }
-                String bottomText = getBottomTextForBox(
-                    displayWidget.getCells(), indexRow, indexCol);
+                String bottomText = getBottomTextForBox(displayWidget.getCells(), row, col);
                 if (bottomText != null) {
-                    drawText(e, bottomText, rectangle, SWT.BOTTOM);
+                    drawText(display, newGC, bottomText, r, SWT.BOTTOM);
                 }
-
             }
         }
+
         if (legendStatus != null) {
             legendWidth = gridWidth / legendStatus.size();
             for (int i = 0; i < legendStatus.size(); i++) {
                 UICellStatus status = legendStatus.get(i);
-                drawLegend(e, status.getColor(), i, status.getLegend());
+                drawLegend(display, newGC, status.getColor(), i, status.getLegend());
             }
         }
+        newGC.dispose();
+        return image;
     }
 
     @Override
@@ -99,8 +123,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
             gridWidth = cellWidth * columns;
             gridHeight = cellHeight * rows;
         }
-        int width = gridWidth + 10;
-        int height = gridHeight + 10;
+        int width = gridWidth + 2 * IMAGE_BORDER_SIZE;
+        int height = gridHeight + 2 * IMAGE_BORDER_SIZE;
         if (legendStatus != null) {
             if (legendOnSide) {
                 width = width + LEGEND_WIDTH + 4;
@@ -111,27 +135,26 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return new Point(width, height);
     }
 
-    // @Override
-    // public void initLegend(List<UICellStatus> status) {
-    // super.initLegend(status);
-    // hasLegend = status != null && status.size() > 0;
-    // }
-
-    protected void drawRectangle(PaintEvent e,
-        ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol, Color defaultBackgroundColor) {
+    protected void drawRectangle(
+        Display display,
+        GC gc,
+        ContainerDisplayWidget displayWidget,
+        Rectangle rectangle,
+        int indexRow,
+        int indexCol,
+        Color defaultBackgroundColor) {
         Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getSelection() != null
             && displayWidget.getSelection().getRow() != null
             && displayWidget.getSelection().getRow() == indexRow
             && displayWidget.getSelection().getCol() != null
             && displayWidget.getSelection().getCol() == indexCol) {
-            backgroundColor = e.display.getSystemColor(SWT.COLOR_YELLOW);
+            backgroundColor = display.getSystemColor(SWT.COLOR_YELLOW);
         }
-        e.gc.setBackground(backgroundColor);
-        e.gc.fillRectangle(rectangle);
-        e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-        e.gc.drawRectangle(rectangle);
+        gc.setBackground(backgroundColor);
+        gc.fillRectangle(rectangle);
+        gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+        gc.drawRectangle(rectangle);
         if (displayWidget.getCells() != null) {
             if (displayWidget.getMultiSelectionManager().isEnabled()) {
                 AbstractUIWell cell = displayWidget.getCells().get(
@@ -140,13 +163,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     Rectangle rect = new Rectangle(rectangle.x + 5,
                         rectangle.y + 5, rectangle.width - 10,
                         rectangle.height - 10);
-                    Color color = e.display.getSystemColor(SWT.COLOR_BLUE);
-                    e.gc.setForeground(color);
-                    e.gc.drawRectangle(rect);
+                    Color color = display.getSystemColor(SWT.COLOR_BLUE);
+                    gc.setForeground(color);
+                    gc.drawRectangle(rect);
                 }
             }
         }
-        e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+        gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
 
     }
 
@@ -193,15 +216,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         }
     }
 
-    /**
-     * Draw the text on the horizontal middle of the rectangle. Vertical alignment depend on the
-     * verticalPosition parameter.
-     */
-    private void drawText(PaintEvent e, String text, Rectangle rectangle,
+    private void drawText(
+        Display display,
+        GC gc,
+        String text,
+        Rectangle rectangle,
         int verticalPosition) {
-        Font oldFont = e.gc.getFont();
+        Font oldFont = gc.getFont();
         Font tmpFont = null;
-        Point textSize = e.gc.textExtent(text);
+        Point textSize = gc.textExtent(text);
         if (textSize.x > rectangle.width) {
             // Try to find a smallest font to see the whole text
             FontData fd = oldFont.getFontData()[0];
@@ -214,14 +237,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 height--;
                 FontData fd2 =
                     new FontData(fd.getName(), height, fd.getStyle());
-                tmpFont = new Font(e.display, fd2);
-                e.gc.setFont(tmpFont);
-                currentTextSize = e.gc.textExtent(text);
+                tmpFont = new Font(display, fd2);
+                gc.setFont(tmpFont);
+                currentTextSize = gc.textExtent(text);
             }
             if (height > 3) {
                 textSize = currentTextSize;
             } else {
-                e.gc.setFont(oldFont);
+                gc.setFont(oldFont);
             }
         }
         int xTextPosition = (rectangle.width - textSize.x) / 2 + rectangle.x;
@@ -236,15 +259,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         case SWT.BOTTOM:
             yTextPosition = rectangle.y + rectangle.height - textSize.y - 3;
         }
-        e.gc.drawText(text, xTextPosition, yTextPosition, true);
-        e.gc.setFont(oldFont);
+        gc.drawText(text, xTextPosition, yTextPosition, true);
+        gc.setFont(oldFont);
         if (tmpFont != null) {
             tmpFont.dispose();
         }
     }
 
-    protected void drawLegend(PaintEvent e, Color color, int index, String text) {
-        e.gc.setBackground(color);
+    protected void drawLegend(Display display, GC gc, Color color, int index, String text) {
+        gc.setBackground(color);
         int width = legendWidth;
         int startx = legendWidth * index;
         int starty = gridHeight + 4;
@@ -255,9 +278,9 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         }
         Rectangle rectangle = new Rectangle(startx, starty, width,
             LEGEND_HEIGHT);
-        e.gc.fillRectangle(rectangle);
-        e.gc.drawRectangle(rectangle);
-        drawText(e, text, rectangle, SWT.CENTER);
+        gc.fillRectangle(rectangle);
+        gc.drawRectangle(rectangle);
+        drawText(display, gc, text, rectangle, SWT.CENTER);
     }
 
     /**

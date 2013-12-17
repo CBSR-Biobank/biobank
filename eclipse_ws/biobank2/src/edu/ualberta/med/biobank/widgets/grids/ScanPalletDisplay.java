@@ -9,7 +9,9 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -60,7 +62,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         setCellHeight(SAMPLE_WIDTH);
         setDefaultStorageSize(rows, cols);
     }
-
 
     public void setDefaultStorageSize() {
         setStorageSize(SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
@@ -117,9 +118,14 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected void drawRectangle(PaintEvent e,
-        ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol, Color defaultBackgroundColor) {
+    protected void drawRectangle(
+        Display display,
+        GC gc,
+        ContainerDisplayWidget displayWidget,
+        Rectangle rectangle,
+        int indexRow,
+        int indexCol,
+        Color defaultBackgroundColor) {
         Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getCells() != null) {
             PalletWell cell = (PalletWell) displayWidget.getCells().get(
@@ -128,10 +134,10 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
                 backgroundColor = cell.getStatus().getColor();
             }
         }
-        e.gc.setBackground(backgroundColor);
-        e.gc.fillRectangle(rectangle);
-        e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-        e.gc.drawRectangle(rectangle);
+        gc.setBackground(backgroundColor);
+        gc.fillRectangle(rectangle);
+        gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+        gc.drawRectangle(rectangle);
     }
 
 }

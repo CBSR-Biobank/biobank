@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
@@ -67,7 +67,7 @@ public abstract class AbstractContainerDisplay {
         this.containerType = type;
     }
 
-    protected abstract void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget);
+    protected abstract Image createGridImage(ContainerDisplayWidget containerDisplayWidget);
 
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
 

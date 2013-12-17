@@ -247,15 +247,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                     int cols = plateDimensions.getCols();
                     Capacity capacity = new Capacity(rows, cols);
                     adjustWidgetsForScannedPallet(capacity);
-
-                    try {
-                        setFakeContainerType(rows, cols);
-                    } catch (ApplicationException e) {
-                        BgcPlugin.openError(
-                            // TR: dialog title
-                            i18n.tr("Server error"),
-                            e);
-                    }
+                    setFakeContainerType(rows, cols);
                 }
             },
             new LabelProvider() {

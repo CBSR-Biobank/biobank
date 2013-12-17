@@ -3,15 +3,13 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.gui.common.widgets.ImageCanvas;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -22,7 +20,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 /**
  * This class is there to give a common parent class to grid container widgets and drawers widgets
  */
-public class ContainerDisplayWidget extends Canvas {
+public class ContainerDisplayWidget extends ImageCanvas {
 
     protected Map<RowColPos, ? extends AbstractUIWell> cells;
 
@@ -60,24 +58,20 @@ public class ContainerDisplayWidget extends Canvas {
     }
 
     public ContainerDisplayWidget(Composite parent, List<UICellStatus> cellStatus) {
-        super(parent, SWT.DOUBLE_BUFFERED);
-        addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                paintGrid(e);
-            }
-        });
+        super(parent);
         multiSelectionManager = new MultiSelectionManager(this);
         this.cellStatus = cellStatus;
     }
 
-    protected void paintGrid(PaintEvent e) {
+    @Override
+    protected void paint(GC gc) {
         if (containerDisplay != null) {
             Point size = containerDisplay.getSizeToApply();
             if (size != null) {
                 setSize(size);
             }
-            containerDisplay.paintGrid(e, this);
+            super.paint(gc);
+        } else {
         }
     }
 
@@ -108,8 +102,8 @@ public class ContainerDisplayWidget extends Canvas {
     public void setStorageSize(int rows, int columns) {
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
-            // redraw();
-            getParent().layout(true, true);
+            setSourceImage(containerDisplay.createGridImage(this));
+            redraw();
         }
     }
 
@@ -125,6 +119,7 @@ public class ContainerDisplayWidget extends Canvas {
         this.maxHeight = maxHeight;
         if (containerDisplay != null) {
             containerDisplay.setDisplaySize(maxWidth, maxHeight);
+            setSourceImage(containerDisplay.createGridImage(this));
         }
     }
 
@@ -146,6 +141,7 @@ public class ContainerDisplayWidget extends Canvas {
         if (container != null) {
             setContainerType(container.getContainerType());
             containerDisplay.setContainer(container);
+            setSourceImage(containerDisplay.createGridImage(this));
         }
     }
 
@@ -212,12 +208,18 @@ public class ContainerDisplayWidget extends Canvas {
             ((AbstractGridDisplay) display).setCellWidth(cellSize);
             ((AbstractGridDisplay) display).setCellHeight(cellSize);
         }
+        setSourceImage(containerDisplay.createGridImage(this));
     }
 
     protected void setContainerDisplay(AbstractContainerDisplay display) {
         containerDisplay = display;
         if (cellStatus != null && containerDisplay != null) {
             containerDisplay.initLegend(cellStatus);
+        }
+        if (containerDisplay == null) {
+            setSourceImage(null);
+        } else {
+            setSourceImage(containerDisplay.createGridImage(this));
         }
     }
 
