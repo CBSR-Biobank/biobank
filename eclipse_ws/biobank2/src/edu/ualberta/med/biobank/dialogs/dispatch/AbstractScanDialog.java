@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.forms.linkassign.IPalletScanManagement;
+import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
@@ -52,7 +52,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     extends BgcBaseDialog
-    implements IPalletScanManagement {
+    implements IDecodePalletManagement {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractScanDialog.class);
 
@@ -339,13 +339,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     @Override
-    public void beforeProcessing() {
-        // do nothing
-    }
-
-    @Override
     @SuppressWarnings("nls")
-    public void processScanResult() throws Exception {
+    public void processDecodeResult() throws Exception {
         log.debug("processScanResult: start");
         Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
 
@@ -387,21 +382,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             setScanOkValue(false);
         }
         setHasValues();
-        log.debug("processScanResult: end");
-    }
 
-    @Override
-    public void afterScanBeforeMerge() {
-        // do nothing
-    }
-
-    @Override
-    public void afterSuccessfulScan(Map<RowColPos, PalletWell> wells) {
-        // do nothing
-    }
-
-    @Override
-    public void afterScanAndProcess() {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -409,16 +390,18 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                 setScanHasBeenLaunched(true);
             }
         });
+
+        log.debug("processScanResult: end");
     }
 
     @Override
-    public void scanAndProcessError(String errorMsg) {
+    public void decodeAndProcessError(String errorMsg) {
         // do nothing
     }
 
     @Override
     @SuppressWarnings("nls")
-    public void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+    public void postProcessDecodeTubesManually(Set<PalletWell> cells) throws Exception {
         log.debug("postprocessScanTubesManually: start");
         boolean errorFound = false;
         for (PalletWell cell : cells) {
@@ -443,7 +426,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     @Override
     @SuppressWarnings("nls")
-    public boolean canScanTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(PalletWell cell) {
         boolean result = ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
             || (cell.getStatus() == UICellStatus.ERROR)
             || (cell.getStatus() == UICellStatus.MISSING));

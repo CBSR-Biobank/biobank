@@ -843,16 +843,16 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public boolean canScanTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(PalletWell cell) {
         if (linkFormPatientManagement.getSelectedCollectionEvent() == null) {
             return false;
         }
-        return super.canScanTubesManually(cell);
+        return super.canDecodeTubesManually(cell);
     }
 
     @Override
-    public void postprocessScanTubesManually(Set<PalletWell> palletCells) throws Exception {
-        super.postprocessScanTubesManually(palletCells);
+    public void postProcessDecodeTubesManually(Set<PalletWell> palletCells) throws Exception {
+        super.postProcessDecodeTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
     }
 

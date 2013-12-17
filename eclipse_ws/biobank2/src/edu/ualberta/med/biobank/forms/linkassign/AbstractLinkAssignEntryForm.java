@@ -456,7 +456,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected void manageDoubleClick(MouseEvent e) {
         ScanPalletWidget widget = (ScanPalletWidget) e.widget;
         PalletWell cell = (PalletWell) widget.getObjectAtCoordinates(e.x, e.y);
-        if (canScanTubesManually(cell)) {
+        if (canDecodeTubesManually(cell)) {
             scanTubesManually(e);
         } else if (cell != null) {
             switch (cell.getStatus()) {

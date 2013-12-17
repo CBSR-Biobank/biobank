@@ -47,7 +47,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
-    implements IPalletScanManagement, ModifyListener {
+    implements IDecodePalletManagement, ModifyListener {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractPalletSpecimenAdminForm.class);
 
@@ -90,12 +90,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     public void beforeProcessingThreadStart() {
     }
 
-    @Override
-    public void beforeProcessing() {
-        setScanHasBeenLaunched(false, true);
-
-    }
-
     /**
      * go through cells retrieved from scan, set status and update the types combos components
      * 
@@ -103,7 +97,9 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
      */
     @Override
     @SuppressWarnings("nls")
-    public void processScanResult() throws Exception {
+    public void processDecodeResult() throws Exception {
+        setScanHasBeenLaunched(false, true);
+
         Map<RowColPos, PalletWell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, CellInfo> serverCells = null;
@@ -148,26 +144,20 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
         setScanValid(getCells() != null && !getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
-    }
 
-    @Override
-    public void afterScanBeforeMerge() {
-        setScanHasBeenLaunched(true, true);
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    public void afterSuccessfulScan(Map<RowColPos, PalletWell> wells) {
-        appendLog(NLS.bind("Scan completed - {0} specimens found", wells.keySet().size()));
-    }
-
-    @Override
-    public void afterScanAndProcess() {
         afterScanAndProcess(null);
+
+        setScanHasBeenLaunched(true, true);
+        appendLog(NLS.bind("Scan completed - {0} specimens found", cells.keySet().size()));
+    }
+
+    @SuppressWarnings("unused")
+    protected void afterScanAndProcess(Integer rowToProcess) {
+        // default does nothing
     }
 
     @Override
-    public void scanAndProcessError(String errorMsg) {
+    public void decodeAndProcessError(String errorMsg) {
         setScanValid(false);
         if (errorMsg != null && !errorMsg.isEmpty()) {
             appendLog(errorMsg);
@@ -176,7 +166,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @SuppressWarnings("nls")
     @Override
-    public void postprocessScanTubesManually(Set<PalletWell> cells) throws Exception {
+    public void postProcessDecodeTubesManually(Set<PalletWell> cells) throws Exception {
         for (PalletWell palletCell : cells) {
             appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
                 palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
@@ -199,13 +189,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     @Override
-    public boolean canScanTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(PalletWell cell) {
         return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY));
-    }
-
-    @SuppressWarnings("unused")
-    protected void afterScanAndProcess(Integer rowToProcess) {
-        // default does nothing
     }
 
     protected abstract void enableFields(boolean enable);

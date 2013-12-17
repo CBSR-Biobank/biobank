@@ -1308,7 +1308,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    public boolean canScanTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(PalletWell cell) {
         return fieldsValid();
     }
 
@@ -1465,8 +1465,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void postprocessScanTubesManually(Set<PalletWell> palletCells) throws Exception {
-        super.postprocessScanTubesManually(palletCells);
+    public void postProcessDecodeTubesManually(Set<PalletWell> palletCells) throws Exception {
+        super.postProcessDecodeTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
     }
 }

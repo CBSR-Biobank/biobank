@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
-import edu.ualberta.med.biobank.forms.linkassign.IPalletScanManagement;
+import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -55,15 +55,15 @@ public class PalletScanManagement {
 
     private ContainerType selectedContainerType;
 
-    private final IPalletScanManagement parent;
+    private final IDecodePalletManagement parent;
 
-    public PalletScanManagement(IPalletScanManagement parent, ContainerType containerType) {
+    public PalletScanManagement(IDecodePalletManagement parent, ContainerType containerType) {
         this.parent = parent;
         this.selectedContainerType = containerType;
     }
 
     @SuppressWarnings("nls")
-    public PalletScanManagement(IPalletScanManagement parent) {
+    public PalletScanManagement(IDecodePalletManagement parent) {
         this.parent = parent;
 
         try {
@@ -124,21 +124,16 @@ public class PalletScanManagement {
                         IProgressMonitor.UNKNOWN);
 
                     try {
-                        parent.beforeProcessing();
-                        parent.processScanResult();
-                        parent.afterScanAndProcess();
-                        parent.afterScanBeforeMerge();
-                        parent.afterSuccessfulScan(wells);
-                        parent.afterScanAndProcess();
+                        parent.processDecodeResult();
                     } catch (RemoteConnectFailureException exp) {
                         BgcPlugin.openRemoteConnectErrorMessage(exp);
-                        parent.scanAndProcessError(null);
+                        parent.decodeAndProcessError(null);
                     } catch (AccessDeniedException e) {
                         BgcPlugin.openAsyncError(
                             // dialog title
                             i18n.tr("Scan result error"),
                             e.getLocalizedMessage());
-                        parent.scanAndProcessError(e.getLocalizedMessage());
+                        parent.decodeAndProcessError(e.getLocalizedMessage());
                     } catch (Exception ex) {
                         BgcPlugin.openAsyncError(
                             // dialog title
@@ -188,7 +183,7 @@ public class PalletScanManagement {
         }
 
         try {
-            parent.postprocessScanTubesManually(manuallyEnteredCells);
+            parent.postProcessDecodeTubesManually(manuallyEnteredCells);
         } catch (Exception ex) {
             BgcPlugin.openAsyncError(
                 // dialog title
