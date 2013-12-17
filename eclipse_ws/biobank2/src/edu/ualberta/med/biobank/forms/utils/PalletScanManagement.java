@@ -33,7 +33,7 @@ import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.mvp.view.DialogView.Dialog;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
@@ -62,36 +62,31 @@ public class PalletScanManagement {
         this.selectedContainerType = containerType;
     }
 
-    @SuppressWarnings("nls")
     public PalletScanManagement(IDecodePalletManagement parent) {
         this.parent = parent;
-
-        try {
-            this.selectedContainerType = getFakePalletRowsCols(8, 12);
-        } catch (ApplicationException e) {
-            BgcPlugin.openAsyncError(
-                // TR: dialog title
-                i18n.tr("Error"),
-                // TR: dialog message
-                i18n.tr("Unable to load pallet type 8*12"),
-                e);
-        }
+        this.selectedContainerType = getFakePalletRowsCols(8, 12);
     }
 
     @SuppressWarnings("nls")
-    private ContainerType getFakePalletRowsCols(int rows, int cols) throws ApplicationException {
-        ContainerType ct = new ContainerType();
-        ct.setCapacity(new Capacity(rows, cols));
+    private ContainerType getFakePalletRowsCols(int rows, int cols) {
+        try {
 
-        ContainerLabelingSchemeInfo schemeInfo = SessionManager.getAppService().doAction(
-            new ContainerLabelingSchemeGetInfoAction("SBS Standard"));
+            ContainerType ct = new ContainerType();
+            ct.setCapacity(new Capacity(rows, cols));
 
-        if (schemeInfo == null) {
-            throw new RuntimeException("SBS Standard labeling scheme not found in database");
+            ContainerLabelingSchemeInfo schemeInfo;
+            schemeInfo = SessionManager.getAppService().doAction(
+                new ContainerLabelingSchemeGetInfoAction("SBS Standard"));
+
+            if (schemeInfo == null) {
+                throw new RuntimeException("SBS Standard labeling scheme not found in database");
+            }
+
+            ct.setChildLabelingScheme(schemeInfo.getLabelingScheme());
+            return ct;
+        } catch (ApplicationException e) {
+            throw new RuntimeException(e);
         }
-
-        ct.setChildLabelingScheme(schemeInfo.getLabelingScheme());
-        return ct;
     }
 
     @SuppressWarnings("nls")
@@ -111,6 +106,8 @@ public class PalletScanManagement {
             scansCount++;
             initCells();
             Set<DecodedWell> decodeResult = dialog.getDecodeResult();
+            PalletDimensions plateDimensions = dialog.getPlateDimensions();
+            setFakeContainerType(plateDimensions.getRows(), plateDimensions.getCols());
             wells = PalletWell.convertArray(decodeResult);
 
             parent.beforeProcessingThreadStart();
@@ -158,7 +155,7 @@ public class PalletScanManagement {
 
     @SuppressWarnings("nls")
     public void scanTubesManually(MouseEvent event, ScanManualOption scanManualOption) {
-        RowColPos startPos = ((ScanPalletWidget) event.widget).getPositionAtCoordinates(
+        RowColPos startPos = ((PalletWidget) event.widget).getPositionAtCoordinates(
             event.x, event.y);
 
         // if mouse click does not produce a position then there is nothing to do
@@ -187,7 +184,7 @@ public class PalletScanManagement {
         } catch (Exception ex) {
             BgcPlugin.openAsyncError(
                 // dialog title
-                i18n.tr("Scan tube error"),
+                i18n.tr("Decode pallet error"),
                 ex);
         }
     }
@@ -342,7 +339,7 @@ public class PalletScanManagement {
         }
     }
 
-    public void setFakeContainerType(int rows, int cols) throws ApplicationException {
+    public void setFakeContainerType(int rows, int cols) {
         this.selectedContainerType = getFakePalletRowsCols(rows, cols);
     }
 

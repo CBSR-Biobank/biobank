@@ -108,7 +108,8 @@ public class ContainerDisplayWidget extends Canvas {
     public void setStorageSize(int rows, int columns) {
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
-            redraw();
+            // redraw();
+            getParent().layout(true, true);
         }
     }
 

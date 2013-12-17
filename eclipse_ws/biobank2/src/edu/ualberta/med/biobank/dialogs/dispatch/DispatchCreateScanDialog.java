@@ -132,7 +132,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
 
     @SuppressWarnings("nls")
     @Override
-    protected void scanButtonSelected() {
+    protected void decodeButtonSelected() {
         BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
             @Override
             public void run() {
@@ -172,7 +172,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
             }
         });
 
-        super.scanButtonSelected();
+        super.decodeButtonSelected();
 
     }
 

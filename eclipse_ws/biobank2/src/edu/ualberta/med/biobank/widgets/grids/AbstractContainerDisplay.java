@@ -67,8 +67,7 @@ public abstract class AbstractContainerDisplay {
         this.containerType = type;
     }
 
-    protected abstract void paintGrid(PaintEvent e,
-        ContainerDisplayWidget displayWidget);
+    protected abstract void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget);
 
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
 

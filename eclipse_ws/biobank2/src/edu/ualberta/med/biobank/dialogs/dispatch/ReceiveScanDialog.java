@@ -130,7 +130,7 @@ public abstract class ReceiveScanDialog<T extends ModelWrapper<?>>
             if (barcodeDialog.open() == Dialog.OK) {
                 String productBarcode = barcodeDialog.getBarcode();
                 List<Object> output = new ArrayList<Object>();
-                Map<RowColPos, ? extends AbstractUIWell> cells = spw.getCells();
+                Map<RowColPos, ? extends AbstractUIWell> cells = palletWidget.getCells();
                 for (RowColPos pos : cells.keySet()) {
                     String inventoryId = ((PalletWell) cells.get(pos)).getValue();
                     SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(

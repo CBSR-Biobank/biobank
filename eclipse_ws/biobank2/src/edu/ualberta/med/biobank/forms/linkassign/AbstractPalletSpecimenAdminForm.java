@@ -44,7 +44,6 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
     implements IDecodePalletManagement, ModifyListener {
@@ -375,7 +374,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         palletScanManagement.setContainerType(type);
     }
 
-    protected void setFakeContainerType(int rows, int cols) throws ApplicationException {
+    protected void setFakeContainerType(int rows, int cols) {
         palletScanManagement.setFakeContainerType(rows, cols);
     }
 }

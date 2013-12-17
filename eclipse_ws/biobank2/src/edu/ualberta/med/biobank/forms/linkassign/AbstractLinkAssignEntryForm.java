@@ -50,7 +50,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
@@ -114,7 +114,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected Label palletLabel;
     protected ContainerDisplayWidget freezerWidget;
     protected ContainerDisplayWidget hotelWidget;
-    protected ScanPalletWidget palletWidget;
+    protected PalletWidget palletWidget;
 
     protected RowColPos currentGridDimensions =
         new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
@@ -431,8 +431,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         showOnlyPallet(true);
     }
 
-    protected ScanPalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols) {
-        palletWidget = new ScanPalletWidget(palletComposite,
+    protected PalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols) {
+        palletWidget = new PalletWidget(palletComposite,
             UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
@@ -454,7 +454,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
      * Multiple assign
      */
     protected void manageDoubleClick(MouseEvent e) {
-        ScanPalletWidget widget = (ScanPalletWidget) e.widget;
+        PalletWidget widget = (PalletWidget) e.widget;
         PalletWell cell = (PalletWell) widget.getObjectAtCoordinates(e.x, e.y);
         if (canDecodeTubesManually(cell)) {
             scanTubesManually(e);

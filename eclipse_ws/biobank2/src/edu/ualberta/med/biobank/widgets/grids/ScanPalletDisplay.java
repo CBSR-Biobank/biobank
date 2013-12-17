@@ -33,7 +33,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
-    public ScanPalletDisplay(final ScanPalletWidget widget, int rows, int cols) {
+    public ScanPalletDisplay(final PalletWidget widget, int rows, int cols) {
         super();
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override

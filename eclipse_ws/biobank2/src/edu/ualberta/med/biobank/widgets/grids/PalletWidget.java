@@ -9,18 +9,18 @@ import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
-public class ScanPalletWidget extends ContainerDisplayWidget {
+public class PalletWidget extends ContainerDisplayWidget {
 
-    public ScanPalletWidget(Composite parent) {
+    public PalletWidget(Composite parent) {
         this(parent, null);
     }
 
-    public ScanPalletWidget(Composite parent, List<UICellStatus> cellStatus) {
+    public PalletWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(parent, cellStatus);
         setContainerDisplay(new ScanPalletDisplay(this, RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT));
     }
 
-    public ScanPalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
+    public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
         super(parent, cellStatus);
         setContainerDisplay(new ScanPalletDisplay(this, rows, cols));
     }

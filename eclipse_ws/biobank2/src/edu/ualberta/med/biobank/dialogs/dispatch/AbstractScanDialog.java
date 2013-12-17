@@ -42,10 +42,11 @@ import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
@@ -67,7 +68,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     private final PalletScanManagement palletScanManagement;
 
-    protected ScanPalletWidget spw;
+    protected PalletWidget palletWidget;
 
     protected T currentShipment;
 
@@ -83,7 +84,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     private final IObservableValue scanStatusObservable =
         new WritableValue(Boolean.TRUE, Boolean.class);
 
-    private Button scanButton;
+    private Button decodeButton;
 
     protected CenterWrapper<?> currentCenter;
 
@@ -127,15 +128,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
         createCustomDialogPreContents(contents);
 
-        scanButton = new Button(contents, SWT.PUSH);
-        scanButton.setText(DECODE_PALLET_BUTTON_LABEL);
-        scanButton.addSelectionListener(new SelectionAdapter() {
+        decodeButton = new Button(contents, SWT.PUSH);
+        decodeButton.setText(DECODE_PALLET_BUTTON_LABEL);
+        decodeButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                scanButtonSelected();
+                decodeButtonSelected();
             }
         });
-        scanButton.setEnabled(false);
+        decodeButton.setEnabled(false);
 
         createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
@@ -157,9 +158,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             IStatus.ERROR);
     }
 
-    protected void scanButtonSelected() {
-        launchScan();
-
+    @SuppressWarnings("nls")
+    protected void decodeButtonSelected() {
+        log.debug("decodeButtonSelected");
+        setDecodeOkValue(false);
+        palletScanManagement.launchScanAndProcessResult();
     }
 
     @SuppressWarnings("unused")
@@ -170,22 +173,15 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     protected abstract List<UICellStatus> getPalletCellStatus();
 
     @SuppressWarnings("nls")
-    private void launchScan() {
-        log.debug("launchScan");
-        setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult();
-    }
-
-    @SuppressWarnings("nls")
     protected void startNewPallet() {
         log.debug("startNewPallet");
-        spw.setCells(null);
+        palletWidget.setCells(null);
         scanHasBeenLaunchedValue.setValue(false);
     }
 
     @SuppressWarnings("nls")
-    protected void setScanOkValue(final boolean value) {
-        log.debug("setScanOkValue: value: {}", value);
+    protected void setDecodeOkValue(final boolean value) {
+        log.debug("setDecodeOkValue: value: {}", value);
         scanStatus = value;
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -227,7 +223,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     protected void redrawPallet() {
-        spw.redraw();
+        palletWidget.redraw();
     }
 
     @SuppressWarnings("nls")
@@ -277,7 +273,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     @Override
     protected void handleStatusChanged(IStatus status) {
         super.handleStatusChanged(status);
-        scanButton.setEnabled(fieldsValid());
+        decodeButton.setEnabled(fieldsValid());
     }
 
     protected boolean fieldsValid() {
@@ -312,19 +308,19 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         Integer centerId, Map<RowColPos, CellInfo> cells, Locale locale);
 
     protected void resetScan() {
-        if (spw != null)
-            spw.setCells(null);
+        if (palletWidget != null)
+            palletWidget.setCells(null);
         setScanHasBeenLaunched(false);
         palletScanManagement.onReset();
     }
 
     private void createScanPalletWidget(Composite contents, int rows, int cols) {
-        spw = new ScanPalletWidget(contents, getPalletCellStatus(), rows, cols);
+        palletWidget = new PalletWidget(contents, getPalletCellStatus(), rows, cols);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
-        spw.setLayoutData(gd);
+        palletWidget.setLayoutData(gd);
 
-        spw.addMouseListener(new MouseAdapter() {
+        palletWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
                 if (isScanHasBeenLaunched())
@@ -342,10 +338,22 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     @SuppressWarnings("nls")
     public void processDecodeResult() throws Exception {
         log.debug("processScanResult: start");
-        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                Capacity capacity = palletScanManagement.getContainerType().getCapacity();
+                palletWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
+            }
+        });
+
+        if (SessionManager.getUser().getCurrentWorkingCenter() == null) {
+            throw new IllegalStateException("current workin center is null");
+        }
 
         if (checkBeforeProcessing(currentCenter)) {
             Map<RowColPos, PalletWell> cells = getCells();
+
             // conversion for server side call
             Map<RowColPos, CellInfo> serverCells = null;
             if (cells != null) {
@@ -377,16 +385,16 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                     specificScanPosProcess(palletWell);
                 }
             }
-            setScanOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
+            setDecodeOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
         } else {
-            setScanOkValue(false);
+            setDecodeOkValue(false);
         }
         setHasValues();
 
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                spw.setCells(getCells());
+                palletWidget.setCells(getCells());
                 setScanHasBeenLaunched(true);
             }
         });
@@ -418,8 +426,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             }
             specificScanPosProcess(cell);
         }
-        spw.redraw();
-        setScanOkValue(scanStatus && !errorFound);
+        palletWidget.redraw();
+        setDecodeOkValue(scanStatus && !errorFound);
         setHasValues();
         log.debug("postprocessScanTubesManually: end");
     }
