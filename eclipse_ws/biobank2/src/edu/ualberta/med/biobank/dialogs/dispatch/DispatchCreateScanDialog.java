@@ -172,6 +172,9 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
             }
         });
 
+        if (!isPalletWithPosition) {
+            setContainerType(null);
+        }
         super.decodeButtonSelected();
 
     }
