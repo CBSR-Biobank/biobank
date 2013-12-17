@@ -59,7 +59,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @SuppressWarnings("nls")
     // TR: button label
-    private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
+    private static final String DECODE_PALLET_BUTTON_LABEL = i18n.tr("Decode pallet");
 
     private final IObservableValue canLaunchScanValue =
         new WritableValue(Boolean.TRUE, Boolean.class);
@@ -213,7 +213,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     @SuppressWarnings("nls")
     protected void createScanButton(Composite parent) {
         // TR: button text
-        scanButton = toolkit.createButton(parent, FLATBED_SCAN_BUTTON_LABEL, SWT.PUSH);
+        scanButton = toolkit.createButton(parent, DECODE_PALLET_BUTTON_LABEL, SWT.PUSH);
         GridData gd = new GridData();
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
@@ -228,12 +228,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
             canLaunchScanValue,
             // TR: validation error message
-            i18n.tr("Errors were detected. Cannot perform a flatbed scan yet."));
+            i18n.tr("Errors were detected. Cannot decode pallet yet."));
         addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanHasBeenLaunchedValue,
             // TR: validation error message
-            i18n.tr("Launch a flatbed scan or enter inventory IDs manually by double clicking cells on the grid"));
+            i18n.tr("Decode a pallet or enter inventory IDs manually by double clicking cells on the grid"));
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             scanValidValue,
             // TR: validation error message

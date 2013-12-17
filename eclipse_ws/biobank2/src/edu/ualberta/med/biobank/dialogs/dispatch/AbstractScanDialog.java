@@ -63,7 +63,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     @SuppressWarnings("nls")
     // TR: button label
-    private static final String FLATBED_SCAN_BUTTON_LABEL = i18n.tr("Flatbed Scan");
+    private static final String DECODE_PALLET_BUTTON_LABEL = i18n.tr("Decode pallet");
 
     private final PalletScanManagement palletScanManagement;
 
@@ -128,7 +128,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         createCustomDialogPreContents(contents);
 
         scanButton = new Button(contents, SWT.PUSH);
-        scanButton.setText(FLATBED_SCAN_BUTTON_LABEL);
+        scanButton.setText(DECODE_PALLET_BUTTON_LABEL);
         scanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

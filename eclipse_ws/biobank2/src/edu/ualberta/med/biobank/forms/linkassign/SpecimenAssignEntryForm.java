@@ -578,7 +578,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
         widgetCreator.createLabel(multipleOptionsFields,
             // TR: label
-            i18n.tr("Use flatbed scanner"));
+            i18n.tr("Decode pallet"));
         useScannerButton = toolkit.createButton(multipleOptionsFields,
             StringUtil.EMPTY_STRING, SWT.CHECK);
         useScannerButton.addSelectionListener(new SelectionAdapter() {
