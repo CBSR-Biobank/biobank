@@ -59,7 +59,6 @@ public class ImageCanvas extends Canvas {
         }
     }
 
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ImageCanvas.class.getName());
 
     // margin between canvas and screen image

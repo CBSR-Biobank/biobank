@@ -202,13 +202,22 @@ public class Drawer36Display extends AbstractContainerDisplay {
         drawTextOnCenter(gc, text, rectangle);
     }
 
-    @Override
-    public Point computeSize(int wHint, int hHint, boolean changed) {
+    private int getFullHeight() {
         int fullHeight = HEIGHT;
         if (legendStatus != null) {
             fullHeight += LEGEND_HEIGHT;
         }
-        return new Point(WIDTH, fullHeight);
+        return fullHeight;
+    }
+
+    @Override
+    public Point computeSize(int wHint, int hHint, boolean changed) {
+        return new Point(WIDTH, getFullHeight());
+    }
+
+    @Override
+    protected Rectangle getClientArea() {
+        return new Rectangle(0, 0, WIDTH, getFullHeight());
     }
 
 }
