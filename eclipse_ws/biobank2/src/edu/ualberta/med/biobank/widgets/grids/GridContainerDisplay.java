@@ -23,6 +23,10 @@ public class GridContainerDisplay extends AbstractGridDisplay {
      */
     private UICellStatus defaultStatus = UICellStatus.NOT_INITIALIZED;
 
+    public GridContainerDisplay(String name) {
+        super(name);
+    }
+
     @Override
     protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,

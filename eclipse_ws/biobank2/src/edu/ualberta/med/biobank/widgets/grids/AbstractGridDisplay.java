@@ -16,6 +16,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.gui.common.Swt2DUtil;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -28,6 +30,8 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  * width and height of the cells
  */
 public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
+
+    private static Logger log = LoggerFactory.getLogger(AbstractGridDisplay.class.getName());
 
     private static final int IMAGE_BORDER_SIZE = 2;
 
@@ -60,18 +64,26 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     public boolean legendOnSide = false;
 
+    public AbstractGridDisplay(String name) {
+        super(name);
+    }
+
+    @SuppressWarnings("nls")
     @Override
     protected Image createGridImage(ContainerDisplayWidget displayWidget) {
-        // make image slightly larger so all cell borders fit on image
-        int width = columns * cellWidth + 2 * IMAGE_BORDER_SIZE;
-        int height = rows * cellHeight + 2 * IMAGE_BORDER_SIZE;
-
         Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-        Image image = new Image(display, width, height);
+        Rectangle clientArea = getClientArea();
+        Image image = new Image(display, clientArea.width, clientArea.height);
+
+        if (this.name.equals("PalletDisplay")) {
+            log.debug("here");
+        }
+
+        log.debug("createGridImage: {}", name);
 
         // center grid on image
         Rectangle2D.Double cellRect = new Rectangle2D.Double(
-            IMAGE_BORDER_SIZE, IMAGE_BORDER_SIZE, cellWidth, cellHeight);
+            0, 0, cellWidth, cellHeight);
 
         GC newGC = new GC(image);
         for (int row = 0; row < rows; ++row) {
@@ -113,26 +125,50 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     @Override
-    public Point computeSize(int wHint, int hHint, boolean changed) {
-        if (maxWidth != -1 && maxHeight != -1) {
+    protected Rectangle getClientArea() {
+        int width;
+        int height;
+
+        if ((maxWidth >= 0) && (maxHeight >= 0)) {
+            width = maxWidth;
+            height = maxHeight;
+
             cellWidth = maxWidth / columns;
             cellHeight = maxHeight / rows;
-            gridWidth = maxWidth;
-            gridHeight = maxHeight;
         } else {
-            gridWidth = cellWidth * columns;
-            gridHeight = cellHeight * rows;
+            width = cellWidth * columns;
+            height = cellHeight * rows;
         }
-        int width = gridWidth + 2 * IMAGE_BORDER_SIZE;
-        int height = gridHeight + 2 * IMAGE_BORDER_SIZE;
+
+        gridWidth = width;
+        gridHeight = height;
+
+        width += 2 * IMAGE_BORDER_SIZE;
+        height += 2 * IMAGE_BORDER_SIZE;
+
         if (legendStatus != null) {
             if (legendOnSide) {
-                width = width + LEGEND_WIDTH + 4;
+                width += LEGEND_WIDTH + 4;
             } else {
-                height = height + LEGEND_HEIGHT + 4;
+                height += LEGEND_HEIGHT + 4;
             }
         }
-        return new Point(width, height);
+
+        // log.debug("getClientArea: width: {}, height: {}", width, height);
+        return new Rectangle(0, 0, width, height);
+
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public Point computeSize(int wHint, int hHint, boolean changed) {
+        Rectangle clientArea = getClientArea();
+
+        if (this.name.equals("PalletDisplay")) {
+            log.debug("computeSize: width: {}, height: {}", clientArea.x, clientArea.y);
+        }
+
+        return new Point(clientArea.width, clientArea.height);
     }
 
     protected void drawRectangle(

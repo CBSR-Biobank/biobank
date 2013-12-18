@@ -16,13 +16,16 @@ public class PalletWidget extends ContainerDisplayWidget {
     }
 
     public PalletWidget(Composite parent, List<UICellStatus> cellStatus) {
-        super(parent, cellStatus);
-        setContainerDisplay(new ScanPalletDisplay(this, RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT));
+        super(parent, PalletWidget.class.getSimpleName(), cellStatus);
+        setContainerDisplay(new PalletDisplay(
+            this,
+            RowColPos.ROWS_DEFAULT,
+            RowColPos.COLS_DEFAULT));
     }
 
     public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
-        super(parent, cellStatus);
-        setContainerDisplay(new ScanPalletDisplay(this, rows, cols));
+        super(parent, PalletWidget.class.getSimpleName(), cellStatus);
+        setContainerDisplay(new PalletDisplay(this, rows, cols));
     }
 
     public boolean isEverythingTyped() {
@@ -38,14 +41,16 @@ public class PalletWidget extends ContainerDisplayWidget {
     }
 
     @Override
-    public void initDisplayFromType(boolean createDefaultContainer,
-        Integer cellSize) {
-        ScanPalletDisplay display = (ScanPalletDisplay) getContainerDisplay();
+    public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
+        PalletDisplay display = (PalletDisplay) getContainerDisplay();
         if (containerType == null) {
-            setContainerDisplay(new ScanPalletDisplay(this, RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT));
-        }
-        else
+            setContainerDisplay(new PalletDisplay(
+                this,
+                RowColPos.ROWS_DEFAULT,
+                RowColPos.COLS_DEFAULT));
+        } else {
             display.setContainerType(containerType);
+        }
         display.setCellWidth(cellSize);
         display.setCellHeight(cellSize);
     }

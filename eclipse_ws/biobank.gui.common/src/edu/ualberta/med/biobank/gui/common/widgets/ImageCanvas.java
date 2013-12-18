@@ -79,7 +79,7 @@ public class ImageCanvas extends Canvas {
     protected AffineTransform sourceImageToCanvasTransform = new AffineTransform();
 
     public ImageCanvas(final Composite parent) {
-        this(parent, SWT.NULL);
+        this(parent, SWT.NONE);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ImageCanvas extends Canvas {
      * @param style the style of this control.
      */
     public ImageCanvas(final Composite parent, int style) {
-        super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        super(parent, style | SWT.V_SCROLL | SWT.H_SCROLL);
         // super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND);
         addListeners();
         initScrollBars();
@@ -131,14 +131,17 @@ public class ImageCanvas extends Canvas {
 
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void dispose() {
+        log.debug("dispose: ");
         if ((sourceImage != null) && !sourceImage.isDisposed()) {
             sourceImage.dispose();
         }
         if ((screenImage != null) && !screenImage.isDisposed()) {
             screenImage.dispose();
         }
+        super.dispose();
     }
 
     public void controlResized() {
@@ -148,6 +151,7 @@ public class ImageCanvas extends Canvas {
     /*
      * Draws the source image on the canvas.
      */
+    @SuppressWarnings("nls")
     protected Image clippedSourceImage() {
         if (sourceImage == null) {
             throw new IllegalStateException("source image is null");
@@ -331,11 +335,13 @@ public class ImageCanvas extends Canvas {
             /* image is wider than client area */
             horizontal.setMaximum((int) (imageBound.width * sx));
             horizontal.setEnabled(true);
+            horizontal.setVisible(true);
             if (((int) -tx) > horizontal.getMaximum() - cw)
                 tx = -horizontal.getMaximum() + cw;
         } else {
             /* image is narrower than client area */
             horizontal.setEnabled(false);
+            horizontal.setVisible(false);
             tx = (cw - imageBound.width * sx) / 2; // center if too small.
         }
         horizontal.setSelection((int) (-tx));
@@ -348,11 +354,13 @@ public class ImageCanvas extends Canvas {
             /* image is higher than client area */
             vertical.setMaximum((int) (imageBound.height * sy));
             vertical.setEnabled(true);
+            vertical.setVisible(true);
             if (((int) -ty) > vertical.getMaximum() - ch)
                 ty = -vertical.getMaximum() + ch;
         } else {
             /* image is less higher than client area */
             vertical.setEnabled(false);
+            vertical.setVisible(false);
             ty = (ch - imageBound.height * sy) / 2; // center if too small.
         }
         vertical.setSelection((int) (-ty));

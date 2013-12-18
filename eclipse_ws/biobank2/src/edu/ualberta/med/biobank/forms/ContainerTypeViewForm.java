@@ -137,7 +137,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         isTopLevelButton = (Button) createLabelledWidget(client, Button.class, SWT.NONE,
             ContainerType.Property.TOP_LEVEL.toString());
         isMicroplateButton = (Button) createLabelledWidget(client, Button.class, SWT.NONE,
-                ContainerType.Property.IS_MICROPLATE.toString());
+            ContainerType.Property.IS_MICROPLATE.toString());
         rowCapacityLabel = createReadOnlyLabelledField(client, SWT.NONE,
             // label
             i18n.tr("Rows"));
@@ -265,7 +265,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         sc.setExpandVertical(true);
         Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
-        ContainerDisplayWidget containerDisplay = new ContainerDisplayWidget(client);
+        ContainerDisplayWidget containerDisplay =
+            new ContainerDisplayWidget(client, ContainerTypeViewForm.class.getSimpleName());
         containerDisplay.setContainerType(containerType);
         toolkit.adapt(containerSection);
         toolkit.adapt(sc);

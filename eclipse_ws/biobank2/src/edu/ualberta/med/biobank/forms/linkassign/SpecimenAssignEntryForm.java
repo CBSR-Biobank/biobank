@@ -73,7 +73,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
+import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
@@ -1251,7 +1251,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             hotelWidget.setSelection(null);
             palletLabel.setText(i18n.tr("Pallet"));
             palletWidget.setCells(null);
-            palletWidget.setContainerType(null, ScanPalletDisplay.SAMPLE_WIDTH,
+            palletWidget.setContainerType(null, PalletDisplay.SAMPLE_WIDTH,
                 true);
         }
         setScanHasBeenLaunched(isSingleMode() || !useScanner);
@@ -1377,7 +1377,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             palletLabel.setText(palletPositionText.getText());
 
             palletWidget.setContainerType(currentMultipleContainer.getContainerType(),
-                ScanPalletDisplay.SAMPLE_WIDTH);
+                PalletDisplay.SAMPLE_WIDTH);
             setContainerType(currentMultipleContainer.getContainerType().getWrappedObject());
             palletWidget.setCells(getCells());
 

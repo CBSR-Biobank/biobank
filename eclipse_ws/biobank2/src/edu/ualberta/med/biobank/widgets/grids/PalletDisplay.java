@@ -5,10 +5,7 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -22,7 +19,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 /**
  * Specific widget to draw a pallet for scan features
  */
-public class ScanPalletDisplay extends AbstractGridDisplay {
+public class PalletDisplay extends AbstractGridDisplay {
 
     public static final int SAMPLE_WIDTH = 50;
 
@@ -35,13 +32,13 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
-    public ScanPalletDisplay(final PalletWidget widget, int rows, int cols) {
-        super();
+    public PalletDisplay(final PalletWidget widget, int rows, int cols) {
+        super(PalletDisplay.class.getSimpleName());
+
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
-                PalletWell cell = (PalletWell) getObjectAtCoordinates(widget,
-                    e.x, e.y);
+                PalletWell cell = (PalletWell) getObjectAtCoordinates(widget, e.x, e.y);
                 if (cell != null) {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
@@ -69,14 +66,6 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
 
     public void setDefaultStorageSize(int rows, int cols) {
         setStorageSize(rows, cols);
-    }
-
-    @Override
-    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
-        FontData fd = e.gc.getFont().getFontData()[0];
-        FontData fd2 = new FontData(fd.getName(), 8, fd.getStyle());
-        e.gc.setFont(new Font(e.display, fd2));
-        super.paintGrid(e, displayWidget);
     }
 
     @Override

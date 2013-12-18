@@ -5,7 +5,10 @@ import java.util.Map;
 
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -21,6 +24,9 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  * This class is there to give a common parent class to grid container widgets and drawers widgets
  */
 public class ContainerDisplayWidget extends ImageCanvas {
+
+    @SuppressWarnings("unused")
+    private static Logger log = LoggerFactory.getLogger(ContainerDisplayWidget.class.getName());
 
     protected Map<RowColPos, ? extends AbstractUIWell> cells;
 
@@ -53,14 +59,17 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final List<UICellStatus> cellStatus;
 
-    public ContainerDisplayWidget(Composite parent) {
-        this(parent, null);
-    }
+    private final String name;
 
-    public ContainerDisplayWidget(Composite parent, List<UICellStatus> cellStatus) {
+    public ContainerDisplayWidget(Composite parent, String name, List<UICellStatus> cellStatus) {
         super(parent);
         multiSelectionManager = new MultiSelectionManager(this);
         this.cellStatus = cellStatus;
+        this.name = name;
+    }
+
+    public ContainerDisplayWidget(Composite parent, String name) {
+        this(parent, name, null);
     }
 
     @Override
@@ -70,9 +79,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
             if (size != null) {
                 setSize(size);
             }
-            super.paint(gc);
-        } else {
         }
+        super.paint(gc);
     }
 
     @Override
@@ -92,6 +100,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     public void setCells(Map<RowColPos, ? extends AbstractUIWell> cells) {
         this.cells = cells;
+        setSourceImage(containerDisplay.createGridImage(this));
         redraw();
     }
 
@@ -150,7 +159,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
     }
 
     public void setContainerType(ContainerType type) {
-        setContainerType(type, ScanPalletDisplay.SAMPLE_WIDTH, false);
+        setContainerType(type, PalletDisplay.SAMPLE_WIDTH, false);
     }
 
     public void setContainerType(ContainerType type, Integer cellSize) {
@@ -181,20 +190,21 @@ public class ContainerDisplayWidget extends ImageCanvas {
     }
 
     public void initDisplayFromType(boolean createDefaultContainer) {
-        initDisplayFromType(createDefaultContainer, ScanPalletDisplay.SAMPLE_WIDTH);
+        initDisplayFromType(createDefaultContainer, PalletDisplay.SAMPLE_WIDTH);
     }
 
     public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
         AbstractContainerDisplay display = null;
+
         if (containerType == null) {
             if (createDefaultContainer) {
-                display = new GridContainerDisplay();
+                display = new GridContainerDisplay(this.name);
                 display.setStorageSize(3, 5);
             }
         } else if (containerType.getName().equals(Drawer36Display.CONTAINER_NAME)) {
-            display = new Drawer36Display();
+            display = new Drawer36Display(containerType.getName());
         } else {
-            display = new GridContainerDisplay();
+            display = new GridContainerDisplay(containerType.getName());
         }
 
         if (display != null) {
@@ -204,16 +214,16 @@ public class ContainerDisplayWidget extends ImageCanvas {
             }
         }
         setContainerDisplay(display);
-        if (display instanceof AbstractGridDisplay && cellSize != null) {
-            ((AbstractGridDisplay) display).setCellWidth(cellSize);
-            ((AbstractGridDisplay) display).setCellHeight(cellSize);
+        if ((display instanceof AbstractGridDisplay) && (cellSize != null)) {
+            AbstractGridDisplay grid = (AbstractGridDisplay) display;
+            grid.setCellWidth(cellSize);
+            grid.setCellHeight(cellSize);
         }
-        setSourceImage(containerDisplay.createGridImage(this));
     }
 
     protected void setContainerDisplay(AbstractContainerDisplay display) {
         containerDisplay = display;
-        if (cellStatus != null && containerDisplay != null) {
+        if ((cellStatus != null) && (containerDisplay != null)) {
             containerDisplay.initLegend(cellStatus);
         }
         if (containerDisplay == null) {
@@ -237,6 +247,11 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     public RowColPos getPositionAtCoordinates(int x, int y) {
         return containerDisplay.getPositionAtCoordinates(x, y);
+    }
+
+    @Override
+    public Rectangle getClientArea() {
+        return containerDisplay.getClientArea();
     }
 
 }

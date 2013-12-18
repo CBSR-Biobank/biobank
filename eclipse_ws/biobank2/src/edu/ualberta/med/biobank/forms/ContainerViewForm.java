@@ -297,7 +297,9 @@ public class ContainerViewForm extends BiobankViewForm {
                 i18n.tr("Error in container children : can't display those initialized"));
             label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
         }
-        containerWidget = new ContainerDisplayWidget(client,
+        containerWidget = new ContainerDisplayWidget(
+            client,
+            ContainerViewForm.class.getSimpleName(),
             UICellStatus.DEFAULT_CONTAINER_STATUS_LIST);
         containerWidget.setContainer(container);
         containerWidget.setCells(cells);

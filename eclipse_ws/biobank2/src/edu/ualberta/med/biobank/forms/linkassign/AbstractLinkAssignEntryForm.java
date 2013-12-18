@@ -49,7 +49,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
+import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
@@ -374,8 +374,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         multipleVisualisation = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(3, false);
         multipleVisualisation.setLayout(layout);
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
+        GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
         multipleVisualisation.setLayoutData(gd);
 
         Composite freezerComposite = toolkit.createComposite(multipleVisualisation);
@@ -394,10 +393,10 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             // TR: label
             i18n.tr("Freezer"));
         freezerLabel.setLayoutData(new GridData());
-        freezerWidget = new ContainerDisplayWidget(freezerComposite);
+        freezerWidget = new ContainerDisplayWidget(freezerComposite, "freezerWidget");
         freezerWidget.initDisplayFromType(true);
         toolkit.adapt(freezerWidget);
-        freezerWidget.setDisplaySize(ScanPalletDisplay.PALLET_WIDTH, 100);
+        freezerWidget.setDisplaySize(PalletDisplay.PALLET_WIDTH, 100);
 
         Composite hotelComposite = toolkit.createComposite(multipleVisualisation);
         layout = new GridLayout(1, false);
@@ -410,30 +409,34 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         hotelLabel = toolkit.createLabel(hotelComposite,
             // TR: label
             i18n.tr("Hotel"));
-        hotelWidget = new ContainerDisplayWidget(hotelComposite);
+        hotelWidget = new ContainerDisplayWidget(hotelComposite, "hotelWidget");
         hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
-        hotelWidget.setDisplaySize(100, ScanPalletDisplay.PALLET_HEIGHT_AND_LEGEND);
+        hotelWidget.setDisplaySize(100, PalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
-        Composite palletComposite = toolkit
-            .createComposite(multipleVisualisation);
+        Composite palletComposite = toolkit.createComposite(multipleVisualisation);
         layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         palletComposite.setLayout(layout);
-        palletComposite.setLayoutData(new GridData());
+        palletComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
         palletLabel = toolkit.createLabel(palletComposite,
             // TR: label
             i18n.tr("Pallet"));
-        createScanPalletWidget(palletComposite, currentGridDimensions.getRow(),
+        palletWidget = createScanPalletWidget(
+            palletComposite,
+            currentGridDimensions.getRow(),
             currentGridDimensions.getCol());
         showOnlyPallet(true);
     }
 
     protected PalletWidget createScanPalletWidget(Composite palletComposite, int rows, int cols) {
-        palletWidget = new PalletWidget(palletComposite,
-            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST, rows, cols);
+        PalletWidget palletWidget = new PalletWidget(
+            palletComposite,
+            UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST,
+            rows,
+            cols);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -447,7 +450,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     protected void recreateScanPalletWidget(int rows, int cols) {
         Composite palletComposite = palletWidget.getParent();
         palletWidget.dispose();
-        createScanPalletWidget(palletComposite, rows, cols);
+        palletWidget = createScanPalletWidget(palletComposite, rows, cols);
     }
 
     /**
@@ -470,6 +473,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         }
     }
 
+    @SuppressWarnings("nls")
     protected void createSingleVisualisation(Composite parent) {
         singleVisualisation = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
@@ -485,16 +489,16 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
-        thirdSingleParentWidget = new ContainerDisplayWidget(
-            singleVisualisation);
+        thirdSingleParentWidget =
+            new ContainerDisplayWidget(singleVisualisation, "thirdSingleParentWidget");
         thirdSingleParentWidget.setContainerType(thirdSingleParentType, true);
         toolkit.adapt(thirdSingleParentWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         thirdSingleParentWidget.setLayoutData(gdDrawer);
 
-        secondSingleParentWidget = new ContainerDisplayWidget(
-            singleVisualisation);
+        secondSingleParentWidget =
+            new ContainerDisplayWidget(singleVisualisation, "secondSingleParentWidget");
         secondSingleParentWidget.setContainerType(secondSingleParentType, true);
         toolkit.adapt(secondSingleParentWidget);
 

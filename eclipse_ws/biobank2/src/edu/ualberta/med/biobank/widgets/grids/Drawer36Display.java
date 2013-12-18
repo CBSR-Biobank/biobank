@@ -3,11 +3,13 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
@@ -42,6 +44,10 @@ public class Drawer36Display extends AbstractContainerDisplay {
 
     public static int LEGEND_HEIGHT = 20;
 
+    public Drawer36Display(String name) {
+        super(name);
+    }
+
     @Override
     public Point getSizeToApply() {
         int fullHeight = HEIGHT;
@@ -52,11 +58,14 @@ public class Drawer36Display extends AbstractContainerDisplay {
     }
 
     @Override
-    protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
+    protected Image createGridImage(ContainerDisplayWidget displayWidget) {
+        Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
+        Image image = new Image(display, WIDTH, HEIGHT);
+
         if (legendStatus != null) {
             LEGEND_WIDTH = WIDTH / legendStatus.size();
         }
-        GC gc = e.gc;
+        GC newGC = new GC(image);
         int currentX = 0;
         int rectYTotal = 0;
         int squareYTotal = 0;
@@ -87,21 +96,21 @@ public class Drawer36Display extends AbstractContainerDisplay {
             Rectangle rectangle = new Rectangle(rectXPosition, rectYPosition,
                 width, height);
 
-            gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-            gc.setBackground(getStatus(displayWidget.getCells(), boxIndex)
+            newGC.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+            newGC.setBackground(getStatus(displayWidget.getCells(), boxIndex)
                 .getColor());
-            gc.fillRectangle(rectangle);
+            newGC.fillRectangle(rectangle);
             if (displayWidget.getSelection() != null
                 && (displayWidget.getSelection().getRow() + 1) == boxIndex) {
-                gc.setBackground(e.display.getSystemColor(SWT.COLOR_YELLOW));
-                gc.fillRectangle(rectangle);
+                newGC.setBackground(display.getSystemColor(SWT.COLOR_YELLOW));
+                newGC.fillRectangle(rectangle);
             }
-            gc.drawRectangle(rectangle);
+            newGC.drawRectangle(rectangle);
 
             String text = getDefaultTextForBox(displayWidget.getCells(),
                 boxIndex - 1, 0);
             if (text != null) {
-                drawTextOnCenter(gc, text, rectangle);
+                drawTextOnCenter(newGC, text, rectangle);
             }
             if (boxIndex % 9 == 0) {
                 // one column of 9 boxes done
@@ -118,9 +127,9 @@ public class Drawer36Display extends AbstractContainerDisplay {
                         Rectangle rect = new Rectangle(rectangle.x + 5,
                             rectangle.y + 5, rectangle.width - 10,
                             rectangle.height - 10);
-                        Color color = e.display.getSystemColor(SWT.COLOR_BLUE);
-                        e.gc.setForeground(color);
-                        e.gc.drawRectangle(rect);
+                        Color color = display.getSystemColor(SWT.COLOR_BLUE);
+                        newGC.setForeground(color);
+                        newGC.drawRectangle(rect);
                     }
                 }
             }
@@ -128,9 +137,12 @@ public class Drawer36Display extends AbstractContainerDisplay {
         if (legendStatus != null) {
             for (int i = 0; i < legendStatus.size(); i++) {
                 UICellStatus status = legendStatus.get(i);
-                drawLegend(e, status.getColor(), i, status.getLegend());
+                drawLegend(newGC, status.getColor(), i, status.getLegend());
             }
         }
+
+        newGC.dispose();
+        return image;
     }
 
     private UICellStatus getStatus(
@@ -177,17 +189,17 @@ public class Drawer36Display extends AbstractContainerDisplay {
             * yGridCellNumOffset - 1, 0);
     }
 
-    protected void drawLegend(PaintEvent e, Color color, int index, String text) {
-        e.gc.setBackground(color);
+    protected void drawLegend(GC gc, Color color, int index, String text) {
+        gc.setBackground(color);
         int width = LEGEND_WIDTH;
         int startx = LEGEND_WIDTH * index;
         int starty = GRID_HEIGHT + 4;
 
         Rectangle rectangle = new Rectangle(startx, starty, width,
             LEGEND_HEIGHT);
-        e.gc.fillRectangle(rectangle);
-        e.gc.drawRectangle(rectangle);
-        drawTextOnCenter(e.gc, text, rectangle);
+        gc.fillRectangle(rectangle);
+        gc.drawRectangle(rectangle);
+        drawTextOnCenter(gc, text, rectangle);
     }
 
     @Override

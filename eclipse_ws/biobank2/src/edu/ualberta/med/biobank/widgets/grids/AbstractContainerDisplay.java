@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.Container;
@@ -17,6 +20,8 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  * This class is there to give a common parent class to grid container widgets and drawers widgets
  */
 public abstract class AbstractContainerDisplay {
+
+    private static Logger log = LoggerFactory.getLogger(AbstractContainerDisplay.class.getName());
 
     protected Container container;
 
@@ -37,6 +42,12 @@ public abstract class AbstractContainerDisplay {
     protected int maxHeight = -1;
 
     protected List<UICellStatus> legendStatus;
+
+    protected String name;
+
+    public AbstractContainerDisplay(String name) {
+        this.name = name;
+    }
 
     public AbstractUIWell getObjectAtCoordinates(
         ContainerDisplayWidget displayWidget, int x, int y) {
@@ -70,6 +81,8 @@ public abstract class AbstractContainerDisplay {
     protected abstract Image createGridImage(ContainerDisplayWidget containerDisplayWidget);
 
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
+
+    protected abstract Rectangle getClientArea();
 
     /**
      * Get the text to write inside the cell. This default implementation use the cell position and
@@ -105,9 +118,11 @@ public abstract class AbstractContainerDisplay {
      * @param maxWidth max width the grid should have
      * @param maxHeight max height the grid should have
      */
+    @SuppressWarnings("nls")
     public void setDisplaySize(int maxWidth, int maxHeight) {
         this.maxWidth = maxWidth;
         this.maxHeight = maxHeight;
+        log.debug("setDisplaySize: maxWidth: {}, maxHeight: {}", maxWidth, maxHeight);
     }
 
 }
