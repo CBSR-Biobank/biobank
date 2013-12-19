@@ -108,7 +108,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public void setCells(Map<RowColPos, ? extends AbstractUIWell> cells) {
         log.debug("setCells");
         this.cells = cells;
-        redraw();
+        updateCells();
     }
 
     /**
@@ -120,8 +120,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         log.debug("setStorageSize");
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
-            setSourceImage(containerDisplay.updateGridImage(this));
-            redraw();
+            updateCells();
         }
     }
 
@@ -147,8 +146,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public void setSelection(RowColPos selection) {
         log.debug("setSelection");
         this.selection = selection;
-        setSourceImage(containerDisplay.updateGridImage(this));
-        redraw();
+        updateCells();
     }
 
     @SuppressWarnings("nls")

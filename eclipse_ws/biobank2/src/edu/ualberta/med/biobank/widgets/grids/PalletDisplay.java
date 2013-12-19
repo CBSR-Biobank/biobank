@@ -115,7 +115,6 @@ public class PalletDisplay extends AbstractGridDisplay {
         int indexRow,
         int indexCol,
         Color defaultBackgroundColor,
-        boolean multiSelectionEnabled,
         Map<RowColPos, ? extends AbstractUIWell> cells,
         RowColPos selection) {
 

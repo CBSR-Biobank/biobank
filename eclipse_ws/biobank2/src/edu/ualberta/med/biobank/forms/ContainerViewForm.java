@@ -236,8 +236,7 @@ public class ContainerViewForm extends BiobankViewForm {
             if (colCap == 0) colCap = 1;
 
             cells = new TreeMap<RowColPos, ContainerCell>();
-            Map<RowColPos, ContainerWrapper> childrenMap =
-                new HashMap<RowColPos, ContainerWrapper>();
+            Map<RowColPos, ContainerWrapper> childrenMap = new HashMap<RowColPos, ContainerWrapper>();
             for (ContainerPosition position : container.getChildPositions()) {
                 childrenMap.put(
                     new RowColPos(position.getRow(), position.getCol()),
