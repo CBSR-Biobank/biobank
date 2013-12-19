@@ -8,6 +8,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,170 +70,27 @@ public class ContainerDisplayWidget extends ImageCanvas {
         this.cellStatus = cellStatus;
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
+
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = 5;
+        layout.marginHeight = 5;
+        setLayout(layout);
+
+        Point sizeHint = getSizeHint();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.horizontalSpan = 2;
+        gd.widthHint = sizeHint.x;
+        gd.heightHint = sizeHint.y;
+        setLayoutData(gd);
     }
 
     public ContainerDisplayWidget(Composite parent, String name) {
         this(parent, name, null);
     }
 
-    @Override
-    protected void paint(GC gc) {
-        if (containerDisplay != null) {
-            Point size = containerDisplay.getSizeToApply();
-            if (size != null) {
-                setSize(size);
-            }
-        }
-        super.paint(gc);
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    public Point computeSize(int wHint, int hHint, boolean changed) {
-        log.debug("computeSize");
-        if (containerDisplay != null) {
-            return containerDisplay.computeSize(wHint, hHint, changed);
-        }
-        return super.computeSize(wHint, hHint, changed);
-    }
-
-    @SuppressWarnings("nls")
-    public AbstractUIWell getObjectAtCoordinates(int x, int y) {
-        log.debug("getObjectAtCoordinates");
-        if (containerDisplay != null) {
-            return containerDisplay.getObjectAtCoordinates(this, x, y);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("nls")
-    public void setCells(Map<RowColPos, ? extends AbstractUIWell> cells) {
-        log.debug("setCells");
-        this.cells = cells;
-        updateCells();
-    }
-
-    /**
-     * Modify only the number of rows and columns of the grid. If no max width and max height has
-     * been given to the grid, the default cell width and cell height will be used
-     */
-    @SuppressWarnings("nls")
-    public void setStorageSize(int rows, int columns) {
-        log.debug("setStorageSize");
-        if (containerDisplay != null) {
-            containerDisplay.setStorageSize(rows, columns);
-            updateCells();
-        }
-    }
-
-    /**
-     * Modify dimensions of the grid. maxWidth and maxHeight are used to calculate the size of the
-     * cells
-     * 
-     * @param maxWidth max width the grid should have
-     * @param maxHeight max height the grid should have
-     */
-    @SuppressWarnings("nls")
-    public void setDisplaySize(int maxWidth, int maxHeight) {
-        log.debug("setDisplaySize");
-        this.maxWidth = maxWidth;
-        this.maxHeight = maxHeight;
-        if (containerDisplay != null) {
-            containerDisplay.setDisplaySize(maxWidth, maxHeight);
-            setSourceImage(containerDisplay.updateGridImage(this));
-        }
-    }
-
-    @SuppressWarnings("nls")
-    public void setSelection(RowColPos selection) {
-        log.debug("setSelection");
-        this.selection = selection;
-        updateCells();
-    }
-
-    @SuppressWarnings("nls")
-    public RowColPos getSelection() {
-        log.debug("getSelection");
-        return selection;
-    }
-
-    @SuppressWarnings("nls")
-    public void displayFullInfoString(boolean display) {
-        log.debug("displayFullInfoString");
-        this.displayFullInfoString = display;
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainer(Container container) {
-        log.debug("setContainer");
-        this.container = container;
-        if (container != null) {
-            setContainerType(container.getContainerType());
-            containerDisplay.setContainer(container);
-            setSourceImage(containerDisplay.updateGridImage(this));
-        }
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainer(ContainerWrapper container) {
-        log.debug("setContainer");
-        setContainer(container.getWrappedObject());
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type) {
-        log.debug("setContainerType");
-        setContainerType(type, PalletDisplay.SAMPLE_WIDTH, false);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, Integer cellSize) {
-        log.debug("setContainerType");
-        setContainerType(type, cellSize, false);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, Integer cellSize,
-        boolean createDefaultContainer) {
-        log.debug("setContainerType");
-        this.containerType = type;
-        initDisplayFromType(createDefaultContainer, cellSize);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerTypeWrapper type) {
-        log.debug("setContainerType");
-        setContainerType(type.getWrappedObject());
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, boolean createDefaultContainer) {
-        log.debug("setContainerType");
-        this.containerType = type;
-        initDisplayFromType(createDefaultContainer);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
-        log.debug("setContainerType");
-        setContainerType(type.getWrappedObject(), cellSize, false);
-    }
-
-    @SuppressWarnings("nls")
-    public ContainerType getContainerType() {
-        log.debug("getContainerType");
-        return containerType;
-    }
-
-    @SuppressWarnings("nls")
-    public void initDisplayFromType(boolean createDefaultContainer) {
-        log.debug("initDisplayFromType");
-        initDisplayFromType(createDefaultContainer, PalletDisplay.SAMPLE_WIDTH);
-    }
-
     @SuppressWarnings("nls")
     public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
-        log.debug("initDisplayFromType");
+        log.trace("initDisplayFromType");
         AbstractContainerDisplay display = null;
 
         if (containerType == null) {
@@ -260,8 +119,167 @@ public class ContainerDisplayWidget extends ImageCanvas {
     }
 
     @SuppressWarnings("nls")
+    public void initDisplayFromType(boolean createDefaultContainer) {
+        log.trace("initDisplayFromType");
+        initDisplayFromType(createDefaultContainer, PalletDisplay.SAMPLE_WIDTH);
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerType type, Integer cellSize,
+        boolean createDefaultContainer) {
+        log.trace("setContainerType");
+        this.containerType = type;
+        initDisplayFromType(createDefaultContainer, cellSize);
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerType type, boolean createDefaultContainer) {
+        log.trace("setContainerType");
+        this.containerType = type;
+        initDisplayFromType(createDefaultContainer);
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainer(Container container) {
+        log.trace("setContainer");
+        this.container = container;
+        if (container != null) {
+            setContainerType(container.getContainerType());
+            containerDisplay.setContainer(container);
+            setSourceImage(containerDisplay.updateGridImage(this));
+        }
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainer(ContainerWrapper container) {
+        log.trace("setContainer");
+        setContainer(container.getWrappedObject());
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerType type) {
+        log.trace("setContainerType");
+        setContainerType(type, PalletDisplay.SAMPLE_WIDTH, false);
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerType type, Integer cellSize) {
+        log.trace("setContainerType");
+        setContainerType(type, cellSize, false);
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerTypeWrapper type) {
+        log.trace("setContainerType");
+        setContainerType(type.getWrappedObject());
+    }
+
+    @SuppressWarnings("nls")
+    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
+        log.trace("setContainerType");
+        setContainerType(type.getWrappedObject(), cellSize, false);
+    }
+
+    @SuppressWarnings("nls")
+    public ContainerType getContainerType() {
+        log.trace("getContainerType");
+        return containerType;
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public Point computeSize(int wHint, int hHint, boolean changed) {
+        log.debug("computeSize");
+        if (containerDisplay != null) {
+            return containerDisplay.computeSize(wHint, hHint, changed);
+        }
+        return super.computeSize(wHint, hHint, changed);
+    }
+
+    public Point getSizeHint() {
+        return containerDisplay.computeSize(0, 0, false);
+    }
+
+    @Override
+    protected void paint(GC gc) {
+        if (containerDisplay != null) {
+            Point size = containerDisplay.getSizeToApply();
+            if (size != null) {
+                setSize(size);
+            }
+        }
+        super.paint(gc);
+    }
+
+    @SuppressWarnings("nls")
+    public AbstractUIWell getObjectAtCoordinates(int x, int y) {
+        log.trace("getObjectAtCoordinates");
+        if (containerDisplay != null) {
+            return containerDisplay.getObjectAtCoordinates(this, x, y);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("nls")
+    public void setCells(Map<RowColPos, ? extends AbstractUIWell> cells) {
+        log.trace("setCells");
+        this.cells = cells;
+        updateCells();
+    }
+
+    /**
+     * Modify only the number of rows and columns of the grid. If no max width and max height has
+     * been given to the grid, the default cell width and cell height will be used
+     */
+    @SuppressWarnings("nls")
+    public void setStorageSize(int rows, int columns) {
+        log.trace("setStorageSize");
+        if (containerDisplay != null) {
+            containerDisplay.setStorageSize(rows, columns);
+            updateCells();
+        }
+    }
+
+    /**
+     * Modify dimensions of the grid. maxWidth and maxHeight are used to calculate the size of the
+     * cells
+     * 
+     * @param maxWidth max width the grid should have
+     * @param maxHeight max height the grid should have
+     */
+    @SuppressWarnings("nls")
+    public void setDisplaySize(int maxWidth, int maxHeight) {
+        log.trace("setDisplaySize");
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
+        if (containerDisplay != null) {
+            containerDisplay.setDisplaySize(maxWidth, maxHeight);
+            setSourceImage(containerDisplay.updateGridImage(this));
+        }
+    }
+
+    @SuppressWarnings("nls")
+    public void setSelection(RowColPos selection) {
+        log.trace("setSelection");
+        this.selection = selection;
+        updateCells();
+    }
+
+    @SuppressWarnings("nls")
+    public RowColPos getSelection() {
+        log.trace("getSelection");
+        return selection;
+    }
+
+    @SuppressWarnings("nls")
+    public void displayFullInfoString(boolean display) {
+        log.trace("displayFullInfoString");
+        this.displayFullInfoString = display;
+    }
+
+    @SuppressWarnings("nls")
     protected void setContainerDisplay(AbstractContainerDisplay display) {
-        log.debug("setContainerDisplay");
+        log.trace("setContainerDisplay");
         containerDisplay = display;
         if ((cellStatus != null) && (containerDisplay != null)) {
             containerDisplay.initLegend(cellStatus);
@@ -275,32 +293,32 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     @SuppressWarnings("nls")
     protected AbstractContainerDisplay getContainerDisplay() {
-        log.debug("getContainerDisplay");
+        log.trace("getContainerDisplay");
         return containerDisplay;
     }
 
     @SuppressWarnings("nls")
     public Map<RowColPos, ? extends AbstractUIWell> getCells() {
-        log.debug("getCells");
+        log.trace("getCells");
         return cells;
     }
 
     @SuppressWarnings("nls")
     public MultiSelectionManager getMultiSelectionManager() {
-        log.debug("getMultiSelectionManager");
+        log.trace("getMultiSelectionManager");
         return multiSelectionManager;
     }
 
     @SuppressWarnings("nls")
     public RowColPos getPositionAtCoordinates(int x, int y) {
-        log.debug("getPositionAtCoordinates");
+        log.trace("getPositionAtCoordinates");
         return containerDisplay.getPositionAtCoordinates(x, y);
     }
 
     @SuppressWarnings("nls")
     @Override
     public Rectangle getClientArea() {
-        log.debug("getClientArea");
+        log.trace("getClientArea");
         return containerDisplay.getClientArea();
     }
 

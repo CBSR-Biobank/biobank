@@ -138,7 +138,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         });
         decodeButton.setEnabled(false);
 
-        createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
+        palletWidget = createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
 
         scanStatus = false;
         widgetCreator.addBooleanBinding(
@@ -314,11 +314,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         palletScanManagement.onReset();
     }
 
-    private void createScanPalletWidget(Composite contents, int rows, int cols) {
-        palletWidget = new PalletWidget(contents, getPalletCellStatus(), rows, cols);
-        GridData gd = new GridData();
-        gd.horizontalSpan = 2;
-        palletWidget.setLayoutData(gd);
+    private PalletWidget createScanPalletWidget(Composite contents, int rows, int cols) {
+        PalletWidget palletWidget = new PalletWidget(contents, getPalletCellStatus(), rows, cols);
 
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -327,6 +324,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                     palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
             }
         });
+        return palletWidget;
     }
 
     @Override
