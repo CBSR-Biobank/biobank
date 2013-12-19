@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  */
 public class ContainerDisplayWidget extends ImageCanvas {
 
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ContainerDisplayWidget.class.getName());
 
     protected Map<RowColPos, ? extends AbstractUIWell> cells;
@@ -121,7 +120,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         log.debug("setStorageSize");
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
-            setSourceImage(containerDisplay.createGridImage(this));
+            setSourceImage(containerDisplay.updateGridImage(this));
             redraw();
         }
     }
@@ -140,7 +139,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         this.maxHeight = maxHeight;
         if (containerDisplay != null) {
             containerDisplay.setDisplaySize(maxWidth, maxHeight);
-            setSourceImage(containerDisplay.createGridImage(this));
+            setSourceImage(containerDisplay.updateGridImage(this));
         }
     }
 
@@ -148,7 +147,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public void setSelection(RowColPos selection) {
         log.debug("setSelection");
         this.selection = selection;
-        setSourceImage(containerDisplay.createGridImage(this));
+        setSourceImage(containerDisplay.updateGridImage(this));
         redraw();
     }
 
@@ -171,7 +170,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         if (container != null) {
             setContainerType(container.getContainerType());
             containerDisplay.setContainer(container);
-            setSourceImage(containerDisplay.createGridImage(this));
+            setSourceImage(containerDisplay.updateGridImage(this));
         }
     }
 
@@ -272,7 +271,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         if (containerDisplay == null) {
             setSourceImage(null);
         } else {
-            setSourceImage(containerDisplay.createGridImage(this));
+            setSourceImage(containerDisplay.updateGridImage(this));
         }
     }
 
@@ -305,6 +304,10 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public Rectangle getClientArea() {
         log.debug("getClientArea");
         return containerDisplay.getClientArea();
+    }
+
+    public void updateCells() {
+        setSourceImage(containerDisplay.updateGridImage(this));
     }
 
 }

@@ -58,7 +58,7 @@ public class Drawer36Display extends AbstractContainerDisplay {
     }
 
     @Override
-    protected Image createGridImage(ContainerDisplayWidget displayWidget) {
+    protected Image updateGridImage(ContainerDisplayWidget displayWidget) {
         Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
         Image image = new Image(display, WIDTH, HEIGHT);
 

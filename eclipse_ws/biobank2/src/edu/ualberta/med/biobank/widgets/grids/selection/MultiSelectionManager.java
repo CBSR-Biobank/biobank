@@ -157,7 +157,7 @@ public class MultiSelectionManager {
                             break;
                         }
                         notifyListeners();
-                        container.redraw();
+                        container.updateCells();
                     }
                 }
 

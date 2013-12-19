@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.grids;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import edu.ualberta.med.biobank.gui.common.Swt2DUtil;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
@@ -68,17 +70,26 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         super(name);
     }
 
+    private Rectangle getCellRectangleTranslated(Rectangle2D.Double cellRect, int row, int col) {
+        AffineTransform t = AffineTransform.getTranslateInstance(
+            col * cellWidth, row * cellHeight);
+        Rectangle2D.Double rectangle = Swt2DUtil.transformRect(t, cellRect);
+        Rectangle r = new Rectangle(
+            (int) rectangle.x,
+            (int) rectangle.y,
+            (int) rectangle.width,
+            (int) rectangle.height);
+        return r;
+    }
+
     @Override
-    protected Image createGridImage(ContainerDisplayWidget displayWidget) {
+    protected Image updateGridImage(ContainerDisplayWidget displayWidget) {
         Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
         Rectangle clientArea = getClientArea();
         Image image = new Image(display, clientArea.width, clientArea.height);
 
-        // center grid on image
-        Rectangle2D.Double cellRect = new Rectangle2D.Double(
-            0, 0, cellWidth, cellHeight);
+        Rectangle2D.Double cellRect = new Rectangle2D.Double(0, 0, cellWidth, cellHeight);
 
-        boolean multiSelectionEnabled = displayWidget.getMultiSelectionManager().isEnabled();
         RowColPos widgetSelection = displayWidget.getSelection();
         Map<RowColPos, ? extends AbstractUIWell> cells = displayWidget.getCells();
         if (cells == null) {
@@ -88,14 +99,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         GC newGC = new GC(image);
         for (int row = 0; row < rows; ++row) {
             for (int col = 0; col < columns; ++col) {
-                AffineTransform t = AffineTransform.getTranslateInstance(
-                    col * cellWidth, row * cellHeight);
-                Rectangle2D.Double rectangle = Swt2DUtil.transformRect(t, cellRect);
-                Rectangle r = new Rectangle(
-                    (int) rectangle.x,
-                    (int) rectangle.y,
-                    (int) rectangle.width,
-                    (int) rectangle.height);
+                Rectangle r = getCellRectangleTranslated(cellRect, row, col);
 
                 Color defaultColor = getDefaultBackgroundColor(display, cells, r, row, col);
 
@@ -106,9 +110,9 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     row,
                     col,
                     defaultColor,
-                    multiSelectionEnabled,
                     cells,
                     widgetSelection);
+
                 String topText = getTopTextForBox(cells, row, col);
                 if (topText != null) {
                     drawText(display, newGC, topText, r, SWT.TOP);
@@ -121,6 +125,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 if (bottomText != null) {
                     drawText(display, newGC, bottomText, r, SWT.BOTTOM);
                 }
+            }
+        }
+
+        MultiSelectionManager multiSelectionManager = displayWidget.getMultiSelectionManager();
+        if (multiSelectionManager.isEnabled()) {
+            Collection<AbstractUIWell> selectedCells = multiSelectionManager.getSelectedCells();
+            if (!selectedCells.isEmpty()) {
+                drawCellSelections(display, newGC, selectedCells, cellRect);
             }
         }
 
@@ -190,7 +202,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         int indexRow,
         int indexCol,
         Color defaultBackgroundColor,
-        boolean multiSelectionEnabled,
         Map<RowColPos, ? extends AbstractUIWell> cells,
         RowColPos selection) {
 
@@ -215,21 +226,43 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         gc.fillRectangle(rectangle);
         gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
         gc.drawRectangle(rectangle);
-        if (!cells.isEmpty() && multiSelectionEnabled) {
-            AbstractUIWell cell = cells.get(new RowColPos(indexRow, indexCol));
-            if (cell != null && cell.isSelected()) {
-                Rectangle rect = new Rectangle(
-                    rectangle.x + 5,
-                    rectangle.y + 5,
-                    rectangle.width - 10,
-                    rectangle.height - 10);
-                Color color = display.getSystemColor(SWT.COLOR_BLUE);
-                gc.setForeground(color);
-                gc.drawRectangle(rect);
+    }
+
+    @SuppressWarnings("nls")
+    private void drawCellSelections(
+        Display display,
+        GC gc,
+        Collection<AbstractUIWell> cells,
+        Rectangle2D.Double cellRect) {
+
+        if (cells.isEmpty()) {
+            throw new IllegalStateException("cells are empty");
+        }
+
+        Rectangle2D.Double selectionRect = new Rectangle2D.Double(
+            5, 5, cellRect.width - 10, cellRect.height - 10);
+
+        for (AbstractUIWell cell : cells) {
+            Integer row = cell.getRow();
+            Integer col = cell.getCol();
+
+            if (!cell.isSelected()) {
+                throw new IllegalStateException("cell is not selected: " + row + ", " + col);
             }
+
+            AffineTransform t = AffineTransform.getTranslateInstance(
+                col * cellWidth, row * cellHeight);
+            Rectangle2D.Double selectionRectCell = Swt2DUtil.transformRect(t, selectionRect);
+
+            Color color = display.getSystemColor(SWT.COLOR_BLUE);
+            gc.setForeground(color);
+            gc.drawRectangle(
+                (int) selectionRectCell.x,
+                (int) selectionRectCell.y,
+                (int) selectionRectCell.width,
+                (int) selectionRectCell.height);
         }
         gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
-
     }
 
     @SuppressWarnings("unused")

@@ -84,7 +84,7 @@ public abstract class AbstractContainerDisplay {
         this.containerType = type;
     }
 
-    protected abstract Image createGridImage(ContainerDisplayWidget containerDisplayWidget);
+    protected abstract Image updateGridImage(ContainerDisplayWidget containerDisplayWidget);
 
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
 
