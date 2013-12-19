@@ -3,10 +3,10 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -27,38 +27,52 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         super(name);
     }
 
+    @SuppressWarnings("nls")
     @Override
-    protected Color getDefaultBackgroundColor(PaintEvent e,
-        ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol) {
-        if (displayWidget.getCells() != null) {
-            AbstractUIWell uiCell = displayWidget.getCells().get(
-                new RowColPos(indexRow, indexCol));
-            if (uiCell == null) {
-                return super.getDefaultBackgroundColor(e, displayWidget,
-                    rectangle, indexRow, indexCol);
-            }
-            UICellStatus status = uiCell.getStatus();
-            if (status == null)
-                status = defaultStatus;
-            return status.getColor();
+    protected Color getDefaultBackgroundColor(
+        Display display,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        Rectangle rectangle,
+        int indexRow,
+        int indexCol) {
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
         }
-        return super.getDefaultBackgroundColor(e, displayWidget, rectangle,
-            indexRow, indexCol);
+
+        if (cells.isEmpty()) {
+            return super.getDefaultBackgroundColor(display, cells, rectangle, indexRow, indexCol);
+        }
+
+        AbstractUIWell uiCell = cells.get(new RowColPos(indexRow, indexCol));
+        if (uiCell == null) {
+            return super.getDefaultBackgroundColor(display, cells, rectangle, indexRow, indexCol);
+        }
+        UICellStatus status = uiCell.getStatus();
+        if (status == null) {
+            status = defaultStatus;
+        }
+        return status.getColor();
     }
 
+    @SuppressWarnings("nls")
     @Override
-    protected String getDefaultTextForBox(Map<RowColPos, ? extends AbstractUIWell> cells,
-        int indexRow, int indexCol) {
+    protected String getDefaultTextForBox(
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow,
+        int indexCol) {
         String text = super.getDefaultTextForBox(cells, indexRow, indexCol);
         if (text.isEmpty()) {
-            return StringUtil.EMPTY_STRING;
+            return text;
         }
 
+        StringBuffer buf = new StringBuffer();
+        buf.append(text);
+
         if (getCellHeight() <= HEIGHT_TWO_LINES) {
-            return text + " " + getContainerTypeText(cells, indexRow, indexCol); //$NON-NLS-1$
+            buf.append(" ");
+            buf.append(getContainerTypeText(cells, indexRow, indexCol));
         }
-        return text;
+        return buf.toString();
     }
 
     @Override
@@ -71,8 +85,10 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @SuppressWarnings("nls")
-    protected String getContainerTypeText(Map<RowColPos, ? extends AbstractUIWell> cells,
-        int indexRow, int indexCol) {
+    protected String getContainerTypeText(
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow,
+        int indexCol) {
         StringBuffer sname = new StringBuffer();
         if (cells != null) {
             ContainerCell cell = (ContainerCell) cells.get(new RowColPos(indexRow, indexCol));
@@ -80,8 +96,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
                 && (cell.getContainer() != null)
                 && (cell.getContainer().getContainerType() != null)
                 && (cell.getContainer().getContainerType().getNameShort() != null))
-                sname
-                    .append("(")
+                sname.append("(")
                     .append(cell.getContainer().getContainerType().getNameShort())
                     .append(")");
         }
@@ -94,7 +109,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
 
     @Override
     public Point getSizeToApply() {
-        return this.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+        return computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
     }
 
 }

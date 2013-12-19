@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -98,13 +97,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     (int) rectangle.width,
                     (int) rectangle.height);
 
+                Color defaultColor = getDefaultBackgroundColor(display, cells, r, row, col);
+
                 drawRectangle(
                     display,
                     newGC,
                     r,
                     row,
                     col,
-                    UICellStatus.EMPTY.getColor(),
+                    defaultColor,
                     multiSelectionEnabled,
                     cells,
                     widgetSelection);
@@ -232,9 +233,12 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     @SuppressWarnings("unused")
-    protected Color getDefaultBackgroundColor(PaintEvent e,
-        ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol) {
+    protected Color getDefaultBackgroundColor(
+        Display display,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        Rectangle rectangle,
+        int indexRow,
+        int indexCol) {
         return UICellStatus.EMPTY.getColor();
     }
 
