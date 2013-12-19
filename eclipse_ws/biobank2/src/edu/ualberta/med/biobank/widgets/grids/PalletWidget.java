@@ -28,8 +28,13 @@ public class PalletWidget extends ContainerDisplayWidget {
         setContainerDisplay(new PalletDisplay(this, rows, cols));
     }
 
+    @SuppressWarnings("nls")
     public boolean isEverythingTyped() {
-        if (cells == null) return false;
+        if (cells == null) {
+            throw new IllegalStateException("cells is null");
+        }
+
+        if (cells.isEmpty()) return false;
 
         for (AbstractUIWell cell : cells.values()) {
             PalletWell pCell = (PalletWell) cell;

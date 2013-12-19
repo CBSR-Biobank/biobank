@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.widgets.grids;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
@@ -68,22 +69,22 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         super(name);
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected Image createGridImage(ContainerDisplayWidget displayWidget) {
         Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
         Rectangle clientArea = getClientArea();
         Image image = new Image(display, clientArea.width, clientArea.height);
 
-        if (this.name.equals("PalletDisplay")) {
-            log.debug("here");
-        }
-
-        log.debug("createGridImage: {}", name);
-
         // center grid on image
         Rectangle2D.Double cellRect = new Rectangle2D.Double(
             0, 0, cellWidth, cellHeight);
+
+        boolean multiSelectionEnabled = displayWidget.getMultiSelectionManager().isEnabled();
+        RowColPos widgetSelection = displayWidget.getSelection();
+        Map<RowColPos, ? extends AbstractUIWell> cells = displayWidget.getCells();
+        if (cells == null) {
+            cells = new HashMap<RowColPos, AbstractUIWell>(0);
+        }
 
         GC newGC = new GC(image);
         for (int row = 0; row < rows; ++row) {
@@ -97,16 +98,25 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     (int) rectangle.width,
                     (int) rectangle.height);
 
-                drawRectangle(display, newGC, displayWidget, r, row, col, UICellStatus.EMPTY.getColor());
-                String topText = getTopTextForBox(displayWidget.getCells(), row, col);
+                drawRectangle(
+                    display,
+                    newGC,
+                    r,
+                    row,
+                    col,
+                    UICellStatus.EMPTY.getColor(),
+                    multiSelectionEnabled,
+                    cells,
+                    widgetSelection);
+                String topText = getTopTextForBox(cells, row, col);
                 if (topText != null) {
                     drawText(display, newGC, topText, r, SWT.TOP);
                 }
-                String middleText = getMiddleTextForBox(displayWidget.getCells(), row, col);
+                String middleText = getMiddleTextForBox(cells, row, col);
                 if (middleText != null) {
                     drawText(display, newGC, middleText, r, SWT.CENTER);
                 }
-                String bottomText = getBottomTextForBox(displayWidget.getCells(), row, col);
+                String bottomText = getBottomTextForBox(cells, row, col);
                 if (bottomText != null) {
                     drawText(display, newGC, bottomText, r, SWT.BOTTOM);
                 }
@@ -171,38 +181,50 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return new Point(clientArea.width, clientArea.height);
     }
 
+    @SuppressWarnings("nls")
     protected void drawRectangle(
         Display display,
         GC gc,
-        ContainerDisplayWidget displayWidget,
         Rectangle rectangle,
         int indexRow,
         int indexCol,
-        Color defaultBackgroundColor) {
+        Color defaultBackgroundColor,
+        boolean multiSelectionEnabled,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        RowColPos selection) {
+
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
+        }
+
         Color backgroundColor = defaultBackgroundColor;
-        if (displayWidget.getSelection() != null
-            && displayWidget.getSelection().getRow() != null
-            && displayWidget.getSelection().getRow() == indexRow
-            && displayWidget.getSelection().getCol() != null
-            && displayWidget.getSelection().getCol() == indexCol) {
-            backgroundColor = display.getSystemColor(SWT.COLOR_YELLOW);
+        if (selection != null) {
+            Integer selectionRow = selection.getRow();
+            Integer selectionCol = selection.getCol();
+
+            if ((selectionRow == null) || (selectionCol == null)) {
+                throw new IllegalArgumentException("selection row or column is null");
+            }
+
+            if ((selectionRow == indexRow) && (selectionCol == indexCol)) {
+                backgroundColor = display.getSystemColor(SWT.COLOR_YELLOW);
+            }
         }
         gc.setBackground(backgroundColor);
         gc.fillRectangle(rectangle);
         gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
         gc.drawRectangle(rectangle);
-        if (displayWidget.getCells() != null) {
-            if (displayWidget.getMultiSelectionManager().isEnabled()) {
-                AbstractUIWell cell = displayWidget.getCells().get(
-                    new RowColPos(indexRow, indexCol));
-                if (cell != null && cell.isSelected()) {
-                    Rectangle rect = new Rectangle(rectangle.x + 5,
-                        rectangle.y + 5, rectangle.width - 10,
-                        rectangle.height - 10);
-                    Color color = display.getSystemColor(SWT.COLOR_BLUE);
-                    gc.setForeground(color);
-                    gc.drawRectangle(rect);
-                }
+        if (!cells.isEmpty() && multiSelectionEnabled) {
+            AbstractUIWell cell = cells.get(new RowColPos(indexRow, indexCol));
+            if (cell != null && cell.isSelected()) {
+                Rectangle rect = new Rectangle(
+                    rectangle.x + 5,
+                    rectangle.y + 5,
+                    rectangle.width - 10,
+                    rectangle.height - 10);
+                Color color = display.getSystemColor(SWT.COLOR_BLUE);
+                gc.setForeground(color);
+                gc.drawRectangle(rect);
             }
         }
         gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
@@ -236,13 +258,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return null;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void setContainerType(ContainerType type) {
         super.setContainerType(type);
         Integer rowCap = containerType.getRowCapacity();
         Integer colCap = containerType.getColCapacity();
-        Assert.isNotNull(rowCap, "row capacity is null"); //$NON-NLS-1$
-        Assert.isNotNull(colCap, "column capacity is null"); //$NON-NLS-1$
+        Assert.isNotNull(rowCap, "row capacity is null");
+        Assert.isNotNull(colCap, "column capacity is null");
         setStorageSize(rowCap, colCap);
         if (colCap <= 1) {
             // single dimension size

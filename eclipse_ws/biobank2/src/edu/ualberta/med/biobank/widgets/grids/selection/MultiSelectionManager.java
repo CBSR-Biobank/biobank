@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 
 public class MultiSelectionManager {
 
-    private ContainerDisplayWidget container;
+    private final ContainerDisplayWidget container;
 
     private MouseListener selectionMouseListener;
     private MouseTrackListener selectionMouseTrackListener;
@@ -34,9 +34,9 @@ public class MultiSelectionManager {
     private boolean selectionTrackOn = false;
     private SelectionMode selectionMode = SelectionMode.NONE;
 
-    private Map<RowColPos, AbstractUIWell> selectedCells;
+    private final Map<RowColPos, AbstractUIWell> selectedCells;
     private AbstractUIWell lastSelectedCell;
-    private List<MultiSelectionListener> listeners;
+    private final List<MultiSelectionListener> listeners;
 
     private MultiSelectionSpecificBehaviour specificBehaviour;
 
@@ -126,14 +126,12 @@ public class MultiSelectionManager {
                 @Override
                 public void mouseDown(MouseEvent e) {
                     selectionTrackOn = true;
-                    AbstractUIWell cell = container.getObjectAtCoordinates(e.x,
-                        e.y);
-                    if (cell != null && specificBehaviour.isSelectable(cell)) {
+                    AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
+                    if ((cell != null) && specificBehaviour.isSelectable(cell)) {
                         switch (selectionMode) {
                         case MULTI:
                             if (selectedCells.containsValue(cell)) {
-                                selectedCells.remove(new RowColPos(cell
-                                    .getRow(), cell.getCol()));
+                                selectedCells.remove(new RowColPos(cell.getRow(), cell.getCol()));
                                 cell.setSelected(false);
                             } else {
                                 selectCell(cell);
@@ -147,9 +145,8 @@ public class MultiSelectionManager {
                             }
                             break;
                         default:
-                            boolean alreadySelected = selectedCells
-                                .containsValue(cell);
-                            if (alreadySelected && selectedCells.size() == 1) {
+                            boolean alreadySelected = selectedCells.containsValue(cell);
+                            if (alreadySelected && (selectedCells.size() == 1)) {
                                 selectedCells.clear();
                                 cell.setSelected(false);
                                 lastSelectedCell = null;
@@ -176,8 +173,7 @@ public class MultiSelectionManager {
                 @Override
                 public void mouseHover(MouseEvent e) {
                     if (selectionTrackOn) {
-                        AbstractUIWell cell = container.getObjectAtCoordinates(
-                            e.x, e.y);
+                        AbstractUIWell cell = container.getObjectAtCoordinates(e.x, e.y);
                         if (cell != null && !cell.equals(lastSelectedCell)) {
                             selectCell(cell);
                             notifyListeners();

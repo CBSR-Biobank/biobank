@@ -106,20 +106,27 @@ public class PalletDisplay extends AbstractGridDisplay {
         return StringUtil.EMPTY_STRING;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected void drawRectangle(
         Display display,
         GC gc,
-        ContainerDisplayWidget displayWidget,
         Rectangle rectangle,
         int indexRow,
         int indexCol,
-        Color defaultBackgroundColor) {
+        Color defaultBackgroundColor,
+        boolean multiSelectionEnabled,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        RowColPos selection) {
+
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
+        }
+
         Color backgroundColor = defaultBackgroundColor;
-        if (displayWidget.getCells() != null) {
-            PalletWell cell = (PalletWell) displayWidget.getCells().get(
-                new RowColPos(indexRow, indexCol));
-            if (cell != null && cell.getStatus() != null) {
+        if (!cells.isEmpty()) {
+            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow, indexCol));
+            if ((cell != null) && (cell.getStatus() != null)) {
                 backgroundColor = cell.getStatus().getColor();
             }
         }

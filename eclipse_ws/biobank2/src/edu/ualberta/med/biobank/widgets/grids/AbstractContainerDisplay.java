@@ -49,14 +49,20 @@ public abstract class AbstractContainerDisplay {
         this.name = name;
     }
 
+    @SuppressWarnings("nls")
     public AbstractUIWell getObjectAtCoordinates(
         ContainerDisplayWidget displayWidget, int x, int y) {
-        if (displayWidget.getCells() == null) {
-            return null;
+        Map<RowColPos, ? extends AbstractUIWell> cells = displayWidget.getCells();
+
+        if (cells == null) {
+            throw new IllegalStateException("cells is null");
         }
-        RowColPos rcp = getPositionAtCoordinates(x, y);
-        if (rcp != null) {
-            return displayWidget.getCells().get(rcp);
+
+        if (!cells.isEmpty()) {
+            RowColPos rcp = getPositionAtCoordinates(x, y);
+            if (rcp != null) {
+                return cells.get(rcp);
+            }
         }
         return null;
     }

@@ -517,7 +517,9 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         scrollData.horizontalAlignment = SWT.FILL;
         scrollData.grabExcessHorizontalSpace = true;
         visualisationScroll.setLayoutData(scrollData);
+
         visualisationComposite = toolkit.createComposite(visualisationScroll);
+
         GridLayout layout = new GridLayout(1, false);
         layout.verticalSpacing = 0;
         layout.horizontalSpacing = 0;

@@ -81,13 +81,13 @@ import edu.ualberta.med.biobank.widgets.infotables.NewSpecimenInfoTable.ColumnsS
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerViewForm extends BiobankViewForm {
-    private static final I18n i18n = I18nFactory.getI18n(ContainerViewForm.class);
 
     @SuppressWarnings("nls")
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
 
-    private static BgcLogger logger = BgcLogger
-        .getLogger(ContainerViewForm.class.getName());
+    private static final I18n i18n = I18nFactory.getI18n(ContainerViewForm.class);
+
+    private static BgcLogger logger = BgcLogger.getLogger(ContainerViewForm.class.getName());
 
     private NewSpecimenInfoTable specimensWidget;
 
@@ -311,8 +311,8 @@ public class ContainerViewForm extends BiobankViewForm {
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDoubleClick(MouseEvent e) {
-                AbstractUIWell cell = ((ContainerDisplayWidget) e.widget).getObjectAtCoordinates(
-                    e.x, e.y);
+                ContainerDisplayWidget widget = (ContainerDisplayWidget) e.widget;
+                AbstractUIWell cell = widget.getObjectAtCoordinates(e.x, e.y);
                 if (cell != null) {
                     openFormFor((ContainerCell) cell);
                 }
