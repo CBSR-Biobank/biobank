@@ -108,6 +108,27 @@ public class PalletDisplay extends AbstractGridDisplay {
 
     @SuppressWarnings("nls")
     @Override
+    protected Color getDefaultBackgroundColor(
+        Display display,
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        Rectangle rectangle,
+        int indexRow,
+        int indexCol) {
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
+        }
+
+        if (!cells.isEmpty()) {
+
+            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow, indexCol));
+            if ((cell != null) && (cell.getStatus() != null)) {
+                return cell.getStatus().getColor();
+            }
+        }
+        return super.getDefaultBackgroundColor(display, cells, rectangle, indexRow, indexCol);
+    }
+
+    @Override
     protected void drawRectangle(
         Display display,
         GC gc,
@@ -115,21 +136,9 @@ public class PalletDisplay extends AbstractGridDisplay {
         int indexRow,
         int indexCol,
         Color defaultBackgroundColor,
-        Map<RowColPos, ? extends AbstractUIWell> cells,
         RowColPos selection) {
 
-        if (cells == null) {
-            throw new IllegalArgumentException("cells is null");
-        }
-
-        Color backgroundColor = defaultBackgroundColor;
-        if (!cells.isEmpty()) {
-            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow, indexCol));
-            if ((cell != null) && (cell.getStatus() != null)) {
-                backgroundColor = cell.getStatus().getColor();
-            }
-        }
-        gc.setBackground(backgroundColor);
+        gc.setBackground(defaultBackgroundColor);
         gc.fillRectangle(rectangle);
         gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
         gc.drawRectangle(rectangle);

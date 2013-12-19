@@ -110,7 +110,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                     row,
                     col,
                     defaultColor,
-                    cells,
                     widgetSelection);
 
                 String topText = getTopTextForBox(cells, row, col);
@@ -202,12 +201,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         int indexRow,
         int indexCol,
         Color defaultBackgroundColor,
-        Map<RowColPos, ? extends AbstractUIWell> cells,
         RowColPos selection) {
-
-        if (cells == null) {
-            throw new IllegalArgumentException("cells is null");
-        }
 
         Color backgroundColor = defaultBackgroundColor;
         if (selection != null) {
