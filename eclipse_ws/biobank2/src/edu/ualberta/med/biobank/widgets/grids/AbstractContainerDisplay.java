@@ -51,8 +51,9 @@ public abstract class AbstractContainerDisplay {
 
     @SuppressWarnings("nls")
     public AbstractUIWell getObjectAtCoordinates(
-        ContainerDisplayWidget displayWidget, int x, int y) {
-        Map<RowColPos, ? extends AbstractUIWell> cells = displayWidget.getCells();
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        int x,
+        int y) {
 
         if (cells == null) {
             throw new IllegalStateException("cells is null");
@@ -71,13 +72,6 @@ public abstract class AbstractContainerDisplay {
 
     public void initLegend(List<UICellStatus> status) {
         this.legendStatus = status;
-    }
-
-    public void setContainer(Container container) {
-        this.container = container;
-        if (container != null) {
-            setContainerType(container.getContainerType());
-        }
     }
 
     public void setContainerType(ContainerType type) {

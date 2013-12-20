@@ -14,10 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.widgets.ImageCanvas;
-import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
@@ -33,10 +30,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
     private static Logger log = LoggerFactory.getLogger(ContainerDisplayWidget.class.getName());
 
     protected Map<RowColPos, ? extends AbstractUIWell> cells;
-
-    protected Container container;
-
-    protected ContainerType containerType;
     /**
      * true if we want the container to display full info in each box displayed
      */
@@ -49,7 +42,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final MultiSelectionManager multiSelectionManager;
 
-    private AbstractContainerDisplay containerDisplay;
+    private/* final */AbstractContainerDisplay containerDisplay;
 
     private final IContainerDisplayWidget tooltipCallback;
 
@@ -63,21 +56,29 @@ public class ContainerDisplayWidget extends ImageCanvas {
      */
     protected int maxHeight = -1;
 
-    private final List<UICellStatus> cellStatus;
-
     private final String name;
 
+    @SuppressWarnings("nls")
     public ContainerDisplayWidget(
         Composite widgetParent,
-        IContainerDisplayWidget callback,
+        IContainerDisplayWidget tooltipCallback,
         String name,
+        AbstractContainerDisplay containerDisplay,
         List<UICellStatus> cellStatus) {
+
         super(widgetParent, SWT.DOUBLE_BUFFERED);
         multiSelectionManager = new MultiSelectionManager(this);
-        this.cellStatus = cellStatus;
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
-        this.tooltipCallback = callback;
+        this.tooltipCallback = tooltipCallback;
+
+        if (containerDisplay == null) {
+            throw new IllegalArgumentException("container display is null");
+        }
+
+        setContainerDisplay(containerDisplay, cellStatus);
+
+        // initDisplayFromType(type, createDefaultContainer, cellSize);
 
         // GridLayout layout = new GridLayout(1, false);
         // layout.marginWidth = 5;
@@ -108,27 +109,45 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     public ContainerDisplayWidget(
         Composite widgetParent,
+        IContainerDisplayWidget tooltipCallback,
         String name,
-        List<UICellStatus> cellStatus) {
-        this(widgetParent, null, name, cellStatus);
+        List<UICellStatus> cellStatus,
+        ContainerType containerType,
+        boolean createDefaultContainer) {
+
+        this(
+            widgetParent,
+            tooltipCallback,
+            name,
+            getContainerDisplayFromType(name, containerType, createDefaultContainer),
+            cellStatus);
     }
 
     public ContainerDisplayWidget(Composite parent, IContainerDisplayWidget callback, String name) {
-        this(parent, callback, name, null);
+        this(parent, callback, name, null, null);
     }
 
     public ContainerDisplayWidget(Composite parent, String name) {
-        this(parent, null, name, null);
+        this(
+            parent,
+            null,
+            name,
+            getContainerDisplayFromType(name, null, true),
+            null);
     }
 
     @SuppressWarnings("nls")
-    public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
+    private static AbstractContainerDisplay getContainerDisplayFromType(
+        String name,
+        ContainerType containerType,
+        boolean createDefaultContainer) {
+
         log.trace("initDisplayFromType");
         AbstractContainerDisplay display = null;
 
         if (containerType == null) {
             if (createDefaultContainer) {
-                display = new GridContainerDisplay(this.name);
+                display = new GridContainerDisplay(name);
                 display.setStorageSize(3, 5);
             }
         } else if (containerType.getName().equals(Drawer36Display.CONTAINER_NAME)) {
@@ -138,12 +157,29 @@ public class ContainerDisplayWidget extends ImageCanvas {
         }
 
         if (display != null) {
-            display.setDisplaySize(maxWidth, maxHeight);
             if (containerType != null) {
                 display.setContainerType(containerType);
             }
         }
-        setContainerDisplay(display);
+
+        return display;
+    }
+
+    @SuppressWarnings("nls")
+    protected void initDisplayFromType(
+        ContainerType containerType,
+        boolean createDefaultContainer,
+        Integer cellSize,
+        List<UICellStatus> cellStatus) {
+
+        log.trace("initDisplayFromType");
+        AbstractContainerDisplay display = getContainerDisplayFromType(
+            name, containerType, createDefaultContainer);
+
+        if (display != null) {
+            display.setDisplaySize(maxWidth, maxHeight);
+        }
+        setContainerDisplay(display, cellStatus);
         if ((display instanceof AbstractGridDisplay) && (cellSize != null)) {
             AbstractGridDisplay grid = (AbstractGridDisplay) display;
             grid.setCellWidth(cellSize);
@@ -151,72 +187,21 @@ public class ContainerDisplayWidget extends ImageCanvas {
         }
     }
 
-    @SuppressWarnings("nls")
-    public void initDisplayFromType(boolean createDefaultContainer) {
-        log.trace("initDisplayFromType");
-        initDisplayFromType(createDefaultContainer, PalletDisplay.SAMPLE_WIDTH);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, Integer cellSize,
+    // FIXME: this method should be renamed, and should resize the display based on rows and columns
+    // and should know nothing about container types
+    @SuppressWarnings({ "nls", "unused" })
+    public void setContainerType(
+        ContainerType type,
+        Integer cellSize,
         boolean createDefaultContainer) {
-        log.trace("setContainerType");
-        this.containerType = type;
-        initDisplayFromType(createDefaultContainer, cellSize);
+        throw new IllegalStateException("no longer used");
     }
 
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, boolean createDefaultContainer) {
-        log.trace("setContainerType");
-        this.containerType = type;
-        initDisplayFromType(createDefaultContainer);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainer(Container container) {
-        log.trace("setContainer");
-        this.container = container;
-        if (container != null) {
-            setContainerType(container.getContainerType());
-            containerDisplay.setContainer(container);
-            setSourceImage(containerDisplay.updateGridImage(this));
-        }
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainer(ContainerWrapper container) {
-        log.trace("setContainer");
-        setContainer(container.getWrappedObject());
-    }
-
-    @SuppressWarnings("nls")
+    // FIXME: this method should be renamed, and should resize the display based on rows and columns
+    // and should know nothing about container types
+    @SuppressWarnings({ "nls", "unused" })
     public void setContainerType(ContainerType type) {
-        log.trace("setContainerType");
-        setContainerType(type, PalletDisplay.SAMPLE_WIDTH, false);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerType type, Integer cellSize) {
-        log.trace("setContainerType");
-        setContainerType(type, cellSize, false);
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerTypeWrapper type) {
-        log.trace("setContainerType");
-        setContainerType(type.getWrappedObject());
-    }
-
-    @SuppressWarnings("nls")
-    public void setContainerType(ContainerTypeWrapper type, Integer cellSize) {
-        log.trace("setContainerType");
-        setContainerType(type.getWrappedObject(), cellSize, false);
-    }
-
-    @SuppressWarnings("nls")
-    public ContainerType getContainerType() {
-        log.trace("getContainerType");
-        return containerType;
+        throw new IllegalStateException("no longer used");
     }
 
     @SuppressWarnings("nls")
@@ -248,7 +233,10 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public AbstractUIWell getObjectAtCoordinates(int x, int y) {
         log.trace("getObjectAtCoordinates");
         if (containerDisplay != null) {
-            return containerDisplay.getObjectAtCoordinates(this, x, y);
+            Map<RowColPos, ? extends AbstractUIWell> cells = getCells();
+            if (cells != null) {
+                return containerDisplay.getObjectAtCoordinates(cells, x, y);
+            }
         }
         return null;
     }
@@ -311,15 +299,18 @@ public class ContainerDisplayWidget extends ImageCanvas {
     }
 
     @SuppressWarnings("nls")
-    protected void setContainerDisplay(AbstractContainerDisplay display) {
+    private void setContainerDisplay(
+        AbstractContainerDisplay display,
+        List<UICellStatus> cellStatus) {
         log.trace("setContainerDisplay");
         containerDisplay = display;
-        if ((cellStatus != null) && (containerDisplay != null)) {
-            containerDisplay.initLegend(cellStatus);
-        }
+
         if (containerDisplay == null) {
             setSourceImage(null);
         } else {
+            if (cellStatus != null) {
+                containerDisplay.initLegend(cellStatus);
+            }
             setSourceImage(containerDisplay.updateGridImage(this));
         }
     }

@@ -1357,27 +1357,25 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void displayPalletPositions() {
         if (currentMultipleContainer.hasParentContainer()) {
-            ContainerWrapper hotelContainer = currentMultipleContainer
-                .getParentContainer();
-            ContainerWrapper freezerContainer = hotelContainer
-                .getParentContainer();
+            ContainerWrapper hotelContainer = currentMultipleContainer.getParentContainer();
+            ContainerWrapper freezerContainer = hotelContainer.getParentContainer();
 
             if (freezerContainer != null) {
                 freezerLabel.setText(freezerContainer.getFullInfoLabel());
-                freezerWidget.setContainerType(freezerContainer.getContainerType());
+                freezerWidget.setContainerType(freezerContainer.getContainerType().getWrappedObject());
                 freezerWidget.setSelection(hotelContainer.getPositionAsRowCol());
                 freezerWidget.redraw();
             }
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
-            hotelWidget.setContainerType(hotelContainer.getContainerType());
+            hotelWidget.setContainerType(hotelContainer.getContainerType().getWrappedObject());
             hotelWidget.setSelection(currentMultipleContainer.getPositionAsRowCol());
             hotelWidget.redraw();
 
             palletLabel.setText(palletPositionText.getText());
 
-            palletWidget.setContainerType(currentMultipleContainer.getContainerType(),
-                PalletDisplay.SAMPLE_WIDTH);
+            palletWidget.setContainerType(
+                currentMultipleContainer.getContainerType().getWrappedObject());
             setContainerType(currentMultipleContainer.getContainerType().getWrappedObject());
             palletWidget.setCells(getCells());
 

@@ -298,9 +298,11 @@ public class ContainerViewForm extends BiobankViewForm {
         }
         containerWidget = new ContainerDisplayWidget(
             client,
+            null,
             ContainerViewForm.class.getSimpleName(),
-            UICellStatus.DEFAULT_CONTAINER_STATUS_LIST);
-        containerWidget.setContainer(container);
+            UICellStatus.DEFAULT_CONTAINER_STATUS_LIST,
+            container.getContainerType(),
+            false);
         containerWidget.setCells(cells);
         toolkit.adapt(containerWidget);
 

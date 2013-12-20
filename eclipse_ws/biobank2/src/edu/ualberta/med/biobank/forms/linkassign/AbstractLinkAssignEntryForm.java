@@ -394,7 +394,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             i18n.tr("Freezer"));
         freezerLabel.setLayoutData(new GridData());
         freezerWidget = new ContainerDisplayWidget(freezerComposite, "freezerWidget");
-        freezerWidget.initDisplayFromType(true);
         toolkit.adapt(freezerWidget);
         freezerWidget.setDisplaySize(PalletDisplay.PALLET_WIDTH, 100);
 
@@ -410,7 +409,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             // TR: label
             i18n.tr("Hotel"));
         hotelWidget = new ContainerDisplayWidget(hotelComposite, "hotelWidget");
-        hotelWidget.initDisplayFromType(true);
         toolkit.adapt(hotelWidget);
         hotelWidget.setDisplaySize(100, PalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
@@ -489,17 +487,25 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
         ContainerType thirdSingleParentType = null;
         ContainerType secondSingleParentType = null;
-        thirdSingleParentWidget =
-            new ContainerDisplayWidget(singleVisualisation, "thirdSingleParentWidget");
-        thirdSingleParentWidget.setContainerType(thirdSingleParentType, true);
+        thirdSingleParentWidget = new ContainerDisplayWidget(
+            singleVisualisation,
+            null,
+            "thirdSingleParentWidget",
+            null,
+            thirdSingleParentType,
+            true);
         toolkit.adapt(thirdSingleParentWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         thirdSingleParentWidget.setLayoutData(gdDrawer);
 
-        secondSingleParentWidget =
-            new ContainerDisplayWidget(singleVisualisation, "secondSingleParentWidget");
-        secondSingleParentWidget.setContainerType(secondSingleParentType, true);
+        secondSingleParentWidget = new ContainerDisplayWidget(
+            singleVisualisation,
+            null,
+            "secondSingleParentWidget",
+            null,
+            secondSingleParentType,
+            true);
         toolkit.adapt(secondSingleParentWidget);
 
         displaySinglePositions(false);
@@ -599,28 +605,23 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                     if (parentContainers.size() >= 1)
                         firstParent = parentContainers.get(0);
                     boolean hasThirdParent = thirdParent != null;
-                    widgetCreator.showWidget(thirdSingleParentWidget,
-                        hasThirdParent);
-                    widgetCreator.showWidget(thirdSingleParentLabel,
-                        hasThirdParent);
+                    widgetCreator.showWidget(thirdSingleParentWidget, hasThirdParent);
+                    widgetCreator.showWidget(thirdSingleParentLabel, hasThirdParent);
                     if (hasThirdParent) {
-                        thirdSingleParentWidget.setContainerType(thirdParent
-                            .getContainerType());
+                        thirdSingleParentWidget.setContainerType(
+                            thirdParent.getContainerType().getWrappedObject());
                         thirdSingleParentWidget.setSelection(secondParent
                             .getPositionAsRowCol());
                         thirdSingleParentLabel.setText(thirdParent.getLabel());
                     }
                     boolean hasSecondParent = secondParent != null;
-                    widgetCreator.showWidget(secondSingleParentWidget,
-                        hasSecondParent);
-                    widgetCreator.showWidget(secondSingleParentLabel,
-                        hasSecondParent);
+                    widgetCreator.showWidget(secondSingleParentWidget, hasSecondParent);
+                    widgetCreator.showWidget(secondSingleParentLabel, hasSecondParent);
                     if (hasSecondParent) {
-                        secondSingleParentWidget.setContainer(secondParent);
-                        secondSingleParentWidget.setSelection(firstParent
-                            .getPositionAsRowCol());
-                        secondSingleParentLabel
-                            .setText(secondParent.getLabel());
+                        secondSingleParentWidget.setContainerType(
+                            secondParent.getContainerType().getWrappedObject());
+                        secondSingleParentWidget.setSelection(firstParent.getPositionAsRowCol());
+                        secondSingleParentLabel.setText(secondParent.getLabel());
                     }
                 }
             }

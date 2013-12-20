@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public class PalletWidget extends ContainerDisplayWidget {
 
-    private static final IContainerDisplayWidget tooltipCallback =
+    private static final IContainerDisplayWidget TOOLTIP_CALLBACK =
         new IContainerDisplayWidget() {
 
             @SuppressWarnings("nls")
@@ -37,12 +37,21 @@ public class PalletWidget extends ContainerDisplayWidget {
     }
 
     public PalletWidget(Composite parent, List<UICellStatus> cellStatus) {
-        super(parent, tooltipCallback, PalletWidget.class.getSimpleName(), cellStatus);
+        super(
+            parent,
+            TOOLTIP_CALLBACK,
+            PalletWidget.class.getSimpleName(),
+            new PalletDisplay(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT),
+            cellStatus);
     }
 
     public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
-        super(parent, tooltipCallback, PalletWidget.class.getSimpleName(), cellStatus);
-        setContainerDisplay(new PalletDisplay(rows, cols));
+        super(
+            parent,
+            TOOLTIP_CALLBACK,
+            PalletWidget.class.getSimpleName(),
+            new PalletDisplay(rows, cols),
+            cellStatus);
     }
 
     @SuppressWarnings("nls")
@@ -60,17 +69,5 @@ public class PalletWidget extends ContainerDisplayWidget {
             }
         }
         return true;
-    }
-
-    @Override
-    public void initDisplayFromType(boolean createDefaultContainer, Integer cellSize) {
-        PalletDisplay display = (PalletDisplay) getContainerDisplay();
-        if (containerType == null) {
-            setContainerDisplay(new PalletDisplay(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT));
-        } else {
-            display.setContainerType(containerType);
-        }
-        display.setCellWidth(cellSize);
-        display.setCellHeight(cellSize);
     }
 }
