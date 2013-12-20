@@ -184,20 +184,22 @@ public class SpecimenTypeSelectionWidget extends BgcBaseWidget
     @SuppressWarnings("nls")
     public void resetValues(
         int row,
-        final boolean resetSelection,
-        final boolean resetNumber,
+        boolean resetSelection,
+        boolean resetNumber,
         boolean async) {
         if (row > specimenTypesWidgets.size()) {
             throw new IllegalArgumentException("row exeeds maximum: " + row);
         }
-        final AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
+        AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(row);
         widget.resetValues(resetSelection, resetNumber, async);
     }
 
-    public void updateHierarchyWidgets(int rows) {
+    public void resetHierarchyWidgets(int rows) {
         currentRows = rows;
         for (int i = 0; i < maxRows; ++i) {
-            specimenTypesWidgets.get(i).showWidget(i < currentRows);
+            AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets.get(i);
+            widget.resetValues(true, true, true);
+            widget.showWidget(i < currentRows);
         }
     }
 }

@@ -10,8 +10,6 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,17 +79,17 @@ public class ContainerDisplayWidget extends ImageCanvas {
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
         this.tooltipCallback = callback;
 
-        GridLayout layout = new GridLayout(1, false);
-        layout.marginWidth = 5;
-        layout.marginHeight = 5;
-        setLayout(layout);
-
-        Point sizeHint = getSizeHint();
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        gd.horizontalSpan = 2;
-        gd.widthHint = sizeHint.x;
-        gd.heightHint = sizeHint.y;
-        setLayoutData(gd);
+        // GridLayout layout = new GridLayout(1, false);
+        // layout.marginWidth = 5;
+        // layout.marginHeight = 5;
+        // setLayout(layout);
+        //
+        // Point sizeHint = getSizeHint();
+        // GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        // gd.horizontalSpan = 2;
+        // gd.widthHint = sizeHint.x;
+        // gd.heightHint = sizeHint.y;
+        // setLayoutData(gd);
 
         if (this.tooltipCallback != null) {
             addMouseTrackListener(new MouseTrackAdapter() {

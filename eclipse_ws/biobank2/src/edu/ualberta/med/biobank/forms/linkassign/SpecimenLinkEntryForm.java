@@ -232,7 +232,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         widgetCreator.createComboViewer(
             multipleOptionsFields,
-            i18n.tr("Pallet Dimensions"),
+            i18n.tr("Pallet dimensions"),
             Arrays.asList(PalletDimensions.values()),
             getCurrentPlateDimensions(),
             // TR: validation error message
@@ -701,7 +701,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         int cols = capacity.getColCapacity();
         currentGridDimensions = new RowColPos(rows, cols);
         recreateScanPalletWidget(rows, cols);
-        specimenTypesWidget.updateHierarchyWidgets(rows);
+        specimenTypesWidget.resetHierarchyWidgets(rows);
         page.layout(true, true);
         book.reflow(true);
     }
