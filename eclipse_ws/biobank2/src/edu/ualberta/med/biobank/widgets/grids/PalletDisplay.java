@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.widgets.grids;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -32,29 +30,8 @@ public class PalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
-    public PalletDisplay(final PalletWidget widget, int rows, int cols) {
+    public PalletDisplay(int rows, int cols) {
         super(PalletDisplay.class.getSimpleName());
-
-        widget.addMouseTrackListener(new MouseTrackAdapter() {
-            @Override
-            public void mouseHover(MouseEvent e) {
-                PalletWell cell = (PalletWell) getObjectAtCoordinates(widget, e.x, e.y);
-                if (cell != null) {
-                    String msg = cell.getValue();
-                    if (cell.getInformation() != null) {
-                        if (msg == null) {
-                            msg = StringUtil.EMPTY_STRING;
-                        } else {
-                            msg += ": "; //$NON-NLS-1$
-                        }
-                        msg += cell.getInformation();
-                    }
-                    widget.setToolTipText(msg);
-                } else {
-                    widget.setToolTipText(null);
-                }
-            }
-        });
         setCellWidth(SAMPLE_WIDTH);
         setCellHeight(SAMPLE_WIDTH);
         setDefaultStorageSize(rows, cols);

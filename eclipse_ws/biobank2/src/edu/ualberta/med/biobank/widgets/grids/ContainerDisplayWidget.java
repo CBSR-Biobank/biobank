@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -22,6 +24,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
+import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
@@ -50,6 +53,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private AbstractContainerDisplay containerDisplay;
 
+    private final IContainerDisplayWidget tooltipCallback;
+
     /**
      * max width this container will have : used to calculate cells width
      */
@@ -64,12 +69,17 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final String name;
 
-    public ContainerDisplayWidget(Composite parent, String name, List<UICellStatus> cellStatus) {
-        super(parent, SWT.DOUBLE_BUFFERED);
+    public ContainerDisplayWidget(
+        Composite widgetParent,
+        IContainerDisplayWidget callback,
+        String name,
+        List<UICellStatus> cellStatus) {
+        super(widgetParent, SWT.DOUBLE_BUFFERED);
         multiSelectionManager = new MultiSelectionManager(this);
         this.cellStatus = cellStatus;
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
+        this.tooltipCallback = callback;
 
         GridLayout layout = new GridLayout(1, false);
         layout.marginWidth = 5;
@@ -82,10 +92,35 @@ public class ContainerDisplayWidget extends ImageCanvas {
         gd.widthHint = sizeHint.x;
         gd.heightHint = sizeHint.y;
         setLayoutData(gd);
+
+        if (this.tooltipCallback != null) {
+            addMouseTrackListener(new MouseTrackAdapter() {
+                @Override
+                public void mouseHover(MouseEvent e) {
+                    PalletWell cell = (PalletWell) getObjectAtCoordinates(e.x, e.y);
+                    if (cell != null) {
+                        setToolTipText(ContainerDisplayWidget.this.tooltipCallback.getTooltipText(cell));
+                    } else {
+                        setToolTipText(null);
+                    }
+                }
+            });
+        }
+    }
+
+    public ContainerDisplayWidget(
+        Composite widgetParent,
+        String name,
+        List<UICellStatus> cellStatus) {
+        this(widgetParent, null, name, cellStatus);
+    }
+
+    public ContainerDisplayWidget(Composite parent, IContainerDisplayWidget callback, String name) {
+        this(parent, callback, name, null);
     }
 
     public ContainerDisplayWidget(Composite parent, String name) {
-        this(parent, name, null);
+        this(parent, null, name, null);
     }
 
     @SuppressWarnings("nls")
