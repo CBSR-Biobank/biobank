@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseText;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.type.DispatchSpecimenState;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -243,7 +243,7 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     @Override
     protected void doProceed() throws Exception {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (PalletWell cell : getCells().values()) {
+        for (SpecimenCell cell : getCells().values()) {
             if (cell.getStatus() != UICellStatus.MISSING) {
                 specimens.add(cell.getSpecimen());
                 cell.setStatus(UICellStatus.IN_SHIPMENT_ADDED);

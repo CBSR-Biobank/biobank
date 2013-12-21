@@ -30,8 +30,8 @@ import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;
 import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;

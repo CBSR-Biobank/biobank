@@ -18,8 +18,8 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenInfo;

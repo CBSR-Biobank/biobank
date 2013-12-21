@@ -1,0 +1,38 @@
+package edu.ualberta.med.biobank.common.action.specimen;
+
+import java.util.Stack;
+
+import edu.ualberta.med.biobank.common.action.ActionResult;
+import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.Specimen;
+
+public class SpecimenBriefInfo implements ActionResult {
+    private static final long serialVersionUID = 1L;
+
+    private Specimen specimen;
+    private Stack<Container> parents = new Stack<Container>();
+    private BatchOperation batch;
+
+    public SpecimenBriefInfo() {
+    }
+
+    public SpecimenBriefInfo(Specimen specimen, Stack<Container> parents,
+        BatchOperation batch) {
+        this.specimen = specimen;
+        this.parents = parents;
+        this.batch = batch;
+    }
+
+    public Specimen getSpecimen() {
+        return specimen;
+    }
+
+    public Stack<Container> getParents() {
+        return parents;
+    }
+
+    public BatchOperation getBatch() {
+        return batch;
+    }
+}

@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.Set;
 
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 
 public interface IDecodePalletManagement {
 
@@ -12,7 +12,7 @@ public interface IDecodePalletManagement {
 
     void decodeAndProcessError(String errorMsg);
 
-    void postProcessDecodeTubesManually(Set<PalletWell> cells) throws Exception;
+    void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception;
 
-    boolean canDecodeTubesManually(PalletWell cell);
+    boolean canDecodeTubesManually(SpecimenCell cell);
 }

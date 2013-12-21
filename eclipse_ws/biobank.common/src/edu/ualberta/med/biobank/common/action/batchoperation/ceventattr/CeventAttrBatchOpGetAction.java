@@ -15,8 +15,7 @@ import edu.ualberta.med.biobank.model.BatchOperation;
 import edu.ualberta.med.biobank.model.BatchOperationEventAttr;
 import edu.ualberta.med.biobank.model.EventAttr;
 
-public class CeventAttrBatchOpGetAction
-    implements Action<BatchOpGetResult<EventAttr>> {
+public class CeventAttrBatchOpGetAction implements Action<BatchOpGetResult<EventAttr>> {
     private static final long serialVersionUID = 1L;
 
     private final Integer batchOperationId;
@@ -32,8 +31,7 @@ public class CeventAttrBatchOpGetAction
 
     @SuppressWarnings("nls")
     @Override
-    public BatchOpGetResult<EventAttr> run(ActionContext context)
-        throws ActionException {
+    public BatchOpGetResult<EventAttr> run(ActionContext context) throws ActionException {
         Session session = context.getSession();
 
         BatchOperation batch = context.load(BatchOperation.class, batchOperationId);

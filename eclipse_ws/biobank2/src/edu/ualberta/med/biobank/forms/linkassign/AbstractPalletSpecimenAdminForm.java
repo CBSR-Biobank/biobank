@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOptio
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -99,12 +99,12 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     public void processDecodeResult() throws Exception {
         setScanHasBeenLaunched(false, true);
 
-        Map<RowColPos, PalletWell> cells = getCells();
+        Map<RowColPos, SpecimenCell> cells = getCells();
         // conversion for server side call
         Map<RowColPos, CellInfo> serverCells = null;
         if (cells != null) {
             serverCells = new HashMap<RowColPos, CellInfo>();
-            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+            for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
                 serverCells.put(entry.getKey(), entry.getValue()
                     .transformIntoServerCell());
             }
@@ -120,11 +120,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
             // for each cell, convert into a client side cell
             for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
                 RowColPos pos = entry.getKey();
-                PalletWell palletCell = cells.get(entry.getKey());
+                SpecimenCell palletCell = cells.get(entry.getKey());
                 CellInfo servercell = entry.getValue();
                 if (palletCell == null) {
                     // can happen if missing no tube in this cell
-                    palletCell = new PalletWell(
+                    palletCell = new SpecimenCell(
                         pos.getRow(),
                         pos.getCol(),
                         new DecodedWell(
@@ -165,8 +165,8 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
 
     @SuppressWarnings("nls")
     @Override
-    public void postProcessDecodeTubesManually(Set<PalletWell> cells) throws Exception {
-        for (PalletWell palletCell : cells) {
+    public void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception {
+        for (SpecimenCell palletCell : cells) {
             appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
                 palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
             beforeScanTubeAlone();
@@ -188,7 +188,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     @Override
-    public boolean canDecodeTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(SpecimenCell cell) {
         return ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY));
     }
 
@@ -321,7 +321,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         // default does nothing
     }
 
-    protected Map<RowColPos, PalletWell> getCells() {
+    protected Map<RowColPos, SpecimenCell> getCells() {
         return palletScanManagement.getCells();
     }
 
@@ -343,7 +343,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     @SuppressWarnings("unused")
-    protected void processCellResult(RowColPos rcp, PalletWell palletCell) {
+    protected void processCellResult(RowColPos rcp, SpecimenCell palletCell) {
         // nothing done by default
     }
 

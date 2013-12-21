@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.util.StringUtil;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 
 /**
  * Specific widget to draw a pallet for scan features
@@ -50,7 +50,7 @@ public class PalletDisplay extends AbstractGridDisplay {
         Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (cells != null) {
-            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow,
+            SpecimenCell cell = (SpecimenCell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null)
                 return cell.getTitle();
@@ -63,9 +63,7 @@ public class PalletDisplay extends AbstractGridDisplay {
         Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (containerType == null) {
-            String row = Character.valueOf((char) (indexRow + 'A')).toString();
-            String col = Integer.valueOf(indexCol + 1).toString();
-            return row + col;
+            return SbsLabeling.fromRowCol(indexRow, indexCol);
         }
         return getDefaultTextForBox(cells, indexRow, indexCol);
     }
@@ -75,7 +73,7 @@ public class PalletDisplay extends AbstractGridDisplay {
         Map<RowColPos, ? extends AbstractUIWell> cells, int indexRow,
         int indexCol) {
         if (cells != null) {
-            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow,
+            SpecimenCell cell = (SpecimenCell) cells.get(new RowColPos(indexRow,
                 indexCol));
             if (cell != null)
                 return cell.getTypeString();
@@ -97,7 +95,7 @@ public class PalletDisplay extends AbstractGridDisplay {
 
         if (!cells.isEmpty()) {
 
-            PalletWell cell = (PalletWell) cells.get(new RowColPos(indexRow, indexCol));
+            SpecimenCell cell = (SpecimenCell) cells.get(new RowColPos(indexRow, indexCol));
             if ((cell != null) && (cell.getStatus() != null)) {
                 return cell.getStatus().getColor();
             }

@@ -23,9 +23,12 @@ public abstract class AbstractContainerDisplay {
 
     private static Logger log = LoggerFactory.getLogger(AbstractContainerDisplay.class.getName());
 
+    // FIXME: remove this field
     protected Container container;
 
+    // FIXME: remove this field
     protected ContainerType containerType;
+
     /**
      * true if we want the container to display full info in each box displayed
      */
@@ -43,10 +46,10 @@ public abstract class AbstractContainerDisplay {
 
     protected List<UICellStatus> legendStatus;
 
-    protected String name;
+    protected final String containerLabel;
 
-    public AbstractContainerDisplay(String name) {
-        this.name = name;
+    public AbstractContainerDisplay(String containerLabel) {
+        this.containerLabel = containerLabel;
     }
 
     @SuppressWarnings("nls")
@@ -89,15 +92,17 @@ public abstract class AbstractContainerDisplay {
      * the containerType.
      */
     @SuppressWarnings("unused")
-    protected String getDefaultTextForBox(Map<RowColPos, ? extends AbstractUIWell> cells,
-        int indexRow, int indexCol) {
+    protected String getDefaultTextForBox(
+        Map<RowColPos, ? extends AbstractUIWell> cells,
+        int indexRow,
+        int indexCol) {
         RowColPos rowcol = new RowColPos(indexRow, indexCol);
         String parentLabel = StringUtil.EMPTY_STRING;
         if (displayFullInfoString && container != null) {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
-            return parentLabel + containerType.getPositionString(rowcol);
+            return containerLabel + containerType.getPositionString(rowcol);
         }
         return StringUtil.EMPTY_STRING;
     }

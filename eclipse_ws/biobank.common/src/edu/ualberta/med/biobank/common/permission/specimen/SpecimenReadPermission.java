@@ -44,7 +44,6 @@ public class SpecimenReadPermission implements Permission {
         Center center = specimen.getCurrentCenter();
         Study study = specimen.getCollectionEvent().getPatient().getStudy();
 
-        return PermissionEnum.SPECIMEN_READ.isAllowed(context.getUser(),
-            center, study);
+        return PermissionEnum.SPECIMEN_READ.isAllowed(context.getUser(), center, study);
     }
 }

@@ -74,7 +74,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -1094,11 +1094,11 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         if (!saveEvenIfMissing) return;
 
         try {
-            Map<RowColPos, PalletWell> cells = getCells();
+            Map<RowColPos, SpecimenCell> cells = getCells();
             List<SpecimenInfo> specInfos = new ArrayList<SpecimenAssignSaveAction.SpecimenInfo>();
-            for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+            for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
                 RowColPos rcp = entry.getKey();
-                PalletWell cell = entry.getValue();
+                SpecimenCell cell = entry.getValue();
                 if ((cell != null) && ((cell.getStatus() == UICellStatus.NEW)
                     || (cell.getStatus() == UICellStatus.MOVED))) {
                     SpecimenWrapper specimen = cell.getSpecimen();
@@ -1308,7 +1308,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple assign
      */
     @Override
-    public boolean canDecodeTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(SpecimenCell cell) {
         return fieldsValid();
     }
 
@@ -1463,7 +1463,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void postProcessDecodeTubesManually(Set<PalletWell> palletCells) throws Exception {
+    public void postProcessDecodeTubesManually(Set<SpecimenCell> palletCells) throws Exception {
         super.postProcessDecodeTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
     }

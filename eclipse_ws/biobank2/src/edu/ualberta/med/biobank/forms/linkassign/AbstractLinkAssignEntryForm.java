@@ -51,7 +51,7 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -456,7 +456,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
      */
     protected void manageDoubleClick(MouseEvent e) {
         PalletWidget widget = (PalletWidget) e.widget;
-        PalletWell cell = (PalletWell) widget.getObjectAtCoordinates(e.x, e.y);
+        SpecimenCell cell = (SpecimenCell) widget.getObjectAtCoordinates(e.x, e.y);
         if (canDecodeTubesManually(cell)) {
             scanTubesManually(e);
         } else if (cell != null) {

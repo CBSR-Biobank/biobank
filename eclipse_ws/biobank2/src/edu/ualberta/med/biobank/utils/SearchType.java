@@ -54,8 +54,7 @@ public enum SearchType {
             CenterWrapper<?> center) throws Exception {
             if (center instanceof SiteWrapper) {
                 SpecimenByPositionSearchAction action =
-                    new SpecimenByPositionSearchAction(searchString,
-                        center.getId());
+                    new SpecimenByPositionSearchAction(searchString, center.getWrappedObject());
                 return wrapIds(SessionManager.getAppService()
                     .doAction(action).getList(), SpecimenWrapper.class);
             }

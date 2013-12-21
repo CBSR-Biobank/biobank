@@ -47,7 +47,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -110,7 +110,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     @SuppressWarnings("unused")
-    protected void specificScanPosProcess(PalletWell palletCell) {
+    protected void specificScanPosProcess(SpecimenCell palletCell) {
         // default do nothing
     }
 
@@ -218,7 +218,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         return scanHasBeenLaunchedValue.getValue().equals(true);
     }
 
-    protected Map<RowColPos, PalletWell> getCells() {
+    protected Map<RowColPos, SpecimenCell> getCells() {
         return palletScanManagement.getCells();
     }
 
@@ -350,13 +350,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         }
 
         if (checkBeforeProcessing(currentCenter)) {
-            Map<RowColPos, PalletWell> cells = getCells();
+            Map<RowColPos, SpecimenCell> cells = getCells();
 
             // conversion for server side call
             Map<RowColPos, CellInfo> serverCells = null;
             if (cells != null) {
                 serverCells = new HashMap<RowColPos, CellInfo>();
-                for (Entry<RowColPos, PalletWell> entry : cells.entrySet()) {
+                for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
                     serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
                 }
             }
@@ -371,11 +371,11 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                 // for each cell, convert into a client side cell
                 for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
                     RowColPos pos = entry.getKey();
-                    PalletWell palletWell = cells.get(entry.getKey());
+                    SpecimenCell palletWell = cells.get(entry.getKey());
                     CellInfo servercell = entry.getValue();
                     if (palletWell == null) {
                         // can happen if missing
-                        palletWell = new PalletWell(pos.getRow(), pos.getCol(), new DecodedWell(
+                        palletWell = new SpecimenCell(pos.getRow(), pos.getCol(), new DecodedWell(
                             servercell.getRow(), servercell.getCol(), servercell.getValue()));
                         cells.put(pos, palletWell);
                     }
@@ -407,10 +407,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     @Override
     @SuppressWarnings("nls")
-    public void postProcessDecodeTubesManually(Set<PalletWell> cells) throws Exception {
+    public void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception {
         log.debug("postprocessScanTubesManually: start");
         boolean errorFound = false;
-        for (PalletWell cell : cells) {
+        for (SpecimenCell cell : cells) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
                 getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
@@ -432,7 +432,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     @Override
     @SuppressWarnings("nls")
-    public boolean canDecodeTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(SpecimenCell cell) {
         boolean result = ((cell == null) || (cell.getStatus() == UICellStatus.EMPTY)
             || (cell.getStatus() == UICellStatus.ERROR)
             || (cell.getStatus() == UICellStatus.MISSING));

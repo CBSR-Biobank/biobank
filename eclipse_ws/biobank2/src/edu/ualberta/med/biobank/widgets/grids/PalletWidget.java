@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 public class PalletWidget extends ContainerDisplayWidget {
@@ -17,7 +17,7 @@ public class PalletWidget extends ContainerDisplayWidget {
             @SuppressWarnings("nls")
             @Override
             public String getTooltipText(AbstractUIWell cell) {
-                PalletWell palletCell = (PalletWell) cell;
+                SpecimenCell palletCell = (SpecimenCell) cell;
                 StringBuffer buf = new StringBuffer();
                 String msg = palletCell.getValue();
                 if (!msg.isEmpty()) {
@@ -63,8 +63,8 @@ public class PalletWidget extends ContainerDisplayWidget {
         if (cells.isEmpty()) return false;
 
         for (AbstractUIWell cell : cells.values()) {
-            PalletWell pCell = (PalletWell) cell;
-            if (PalletWell.hasValue(pCell) && pCell.getType() == null) {
+            SpecimenCell pCell = (SpecimenCell) cell;
+            if (SpecimenCell.hasValue(pCell) && pCell.getType() == null) {
                 return false;
             }
         }

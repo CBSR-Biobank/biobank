@@ -1,15 +1,26 @@
 package edu.ualberta.med.biobank.common.action.specimen;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.Stack;
+
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.CommonBundle;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.BatchOperation;
+import edu.ualberta.med.biobank.model.BatchOperationSpecimen;
+import edu.ualberta.med.biobank.model.Comment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.DispatchSpecimen;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.Study;
@@ -97,8 +108,11 @@ public class SpecimenActionHelper {
     }
 
     @SuppressWarnings("nls")
-    public static String getPositionString(Specimen specimen,
-        boolean fullString, boolean addTopParentShortName) {
+    public static String getPositionString(
+        Specimen specimen,
+        boolean fullString,
+        boolean addTopParentShortName) {
+
         if (specimen.getSpecimenPosition() == null)
             return null;
 
@@ -115,5 +129,111 @@ public class SpecimenActionHelper {
             position.append(")");
         }
         return position.toString();
+    }
+
+    /**
+     * Returns the "brief" information for a specimen. It is meant to only be called by actions.
+     * 
+     * @param context The context the action is running under.
+     * @param specimenId The specimen id. Can be null.
+     * @param inventoryId The inventory id. Can be null.
+     * @return The specimen informaiton along with many of its associations.
+     */
+    @SuppressWarnings("nls")
+    public static SpecimenBriefInfo getSpecimenBriefInfo(
+        ActionContext context,
+        Integer specimenId,
+        String inventoryId) {
+        Criteria criteria = context.getSession().createCriteria(Specimen.class);
+
+        if ((specimenId == null) && (inventoryId == null)) {
+            throw new IllegalArgumentException("specimen id and inventory id cannot both be null");
+        }
+
+        if (specimenId != null) {
+            criteria.add(Restrictions.eq("id", specimenId));
+        }
+
+        if (inventoryId != null) {
+            criteria.add(Restrictions.eq("inventoryId", inventoryId));
+        }
+
+        Specimen specimen = (Specimen) criteria.uniqueResult();
+
+        // lazy load some associations
+        specimen.getTopSpecimen().getSpecimenType().getName();
+        specimen.getSpecimenType().getName();
+        specimen.getCurrentCenter().getName();
+        specimen.getOriginInfo().getCenter().getName();
+        specimen.getCollectionEvent().getPatient().getPnumber();
+        specimen.getCollectionEvent().getPatient().getStudy().getName();
+
+        SpecimenPosition specimenPosition = specimen.getSpecimenPosition();
+        if (specimenPosition != null) {
+            specimenPosition.getRow();
+            specimenPosition.getContainer().getLabel();
+        }
+
+        ShipmentInfo shipmentInfo = specimen.getOriginInfo().getShipmentInfo();
+        if (shipmentInfo != null) {
+            shipmentInfo.getShippingMethod().getName();
+        }
+
+        Set<DispatchSpecimen> dispatchSpecimens = specimen.getDispatchSpecimens();
+        if (dispatchSpecimens != null) {
+            for (DispatchSpecimen ds : dispatchSpecimens) {
+                ds.getDispatch().getSenderCenter().getName();
+            }
+        }
+
+        Set<Specimen> childSpecimens = specimen.getChildSpecimens();
+        for (Specimen child : childSpecimens) {
+            child.getSpecimenType().getName();
+        }
+
+        Set<Comment> comments = specimen.getComments();
+        for (Comment comment : comments) {
+            comment.getUser().getFullName();
+        }
+
+        ProcessingEvent pevent = specimen.getProcessingEvent();
+        if (pevent != null) {
+            specimen.getProcessingEvent().getCenter().getName();
+        }
+        Specimen topSpecimen = specimen.getTopSpecimen();
+        if (topSpecimen != null) {
+            ProcessingEvent topPevent = topSpecimen.getProcessingEvent();
+            if (topPevent != null) {
+                topPevent.getCenter();
+            }
+            topSpecimen.getOriginInfo().getCenter().getName();
+        }
+        Specimen parentSpecimen = specimen.getParentSpecimen();
+        if (parentSpecimen != null) {
+            ProcessingEvent parentPevent = parentSpecimen.getProcessingEvent();
+            if (parentPevent != null) {
+                parentPevent.getCenter();
+            }
+            parentSpecimen.getOriginInfo().getCenter().getName();
+        }
+
+        // get all parent containers - can be used for visualisation
+        Stack<Container> parents = new Stack<Container>();
+        SpecimenPosition pos = specimen.getSpecimenPosition();
+        if (pos != null) {
+            Container container = pos.getContainer();
+            while (container != null) {
+                container.getContainerType().getChildLabelingScheme().getName();
+                container.getContainerType().getCapacity().getRowCapacity();
+                parents.push(container);
+                container = container.getParentContainer();
+            }
+        }
+
+        BatchOperation batch = (BatchOperation) context.getSession()
+            .createCriteria(BatchOperationSpecimen.class)
+            .add(Restrictions.eq("specimen.id", specimen.getId())).uniqueResult();
+
+        return new SpecimenBriefInfo(specimen, parents, batch);
     }
 }

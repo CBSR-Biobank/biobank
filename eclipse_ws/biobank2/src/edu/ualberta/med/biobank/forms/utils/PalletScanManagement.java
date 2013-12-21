@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.mvp.view.DialogView.Dialog;
 import edu.ualberta.med.biobank.widgets.grids.PalletWidget;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
 import edu.ualberta.med.scannerconfig.dialogs.DecodeImageDialog;
@@ -44,7 +44,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class PalletScanManagement {
     private static final I18n i18n = I18nFactory.getI18n(PalletScanManagement.class);
 
-    protected Map<RowColPos, PalletWell> wells = new HashMap<RowColPos, PalletWell>();
+    protected Map<RowColPos, SpecimenCell> wells = new HashMap<RowColPos, SpecimenCell>();
 
     public enum ScanManualOption {
         ALLOW_DUPLICATES, NO_DUPLICATES
@@ -108,7 +108,7 @@ public class PalletScanManagement {
             Set<DecodedWell> decodeResult = dialog.getDecodeResult();
             PalletDimensions plateDimensions = dialog.getPlateDimensions();
             setFakeContainerType(plateDimensions.getRows(), plateDimensions.getCols());
-            wells = PalletWell.convertArray(decodeResult);
+            wells = SpecimenCell.convertArray(decodeResult);
 
             parent.beforeProcessingThreadStart();
 
@@ -163,7 +163,7 @@ public class PalletScanManagement {
 
         if (!canScanTubeAlone(wells.get(startPos))) return;
 
-        Set<PalletWell> manuallyEnteredCells = new HashSet<PalletWell>();
+        Set<SpecimenCell> manuallyEnteredCells = new HashSet<SpecimenCell>();
 
         for (Entry<RowColPos, String> entry : scanTubesManually(startPos, scanManualOption).entrySet()) {
             RowColPos pos = entry.getKey();
@@ -173,7 +173,7 @@ public class PalletScanManagement {
 
             if ((inventoryId == null) || inventoryId.isEmpty()) continue;
 
-            PalletWell cell = new PalletWell(row, col, new DecodedWell(row, col, inventoryId));
+            SpecimenCell cell = new SpecimenCell(row, col, new DecodedWell(row, col, inventoryId));
             wells.put(pos, cell);
 
             manuallyEnteredCells.add(cell);
@@ -190,7 +190,7 @@ public class PalletScanManagement {
     }
 
     protected boolean canScanTubeAlone(
-        @SuppressWarnings("unused") PalletWell cell) {
+        @SuppressWarnings("unused") SpecimenCell cell) {
         return true;
     }
 
@@ -200,7 +200,7 @@ public class PalletScanManagement {
         Map<String, String> existingInventoryIdsByLabel = new HashMap<String, String>();
 
         if (scanManualOption == ScanManualOption.NO_DUPLICATES) {
-            for (PalletWell well : wells.values()) {
+            for (SpecimenCell well : wells.values()) {
                 String inventoryId = well.getValue();
                 if ((inventoryId == null) || !inventoryId.isEmpty()) {
                     existingInventoryIdsByLabel.put(well.getLabel(), well.getValue());
@@ -257,7 +257,7 @@ public class PalletScanManagement {
                     selectionFound = true;
                 }
 
-                PalletWell well = wells.get(pos);
+                SpecimenCell well = wells.get(pos);
 
                 if ((well == null) || (well.getValue() == null) || well.getValue().isEmpty()) {
                     if (selectionFound) {
@@ -274,7 +274,7 @@ public class PalletScanManagement {
         return labelsMissingInventoryId;
     }
 
-    public Map<RowColPos, PalletWell> getCells() {
+    public Map<RowColPos, SpecimenCell> getCells() {
         return wells;
     }
 
@@ -288,7 +288,7 @@ public class PalletScanManagement {
     }
 
     private void initCells() {
-        wells = new HashMap<RowColPos, PalletWell>();
+        wells = new HashMap<RowColPos, SpecimenCell>();
     }
 
     public int getScansCount() {
@@ -302,8 +302,8 @@ public class PalletScanManagement {
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos pos = entry.getKey();
-                PalletWell cell =
-                    new PalletWell(pos.getRow(), pos.getCol(),
+                SpecimenCell cell =
+                    new SpecimenCell(pos.getRow(), pos.getCol(),
                         new DecodedWell(pos.getRow(), pos.getCol(), entry
                             .getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
@@ -324,8 +324,8 @@ public class PalletScanManagement {
                         SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
                             SessionManager.getAppService(), id);
                         RowColPos pos = container.getPositionFromLabelingScheme(InventoryIdUtil.positionPart(id));
-                        PalletWell cell =
-                            new PalletWell(pos.getRow(), pos.getCol(),
+                        SpecimenCell cell =
+                            new SpecimenCell(pos.getRow(), pos.getCol(),
                                 new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
                         cell.setSpecimen(sw);
                         cell.setStatus(UICellStatus.NEW);

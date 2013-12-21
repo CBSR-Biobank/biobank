@@ -18,12 +18,13 @@ import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByInventorySearchAction;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction;
-import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetInfoAction.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenGetPossibleTypesAction.SpecimenTypeData;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction;
 import edu.ualberta.med.biobank.common.action.specimen.SpecimenMicroplateConsistentAction.SpecimenMicroplateInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenSetGetInfoAction;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -258,5 +259,26 @@ public class TestSpecimen extends TestAction {
         SpecimenTypeData SpecimenTypeData = exec(new SpecimenGetPossibleTypesAction(specimen));
         Assert.assertEquals(specimenTypes.size(), SpecimenTypeData.getSpecimenTypes().size());
         Assert.assertEquals(specimenTypes.size(), SpecimenTypeData.getVolumeMap().size());
+    }
+
+    @Test
+    public void specimenSetGetInfoAction() {
+        Set<String> inventoryIds = new HashSet<String>();
+        session.beginTransaction();
+
+        Specimen specimen = factory.createParentSpecimen();
+        inventoryIds.add(specimen.getInventoryId());
+        specimen = factory.createChildSpecimen();
+        inventoryIds.add(specimen.getInventoryId());
+        session.getTransaction().commit();
+
+        ArrayList<SpecimenBriefInfo> result = exec(new SpecimenSetGetInfoAction(
+            factory.getDefaultSite(),
+            factory.getDefaultStudy(),
+            inventoryIds)).getList();
+        Assert.assertEquals(inventoryIds.size(), result.size());
+        for (SpecimenBriefInfo info : result) {
+            Assert.assertTrue(inventoryIds.contains(info.getSpecimen().getInventoryId()));
+        }
     }
 }

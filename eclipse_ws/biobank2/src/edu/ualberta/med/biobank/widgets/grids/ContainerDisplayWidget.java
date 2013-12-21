@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 
 /**
@@ -96,7 +96,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
             addMouseTrackListener(new MouseTrackAdapter() {
                 @Override
                 public void mouseHover(MouseEvent e) {
-                    PalletWell cell = (PalletWell) getObjectAtCoordinates(e.x, e.y);
+                    SpecimenCell cell = (SpecimenCell) getObjectAtCoordinates(e.x, e.y);
                     if (cell != null) {
                         setToolTipText(ContainerDisplayWidget.this.tooltipCallback.getTooltipText(cell));
                     } else {
@@ -150,8 +150,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
                 display = new GridContainerDisplay(name);
                 display.setStorageSize(3, 5);
             }
-        } else if (containerType.getName().equals(Drawer36Display.CONTAINER_NAME)) {
-            display = new Drawer36Display(containerType.getName());
         } else {
             display = new GridContainerDisplay(containerType.getName());
         }

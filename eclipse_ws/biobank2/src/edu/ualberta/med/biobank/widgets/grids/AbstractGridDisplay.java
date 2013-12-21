@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -21,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.gui.common.Swt2DUtil;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
@@ -186,7 +184,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     public Point computeSize(int wHint, int hHint, boolean changed) {
         Rectangle clientArea = getClientArea();
 
-        if (this.name.equals("PalletDisplay")) {
+        if (this.containerLabel.equals("PalletDisplay")) {
             log.debug("computeSize: width: {}, height: {}", clientArea.x, clientArea.y);
         }
 
@@ -289,23 +287,6 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return null;
     }
 
-    @SuppressWarnings("nls")
-    @Override
-    public void setContainerType(ContainerType type) {
-        super.setContainerType(type);
-        Integer rowCap = containerType.getRowCapacity();
-        Integer colCap = containerType.getColCapacity();
-        Assert.isNotNull(rowCap, "row capacity is null");
-        Assert.isNotNull(colCap, "column capacity is null");
-        setStorageSize(rowCap, colCap);
-        if (colCap <= 1) {
-            // single dimension size
-            setCellWidth(120);
-            setCellHeight(20);
-            setLegendOnSide(true);
-        }
-    }
-
     private void drawText(
         Display display,
         GC gc,
@@ -381,6 +362,12 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     public void setStorageSize(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
+        if (columns <= 1) {
+            // single dimension size
+            setCellWidth(120);
+            setCellHeight(20);
+            setLegendOnSide(true);
+        }
     }
 
     public int getCellWidth() {

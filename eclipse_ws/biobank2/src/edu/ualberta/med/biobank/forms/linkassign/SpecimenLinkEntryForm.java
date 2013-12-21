@@ -61,7 +61,7 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
-import edu.ualberta.med.biobank.widgets.grids.well.PalletWell;
+import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.AliquotedSpecimenSelectionWidget;
 import edu.ualberta.med.biobank.widgets.specimentypeselection.ISpecimenTypeSelectionChangedListener;
@@ -557,10 +557,10 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
         log.debug("saveMultipleSpecimens");
 
         @SuppressWarnings("unchecked")
-        Map<RowColPos, PalletWell> cells = (Map<RowColPos, PalletWell>) palletWidget.getCells();
+        Map<RowColPos, SpecimenCell> cells = (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
         List<AliquotedSpecimenInfo> asiList = new ArrayList<AliquotedSpecimenInfo>();
-        for (PalletWell cell : cells.values()) {
-            if (PalletWell.hasValue(cell) && cell.getStatus() == UICellStatus.TYPE) {
+        for (SpecimenCell cell : cells.values()) {
+            if (SpecimenCell.hasValue(cell) && cell.getStatus() == UICellStatus.TYPE) {
                 SpecimenWrapper sourceSpecimen = cell.getSourceSpecimen();
                 SpecimenWrapper aliquotedSpecimen = cell.getSpecimen();
                 AliquotedSpecimenInfo asi = new AliquotedSpecimenInfo();
@@ -790,7 +790,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      */
     @SuppressWarnings("nls")
     @Override
-    protected void processCellResult(final RowColPos rcp, PalletWell cell) {
+    protected void processCellResult(final RowColPos rcp, SpecimenCell cell) {
         log.debug("processCellResult");
         Integer typesRowsCount = typesRows.get(rcp.getRow());
         if (typesRowsCount == null) {
@@ -800,7 +800,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
 
         SpecimenHierarchyInfo selection = preSelections.get(cell.getRow());
         if (selection != null) setHierarchyToCell(cell, selection);
-        if (PalletWell.hasValue(cell)) {
+        if (SpecimenCell.hasValue(cell)) {
             typesRowsCount++;
             typesRows.put(rcp.getRow(), typesRowsCount);
         }
@@ -810,7 +810,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
      * Multiple linking: apply a source and type to a specific cell.
      */
     @SuppressWarnings("nls")
-    private void setHierarchyToCell(PalletWell cell, SpecimenHierarchyInfo selection) {
+    private void setHierarchyToCell(SpecimenCell cell, SpecimenHierarchyInfo selection) {
         log.debug("setHierarchyToCell");
         cell.setSourceSpecimen(new SpecimenWrapper(SessionManager.getAppService(),
             selection.getParentSpecimen()));
@@ -835,7 +835,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public boolean canDecodeTubesManually(PalletWell cell) {
+    public boolean canDecodeTubesManually(SpecimenCell cell) {
         if (linkFormPatientManagement.getSelectedCollectionEvent() == null) {
             return false;
         }
@@ -843,7 +843,7 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
     }
 
     @Override
-    public void postProcessDecodeTubesManually(Set<PalletWell> palletCells) throws Exception {
+    public void postProcessDecodeTubesManually(Set<SpecimenCell> palletCells) throws Exception {
         super.postProcessDecodeTubesManually(palletCells);
         scanMultipleWithHandheldInput = true;
     }
@@ -857,13 +857,13 @@ public class SpecimenLinkEntryForm extends AbstractLinkAssignEntryForm {
                 @Override
                 public void selectionChanged(SpecimenTypeSelectionEvent event) {
                     @SuppressWarnings("unchecked")
-                    Map<RowColPos, PalletWell> cells =
-                        (Map<RowColPos, PalletWell>) palletWidget.getCells();
+                    Map<RowColPos, SpecimenCell> cells =
+                        (Map<RowColPos, SpecimenCell>) palletWidget.getCells();
                     if (cells != null) {
                         for (RowColPos rcp : cells.keySet()) {
                             if (rcp.getRow() == event.getRowNumber()) {
-                                PalletWell cell = cells.get(rcp);
-                                if (PalletWell.hasValue(cell)) {
+                                SpecimenCell cell = cells.get(rcp);
+                                if (SpecimenCell.hasValue(cell)) {
                                     setHierarchyToCell(cell, event);
                                 }
                             }

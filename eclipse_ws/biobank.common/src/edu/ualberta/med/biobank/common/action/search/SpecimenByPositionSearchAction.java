@@ -8,51 +8,47 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.ListResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
-import edu.ualberta.med.biobank.common.permission.specimen.SpecimenSiteReadPermission;
+import edu.ualberta.med.biobank.common.permission.specimen.SpecimenStudyCenterReadPermission;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Specimen;
 
-public class SpecimenByPositionSearchAction implements
-    Action<ListResult<Integer>> {
+public class SpecimenByPositionSearchAction implements Action<ListResult<Integer>> {
+    private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("nls")
     protected static final String SPEC_BASE_QRY =
-        "SELECT distinct spec.id FROM "
-            + Specimen.class.getName()
-            + " spec"
-            + " where spec.specimenPosition.container.label=? and spec.specimenPosition.positionString=? and spec.currentCenter.id=?";
+        "SELECT distinct spec.id FROM " + Specimen.class.getName() + " spec "
+            + "WHERE spec.specimenPosition.container.label=? "
+            + "AND spec.specimenPosition.positionString=? "
+            + "AND spec.currentCenter.id=?";
 
-    private static final long serialVersionUID = 1L;
-    private String positionString;
+    private final String positionString;
 
-    private Integer currentCenter;
+    private final Integer centerId;
 
-    public SpecimenByPositionSearchAction(String positionString,
-        Integer currentCenter) {
+    public SpecimenByPositionSearchAction(String positionString, Center center) {
         this.positionString = positionString;
-        this.currentCenter = currentCenter;
+        this.centerId = center.getId();
     }
 
     @Override
     public boolean isAllowed(ActionContext context) throws ActionException {
-        return new SpecimenSiteReadPermission(currentCenter).isAllowed(context);
+        return new SpecimenStudyCenterReadPermission(centerId).isAllowed(context);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ListResult<Integer> run(ActionContext context)
-        throws ActionException {
-        if (positionString.length() > 2) {
-            String container =
-                positionString.substring(0, positionString.length() - 2);
-            String specimen =
-                positionString.substring(positionString.length() - 2);
-            Query q =
-                context.getSession().createQuery(SPEC_BASE_QRY);
-            q.setParameter(0, container);
-            q.setParameter(1, specimen);
-            q.setParameter(2, currentCenter);
-            return new ListResult<Integer>(q.list());
+    public ListResult<Integer> run(ActionContext context) throws ActionException {
+        if (positionString.length() <= 2) {
+            return new ListResult<Integer>(new ArrayList<Integer>());
         }
-        return new ListResult<Integer>(new ArrayList<Integer>());
+
+        String container = positionString.substring(0, positionString.length() - 2);
+        String specimen = positionString.substring(positionString.length() - 2);
+        Query q = context.getSession().createQuery(SPEC_BASE_QRY);
+        q.setParameter(0, container);
+        q.setParameter(1, specimen);
+        q.setParameter(2, centerId);
+        return new ListResult<Integer>(q.list());
     }
 }
