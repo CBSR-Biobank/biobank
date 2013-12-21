@@ -41,7 +41,11 @@ public class SpecimenSetGetInfoAction implements Action<ListResult<SpecimenBrief
     public ListResult<SpecimenBriefInfo> run(ActionContext context) throws ActionException {
         List<SpecimenBriefInfo> result = new ArrayList<SpecimenBriefInfo>(inventoryIds.size());
         for (String inventoryId : inventoryIds) {
-            result.add(SpecimenActionHelper.getSpecimenBriefInfo(context, null, inventoryId));
+            SpecimenBriefInfo info = SpecimenActionHelper.getSpecimenBriefInfo(
+                context, null, inventoryId);
+            if (info != null) {
+                result.add(info);
+            }
         }
         return new ListResult<SpecimenBriefInfo>(result);
     }

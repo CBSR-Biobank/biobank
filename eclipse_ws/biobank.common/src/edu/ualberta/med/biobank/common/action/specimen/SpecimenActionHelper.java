@@ -160,6 +160,8 @@ public class SpecimenActionHelper {
 
         Specimen specimen = (Specimen) criteria.uniqueResult();
 
+        if (specimen == null) return null;
+
         // lazy load some associations
         specimen.getTopSpecimen().getSpecimenType().getName();
         specimen.getSpecimenType().getName();
