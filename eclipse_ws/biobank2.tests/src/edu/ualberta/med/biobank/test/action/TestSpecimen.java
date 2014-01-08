@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.SpecimenType;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 
 public class TestSpecimen extends TestAction {
@@ -275,7 +274,6 @@ public class TestSpecimen extends TestAction {
 
         ArrayList<SpecimenBriefInfo> result = exec(new SpecimenSetGetInfoAction(
             factory.getDefaultSite(),
-            factory.getDefaultStudy(),
             inventoryIds)).getList();
         Assert.assertEquals(inventoryIds.size(), result.size());
         for (SpecimenBriefInfo info : result) {
@@ -290,12 +288,10 @@ public class TestSpecimen extends TestAction {
 
         session.beginTransaction();
         Site site = factory.createSite();
-        Study study = factory.createStudy();
         session.getTransaction().commit();
 
         ArrayList<SpecimenBriefInfo> result = exec(new SpecimenSetGetInfoAction(
             site,
-            study,
             inventoryIds)).getList();
         Assert.assertEquals(0, result.size());
     }

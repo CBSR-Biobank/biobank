@@ -105,14 +105,16 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         if (cells != null) {
             serverCells = new HashMap<RowColPos, CellInfo>();
             for (Entry<RowColPos, SpecimenCell> entry : cells.entrySet()) {
-                serverCells.put(entry.getKey(), entry.getValue()
-                    .transformIntoServerCell());
+                serverCells.put(entry.getKey(), entry.getValue().transformIntoServerCell());
             }
         }
         // server side call
         ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
-            getPalletProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                serverCells, Locale.getDefault()));
+            getPalletProcessAction(
+                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                serverCells,
+                Locale.getDefault()));
+
         // print result logs
         appendLogs(res.getLogs());
 

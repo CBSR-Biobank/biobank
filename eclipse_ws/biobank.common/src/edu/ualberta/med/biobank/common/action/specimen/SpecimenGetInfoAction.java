@@ -21,7 +21,7 @@ public class SpecimenGetInfoAction implements Action<SpecimenBriefInfo> {
 
     @Override
     public SpecimenBriefInfo run(ActionContext context) throws ActionException {
-        return SpecimenActionHelper.getSpecimenBriefInfo(context, specimenId, null);
+        return SpecimenActionHelper.getSpecimenBriefInfo(context, specimenId);
     }
 
 }

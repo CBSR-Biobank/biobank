@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +36,8 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenSetGetInfoAction;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
@@ -410,13 +413,38 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     public void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception {
         log.debug("postprocessScanTubesManually: start");
         boolean errorFound = false;
+
+        // server side call
+        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+            getPalletProcessAction(
+                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                cells,
+                Locale.getDefault()));
+
+        Set<String> inventoryIds = new HashSet<String>();
+        for (SpecimenCell cell : cells) {
+            String inventoryId = cell.getValue();
+            if (inventoryId == null) {
+                throw new IllegalStateException("cell has no inventory id");
+            }
+            inventoryIds.add(inventoryId);
+        }
+
+        List<SpecimenBriefInfo> specimenData = SessionManager.getAppService().doAction(
+            new SpecimenSetGetInfoAction(
+                SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject(),
+                inventoryIds)).getList();
+
+        Map<String, SpecimenBriefInfo> specimenDataMap =
+            SpecimenSetGetInfoAction.toMap(specimenData);
+
         for (SpecimenCell cell : cells) {
             Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
             CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
                 getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
                     cell.transformIntoServerCell(),
                     Locale.getDefault()));
-            cell.merge(SessionManager.getAppService(), res.getCell());
+            cell.merge(specimenDataMap.get(cell.getValue()), res.getCell());
             if (res.getProcessStatus() == CellInfoStatus.ERROR) {
                 Button okButton = getButton(IDialogConstants.PROCEED_ID);
                 okButton.setEnabled(false);

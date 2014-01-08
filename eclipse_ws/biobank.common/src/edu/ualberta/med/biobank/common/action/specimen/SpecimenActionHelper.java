@@ -238,4 +238,15 @@ public class SpecimenActionHelper {
 
         return new SpecimenBriefInfo(specimen, parents, batch);
     }
+
+    /**
+     * Returns the "brief" information for a specimen. It is meant to only be called by actions.
+     * 
+     * @param context The context the action is running under.
+     * @param specimenId The specimen id. Can be null.
+     * @return The specimen informaiton along with many of its associations.
+     */
+    public static SpecimenBriefInfo getSpecimenBriefInfo(ActionContext context, Integer specimenId) {
+        return getSpecimenBriefInfo(context, specimenId, null);
+    }
 }
