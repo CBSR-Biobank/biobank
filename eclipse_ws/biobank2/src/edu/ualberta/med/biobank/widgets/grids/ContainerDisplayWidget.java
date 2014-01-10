@@ -10,6 +10,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,19 +81,17 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
         setContainerDisplay(containerDisplay, cellStatus);
 
-        // initDisplayFromType(type, createDefaultContainer, cellSize);
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = 5;
+        layout.marginHeight = 5;
+        setLayout(layout);
 
-        // GridLayout layout = new GridLayout(1, false);
-        // layout.marginWidth = 5;
-        // layout.marginHeight = 5;
-        // setLayout(layout);
-        //
-        // Point sizeHint = getSizeHint();
-        // GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        // gd.horizontalSpan = 2;
-        // gd.widthHint = sizeHint.x;
-        // gd.heightHint = sizeHint.y;
-        // setLayoutData(gd);
+        Point sizeHint = getSizeHint();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        gd.horizontalSpan = 2;
+        gd.widthHint = sizeHint.x;
+        gd.heightHint = sizeHint.y;
+        setLayoutData(gd);
 
         if (this.tooltipCallback != null) {
             addMouseTrackListener(new MouseTrackAdapter() {
@@ -188,10 +188,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
         }
     }
 
-    @SuppressWarnings("nls")
     @Override
     public Point computeSize(int wHint, int hHint, boolean changed) {
-        log.debug("computeSize");
         if (containerDisplay != null) {
             return containerDisplay.computeSize(wHint, hHint, changed);
         }
@@ -238,7 +236,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
      */
     @SuppressWarnings("nls")
     public void setStorageSize(int rows, int columns) {
-        log.debug("setStorageSize: rows: {}, cols: {}", rows, columns);
+        log.trace("setStorageSize: rows: {}, cols: {}", rows, columns);
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
             updateCells();

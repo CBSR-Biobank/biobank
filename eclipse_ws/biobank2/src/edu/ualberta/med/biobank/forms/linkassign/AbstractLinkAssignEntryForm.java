@@ -581,7 +581,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     /**
      * single assign. Display containers
      */
-    @SuppressWarnings("nls")
     protected void displaySinglePositions(boolean show) {
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {

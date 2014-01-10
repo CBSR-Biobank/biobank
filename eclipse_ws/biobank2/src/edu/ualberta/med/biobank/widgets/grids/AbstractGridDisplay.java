@@ -179,15 +179,9 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     }
 
-    @SuppressWarnings("nls")
     @Override
     public Point computeSize(int wHint, int hHint, boolean changed) {
         Rectangle clientArea = getClientArea();
-
-        if (this.containerLabel.equals("PalletDisplay")) {
-            log.debug("computeSize: width: {}, height: {}", clientArea.x, clientArea.y);
-        }
-
         return new Point(clientArea.width, clientArea.height);
     }
 

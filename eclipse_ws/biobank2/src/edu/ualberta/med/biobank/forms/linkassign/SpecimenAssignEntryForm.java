@@ -797,7 +797,8 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         // only perform checks for existing containers
         if (container.isNew()) return true;
 
-        if (container.getContainerType().getSpecimenTypeCollection().isEmpty()) {
+        ContainerTypeWrapper containerType = container.getContainerType();
+        if ((containerType != null) && containerType.getSpecimenTypeCollection().isEmpty()) {
             BgcPlugin.openError(
                 // TR: dialog title
                 i18n.tr("Error"),
