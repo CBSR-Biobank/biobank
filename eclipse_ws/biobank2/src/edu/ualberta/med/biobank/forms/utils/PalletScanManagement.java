@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.action.containerType.ContainerLabelingSch
 import edu.ualberta.med.biobank.common.action.exception.AccessDeniedException;
 import edu.ualberta.med.biobank.common.action.search.SpecimenByMicroplateSearchAction;
 import edu.ualberta.med.biobank.common.util.InventoryIdUtil;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.scanmanually.ScanTubesManuallyWizardDialog;
@@ -302,10 +303,10 @@ public class PalletScanManagement {
             for (Entry<RowColPos, SpecimenWrapper> entry : container
                 .getSpecimens().entrySet()) {
                 RowColPos pos = entry.getKey();
-                SpecimenCell cell =
-                    new SpecimenCell(pos.getRow(), pos.getCol(),
-                        new DecodedWell(pos.getRow(), pos.getCol(), entry
-                            .getValue().getInventoryId()));
+                SpecimenCell cell = new SpecimenCell(
+                    pos.getRow(),
+                    pos.getCol(),
+                    new DecodedWell(pos.getRow(), pos.getCol(), entry.getValue().getInventoryId()));
                 cell.setSpecimen(entry.getValue());
                 cell.setStatus(UICellStatus.FILLED);
                 wells.put(pos, cell);
@@ -317,16 +318,19 @@ public class PalletScanManagement {
                     ids = SessionManager.getAppService().doAction(
                         new SpecimenByMicroplateSearchAction(container.getProductBarcode())).getList();
                 }
-                if ((container.getContainerType().getIsMicroplate()) || (!ids.isEmpty())) { // microplate
-                                                                                            // with
-                                                                                            // specimens
+                ContainerTypeWrapper containerType = container.getContainerType();
+                if (((containerType != null) && containerType.getIsMicroplate())
+                    || !ids.isEmpty()) {
+                    // microplate with specimens
                     for (String id : ids) {
                         SpecimenWrapper sw = SpecimenWrapper.getSpecimen(
                             SessionManager.getAppService(), id);
-                        RowColPos pos = container.getPositionFromLabelingScheme(InventoryIdUtil.positionPart(id));
-                        SpecimenCell cell =
-                            new SpecimenCell(pos.getRow(), pos.getCol(),
-                                new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
+                        RowColPos pos = container.getPositionFromLabelingScheme(
+                            InventoryIdUtil.positionPart(id));
+                        SpecimenCell cell = new SpecimenCell(
+                            pos.getRow(),
+                            pos.getCol(),
+                            new DecodedWell(pos.getRow(), pos.getCol(), sw.getInventoryId()));
                         cell.setSpecimen(sw);
                         cell.setStatus(UICellStatus.NEW);
                         wells.put(pos, cell);

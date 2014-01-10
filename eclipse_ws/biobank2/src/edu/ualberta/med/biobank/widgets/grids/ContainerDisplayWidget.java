@@ -238,7 +238,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
      */
     @SuppressWarnings("nls")
     public void setStorageSize(int rows, int columns) {
-        log.trace("setStorageSize");
+        log.debug("setStorageSize: rows: {}, cols: {}", rows, columns);
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
             updateCells();

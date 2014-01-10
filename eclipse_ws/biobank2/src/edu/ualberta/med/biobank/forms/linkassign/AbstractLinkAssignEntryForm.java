@@ -575,7 +575,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         container = null;
         cancelConfirmWidget.reset();
         setScanHasBeenLaunched(isSingleMode());
-        setCanLaunchScan(false);
         currentGridDimensions = new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
     }
 
@@ -608,14 +607,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                     boolean hasThirdParent = (thirdParent != null);
 
                     if (hasThirdParent) {
-                        thirdSingleParentWidget = new ContainerDisplayWidget(
-                            singleVisualisation,
-                            null,
-                            "thirdSingleParentWidget",
-                            null,
-                            thirdParent.getContainerType().getWrappedObject(),
-                            true);
-                        toolkit.adapt(thirdSingleParentWidget);
+                        Capacity capacity = thirdParent.getContainerType().getWrappedObject().getCapacity();
+                        thirdSingleParentWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
                         thirdSingleParentWidget.setSelection(secondParent.getPositionAsRowCol());
                         thirdSingleParentLabel.setText(thirdParent.getLabel());
                     }
@@ -627,14 +620,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                     widgetCreator.showWidget(secondSingleParentWidget, hasSecondParent);
                     widgetCreator.showWidget(secondSingleParentLabel, hasSecondParent);
                     if (hasSecondParent) {
-                        secondSingleParentWidget = new ContainerDisplayWidget(
-                            singleVisualisation,
-                            null,
-                            "secondSingleParentWidget",
-                            null,
-                            secondParent.getContainerType().getWrappedObject(),
-                            true);
-                        toolkit.adapt(secondSingleParentWidget);
+                        Capacity capacity = secondParent.getContainerType().getWrappedObject().getCapacity();
+                        secondSingleParentWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
                         secondSingleParentWidget.setSelection(firstParent.getPositionAsRowCol());
                         secondSingleParentLabel.setText(secondParent.getLabel());
                     }

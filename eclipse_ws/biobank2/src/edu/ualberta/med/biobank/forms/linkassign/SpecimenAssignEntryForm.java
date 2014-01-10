@@ -66,6 +66,7 @@ import edu.ualberta.med.biobank.gui.common.widgets.BgcBaseWidget;
 import edu.ualberta.med.biobank.gui.common.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -1279,7 +1280,7 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
         setScanHasBeenLaunched(isSingleMode || !useScanner);
         log.debug("setBindings: isSingleMode" + isSingleMode);
         checkPalletContainerTypes();
-        setCanLaunchScan(false);
+        setCanLaunchScan(true);
     }
 
     @Override
@@ -1354,17 +1355,22 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
      */
     protected void displayPalletPositions() {
         if (currentMultipleContainer.hasParentContainer()) {
+            Capacity capacity;
             ContainerWrapper hotelContainer = currentMultipleContainer.getParentContainer();
             ContainerWrapper freezerContainer = hotelContainer.getParentContainer();
 
             if (freezerContainer != null) {
                 freezerLabel.setText(freezerContainer.getFullInfoLabel());
                 freezerWidget.setSelection(hotelContainer.getPositionAsRowCol());
+                capacity = freezerContainer.getContainerType().getWrappedObject().getCapacity();
+                freezerWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
                 freezerWidget.redraw();
             }
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
             hotelWidget.setSelection(currentMultipleContainer.getPositionAsRowCol());
+            capacity = hotelContainer.getContainerType().getWrappedObject().getCapacity();
+            hotelWidget.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
             hotelWidget.redraw();
 
             palletLabel.setText(palletPositionText.getText());
