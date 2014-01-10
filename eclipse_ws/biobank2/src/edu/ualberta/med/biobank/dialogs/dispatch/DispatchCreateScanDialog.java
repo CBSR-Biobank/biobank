@@ -198,15 +198,15 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
         return true;
     }
 
-    @SuppressWarnings("nls")
-    @Override
-    protected Action<ProcessResult> getCellProcessAction(
-        Integer centerId,
-        CellInfo cell,
-        Locale locale) {
-        log.debug("getCellProcessAction");
-        return new DispatchCreateProcessAction(getProcessData(), centerId, cell, locale);
-    }
+    // @SuppressWarnings("nls")
+    // @Override
+    // protected Action<ProcessResult> getCellProcessAction(
+    // Integer centerId,
+    // CellInfo cell,
+    // Locale locale) {
+    // log.debug("getCellProcessAction");
+    // return new DispatchCreateProcessAction(getProcessData(), centerId, cell, locale);
+    // }
 
     @SuppressWarnings("nls")
     @Override

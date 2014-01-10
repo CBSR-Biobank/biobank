@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.ualberta.med.biobank.gui.common.widgets.ImageCanvas;
+import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionManager;
@@ -152,6 +153,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
             }
         } else {
             display = new GridContainerDisplay(containerType.getName());
+            Capacity capacity = containerType.getCapacity();
+            display.setStorageSize(capacity.getRowCapacity(), capacity.getColCapacity());
         }
 
         if (display != null) {
@@ -183,23 +186,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
             grid.setCellWidth(cellSize);
             grid.setCellHeight(cellSize);
         }
-    }
-
-    // FIXME: this method should be renamed, and should resize the display based on rows and columns
-    // and should know nothing about container types
-    @SuppressWarnings({ "nls", "unused" })
-    public void setContainerType(
-        ContainerType type,
-        Integer cellSize,
-        boolean createDefaultContainer) {
-        throw new IllegalStateException("no longer used");
-    }
-
-    // FIXME: this method should be renamed, and should resize the display based on rows and columns
-    // and should know nothing about container types
-    @SuppressWarnings({ "nls", "unused" })
-    public void setContainerType(ContainerType type) {
-        throw new IllegalStateException("no longer used");
     }
 
     @SuppressWarnings("nls")

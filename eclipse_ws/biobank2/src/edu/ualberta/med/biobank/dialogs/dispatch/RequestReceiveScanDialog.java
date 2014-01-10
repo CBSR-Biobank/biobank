@@ -72,13 +72,13 @@ public class RequestReceiveScanDialog extends ReceiveScanDialog<RequestWrapper> 
         return dispatchSpecimens;
     }
 
-    @Override
-    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        CellInfo cell, Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
-            cell,
-            locale);
-    }
+    // @Override
+    // protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+    // CellInfo cell, Locale locale) {
+    // return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+    // cell,
+    // locale);
+    // }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(

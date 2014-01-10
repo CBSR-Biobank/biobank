@@ -27,7 +27,7 @@ public class SpecimenStudyCenterReadPermission implements Permission {
     @Override
     public boolean isAllowed(ActionContext context) {
         Study study = null;
-        if (studyId == null) {
+        if (studyId != null) {
             study = context.load(Study.class, studyId);
         }
         Center center = context.load(Center.class, centerId);

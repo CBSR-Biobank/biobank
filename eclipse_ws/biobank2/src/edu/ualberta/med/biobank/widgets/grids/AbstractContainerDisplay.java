@@ -102,7 +102,7 @@ public abstract class AbstractContainerDisplay {
             parentLabel = container.getLabel();
         }
         if (containerType != null) {
-            return containerLabel + containerType.getPositionString(rowcol);
+            return parentLabel + containerType.getPositionString(rowcol);
         }
         return StringUtil.EMPTY_STRING;
     }

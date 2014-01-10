@@ -73,7 +73,6 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
-import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.PalletDimensions;
@@ -1251,8 +1250,6 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
             hotelWidget.setSelection(null);
             palletLabel.setText(i18n.tr("Pallet"));
             palletWidget.setCells(null);
-            palletWidget.setContainerType(null, PalletDisplay.SAMPLE_WIDTH,
-                true);
         }
         setScanHasBeenLaunched(isSingleMode() || !useScanner);
         initPalletValues();
@@ -1362,20 +1359,16 @@ public class SpecimenAssignEntryForm extends AbstractLinkAssignEntryForm {
 
             if (freezerContainer != null) {
                 freezerLabel.setText(freezerContainer.getFullInfoLabel());
-                freezerWidget.setContainerType(freezerContainer.getContainerType().getWrappedObject());
                 freezerWidget.setSelection(hotelContainer.getPositionAsRowCol());
                 freezerWidget.redraw();
             }
 
             hotelLabel.setText(hotelContainer.getFullInfoLabel());
-            hotelWidget.setContainerType(hotelContainer.getContainerType().getWrappedObject());
             hotelWidget.setSelection(currentMultipleContainer.getPositionAsRowCol());
             hotelWidget.redraw();
 
             palletLabel.setText(palletPositionText.getText());
 
-            palletWidget.setContainerType(
-                currentMultipleContainer.getContainerType().getWrappedObject());
             setContainerType(currentMultipleContainer.getContainerType().getWrappedObject());
             palletWidget.setCells(getCells());
 

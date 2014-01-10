@@ -30,13 +30,13 @@ public class DispatchReceiveScanDialog extends ReceiveScanDialog<DispatchWrapper
         super(parentShell, currentShipment, currentSite);
     }
 
-    @Override
-    protected Action<ProcessResult> getCellProcessAction(Integer centerId,
-        CellInfo cell, Locale locale) {
-        return new ShipmentReceiveProcessAction(getProcessData(), centerId,
-            cell,
-            locale);
-    }
+    // @Override
+    // protected Action<ProcessResult> getCellProcessAction(Integer centerId,
+    // CellInfo cell, Locale locale) {
+    // return new ShipmentReceiveProcessAction(getProcessData(), centerId,
+    // cell,
+    // locale);
+    // }
 
     @Override
     protected Action<ProcessResult> getPalletProcessAction(

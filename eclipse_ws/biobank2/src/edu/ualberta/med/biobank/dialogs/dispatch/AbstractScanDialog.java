@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,8 +34,10 @@ import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfoStatus;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.forms.linkassign.AbstractPalletSpecimenAdminForm;
 import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
@@ -299,8 +302,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
 
     protected abstract void doProceed() throws Exception;
 
-    protected abstract Action<ProcessResult> getCellProcessAction(
-        Integer centerId, CellInfo cell, Locale locale);
+    // protected abstract Action<ProcessResult> getCellProcessAction(
+    // Integer centerId, CellInfo cell, Locale locale);
 
     protected abstract Action<ProcessResult> getPalletProcessAction(
         Integer centerId, Map<RowColPos, CellInfo> cells, Locale locale);
@@ -343,8 +346,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             }
         });
 
-        if (SessionManager.getUser().getCurrentWorkingCenter() == null) {
-            throw new IllegalStateException("current workin center is null");
+        if (currentCenter == null) {
+            throw new IllegalStateException("current working center is null");
         }
 
         if (checkBeforeProcessing(currentCenter)) {
@@ -361,25 +364,26 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             // server side call
             ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
                 getPalletProcessAction(
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                    currentCenter.getId(),
                     serverCells,
                     Locale.getDefault()));
 
-            if (cells != null) {
-                // for each cell, convert into a client side cell
-                for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
-                    RowColPos pos = entry.getKey();
-                    SpecimenCell palletWell = cells.get(entry.getKey());
-                    CellInfo servercell = entry.getValue();
-                    if (palletWell == null) {
-                        // can happen if missing
-                        palletWell = new SpecimenCell(pos.getRow(), pos.getCol(), new DecodedWell(
-                            servercell.getRow(), servercell.getCol(), servercell.getValue()));
-                        cells.put(pos, palletWell);
-                    }
-                    palletWell.merge(SessionManager.getAppService(), servercell);
-                    specificScanPosProcess(palletWell);
+            Map<String, SpecimenBriefInfo> specimenDataMap =
+                AbstractPalletSpecimenAdminForm.getSpecimenData(
+                    currentCenter, new HashSet<SpecimenCell>(cells.values()));
+
+            for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
+                RowColPos pos = entry.getKey();
+                SpecimenCell palletWell = cells.get(entry.getKey());
+                CellInfo servercell = entry.getValue();
+                if (palletWell == null) {
+                    // can happen if missing
+                    palletWell = new SpecimenCell(pos.getRow(), pos.getCol(), new DecodedWell(
+                        servercell.getRow(), servercell.getCol(), servercell.getValue()));
+                    cells.put(pos, palletWell);
                 }
+                palletWell.merge(specimenDataMap.get(palletWell.getValue()), servercell);
+                specificScanPosProcess(palletWell);
             }
             setDecodeOkValue(res.getProcessStatus() != CellInfoStatus.ERROR);
         } else {
@@ -407,53 +411,45 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     @SuppressWarnings("nls")
     public void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception {
         log.debug("postprocessScanTubesManually: start");
-        // boolean errorFound = false;
+        boolean errorFound = false;
+
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
+        }
+
+        CenterWrapper<?> currentWorkingCenter = SessionManager.getUser().getCurrentWorkingCenter();
+        if (currentWorkingCenter == null) {
+            throw new IllegalStateException("current working center is null");
+        }
+
+        // conversion for server side call
+        Map<RowColPos, CellInfo> serverCells =
+            AbstractPalletSpecimenAdminForm.getServerSpecimenData(cells);
 
         // server side call
-        throw new IllegalStateException("needs refactoring");
+        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+            getPalletProcessAction(
+                currentWorkingCenter.getId(),
+                serverCells,
+                Locale.getDefault()));
 
-        // ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
-        // getPalletProcessAction(
-        // SessionManager.getUser().getCurrentWorkingCenter().getId(),
-        // cells,
-        // Locale.getDefault()));
-        //
-        // Set<String> inventoryIds = new HashSet<String>();
-        //
-        // for (SpecimenCell cell : cells) {
-        // String inventoryId = cell.getValue();
-        // if (inventoryId == null) {
-        // throw new IllegalStateException("cell has no inventory id");
-        // }
-        // inventoryIds.add(inventoryId);
-        // }
+        Map<String, SpecimenBriefInfo> specimenDataMap =
+            AbstractPalletSpecimenAdminForm.getSpecimenData(currentWorkingCenter, cells);
 
-        // List<SpecimenBriefInfo> specimenData = SessionManager.getAppService().doAction(
-        // new SpecimenSetGetInfoAction(
-        // SessionManager.getUser().getCurrentWorkingCenter().getWrappedObject(),
-        // inventoryIds)).getList();
-        //
-        // Map<String, SpecimenBriefInfo> specimenDataMap =
-        // SpecimenSetGetInfoAction.toMap(specimenData);
-        //
-        // for (SpecimenCell cell : cells) {
-        // Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
-        // CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-        // getCellProcessAction(SessionManager.getUser().getCurrentWorkingCenter().getId(),
-        // cell.transformIntoServerCell(),
-        // Locale.getDefault()));
-        // cell.merge(specimenDataMap.get(cell.getValue()), res.getCell());
-        // if (res.getProcessStatus() == CellInfoStatus.ERROR) {
-        // Button okButton = getButton(IDialogConstants.PROCEED_ID);
-        // okButton.setEnabled(false);
-        // errorFound = true;
-        // }
-        // specificScanPosProcess(cell);
-        // }
-        // palletWidget.redraw();
-        // setDecodeOkValue(scanStatus && !errorFound);
-        // setHasValues();
-        // log.debug("postprocessScanTubesManually: end");
+        for (SpecimenCell cell : cells) {
+            CellInfo cellServerInfo = res.getCells().get(cell.getRowColPos());
+            cell.merge(specimenDataMap.get(cell.getValue()), cellServerInfo);
+            if (res.getProcessStatus() == CellInfoStatus.ERROR) {
+                Button okButton = getButton(IDialogConstants.PROCEED_ID);
+                okButton.setEnabled(false);
+                errorFound = true;
+            }
+            specificScanPosProcess(cell);
+        }
+        palletWidget.redraw();
+        setDecodeOkValue(scanStatus && !errorFound);
+        setHasValues();
+        log.debug("postprocessScanTubesManually: end");
     }
 
     @Override
@@ -469,4 +465,5 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     public void setContainerType(ContainerType containerType) {
         palletScanManagement.setContainerType(containerType);
     }
+
 }

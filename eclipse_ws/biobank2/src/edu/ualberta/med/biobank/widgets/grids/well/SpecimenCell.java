@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.i18n.LString;
 import edu.ualberta.med.biobank.model.util.RowColPos;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.util.SbsLabeling;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
@@ -142,11 +141,6 @@ public class SpecimenCell extends AbstractUIWell {
         return palletScanned;
     }
 
-    public void merge(BiobankApplicationService appService, CellInfo servercell) {
-        throw new IllegalStateException("should be re-implemented");
-
-    }
-
     public void merge(SpecimenBriefInfo specimenBriefInfo, CellInfo cell) throws Exception {
         setStatus(cell.getStatus());
         if (cell.getInformation() != null) {
@@ -157,8 +151,12 @@ public class SpecimenCell extends AbstractUIWell {
         decodedWell = new DecodedWell(decodedWell.getLabel(), cell.getValue());
         setTitle(cell.getTitle().toString());
 
-        SpecimenWrapper specimen = new SpecimenWrapper(
-            SessionManager.getAppService(), specimenBriefInfo.getSpecimen());
+        SpecimenWrapper specimen;
+        if (specimenBriefInfo != null) {
+            specimen = new SpecimenWrapper(SessionManager.getAppService(), specimenBriefInfo.getSpecimen());
+        } else {
+            specimen = new SpecimenWrapper(SessionManager.getAppService());
+        }
         setExpectedSpecimen(specimen);
         setSpecimen(specimen);
     }

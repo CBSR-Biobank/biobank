@@ -582,6 +582,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
     /**
      * single assign. Display containers
      */
+    @SuppressWarnings("nls")
     protected void displaySinglePositions(boolean show) {
         if (isSingleMode()) {
             if (secondSingleParentWidget != null) {
@@ -604,22 +605,36 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                         secondParent = parentContainers.get(1);
                     if (parentContainers.size() >= 1)
                         firstParent = parentContainers.get(0);
-                    boolean hasThirdParent = thirdParent != null;
-                    widgetCreator.showWidget(thirdSingleParentWidget, hasThirdParent);
-                    widgetCreator.showWidget(thirdSingleParentLabel, hasThirdParent);
+                    boolean hasThirdParent = (thirdParent != null);
+
                     if (hasThirdParent) {
-                        thirdSingleParentWidget.setContainerType(
-                            thirdParent.getContainerType().getWrappedObject());
-                        thirdSingleParentWidget.setSelection(secondParent
-                            .getPositionAsRowCol());
+                        thirdSingleParentWidget = new ContainerDisplayWidget(
+                            singleVisualisation,
+                            null,
+                            "thirdSingleParentWidget",
+                            null,
+                            thirdParent.getContainerType().getWrappedObject(),
+                            true);
+                        toolkit.adapt(thirdSingleParentWidget);
+                        thirdSingleParentWidget.setSelection(secondParent.getPositionAsRowCol());
                         thirdSingleParentLabel.setText(thirdParent.getLabel());
                     }
+
+                    widgetCreator.showWidget(thirdSingleParentWidget, hasThirdParent);
+                    widgetCreator.showWidget(thirdSingleParentLabel, hasThirdParent);
+
                     boolean hasSecondParent = secondParent != null;
                     widgetCreator.showWidget(secondSingleParentWidget, hasSecondParent);
                     widgetCreator.showWidget(secondSingleParentLabel, hasSecondParent);
                     if (hasSecondParent) {
-                        secondSingleParentWidget.setContainerType(
-                            secondParent.getContainerType().getWrappedObject());
+                        secondSingleParentWidget = new ContainerDisplayWidget(
+                            singleVisualisation,
+                            null,
+                            "secondSingleParentWidget",
+                            null,
+                            secondParent.getContainerType().getWrappedObject(),
+                            true);
+                        toolkit.adapt(secondSingleParentWidget);
                         secondSingleParentWidget.setSelection(firstParent.getPositionAsRowCol());
                         secondSingleParentLabel.setText(secondParent.getLabel());
                     }

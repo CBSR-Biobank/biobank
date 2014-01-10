@@ -47,7 +47,6 @@ import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.PalletDisplay;
 import edu.ualberta.med.biobank.widgets.infotables.CommentsInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -350,8 +349,6 @@ public class SpecimenViewForm extends BiobankViewForm {
                 toolkit.createLabel(containerComposite, sb.toString());
                 ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
                     containerComposite, SpecimenViewForm.class.getSimpleName());
-                containerWidget.setContainerType(container.getContainerType(),
-                    PalletDisplay.SAMPLE_WIDTH, false);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);
             }

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.forms.linkassign;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,9 +34,11 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.scanprocess.CellInfo;
-import edu.ualberta.med.biobank.common.action.scanprocess.result.CellProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ProcessResult;
 import edu.ualberta.med.biobank.common.action.scanprocess.result.ScanProcessResult;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenBriefInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenSetGetInfoAction;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
@@ -44,6 +48,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAdminForm
     implements IDecodePalletManagement, ModifyListener {
@@ -97,6 +102,11 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     @Override
     @SuppressWarnings("nls")
     public void processDecodeResult() throws Exception {
+        CenterWrapper<?> currentWorkingCenter = SessionManager.getUser().getCurrentWorkingCenter();
+        if (currentWorkingCenter == null) {
+            throw new IllegalStateException("current working center is null");
+        }
+
         setScanHasBeenLaunched(false, true);
 
         Map<RowColPos, SpecimenCell> cells = getCells();
@@ -111,37 +121,40 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
         // server side call
         ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
             getPalletProcessAction(
-                SessionManager.getUser().getCurrentWorkingCenter().getId(),
+                currentWorkingCenter.getId(),
                 serverCells,
                 Locale.getDefault()));
 
         // print result logs
         appendLogs(res.getLogs());
 
-        if (cells != null) {
-            // for each cell, convert into a client side cell
-            for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
-                RowColPos pos = entry.getKey();
-                SpecimenCell palletCell = cells.get(entry.getKey());
-                CellInfo servercell = entry.getValue();
-                if (palletCell == null) {
-                    // can happen if missing no tube in this cell
-                    palletCell = new SpecimenCell(
-                        pos.getRow(),
-                        pos.getCol(),
-                        new DecodedWell(
-                            servercell.getRow(),
-                            servercell.getCol(),
-                            servercell.getValue()));
-                    cells.put(pos, palletCell);
-                    log.debug("processScanResult: palletCell is null: pos ({}, {})",
-                        pos.getRow(), pos.getCol());
-                }
-                palletCell.merge(SessionManager.getAppService(), servercell);
-                // additional cell specific client conversion if needed
-                processCellResult(pos, palletCell);
+        Map<String, SpecimenBriefInfo> specimenDataMap =
+            AbstractPalletSpecimenAdminForm.getSpecimenData(
+                currentWorkingCenter, new HashSet<SpecimenCell>(cells.values()));
+
+        // for each cell, convert into a client side cell
+        for (Entry<RowColPos, CellInfo> entry : res.getCells().entrySet()) {
+            RowColPos pos = entry.getKey();
+            SpecimenCell palletCell = cells.get(entry.getKey());
+            CellInfo servercell = entry.getValue();
+            if (palletCell == null) {
+                // can happen if missing no tube in this cell
+                palletCell = new SpecimenCell(
+                    pos.getRow(),
+                    pos.getCol(),
+                    new DecodedWell(
+                        servercell.getRow(),
+                        servercell.getCol(),
+                        servercell.getValue()));
+                cells.put(pos, palletCell);
+                log.debug("processScanResult: palletCell is null: pos ({}, {})",
+                    pos.getRow(), pos.getCol());
             }
+            palletCell.merge(specimenDataMap.get(palletCell.getValue()), servercell);
+            // additional cell specific client conversion if needed
+            processCellResult(pos, palletCell);
         }
+
         currentScanState = UICellStatus.valueOf(res.getProcessStatus().name());
         setScanValid(getCells() != null && !getCells().isEmpty()
             && currentScanState != UICellStatus.ERROR);
@@ -168,16 +181,29 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     @SuppressWarnings("nls")
     @Override
     public void postProcessDecodeTubesManually(Set<SpecimenCell> cells) throws Exception {
+        CenterWrapper<?> currentWorkingCenter = SessionManager.getUser().getCurrentWorkingCenter();
+        if (currentWorkingCenter == null) {
+            throw new IllegalStateException("current working center is null");
+        }
+
+        Map<RowColPos, CellInfo> serverCells =
+            AbstractPalletSpecimenAdminForm.getServerSpecimenData(cells);
+
+        ScanProcessResult res = (ScanProcessResult) SessionManager.getAppService().doAction(
+            getPalletProcessAction(
+                currentWorkingCenter.getId(),
+                serverCells,
+                Locale.getDefault()));
+
+        Map<String, SpecimenBriefInfo> specimenDataMap =
+            AbstractPalletSpecimenAdminForm.getSpecimenData(currentWorkingCenter, cells);
+
         for (SpecimenCell palletCell : cells) {
+            CellInfo cellServerInfo = res.getCells().get(palletCell.getRowColPos());
             appendLog(NLS.bind("Tube {0} scanned and set to position {1}", palletCell.getValue(),
                 palletScanManagement.getContainerType().getPositionString(palletCell.getRowColPos())));
             beforeScanTubeAlone();
-            CellProcessResult res = (CellProcessResult) SessionManager.getAppService().doAction(
-                getCellProcessAction(
-                    SessionManager.getUser().getCurrentWorkingCenter().getId(),
-                    palletCell.transformIntoServerCell(),
-                    Locale.getDefault()));
-            palletCell.merge(SessionManager.getAppService(), res.getCell());
+            palletCell.merge(specimenDataMap.get(palletCell.getValue()), cellServerInfo);
             appendLogs(res.getLogs());
             processCellResult(palletCell.getRowColPos(), palletCell);
             currentScanState = currentScanState.mergeWith(palletCell.getStatus());
@@ -379,4 +405,58 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     protected void setFakeContainerType(int rows, int cols) {
         palletScanManagement.setFakeContainerType(rows, cols);
     }
+
+    /**
+     * Returns the information stored on the server for each specimen inventory ID passed in. If the
+     * inventory ID is not in the database then nothing is returned.
+     * 
+     * @param currentWorkingCenter
+     * @param cells
+     * @return
+     * @throws ApplicationException
+     */
+    @SuppressWarnings("nls")
+    public static Map<String, SpecimenBriefInfo> getSpecimenData(
+        CenterWrapper<?> currentWorkingCenter,
+        Set<SpecimenCell> cells)
+        throws ApplicationException {
+        Set<String> inventoryIds = new HashSet<String>();
+
+        for (SpecimenCell cell : cells) {
+            String inventoryId = cell.getValue();
+            if (inventoryId == null) {
+                throw new IllegalStateException("cell has no inventory id");
+            }
+            inventoryIds.add(inventoryId);
+        }
+
+        List<SpecimenBriefInfo> specimenData = SessionManager.getAppService().doAction(
+            new SpecimenSetGetInfoAction(
+                currentWorkingCenter.getWrappedObject(),
+                inventoryIds)).getList();
+
+        return SpecimenSetGetInfoAction.toMap(specimenData);
+    }
+
+    /**
+     * Conversion for server side call.
+     * 
+     * @param cells
+     * @return
+     */
+    @SuppressWarnings("nls")
+    public static Map<RowColPos, CellInfo> getServerSpecimenData(Set<SpecimenCell> cells) {
+        if (cells == null) {
+            throw new IllegalArgumentException("cells is null");
+        }
+
+        Map<RowColPos, CellInfo> serverCells = new HashMap<RowColPos, CellInfo>();
+        for (SpecimenCell cell : cells) {
+            serverCells.put(cell.getRowColPos(), cell.transformIntoServerCell());
+        }
+
+        return serverCells;
+
+    }
+
 }
