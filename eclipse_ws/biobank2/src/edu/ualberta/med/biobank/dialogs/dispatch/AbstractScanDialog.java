@@ -159,11 +159,14 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             IStatus.ERROR);
     }
 
-    @SuppressWarnings("nls")
     protected void decodeButtonSelected() {
-        log.debug("decodeButtonSelected");
+        setContainerType(null);
+        decodeAndProcessResult();
+    }
+
+    protected void decodeAndProcessResult() {
         setDecodeOkValue(false);
-        palletScanManagement.launchScanAndProcessResult();
+        palletScanManagement.decodeAndProcessResult();
     }
 
     @SuppressWarnings("unused")

@@ -133,18 +133,17 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     @SuppressWarnings("nls")
     @Override
     protected void decodeButtonSelected() {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @Override
-            public void run() {
-                currentPallet = null;
-                if (isPalletWithPosition) {
+        currentPallet = null;
+        if (isPalletWithPosition) {
+            BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+                @Override
+                public void run() {
                     if (currentCenter instanceof SiteWrapper) {
                         try {
                             SiteWrapper site = (SiteWrapper) currentCenter;
                             Container container = new Container();
                             container.setProductBarcode(currentProductBarcode);
-                            List<Container> containers;
-                            containers = SessionManager.getAppService().doAction(
+                            List<Container> containers = SessionManager.getAppService().doAction(
                                 new ContainerGetInfoAction(container, site.getWrappedObject()))
                                 .getList();
 
@@ -153,15 +152,23 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
                                     i18n.tr("Pallet error"),
                                     i18n.tr("Can''t find pallet with barcode \"{0}\".",
                                         currentProductBarcode));
-                            } else if (containers.size() > 1) {
-                                throw new IllegalStateException(
-                                    "ContainerGetInfoAction returned more than one container for product barcode "
-                                        + currentProductBarcode);
-                            }
+                            } else {
+                                if (containers.size() > 1) {
+                                    throw new IllegalStateException(
+                                        "ContainerGetInfoAction returned more than one container for product barcode "
+                                            + currentProductBarcode);
+                                }
 
-                            currentPallet = new ContainerWrapper(
-                                SessionManager.getAppService(), containers.get(0));
-                            setContainerType(currentPallet.getContainerType().getWrappedObject());
+                                currentPallet = new ContainerWrapper(
+                                    SessionManager.getAppService(), containers.get(0));
+                                setContainerType(currentPallet.getContainerType().getWrappedObject());
+                                Display.getDefault().asyncExec(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DispatchCreateScanDialog.super.decodeAndProcessResult();
+                                    }
+                                });
+                            }
                         } catch (ApplicationException e) {
                             BgcPlugin.openError(
                                 // TR: dialog title
@@ -169,13 +176,11 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
                         }
                     }
                 }
-            }
-        });
-
-        if (!isPalletWithPosition) {
+            });
+        } else {
             setContainerType(null);
+            super.decodeAndProcessResult();
         }
-        super.decodeButtonSelected();
 
     }
 

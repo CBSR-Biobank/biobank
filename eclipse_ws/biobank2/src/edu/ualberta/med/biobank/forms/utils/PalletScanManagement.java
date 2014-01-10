@@ -91,7 +91,7 @@ public class PalletScanManagement {
     }
 
     @SuppressWarnings("nls")
-    public void launchScanAndProcessResult() {
+    public void decodeAndProcessResult() {
         Set<PalletDimensions> validPlateDimensions;
         DecodeImageDialog dialog;
 

@@ -253,7 +253,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends AbstractSpecimenAd
     }
 
     protected void launchScanAndProcessResult() {
-        palletScanManagement.launchScanAndProcessResult();
+        palletScanManagement.decodeAndProcessResult();
         refreshPalletDisplay();
     }
 
