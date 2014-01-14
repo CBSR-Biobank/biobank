@@ -127,7 +127,7 @@ public class ImageCanvas extends Canvas {
                 // do nothing
             }
         });
-
+        setFocus();
     }
 
     @SuppressWarnings("nls")
@@ -156,7 +156,8 @@ public class ImageCanvas extends Canvas {
             throw new IllegalStateException("source image is null");
         }
 
-        Rectangle clientRect = getClientArea();
+        Rectangle clientRect = super.getClientArea();
+        // log.debug("clippedSourceImage: clientRect: {}", clientRect);
         Rectangle2D.Double clientRectDouble = Swt2DUtil.rectangleToDouble(clientRect);
 
         Rectangle2D.Double canvasRectTf = Swt2DUtil.inverseTransformRect(sourceImageToCanvasTransform, clientRectDouble);
@@ -206,7 +207,6 @@ public class ImageCanvas extends Canvas {
             Rectangle clientRect = getClientArea();
             gc.setClipping(clientRect);
             gc.fillRectangle(clientRect);
-            initScrollBars();
         }
     }
 
@@ -321,7 +321,9 @@ public class ImageCanvas extends Canvas {
         AffineTransform af = sourceImageToCanvasTransform;
         double sx = af.getScaleX(), sy = af.getScaleY();
         double tx = af.getTranslateX(), ty = af.getTranslateY();
-        int cw = getClientArea().width, ch = getClientArea().height;
+        Rectangle clientArea = getClientArea();
+        int cw = clientArea.width;
+        int ch = clientArea.height;
 
         if (tx > 0) tx = 0;
         if (ty > 0) ty = 0;

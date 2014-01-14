@@ -31,6 +31,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  */
 public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AbstractGridDisplay.class.getName());
 
     private static final int IMAGE_BORDER_SIZE = 2;

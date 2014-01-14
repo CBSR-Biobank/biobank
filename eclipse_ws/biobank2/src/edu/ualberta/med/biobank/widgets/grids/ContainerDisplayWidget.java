@@ -9,7 +9,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -70,6 +69,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         List<UICellStatus> cellStatus) {
 
         super(widgetParent, SWT.DOUBLE_BUFFERED);
+
         multiSelectionManager = new MultiSelectionManager(this);
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
@@ -319,13 +319,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public RowColPos getPositionAtCoordinates(int x, int y) {
         log.trace("getPositionAtCoordinates");
         return containerDisplay.getPositionAtCoordinates(x, y);
-    }
-
-    @SuppressWarnings("nls")
-    @Override
-    public Rectangle getClientArea() {
-        log.trace("getClientArea");
-        return containerDisplay.getClientArea();
     }
 
     public void updateCells() {

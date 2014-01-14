@@ -139,13 +139,13 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         });
         decodeButton.setEnabled(false);
 
-        palletWidget = createScanPalletWidget(contents, SbsLabeling.ROW_DEFAULT, SbsLabeling.COL_DEFAULT);
+        palletWidget = createScanPalletWidget(contents);
 
         scanStatus = false;
         widgetCreator.addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
             scanStatusObservable,
-            i18n.tr("Error in scan result. Please keep only specimens with no errors."),
+            i18n.tr("Error in scan result. Please, only keep specimens without errors."),
             IStatus.ERROR);
         widgetCreator.addBooleanBinding(
             new WritableValue(Boolean.FALSE, Boolean.class),
@@ -167,6 +167,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     protected void decodeAndProcessResult() {
         setDecodeOkValue(false);
         palletScanManagement.decodeAndProcessResult();
+        palletWidget.setVisible(true);
     }
 
     @SuppressWarnings("unused")
@@ -318,8 +319,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
         palletScanManagement.onReset();
     }
 
-    private PalletWidget createScanPalletWidget(Composite contents, int rows, int cols) {
-        PalletWidget palletWidget = new PalletWidget(contents, getPalletCellStatus(), rows, cols);
+    private PalletWidget createScanPalletWidget(Composite contents) {
+        PalletWidget palletWidget = new PalletWidget(
+            contents,
+            getPalletCellStatus(),
+            SbsLabeling.ROW_DEFAULT,
+            SbsLabeling.COL_DEFAULT);
 
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -328,6 +333,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
                     palletScanManagement.scanTubesManually(e, ScanManualOption.NO_DUPLICATES);
             }
         });
+        palletWidget.setVisible(false);
         return palletWidget;
     }
 
