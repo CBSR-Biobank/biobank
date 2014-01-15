@@ -27,17 +27,18 @@ import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 
 public class DispatchSaveAction implements Action<IdResult> {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
+
     private DispatchSaveInfo dInfo;
+
     private final Set<DispatchSpecimenInfo> dsInfos;
+
     private final ShipmentInfoSaveInfo siInfo;
 
-    public DispatchSaveAction(DispatchSaveInfo dInfo,
-        Set<DispatchSpecimenInfo> dsInfos, ShipmentInfoSaveInfo siInfo) {
+    public DispatchSaveAction(
+        DispatchSaveInfo dInfo,
+        Set<DispatchSpecimenInfo> dsInfos,
+        ShipmentInfoSaveInfo siInfo) {
         this.dInfo = dInfo;
         this.dsInfos = dsInfos;
         this.siInfo = siInfo;
@@ -59,7 +60,7 @@ public class DispatchSaveAction implements Action<IdResult> {
             specimenMicroplateInfos.add(smi);
         }
         new SpecimenMicroplateConsistentAction(
-                dInfo.receiverId, false, specimenMicroplateInfos).run(context);
+            dInfo.receiverId, false, specimenMicroplateInfos).run(context);
 
         Dispatch disp = context.get(Dispatch.class, dInfo.dispatchId, new Dispatch());
 

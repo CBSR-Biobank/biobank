@@ -101,8 +101,7 @@ public class SpecimenActionHelper {
         } else if ((rcp == null && containerId != null)
             || (rcp != null && containerId == null)) {
             throw new LocalizedException(
-                bundle
-                    .tr("Parent container and position should either both be set or both be null")
+                bundle.tr("Parent container and position should either both be set or both be null")
                     .format());
         }
     }

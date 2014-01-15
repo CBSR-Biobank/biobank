@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.action.ActionContext;
 import edu.ualberta.med.biobank.common.action.IdResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
+import edu.ualberta.med.biobank.common.action.specimen.SpecimenActionHelper;
 import edu.ualberta.med.biobank.common.permission.dispatch.DispatchChangeStatePermission;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Center;
@@ -52,17 +53,19 @@ public class DispatchChangeStateAction implements Action<IdResult> {
                 ds.getSpecimen().setActivityStatus(ActivityStatus.FLAGGED);
             }
         } else if (newState.equals(DispatchState.IN_TRANSIT)) {
-            // update the current center on the specimens
+            // update the current center on the specimens and clear the previous position
             Center receiverCenter = dispatch.getReceiverCenter();
 
             @SuppressWarnings({ "unchecked", "nls" })
-            List<DispatchSpecimen> list = context.getSession().createCriteria(DispatchSpecimen.class)
+            List<DispatchSpecimen> list = context.getSession()
+                .createCriteria(DispatchSpecimen.class)
                 .add(Restrictions.eq("dispatch", dispatch))
                 .setFetchMode("specimen", FetchMode.JOIN).list();
 
             for (DispatchSpecimen dispatchSpecimen : list) {
                 Specimen specimen = dispatchSpecimen.getSpecimen();
                 specimen.setCurrentCenter(receiverCenter);
+                SpecimenActionHelper.setPosition(context, specimen, null, null);
                 context.getSession().saveOrUpdate(specimen);
             }
         }

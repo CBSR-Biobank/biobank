@@ -21,10 +21,13 @@ import edu.ualberta.med.biobank.common.action.info.DispatchSaveInfo;
 import edu.ualberta.med.biobank.common.action.info.DispatchSpecimenInfo;
 import edu.ualberta.med.biobank.common.action.info.ShipmentInfoSaveInfo;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchSpecimen;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 import edu.ualberta.med.biobank.model.type.DispatchState;
 import edu.ualberta.med.biobank.test.action.helper.DispatchHelper;
 import edu.ualberta.med.biobank.test.action.helper.ShipmentInfoHelper;
@@ -71,8 +74,8 @@ public class TestDispatch extends TestAction {
 
         @SuppressWarnings("unchecked")
         List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
-        .add(Restrictions.eq("dispatch.id", dispatchId))
-        .setFetchMode("specimen", FetchMode.JOIN).list();
+            .add(Restrictions.eq("dispatch.id", dispatchId))
+            .setFetchMode("specimen", FetchMode.JOIN).list();
 
         for (DispatchSpecimen dispatchSpecimen : list) {
             Specimen specimen = dispatchSpecimen.getSpecimen();
@@ -114,14 +117,14 @@ public class TestDispatch extends TestAction {
     }
 
     /*
-     * Ensure current centre on specimens has been updated after a dispatch goes into
-     * IN_TRANSIT state.
+     * Ensure current centre on specimens has been updated after a dispatch goes into IN_TRANSIT
+     * state.
      */
     @Test
     public void specimenCurrentCenter() throws Exception {
         session.beginTransaction();
         Dispatch dispatch = factory.createDispatch(clinic, site);
-        DispatchSpecimen [] dispatchSpecimens = new DispatchSpecimen [] {
+        DispatchSpecimen[] dispatchSpecimens = new DispatchSpecimen[] {
             factory.createDispatchSpecimen(),
             factory.createDispatchSpecimen()
         };
@@ -139,11 +142,73 @@ public class TestDispatch extends TestAction {
         session.clear();
         @SuppressWarnings("unchecked")
         List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
-        .add(Restrictions.eq("dispatch.id", dispatch.getId()))
-        .setFetchMode("specimen", FetchMode.JOIN).list();
+            .add(Restrictions.eq("dispatch.id", dispatch.getId()))
+            .setFetchMode("specimen", FetchMode.JOIN).list();
 
         for (DispatchSpecimen dispatchSpecimen : list) {
             Assert.assertEquals(site, dispatchSpecimen.getSpecimen().getCurrentCenter());
+        }
+    }
+
+    /**
+     * The positions on the specimens mus be cleared when the dispatch state is set to IN_TRANSIT.
+     * 
+     */
+    @Test
+    public void specimenPosition() throws Exception {
+        session.beginTransaction();
+
+        Center receivingSite = factory.createSite();
+        Center sendingSite = factory.createSite();
+        Container container = factory.createContainer();
+
+        Dispatch dispatch = factory.createDispatch(sendingSite, receivingSite);
+        DispatchSpecimen[] dispatchSpecimens = new DispatchSpecimen[] {
+            factory.createDispatchSpecimen(),
+            factory.createDispatchSpecimen()
+        };
+
+        int row = 0;
+        ContainerType containerType = container.getContainerType();
+        for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
+            Specimen spc = dispatchSpecimen.getSpecimen();
+
+            containerType.getSpecimenTypes().add(spc.getSpecimenType());
+            session.update(containerType);
+            session.flush();
+
+            SpecimenPosition pos = new SpecimenPosition();
+            pos.setContainer(container);
+            pos.setSpecimen(spc);
+            pos.setRow(row);
+            pos.setCol(0);
+            pos.setPositionString("A1");
+
+            spc.setSpecimenPosition(pos);
+            ++row;
+        }
+
+        ShippingMethod shippingMethod = factory.createShippingMethod();
+        session.getTransaction().commit();
+
+        for (DispatchSpecimen dispatchSpecimen : dispatchSpecimens) {
+            Assert.assertEquals(sendingSite, dispatchSpecimen.getSpecimen().getCurrentCenter());
+            Assert.assertNotNull(dispatchSpecimen.getSpecimen().getSpecimenPosition());
+        }
+
+        exec(new DispatchChangeStateAction(dispatch.getId(), DispatchState.IN_TRANSIT,
+            new ShipmentInfoSaveInfo(null, getMethodNameR(), new Date(), new Date(),
+                getMethodNameR(), shippingMethod.getId())));
+        session.clear();
+
+        @SuppressWarnings("unchecked")
+        List<DispatchSpecimen> list = session.createCriteria(DispatchSpecimen.class)
+            .add(Restrictions.eq("dispatch.id", dispatch.getId()))
+            .setFetchMode("specimen", FetchMode.JOIN).list();
+
+        for (DispatchSpecimen dispatchSpecimen : list) {
+            Assert.assertEquals(receivingSite, dispatchSpecimen.getSpecimen().getCurrentCenter());
+            Assert.assertEquals(null, dispatchSpecimen.getSpecimen().getSpecimenPosition());
         }
     }
 
@@ -151,7 +216,7 @@ public class TestDispatch extends TestAction {
     public void getDispatchInfo() throws Exception {
         session.beginTransaction();
         Dispatch dispatch = factory.createDispatch(clinic, site);
-        DispatchSpecimen [] dispatchSpecimens = new DispatchSpecimen [] {
+        DispatchSpecimen[] dispatchSpecimens = new DispatchSpecimen[] {
             factory.createDispatchSpecimen(),
             factory.createDispatchSpecimen()
         };
