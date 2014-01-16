@@ -45,9 +45,11 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final MultiSelectionManager multiSelectionManager;
 
-    private/* final */AbstractContainerDisplay containerDisplay;
+    private AbstractContainerDisplay containerDisplay;
 
     private final IContainerDisplayWidget tooltipCallback;
+
+    private final boolean manageOwnSize;
 
     /**
      * max width this container will have : used to calculate cells width
@@ -61,13 +63,25 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final String name;
 
+    /**
+     * 
+     * @param widgetParent
+     * @param tooltipCallback
+     * @param name
+     * @param containerDisplay
+     * @param cellStatus
+     * @param manageOwnSize When set to true, the size of the widget depends on
+     *            {@link containerDisplay}. Set this to false to have the the image displayed with
+     *            scroll bars (when needed).
+     */
     @SuppressWarnings("nls")
     public ContainerDisplayWidget(
         Composite widgetParent,
         IContainerDisplayWidget tooltipCallback,
         String name,
         AbstractContainerDisplay containerDisplay,
-        List<UICellStatus> cellStatus) {
+        List<UICellStatus> cellStatus,
+        boolean manageOwnSize) {
 
         super(widgetParent, SWT.DOUBLE_BUFFERED);
 
@@ -75,6 +89,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
         this.tooltipCallback = tooltipCallback;
+        this.manageOwnSize = manageOwnSize;
 
         if (containerDisplay == null) {
             throw new IllegalArgumentException("container display is null");
@@ -120,11 +135,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
             tooltipCallback,
             name,
             getContainerDisplayFromType(name, containerType, createDefaultContainer),
-            cellStatus);
-    }
-
-    public ContainerDisplayWidget(Composite parent, IContainerDisplayWidget callback, String name) {
-        this(parent, callback, name, null, null);
+            cellStatus,
+            true);
     }
 
     public ContainerDisplayWidget(Composite parent, String name) {
@@ -133,7 +145,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
             null,
             name,
             getContainerDisplayFromType(name, null, true),
-            null);
+            null,
+            true);
     }
 
     @SuppressWarnings("nls")
@@ -327,8 +340,12 @@ public class ContainerDisplayWidget extends ImageCanvas {
     @SuppressWarnings("nls")
     @Override
     public Rectangle getClientArea() {
-        log.trace("getClientArea");
-        return containerDisplay.getClientArea();
+        if (manageOwnSize) {
+            log.trace("getClientArea");
+            return containerDisplay.getClientArea();
+        }
+
+        return super.getClientArea();
     }
 
 }

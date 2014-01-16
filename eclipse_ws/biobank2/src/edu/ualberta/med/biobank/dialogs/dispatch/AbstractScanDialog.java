@@ -138,6 +138,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             }
         });
         decodeButton.setEnabled(false);
+        GridData gd = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+        decodeButton.setLayoutData(gd);
 
         palletWidget = createScanPalletWidget(contents);
 
@@ -324,7 +326,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             contents,
             getPalletCellStatus(),
             SbsLabeling.ROW_DEFAULT,
-            SbsLabeling.COL_DEFAULT);
+            SbsLabeling.COL_DEFAULT,
+            false);
 
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override

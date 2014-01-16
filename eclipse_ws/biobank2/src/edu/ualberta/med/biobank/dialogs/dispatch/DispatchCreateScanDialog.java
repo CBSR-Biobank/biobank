@@ -84,10 +84,11 @@ public class DispatchCreateScanDialog extends AbstractScanDialog<DispatchWrapper
     @SuppressWarnings("nls")
     @Override
     protected void createCustomDialogPreContents(final Composite parent) {
-        Assert.isNotNull(SessionManager.getUser().getCurrentWorkingCenter());
+        CenterWrapper<?> currentWorkingCenter = SessionManager.getUser().getCurrentWorkingCenter();
+        Assert.isNotNull(currentWorkingCenter);
 
         // only sites have containers
-        if (SessionManager.getUser().getCurrentWorkingCenter() instanceof SiteWrapper) {
+        if (currentWorkingCenter instanceof SiteWrapper) {
             Button palletWithoutPositionRadio = new Button(parent, SWT.RADIO);
             palletWithoutPositionRadio.setText(i18n.tr("Pallet without previous position"));
             final Button palletWithPositionRadio = new Button(parent, SWT.RADIO);

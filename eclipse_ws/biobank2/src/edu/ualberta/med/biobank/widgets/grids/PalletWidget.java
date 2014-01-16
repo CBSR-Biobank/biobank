@@ -33,25 +33,28 @@ public class PalletWidget extends ContainerDisplayWidget {
         };
 
     public PalletWidget(Composite parent) {
-        this(parent, null);
-    }
-
-    public PalletWidget(Composite parent, List<UICellStatus> cellStatus) {
         super(
             parent,
             TOOLTIP_CALLBACK,
             PalletWidget.class.getSimpleName(),
             new PalletDisplay(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT),
-            cellStatus);
+            null,
+            false);
     }
 
-    public PalletWidget(Composite parent, List<UICellStatus> cellStatus, int rows, int cols) {
+    public PalletWidget(
+        Composite parent,
+        List<UICellStatus> cellStatus,
+        int rows,
+        int cols,
+        boolean manageOwnSize) {
         super(
             parent,
             TOOLTIP_CALLBACK,
             PalletWidget.class.getSimpleName(),
             new PalletDisplay(rows, cols),
-            cellStatus);
+            cellStatus,
+            manageOwnSize);
     }
 
     @SuppressWarnings("nls")

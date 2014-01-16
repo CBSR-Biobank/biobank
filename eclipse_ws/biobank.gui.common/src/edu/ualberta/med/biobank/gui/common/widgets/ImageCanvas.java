@@ -92,6 +92,7 @@ public class ImageCanvas extends Canvas {
         // super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND);
         addListeners();
         initScrollBars();
+        autoHideScrollBars();
     }
 
     private void addListeners() {
@@ -304,6 +305,7 @@ public class ImageCanvas extends Canvas {
 
         sourceImage = image;
         syncScrollBars();
+        autoHideScrollBars();
     }
 
     /**
@@ -335,13 +337,11 @@ public class ImageCanvas extends Canvas {
             /* image is wider than client area */
             horizontal.setMaximum((int) (imageBound.width * sx));
             horizontal.setEnabled(true);
-            horizontal.setVisible(true);
             if (((int) -tx) > horizontal.getMaximum() - cw)
                 tx = -horizontal.getMaximum() + cw;
         } else {
             /* image is narrower than client area */
             horizontal.setEnabled(false);
-            horizontal.setVisible(false);
             tx = (cw - imageBound.width * sx) / 2; // center if too small.
         }
         horizontal.setSelection((int) (-tx));
@@ -354,13 +354,11 @@ public class ImageCanvas extends Canvas {
             /* image is higher than client area */
             vertical.setMaximum((int) (imageBound.height * sy));
             vertical.setEnabled(true);
-            vertical.setVisible(true);
             if (((int) -ty) > vertical.getMaximum() - ch)
                 ty = -vertical.getMaximum() + ch;
         } else {
             /* image is less higher than client area */
             vertical.setEnabled(false);
-            vertical.setVisible(false);
             ty = (ch - imageBound.height * sy) / 2; // center if too small.
         }
         vertical.setSelection((int) (-ty));
@@ -372,6 +370,22 @@ public class ImageCanvas extends Canvas {
         sourceImageToCanvasTransform = af;
 
         redraw();
+    }
+
+    /**
+     * Displays or hides the scroll bars if they are needed.
+     */
+    @SuppressWarnings("nls")
+    public void autoHideScrollBars() {
+        ScrollBar horizontal = getHorizontalBar();
+        boolean horizontalVisible = horizontal.getEnabled();
+        horizontal.setVisible(horizontalVisible);
+        log.debug("autoHideScrollBars: horizontalVisible: {}", horizontalVisible);
+
+        ScrollBar vertical = getVerticalBar();
+        boolean verticalVisisble = vertical.getEnabled();
+        vertical.setVisible(verticalVisisble);
+        log.debug("autoHideScrollBars: verticalVisisble: {}", verticalVisisble);
     }
 
     /**
