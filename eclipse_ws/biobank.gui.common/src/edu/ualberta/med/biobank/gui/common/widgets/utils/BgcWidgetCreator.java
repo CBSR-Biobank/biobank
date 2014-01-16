@@ -763,8 +763,9 @@ public class BgcWidgetCreator {
     public void showWidget(Control widget, boolean show) {
         widget.setVisible(show);
         GridData gd = (GridData) widget.getLayoutData();
-        if (gd != null)
+        if (gd != null) {
             gd.exclude = !show;
+        }
     }
 
     public void showWidget(Control widget) {

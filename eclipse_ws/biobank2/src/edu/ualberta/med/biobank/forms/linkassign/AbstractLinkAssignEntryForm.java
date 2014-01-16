@@ -387,7 +387,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
         gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
         gd.horizontalSpan = 2;
-        gd.exclude = true;
+        // gd.exclude = true;
         freezerComposite.setLayoutData(gd);
 
         freezerLabel = toolkit.createLabel(freezerComposite,
@@ -407,7 +407,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         hotelComposite.setLayout(layout);
 
         gd = new GridData(SWT.BEGINNING, SWT.FILL, false, true);
-        gd.exclude = true;
+        // gd.exclude = true;
         hotelComposite.setLayoutData(gd);
         hotelLabel = toolkit.createLabel(hotelComposite,
             // TR: label
