@@ -31,10 +31,9 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
  */
 public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AbstractGridDisplay.class.getName());
 
-    private static final int IMAGE_BORDER_SIZE = 2;
+    private static final int IMAGE_BORDER_SIZE = 5;
 
     private int cellWidth = 60;
 
@@ -87,7 +86,8 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         Rectangle clientArea = getClientArea();
         Image image = new Image(display, clientArea.width, clientArea.height);
 
-        Rectangle2D.Double cellRect = new Rectangle2D.Double(0, 0, cellWidth, cellHeight);
+        Rectangle2D.Double cellRect = new Rectangle2D.Double(
+            IMAGE_BORDER_SIZE, IMAGE_BORDER_SIZE, cellWidth, cellHeight);
 
         RowColPos widgetSelection = displayWidget.getSelection();
         Map<RowColPos, ? extends AbstractUIWell> cells = displayWidget.getCells();
@@ -145,10 +145,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return image;
     }
 
+    @SuppressWarnings("nls")
     @Override
     protected Rectangle getClientArea() {
         int width;
         int height;
+
+        log.debug("getClientArea: name: {}", containerLabel);
 
         if ((maxWidth >= 0) && (maxHeight >= 0)) {
             width = maxWidth;
@@ -156,10 +159,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
             cellWidth = maxWidth / columns;
             cellHeight = maxHeight / rows;
+            log.debug("getClientArea: cellWidth and cellHeight dependent on max width and height");
         } else {
             width = cellWidth * columns;
             height = cellHeight * rows;
+            log.debug("getClientArea: width and height dependent on default cell width and height");
         }
+
+        log.debug("getClientArea: rows: {}, columns: {}", rows, columns);
+        log.debug("getClientArea: cellWidth: {}, cellHeight: {}", cellWidth, cellHeight);
 
         gridWidth = width;
         gridHeight = height;
@@ -169,13 +177,13 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
         if (legendStatus != null) {
             if (legendOnSide) {
-                width += LEGEND_WIDTH + 4;
+                width += LEGEND_WIDTH + IMAGE_BORDER_SIZE;
             } else {
-                height += LEGEND_HEIGHT + 4;
+                height += LEGEND_HEIGHT + IMAGE_BORDER_SIZE;
             }
         }
 
-        // log.debug("getClientArea: width: {}, height: {}", width, height);
+        log.debug("getClientArea: width: {}, height: {}", width, height);
         return new Rectangle(0, 0, width, height);
 
     }
@@ -238,7 +246,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
             }
 
             AffineTransform t = AffineTransform.getTranslateInstance(
-                col * cellWidth, row * cellHeight);
+                col * cellWidth + IMAGE_BORDER_SIZE, row * cellHeight + IMAGE_BORDER_SIZE);
             Rectangle2D.Double selectionRectCell = Swt2DUtil.transformRect(t, selectionRect);
 
             Color color = display.getSystemColor(SWT.COLOR_BLUE);
@@ -335,15 +343,14 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     protected void drawLegend(Display display, GC gc, Color color, int index, String text) {
         gc.setBackground(color);
         int width = legendWidth;
-        int startx = legendWidth * index;
-        int starty = gridHeight + 4;
+        int startx = legendWidth * index + IMAGE_BORDER_SIZE;
+        int starty = gridHeight + 5;
         if (legendOnSide) {
             width = LEGEND_WIDTH;
-            startx = gridWidth + 4;
-            starty = LEGEND_HEIGHT * index;
+            startx = gridWidth + 2 * IMAGE_BORDER_SIZE;
+            starty = LEGEND_HEIGHT * index + IMAGE_BORDER_SIZE;
         }
-        Rectangle rectangle = new Rectangle(startx, starty, width,
-            LEGEND_HEIGHT);
+        Rectangle rectangle = new Rectangle(startx, starty, width, LEGEND_HEIGHT);
         gc.fillRectangle(rectangle);
         gc.drawRectangle(rectangle);
         drawText(display, gc, text, rectangle, SWT.CENTER);

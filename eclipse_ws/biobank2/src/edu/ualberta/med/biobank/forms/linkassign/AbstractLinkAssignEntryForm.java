@@ -12,12 +12,10 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -106,7 +104,6 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
     // Multiple
     private Composite multipleFieldsComposite;
-    private ScrolledComposite visualisationScroll;
     private Composite visualisationComposite;
     private Composite multipleVisualisation;
     protected Label freezerLabel;
@@ -371,23 +368,27 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
     @SuppressWarnings("nls")
     protected void createMultipleVisualisation(Composite parent) {
-        multipleVisualisation = toolkit.createComposite(parent);
-        GridLayout layout = new GridLayout(3, false);
+        multipleVisualisation = toolkit.createComposite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        layout.verticalSpacing = 0;
+        layout.horizontalSpacing = 0;
         multipleVisualisation.setLayout(layout);
         GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
         multipleVisualisation.setLayoutData(gd);
 
-        Composite freezerComposite = toolkit.createComposite(multipleVisualisation);
+        Composite freezerComposite = toolkit.createComposite(multipleVisualisation, SWT.NONE);
         layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
         layout.verticalSpacing = 0;
         freezerComposite.setLayout(layout);
 
-        GridData gdFreezer = new GridData();
-        gdFreezer.horizontalSpan = 3;
-        gdFreezer.horizontalAlignment = SWT.RIGHT;
-        freezerComposite.setLayoutData(gdFreezer);
+        gd = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+        gd.horizontalSpan = 2;
+        gd.exclude = true;
+        freezerComposite.setLayoutData(gd);
 
         freezerLabel = toolkit.createLabel(freezerComposite,
             // TR: label
@@ -397,14 +398,17 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         toolkit.adapt(freezerWidget);
         freezerWidget.setDisplaySize(PalletDisplay.PALLET_WIDTH, 100);
 
-        Composite hotelComposite = toolkit.createComposite(multipleVisualisation);
+        Composite hotelComposite = toolkit.createComposite(multipleVisualisation, SWT.NONE);
         layout = new GridLayout(1, false);
-        layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        layout.horizontalSpacing = 0;
         layout.verticalSpacing = 0;
         hotelComposite.setLayout(layout);
 
-        hotelComposite.setLayoutData(new GridData());
+        gd = new GridData(SWT.BEGINNING, SWT.FILL, false, true);
+        gd.exclude = true;
+        hotelComposite.setLayoutData(gd);
         hotelLabel = toolkit.createLabel(hotelComposite,
             // TR: label
             i18n.tr("Hotel"));
@@ -412,13 +416,17 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         toolkit.adapt(hotelWidget);
         hotelWidget.setDisplaySize(100, PalletDisplay.PALLET_HEIGHT_AND_LEGEND);
 
-        Composite palletComposite = toolkit.createComposite(multipleVisualisation);
+        Composite palletComposite = toolkit.createComposite(multipleVisualisation, SWT.NONE);
         layout = new GridLayout(1, false);
-        layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        layout.horizontalSpacing = 0;
         layout.verticalSpacing = 0;
         palletComposite.setLayout(layout);
-        palletComposite.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
+        gd = new GridData(SWT.BEGINNING, SWT.FILL, true, true);
+        palletComposite.setLayoutData(gd);
+
         palletLabel = toolkit.createLabel(palletComposite,
             // TR: label
             i18n.tr("Pallet"));
@@ -442,6 +450,8 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
                 manageDoubleClick(e);
             }
         });
+
+        showOnlyPallet(true);
         return palletWidget;
     }
 
@@ -515,39 +525,28 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
      * Containers visualisation
      */
     private void createVisualisationSection(Composite parent) {
-        visualisationScroll = new ScrolledComposite(parent, SWT.H_SCROLL);
-        visualisationScroll.setExpandHorizontal(true);
-        visualisationScroll.setExpandVertical(true);
-        visualisationScroll.setLayout(new FillLayout());
-        GridData scrollData = new GridData();
-        scrollData.horizontalAlignment = SWT.FILL;
-        scrollData.grabExcessHorizontalSpace = true;
-        visualisationScroll.setLayoutData(scrollData);
-
-        visualisationComposite = toolkit.createComposite(visualisationScroll);
-
+        visualisationComposite = toolkit.createComposite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
-        layout.verticalSpacing = 0;
-        layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
-        layout.marginLeft = 20;
+        layout.marginHeight = 0;
+        layout.horizontalSpacing = 0;
+        layout.verticalSpacing = 0;
         visualisationComposite.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
+
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         visualisationComposite.setLayoutData(gd);
-        visualisationScroll.setContent(visualisationComposite);
 
         createMultipleVisualisation(visualisationComposite);
         createSingleVisualisation(visualisationComposite);
     }
 
+    @SuppressWarnings("nls")
     protected void showVisualisation(boolean show) {
-        if (visualisationScroll != null) {
-            widgetCreator.showWidget(visualisationScroll, show);
-            visualisationScroll.setMinSize(visualisationComposite.computeSize(
-                SWT.DEFAULT, SWT.DEFAULT));
+        if (visualisationComposite == null) {
+            throw new IllegalStateException("visualisationComposite is null");
         }
+
+        widgetCreator.showWidget(visualisationComposite, show);
     }
 
     @Override

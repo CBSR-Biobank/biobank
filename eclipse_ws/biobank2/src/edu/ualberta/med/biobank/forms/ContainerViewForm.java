@@ -501,8 +501,7 @@ public class ContainerViewForm extends BiobankViewForm {
                     Display.getDefault().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            containerWidget.getMultiSelectionManager()
-                                .clearMultiSelection();
+                            containerWidget.getMultiSelectionManager().clearMultiSelection();
                         }
                     });
                 }

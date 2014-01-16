@@ -303,7 +303,6 @@ public class ImageCanvas extends Canvas {
         }
 
         sourceImage = image;
-        sourceImageToCanvasTransform = new AffineTransform();
         syncScrollBars();
     }
 
