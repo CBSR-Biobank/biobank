@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.model.util.RowColPos;
 import edu.ualberta.med.biobank.widgets.grids.well.AbstractUIWell;
 import edu.ualberta.med.biobank.widgets.grids.well.SpecimenCell;
 import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
@@ -31,16 +30,6 @@ public class PalletWidget extends ContainerDisplayWidget {
                 return buf.toString();
             }
         };
-
-    public PalletWidget(Composite parent) {
-        super(
-            parent,
-            TOOLTIP_CALLBACK,
-            PalletWidget.class.getSimpleName(),
-            new PalletDisplay(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT),
-            null,
-            false);
-    }
 
     public PalletWidget(
         Composite parent,

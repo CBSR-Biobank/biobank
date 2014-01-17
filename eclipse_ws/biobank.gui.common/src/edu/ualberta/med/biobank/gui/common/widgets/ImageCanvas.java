@@ -95,7 +95,7 @@ public class ImageCanvas extends Canvas {
         autoHideScrollBars();
     }
 
-    private void addListeners() {
+    protected void addListeners() {
         // resize listener
         addControlListener(new ControlAdapter() {
             @Override

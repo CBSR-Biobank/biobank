@@ -265,6 +265,9 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         sc.setExpandVertical(true);
         Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        client.setLayoutData(gd);
+
         ContainerDisplayWidget containerDisplay = new ContainerDisplayWidget(
             client,
             null,

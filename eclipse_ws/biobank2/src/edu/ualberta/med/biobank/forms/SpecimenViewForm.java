@@ -333,13 +333,14 @@ public class SpecimenViewForm extends BiobankViewForm {
                 } else {
                     position = parents.peek().getPositionAsRowCol();
                 }
-                Composite containerComposite = toolkit
-                    .createComposite(containersComposite);
+                Composite containerComposite = toolkit.createComposite(containersComposite);
                 GridLayout layout = new GridLayout(1, false);
                 layout.horizontalSpacing = 0;
                 layout.marginWidth = 0;
                 layout.verticalSpacing = 0;
                 containerComposite.setLayout(layout);
+                GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+                containerComposite.setLayoutData(gd);
 
                 StringBuffer sb = new StringBuffer(container.getLabel());
                 sb.append(" (");

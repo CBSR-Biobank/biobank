@@ -283,8 +283,12 @@ public class ContainerViewForm extends BiobankViewForm {
         ScrolledComposite sc = new ScrolledComposite(containerSection, SWT.H_SCROLL);
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
+
         Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        client.setLayoutData(gd);
+
         toolkit.adapt(containerSection);
         toolkit.adapt(sc);
         toolkit.adapt(client);

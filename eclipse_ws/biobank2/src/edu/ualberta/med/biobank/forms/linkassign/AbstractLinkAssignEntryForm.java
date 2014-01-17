@@ -407,6 +407,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
 
         gd = new GridData(SWT.BEGINNING, SWT.FILL, false, true);
         hotelComposite.setLayoutData(gd);
+
         hotelLabel = toolkit.createLabel(hotelComposite,
             // TR: label
             i18n.tr("Hotel"));
@@ -486,7 +487,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
         singleVisualisation = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
         singleVisualisation.setLayout(layout);
-        GridData gd = new GridData();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
         gd.grabExcessHorizontalSpace = true;
         singleVisualisation.setLayoutData(gd);
 
