@@ -328,8 +328,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             contents,
             getPalletCellStatus(),
             SbsLabeling.ROW_DEFAULT,
-            SbsLabeling.COL_DEFAULT,
-            false);
+            SbsLabeling.COL_DEFAULT);
 
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override

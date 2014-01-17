@@ -35,15 +35,13 @@ public class PalletWidget extends ContainerDisplayWidget {
         Composite parent,
         List<UICellStatus> cellStatus,
         int rows,
-        int cols,
-        boolean manageOwnSize) {
+        int cols) {
         super(
             parent,
             TOOLTIP_CALLBACK,
             PalletWidget.class.getSimpleName(),
             new PalletDisplay(rows, cols),
-            cellStatus,
-            manageOwnSize);
+            cellStatus);
     }
 
     @SuppressWarnings("nls")

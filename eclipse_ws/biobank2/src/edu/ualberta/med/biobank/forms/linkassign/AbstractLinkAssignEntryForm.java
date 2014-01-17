@@ -441,8 +441,7 @@ public abstract class AbstractLinkAssignEntryForm extends AbstractPalletSpecimen
             palletComposite,
             UICellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST,
             rows,
-            cols,
-            true);
+            cols);
 
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {

@@ -332,17 +332,17 @@ public class ImageCanvas extends Canvas {
         ScrollBar horizontal = getHorizontalBar();
         horizontal.setIncrement(cw / 100);
         horizontal.setPageIncrement(cw);
-        Rectangle imageBound = sourceImage.getBounds();
-        if (imageBound.width * sx > cw) {
+        Rectangle imageBounds = sourceImage.getBounds();
+        if (imageBounds.width * sx > cw) {
             /* image is wider than client area */
-            horizontal.setMaximum((int) (imageBound.width * sx));
+            horizontal.setMaximum((int) (imageBounds.width * sx));
             horizontal.setEnabled(true);
             if (((int) -tx) > horizontal.getMaximum() - cw)
                 tx = -horizontal.getMaximum() + cw;
         } else {
             /* image is narrower than client area */
             horizontal.setEnabled(false);
-            tx = (cw - imageBound.width * sx) / 2; // center if too small.
+            tx = (cw - imageBounds.width * sx) / 2; // center if too small.
         }
         horizontal.setSelection((int) (-tx));
         horizontal.setThumb(cw);
@@ -350,16 +350,16 @@ public class ImageCanvas extends Canvas {
         ScrollBar vertical = getVerticalBar();
         vertical.setIncrement(ch / 100);
         vertical.setPageIncrement(ch);
-        if (imageBound.height * sy > ch) {
+        if (imageBounds.height * sy > ch) {
             /* image is higher than client area */
-            vertical.setMaximum((int) (imageBound.height * sy));
+            vertical.setMaximum((int) (imageBounds.height * sy));
             vertical.setEnabled(true);
             if (((int) -ty) > vertical.getMaximum() - ch)
                 ty = -vertical.getMaximum() + ch;
         } else {
             /* image is less higher than client area */
             vertical.setEnabled(false);
-            ty = (ch - imageBound.height * sy) / 2; // center if too small.
+            ty = (ch - imageBounds.height * sy) / 2; // center if too small.
         }
         vertical.setSelection((int) (-ty));
         vertical.setThumb(ch);
@@ -375,17 +375,25 @@ public class ImageCanvas extends Canvas {
     /**
      * Displays or hides the scroll bars if they are needed.
      */
-    @SuppressWarnings("nls")
     public void autoHideScrollBars() {
         ScrollBar horizontal = getHorizontalBar();
-        boolean horizontalVisible = horizontal.getEnabled();
-        horizontal.setVisible(horizontalVisible);
-        log.trace("autoHideScrollBars: horizontalVisible: {}", horizontalVisible);
-
         ScrollBar vertical = getVerticalBar();
-        boolean verticalVisisble = vertical.getEnabled();
-        vertical.setVisible(verticalVisisble);
-        log.trace("autoHideScrollBars: verticalVisisble: {}", verticalVisisble);
+
+        if (sourceImage == null) {
+            horizontal.setVisible(false);
+            vertical.setVisible(false);
+            return;
+        }
+
+        Rectangle imageBounds = sourceImage.getBounds();
+        AffineTransform af = sourceImageToCanvasTransform;
+        double sx = af.getScaleX(), sy = af.getScaleY();
+        Rectangle clientArea = getClientArea();
+        int cw = clientArea.width;
+        int ch = clientArea.height;
+
+        horizontal.setVisible(imageBounds.width * sx > cw);
+        vertical.setVisible(imageBounds.height * sy > ch);
     }
 
     /**

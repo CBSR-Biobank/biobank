@@ -49,8 +49,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
 
     private final IContainerDisplayWidget tooltipCallback;
 
-    private final boolean manageOwnSize;
-
     /**
      * max width this container will have : used to calculate cells width
      */
@@ -80,8 +78,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
         IContainerDisplayWidget tooltipCallback,
         String name,
         AbstractContainerDisplay containerDisplay,
-        List<UICellStatus> cellStatus,
-        boolean manageOwnSize) {
+        List<UICellStatus> cellStatus) {
 
         super(widgetParent, SWT.DOUBLE_BUFFERED);
 
@@ -89,7 +86,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
         this.name = name;
         this.cells = new HashMap<RowColPos, AbstractUIWell>(0);
         this.tooltipCallback = tooltipCallback;
-        this.manageOwnSize = manageOwnSize;
 
         if (containerDisplay == null) {
             throw new IllegalArgumentException("container display is null");
@@ -135,8 +131,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
             tooltipCallback,
             name,
             getContainerDisplayFromType(name, containerType, createDefaultContainer),
-            cellStatus,
-            true);
+            cellStatus);
     }
 
     public ContainerDisplayWidget(Composite parent, String name) {
@@ -145,8 +140,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
             null,
             name,
             getContainerDisplayFromType(name, null, true),
-            null,
-            true);
+            null);
     }
 
     @SuppressWarnings("nls")
@@ -340,14 +334,8 @@ public class ContainerDisplayWidget extends ImageCanvas {
     @SuppressWarnings("nls")
     @Override
     public Rectangle getClientArea() {
-        if (manageOwnSize) {
-            Rectangle clientArea = containerDisplay.getClientArea();
-            log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
-            return clientArea;
-        }
-
-        Rectangle clientArea = super.getClientArea();
-        log.trace("getClientArea: super clientArea: {}", clientArea);
+        Rectangle clientArea = containerDisplay.getClientArea();
+        log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
         return clientArea;
     }
 
