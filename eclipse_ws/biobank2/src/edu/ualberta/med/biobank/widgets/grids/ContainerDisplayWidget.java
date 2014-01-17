@@ -341,11 +341,14 @@ public class ContainerDisplayWidget extends ImageCanvas {
     @Override
     public Rectangle getClientArea() {
         if (manageOwnSize) {
-            log.trace("getClientArea");
-            return containerDisplay.getClientArea();
+            Rectangle clientArea = containerDisplay.getClientArea();
+            log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
+            return clientArea;
         }
 
-        return super.getClientArea();
+        Rectangle clientArea = super.getClientArea();
+        log.trace("getClientArea: super clientArea: {}", clientArea);
+        return clientArea;
     }
 
 }

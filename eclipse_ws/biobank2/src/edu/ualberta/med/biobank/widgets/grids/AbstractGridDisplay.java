@@ -151,7 +151,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         int width;
         int height;
 
-        log.debug("getClientArea: name: {}", containerLabel);
+        log.trace("getClientArea: name: {}", containerLabel);
 
         if ((maxWidth >= 0) && (maxHeight >= 0)) {
             width = maxWidth;
@@ -159,15 +159,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
             cellWidth = maxWidth / columns;
             cellHeight = maxHeight / rows;
-            log.debug("getClientArea: cellWidth and cellHeight dependent on max width and height");
+            log.trace("getClientArea: cellWidth and cellHeight dependent on max width and height");
         } else {
             width = cellWidth * columns;
             height = cellHeight * rows;
-            log.debug("getClientArea: width and height dependent on default cell width and height");
+            log.trace("getClientArea: width and height dependent on default cell width and height");
         }
 
-        log.debug("getClientArea: rows: {}, columns: {}", rows, columns);
-        log.debug("getClientArea: cellWidth: {}, cellHeight: {}", cellWidth, cellHeight);
+        log.trace("getClientArea: rows: {}, columns: {}", rows, columns);
+        log.trace("getClientArea: cellWidth: {}, cellHeight: {}", cellWidth, cellHeight);
 
         gridWidth = width;
         gridHeight = height;
@@ -183,7 +183,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
             }
         }
 
-        log.debug("getClientArea: width: {}, height: {}", width, height);
+        log.trace("getClientArea: width: {}, height: {}", width, height);
         return new Rectangle(0, 0, width, height);
 
     }

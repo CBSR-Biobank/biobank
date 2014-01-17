@@ -380,12 +380,12 @@ public class ImageCanvas extends Canvas {
         ScrollBar horizontal = getHorizontalBar();
         boolean horizontalVisible = horizontal.getEnabled();
         horizontal.setVisible(horizontalVisible);
-        log.debug("autoHideScrollBars: horizontalVisible: {}", horizontalVisible);
+        log.trace("autoHideScrollBars: horizontalVisible: {}", horizontalVisible);
 
         ScrollBar vertical = getVerticalBar();
         boolean verticalVisisble = vertical.getEnabled();
         vertical.setVisible(verticalVisisble);
-        log.debug("autoHideScrollBars: verticalVisisble: {}", verticalVisisble);
+        log.trace("autoHideScrollBars: verticalVisisble: {}", verticalVisisble);
     }
 
     /**
@@ -395,40 +395,6 @@ public class ImageCanvas extends Canvas {
      */
     public ImageData getImageData() {
         return sourceImage.getImageData();
-    }
-
-    /**
-     * Fit the image onto the canvas
-     */
-    public void fitCanvas() {
-        if (sourceImage == null) return;
-
-        Rectangle imageBound = sourceImage.getBounds();
-        Rectangle destRect = getClientArea();
-        double sx = (double) destRect.width / (double) imageBound.width;
-        double sy = (double) destRect.height / (double) imageBound.height;
-        double s = Math.min(sx, sy);
-        double dx = 0.5 * destRect.width;
-        double dy = 0.5 * destRect.height;
-        centerZoom(dx, dy, s, new AffineTransform());
-    }
-
-    /**
-     * Show the image with the original size
-     */
-    public void showOriginal() {
-        if (sourceImage == null) return;
-
-        sourceImageToCanvasTransform = new AffineTransform();
-        syncScrollBars();
-    }
-
-    protected void centerZoomIn(double dx, double dy) {
-        centerZoom(dx, dy, ZOOM_IN_RATE, sourceImageToCanvasTransform);
-    }
-
-    protected void centerZoomOut(double dx, double dy) {
-        centerZoom(dx, dy, ZOOM_OUT_RATE, sourceImageToCanvasTransform);
     }
 
     /**
@@ -457,6 +423,42 @@ public class ImageCanvas extends Canvas {
         af.preConcatenate(AffineTransform.getTranslateInstance(dx, dy));
         sourceImageToCanvasTransform = af;
         syncScrollBars();
+        autoHideScrollBars();
+    }
+
+    /**
+     * Fit the image onto the canvas
+     */
+    public void fitCanvas() {
+        if (sourceImage == null) return;
+
+        Rectangle imageBound = sourceImage.getBounds();
+        Rectangle destRect = getClientArea();
+        double sx = (double) destRect.width / (double) imageBound.width;
+        double sy = (double) destRect.height / (double) imageBound.height;
+        double s = Math.min(sx, sy);
+        double dx = 0.5 * destRect.width;
+        double dy = 0.5 * destRect.height;
+        centerZoom(dx, dy, s, new AffineTransform());
+    }
+
+    /**
+     * Show the image with the original size
+     */
+    public void showOriginal() {
+        if (sourceImage == null) return;
+
+        sourceImageToCanvasTransform = new AffineTransform();
+        syncScrollBars();
+        autoHideScrollBars();
+    }
+
+    protected void centerZoomIn(double dx, double dy) {
+        centerZoom(dx, dy, ZOOM_IN_RATE, sourceImageToCanvasTransform);
+    }
+
+    protected void centerZoomOut(double dx, double dy) {
+        centerZoom(dx, dy, ZOOM_OUT_RATE, sourceImageToCanvasTransform);
     }
 
     /*

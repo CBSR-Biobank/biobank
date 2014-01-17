@@ -5,6 +5,7 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -27,8 +28,7 @@ public class PalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_WIDTH = SAMPLE_WIDTH * SbsLabeling.COL_DEFAULT;
     public static final int PALLET_HEIGHT = SAMPLE_WIDTH * SbsLabeling.ROW_DEFAULT;
 
-    public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
-        + LEGEND_HEIGHT + 4;
+    public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT + LEGEND_HEIGHT + 4;
 
     public PalletDisplay(int rows, int cols) {
         super(PalletDisplay.class.getSimpleName());

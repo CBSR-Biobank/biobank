@@ -92,7 +92,9 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     protected RowColPos currentGridDimensions =
         new RowColPos(RowColPos.ROWS_DEFAULT, RowColPos.COLS_DEFAULT);
 
-    public AbstractScanDialog(Shell parentShell, final T currentShipment,
+    public AbstractScanDialog(
+        Shell parentShell,
+        final T currentShipment,
         CenterWrapper<?> currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
