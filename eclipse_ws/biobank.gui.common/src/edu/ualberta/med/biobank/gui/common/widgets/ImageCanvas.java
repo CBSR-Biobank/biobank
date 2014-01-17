@@ -375,6 +375,7 @@ public class ImageCanvas extends Canvas {
     /**
      * Displays or hides the scroll bars if they are needed.
      */
+    @SuppressWarnings("nls")
     public void autoHideScrollBars() {
         ScrollBar horizontal = getHorizontalBar();
         ScrollBar vertical = getVerticalBar();
@@ -391,6 +392,9 @@ public class ImageCanvas extends Canvas {
         Rectangle clientArea = getClientArea();
         int cw = clientArea.width;
         int ch = clientArea.height;
+
+        log.debug("autoHideScrollBars: imageBounds: {}", imageBounds);
+        log.debug("autoHideScrollBars: clientArea: {}", clientArea);
 
         horizontal.setVisible(imageBounds.width * sx > cw);
         vertical.setVisible(imageBounds.height * sy > ch);

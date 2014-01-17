@@ -242,7 +242,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
      */
     @SuppressWarnings("nls")
     public void setStorageSize(int rows, int columns) {
-        log.trace("setStorageSize: rows: {}, cols: {}", rows, columns);
+        log.debug("setStorageSize: rows: {}, cols: {}", rows, columns);
         if (containerDisplay != null) {
             containerDisplay.setStorageSize(rows, columns);
             updateCells();
@@ -334,7 +334,7 @@ public class ContainerDisplayWidget extends ImageCanvas {
     @SuppressWarnings("nls")
     @Override
     public Rectangle getClientArea() {
-        Rectangle clientArea = containerDisplay.getClientArea();
+        Rectangle clientArea = containerDisplay.getGridSize();
         log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
         return clientArea;
     }

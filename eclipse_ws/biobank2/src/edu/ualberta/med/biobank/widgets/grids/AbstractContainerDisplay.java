@@ -85,7 +85,7 @@ public abstract class AbstractContainerDisplay {
 
     protected abstract Point computeSize(int wHint, int hHint, boolean changed);
 
-    protected abstract Rectangle getClientArea();
+    protected abstract Rectangle getGridSize();
 
     /**
      * Get the text to write inside the cell. This default implementation use the cell position and

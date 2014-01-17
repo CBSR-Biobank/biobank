@@ -83,7 +83,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     @Override
     protected Image updateGridImage(ContainerDisplayWidget displayWidget) {
         Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-        Rectangle clientArea = getClientArea();
+        Rectangle clientArea = getGridSize();
         Image image = new Image(display, clientArea.width, clientArea.height);
 
         Rectangle2D.Double cellRect = new Rectangle2D.Double(
@@ -147,7 +147,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     @SuppressWarnings("nls")
     @Override
-    protected Rectangle getClientArea() {
+    protected Rectangle getGridSize() {
         int width;
         int height;
 
@@ -190,7 +190,7 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     @Override
     public Point computeSize(int wHint, int hHint, boolean changed) {
-        Rectangle clientArea = getClientArea();
+        Rectangle clientArea = getGridSize();
         return new Point(clientArea.width, clientArea.height);
     }
 
