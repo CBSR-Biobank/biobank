@@ -400,12 +400,15 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         return columns;
     }
 
+    // FIXME: coordinates have to be translated into image coordinates
+    @SuppressWarnings("nls")
     @Override
     public RowColPos getPositionAtCoordinates(int x, int y) {
-        int col = x / getCellWidth();
         int row = y / getCellHeight();
-        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
-            return new RowColPos(row, col);
+        int col = x / getCellWidth();
+        log.debug("getPositionAtCoordinates: row: {}, col: {}", row, col);
+        if ((row > 0) && (row <= getRows()) && (col > 0) && (col <= getCols())) {
+            return new RowColPos(row - 1, col - 1);
         }
         return null;
     }

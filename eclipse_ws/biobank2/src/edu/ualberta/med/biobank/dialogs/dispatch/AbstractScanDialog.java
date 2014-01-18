@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.forms.linkassign.IDecodePalletManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement.ScanManualOption;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
-import edu.ualberta.med.biobank.gui.common.dialogs.BgcBaseDialog;
+import edu.ualberta.med.biobank.gui.common.dialogs.PersistedDialog;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.util.RowColPos;
@@ -53,7 +53,7 @@ import edu.ualberta.med.biobank.widgets.grids.well.UICellStatus;
 import edu.ualberta.med.scannerconfig.dmscanlib.DecodedWell;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
-    extends BgcBaseDialog
+    extends PersistedDialog
     implements IDecodePalletManagement {
 
     private static final I18n i18n = I18nFactory.getI18n(AbstractScanDialog.class);
@@ -324,8 +324,16 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
     }
 
     private PalletWidget createScanPalletWidget(Composite contents) {
+        final Composite composite = new Composite(contents, SWT.NONE);
+
+        GridLayout layout = new GridLayout(1, false);
+        composite.setLayout(layout);
+
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        composite.setLayoutData(gd);
+
         PalletWidget palletWidget = new PalletWidget(
-            contents,
+            composite,
             getPalletCellStatus(),
             SbsLabeling.ROW_DEFAULT,
             SbsLabeling.COL_DEFAULT);
@@ -338,6 +346,12 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>>
             }
         });
         palletWidget.setVisible(false);
+
+        layout = new GridLayout(1, false);
+        palletWidget.setLayout(layout);
+
+        gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+        palletWidget.setLayoutData(gd);
         return palletWidget;
     }
 
