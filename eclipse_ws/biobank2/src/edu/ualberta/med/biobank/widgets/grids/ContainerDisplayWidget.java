@@ -94,10 +94,17 @@ public class ContainerDisplayWidget extends ImageCanvas {
             addMouseTrackListener(new MouseTrackAdapter() {
                 @Override
                 public void mouseHover(MouseEvent e) {
-                    SpecimenCell cell = (SpecimenCell) getObjectAtCoordinates(e.x, e.y);
-                    if (cell != null) {
-                        setToolTipText(ContainerDisplayWidget.this.tooltipCallback.getTooltipText(cell));
-                    } else {
+                    SpecimenCell cell = null;
+                    Point point = getPointOnImage(e.x, e.y);
+
+                    if ((point.x >= 0) && (point.y > 0)) {
+                        cell = (SpecimenCell) getObjectAtCoordinates(point.x, point.y);
+                        if (cell != null) {
+                            setToolTipText(ContainerDisplayWidget.this.tooltipCallback.getTooltipText(cell));
+                        }
+                    }
+
+                    if (cell == null) {
                         setToolTipText(null);
                     }
                 }
@@ -317,13 +324,5 @@ public class ContainerDisplayWidget extends ImageCanvas {
     public void updateCells() {
         setSourceImage(containerDisplay.updateGridImage(this));
     }
-
-    // @SuppressWarnings("nls")
-    // @Override
-    // public Rectangle getClientArea() {
-    // Rectangle clientArea = containerDisplay.getGridSize();
-    // log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
-    // return clientArea;
-    // }
 
 }

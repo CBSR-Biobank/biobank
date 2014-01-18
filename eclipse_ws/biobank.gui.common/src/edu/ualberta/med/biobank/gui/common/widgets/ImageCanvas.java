@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.gui.common.widgets;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.awt.geom.Rectangle2D;
 
 import org.eclipse.swt.SWT;
@@ -16,6 +17,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -498,4 +500,10 @@ public class ImageCanvas extends Canvas {
         centerZoom(dx, dy, ZOOM_OUT_RATE, sourceImageToCanvasTransform);
     }
 
+    protected Point getPointOnImage(int x, int y) {
+        Double point = Swt2DUtil.inverseTransformPoint(
+            sourceImageToCanvasTransform,
+            new Point2D.Double(x, y));
+        return new Point((int) point.x, (int) point.y);
+    }
 }
