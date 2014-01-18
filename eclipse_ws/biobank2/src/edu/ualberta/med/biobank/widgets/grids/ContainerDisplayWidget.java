@@ -9,9 +9,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,16 +89,6 @@ public class ContainerDisplayWidget extends ImageCanvas {
         }
 
         setContainerDisplay(containerDisplay, cellStatus);
-
-        GridLayout layout = new GridLayout(1, false);
-        layout.marginWidth = 5;
-        layout.marginHeight = 5;
-        layout.verticalSpacing = 0;
-        layout.horizontalSpacing = 0;
-        setLayout(layout);
-
-        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-        setLayoutData(gd);
 
         if (this.tooltipCallback != null) {
             addMouseTrackListener(new MouseTrackAdapter() {
@@ -331,12 +318,12 @@ public class ContainerDisplayWidget extends ImageCanvas {
         setSourceImage(containerDisplay.updateGridImage(this));
     }
 
-    @SuppressWarnings("nls")
-    @Override
-    public Rectangle getClientArea() {
-        Rectangle clientArea = containerDisplay.getGridSize();
-        log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
-        return clientArea;
-    }
+    // @SuppressWarnings("nls")
+    // @Override
+    // public Rectangle getClientArea() {
+    // Rectangle clientArea = containerDisplay.getGridSize();
+    // log.trace("getClientArea: containerDisplay clientArea: {}", clientArea);
+    // return clientArea;
+    // }
 
 }

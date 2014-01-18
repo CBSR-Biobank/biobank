@@ -380,7 +380,11 @@ public class ImageCanvas extends Canvas {
         ScrollBar horizontal = getHorizontalBar();
         ScrollBar vertical = getVerticalBar();
 
-        if (sourceImage == null) {
+        Rectangle clientArea = getClientArea();
+        int cw = clientArea.width;
+        int ch = clientArea.height;
+
+        if ((sourceImage == null) || ((cw == 0) && (ch == 0))) {
             horizontal.setVisible(false);
             vertical.setVisible(false);
             return;
@@ -389,9 +393,6 @@ public class ImageCanvas extends Canvas {
         Rectangle imageBounds = sourceImage.getBounds();
         AffineTransform af = sourceImageToCanvasTransform;
         double sx = af.getScaleX(), sy = af.getScaleY();
-        Rectangle clientArea = getClientArea();
-        int cw = clientArea.width;
-        int ch = clientArea.height;
 
         log.debug("autoHideScrollBars: imageBounds: {}", imageBounds);
         log.debug("autoHideScrollBars: clientArea: {}", clientArea);
