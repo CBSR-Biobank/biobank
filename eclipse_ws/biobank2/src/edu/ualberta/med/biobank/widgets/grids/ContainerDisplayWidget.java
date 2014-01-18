@@ -8,7 +8,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,9 +97,15 @@ public class ContainerDisplayWidget extends ImageCanvas {
                 @Override
                 public void mouseHover(MouseEvent e) {
                     SpecimenCell cell = null;
+                    Image gridImage = getSourceImage();
+                    if (gridImage == null) {
+                        throw new IllegalStateException("source image is null");
+                    }
+                    Rectangle bounds = gridImage.getBounds();
                     Point point = getPointOnImage(e.x, e.y);
 
-                    if ((point.x >= 0) && (point.y > 0)) {
+                    if ((point.x >= 0) && (point.y > 0)
+                        && (point.x <= bounds.width) && (point.y <= bounds.height)) {
                         cell = (SpecimenCell) getObjectAtCoordinates(point.x, point.y);
                         if (cell != null) {
                             setToolTipText(ContainerDisplayWidget.this.tooltipCallback.getTooltipText(cell));
