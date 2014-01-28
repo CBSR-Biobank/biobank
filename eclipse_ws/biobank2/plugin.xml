@@ -27,7 +27,7 @@
          </property>
          <property
                name="aboutText"
-               value="BioBank Java Client&#x0A;Version {0}&#x0A;&#x0A;Developed for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
+               value="Biobank Client&#x0A;Version {0}&#x0A;&#x0A;Developed for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
          </property>
          <property
                name="aboutImage"

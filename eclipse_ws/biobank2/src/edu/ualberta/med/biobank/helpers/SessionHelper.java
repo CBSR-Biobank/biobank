@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.xnap.commons.i18n.I18n;
@@ -36,8 +37,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class SessionHelper implements Runnable {
     private static final I18n i18n = I18nFactory.getI18n(SessionHelper.class);
 
-    private static BgcLogger logger = BgcLogger.getLogger(SessionHelper.class
-        .getName());
+    private static BgcLogger logger = BgcLogger.getLogger(SessionHelper.class.getName());
 
     private String serverUrl;
 
@@ -51,10 +51,6 @@ public class SessionHelper implements Runnable {
 
     private static Boolean firstConnection = true;
     private static Boolean restartPending = false;
-
-    @SuppressWarnings("nls")
-    private static final String DOWNLOAD_URL =
-        "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
 
     @SuppressWarnings("nls")
     private static final String DEFAULT_TEST_USER = "testuser";
@@ -188,19 +184,31 @@ public class SessionHelper implements Runnable {
                     i18n.tr("The server you are connecting to does not have a version. Cannot authenticate."),
                     exp);
             } else if (exp instanceof ServerVersionNewerException) {
-                if (BgcPlugin.openConfirm(
-                    // dialog title.
-                    i18n.tr("Server Version Error"),
-                    // dialog message. {0} is an exception message.
-                    i18n.tr(
-                        "{0} Would you like to download the latest version?",
-                        exp.getMessage()))) {
-                    try {
-                        Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
-                    } catch (Exception e1) {
-                        // ignore
+                // this preference comes from "plugin_customization.ini" in the biobank plugin
+                // directory
+                IPreferenceStore pstore = BiobankPlugin.getDefault().getPreferenceStore();
+                String downloadUrl = pstore.getString("DOWNLOAD_URL");
+
+                if (downloadUrl.isEmpty()) {
+                    BgcPlugin.openError(
+                        // dialog title.
+                        i18n.tr("Server Version Error"),
+                        exp.getMessage(), exp);
+                } else {
+                    if (BgcPlugin.openConfirm(
+                        // dialog title.
+                        i18n.tr("Server Version Error"),
+                        // dialog message. {0} is an exception message.
+                        i18n.tr(
+                            "{0} Would you like to download the latest version?",
+                            exp.getMessage()))) {
+                        try {
+                            Desktop.getDesktop().browse(new URI(downloadUrl));
+                        } catch (Exception e1) {
+                            // ignore
+                        }
+                        logger.error(exp.getMessage(), exp);
                     }
-                    logger.error(exp.getMessage(), exp);
                 }
             } else if (exp instanceof ServerVersionOlderException) {
                 BgcPlugin.openError(
