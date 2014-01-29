@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.helpers;
 
-import java.awt.Desktop;
 import java.io.IOException;
-import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -14,7 +12,6 @@ import java.util.List;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.xnap.commons.i18n.I18n;
@@ -186,30 +183,10 @@ public class SessionHelper implements Runnable {
             } else if (exp instanceof ServerVersionNewerException) {
                 // this preference comes from "plugin_customization.ini" in the biobank plugin
                 // directory
-                IPreferenceStore pstore = BiobankPlugin.getDefault().getPreferenceStore();
-                String downloadUrl = pstore.getString("DOWNLOAD_URL");
-
-                if (downloadUrl.isEmpty()) {
-                    BgcPlugin.openError(
-                        // dialog title.
-                        i18n.tr("Server Version Error"),
-                        exp.getMessage(), exp);
-                } else {
-                    if (BgcPlugin.openConfirm(
-                        // dialog title.
-                        i18n.tr("Server Version Error"),
-                        // dialog message. {0} is an exception message.
-                        i18n.tr(
-                            "{0} Would you like to download the latest version?",
-                            exp.getMessage()))) {
-                        try {
-                            Desktop.getDesktop().browse(new URI(downloadUrl));
-                        } catch (Exception e1) {
-                            // ignore
-                        }
-                        logger.error(exp.getMessage(), exp);
-                    }
-                }
+                BgcPlugin.openError(
+                    // dialog title.
+                    i18n.tr("Server Version Error"),
+                    exp.getMessage(), exp);
             } else if (exp instanceof ServerVersionOlderException) {
                 BgcPlugin.openError(
                     // dialog title.

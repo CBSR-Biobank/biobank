@@ -88,10 +88,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     @SuppressWarnings("nls")
     @Override
     public void postWindowOpen() {
-        P2Util.checkForUpdates();
+        // Comment out client software updates for now
+        // P2Util.setRepositories();
+        // P2Util.checkForUpdates();
 
-        IStatusLineManager statusline = getWindowConfigurer()
-            .getActionBarConfigurer().getStatusLineManager();
+        IStatusLineManager statusline =
+            getWindowConfigurer().getActionBarConfigurer().getStatusLineManager();
         statusline.setMessage(null,
             // status line message.
             i18n.tr("Application ready"));

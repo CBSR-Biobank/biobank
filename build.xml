@@ -18,6 +18,7 @@
   <!-- TODO: create a cacore directory with all the cacore stuff in it
        that we can throw into the war file and use to create the database -->
   <property file="build.properties" />
+  <property file="client.properties" />
   <property file="db.properties" />
 
   <!-- must use a property with a LOCATION attribute because it is converted

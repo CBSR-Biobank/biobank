@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.rcp;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -8,20 +10,29 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
+import org.eclipse.equinox.internal.p2.ui.ProvUI;
+import org.eclipse.equinox.internal.p2.ui.ProvUIActivator;
+import org.eclipse.equinox.internal.p2.ui.model.ElementUtils;
+import org.eclipse.equinox.internal.p2.ui.model.MetadataRepositoryElement;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.equinox.p2.operations.UpdateOperation;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
+import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 
 /**
  * This class shows an example for checking for updates and performing the update synchronously. It
@@ -47,6 +58,52 @@ public class P2Util {
     private static final String JUSTUPDATED = "justUpdated";
 
     private static BgcLogger logger = BgcLogger.getLogger(P2Util.class.getName());
+
+    @SuppressWarnings("nls")
+    public static void addUpdateSites() {
+        IPreferenceStore pstore = BiobankPlugin.getDefault().getPreferenceStore();
+        String updateSiteUrl = pstore.getString("UPDATE_SITE_URL");
+
+        try {
+            if (!updateSiteUrl.isEmpty()) {
+                URI repoUri = new URI(updateSiteUrl);
+                final ProvisioningUI ui = ProvUIActivator.getDefault().getProvisioningUI();
+                IArtifactRepositoryManager artifactManager = ProvUI.getArtifactRepositoryManager(ui.getSession());
+                artifactManager.addRepository(repoUri);
+
+                IMetadataRepositoryManager metadataManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+                metadataManager.addRepository(repoUri);
+            }
+        } catch (URISyntaxException e) {
+            BgcPlugin.openError(
+                // dialog title.
+                i18n.tr("Update site configuration error"),
+                e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("nls")
+    public static void setRepositories() {
+        IPreferenceStore pstore = BiobankPlugin.getDefault().getPreferenceStore();
+        String updateSiteUrl = pstore.getString("UPDATE_SITE_URL");
+
+        try {
+            if (!updateSiteUrl.isEmpty()) {
+                URI repoUri = new URI(updateSiteUrl);
+                MetadataRepositoryElement[] elements = new MetadataRepositoryElement[] {
+                    new MetadataRepositoryElement(null, repoUri, true)
+                };
+                ProvisioningUI ui = ProvisioningUI.getDefaultUI();
+                Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+                ElementUtils.updateRepositoryUsingElements(ui, elements, shell);
+            }
+        } catch (URISyntaxException e) {
+            logger.addRcpLogStatus(
+                IStatus.ERROR,
+                "Could not set the update site repositories.",
+                null);
+        }
+    }
 
     @SuppressWarnings("nls")
     public static void checkForUpdates() {
