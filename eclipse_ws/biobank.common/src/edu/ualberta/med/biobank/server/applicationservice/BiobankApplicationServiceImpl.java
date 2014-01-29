@@ -42,11 +42,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
- * Implementation of the BiobankApplicationService interface. This class will be
- * only on the server side.
+ * Implementation of the BiobankApplicationService interface. This class will be only on the server
+ * side.
  * 
- * See build.properties of the sdk for the generator configuration +
- * application-config*.xml for the generated files.
+ * See build.properties of the sdk for the generator configuration + application-config*.xml for the
+ * generated files.
  */
 public class BiobankApplicationServiceImpl extends
     WritableApplicationServiceImpl implements BiobankApplicationService {
@@ -96,11 +96,11 @@ public class BiobankApplicationServiceImpl extends
     /**
      * See log4j.xml: it should contain the Biobank.Activity appender
      */
+    @SuppressWarnings("nls")
     @Override
     public void logActivity(Log log) throws Exception {
-        Logger logger = Logger.getLogger("Biobank.Activity"); //$NON-NLS-1$
-        logger.log(Level.toLevel("INFO"), //$NON-NLS-1$
-            MessageGenerator.generateStringMessage(log));
+        Logger logger = Logger.getLogger("Biobank.Activity");
+        logger.log(Level.toLevel("INFO"), MessageGenerator.generateStringMessage(log));
     }
 
     @Override
@@ -189,55 +189,21 @@ public class BiobankApplicationServiceImpl extends
         return BiobankVersionUtil.getServerVersion();
     }
 
-    // @Override
-    // @Deprecated
-    // public ScanProcessResult processScanResult(Map<RowColPos, Cell> cells,
-    // ProcessData processData, boolean isRescanMode,
-    // Integer currentWorkingCenterId, Locale locale)
-    // throws ApplicationException {
-    // try {
-    // ServerProcess process = processData.getProcessInstance(this,
-    // currentWorkingCenterId, locale);
-    // return process.processScanResult(cells, isRescanMode);
-    // } catch (ApplicationException ae) {
-    // throw ae;
-    // } catch (Exception e) {
-    // throw new ApplicationException(e);
-    // }
-    // }
-    //
-    // @Override
-    // @Deprecated
-    // public CellProcessResult processCellStatus(Cell cell,
-    // ProcessData processData, Integer currentWorkingCenterId, Locale locale)
-    // throws ApplicationException {
-    // try {
-    // ServerProcess process = processData.getProcessInstance(this,
-    // currentWorkingCenterId, locale);
-    // return process.processCellStatus(cell);
-    // } catch (ApplicationException ae) {
-    // throw ae;
-    // } catch (Exception e) {
-    // throw new ApplicationException(e);
-    // }
-    // }
-
     private static final int SS_INV_ID_LENGTH = 12;
 
     @SuppressWarnings("nls")
-    private static final String SS_INV_ID_ALPHABET =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String SS_INV_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET
-        .length();
+    private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET.length();
 
-    private static final int SS_INV_ID_GENERATE_RETRIES = (int) Math.pow(
-        SS_INV_ID_ALPHABET_LENGTH, SS_INV_ID_ALPHABET_LENGTH);
+    private static final int SS_INV_ID_GENERATE_RETRIES =
+        (int) Math.pow(SS_INV_ID_ALPHABET_LENGTH, SS_INV_ID_ALPHABET_LENGTH);
 
     @SuppressWarnings("nls")
-    private static final String SS_INV_ID_UNIQ_BASE_QRY = "SELECT count(*) "
-        + "FROM printed_ss_inv_item where txt=\"{id}\"";
+    private static final String SS_INV_ID_UNIQ_BASE_QRY =
+        "SELECT count(*) FROM printed_ss_inv_item where txt=\"{id}\"";
 
+    @SuppressWarnings("nls")
     @Override
     public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
         throws ApplicationException {
@@ -261,7 +227,7 @@ public class BiobankApplicationServiceImpl extends
 
                 // check database if string is unique
                 String potentialInvId = newInvId.toString();
-                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}", //$NON-NLS-1$
+                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}",
                     potentialInvId);
 
                 List<BigInteger> count = privateQuery(new BiobankSQLCriteria(
@@ -281,7 +247,7 @@ public class BiobankApplicationServiceImpl extends
             if (genRetries >= SS_INV_ID_GENERATE_RETRIES) {
                 // cannot generate any more unique strings
                 throw new BiobankServerException(
-                    "cannot generate any more source specimen inventory IDs"); //$NON-NLS-1$
+                    "cannot generate any more source specimen inventory IDs");
             }
 
         }
@@ -302,8 +268,7 @@ public class BiobankApplicationServiceImpl extends
     public <T extends ActionResult> T doAction(Action<T> action)
         throws ApplicationException {
         try {
-            Request request =
-                new Request(new AppServiceAction<T>(action, this));
+            Request request = new Request(new AppServiceAction<T>(action, this));
             request.setDomainObjectName(Site.class.getName());
 
             Response response = query(request);
