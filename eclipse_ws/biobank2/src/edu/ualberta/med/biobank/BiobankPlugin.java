@@ -1,11 +1,17 @@
 package edu.ualberta.med.biobank;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.ui.ProvUI;
+import org.eclipse.equinox.internal.p2.ui.ProvUIActivator;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -30,6 +36,7 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.web.bindery.event.shared.EventBus;
 
+import edu.ualberta.med.biobank.BiobankPlugin.ExceptionDisplay;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.gui.common.BgcPlugin;
 import edu.ualberta.med.biobank.mvp.event.ExceptionEvent;
@@ -163,6 +170,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * 
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext )
      */
+    @SuppressWarnings({ "nls", "restriction" })
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
@@ -176,11 +184,23 @@ public class BiobankPlugin extends AbstractUIPlugin {
         // There will also have to be a perspective manager?
         // TODO: FormManager is pretty specific to eclipse, take out of mvp
         // plugin?
-        FormManagerPresenter formManagerPresenter =
-            injector.getInstance(FormManagerPresenter.class);
+        FormManagerPresenter formManagerPresenter = injector.getInstance(FormManagerPresenter.class);
         formManagerPresenter.bind();
 
         injector.getInstance(ExceptionDisplay.class);
+
+        IPreferenceStore pstore = BiobankPlugin.getDefault().getPreferenceStore();
+        String updateSiteUrl = pstore.getString("UPDATE_SITE_URL");
+
+        if (!updateSiteUrl.isEmpty()) {
+            URI repoUri = new URI(updateSiteUrl);
+            final ProvisioningUI ui = ProvUIActivator.getDefault().getProvisioningUI();
+            IArtifactRepositoryManager artifactManager = ProvUI.getArtifactRepositoryManager(ui.getSession());
+            artifactManager.addRepository(repoUri);
+
+            IMetadataRepositoryManager metadataManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+            metadataManager.addRepository(repoUri);
+        }
     }
 
     // TODO: move this somewhere much more appropriate

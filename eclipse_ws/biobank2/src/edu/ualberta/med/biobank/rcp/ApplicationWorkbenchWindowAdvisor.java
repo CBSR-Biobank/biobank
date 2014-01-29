@@ -78,9 +78,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         /*
          * configurer.setShowPerspectiveBar(true);
-         * PlatformUI.getPreferenceStore().setDefault("DOCK_PERSPECTIVE_BAR",
-         * "left"); PlatformUI.getPreferenceStore().setDefault(
-         * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
+         * PlatformUI.getPreferenceStore().setDefault("DOCK_PERSPECTIVE_BAR", "left");
+         * PlatformUI.getPreferenceStore().setDefault( "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
          */
         configurer.setShowProgressIndicator(true);
         getWindowConfigurer().setTitle(getWindowTitle());
@@ -168,8 +167,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 }
             });
 
-        BindingContextHelper
-            .activateContextInWorkbench(SessionManager.BIOBANK2_CONTEXT_LOGGED_OUT);
+        BindingContextHelper.activateContextInWorkbench(SessionManager.BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
     @SuppressWarnings("nls")

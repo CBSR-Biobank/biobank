@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
@@ -23,15 +24,14 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.gui.common.BgcLogger;
 
 /**
- * This class shows an example for checking for updates and performing the
- * update synchronously. It is up to the caller to run this in a job if a
- * background update check is desired. This is a reasonable way to run an
- * operation when user intervention is not required. Another approach is to
- * separately perform the resolution and provisioning steps, deciding whether to
- * perform these synchronously or in a job.
+ * This class shows an example for checking for updates and performing the update synchronously. It
+ * is up to the caller to run this in a job if a background update check is desired. This is a
+ * reasonable way to run an operation when user intervention is not required. Another approach is to
+ * separately perform the resolution and provisioning steps, deciding whether to perform these
+ * synchronously or in a job.
  * 
- * Any p2 operation can be run modally (synchronously), or the job can be
- * requested and scheduled by the caller.
+ * Any p2 operation can be run modally (synchronously), or the job can be requested and scheduled by
+ * the caller.
  * 
  * @see UpdateOperation#resolveModal(IProgressMonitor)
  * @see UpdateOperation#getResolveJob(IProgressMonitor)
@@ -39,36 +39,33 @@ import edu.ualberta.med.biobank.gui.common.BgcLogger;
  * 
  * @see "http://wiki.eclipse.org/Equinox/p2/Adding_Self-Update_to_an_RCP_Application"
  */
+@SuppressWarnings("restriction")
 public class P2Util {
     private static final I18n i18n = I18nFactory.getI18n(P2Util.class);
 
     @SuppressWarnings("nls")
     private static final String JUSTUPDATED = "justUpdated";
 
-    private static BgcLogger logger = BgcLogger.getLogger(P2Util.class
-        .getName());
+    private static BgcLogger logger = BgcLogger.getLogger(P2Util.class.getName());
 
-    @SuppressWarnings({ "restriction", "nls" })
+    @SuppressWarnings("nls")
     public static void checkForUpdates() {
         if (BiobankPlugin.getDefault().isDebugging()) {
             // do not try to update the client if running in debug mode
             return;
         }
 
-        final IProvisioningAgent agent =
-            (IProvisioningAgent) org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper
-                .getService(BiobankPlugin.bundleContext,
-                    IProvisioningAgent.SERVICE_NAME);
+        final IProvisioningAgent agent = (IProvisioningAgent) ServiceHelper.getService(
+            BiobankPlugin.bundleContext,
+            IProvisioningAgent.SERVICE_NAME);
         if (agent == null) {
-            logger
-                .addRcpLogStatus(
-                    IStatus.ERROR,
-                    "No provisioning agent found.  This application is not set up for updates.",
-                    null);
+            logger.addRcpLogStatus(
+                IStatus.ERROR,
+                "No provisioning agent found.  This application is not set up for updates.",
+                null);
         }
         // XXX if we're restarting after updating, don't check again.
-        final IPreferenceStore prefStore = BiobankPlugin.getDefault()
-            .getPreferenceStore();
+        final IPreferenceStore prefStore = BiobankPlugin.getDefault().getPreferenceStore();
         if (prefStore.getBoolean(JUSTUPDATED)) {
             prefStore.setValue(JUSTUPDATED, false);
             return;
@@ -101,8 +98,10 @@ public class P2Util {
 
     // Check for updates to this application and return a status.
     @SuppressWarnings("nls")
-    private static IStatus checkForUpdates(IProvisioningAgent agent,
-        IProgressMonitor monitor) throws OperationCanceledException {
+    static IStatus checkForUpdates(
+        IProvisioningAgent agent,
+        IProgressMonitor monitor)
+        throws OperationCanceledException {
         ProvisioningSession session = new ProvisioningSession(agent);
         // the default update operation looks for updates to the currently
         // running profile, using the default profile root marker. To change
@@ -120,26 +119,24 @@ public class P2Util {
             throw new OperationCanceledException();
 
         if (status.getSeverity() != IStatus.ERROR) {
-            // More complex status handling might include showing the user what
-            // updates
-            // are available if there are multiples, differentiating patches vs.
-            // updates, etc.
-            // In this example, we simply update as suggested by the operation.
+            // More complex status handling might include showing the user what updates are
+            // available if there are multiples, differentiating patches vs. updates, etc. In this
+            // example, we simply update as suggested by the operation.
             ProvisioningJob job = operation.getProvisioningJob(null);
-            if (job == null)
+            if (job == null) {
                 return new Status(IStatus.ERROR, BiobankPlugin.PLUGIN_ID,
                     i18n.tr("No updates were found."));
+            }
 
             PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    MessageDialog
-                        .openInformation(
-                            null,
-                            // dialog title.
-                            i18n.tr("Updates"),
-                            // dialog message.
-                            i18n.tr("Updates have been found. The application will restart after the installation is done."));
+                    MessageDialog.openInformation(
+                        null,
+                        // dialog title.
+                        i18n.tr("Updates"),
+                        // dialog message.
+                        i18n.tr("Updates have been found. The application will restart after the installation is done."));
                 }
             });
 
