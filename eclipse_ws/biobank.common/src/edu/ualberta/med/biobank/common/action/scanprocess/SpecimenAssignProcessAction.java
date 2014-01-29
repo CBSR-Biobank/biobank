@@ -323,14 +323,16 @@ public class SpecimenAssignProcessAction extends ServerProcessAction {
     // TODO: the server local may be different than the client, baking strings
     // here is a bad idea.
     @SuppressWarnings("nls")
-    private void updateCellAsDispatchedError(String positionString, CellInfo scanCell,
+    private void updateCellAsDispatchedError(
+        String positionString,
+        CellInfo scanCell,
         Specimen foundSpecimen) {
         scanCell.setTitle(foundSpecimen.getCollectionEvent().getPatient().getPnumber());
         scanCell.setStatus(CellInfoStatus.ERROR);
         scanCell.setInformation(bundle.tr(
-            "Cannot assign position to a specimen that in dispatch transit").format());
+            "Cannot assign position to a specimen that is in a pending dispatch").format());
         appendNewLog(MessageFormat.format(
-            "ERROR in {0}: Cannot assign position to a specimen that still is in dispatch transit",
+            "ERROR in {0}: Cannot assign position to a specimen that is in a pending dispatch",
             positionString));
 
     }

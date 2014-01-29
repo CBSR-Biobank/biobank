@@ -25,13 +25,16 @@ public class DispatchCreateProcessAction extends ServerProcessAction {
 
     @SuppressWarnings("nls")
     public static final Tr SPECIMEN_MISSING = bundle.tr("Specimen {0} missing");
+
     @SuppressWarnings("nls")
     public static final LString SPECIMEN_NOT_FOUND = bundle.tr("Specimen does not exist.").format();
+
     @SuppressWarnings("nls")
     public static final LString NO_INFORMATION = bundle.tr("").format();
+
     @SuppressWarnings("nls")
     public static final Tr SPECIMEN_IN_NON_CLOSED_DISPATCH =
-        bundle.tr("{0} is already in a not closed dispatch.");
+        bundle.tr("{0} is already in a pending dispatch.");
 
     private final ShipmentProcessInfo data;
 
