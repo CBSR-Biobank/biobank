@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -79,7 +81,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({ "restriction", "nls" })
 public class BiobankPlugin extends AbstractUIPlugin {
 
     private static final I18n i18n = I18nFactory.getI18n(BiobankPlugin.class);
@@ -136,16 +138,31 @@ public class BiobankPlugin extends AbstractUIPlugin {
         classToImageKey.put(ResearchGroupMasterGroup.class.getName(), BgcPlugin.Image.RESEARCH_GROUPS);
     };
 
-    private static final BgcPlugin.Image[] CONTAINER_TYPE_IMAGES = new BgcPlugin.Image[] {
-        BgcPlugin.Image.BIN,
-        BgcPlugin.Image.CABINET,
-        BgcPlugin.Image.DRAWER,
-        BgcPlugin.Image.FREEZER,
-        BgcPlugin.Image.HOTEL,
-        BgcPlugin.Image.PALLET, };
+    private static final Map<String, BgcPlugin.Image> CONTAINER_TYPE_IMAGES;
+    static {
+        final String tokenSplitRe = "\\.(?=[^\\.]+$)";
+        BgcPlugin.Image[] images = new BgcPlugin.Image[] {
+            BgcPlugin.Image.BIN,
+            BgcPlugin.Image.CABINET,
+            BgcPlugin.Image.DRAWER,
+            BgcPlugin.Image.FREEZER,
+            BgcPlugin.Image.HOTEL,
+            BgcPlugin.Image.PALLET
+        };
 
-    public static final String BARCODES_FILE = BiobankPlugin.class.getPackage().getName()
-        + ".barcode"; //$NON-NLS-1$
+        Map<String, BgcPlugin.Image> aMap = new HashMap<String, BgcPlugin.Image>();
+
+        for (BgcPlugin.Image image : images) {
+            String[] tokens = image.getFilename().split(tokenSplitRe);
+            if (tokens.length != 2) {
+                throw new IllegalStateException(
+                    "badly formed image filename: " + image.getFilename());
+            }
+            aMap.put(tokens[0], image);
+        }
+
+        CONTAINER_TYPE_IMAGES = Collections.unmodifiableMap(aMap);
+    };
 
     // The shared instance
     private static BiobankPlugin plugin;
@@ -190,7 +207,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
             eventBus.addHandler(ExceptionEvent.getType(), this);
         }
 
-        @SuppressWarnings("nls")
         @Override
         public void onException(ExceptionEvent event) {
             Throwable t = event.getThrowable();
@@ -284,7 +300,6 @@ public class BiobankPlugin extends AbstractUIPlugin {
         return true;
     }
 
-    @SuppressWarnings("nls")
     public Image getImage(Object object) {
         BgcPlugin.Image imageKey = null;
         if (object == null) return null;
@@ -328,10 +343,11 @@ public class BiobankPlugin extends AbstractUIPlugin {
             return BgcPlugin.getDefault().getImage(classToImageKey.get(typeName));
         }
 
+        String typeNameLower = typeName.toLowerCase();
         BgcPlugin.Image result = null;
-        for (BgcPlugin.Image image : CONTAINER_TYPE_IMAGES) {
-            if (image.getFilename().contains(typeName.toLowerCase())) {
-                result = image;
+        for (Entry<String, BgcPlugin.Image> entry : CONTAINER_TYPE_IMAGES.entrySet()) {
+            if (typeNameLower.contains(entry.getKey())) {
+                result = entry.getValue();
                 break;
             }
         }

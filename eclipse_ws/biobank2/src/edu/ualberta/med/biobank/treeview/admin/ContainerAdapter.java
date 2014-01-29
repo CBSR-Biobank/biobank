@@ -45,12 +45,10 @@ import edu.ualberta.med.biobank.treeview.AbstractAdapterBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerAdapter extends AdapterBase {
-    private static final I18n i18n = I18nFactory
-        .getI18n(ContainerAdapter.class);
+    private static final I18n i18n = I18nFactory.getI18n(ContainerAdapter.class);
 
     @SuppressWarnings("unused")
-    private static BgcLogger LOGGER = BgcLogger
-        .getLogger(ContainerAdapter.class.getName());
+    private static BgcLogger LOGGER = BgcLogger.getLogger(ContainerAdapter.class.getName());
 
     private List<Container> childContainers = null;
 
@@ -80,8 +78,7 @@ public class ContainerAdapter extends AdapterBase {
         Integer id = container.getId();
 
         this.isDeletable = isAllowed(new ContainerDeletePermission(id));
-        this.isReadable =
-            isAllowed(new ContainerReadPermission(container.getSite().getId()));
+        this.isReadable = isAllowed(new ContainerReadPermission(container.getSite().getId()));
         this.isEditable = isAllowed(new ContainerUpdatePermission(id));
     }
 
