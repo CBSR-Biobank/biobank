@@ -40,6 +40,7 @@
   <import file="build-i18n.xml"/>
   <import file="build-eclipse.xml"/>
   <import file="build-tests.xml"/>
+  <import file="build-tools.xml"/>
 
   <condition property="databse.exec.haveUserAndPassword">
     <and>
@@ -556,7 +557,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars,clean-product,clean-doxygen"
+          depends="clean-tests,clean-tools,clean-jars,clean-product,clean-doxygen"
           description="cleans project output, tests, and jars">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />

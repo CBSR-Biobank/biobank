@@ -22,13 +22,12 @@ import edu.ualberta.med.biobank.tools.GenericAppArgs;
 import edu.ualberta.med.biobank.tools.utils.HostUrl;
 
 /**
- * Matthe Klassen sent the following email on Jan 10, 2011:
+ * Matthew Klassen sent the following email on Jan 10, 2011:
  * 
- * On the weekend we finished pulling all Cells500 samples from our freezer 1
- * and 2 however there are still 470 samples still listed in biobank as in
- * freezer 1 & 2. I have personally verified that all of these aliquots are no
- * longer in the freezer. Would you be able to change the activity status of all
- * the samples in the attached list to closed and add the comment
+ * On the weekend we finished pulling all Cells500 samples from our freezer 1 and 2 however there
+ * are still 470 samples still listed in biobank as in freezer 1 & 2. I have personally verified
+ * that all of these aliquots are no longer in the freezer. Would you be able to change the activity
+ * status of all the samples in the attached list to closed and add the comment
  * "Sample was absent during Cell Pull MK."
  * 
  * Thanks
@@ -47,7 +46,7 @@ public class Cells500Absent {
             + "  -u, --user       user name to log into BioBank server\n"
             + "  -w, --password   password to log into BioBank server\n"
             + "  -v, --verbose    shows verbose output\n"
-            + "  -h, --help       shows this text\n"; //$NON-NLS-1$
+            + "  -h, --help       shows this text\n";
 
     private static String CLOSED_COMMENT =
         "Sample was absent during Cell Pull MK.";

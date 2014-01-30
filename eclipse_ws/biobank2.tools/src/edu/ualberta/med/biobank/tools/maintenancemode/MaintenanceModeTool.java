@@ -1,0 +1,111 @@
+package edu.ualberta.med.biobank.tools.maintenancemode;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.client.util.TrustStore;
+import edu.ualberta.med.biobank.client.util.TrustStore.Cert;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.tools.GenericAppArgs;
+import edu.ualberta.med.biobank.tools.utils.HostUrl;
+
+/**
+ * A tool that can be used to change or query the Biobank Server's Maintenante Mode setting. This
+ * tool can be run as a command from the project's maint Ant build file or standalone.
+ * 
+ * @author loyola
+ * 
+ */
+public class MaintenanceModeTool {
+
+    private static String USAGE =
+        "Usage: maintenancemode [options]\n\n"
+            + "Options\n"
+            + "  -H, --hostname   hostname for BioBank server and MySQL server\n"
+            + "  -p, --port       port number for BioBank server\n"
+            + "  -u, --user       user name to log into BioBank server\n"
+            + "  -w, --password   password to log into BioBank server\n"
+            + "  -v, --verbose    shows verbose output\n"
+            + "  -h, --help       shows this text\n";
+
+    private static final Logger log = LoggerFactory.getLogger(MaintenanceModeTool.class);
+
+    private final BiobankApplicationService appService;
+
+    public static void main(String[] argv) {
+        try {
+            log.trace("args: " + StringUtils.join(argv, " "));
+            GenericAppArgs args = new GenericAppArgs(argv);
+
+            if (args.help) {
+                System.out.println(USAGE);
+                System.exit(0);
+            } else if (args.error) {
+                System.out.println(args.errorMsg + "\n" + USAGE);
+                System.exit(-1);
+            }
+            new MaintenanceModeTool(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MaintenanceModeTool(GenericAppArgs globalArgs) throws Exception {
+        String hostUrl = HostUrl.getHostUrl(globalArgs.hostname, globalArgs.port);
+
+        checkCertificates(hostUrl);
+
+        appService = ServiceConnection.getAppService(
+            hostUrl, globalArgs.username, globalArgs.password);
+
+        if (globalArgs.remainingArgs.length != 1) {
+            System.out.println("ERROR: invalid argument(s): "
+                + StringUtils.join(globalArgs.remainingArgs, " "));
+        } else if (globalArgs.remainingArgs[0].equals("query")) {
+            int mode = appService.maintenanceMode();
+            System.out.print("Server maintenance mode is ");
+            System.out.println(mode == 0 ? "disabled" : "enabled");
+        } else if (globalArgs.remainingArgs[0].equals("toggle")) {
+            int mode = 1 - appService.maintenanceMode();
+            appService.maintenanceMode(mode);
+            System.out.print("Server maintenance mode changed to ");
+            System.out.println(mode == 0 ? "disabled" : "enabled");
+        } else {
+            System.out.println("ERROR: invalid argument(s): "
+                + StringUtils.join(globalArgs.remainingArgs, " "));
+        }
+
+    }
+
+    @SuppressWarnings("nls")
+    private boolean checkCertificates(String serverUrl)
+        throws KeyManagementException, NoSuchAlgorithmException,
+        KeyStoreException, UnknownHostException, IOException,
+        CertificateException {
+        TrustStore ts = TrustStore.getInstance();
+        List<Cert> untrustedCerts = ts.getUntrustedCerts(serverUrl);
+        boolean restartPending = false;
+
+        if (!untrustedCerts.isEmpty()) {
+            for (Cert untrustedCert : untrustedCerts) {
+                untrustedCert.trust();
+            }
+
+            System.out.println("SSL certificate updated. Run this tool again to connect to the specified server.");
+            System.exit(-1);
+        }
+
+        return restartPending;
+    }
+
+}
