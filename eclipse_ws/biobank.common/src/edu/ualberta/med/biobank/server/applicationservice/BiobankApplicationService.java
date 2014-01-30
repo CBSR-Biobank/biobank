@@ -15,12 +15,11 @@ import java.util.List;
 
 /**
  * Application service interface obtained through
- * "ApplicationServiceProvider.getApplicationServiceFromUrl" method. This
- * replace the default WritableApplicationService interface to add our own
- * methods.
+ * "ApplicationServiceProvider.getApplicationServiceFromUrl" method. This replace the default
+ * WritableApplicationService interface to add our own methods.
  * 
- * See build.properties of the sdk for the generator configuration +
- * application-config*.xml for the generated files.
+ * See build.properties of the sdk for the generator configuration + application-config*.xml for the
+ * generated files.
  */
 public interface BiobankApplicationService extends WritableApplicationService {
 
@@ -53,9 +52,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public List<Object> startQuery(QueryHandle qh) throws Exception;
 
     public void stopQuery(QueryHandle qh) throws Exception;
-
-    public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
-        throws ApplicationException;
 
     public String getUserPassword(String login) throws ApplicationException;
 

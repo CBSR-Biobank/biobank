@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.test.action.security.SecuritySuite;
     TestDispatch.class,
     TestPatient.class,
     TestPatientBatchOp.class,
+    TestPatientLabels.class,
     TestProcessingEvent.class,
     TestRequest.class,
     TestResearchGroup.class,

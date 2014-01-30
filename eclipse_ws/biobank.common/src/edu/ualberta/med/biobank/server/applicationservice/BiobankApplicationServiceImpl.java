@@ -14,11 +14,9 @@ import edu.ualberta.med.biobank.common.wrappers.actions.BiobankSessionAction;
 import edu.ualberta.med.biobank.i18n.Bundle;
 import edu.ualberta.med.biobank.i18n.LocalizedException;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.PrintedSsInvItem;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.User;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.orm.BiobankORMDAOImpl;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -27,16 +25,12 @@ import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import gov.nih.nci.system.util.ClassCache;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -79,9 +73,16 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public void logActivity(String action, String site, String patientNumber,
-        String inventoryID, String locationLabel, String details, String type)
+    public void logActivity(
+        String action,
+        String site,
+        String patientNumber,
+        String inventoryID,
+        String locationLabel,
+        String details,
+        String type)
         throws Exception {
+
         Log log = new Log();
         log.setAction(action);
         log.setCenter(site);
@@ -104,8 +105,12 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Object> runReport(Report report, int maxResults, int firstRow,
-        int timeout) throws ApplicationException {
+    public List<Object> runReport(
+        Report report,
+        int maxResults,
+        int firstRow,
+        int timeout)
+        throws ApplicationException {
 
         ReportData reportData = new ReportData(report);
         reportData.setMaxResults(maxResults);
@@ -156,9 +161,13 @@ public class BiobankApplicationServiceImpl extends
 
     @SuppressWarnings("nls")
     @Override
-    public void executeModifyPassword(Long csmUserId, String oldPassword,
-        String newPassword, Boolean recvBulkEmails)
+    public void executeModifyPassword(
+        Long csmUserId,
+        String oldPassword,
+        String newPassword,
+        Boolean recvBulkEmails)
         throws ApplicationException {
+
         BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
             newPassword);
         List<User> users = query(new HQLCriteria(GET_USER_QRY,
@@ -187,71 +196,6 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public String getServerVersion() {
         return BiobankVersionUtil.getServerVersion();
-    }
-
-    private static final int SS_INV_ID_LENGTH = 12;
-
-    @SuppressWarnings("nls")
-    private static final String SS_INV_ID_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    private static final int SS_INV_ID_ALPHABET_LENGTH = SS_INV_ID_ALPHABET.length();
-
-    private static final int SS_INV_ID_GENERATE_RETRIES =
-        (int) Math.pow(SS_INV_ID_ALPHABET_LENGTH, SS_INV_ID_ALPHABET_LENGTH);
-
-    @SuppressWarnings("nls")
-    private static final String SS_INV_ID_UNIQ_BASE_QRY =
-        "SELECT count(*) FROM printed_ss_inv_item where txt=\"{id}\"";
-
-    @SuppressWarnings("nls")
-    @Override
-    public List<String> executeGetSourceSpecimenUniqueInventoryIds(int numIds)
-        throws ApplicationException {
-        boolean isUnique;
-        int genRetries;
-        Random r = new Random();
-        StringBuilder newInvId;
-        List<String> result = new ArrayList<String>();
-
-        while (result.size() < numIds) {
-            isUnique = false;
-            genRetries = 0;
-            newInvId = new StringBuilder();
-
-            while (!isUnique && (genRetries < SS_INV_ID_GENERATE_RETRIES)) {
-                for (int j = 0; j < SS_INV_ID_LENGTH; ++j) {
-                    newInvId.append(SS_INV_ID_ALPHABET.charAt(r
-                        .nextInt(SS_INV_ID_ALPHABET_LENGTH)));
-                    genRetries++;
-                }
-
-                // check database if string is unique
-                String potentialInvId = newInvId.toString();
-                String qry = SS_INV_ID_UNIQ_BASE_QRY.replace("{id}",
-                    potentialInvId);
-
-                List<BigInteger> count = privateQuery(new BiobankSQLCriteria(
-                    qry), PrintedSsInvItem.class.getName());
-
-                if (count.get(0).equals(BigInteger.ZERO)) {
-                    // add new inventory id to the database
-                    isUnique = true;
-                    result.add(potentialInvId);
-                    PrintedSsInvItem newInvIdItem = new PrintedSsInvItem();
-                    newInvIdItem.setTxt(potentialInvId);
-                    SDKQuery query = new InsertExampleQuery(newInvIdItem);
-                    executeQuery(query);
-                }
-            }
-
-            if (genRetries >= SS_INV_ID_GENERATE_RETRIES) {
-                // cannot generate any more unique strings
-                throw new BiobankServerException(
-                    "cannot generate any more source specimen inventory IDs");
-            }
-
-        }
-        return result;
     }
 
     @Override
