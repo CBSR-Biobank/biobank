@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.action.Action;
 import edu.ualberta.med.biobank.common.action.ActionResult;
 import edu.ualberta.med.biobank.common.action.exception.ActionException;
 import edu.ualberta.med.biobank.common.peer.UserPeer;
+import edu.ualberta.med.biobank.common.permission.GlobalAdminPermission;
 import edu.ualberta.med.biobank.common.permission.Permission;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
@@ -42,20 +43,28 @@ import org.apache.log4j.Logger;
  * See build.properties of the sdk for the generator configuration + application-config*.xml for the
  * generated files.
  */
-public class BiobankApplicationServiceImpl extends
-    WritableApplicationServiceImpl implements BiobankApplicationService {
+public class BiobankApplicationServiceImpl
+    extends WritableApplicationServiceImpl
+    implements BiobankApplicationService {
+
     private static final Bundle bundle = new CommonBundle();
+
+    private int maintenanceMode;
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
+        this.maintenanceMode = 0;
     }
 
     /**
      * How can we manage security using sql ??
      */
     @Override
-    public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
-        String targetClassName) throws ApplicationException {
+    public <E> List<E> query(
+        BiobankSQLCriteria sqlCriteria,
+        String targetClassName)
+        throws ApplicationException {
+
         return privateQuery(sqlCriteria, targetClassName);
     }
 
@@ -132,8 +141,7 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public QueryHandle createQuery(QueryCommand qc) throws Exception {
-        QueryHandleRequest qhr = new QueryHandleRequest(qc, CommandType.CREATE,
-            null, this);
+        QueryHandleRequest qhr = new QueryHandleRequest(qc, CommandType.CREATE, null, this);
         return (QueryHandle) getWritableDAO(Site.class.getName()).query(
             new Request(qhr)).getResponse();
     }
@@ -141,23 +149,20 @@ public class BiobankApplicationServiceImpl extends
     @SuppressWarnings("unchecked")
     @Override
     public List<Object> startQuery(QueryHandle qh) throws Exception {
-        QueryHandleRequest qhr = new QueryHandleRequest(null,
-            CommandType.START, qh, this);
+        QueryHandleRequest qhr = new QueryHandleRequest(null, CommandType.START, qh, this);
         return (List<Object>) getWritableDAO(Site.class.getName()).query(
             new Request(qhr)).getResponse();
     }
 
     @Override
     public void stopQuery(QueryHandle qh) throws Exception {
-        QueryHandleRequest qhr = new QueryHandleRequest(null, CommandType.STOP,
-            qh, this);
-        getWritableDAO(Site.class.getName()).query(new Request(qhr))
-            .getResponse();
+        QueryHandleRequest qhr = new QueryHandleRequest(null, CommandType.STOP, qh, this);
+        getWritableDAO(Site.class.getName()).query(new Request(qhr)).getResponse();
     }
 
     @SuppressWarnings("nls")
-    private static final String GET_USER_QRY = "from " + User.class.getName()
-        + " where " + UserPeer.CSM_USER_ID.getName() + " = ?";
+    private static final String GET_USER_QRY =
+        "FROM " + User.class.getName() + " WHERE " + UserPeer.CSM_USER_ID.getName() + " = ?";
 
     @SuppressWarnings("nls")
     @Override
@@ -168,18 +173,16 @@ public class BiobankApplicationServiceImpl extends
         Boolean recvBulkEmails)
         throws ApplicationException {
 
-        BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword,
-            newPassword);
-        List<User> users = query(new HQLCriteria(GET_USER_QRY,
-            Arrays.asList(csmUserId)));
+        BiobankCSMSecurityUtil.modifyPassword(csmUserId, oldPassword, newPassword);
+        List<User> users = query(new HQLCriteria(GET_USER_QRY, Arrays.asList(csmUserId)));
         if (users.size() != 1) {
-            throw new LocalizedException(
-                bundle.tr("Problem with HQL result size").format());
+            throw new LocalizedException(bundle.tr("Problem with HQL result size").format());
         }
         User user = users.get(0);
         user.setNeedPwdChange(false);
-        if (recvBulkEmails != null)
+        if (recvBulkEmails != null) {
             user.setRecvBulkEmails(recvBulkEmails);
+        }
         executeQuery(new UpdateExampleQuery(user));
     }
 
@@ -231,8 +234,19 @@ public class BiobankApplicationServiceImpl extends
 
     @Override
     public boolean isAllowed(Permission permission) throws ApplicationException {
-        return ((BiobankORMDAOImpl) this.getWritableDAO(Site.class.getName()))
-            .isAllowed(permission);
+        return ((BiobankORMDAOImpl) this.getWritableDAO(Site.class.getName())).isAllowed(permission);
+    }
+
+    @Override
+    public void maintenanceMode(int mode) throws ApplicationException {
+        if (isAllowed(new GlobalAdminPermission())) {
+            maintenanceMode = mode;
+        }
+    }
+
+    @Override
+    public int maintenanceMode() {
+        return maintenanceMode;
     }
 
     public class AppServiceAction<T extends ActionResult> {
@@ -240,8 +254,7 @@ public class BiobankApplicationServiceImpl extends
         public Action<T> action;
         public BiobankApplicationService appService;
 
-        public AppServiceAction(Action<T> action,
-            BiobankApplicationService appService) {
+        public AppServiceAction(Action<T> action, BiobankApplicationService appService) {
             this.action = action;
             this.appService = appService;
         }

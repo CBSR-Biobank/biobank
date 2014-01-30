@@ -14,13 +14,13 @@ import org.xnap.commons.i18n.I18nFactory;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
 /**
- * The id of these enumerations are saved in the database. Therefore, DO NOT
- * CHANGE THESE ENUM IDS (unless you are prepared to write an upgrade script).
- * However, order and enum name can be modified freely.
+ * The id of these enumerations are saved in the database. Therefore, DO NOT CHANGE THESE ENUM IDS
+ * (unless you are prepared to write an upgrade script). However, order and enum name can be
+ * modified freely.
  * <p>
- * Also, these enums should probably never be deleted, unless they are not used
- * in <em>any</em> database. Instead, they should be deprecated and probably
- * always return false when checking allow-ability.
+ * Also, these enums should probably never be deleted, unless they are not used in <em>any</em>
+ * database. Instead, they should be deprecated and probably always return false when checking
+ * allow-ability.
  * 
  * @author Jonathan Ferland
  * 
@@ -180,7 +180,7 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     LABEL_PRINTING(67,
         Loader.i18n.tr("Label Printing")),
     BATCH_OPERATIONS(68,
-        Loader.i18n.tr("Batch operations")), ;
+        Loader.i18n.tr("Batch operations"));
 
     private static final List<PermissionEnum> VALUES_LIST = Collections
         .unmodifiableList(Arrays.asList(values()));
@@ -238,8 +238,8 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     * Whether the given {@link User} has this {@link PermissionEnum} on
-     * <em>any</em> {@link Center} or {@link Study}.
+     * Whether the given {@link User} has this {@link PermissionEnum} on <em>any</em> {@link Center}
+     * or {@link Study}.
      * 
      * @see {@link #isMembershipAllowed(Membership, Center, Study)}
      * @param user
@@ -250,8 +250,8 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     * Whether the given {@link User} has this {@link PermissionEnum} on
-     * <em>any</em> {@link Center}, but a specific {@link Study}.
+     * Whether the given {@link User} has this {@link PermissionEnum} on <em>any</em> {@link Center}
+     * , but a specific {@link Study}.
      * 
      * @see {@link #isAllowed(User)}
      * @param user
@@ -262,8 +262,8 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     * Whether the given {@link User} has this {@link PermissionEnum} on
-     * <em>any</em> {@link Study}, but a specific {@link Center}.
+     * Whether the given {@link User} has this {@link PermissionEnum} on <em>any</em> {@link Study},
+     * but a specific {@link Center}.
      * 
      * @see {@link #isAllowed(User)}
      * @param user
@@ -288,8 +288,8 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     * Return true if special requirements (i.e. {@link Require}-s) are met on
-     * the given {@link Membership}, otherwise false.
+     * Return true if special requirements (i.e. {@link Require}-s) are met on the given
+     * {@link Membership}, otherwise false.
      * 
      * @param m
      * @return
@@ -303,9 +303,9 @@ public enum PermissionEnum implements NotAProxy, Serializable {
     }
 
     /**
-     * This is a confusing check. If {@link Center} is null, it means we do not
-     * care about its value, otherwise, {@link Domain#contains(Center)} must be
-     * true. The same applies to {@link Study}.
+     * This is a confusing check. If {@link Center} is null, it means we do not care about its
+     * value, otherwise, {@link Domain#contains(Center)} must be true. The same applies to
+     * {@link Study}.
      * 
      * @param m
      * @param c
@@ -335,16 +335,14 @@ public enum PermissionEnum implements NotAProxy, Serializable {
         DEFAULT,
 
         /**
-         * If present, the {@link PermissionEnum} must exist in a
-         * {@link Membership} for which its {@link Domain#isAllCenters()}
-         * returns true.
+         * If present, the {@link PermissionEnum} must exist in a {@link Membership} for which its
+         * {@link Domain#isAllCenters()} returns true.
          */
         ALL_CENTERS,
 
         /**
-         * If present, the {@link PermissionEnum} must exist in a
-         * {@link Membership} for which its {@link Domain#isAllStudies()}
-         * returns true.
+         * If present, the {@link PermissionEnum} must exist in a {@link Membership} for which its
+         * {@link Domain#isAllStudies()} returns true.
          */
         ALL_STUDIES;
     }

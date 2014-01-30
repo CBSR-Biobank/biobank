@@ -39,7 +39,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-writable-client-framework.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-api.jar" sourcepath="lib/client/slf4j-api-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/slf4j-log4j12.jar" sourcepath="lib/client/slf4j-log4j12-source.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/spring.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/spring.jar" sourcepath="lib/client/spring-source.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/validation-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/csmapi.jar" sourcepath="/home/loyola/Dropbox/CBSR/caCORE/CSM_API_4_1_Source.zip"/>

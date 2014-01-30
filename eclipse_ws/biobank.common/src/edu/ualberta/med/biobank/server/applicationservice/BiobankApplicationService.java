@@ -61,4 +61,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
         throws ApplicationException;
 
     public boolean isAllowed(Permission permission) throws ApplicationException;
+
+    public void maintenanceMode(int mode) throws ApplicationException;
+
+    public int maintenanceMode();
 }

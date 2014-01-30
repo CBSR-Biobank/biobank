@@ -102,7 +102,7 @@
     <dependency org="cacore" name="sdk-security" rev="4.1.1" conf="biobank.webapp->default" />
     <dependency org="cacore" name="sdk-writable-client-framework" rev="4.1.1" conf="biobank.webapp->default" />
     <dependency org="cacore" name="wsdl4j" rev="1.5.1" conf="biobank.webapp->default" />
-    <dependency org="cacore" name="spring" rev="2.0.3" conf="biobank.webapp->default" />
+    <dependency org="org.springframework" name="spring" rev="2.0.3" conf="biobank.webapp->default" />
     <dependency org="cacore" name="log4j" rev="1.2.14" conf="biobank.webapp->default" />
     <dependency org="org.slf4j" name="slf4j-api" rev="1.6.4" conf="biobank.webapp->default" />
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4" conf="biobank.webapp->default" />
@@ -131,7 +131,7 @@
 
     <dependency org="jsse" name="jsse" rev="1.6.0" conf="biobank.common.client->default" />
 
-    <dependency org="cacore" name="spring" rev="2.0.3" conf="biobank.common.client->default" />
+    <dependency org="org.springframework" name="spring" rev="2.0.3" conf="biobank.common.client->default,sources" />
     <dependency org="cacore" name="acegi-security" rev="1.0.4" conf="biobank.common.client->default" />
     <dependency org="cacore" name="antlr" rev="2.7.6" conf="biobank.common.client->default" />
     <dependency org="cacore" name="asm" rev="1.5.3" conf="biobank.common.client->default" />

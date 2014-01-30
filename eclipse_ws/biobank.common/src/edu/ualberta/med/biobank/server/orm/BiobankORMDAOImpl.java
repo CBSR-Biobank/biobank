@@ -46,12 +46,12 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
 /**
- * Hibernate calls are made in this server side class. It extends the default
- * WritableORMDAOImpl class.
+ * Hibernate calls are made in this server side class. It extends the default WritableORMDAOImpl
+ * class.
  * 
  * 
- * See build.properties of the sdk for the generator configuration +
- * application-config*.xml for the generated files.
+ * See build.properties of the sdk for the generator configuration + application-config*.xml for the
+ * generated files.
  */
 @SuppressWarnings("unused")
 public class BiobankORMDAOImpl extends WritableORMDAOImpl {
@@ -98,8 +98,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
         return allClassNames;
     }
 
-    private <T extends ActionResult> Response query(
-        AppServiceAction<T> appServiceAction) {
+    private <T extends ActionResult> Response query(AppServiceAction<T> appServiceAction) {
         Session session = getSession();
         User user = getCurrentUser(session);
 
@@ -124,15 +123,15 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     @SuppressWarnings("nls")
     protected User getCurrentUser(Session session) {
-        String currentLogin = SecurityContextHolder.getContext()
-            .getAuthentication().getName();
+        String currentLogin = SecurityContextHolder.getContext().getAuthentication().getName();
         Criteria criteria = session.createCriteria(User.class).add(
             Restrictions.eq(UserPeer.LOGIN.getName(), currentLogin));
         @SuppressWarnings("unchecked")
         List<User> res = criteria.list();
-        if (res.size() != 1)
+        if (res.size() != 1) {
             throw new LocalizedException(
                 bundle.tr("Unable to get the current user.").format());
+        }
         return res.get(0);
     }
 
@@ -178,14 +177,11 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
                 queryMap.put(handle, new QueryProcess(qhr.getQueryCommand(),
                     qhr.getAppService()));
             } catch (DataAccessResourceFailureException e) {
-                log.error(
-                    "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
-                throw new DAOException(
-                    "DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
+                log.error("DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
+                throw new DAOException("DataAccessResourceFailureException in ORMDAOImpl ", e); //$NON-NLS-1$
             } catch (IllegalStateException e) {
                 log.error("IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
-                throw new DAOException(
-                    "IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
+                throw new DAOException("IllegalStateException in ORMDAOImpl ", e); //$NON-NLS-1$
             }
             return new Response(handle);
         } else if (command.equals(CommandType.STOP)) {
@@ -206,10 +202,7 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     public Boolean isAllowed(Permission permission) {
         Session s = getSession();
-        return permission.isAllowed(new ActionContext(
-            getCurrentUser(s),
-            s,
-            null));
+        return permission.isAllowed(new ActionContext(getCurrentUser(s), s, null));
     }
 
     protected Response query(Request request, BiobankSQLCriteria sqlCriteria) {

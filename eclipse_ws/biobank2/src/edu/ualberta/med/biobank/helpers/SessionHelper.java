@@ -159,19 +159,20 @@ public class SessionHelper implements Runnable {
             if (userName.length() == 0) {
                 if (BiobankPlugin.getDefault().isDebugging()) {
                     userName = DEFAULT_TEST_USER;
-                    appService = ServiceConnection.getAppService(serverUrl,
-                        userName, DEFAULT_TEST_USER_PWD);
+                    appService = ServiceConnection.getAppService(
+                        serverUrl, userName, DEFAULT_TEST_USER_PWD);
                 } else {
                     appService = ServiceConnection.getAppService(serverUrl);
                 }
             } else {
-                appService = ServiceConnection.getAppService(serverUrl,
-                    userName, password);
+                appService = ServiceConnection.getAppService(serverUrl, userName, password);
             }
             String clientVersion = Platform.getProduct().getDefiningBundle().getVersion().toString();
             logger.debug("Check client version:" + clientVersion);
             appService.checkVersion(clientVersion);
-            user = UserWrapper.getUser(appService, userName);
+            if (serverMaintenanceCheck() == 0) {
+                user = UserWrapper.getUser(appService, userName);
+            }
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
                 BgcPlugin.openError(
@@ -221,6 +222,19 @@ public class SessionHelper implements Runnable {
                 i18n.tr("Login Failed"),
                 exp);
         }
+    }
+
+    @SuppressWarnings("nls")
+    private int serverMaintenanceCheck() {
+        int mode = appService.maintenanceMode();
+        if (mode != 0) {
+            BgcPlugin.openError(
+                // dialog title.
+                i18n.tr("Server maintenence"),
+                // dialog message.
+                i18n.tr("The Biobank server is undergoing maintenance. Please log in at a later time."));
+        }
+        return mode;
     }
 
     public BiobankApplicationService getAppService() {
