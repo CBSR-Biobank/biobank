@@ -223,7 +223,12 @@
             id="edu.ualberta.med.biobank.commands.changePassword"
             name="%ChangePassword.command">
       </command>
-       <command
+      <command
+            categoryId="biobank.command.category.server"
+            id="edu.ualberta.med.biobank.commands.maintenanceModeChange"
+            name="%MaintenanceModeChange.command">
+      </command>
+      <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
              name="%AddDispatch.command">
@@ -667,6 +672,20 @@
          </activeWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.MaintenanceModeChangeHandler"
+            commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="edu.ualberta.med.biobank.gui.common.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd">
          <activeWhen>
@@ -910,6 +929,11 @@
                 <command
                       commandId="edu.ualberta.med.biobank.commands.changePassword"
                       id="edu.ualberta.med.biobank.menu.changePassword"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.maintenanceModeChange"
+                      id="edu.ualberta.med.biobank.menu.maintenanceModeChange"
                       style="push">
                 </command>
          </menu>
